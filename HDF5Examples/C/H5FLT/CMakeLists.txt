@@ -173,6 +173,7 @@ endif ()
 #run-time loadable library examples
 foreach (example ${dyn_examples})
   add_executable (${EXAMPLE_VARNAME}_${example} ${PROJECT_SOURCE_DIR}/${example}.c)
+  hdf5_example_target_use_platform (${EXAMPLE_VARNAME}_${example})
   TARGET_C_PROPERTIES (${EXAMPLE_VARNAME}_${example} ${LIB_TYPE})
   target_compile_options (${EXAMPLE_VARNAME}_${example}
       PRIVATE

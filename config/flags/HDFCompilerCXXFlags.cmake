@@ -85,12 +85,6 @@ if (CMAKE_CXX_COMPILER_LOADED)
     include (${HDF_CONFIG_DIR}/flags/HDFClangCXXFlags.cmake)
   endif ()
 
-  if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    list (PREPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
-  else ()
-    list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
-  endif ()
-
   #-----------------------------------------------------------------------------
   # HDF5 library compile options - to be made available to all targets
   #-----------------------------------------------------------------------------
@@ -101,9 +95,9 @@ if (CMAKE_CXX_COMPILER_LOADED)
     # it, so only hand it to the compiler that understands it. Each flag must be
     # a separate list element or they are passed as one bogus argument.
     if (CMAKE_CXX_COMPILER_ID MATCHES "SunPro")
-      list (APPEND HDF5_CMAKE_CXX_FLAGS "-erroff=%none")
+      list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "-erroff=%none")
     endif ()
-    list (APPEND HDF5_CMAKE_CXX_FLAGS "-DBSD_COMP")
+    list (APPEND HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS "-DBSD_COMP")
   else ()
     # General flags
     #
@@ -115,9 +109,9 @@ if (CMAKE_CXX_COMPILER_LOADED)
     # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
     # warnings that are emitted. If you need it, add it at configure time.
     if (CMAKE_CXX_COMPILER_ID STREQUAL "PGI")
-      list (APPEND HDF5_CMAKE_CXX_FLAGS "-Minform=inform")
+      list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "-Minform=inform")
     endif ()
-    message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_FLAGS}")
+    message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_WARNING_FLAGS}")
   endif ()
 
   #-----------------------------------------------------------------------------
@@ -128,13 +122,13 @@ if (CMAKE_CXX_COMPILER_LOADED)
     if (MSVC)
       if (HDF5_ENABLE_DEV_WARNINGS)
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        list (APPEND HDF5_CMAKE_CXX_FLAGS "/Wall" "/wd4668")
+        list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "/Wall" "/wd4668")
       else ()
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        list (APPEND HDF5_CMAKE_CXX_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
+        list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
       endif ()
     else ()
-      list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS})
+      list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS ${HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS})
     endif ()
   endif ()
 
@@ -142,15 +136,22 @@ if (CMAKE_CXX_COMPILER_LOADED)
   # This option will force/override the default setting for all configurations
   #-----------------------------------------------------------------------------
   if (HDF5_ENABLE_PROFILING)
-    list (APPEND HDF5_CMAKE_CXX_FLAGS "${PROFILE_CXXFLAGS}")
+    list (APPEND HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS "${PROFILE_CXXFLAGS}")
   endif ()
 
   #-----------------------------------------------------------------------------
   # This option will force/override the default setting for all configurations
   #-----------------------------------------------------------------------------
   if (HDF5_ENABLE_OPTIMIZATION)
-    list (APPEND HDF5_CMAKE_CXX_FLAGS "${OPTIMIZE_CXXFLAGS}")
+    list (APPEND HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS "${OPTIMIZE_CXXFLAGS}")
   endif ()
+
+  # Preserve the established build report fields while target ownership remains
+  # split between hdf5_warnings and hdf5_build_options.
+  set (HDF5_CMAKE_CXX_FLAGS
+      ${HDF5_CMAKE_CXX_WARNING_FLAGS}
+      ${HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS}
+  )
 
   set (_HDF5_H5CC_CXX_COMPILER ${CMAKE_CXX_COMPILER})
   set (HDF5_H5CC_CXX_COMPILER ${_HDF5_H5CC_CXX_COMPILER} CACHE STRING "C++ compiler to use in h5c++")

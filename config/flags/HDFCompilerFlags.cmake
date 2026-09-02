@@ -78,8 +78,6 @@ if (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
   include (${HDF_CONFIG_DIR}/flags/HDFClangFlags.cmake)
 endif ()
 
-list (APPEND HDF5_CMAKE_C_FLAGS ${HDF5_CMAKE_C_WARNING_FLAGS})
-
 #-----------------------------------------------------------------------------
 # HDF5 library compile options - to be made available to all targets
 #-----------------------------------------------------------------------------
@@ -103,9 +101,9 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   # it, so only hand it to the compiler that understands it. Each flag must be
   # a separate list element or they are passed as one bogus argument.
   if (CMAKE_C_COMPILER_ID MATCHES "SunPro")
-    list (APPEND HDF5_CMAKE_C_FLAGS "-erroff=%none")
+    list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "-erroff=%none")
   endif ()
-  list (APPEND HDF5_CMAKE_C_FLAGS "-DBSD_COMP")
+  list (APPEND HDF5_CMAKE_C_BUILD_OPTION_FLAGS "-DBSD_COMP")
 else ()
   # General flags
   #
@@ -117,9 +115,9 @@ else ()
   # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
   # warnings that are emitted. If you need it, add it at configure time.
   if (CMAKE_C_COMPILER_ID STREQUAL "PGI")
-    list (APPEND HDF5_CMAKE_C_FLAGS "-Minform=inform")
+    list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "-Minform=inform")
   endif ()
-  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_FLAGS}")
+  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -163,13 +161,13 @@ if (HDF5_ENABLE_ALL_WARNINGS)
   if (MSVC)
     if (HDF5_ENABLE_DEV_WARNINGS)
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-      list (APPEND HDF5_CMAKE_C_FLAGS "/Wall" "/wd4668")
+      list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "/Wall" "/wd4668")
     else ()
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-      list (APPEND HDF5_CMAKE_C_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
+      list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
     endif ()
   else ()
-    list (APPEND HDF5_CMAKE_C_FLAGS ${HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS})
+    list (APPEND HDF5_CMAKE_C_WARNING_FLAGS ${HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS})
   endif ()
 endif ()
 
@@ -200,7 +198,7 @@ mark_as_advanced (HDF5_ENABLE_SYMBOLS)
 #-----------------------------------------------------------------------------
 option (HDF5_ENABLE_PROFILING "Enable profiling flags independently from the build mode." OFF)
 if (HDF5_ENABLE_PROFILING)
-  list (APPEND HDF5_CMAKE_C_FLAGS "${PROFILE_CFLAGS}")
+  list (APPEND HDF5_CMAKE_C_BUILD_OPTION_FLAGS "${PROFILE_CFLAGS}")
 endif ()
 mark_as_advanced (HDF5_ENABLE_PROFILING)
 
@@ -209,9 +207,16 @@ mark_as_advanced (HDF5_ENABLE_PROFILING)
 #-----------------------------------------------------------------------------
 option (HDF5_ENABLE_OPTIMIZATION "Enable optimization flags/settings independently from the build mode" OFF)
 if (HDF5_ENABLE_OPTIMIZATION)
-  list (APPEND HDF5_CMAKE_C_FLAGS "${OPTIMIZE_CFLAGS}")
+  list (APPEND HDF5_CMAKE_C_BUILD_OPTION_FLAGS "${OPTIMIZE_CFLAGS}")
 endif ()
 mark_as_advanced (HDF5_ENABLE_OPTIMIZATION)
+
+# Preserve the established build report fields while target ownership remains
+# split between hdf5_warnings and hdf5_build_options.
+set (HDF5_CMAKE_C_FLAGS
+    ${HDF5_CMAKE_C_WARNING_FLAGS}
+    ${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}
+)
 
 #-----------------------------------------------------------------------------
 # The build mode flags are not added to CMAKE_C_FLAGS, so create a separate

@@ -13,6 +13,13 @@ mark_as_advanced (HDF5_ONLY_SHARED_LIBS)
 option (BUILD_STATIC_LIBS "Build Static Libraries" ON)
 option (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
 
+set (HDF5_EXTERNAL_LIB_PREFIX "" CACHE STRING "Use prefix for custom library naming.")
+mark_as_advanced (HDF5_EXTERNAL_LIB_PREFIX)
+set (HDF5_LIB_INFIX "" CACHE STRING "Use infix for custom library naming.")
+mark_as_advanced (HDF5_LIB_INFIX)
+set (HDF5_EXTERNAL_LIB_SUFFIX "" CACHE STRING "Use suffix for custom library naming.")
+mark_as_advanced (HDF5_EXTERNAL_LIB_SUFFIX)
+
 option (HDF5_BUILD_STATIC_TOOLS "Build Static Tools NOT Shared Tools" OFF)
 mark_as_advanced (HDF5_BUILD_STATIC_TOOLS)
 

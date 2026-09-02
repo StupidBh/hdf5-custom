@@ -89,23 +89,15 @@ include (CMakeDependentOption)
 #-----------------------------------------------------------------------------
 include (CMakeBuildOptions.cmake)
 
-#option (HDF5_EXTERNAL_LIB_PREFIX "Use prefix for custom library naming." "")
-set (HDF5_EXTERNAL_LIB_PREFIX "" CACHE STRING "Use prefix for custom library naming.")
-mark_as_advanced (HDF5_EXTERNAL_LIB_PREFIX)
 # HDF5_EXTERNAL_LIB_PREFIX :
 #   If the parent project needs to install hdf libraries, but avoid
 #   name conflicts with system versions, then a prefix may be added
 #   to ensure that the correct versions configured are used.
-set (HDF5_LIB_INFIX "" CACHE STRING "Use infix for custom library naming.")
-mark_as_advanced (HDF5_LIB_INFIX)
 # HDF5_LIB_INFIX :
 #   This infix is added to all library names after 'hdf5'.
 #   e.g. the infix '_openmpi' results in the library name 'libhdf5_openmpi.so'
 #   This name is used in packages on debian based systems.
 #   (see https://packages.debian.org/jessie/amd64/libhdf5-openmpi-8/filelist)
-#option (HDF5_EXTERNAL_LIB_SUFFIX "Use prefix for custom library naming." "")
-set (HDF5_EXTERNAL_LIB_SUFFIX "" CACHE STRING "Use suffix for custom library naming.")
-mark_as_advanced (HDF5_EXTERNAL_LIB_SUFFIX)
 # HDF5_EXTERNAL_LIB_SUFFIX :
 #   If the parent project needs to install hdf libraries, but avoid
 #   name conflicts with system versions, then a suffix may be added

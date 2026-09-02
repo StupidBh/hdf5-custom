@@ -174,25 +174,24 @@ if (HDF5_VOL_ALLOW_EXTERNAL MATCHES "GIT" OR HDF5_VOL_ALLOW_EXTERNAL MATCHES "LO
       set (hdf5_vol_depname "${HDF5_VOL_${hdf5_vol_name_upper}_CMAKE_PACKAGE_NAME}")
       string (TOLOWER "${hdf5_vol_depname}" hdf5_vol_depname_lower)
 
-      if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.24")
-        set("OVERRIDE_FIND_PACKAGE_OPT" "OVERRIDE_FIND_PACKAGE")
-      endif()
-
       if (HDF5_VOL_ALLOW_EXTERNAL MATCHES "GIT")
         FetchContent_Declare (${hdf5_vol_depname}
             GIT_REPOSITORY "${HDF5_VOL_SOURCE}"
             GIT_TAG "${HDF5_VOL_${hdf5_vol_name_upper}_BRANCH}"
-            "${OVERRIDE_FIND_PACKAGE_OPT}"
+            OVERRIDE_FIND_PACKAGE
+            # Connector workarounds must run before add_subdirectory().
+            SOURCE_SUBDIR "__hdf5_fetchcontent_populate_only"
         )
       elseif (HDF5_VOL_ALLOW_EXTERNAL MATCHES "LOCAL_DIR")
         FetchContent_Declare (${hdf5_vol_depname}
             SOURCE_DIR "${HDF5_VOL_SOURCE}"
+            SOURCE_SUBDIR "__hdf5_fetchcontent_populate_only"
         )
       endif ()
 
       FetchContent_GetProperties (${hdf5_vol_depname})
       if (NOT ${hdf5_vol_depname}_POPULATED)
-        FetchContent_Populate (${hdf5_vol_depname})
+        FetchContent_MakeAvailable (${hdf5_vol_depname})
 
         # Now that content has been populated, set other internal
         # convenience variables for FetchContent dependency

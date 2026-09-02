@@ -14,8 +14,8 @@
 #############################################################################################
 #
 # This macro is used to build HDF5 as a subdirectory using FetchContent to get the source code
-# and build it.  The HDF5 options should be set after the FetchContent_Declare command and before
-# the add_subdirectory command..
+# and build it. The HDF5 options should be set after FetchContent_Declare() and before
+# FetchContent_MakeAvailable().
 macro (EXTERNAL_HDF5_LIBRARY compress_type)
   #-----------------------------------------------------------------------------
   # Version is extracted from H5public.h
@@ -63,9 +63,7 @@ macro (EXTERNAL_HDF5_LIBRARY compress_type)
   endif ()
   FetchContent_GetProperties(HDF5LIB)
   if(NOT hdf5lib_POPULATED)
-    FetchContent_Populate(HDF5LIB)
-
-# Adjust variables for building HDF5
+    # Adjust variables before FetchContent adds HDF5 to this build.
     set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build Shared Libraries" FORCE)
     set (HDF5_BUILD_CPP_LIB OFF CACHE BOOL "Build C++ support" FORCE)
     set (BUILD_TESTING OFF CACHE BOOL "Build JHDF5 Unit Testing" FORCE)
@@ -73,9 +71,8 @@ macro (EXTERNAL_HDF5_LIBRARY compress_type)
     set (HDF5_BUILD_HL_LIB OFF CACHE BOOL "Build JHDF5 HIGH Level HDF5 Library" FORCE)
     set (HDF5_ENABLE_ZLIB_SUPPORT OFF CACHE BOOL "Enable Zlib Filters" FORCE)
     set (HDF5_ENABLE_SZIP_SUPPORT OFF CACHE BOOL "Use SZip Filter" FORCE)
-
-    add_subdirectory(${hdf5lib_SOURCE_DIR} ${hdf5lib_BINARY_DIR})
   endif()
+  FetchContent_MakeAvailable(HDF5LIB)
 
   if (HDF_PACKAGE_NAMESPACE)
     add_library(${HDF_PACKAGE_NAMESPACE}hdf5lib-static ALIAS hdf5-static)

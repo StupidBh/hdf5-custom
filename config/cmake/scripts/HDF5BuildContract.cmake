@@ -82,7 +82,7 @@ if (NOT DEFINED HDF5_CONTRACT_CONFIG)
 endif ()
 if (NOT DEFINED HDF5_CONTRACT_IGNORE_TARGET_REGEX)
   set (HDF5_CONTRACT_IGNORE_TARGET_REGEX
-    "^hdf5_(build_options|warnings|platform|dependencies|sanitizers)$"
+    "^hdf5_((build_options|warnings|platform|dependencies|sanitizers)|.+_usage_requirements)$"
   )
 endif ()
 

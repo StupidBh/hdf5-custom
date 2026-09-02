@@ -9,11 +9,10 @@
 # If you do not have access to either file, you may request a copy from
 # help@hdfgroup.org.
 #
+cmake_minimum_required (VERSION 4.0)
+
 # runTest.cmake executes a command and captures the output in a file. File is then compared
 # against a reference file. Exit status of command can also be compared.
-cmake_policy(SET CMP0007 NEW)
-cmake_policy(SET CMP0053 NEW)
-
 # arguments checking
 if (NOT TEST_PROGRAM)
   message (FATAL_ERROR "Require TEST_PROGRAM to be defined")

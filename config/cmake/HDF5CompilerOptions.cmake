@@ -50,6 +50,12 @@ function (hdf5_configure_cxx_build_options)
       "$<$<COMPILE_LANGUAGE:C>:${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}>"
       "$<$<COMPILE_LANGUAGE:CXX>:${HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS}>"
   )
+  if (HDF5_PLATFORM_CXX_COMPILE_OPTIONS)
+    target_compile_options (hdf5_platform INTERFACE ${HDF5_PLATFORM_CXX_COMPILE_OPTIONS})
+  endif ()
+  if (HDF5_PLATFORM_CXX_EXECUTABLE_LINK_OPTIONS)
+    target_link_options (hdf5_platform INTERFACE ${HDF5_PLATFORM_CXX_EXECUTABLE_LINK_OPTIONS})
+  endif ()
 endfunction ()
 
 function (hdf5_target_use_platform target)

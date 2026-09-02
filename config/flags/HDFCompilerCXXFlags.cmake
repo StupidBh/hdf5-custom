@@ -17,15 +17,16 @@ set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_SANITIZER_FLAGS} ${CMAKE_CXX_FLAGS}")
+set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 message (VERBOSE "Warnings Configuration: CXX default: ${CMAKE_CXX_FLAGS}")
 #-----------------------------------------------------------------------------
 # Compiler specific flags
 #-----------------------------------------------------------------------------
 # MSVC 14.28 enables C5105, but the Windows SDK 10.0.18362.0 triggers it.
 if ((_CLANG_MSVC_WINDOWS OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") AND CMAKE_CXX_COMPILER_LOADED)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  string (APPEND HDF5_REPORTED_CXX_FLAGS " /EHsc")
   if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.28)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd5105")
+    string (APPEND HDF5_REPORTED_CXX_FLAGS " -wd5105")
   endif ()
 endif ()
 
@@ -52,7 +53,11 @@ if (CMAKE_CXX_COMPILER_LOADED)
     if (MSVC)
       set (HDF5_WARNINGS_BLOCKED 1)
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+      string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " HDF5_REPORTED_CXX_FLAGS
+          "${HDF5_REPORTED_CXX_FLAGS}"
+      )
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
+      string (APPEND HDF5_REPORTED_CXX_FLAGS " /W0")
     endif ()
     # Most compilers use -w to suppress warnings.
     if (NOT HDF5_WARNINGS_BLOCKED)
@@ -118,9 +123,15 @@ if (CMAKE_CXX_COMPILER_LOADED)
     if (MSVC)
       if (HDF5_ENABLE_DEV_WARNINGS)
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " HDF5_REPORTED_CXX_FLAGS
+            "${HDF5_REPORTED_CXX_FLAGS}"
+        )
         list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "/Wall" "/wd4668")
       else ()
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " HDF5_REPORTED_CXX_FLAGS
+            "${HDF5_REPORTED_CXX_FLAGS}"
+        )
         list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
       endif ()
     else ()
@@ -148,6 +159,10 @@ if (CMAKE_CXX_COMPILER_LOADED)
       ${HDF5_CMAKE_CXX_WARNING_FLAGS}
       ${HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS}
   )
+
+  if (NOT MSVC AND NOT _CLANG_MSVC_WINDOWS)
+    set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  endif ()
 
   set (_HDF5_H5CC_CXX_COMPILER ${CMAKE_CXX_COMPILER})
   set (HDF5_H5CC_CXX_COMPILER ${_HDF5_H5CC_CXX_COMPILER} CACHE STRING "C++ compiler to use in h5c++")

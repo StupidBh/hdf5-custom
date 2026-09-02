@@ -12,8 +12,10 @@ include_guard (GLOBAL)
 
 # Internal targets used to migrate directory-wide build settings to scoped
 # usage requirements. They intentionally remain outside the install exports.
-add_library (hdf5_build_options INTERFACE)
-add_library (hdf5_warnings INTERFACE)
-add_library (hdf5_platform INTERFACE)
-add_library (hdf5_dependencies INTERFACE)
-add_library (hdf5_sanitizers INTERFACE)
+# IMPORTED prevents CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE from leaking the
+# repository root through these configuration-only targets.
+add_library (hdf5_build_options INTERFACE IMPORTED GLOBAL)
+add_library (hdf5_warnings INTERFACE IMPORTED GLOBAL)
+add_library (hdf5_platform INTERFACE IMPORTED GLOBAL)
+add_library (hdf5_dependencies INTERFACE IMPORTED GLOBAL)
+add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)

@@ -89,6 +89,31 @@ Capture normalized manifests for cache options, configured targets, artifacts, g
 exported targets, pkg-config metadata, and registered tests. Add repeatable contract-capture and comparison tools
 before changing organization logic.
 
+Use `config/cmake/scripts/HDF5BuildContract.cmake` to capture a local baseline. Contract files belong in an
+ignored build tree, not in source control. Register the File API query before configuring:
+
+```powershell
+cmake "-DHDF5_CONTRACT_ACTION=QUERY" `
+  "-DHDF5_CONTRACT_BUILD_DIR=build-msvc18" `
+  -P config/cmake/scripts/HDF5BuildContract.cmake
+cmake -S . -B build-msvc18 -G "Visual Studio 18 2026" -A x64
+```
+
+After building and installing, capture the baseline and compare a later capture with it:
+
+```powershell
+cmake "-DHDF5_CONTRACT_ACTION=CAPTURE" `
+  "-DHDF5_CONTRACT_BUILD_DIR=build-msvc18" `
+  "-DHDF5_CONTRACT_INSTALL_DIR=build-msvc18-install" `
+  "-DHDF5_CONTRACT_CONFIG=Release" `
+  "-DHDF5_CONTRACT_OUTPUT=build-msvc18/contracts/baseline.txt" `
+  -P config/cmake/scripts/HDF5BuildContract.cmake
+cmake "-DHDF5_CONTRACT_ACTION=COMPARE" `
+  "-DHDF5_CONTRACT_BASELINE=build-msvc18/contracts/baseline.txt" `
+  "-DHDF5_CONTRACT_CURRENT=build-msvc18/contracts/current.txt" `
+  -P config/cmake/scripts/HDF5BuildContract.cmake
+```
+
 ### 2. Establish CMake 4 correctness
 
 Remove policy settings and version branches made unreachable by the 4.0 minimum. Replace removed APIs, including

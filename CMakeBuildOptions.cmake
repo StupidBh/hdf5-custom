@@ -112,6 +112,48 @@ mark_as_advanced (HDF5_PACKAGE_EXTLIBS)
 
 option (HDF5_ENABLE_THREADSAFE "Enable thread-safety" OFF)
 
+function (hdf5_validate_threadsafe_options)
+  if (NOT HDF5_ENABLE_THREADSAFE)
+    return ()
+  endif ()
+
+  # check for unsupported options
+  if (WIN32)
+    if (BUILD_STATIC_LIBS)
+      message (FATAL_ERROR " **** thread-safety option not supported with static library **** ")
+    endif ()
+  endif ()
+  if (HDF5_ENABLE_PARALLEL)
+    if (NOT HDF5_ALLOW_UNSUPPORTED)
+      message (FATAL_ERROR " **** Parallel and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
+    else ()
+      message (VERBOSE " **** Allowing unsupported parallel and thread-safety options **** ")
+    endif ()
+  endif ()
+  if (HDF5_BUILD_CPP_LIB)
+    if (NOT HDF5_ALLOW_UNSUPPORTED)
+      message (FATAL_ERROR " **** C++ and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
+    else ()
+      message (VERBOSE " **** Allowing unsupported C++ and thread-safety options **** ")
+    endif ()
+  endif ()
+  if (HDF5_BUILD_HL_LIB)
+    if (NOT HDF5_ALLOW_UNSUPPORTED)
+      message (FATAL_ERROR " **** HL and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
+    else ()
+      message (VERBOSE " **** Allowing unsupported HL and thread-safety options **** ")
+    endif ()
+  endif ()
+
+  # Check for threading package
+  if (NOT Threads_FOUND)
+    message (FATAL_ERROR " **** thread-safety option requires a threading package and none was found **** ")
+  endif ()
+
+  set (H5_HAVE_THREADSAFE 1)
+  return (PROPAGATE H5_HAVE_THREADSAFE)
+endfunction ()
+
 option (HDF5_ENABLE_CONCURRENCY "Enable multi-threaded concurrency" OFF)
 
 option (HDF5_ENABLE_MAP_API "Build the map API" OFF)

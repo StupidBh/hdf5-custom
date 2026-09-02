@@ -58,8 +58,9 @@ if (BUILD_STATIC_LIBS)
           "${HDF5_TEST_COMPILE_DEFS_PRIVATE}"
   )
   TARGET_C_PROPERTIES (${HDF5_TEST_LIB_TARGET} STATIC)
+  hdf5_target_link_system_dependencies (${HDF5_TEST_LIB_TARGET} PUBLIC)
   target_link_libraries (${HDF5_TEST_LIB_TARGET}
-      PUBLIC ${LINK_LIBS} ${HDF5_LIB_TARGET}
+      PUBLIC ${HDF5_LIB_TARGET}
       PRIVATE "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
   )
   if (MINGW)
@@ -97,8 +98,9 @@ if (BUILD_SHARED_LIBS)
           "${HDF5_TEST_COMPILE_DEFS_PRIVATE}"
   )
   TARGET_C_PROPERTIES (${HDF5_TEST_LIBSH_TARGET} SHARED)
+  hdf5_target_link_system_dependencies (${HDF5_TEST_LIBSH_TARGET} PUBLIC)
   target_link_libraries (${HDF5_TEST_LIBSH_TARGET}
-      PUBLIC ${LINK_LIBS} ${HDF5_LIBSH_TARGET}
+      PUBLIC ${HDF5_LIBSH_TARGET}
       PRIVATE "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
   )
   if (MINGW)

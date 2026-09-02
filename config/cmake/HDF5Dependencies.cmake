@@ -10,12 +10,15 @@
 
 include_guard (GLOBAL)
 
-function (hdf5_configure_dependencies private_libraries public_libraries)
+function (hdf5_configure_dependencies private_libraries public_libraries system_libraries)
   set_property (TARGET hdf5_dependencies PROPERTY HDF5_PRIVATE_LINK_LIBRARIES
       "${private_libraries}"
   )
   set_property (TARGET hdf5_dependencies PROPERTY HDF5_PUBLIC_LINK_LIBRARIES
       "${public_libraries}"
+  )
+  set_property (TARGET hdf5_dependencies PROPERTY HDF5_SYSTEM_LINK_LIBRARIES
+      "${system_libraries}"
   )
 endfunction ()
 
@@ -32,5 +35,18 @@ function (hdf5_target_link_dependencies target)
   endif ()
   if (public_libraries)
     target_link_libraries (${target} PUBLIC ${public_libraries})
+  endif ()
+endfunction ()
+
+function (hdf5_target_link_system_dependencies target visibility)
+  if (NOT visibility MATCHES "^(PRIVATE|PUBLIC|INTERFACE)$")
+    message (FATAL_ERROR "Invalid dependency visibility for ${target}: ${visibility}")
+  endif ()
+
+  get_property (system_libraries TARGET hdf5_dependencies
+      PROPERTY HDF5_SYSTEM_LINK_LIBRARIES
+  )
+  if (system_libraries)
+    target_link_libraries (${target} ${visibility} ${system_libraries})
   endif ()
 endfunction ()

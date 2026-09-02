@@ -663,13 +663,7 @@ hdf5_configure_map_api ()
 #-----------------------------------------------------------------------------
 # Option to override the compiler for h5cc
 #-----------------------------------------------------------------------------
-if (HDF5_ENABLE_PARALLEL)
-  set (_HDF5_H5CC_C_COMPILER ${MPI_C_COMPILER})
-else ()
-  set (_HDF5_H5CC_C_COMPILER ${CMAKE_C_COMPILER})
-endif ()
-set (HDF5_H5CC_C_COMPILER ${_HDF5_H5CC_C_COMPILER} CACHE STRING "C compiler to use in h5cc")
-mark_as_advanced (HDF5_H5CC_C_COMPILER)
+hdf5_configure_h5cc_compiler ()
 
 #-----------------------------------------------------------------------------
 # Option to build documentation

@@ -99,6 +99,17 @@ endif ()
 option (HDF5_ENABLE_HDFS "Enable HDFS" OFF)
 
 option (HDF5_ENABLE_PARALLEL "Enable parallel build (requires MPI)" OFF)
+
+function (hdf5_configure_h5cc_compiler)
+  if (HDF5_ENABLE_PARALLEL)
+    set (_HDF5_H5CC_C_COMPILER ${MPI_C_COMPILER})
+  else ()
+    set (_HDF5_H5CC_C_COMPILER ${CMAKE_C_COMPILER})
+  endif ()
+  set (HDF5_H5CC_C_COMPILER ${_HDF5_H5CC_C_COMPILER} CACHE STRING "C compiler to use in h5cc")
+  mark_as_advanced (HDF5_H5CC_C_COMPILER)
+endfunction ()
+
 cmake_dependent_option (HDF5_ENABLE_SUBFILING_VFD
   "Build Parallel HDF5 Subfiling VFD"
   OFF "HDF5_ENABLE_PARALLEL;NOT WIN32" OFF

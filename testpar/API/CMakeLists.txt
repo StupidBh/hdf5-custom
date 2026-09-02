@@ -91,11 +91,7 @@ target_include_directories (
     "${HDF5_TEST_API_SRC_DIR}"
     "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>"
 )
-target_compile_options (
-  h5_api_test_parallel
-  PRIVATE
-    "${HDF5_CMAKE_C_FLAGS}"
-)
+hdf5_target_use_build_options (h5_api_test_parallel)
 target_compile_definitions (
   h5_api_test_parallel
   PRIVATE

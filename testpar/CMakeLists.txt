@@ -146,7 +146,7 @@ add_executable (testphdf5 ${testphdf5_SOURCES})
 target_include_directories (testphdf5
     PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
 )
-target_compile_options(testphdf5 PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (testphdf5)
 target_compile_definitions(testphdf5 PRIVATE "${HDF5_TESTPAR_COMPILE_DEFS_PRIVATE}")
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (testphdf5 STATIC)
@@ -173,7 +173,7 @@ macro (ADD_H5P_EXE file)
   target_include_directories (${file}
       PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
   )
-  target_compile_options(${file} PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+  hdf5_target_use_build_options (${file})
   target_compile_definitions(${file} PRIVATE "${HDF5_TESTPAR_COMPILE_DEFS_PRIVATE}")
   if (NOT BUILD_SHARED_LIBS)
     TARGET_C_PROPERTIES (${file} STATIC)

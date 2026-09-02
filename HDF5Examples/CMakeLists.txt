@@ -107,7 +107,7 @@ if (H5_HAVE_PARALLEL)
   if (MPI_C_LINK_FLAGS)
     set (CMAKE_EXE_LINKER_FLAGS "${MPI_C_LINK_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
   endif ()
-  INCLUDE_DIRECTORIES (${MPI_C_INCLUDE_DIRS})
+  target_include_directories (hdf5_examples_platform INTERFACE ${MPI_C_INCLUDE_DIRS})
 endif ()
 
 target_include_directories (hdf5_examples_platform INTERFACE "${H5EXAMPLE_HDF5_INCLUDE_DIRS}")

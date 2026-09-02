@@ -11,6 +11,7 @@ project (HDF5_TOOLS_TEST_H5FC C)
 # --------------------------------------------------------------------
 add_executable (h5fc_chk_idx ${HDF5_TOOLS_TEST_H5FC_SOURCE_DIR}/h5fc_chk_idx.c)
 target_include_directories (h5fc_chk_idx PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+hdf5_target_use_platform (h5fc_chk_idx)
 if (BUILD_STATIC_LIBS)
   TARGET_C_PROPERTIES (h5fc_chk_idx STATIC)
   target_link_libraries (h5fc_chk_idx PRIVATE ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})

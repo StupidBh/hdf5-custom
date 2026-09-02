@@ -22,6 +22,12 @@ add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
 
 target_compile_options (hdf5_warnings INTERFACE "${HDF5_CMAKE_C_WARNING_FLAGS}")
 target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}")
+if (WIN32)
+  target_compile_definitions (hdf5_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
+  if (MSVC)
+    target_compile_definitions (hdf5_platform INTERFACE _BIND_TO_CURRENT_VCLIBS_VERSION=1 _CONSOLE)
+  endif ()
+endif ()
 
 function (hdf5_configure_cxx_build_options)
   set_property (TARGET hdf5_warnings PROPERTY INTERFACE_COMPILE_OPTIONS
@@ -38,5 +44,8 @@ function (hdf5_target_use_build_options target)
   target_compile_options (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_warnings,INTERFACE_COMPILE_OPTIONS>"
       "$<TARGET_PROPERTY:hdf5_build_options,INTERFACE_COMPILE_OPTIONS>"
+  )
+  target_compile_definitions (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_platform,INTERFACE_COMPILE_DEFINITIONS>"
   )
 endfunction ()

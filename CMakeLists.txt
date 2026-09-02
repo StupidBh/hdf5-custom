@@ -655,30 +655,6 @@ include (${HDF_CONFIG_DIR}/cmake/HDF5CompilerOptions.cmake)
 set (CMAKE_MODULE_PATH ${HDF_CONFIG_DIR} ${HDF_RESOURCES_DIR} ${CMAKE_MODULE_PATH})
 include (${HDF_CONFIG_DIR}/cmake/HDF5Dependencies.cmake)
 
-# Determine whether to build the HDF5 Subfiling VFD
-set (H5FD_SUBFILING_DIR ${HDF5_SRC_DIR}/H5FDsubfiling)
-set (HDF5_SRC_INCLUDE_DIRS
-    ${HDF5_SRC_INCLUDE_DIRS}
-    ${H5FD_SUBFILING_DIR}
-)
-
-cmake_dependent_option (HDF5_ENABLE_SUBFILING_VFD "Build Parallel HDF5 Subfiling VFD" OFF "HDF5_ENABLE_PARALLEL;NOT WIN32" OFF)
-if (HDF5_ENABLE_SUBFILING_VFD)
-  # Make sure we found MPI_Comm_split_type previously
-  if (NOT H5_HAVE_MPI_Comm_split_type)
-    message (FATAL_ERROR "Subfiling VFD requires MPI-3 support for MPI_Comm_split_type")
-  endif ()
-
-  # Subfiling requires thread operations
-  if (NOT Threads_FOUND)
-    message (FATAL_ERROR "Subfiling requires thread operations support")
-  endif ()
-
-  set (H5_HAVE_SUBFILING_VFD 1)
-  # IOC VFD is currently only built when subfiling is enabled
-  set (H5_HAVE_IOC_VFD 1)
-endif()
-
 message (VERBOSE "LINK_LIBS=${LINK_LIBS}")
 message (VERBOSE "LINK_PUB_LIBS=${LINK_PUB_LIBS}")
 

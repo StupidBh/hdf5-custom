@@ -26,6 +26,7 @@ target_include_directories (h5sign
     "${HDF5_SRC_DIR}"  # For H5PLsig.h
     $<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>
 )
+hdf5_target_use_platform (h5sign)
 
 # Link against HDF5 tools library, HDF5 library, and OpenSSL
 if (HDF5_BUILD_STATIC_TOOLS)

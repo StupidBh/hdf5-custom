@@ -23,6 +23,41 @@ mark_as_advanced (HDF5_EXTERNAL_LIB_SUFFIX)
 option (HDF5_BUILD_STATIC_TOOLS "Build Static Tools NOT Shared Tools" OFF)
 mark_as_advanced (HDF5_BUILD_STATIC_TOOLS)
 
+function (hdf5_validate_library_options)
+  set (H5_ENABLE_STATIC_LIB NO)
+  set (H5_ENABLE_SHARED_LIB NO)
+
+  # only shared libraries/tools is true if user forces static OFF
+  if (NOT BUILD_STATIC_LIBS)
+    set (HDF5_ONLY_SHARED_LIBS ON CACHE BOOL "Only Build Shared Libraries" FORCE)
+  endif ()
+
+  # only shared libraries is set ON by user then force settings
+  if (HDF5_ONLY_SHARED_LIBS)
+    set (H5_ENABLE_STATIC_LIB NO)
+    set (BUILD_SHARED_LIBS ON CACHE BOOL "Build Shared Libraries" FORCE)
+    set (BUILD_STATIC_LIBS OFF CACHE BOOL "Build Static Libraries" FORCE)
+    if (HDF5_BUILD_STATIC_TOOLS)
+      message (WARNING "Cannot build static tools without static libraries. Building shared tools.")
+    endif ()
+    set (HDF5_BUILD_STATIC_TOOLS OFF CACHE BOOL "Build Static Tools NOT Shared Tools" FORCE)
+  endif ()
+
+  if (NOT BUILD_SHARED_LIBS AND NOT HDF5_BUILD_STATIC_TOOLS)
+    message (VERBOSE "Cannot build shared tools without shared libraries. Building static tools.")
+    set (HDF5_BUILD_STATIC_TOOLS ON CACHE BOOL "Build Static Tools NOT Shared Tools" FORCE)
+  endif ()
+
+  if (BUILD_STATIC_LIBS)
+    set (H5_ENABLE_STATIC_LIB YES)
+  endif ()
+  if (BUILD_SHARED_LIBS)
+    set (H5_ENABLE_SHARED_LIB YES)
+  endif ()
+
+  return (PROPAGATE H5_ENABLE_STATIC_LIB H5_ENABLE_SHARED_LIB)
+endfunction ()
+
 option (BUILD_STATIC_EXECS "Build Static Executables" OFF)
 mark_as_advanced (BUILD_STATIC_EXECS)
 

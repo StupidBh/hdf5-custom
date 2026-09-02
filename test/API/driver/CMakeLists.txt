@@ -25,4 +25,7 @@ FetchContent_MakeAvailable(KWSYS)
 include_directories(${kwsys_BINARY_DIR})
 
 add_executable(h5_api_test_driver h5_api_test_driver.cpp)
+if (COMMAND hdf5_target_use_platform)
+  hdf5_target_use_platform (h5_api_test_driver)
+endif ()
 target_link_libraries(h5_api_test_driver h5_api_test_sys)

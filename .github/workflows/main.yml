@@ -25,16 +25,6 @@ on:
         required: false
         default: "skip"
         type: string
-      java_version:
-        description: "Java version for testing (11, 17, 21, 24, latest, auto)"
-        required: false
-        default: "auto"
-        type: string
-      force_java_implementation:
-        description: "Force specific Java implementation (auto, ffm, jni)"
-        required: false
-        default: "jni"
-        type: string
       win_runner:
         description: "Windows runner version to use (windows-2022, windows-latest, etc.)"
         required: false
@@ -78,14 +68,12 @@ jobs:
 
           # Windows w/ MSVC
           #
-          # No Fortran, parallel, or VFDs that rely on POSIX things
+          # No parallel support or VFDs that rely on POSIX features
           - name: "Windows MSVC"
             ostype: windows
             os: ${{ inputs.win_runner }}
             shared: ON
             cpp: ON
-            fortran: OFF
-            java: ON
             docs: ON
             libaecfc: ON
             localaec: OFF
@@ -104,8 +92,6 @@ jobs:
             os: ubuntu-24.04
             shared: ON
             cpp: ON
-            fortran: ON
-            java: ON
             docs: ON
             libaecfc: ON
             localaec: OFF
@@ -124,8 +110,6 @@ jobs:
             os: macos-15
             shared: ON
             cpp: ON
-            fortran: OFF
-            java: ON
             docs: ON
             libaecfc: ON
             localaec: OFF
@@ -180,37 +164,12 @@ jobs:
           which cmake
           cmake --version
 
-      - name: Set up Java (if specified or FFM required)
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
-        with:
-          distribution: ${{ inputs.force_java_implementation == 'ffm' && 'oracle' || 'temurin' }}
-          java-version: |
-            ${{
-              inputs.force_java_implementation == 'ffm' && '25' ||
-              inputs.java_version == 'latest' && '24' ||
-              inputs.java_version
-            }}
-
-      - name: Verify Java Setup
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        run: |
-          java -version
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "Selected Java implementation: ${{ inputs.force_java_implementation }}"
-
       - name: Set environment for MSVC (Windows)
         run: |
           # Set these environment variables so CMake picks the correct compiler
           echo "CXX=cl.exe" >> $GITHUB_ENV
           echo "CC=cl.exe" >> $GITHUB_ENV
         if:  matrix.ostype == 'windows'
-
-      - name: Setup jextract (FFM builds only)
-        if: ${{ inputs.force_java_implementation == 'ffm' }}
-        uses: ./.github/actions/setup-jextract
-        with:
-          java-version: '25'
 
       # CONFIGURE
       - name: Configure
@@ -226,8 +185,6 @@ jobs:
             -DHDF5_ENABLE_DOXY_WARNINGS:BOOL=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=${{ matrix.cpp }} \
-            -DHDF5_BUILD_FORTRAN:BOOL=${{ matrix.fortran }} \
-            -DHDF5_BUILD_JAVA:BOOL=${{ matrix.java }} \
             -DHDF5_BUILD_DOC:BOOL=${{ matrix.docs }} \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=${{ matrix.zlibfc }} \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=${{ matrix.libaecfc }} \
@@ -241,7 +198,6 @@ jobs:
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
             -DHDF5_PACKAGE_EXTLIBS:BOOL=ON \
             -DHDF5_PACK_MACOSX_DMG:BOOL=OFF \
-            -DHDF5_ENABLE_JNI:BOOL=${{ inputs.force_java_implementation == 'jni' }} \
             $GITHUB_WORKSPACE
         shell: bash
         if: ${{ inputs.thread_safety != 'TS' && inputs.concurrent != 'CC'}}
@@ -260,8 +216,6 @@ jobs:
             -DHDF5_ENABLE_CONCURRENCY:BOOL=OFF \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
-            -DHDF5_BUILD_JAVA:BOOL=OFF \
             -DHDF5_BUILD_HL_LIB:BOOL=OFF \
             -DHDF5_BUILD_DOC:BOOL=OFF \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=${{ matrix.zlibfc }} \
@@ -290,8 +244,6 @@ jobs:
             -DHDF5_ENABLE_CONCURRENCY:BOOL=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
-            -DHDF5_BUILD_JAVA:BOOL=OFF \
             -DHDF5_BUILD_HL_LIB:BOOL=OFF \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=${{ matrix.localaec }} \

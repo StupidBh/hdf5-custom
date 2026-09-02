@@ -116,37 +116,10 @@
       }
     },
     {
-      "name": "ci-Fortran",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_FORTRAN": "ON"
-      }
-    },
-    {
-      "name": "ci-Fortran-Clang",
-      "hidden": true,
-      "inherits": "ci-Fortran",
-      "cacheVariables": {
-        "CMAKE_Fortran_COMPILER":  {"type": "FILEPATH", "value": "gfortran"}
-      },
-      "condition": {
-        "type": "matches",
-        "string": "${presetName}",
-        "regex": ".*-Clang"
-      }
-    },
-    {
       "name": "ci-CPP",
       "hidden": true,
       "cacheVariables": {
         "H5EXAMPLE_BUILD_CXX": "ON"
-      }
-    },
-    {
-      "name": "ci-Java",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_JAVA": "ON"
       }
     },
     {
@@ -518,7 +491,9 @@
       "configurePreset": "ci-x64-Release-MSVC",
       "hidden": true,
       "inherits": "ci-base",
-      "configurations": ["RelWithDebInfo"]
+      "configurations": [
+        "RelWithDebInfo"
+      ]
     },
     {
       "name": "ci-x64-Release-Clang",

@@ -117,7 +117,7 @@ function serializeAssigned(assigned) {
 // ── Pure helpers ──────────────────────────────────────────────────────────────
 
 function labelFromPattern(pattern) {
-  // /fortran/ → "fortran", /.github/.well-known → ".github/.well-known"
+  // /filters/ → "filters", /.github/.well-known → ".github/.well-known"
   return pattern.replace(/^\//, '').replace(/\/$/, '') || pattern;
 }
 
@@ -141,7 +141,7 @@ function matchesPattern(file, pattern) {
 
   if (anchored) p = p.slice(1);
 
-  // Directory pattern: /fortran/ → matches fortran/<anything>
+  // Directory pattern: /filters/ → matches filters/<anything>
   if (p.endsWith('/')) {
     return anchored
       ? file.startsWith(p)

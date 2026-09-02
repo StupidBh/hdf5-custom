@@ -129,33 +129,6 @@
 #define H5CPP_HL_DLLVAR H5_VAR_IMPORT
 #endif
 
-/* Fortran library C stubs */
-#if defined(hdf5_f90cstub_shared_EXPORTS)
-#define H5FC_DLL    H5_API_EXPORT
-#define H5FC_DLLVAR H5_VAR_EXPORT
-#else
-#define H5FC_DLL    H5_API_IMPORT
-#define H5FC_DLLVAR H5_VAR_IMPORT
-#endif
-
-/* Fortran test library C stubs */
-#if defined(hdf5_test_f90cstub_shared_EXPORTS)
-#define H5FC_TEST_DLL    H5_API_EXPORT
-#define H5FC_TEST_DLLVAR H5_VAR_EXPORT
-#else
-#define H5FC_TEST_DLL    H5_API_IMPORT
-#define H5FC_TEST_DLLVAR H5_VAR_IMPORT
-#endif
-
-/* High-level Fortran library C stubs */
-#if defined(hdf5_hl_f90cstub_shared_EXPORTS)
-#define H5FC_HL_DLL    H5_API_EXPORT
-#define H5FC_HL_DLLVAR H5_VAR_EXPORT
-#else
-#define H5FC_HL_DLL    H5_API_IMPORT
-#define H5FC_HL_DLLVAR H5_VAR_IMPORT
-#endif
-
 #else
 
 /* Static library decorations */
@@ -173,13 +146,6 @@
 #define H5HL_DLLVAR extern
 #define H5CPP_HL_DLL
 #define H5CPP_HL_DLLVAR extern
-#define H5FC_DLL
-#define H5FC_DLLVAR extern
-#define H5FC_TEST_DLL
-#define H5FC_TEST_DLLVAR extern
-#define H5FC_HL_DLL
-#define H5FC_HL_DLLVAR extern
-
 #endif /* H5_BUILT_AS_DYNAMIC_LIB */
 
 #endif /* H5API_ADPT_H */

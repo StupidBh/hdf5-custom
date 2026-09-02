@@ -36,7 +36,6 @@ The following compilers are supported by HDF5 and included in the Cygwin package
 * `gcc`, which includes:
   * `gcc-core` : C compiler
   * `gcc-g++` : C++ compiler
-  * `gcc-fortran` : Fortran compiler
 
 ##### 2.1.1 Using Compilers Not Supported
 
@@ -44,13 +43,6 @@ By default, the current configuration uses vendor compilers; to use another comp
 
 ```bash
 setenv CC "foo -flags"
-setenv FC "fffoo -flags"
-```
-
-For example, if users want to use `pgf90` as a fortran compiler, then:
-
-```bash
-setenv FC pgf90
 ```
 
 > **Note:** See the configure help page (`configure --help`) for a list of environment variables that have an effect on building the library.
@@ -98,20 +90,13 @@ gunzip < hdf5-2.0.x.tar.gz | tar xf -
 bunzip2 < hdf5-2.0.x.tar.bz2 | tar xf -
 ```
 
-### 3. Setup Environment
-In Cygwin, most compilers and settings are automatically detected during the configure script. However, if you are building Fortran, we recommend that you explicitly set the `FC` variable in your environment to use the `gfortran` compiler. For example, issue the command:
-
-```bash
-export FC=gfortran
-```
-
-### 4. Follow build and test steps
+### 3. Follow build and test steps
 Follow build and test steps in the [INSTALL_CMake.md](./INSTALL_CMake.md) file.
 
-### 5. Check installed HDF5 library
+### 4. Check installed HDF5 library
 After installation, go to your installation directory. There should be three subdirectories: `bin`, `include`, and `lib`.
 
-### 6. Known Problems
+### 5. Known Problems
 * `cache_api` tests may fail. This is a known issue with Cygwin.
 * `make check` fails when building shared lib files is enabled. The default on Cygwin has been changed to disable shared libraries. It can be enabled with the `BUILD_SHARED_LIBS` configure option but is likely to fail `make check` with GCC compilers.
 

@@ -16,7 +16,7 @@
 # for building HDF5. It sets up system-specific flags, checks for headers,
 # libraries, types, and functions, and configures HDF5 build options based on
 # system capabilities. It also handles feature detection for advanced types
-# (e.g., _Float16, __float128), file locking, and VFD (Virtual File Driver)
+# (e.g., _Float16), file locking, and VFD (Virtual File Driver)
 # support. The results are used to generate configuration headers and control
 # conditional compilation throughout the HDF5 codebase.
 #
@@ -26,7 +26,7 @@
 #   - Header/library/function/type checks
 #   - Platform-specific flags and definitions
 #   - Type size checks for C99 and system types
-#   - Feature checks (complex numbers, _Float16, __float128, VFDs, etc.)
+#   - Feature checks (complex numbers, _Float16, VFDs, etc.)
 #   - Options for strict format checks, file locking, and non-standard features
 #   - Macros for reusable check logic
 # -----------------------------------------------------------------------------
@@ -697,142 +697,6 @@ if (HDF5_ENABLE_MIRROR_VFD)
     message (WARNING "The socket-based Mirror VFD was requested but cannot be built. System prerequisites are not met.")
   endif ()
 endif ()
-
-#-----------------------------------------------------------------------------
-# Check if C has __float128 extension (used for Fortran only)
-#-----------------------------------------------------------------------------
-
-if (HDF5_BUILD_FORTRAN)
-  # ----------------------------------------------------------------------
-  # __float128 checks
-  #
-  # If __float128 exists and we can determine its precision, we will use
-  # it in the Fortran interface. The checks for this require that the
-  # precision be specified via a symbol named FLT128_DIG, which might be
-  # found in quadmath.h.
-  #
-  # The checks here are based on the GNU __float128 extension type from
-  # libquadmath, which is now part of gcc. Other compilers (clang, Intel)
-  # also expose __float128 and/or __float128 may be an alias for some
-  # other 128-bit floating point type.
-  #
-  # 128-bit floating-point math is usually handled in software and is thus
-  # orders of magnitude slower than hardware-supported floating-point math.
-  #
-
-  #-----------------------------------------------------------------------------
-  # Is the __float128 type available?
-  #-----------------------------------------------------------------------------
-  HDF_FUNCTION_TEST (HAVE___FLOAT128)
-  # Convert TRUE/FALSE to 0/1 for preprocessor values in test code, below
-  if (${HAVE___FLOAT128})
-    set(C_HAVE_FLOAT128 1)
-  else ()
-    set(C_HAVE_FLOAT128 0)
-  endif ()
-
-  #-----------------------------------------------------------------------------
-  # Get the max decimal precision in C, checking both long double and
-  # __float128 (if available)
-  #-----------------------------------------------------------------------------
-  if (NOT CMAKE_CROSSCOMPILING OR (CMAKE_CROSSCOMPILING AND CMAKE_CROSSCOMPILING_EMULATOR))
-    #-----------------------------------------------------------------------------
-    # The provided CMake C macros don't provide a general compile/run function
-    # so this one is used.
-    #-----------------------------------------------------------------------------
-    set (RUN_OUTPUT_PATH_DEFAULT ${CMAKE_BINARY_DIR})
-    macro (C_RUN FUNCTION_NAME SOURCE_CODE RETURN_VAR RETURN_OUTPUT_VAR)
-        message (VERBOSE "Detecting C ${FUNCTION_NAME}")
-        file (WRITE
-            ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testCCompiler1.c
-          "${SOURCE_CODE}"
-        )
-        try_run (RUN_RESULT_VAR COMPILE_RESULT_VAR
-            SOURCES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testCCompiler1.c
-            COMPILE_OUTPUT_VARIABLE COMPILEOUT
-            RUN_OUTPUT_STDOUT_VARIABLE OUTPUT_VAR
-        )
-
-        set (${RETURN_OUTPUT_VAR} ${OUTPUT_VAR})
-
-        message (VERBOSE "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
-        message (VERBOSE "Test COMPILE_RESULT_VAR ${COMPILE_RESULT_VAR} ")
-        message (VERBOSE "Test COMPILE_OUTPUT ${COMPILEOUT} ")
-        message (VERBOSE "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
-        message (VERBOSE "Test RUN_RESULT_VAR ${RUN_RESULT_VAR} ")
-        message (VERBOSE "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ")
-
-        if (COMPILE_RESULT_VAR)
-          if (RUN_RESULT_VAR EQUAL "0")
-            set (${RETURN_VAR} 1 CACHE INTERNAL "Have C function ${FUNCTION_NAME}")
-            message (VERBOSE "Testing C ${FUNCTION_NAME} - OK")
-            file (APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
-                "Determining if the C ${FUNCTION_NAME} exists passed with the following output:\n"
-                "${OUTPUT_VAR}\n\n"
-            )
-          else ()
-            message (VERBOSE "Testing C ${FUNCTION_NAME} - Fail")
-            set (${RETURN_VAR} 0 CACHE INTERNAL "Have C function ${FUNCTION_NAME}")
-            file (APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeError.log
-                "Determining if the C ${FUNCTION_NAME} exists failed with the following output:\n"
-                "${OUTPUT_VAR}\n\n")
-          endif ()
-        else ()
-            message (FATAL_ERROR "Compilation of C ${FUNCTION_NAME} - Failed")
-        endif ()
-    endmacro ()
-    string (CONFIGURE [=[
-  #include <float.h>
-  #include <stdio.h>
-  #if @C_HAVE_FLOAT128@
-  #  if @C_INCLUDE_QUADMATH_H@
-  #    include <quadmath.h>
-  #  endif
-  #  ifdef FLT128_DIG
-  #    define C_FLT128_DIG FLT128_DIG
-  #  else
-  #    define C_FLT128_DIG 0
-  #  endif
-  #else
-  #  define C_FLT128_DIG 0
-  #endif
-  #define C_LDBL_DIG DECIMAL_DIG
-
-  int main(void) {
-    printf("%d;%d;", C_LDBL_DIG, C_FLT128_DIG);
-    return 0;
-  }
-  ]=] PROG_SRC @ONLY)
-
-    C_RUN ("maximum decimal precision for C" "${PROG_SRC}" PROG_RES PROG_OUTPUT4)
-    message (STATUS "Testing maximum decimal precision for C - ${PROG_OUTPUT4}")
-
-    # The output from the above program will be:
-    #   -- long double decimal precision  --  __float128 decimal precision
-
-    list (GET PROG_OUTPUT4 0 MY_LDBL_DIG)
-    list (GET PROG_OUTPUT4 1 MY_FLT128_DIG)
-
-    # Set configure output and behavior
-    if (${HAVE___FLOAT128} AND (${MY_FLT128_DIG} GREATER ${MY_LDBL_DIG}))
-      set (${HDF_PREFIX}_HAVE_FLOAT128 1)
-      set (_PAC_C_MAX_REAL_PRECISION ${MY_FLT128_DIG})
-    else ()
-      # No __float128 or the precision of __float128 <= that of long double
-      set (_PAC_C_MAX_REAL_PRECISION ${MY_LDBL_DIG})
-    endif ()
-
-    if (NOT ${_PAC_C_MAX_REAL_PRECISION})
-      set (${HDF_PREFIX}_PAC_C_MAX_REAL_PRECISION 0)
-    else ()
-      set (${HDF_PREFIX}_PAC_C_MAX_REAL_PRECISION ${_PAC_C_MAX_REAL_PRECISION})
-    endif ()
-    message (STATUS "maximum decimal precision for C var - ${${HDF_PREFIX}_PAC_C_MAX_REAL_PRECISION}")
-  else ()
-    set (${HDF_PREFIX}_PAC_C_MAX_REAL_PRECISION 0)
-  endif ()
-
-endif()
 
 #-----------------------------------------------------------------------------
 # Macro to determine long double conversion properties

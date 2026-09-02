@@ -177,8 +177,8 @@ Attributes look similar to HDF5 datasets in that they have a datatype and datasp
 do not support partial I/O operations, and they cannot be compressed or extended.
 
 \subsection subsec_intro_desc_soft HDF5 Software
-The HDF5 software is written in C and includes optional wrappers for C++, FORTRAN (90 and F2003),
-and Java. The HDF5 binary distribution consists of the HDF5 libraries, include files, command-line
+The HDF5 software is written in C and includes an optional C++ wrapper.
+The HDF5 binary distribution consists of the HDF5 libraries, include files, command-line
 utilities, scripts for compiling applications, and example programs.
 
 \subsubsection subsec_intro_desc_soft_apis HDF5 APIs and Libraries
@@ -200,8 +200,8 @@ as providing templates for storing objects. Following is a list of the High Leve
 \subsubsection subsec_intro_desc_soft_tools Tools
 Useful tools for working with HDF5 files include:
 \li \ref sec_cltools_h5dump : A utility to dump or display the contents of an HDF5 File
-\li h5cc, h5c++, h5fc :  pkg-config based shell scripts for compiling applications
-\li HDFView :            A java browser to view HDF (HDF4 and HDF5) files
+\li h5cc, h5c++ :  pkg-config based shell scripts for compiling applications
+\li HDFView :      A graphical browser for HDF (HDF4 and HDF5) files
 
 <h4>h5dump</h4>
 The \ref sec_cltools_h5dump utility displays the contents of an HDF5 file in Data Description Language (\ref DDLBNF200).
@@ -224,8 +224,8 @@ Some useful \ref sec_cltools_h5dump options are included below:
    -n                          Display the contents of the file
 \endcode
 
-<h4>h5cc, h5fc, h5c++</h4>
-The built HDF5 binaries include the h5cc, h5fc, h5c++ compile scripts for compiling applications.
+<h4>h5cc, h5c++</h4>
+The built HDF5 binaries include the h5cc and h5c++ compile scripts for compiling applications.
 When using these scripts there is no need to specify the HDF5 libraries and include files.
 Compiler options can be passed to the scripts.
 
@@ -237,7 +237,7 @@ The HDF5 Application Programming Interface is extensive, but a few functions do 
 
 To introduce the programming model, examples in Python and C are included below. The Python examples
 use the HDF5 Python APIs (h5py). See the Examples from "Learning the Basics" page for complete examples
-that can be downloaded and run for C, FORTRAN, C++, Java and Python.
+that can be downloaded and run for C, C++, and Python.
 
 The general paradigm for working with objects in HDF5 is to:
 \li Open the object.
@@ -256,25 +256,17 @@ Keep the following in mind when looking at the example programs included in this
 C routines begin with the prefix “H5*” where * is a single letter indicating the object on which the
 operation is to be performed.
 </li>
-<li>
-FORTRAN routines are similar; they begin with “h5*” and end with “_f”.
-</li>
-<li>
-Java routines are similar; the routine names begin with “H5*” and are prefixed with “H5.” as the class. Constants are
-in the HDF5Constants class and are prefixed with "HDF5Constants.". The function arguments
-are usually similar, see @ref HDF5LIB
-</li>
 </ul>
 For example:
 <ul>
 <li>
-File Interface:<ul><li>#H5Fopen (C)</li><li>\ref h5f::h5fopen_f (FORTRAN)</li><li>H5.H5Fopen (Java)</li></ul>
+File Interface: #H5Fopen
 </li>
 <li>
-Dataset Interface:<ul><li>#H5Dopen (C)</li><li>\ref h5d::h5dopen_f (FORTRAN)</li><li>H5.H5Dopen (Java)</li></ul>
+Dataset Interface: #H5Dopen
 </li>
 <li>
-Dataspace interface:<ul><li>#H5Sclose (C)</li><li>\ref h5s::h5sclose_f (FORTRAN)</li><li>H5.H5Sclose (Java)</li></ul>
+Dataspace interface: #H5Sclose
 </li>
 </ul>
 The HDF5 Python APIs use methods associated with specific objects.
@@ -307,18 +299,6 @@ import numpy
 <li>
 <strong>C</strong>:<br />
 <code>"#include hdf5.h"</code>
-</li>
-<li>
-<strong>FORTRAN</strong>:<br />
-<code>USE HDF5</code><br />
-and call \ref h5lib::h5open_f and `h5close_f` to initialize and close the HDF5 FORTRAN interface
-</li>
-<li>
-<strong>Java</strong>:<br />
-<code>
-import hdf.hdf5lib.H5;<br />
-import hdf.hdf5lib.HDF5Constants;
-</code>
 </li>
 </ul>
 
@@ -623,14 +603,14 @@ on the <a href="http://hdfeos.org/">HDF-EOS Tools and Information Center</a> pag
 \li <a href="https://\SRCURL/HDF5Examples">Examples in the Source Code</a>
 
 \section secHDF5ExamplesCompile How To Compile
-For information on compiling in C, C++ and Fortran, see: \ref LBCompiling
+For information on compiling in C and C++, see: \ref LBCompiling
 
 \section secHDF5ExamplesOther Other Examples
 <a href="http://hdfeos.org/zoo/index.php">IDL, MATLAB, and NCL Examples for HDF-EOS</a>
 Examples of how to access and visualize NASA HDF-EOS files using IDL, MATLAB, and NCL.
 
 <a href="https://\AEXURL/misc-examples/index.html">Miscellaneous Examples</a>
-These (very old) examples resulted from working with users, and are not fully tested. Most of them are in C, with a few in Fortran and Java.
+These (very old) examples resulted from working with users and are not fully tested.
 
 <a href="https://\AEXURL/special_values_HDF5_example.tar">Using Special Values</a>
 These examples show how to create special values in an HDF5 application.

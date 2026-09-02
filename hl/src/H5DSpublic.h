@@ -747,15 +747,11 @@ extern "C" {
  * the dimension of another HDF5 dataset (H5DS)</em>
  *
  * \note \Bold{Programming hints:}
- * \note To use any of these functions or subroutines,
- *       you must first include the relevant include file (C) or
- *       module (Fortran) in your application.
+ * \note To use any of these functions, include the relevant header file
+ *       in your application.
  * \note The following line includes the HDF5 Dimension Scale package,
  *       H5DS, in C applications:
  *       \code #include "hdf5_hl.h" \endcode
- * \note This line includes the H5DS module in Fortran applications:
- *       \code use h5ds \endcode
- *
  * - \ref H5DSwith_new_ref
  *   \n Determines if new references are used with dimension scales.
  * - \ref H5DSattach_scale

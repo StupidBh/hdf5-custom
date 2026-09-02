@@ -92,8 +92,8 @@
  * time's free() call. This function would be used to free any memory allocated by the library. This solution
  * has the advantages of being extremely easy to implement and intuitive to use. It can also be used as a
  * solution with legacy API calls, so it would be necessary even if we modify the HDF5 API. This function will
- * also be extremely useful when HDF5 is wrapped for use with managed languages such as Java, .NET, and
- * Python so that the wrappers can properly clean up resources.
+ * also be extremely useful when HDF5 is wrapped for use with managed language runtimes so that wrappers
+ * can properly clean up resources.
  *
  * See the #H5free_memory entry in the \ref RM for more information.
  *
@@ -105,4 +105,3 @@
  * Navigate back: \ref index "Main" / \ref UG / \ref AR_UG
  *
  */
- 

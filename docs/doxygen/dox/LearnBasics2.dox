@@ -21,28 +21,20 @@ For example:
   status = H5Gclose (group_id);
 \endcode
 
-<em>Fortran</em>
-\code
-  CALL h5gcreate_f (loc_id, name, group_id, error)
-  CALL h5gclose_f (group_id, error)
-\endcode
-
 \section secLBGrpCreateRWEx Programming Example
 
 \subsection secLBGrpCreateRWExDesc Description
 See \ref LBExamples for the examples used in the \ref LearnBasics tutorial.
 
-The example shows how to create and close a group. It creates a file called <code style="background-color:whitesmoke;">group.h5</code> in C
-(<code style="background-color:whitesmoke;">groupf.h5</code> for FORTRAN), creates a group called MyGroup in the root group, and then closes the group and file.
+The example shows how to create and close a group. It creates a file called <code style="background-color:whitesmoke;">group.h5</code>,
+creates a group called MyGroup in the root group, and then closes the group and file.
 
 For details on compiling an HDF5 application:
 [ \ref LBCompiling ]
 
 \subsection secLBGrpCreateRWExCont File Contents
 
-Shown below is the contents and the definition of the group of <code style="background-color:whitesmoke;">group.h5</code> (created by the C program).
-(The FORTRAN program creates the HDF5 file <code style="background-color:whitesmoke;">groupf.h5</code> and the resulting DDL shows the filename
-<code style="background-color:whitesmoke;">groupf.h5</code> in the first line.)
+Shown below is the contents and the definition of the group of <code style="background-color:whitesmoke;">group.h5</code>.
 <table>
 <caption>The Contents of group.h5.</caption>
 <tr>
@@ -155,22 +147,18 @@ For details on compiling an HDF5 application:
 #H5Gcreate creates a group at the location specified by a location identifier and a name. The location identifier
 can be a file identifier or a group identifier and the name can be relative or absolute.
 
-The first #H5Gcreate/\ref h5g::h5gcreate_f creates the group <code style="background-color:whitesmoke;">MyGroup</code>
+The first #H5Gcreate creates the group <code style="background-color:whitesmoke;">MyGroup</code>
 in the root group of the specified file.
 
-The second #H5Gcreate/\ref h5g::h5gcreate_f creates the group <code style="background-color:whitesmoke;">Group_A</code>
+The second #H5Gcreate creates the group <code style="background-color:whitesmoke;">Group_A</code>
 in the group <code style="background-color:whitesmoke;">MyGroup</code> in the root group of the specified
 file. Note that the parent group (<code style="background-color:whitesmoke;">MyGroup</code>) already exists.
 
-The third #H5Gcreate/\ref h5g::h5gcreate_f creates the group <code style="background-color:whitesmoke;">Group_B</code> in the specified group.
+The third #H5Gcreate creates the group <code style="background-color:whitesmoke;">Group_B</code> in the specified group.
 
 \subsection secLBGrpCreateNamesExCont File Contents
 
-Shown below are the contents and the definition of the group of <code style="background-color:whitesmoke;">groups.h5</code>
-(created by the C program).
-(The FORTRAN program creates the HDF5 file <code style="background-color:whitesmoke;">groupsf.h5</code> and
-the resulting DDL shows the filename
-<code style="background-color:whitesmoke;">groupsf.h5</code> in the first line.)
+Shown below are the contents and the definition of the group of <code style="background-color:whitesmoke;">groups.h5</code>.
 <table>
 <caption>The Contents of groups.h5.</caption>
 <tr>
@@ -223,11 +211,9 @@ For details on compiling an HDF5 application:
 
 \subsection secLBGrpDsetExCont File Contents
 
-Shown below is the contents and the definition of the group of <code style="background-color:whitesmoke;">groups.h5</code> (created by the C program).
-(The FORTRAN program creates the HDF5 file <code style="background-color:whitesmoke;">groupsf.h5</code> and the resulting DDL shows the filename
-<code style="background-color:whitesmoke;">groupsf.h5</code> in the first line.)
+Shown below is the contents and the definition of the group of <code style="background-color:whitesmoke;">groups.h5</code>.
 <table>
-<caption>The contents of the file groups.h5 (groupsf.h5 for FORTRAN)</caption>
+<caption>The contents of the file groups.h5</caption>
 <tr>
 <td>
 \image html imggrpdsets.gif
@@ -364,8 +350,7 @@ identifiers from the selections that were made are passed into the read or write
 See \ref LBExamples for the examples used in the \ref LearnBasics tutorial.
 
 The example creates an 8 x 10 integer dataset in an HDF5 file. It then selects and writes to a 3 x 4 subset
-of the dataset created with the dimensions offset by 1 x 2. (If using Fortran, the dimensions will be swapped.
-The dataset will be 10 x 8, the subset will be 4 x 3, and the offset will be 2 x 1.)
+of the dataset created with the dimensions offset by 1 x 2.
 
 PLEASE NOTE that the examples and images below were created using C.
 
@@ -397,7 +382,7 @@ how to make selections.
 \subsubsection subsubsecLBDsetSubRWProgExperOne Example 1
 By default the example code will select and write to a 3 x 4 subset. You can modify the count
 parameter in the example code to select a different subset, by changing the value of
-DIM0_SUB (C, C++) / dim0_sub (Fortran) near the top. Change its value to 7 to create a 7 x 4 subset:
+DIM0_SUB near the top. Change its value to 7 to create a 7 x 4 subset:
 <table>
 <tr>
 <td>
@@ -483,8 +468,8 @@ example code. The memory dataspace was defined as one-dimensional.
 
 \subsection subsecLBDsetSubRWProgRem Remarks
 \li In addition to #H5Sselect_hyperslab, this example introduces the #H5Dget_space call to obtain the dataspace of a dataset.
-\li If using the default values for the stride and block parameters of #H5Sselect_hyperslab, then, for C you can specify NULL
-for these parameters, rather than passing in an array for each, and for Fortran 90 you can omit these parameters.
+\li If using the default values for the stride and block parameters of #H5Sselect_hyperslab, specify NULL
+for these parameters rather than passing in an array for each.
 
 <hr>
 Previous Chapter \ref LBGrpDset - Next Chapter \ref LBDatatypes
@@ -815,7 +800,7 @@ permutation of the array and the size of each dimension.
 \subsection subsecLBDtypeSpecCmpd Compound
 
 \subsubsection subsubsecLBDtypeSpecCmpdProp Properties of compound datatypes
-A compound datatype is similar to a struct in C or a common block in Fortran. It is a collection of
+A compound datatype is similar to a record or struct. It is a collection of
 one or more atomic types or small arrays of such types. To create and use of a compound datatype
 you need to refer to various properties of the data compound datatype:
 \li It is of class compound.
@@ -1036,8 +1021,8 @@ length strings are stored.
 Variable-length (VL) datatypes are sequences of an existing datatype (atomic, VL, or compound)
 which are not fixed in length from one dataset location to another. In essence, they are similar
 to C character strings -- a sequence of a type which is pointed to by a particular type of
-pointer -- although they are implemented more closely to FORTRAN strings by including an explicit
-length in the pointer instead of using a particular value to terminate the sequence.
+pointer -- although they include an explicit length in the pointer instead of using a particular
+value to terminate the sequence.
 
 VL datatypes are useful to the scientific community in many different ways, some of which are listed below:
 <ul>

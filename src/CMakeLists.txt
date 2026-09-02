@@ -1472,9 +1472,9 @@ if (DOXYGEN_FOUND)
   # Contribute the core library headers and the H5build_settings.c generated
   # file to the global property that the top-level doc target reads. The
   # hdf5lib_doc target itself is defined at the very end of the top-level
-  # CMakeLists.txt, after all language-binding subdirectories (c++, fortran,
-  # java, tools) have been processed and have appended their own sources to
-  # HDF5_DOXYGEN_LIB_INPUTS. This eliminates the need for file(GLOB) here.
+  # CMakeLists.txt, after all contributing subdirectories have appended their
+  # sources to HDF5_DOXYGEN_LIB_INPUTS. This eliminates the need for file(GLOB)
+  # here.
   set_property (GLOBAL APPEND PROPERTY HDF5_DOXYGEN_LIB_INPUTS
     ${H5_PUBLIC_HEADERS}
     ${H5_GENERATED_HEADERS}

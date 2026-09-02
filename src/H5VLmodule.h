@@ -522,7 +522,7 @@
  * H5VLnative.h. The current list of native operations is given at the
  * end of this document, along with a list of native-only connector calls.
  *
- * \subsection subsec_vol_lang Language Wrappers
+ * \subsection subsec_vol_lang C++ Wrapper
  * Due to the parameter type and callback changes that were required in the
  * C library API regarding the update from #haddr_t addresses to #H5O_token_t
  * tokens and the difficulty in versioning the wrapper APIs, it was decided to
@@ -531,8 +531,6 @@
  * compatibility.
  *
  * Information on the C API changes can be found above.
- *
- * Affected API calls, by language:
  *
  * \subsubsection subsubsec_vol_lang_c C++
  * <ul>
@@ -549,43 +547,6 @@
  * The C++ wrappers do not allow opening HDF5 file objects by address or token.
  *
  * The public H5VL API calls found in H5VLpublic.h were NOT added to the C++ API.
- *
- * \subsubsection subsubsec_vol_lang_fort Fortran
- * As in the C API, these API calls had their structs updated to the token version
- * so the h5o_info_t, etc. structs no longer contain native file format information
- * and the callbacks will need to match the non-deprecated, token-enabled versions.
- * <ul>
- * <li>\ref h5l::h5lget_info_f</li>
- * <li>\ref h5l::h5lget_info_by_idx_f</li>
- * <li>\ref h5l::h5literate_f</li>
- * <li>\ref h5l::h5literate_by_name_f</li>
- * <li>\ref h5o::h5oget_info_f</li>
- * <li>\ref h5o::h5oget_info_by_idx_f</li>
- * <li>\ref h5o::h5oget_info_by_name_f</li>
- * <li>\ref h5o::h5oopen_by_token_f</li>
- * <li>\ref h5o::h5ovisit_f</li>
- * <li>\ref h5o::h5ovisit_by_name_f</li>
- * </ul>
- *
- * Additionally, \ref h5f::h5fis_hdf5_f was updated to use \ref H5Fis_accessible internally,
- * though with the same caveat as the C++ implementation: the default fapl is
- * always passed in so arbitrary VOL connectors will only work if the default VOL
- * connector is changed via the environment variable.
- *
- * The public H5VL API calls found in H5VLpublic.h were also added to the
- * Fortran wrappers.
- *
- * \subsubsection subsubsec_vol_lang_java Java/JNI
- * <ul>
- * <li>\ref H5Fis_hdf5 Will fail when the library is built without deprecated symbols.</li>
- * <li>\ref H5Fis_accessible is available and takes a fapl, allowing it to work with
- * arbitrary VOL connectors.</li>
- * <li>The H5(O|L)get_info, H5(O|L)visit, and \ref H5Literate calls were updated as in the C library.</li>
- * <li>\ref H5Oget_native_info_by_name et al. were added and they work as in the
- * C library (e.g.: essentially native VOL connector only).</li>
- * <li>\ref H5Oopen_by_addr was replaced with \ref H5Oopen_by_token.</li>
- * <li>The public API calls in H5VLpublic.h were added to the JNI.</li>
- * </ul>
  *
  * \subsection subsec_vol_cl Using VOL Connectors With The HDF5 Command-Line Tools
  * The following command-line tools are VOL-aware and can be used with arbitrary VOL connectors:

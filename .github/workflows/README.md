@@ -35,10 +35,7 @@ There are a few that only get triggered manually.
     * tarball.yml to create a source.zip and source.tar.gz
     * ctest.yml to create signed binaries
     * abi-report.yml to compare ABI to last released binaries
-    * maven-staging.yml to generate and test Maven artifacts with Java examples across all platforms
-    * maven-deploy.yml to deploy Maven artifacts to repositories
     * release-files.yml uploads new binaries to releases page
-- java-examples-maven-test.yml comprehensive Java examples testing with Maven artifacts
 
 ## Triggered Workflows
 - clang-format-check.yml runs clang-format and reports issues
@@ -68,11 +65,8 @@ There are a few that only get triggered manually.
 - bintest.yml test binary packages created by main.yml
 - main-par.yml configure, build, and test HDF5 with openmpi
 - main-par-spc.yml configure, build, and test HDF5 with HDF5_ENABLE_WARNINGS_AS_ERRORS=ON
-- intel.yml configure, build, and test HDF5 with Intel OneAPI on Linux and Windows
-- nvhpc.yml configure, build, and test HDF5 with nvhpc
 - aocc.yml configure, build, and test HDF5 with AOCC and OpenMPI
 - testxpr.yml configure, build, and test HDF5 with HDF_TEST_EXPRESS=0
 - julia.yml configure and build HDF5, then test Julia hdf5 source
 - msys2.yml configure, build, and test HDF5 on mingw32, mingw64, ucrt64, clang64
 - i386.yml configure, build, and test HDF5 on 32-bit Linux
-

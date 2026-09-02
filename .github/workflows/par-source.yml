@@ -77,7 +77,6 @@ jobs:
           echo "${{ runner.workspace }}/openmpi/bin" >> $GITHUB_PATH
           echo "LD_LIBRARY_PATH=${{ runner.workspace }}/openmpi/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "CC=${{ runner.workspace }}/openmpi/bin/mpicc" >> $GITHUB_ENV
-          echo "FC=${{ runner.workspace }}/openmpi/bin/mpif90" >> $GITHUB_ENV
 
       - name: Install CMake
         uses: lukka/get-cmake@4a7d025fc60f00db0c7b44ebf783d19b52444830 # latest
@@ -140,9 +139,7 @@ jobs:
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DMPIEXEC_MAX_NUMPROCS:STRING=2")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PARALLEL:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SUBFILING_VFD:BOOL=ON")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PLUGIN_SUPPORT:BOOL=ON")
@@ -194,7 +191,6 @@ jobs:
           echo "${{ runner.workspace }}/mpich/bin" >> $GITHUB_PATH
           echo "LD_LIBRARY_PATH=${{ runner.workspace }}/mpich/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "CC=${{ runner.workspace }}/mpich/bin/mpicc" >> $GITHUB_ENV
-          echo "FC=${{ runner.workspace }}/mpich/bin/mpif90" >> $GITHUB_ENV
 
       - name: Install CMake
         uses: lukka/get-cmake@4a7d025fc60f00db0c7b44ebf783d19b52444830 # latest
@@ -257,9 +253,7 @@ jobs:
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DMPIEXEC_MAX_NUMPROCS:STRING=2")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PARALLEL:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SUBFILING_VFD:BOOL=ON")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PLUGIN_SUPPORT:BOOL=ON")

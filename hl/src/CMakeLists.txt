@@ -178,8 +178,7 @@ install (
 if (DOXYGEN_FOUND)
   # Contribute HL public headers to the global property that the top-level
   # hdf5hllib_doc target reads. The target itself is defined at the very end
-  # of the top-level CMakeLists.txt so that hl/fortran/src can also append its
-  # F90 sources to HDF5_DOXYGEN_HL_INPUTS before the target is created.
+  # of the top-level CMakeLists.txt after all high-level inputs are known.
   set_property (GLOBAL APPEND PROPERTY HDF5_DOXYGEN_HL_INPUTS
     ${HL_HEADERS}
     "${HDF5_HL_TOOLS_DIR}/h5watch/h5watch.h"

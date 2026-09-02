@@ -18,9 +18,6 @@
  * it easier to identify warnings created by new code and can build with
  * -Werror in CI to ensure new warnings don't get added to the code.
  *
- * There are a few suppression macros that have been added to paper over Java
- * JNI quirks. These macros should never be used outside of the JNI code.
- *
  * USAGE:
  *
  * The macros are used in ON/OFF pairs. (i.e. H5_WARN_FOO_(ON|OFF)). To
@@ -297,42 +294,6 @@
 #else
 #define H5_WARN_AGGREGATE_RETURN_OFF
 #define H5_WARN_AGGREGATE_RETURN_ON
-#endif
-
-/*********************
- * JAVA JNI WARNINGS *
- *********************/
-
-/* These warning suppression macros are ONLY used in the Java wrappers
- * and are due to quirks of the JNI interface. In normal HDF5 code,
- * these warnings should be corrected, not suppressed.
- */
-
-/* Suppress warnings about missing prototypes */
-#if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_MISSING_PROTOTYPE_OFF H5_WARN_OFF("missing-prototypes")
-#define H5_WARN_MISSING_PROTOTYPE_ON  H5_WARN_ON("missing-prototypes")
-#else
-#define H5_WARN_MISSING_PROTOTYPE_OFF
-#define H5_WARN_MISSING_PROTOTYPE_ON
-#endif
-
-/* Suppress warnings about signed/unsigned conversions */
-#if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_SIGN_CONVERSION_OFF H5_WARN_OFF("sign-conversion")
-#define H5_WARN_SIGN_CONVERSION_ON  H5_WARN_ON("sign-conversion")
-#else
-#define H5_WARN_SIGN_CONVERSION_OFF
-#define H5_WARN_SIGN_CONVERSION_ON
-#endif
-
-/* Suppress warnings about unused parameters */
-#if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_UNUSED_PARAMETER_OFF H5_WARN_OFF("unused-parameter")
-#define H5_WARN_UNUSED_PARAMETER_ON  H5_WARN_ON("unused-parameter")
-#else
-#define H5_WARN_UNUSED_PARAMETER_OFF
-#define H5_WARN_UNUSED_PARAMETER_ON
 #endif
 
 #endif /* H5warnings_H */

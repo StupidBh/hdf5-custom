@@ -9,19 +9,6 @@ on:
         type: string
         required: false
         default: snapshot
-      deploy_maven:
-        description: 'Deploy artifacts to Maven repository'
-        type: boolean
-        required: false
-        default: false
-      maven_repository:
-        description: 'Maven repository type'
-        type: choice
-        options:
-          - github-packages
-          - maven-central-staging
-        required: false
-        default: github-packages
 
 permissions:
   contents: read
@@ -99,50 +86,3 @@ jobs:
       file_sha: ${{ needs.call-workflow-tarball.outputs.file_sha }}
       use_tag: ${{ needs.log-the-inputs.outputs.rel_tag }}
       use_environ: release
-
-  call-workflow-maven-staging:
-    needs: [log-the-inputs, call-workflow-tarball]
-    if: ${{ inputs.deploy_maven == true }}
-    permissions:
-      contents: read
-      packages: write
-      pull-requests: write
-    uses: ./.github/workflows/maven-staging.yml
-    with:
-      test_maven_deployment: true
-      use_snapshot_version: ${{ needs.log-the-inputs.outputs.rel_tag == 'snapshot' }}
-      platforms: 'all-platforms'
-      java_implementation: 'both'  # Build both FFM and JNI implementations
-
-  deploy-maven-artifacts:
-    name: Deploy Maven Artifacts
-    needs: [log-the-inputs, call-workflow-tarball, call-workflow-ctest, call-workflow-abi, call-workflow-maven-staging]
-    if: ${{ inputs.deploy_maven == true }}
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/maven-deploy.yml
-    with:
-      # Note: file_base and preset_name are legacy parameters and not used by maven-deploy.yml
-      repository_url: ${{ inputs.maven_repository == 'github-packages' && format('https://maven.pkg.github.com/{0}', github.repository) || 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/' }}
-      repository_id: ${{ inputs.maven_repository == 'github-packages' && 'github' || 'ossrh' }}
-      deploy_snapshots: ${{ inputs.use_tag == 'snapshot' }}
-      dry_run: false
-    secrets:
-      MAVEN_USERNAME: ${{ inputs.maven_repository == 'github-packages' && github.actor || secrets.MAVEN_CENTRAL_USERNAME }}
-      MAVEN_PASSWORD: ${{ inputs.maven_repository == 'github-packages' && secrets.GITHUB_TOKEN || secrets.MAVEN_CENTRAL_PASSWORD }}
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
-  test-deployed-maven-packages:
-    name: Test Deployed Maven Packages
-    needs: [log-the-inputs, call-workflow-maven-staging, deploy-maven-artifacts]
-    if: ${{ inputs.deploy_maven == true && needs.deploy-maven-artifacts.result == 'success' }}
-    permissions:
-      contents: read
-      packages: read
-    uses: ./.github/workflows/test-maven-packages.yml
-    with:
-      version: ${{ needs.call-workflow-maven-staging.outputs.version }}
-      java_implementation: 'both'
-      repository_url: ${{ inputs.maven_repository == 'github-packages' && format('https://maven.pkg.github.com/{0}', github.repository) || 'https://repo.maven.apache.org/maven2' }}

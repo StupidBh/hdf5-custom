@@ -186,8 +186,6 @@ II. Building HDF5 Examples with CMake
         <options> is:
             * H5EXAMPLE_BUILD_TESTING:BOOL=ON
             * BUILD_SHARED_LIBS:BOOL=[ON | OFF]
-            * H5EXAMPLE_BUILD_FORTRAN:BOOL=[ON | OFF]
-            * H5EXAMPLE_BUILD_JAVA:BOOL=[ON | OFF]
 
         if the hdf5 library was built with a namespace (i.e. "hdf5::") add:
             -D HDF5_NAMESPACE:STRING=hdf5::
@@ -255,9 +253,7 @@ III. Defaults in the CMakePresets.json file
 ####        "BUILD_SHARED_LIBS": "ON",
 ####        "H5EXAMPLE_USE_SHARED_LIBS": "ON"
 ####        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-####        "H5EXAMPLE_BUILD_FORTRAN": "ON"
 ####        "H5EXAMPLE_BUILD_CXX": "ON"
-####        "H5EXAMPLE_BUILD_JAVA": "ON"
 ####        "HDF5_NAMESPACE": {"type": "STRING", "value": "hdf5::"},
 ####        "HDF5_PACKAGE_NAME": {"type": "STRING", "value": "hdf5"},
 ####        "H5EXAMPLE_BUILD_TESTING": "ON"
@@ -272,8 +268,6 @@ IV. Defaults in the HDF5_Examples_options.cmake file
 ####         H5EXAMPLE_BUILD_C:BOOL=ON
 ####         H5EXAMPLE_BUILD_HL:BOOL=OFF
 ####         H5EXAMPLE_BUILD_CXX:BOOL=OFF
-####         H5EXAMPLE_BUILD_FORTRAN:BOOL=OFF
-####         H5EXAMPLE_BUILD_JAVA:BOOL=OFF
 ####         H5EXAMPLE_BUILD_FILTERS:BOOL=OFF
 ####         H5EXAMPLE_BUILD_TESTING:BOOL=OFF
 ####         H5EXAMPLE_ENABLE_PARALLEL:BOOL=OFF
@@ -282,4 +276,3 @@ IV. Defaults in the HDF5_Examples_options.cmake file
 ************************************************************************
 
 Need further assistance, send email to help@hdfgroup.org
-

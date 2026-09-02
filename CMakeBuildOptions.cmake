@@ -83,17 +83,7 @@ mark_as_advanced (HDF5_ENABLE_PLUGIN_SUPPORT)
 
 option (HDF5_BUILD_HL_LIB "Build HIGH Level HDF5 Library" ON)
 
-option (HDF5_BUILD_FORTRAN "Build FORTRAN support" OFF)
-
 option (HDF5_BUILD_CPP_LIB "Build HDF5 C++ Library" OFF)
-
-option (HDF5_BUILD_JAVA "Build Java HDF5 Library" OFF)
-cmake_dependent_option (HDF5_ENABLE_JNI "Force JNI implementation instead of FFM for Java bindings when Java 25+ is available" ON "HDF5_BUILD_JAVA" OFF)
-mark_as_advanced (HDF5_ENABLE_JNI)
-cmake_dependent_option (HDF5_ENABLE_MAVEN_DEPLOY "Enable Maven repository deployment support" OFF "HDF5_BUILD_JAVA" OFF)
-mark_as_advanced (HDF5_ENABLE_MAVEN_DEPLOY)
-cmake_dependent_option (HDF5_MAVEN_SNAPSHOT "Build Maven snapshot versions with -SNAPSHOT suffix" OFF "HDF5_BUILD_JAVA" OFF)
-mark_as_advanced (HDF5_MAVEN_SNAPSHOT)
 
 option (HDF5_BUILD_EXAMPLES "Build HDF5 Library Examples" ON)
 
@@ -108,4 +98,3 @@ set_property (CACHE HDF5_ALLOW_EXTERNAL_SUPPORT PROPERTY STRINGS ${allow_externa
 if (NOT "${HDF5_ALLOW_EXTERNAL_SUPPORT}" IN_LIST allow_external_support_types)
   message (FATAL_ERROR "HDF5_ALLOW_EXTERNAL_SUPPORT must be set to one of ${allow_external_support_types}")
 endif ()
-

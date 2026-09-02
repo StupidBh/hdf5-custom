@@ -53,15 +53,6 @@ endif ()
 # Add Target(s) to CMake Install for import into other projects
 #-----------------------------------------------------------------------------
 if (HDF5_EXPORTED_TARGETS AND NOT HDF5_EXTERNALLY_CONFIGURED)
-  if (HDF5_ENABLE_JNI)
-    install (
-        EXPORT ${HDF5_EXPORTED_TARGETS}_java
-        DESTINATION ${HDF5_INSTALL_CMAKE_DIR}
-        FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_java-targets.cmake
-        NAMESPACE ${HDF_PACKAGE_NAMESPACE}
-        COMPONENT configinstall
-    )
-  endif ()
   if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
     install (
         EXPORT ${HDF5_EXPORTED_TARGETS}_static
@@ -100,22 +91,6 @@ set (HDF5_INCLUDES_BUILD_TIME
     ${HDF5_SRC_INCLUDE_DIRS} ${HDF5_CPP_SRC_DIR} ${HDF5_HL_SRC_DIR}
     ${HDF5_TOOLS_SRC_DIR} ${HDF5_SRC_BINARY_DIR}
 )
-
-#-----------------------------------------------------------------------------
-# Set Java JAR names for config file (with Maven SNAPSHOT suffix if enabled)
-#-----------------------------------------------------------------------------
-if (HDF5_BUILD_JAVA)
-  if (HDF5_ENABLE_MAVEN_DEPLOY AND HDF5_MAVEN_SNAPSHOT)
-    set (HDF5_JARHDF5_JAR_NAME "jarhdf5-${HDF5_PACKAGE_VERSION}-SNAPSHOT.jar")
-    set (HDF5_JAVAHDF5_JAR_NAME "javahdf5-${HDF5_PACKAGE_VERSION}-SNAPSHOT.jar")
-  else ()
-    set (HDF5_JARHDF5_JAR_NAME "jarhdf5-${HDF5_PACKAGE_VERSION}.jar")
-    set (HDF5_JAVAHDF5_JAR_NAME "javahdf5-${HDF5_PACKAGE_VERSION}.jar")
-  endif ()
-  # slf4j JAR names derived from configured paths so overrides are reflected in the exported config
-  get_filename_component (HDF5_SLF4J_API_JAR_NAME ${HDF5_JAVA_LOGGING_JAR} NAME)
-  get_filename_component (HDF5_SLF4J_NOP_JAR_NAME ${HDF5_JAVA_LOGGING_NOP_JAR} NAME)
-endif ()
 
 #-----------------------------------------------------------------------------
 # Configure the hdf5-config.cmake file for the build directory
@@ -249,7 +224,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # Configure the README.md file for the binary package
 #-----------------------------------------------------------------------------
-HDF_README_PROPERTIES(HDF5_BUILD_FORTRAN)
+HDF_README_PROPERTIES()
 
 #-----------------------------------------------------------------------------
 # Configure the LICENSE.txt file for the windows binary package
@@ -505,7 +480,7 @@ if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT HDF5_NO_PACKAGES)
 
     * A completely portable file format with no limit on the number or size of data objects in the collection.
 
-    * A software library that runs on a range of computational platforms, from laptops to massively parallel systems, and implements a high-level API with C, C++, Fortran 90, and Java interfaces.
+    * A software library that runs on a range of computational platforms, from laptops to massively parallel systems, and implements APIs for C and C++ applications.
 
     * A rich set of integrated performance features that allow for access time and storage space optimizations.
 
@@ -608,21 +583,6 @@ The HDF5 data model, file format, API, library, and tools are open and distribut
       INSTALL_TYPES Full Developer User
   )
 
-  if (HDF5_BUILD_FORTRAN)
-    cpack_add_component (fortlibraries
-        DISPLAY_NAME "HDF5 Fortran Libraries"
-        DEPENDS libraries
-        GROUP Runtime
-        INSTALL_TYPES Full Developer User
-    )
-    cpack_add_component (fortheaders
-        DISPLAY_NAME "HDF5 Fortran Headers"
-        DEPENDS fortlibraries
-        GROUP Development
-        INSTALL_TYPES Full Developer
-    )
-  endif ()
-
   if (HDF5_BUILD_CPP_LIB)
     cpack_add_component (cpplibraries
         DISPLAY_NAME "HDF5 C++ Libraries"
@@ -697,14 +657,6 @@ The HDF5 data model, file format, API, library, and tools are open and distribut
           DEPENDS hlcpplibraries
           GROUP Development
           INSTALL_TYPES Full Developer
-      )
-    endif ()
-    if (HDF5_BUILD_FORTRAN)
-      cpack_add_component (hlfortlibraries
-          DISPLAY_NAME "HDF5 HL Fortran Libraries"
-          DEPENDS fortlibraries
-          GROUP Runtime
-          INSTALL_TYPES Full Developer User
       )
     endif ()
   endif ()

@@ -70,12 +70,6 @@ set (CTEST_CUSTOM_MEMCHECK_IGNORE
     PERFORM_h5perform-clear-objects
     HL_test-clear-objects
     HL_test-clean-objects
-    HL_FORTRAN_test-clear-objects
-    HL_FORTRAN_test-clean-objects
-    FORTRAN_testhdf5-clear-objects
-    FORTRAN_testhdf5-clean-objects
-    FORTRAN_flush1-clear-objects
-    FORTRAN_flush1-clean-objects
     CPP_testhdf5-clear-objects
     CPP_testhdf5-clean-objects
     ######### examples #########
@@ -93,8 +87,6 @@ set (CTEST_CUSTOM_MEMCHECK_IGNORE
     HL_CPP_ptableTest-clean-objects
     HL_CPP_ex_ptExampleFL-clear-objects
     HL_CPP_ex_ptExampleFL-clean-objects
-    HL_FORTRAN_f90_ex-clear-objects
-    HL_FORTRAN_f90_ex-clean-objects
     ######### tools/h5clear #########
     H5CLEAR-clearall-objects
     H5CLEAR-h5clear_gentest      # does not close ids by design
@@ -197,4 +189,3 @@ list (APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE
     "/test/"
     "/_deps/"
 )
-

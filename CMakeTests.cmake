@@ -15,7 +15,7 @@
 # -----------------------------------------------------------------------------
 # This CMake module configures the testing and dashboard infrastructure for HDF5.
 # It sets up test timeouts, test options, and enables/disables various test suites
-# (API, VFD, VOL, serial, parallel, Fortran, C++, Java, tools, examples, SWMR, etc.).
+# (API, VFD, VOL, serial, parallel, C++, tools, examples, SWMR, etc.).
 # It also configures CTest integration, test express levels, and test directories.
 #
 # Key Features:
@@ -117,14 +117,8 @@
   cmake_dependent_option (HDF5_TEST_PARALLEL "Execute parallel tests" ON "HDF5_ENABLE_PARALLEL" OFF)
   mark_as_advanced (HDF5_TEST_PARALLEL)
 
-  cmake_dependent_option (HDF5_TEST_FORTRAN "Execute fortran tests" ON "HDF5_BUILD_FORTRAN" OFF)
-  mark_as_advanced (HDF5_TEST_FORTRAN)
-
   cmake_dependent_option (HDF5_TEST_CPP "Execute cpp tests" ON "HDF5_BUILD_CPP_LIB" OFF)
   mark_as_advanced (HDF5_TEST_CPP)
-
-  cmake_dependent_option (HDF5_TEST_JAVA "Execute java tests" ON "HDF5_BUILD_JAVA" OFF)
-  mark_as_advanced (HDF5_TEST_JAVA)
 
   if (NOT HDF5_EXTERNALLY_CONFIGURED)
     if (EXISTS "${HDF5_TEST_SRC_DIR}" AND IS_DIRECTORY "${HDF5_TEST_SRC_DIR}")

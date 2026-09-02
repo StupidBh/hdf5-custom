@@ -72,7 +72,7 @@
  * model. The HDF5 library calls the operating system or other storage management software (for
  * example, the MPI/IO Library) to store and retrieve persistent data. The HDF5 library may also
  * link to other software such as filters for compression. The HDF5 library is linked to an
- * application program which may be written in C, C++, Fortran, or Java. The application program
+ * application program which may be written in C or C++. The application program
  * implements problem specific algorithms and data structures and calls the HDF5 library to store
  * and retrieve data. The figure below shows the dependencies of these modules.
  *

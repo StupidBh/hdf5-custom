@@ -24,8 +24,6 @@ set (HDF_PACKAGE_NAMESPACE "hdf5::" CACHE STRING "Name for HDF package namespace
 
 set (HDF5_BUILD_CPP_LIB ON CACHE BOOL "Build C++ support" FORCE)
 
-set (HDF5_BUILD_FORTRAN ON CACHE BOOL "Build FORTRAN support" FORCE)
-
 set (HDF5_BUILD_HL_LIB ON CACHE BOOL "Build HIGH Level HDF5 Library" FORCE)
 
 set (HDF5_BUILD_TOOLS ON CACHE BOOL "Build HDF5 Tools" FORCE)

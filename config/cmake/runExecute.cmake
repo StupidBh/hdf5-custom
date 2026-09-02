@@ -47,7 +47,7 @@ macro (STREAM_STRINGS stream strings_out)
 endmacro()
 
 macro (EXECUTE_TEST)
-  cmake_parse_arguments (TEST "" "NOERRDISPLAY;EXPECT;JAVA;CLASSPATH;PROGRAM;FOLDER;OUTPUT;LIBRARY_DIRECTORY;INPUT;ENV_VAR;ENV_VALUE;KEYSTORE_DIR;EMULATOR;ARGS" "TEST_" ${ARGN})
+  cmake_parse_arguments (TEST "" "NOERRDISPLAY;EXPECT;PROGRAM;FOLDER;OUTPUT;LIBRARY_DIRECTORY;INPUT;ENV_VAR;ENV_VALUE;KEYSTORE_DIR;EMULATOR;ARGS" "TEST_" ${ARGN})
 if (NOT TEST_PROGRAM)
   message (FATAL_ERROR "Require TEST_PROGRAM to be defined")
 endif ()
@@ -60,10 +60,7 @@ endif ()
 if (NOT TEST_EXPECT)
   message (VERBOSE "Optional TEST_EXPECT is not defined")
 endif ()
-if (NOT TEST_JAVA)
-  message (VERBOSE "Optional TEST_JAVA is not defined")
-endif ()
-message (STATUS "EXECUTE ARGS: ${TEST_EMULATOR}/${TEST_JAVA} ${TEST_PROGRAM} ${TEST_ARGS}")
+message (STATUS "EXECUTE ARGS: ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}")
 
 if (EXISTS "${TEST_FOLDER}/${TEST_OUTPUT}")
   file (REMOVE ${TEST_FOLDER}/${TEST_OUTPUT})
@@ -93,42 +90,25 @@ if (TEST_KEYSTORE_DIR)
   message (TRACE "ENV:HDF5_PLUGIN_KEYSTORE=$ENV{HDF5_PLUGIN_KEYSTORE}")
 endif ()
 
-if (NOT TEST_JAVA)
-  message (STATUS "COMMAND: ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}")
-  if (NOT TEST_INPUT)
-    # run the test program, capture the stdout/stderr and the result var
-    execute_process (
-        COMMAND ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}
-        WORKING_DIRECTORY ${TEST_FOLDER}
-        RESULT_VARIABLE TEST_RESULT
-        OUTPUT_FILE ${TEST_OUTPUT}
-        ERROR_FILE ${TEST_OUTPUT}.err
-        OUTPUT_VARIABLE TEST_OUT
-        ERROR_VARIABLE TEST_ERROR
-    )
-  else ()
-    # run the test program with stdin, capture the stdout/stderr and the result var
-    execute_process (
-        COMMAND ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}
-        WORKING_DIRECTORY ${TEST_FOLDER}
-        RESULT_VARIABLE TEST_RESULT
-        INPUT_FILE ${TEST_INPUT}
-        OUTPUT_FILE ${TEST_OUTPUT}
-        ERROR_FILE ${TEST_OUTPUT}.err
-        OUTPUT_VARIABLE TEST_OUT
-        ERROR_VARIABLE TEST_ERROR
-    )
-  endif ()
-else ()
-  message (STATUS "JAVA COMMAND:  ${TEST_JAVA} -Xmx1024M -Dorg.slf4j.simpleLogger.defaultLogLevel=${LOG_LEVEL} -Djava.library.path=${TEST_LIBRARY_DIRECTORY} -cp \"${TEST_CLASSPATH}\" ${TEST_ARGS} ${TEST_PROGRAM}")
+message (STATUS "COMMAND: ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}")
+if (NOT TEST_INPUT)
   # run the test program, capture the stdout/stderr and the result var
   execute_process (
-      COMMAND ${TEST_JAVA} -Xmx1024M
-      -Dorg.slf4j.simpleLogger.defaultLogLevel=${LOG_LEVEL}
-      -Djava.library.path=${TEST_LIBRARY_DIRECTORY}
-      -cp "${TEST_CLASSPATH}" ${TEST_ARGS} ${TEST_PROGRAM}
+      COMMAND ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}
       WORKING_DIRECTORY ${TEST_FOLDER}
       RESULT_VARIABLE TEST_RESULT
+      OUTPUT_FILE ${TEST_OUTPUT}
+      ERROR_FILE ${TEST_OUTPUT}.err
+      OUTPUT_VARIABLE TEST_OUT
+      ERROR_VARIABLE TEST_ERROR
+  )
+else ()
+  # run the test program with stdin, capture the stdout/stderr and the result var
+  execute_process (
+      COMMAND ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}
+      WORKING_DIRECTORY ${TEST_FOLDER}
+      RESULT_VARIABLE TEST_RESULT
+      INPUT_FILE ${TEST_INPUT}
       OUTPUT_FILE ${TEST_OUTPUT}
       ERROR_FILE ${TEST_OUTPUT}.err
       OUTPUT_VARIABLE TEST_OUT
@@ -505,4 +485,3 @@ if (TEST_SKIP_COMPARE AND NOT TEST_NO_DISPLAY AND NOT "${TEST_OUTPUT_FILTERED_ST
   )
 endif ()
 endmacro ()
-

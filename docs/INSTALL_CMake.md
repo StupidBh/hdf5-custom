@@ -1,4 +1,4 @@
-# Build and Install HDF5 C, C++, Fortran, High-Level Libraries and Tools with CMake
+# Build and Install HDF5 C, C++, High-Level Libraries and Tools with CMake
 
 ---
 
@@ -17,7 +17,6 @@
 * [Section XI: Creating Custom Preset Configurations](#section-xi)
 * [Section XII: Using the Library](#section-xii)
 * [Section XIII: Using CMake Regex Options for Testing](#section-xiii)
-* [Section XIV: Java FFM Testing](#section-xiv)
 
 ---
 
@@ -90,16 +89,6 @@ cmake --list-presets
   * `ci-StdShar-MSVC`        (Standard shared libraries - MSVC)
   * `ci-StdShar-Clang`       (Standard shared libraries - Clang)
   * `ci-MinShar-GNUC`        (Minimal shared libraries - GCC)
-* **Java Builds:**
-  * `ci-StdShar-GNUC-Java-FFM`     (Java FFM bindings - GCC)
-  * `ci-StdShar-GNUC-Java-JNI`     (Java JNI bindings - GCC)
-* **Maven Deployment (JNI default - Java 8+):**
-  * `ci-MinShar-GNUC-Maven-Snapshot`               (JNI snapshots for Maven)
-  * `ci-MinShar-GNUC-Maven`                        (JNI release for Maven)
-* **Maven Deployment (FFM optional - Java 25+):**
-  * `ci-MinShar-GNUC-Maven-FFM-Snapshot`           (FFM snapshots for Maven)
-  * `ci-MinShar-GNUC-Maven-FFM`                    (FFM release for Maven)
-
 > **Note:** For ROS3 (S3 support), add `-DHDF5_ENABLE_ROS3_VFD=ON` to any preset.
 
 See [Section XI]((#section-xi)) for creating custom preset configurations.
@@ -136,7 +125,7 @@ If you cannot use presets or need more control, see:
 
 > **NOTE:** Most users should use Section II (CMake Presets) instead. This method is provided for advanced users and automated builds.
 
-This short set of instructions is written for users who want to quickly build the HDF5 C, C++ and Fortran shared libraries and tools from the HDF5 source code package using the CMake tools. This procedure will use the default settings in the `config/cmake/cacheinit.cmake` file. The HDF Group recommends using the presets process to build HDF5.
+This short set of instructions is written for users who want to quickly build the HDF5 C and C++ shared libraries and tools from the HDF5 source code package using the CMake tools. This procedure will use the default settings in the `config/cmake/cacheinit.cmake` file. The HDF Group recommends using the presets process to build HDF5.
 
 > **NOTE:** When using the presets process, the `CMakePresets.json` file in the source directory will configure, build, test, and package HDF5 with the same options that are set in the `cacheinit.cmake` file. In addition, it will get the optional files listed below that are needed, from the appropriate repositories. See [Section II](#section-ii): RECOMMENDED Quick Start with CMake Presets.
 
@@ -372,8 +361,6 @@ Go through these steps:
 3. If you are building on Apple Darwin platforms, you should add the following options:
 
     * Compiler choice - use Xcode by setting the `CC` and `CXX` environment variables.
-
-    * Shared Fortran is not supported, build static with `BUILD_SHARED_LIBS:BOOL=OFF`.
 
     * Additional options:
 
@@ -654,8 +641,8 @@ parallelism on a distributed multi-processor system:
 
 Read [README_HPC.md](./README_HPC.md) for detailed information.
 
-The threadsafe, C++ ,and Java interfaces are not compatible
-with the parallel option. Unless `HDF5_ALLOW_UNSUPPORTED` has been set on the configure line, the following options must be disabled: `HDF5_ENABLE_THREADSAFE`, `HDF5_BUILD_CPP_LIB`, `HDF5_BUILD_JAVA`.
+The threadsafe and C++ interfaces are not compatible
+with the parallel option. Unless `HDF5_ALLOW_UNSUPPORTED` has been set on the configure line, the following options must be disabled: `HDF5_ENABLE_THREADSAFE`, `HDF5_BUILD_CPP_LIB`.
 
 #### Threadsafe Capability
 
@@ -664,12 +651,12 @@ large scale) with the `HDF5_ENABLE_THREADSAFE` flag to the configure
 script. For further information, see the "Technical Notes" category
 in the HDF5 library documentation: https://support.hdfgroup.org/documentation/hdf5/latest/.
 
-The high-level, C++, Fortran and Java interfaces are not compatible
+The high-level and C++ interfaces are not compatible
 with the thread-safety option because the lock is not hoisted
 into the higher-level API calls.
 Unless `HDF5_ALLOW_UNSUPPORTED` has been set on the configure line,
 the following options must be disabled:
-    `HDF5_BUILD_HL_LIB`, `HDF5_BUILD_FORTRAN`, `HDF5_BUILD_CPP_LIB`, `HDF5_BUILD_JAVA`.
+    `HDF5_BUILD_HL_LIB`, `HDF5_BUILD_CPP_LIB`.
 
 ---
 
@@ -678,81 +665,6 @@ the following options must be disabled:
 
 See [INSTALL_CMake_options](./INSTALL_CMake_options.md).
 
-#### Java Implementation Selection (as of HDF5 2.0)
-
-HDF5 Java bindings support two native interface implementations:
-- JNI (Java Native Interface). Default, works with Java 8+, production-stable.
-- FFM (Foreign Function & Memory). Optional, requires Java 25+, modern native access.
-
-Maven Artifacts:
-
-- `org.hdfgroup:hdf5-java-ffm` is FFM implementation
-- `org.hdfgroup:hdf5-java-jni` is JNI implementation
-
-Both implementations use the same `hdf.hdf5lib.*` package structure for seamless migration.
-
-To build HDF5 with Maven deployment support:
-
-    cmake -DHDF5_BUILD_JAVA:BOOL=ON -DHDF5_ENABLE_MAVEN_DEPLOY:BOOL=ON ../hdf5
-
-To build Maven snapshot versions for development:
-
-    cmake -DHDF5_BUILD_JAVA:BOOL=ON -DHDF5_ENABLE_MAVEN_DEPLOY:BOOL=ON -DHDF5_MAVEN_SNAPSHOT:BOOL=ON ../hdf5
-
-> **Note:** FFM is selected for Java 25+ if `HDF5_ENABLE_JNI` is `OFF`.
-> To force JNI even with Java 25+:
->
-> ```
-> cmake -DHDF5_BUILD_JAVA:BOOL=ON -DHDF5_ENABLE_MAVEN_DEPLOY:BOOL=ON -DHDF5_ENABLE_JNI:BOOL=ON ../hdf5
->```
-
-Or use the Maven-enabled CMake presets (recommended):
-
-```bash
-# Minimal build for Java artifacts only (recommended for Maven deployment)
-# Linux (GCC) - JNI (default, Java 8+):
-cmake --workflow --preset ci-MinShar-GNUC-Maven --fresh          # JNI Release
-cmake --workflow --preset ci-MinShar-GNUC-Maven-Snapshot --fresh # JNI Snapshot
-
-# Linux (GCC) - FFM (optional, Java 25+):
-cmake --workflow --preset ci-MinShar-GNUC-Maven-FFM --fresh          # FFM Release
-cmake --workflow --preset ci-MinShar-GNUC-Maven-FFM-Snapshot --fresh # FFM Snapshot
-
-# Windows (MSVC) - JNI (default):
-cmake --workflow --preset ci-MinShar-MSVC-Maven --fresh          # JNI Release
-cmake --workflow --preset ci-MinShar-MSVC-Maven-Snapshot --fresh # JNI Snapshot
-
-# Windows (MSVC) - FFM (optional):
-cmake --workflow --preset ci-MinShar-MSVC-Maven-FFM --fresh          # FFM Release
-cmake --workflow --preset ci-MinShar-MSVC-Maven-FFM-Snapshot --fresh # FFM Snapshot
-
-# macOS (Clang) - JNI (default):
-cmake --workflow --preset ci-MinShar-Clang-Maven --fresh          # JNI Release
-cmake --workflow --preset ci-MinShar-Clang-Maven-Snapshot --fresh # JNI Snapshot
-
-# macOS (Clang) - FFM (optional):
-cmake --workflow --preset ci-MinShar-Clang-Maven-FFM --fresh         # FFM Release
-cmake --workflow --preset ci-MinShar-Clang-Maven-FFM-Snapshot --fresh # FFM Snapshot
-
-# ROS3 VFD (S3 cloud storage) - Add to any preset above:
-cmake --workflow --preset ci-MinShar-GNUC-Maven --fresh -DHDF5_ENABLE_ROS3_VFD=ON
-```
-
->**Note:** Presets are platform-specific. Use `cmake --list-presets` to see available presets for your current platform. Minimal Maven presets skip examples, testing, tools, C++, and Fortran builds to optimize for Java artifact generation only.
-
-#### Java Examples Maven Integration
-
-The HDF5 Java examples are available as a separate Maven artifact: `org.hdfgroup:hdf5-java-examples`. It contains platform-specific dependencies to ensure compatibility with the HDF5 Java library, and complete examples with documentation for all HDF5 Java functionality. See [HDF5Examples/JAVA/README-MAVEN.md](../HDF5Examples/JAVA/README-MAVEN.md) for usage instructions.
-
-#### Testing Java Examples with Maven Artifacts
-
-- Maven staging workflow validates examples against artifacts.
-- Cross-platform testing ensures compatibility on all supported platforms.
-- Native library error handling validates JAR structure in Maven-only environments.
-- Fork-based testing allows validation on repository forks before canonical deployment.
-- Dynamic repository workflows adapt to any GitHub repository automatically.
-
----
 
 <a id="section-viii"></a>
 ## VIII. User Defined Options for HDF5 Libraries with CMake
@@ -897,8 +809,6 @@ To change external support files to use a local directory:
   "inherits": [
     "ci-x64-Release-GNUC",
     "ci-CPP",
-    "ci-Fortran",
-    "ci-Java",
     "my-StdShar",
     "my-StdExamples"
   ]
@@ -906,34 +816,6 @@ To change external support files to use a local directory:
 ```
 
 Then you can change or add options for your specific case.
-
-### Example: Maven Deployment Preset
-
-For Maven deployment with custom repository URL:
-
-```json
-{
-  "name": "my-maven-custom",
-  "inherits": "ci-MinShar-GNUC-Maven-Snapshot",
-  "cacheVariables": {
-    "MAVEN_REPOSITORY_URL": {
-      "type": "STRING",
-      "value": "https://your-repo.com/maven"
-    },
-    "HDF5_ENABLE_ROS3_VFD": {
-      "type": "BOOL",
-      "value": "ON"
-    }
-  }
-}
-```
-
-Build with:
-```bash
-cmake --workflow --preset my-maven-custom --fresh
-```
-
-> **Note:** This example uses JNI (default). For FFM, inherit from `ci-MinShar-GNUC-Maven-FFM-Snapshot`.
 
 ### Preset File Details
 
@@ -992,7 +874,7 @@ find_package (HDF5 NAMES hdf5 COMPONENTS C shared)
 ```
 
 The components are optional and can be omitted if not needed. The
-components are: `shared`, `static`, `C`, `CXX`, `Fortran`, `HL`, `Java`, `Tools`, and `VOL`.
+components are: `shared`, `static`, `C`, `CXX`, `HL`, `Tools`, and `VOL`.
 
 ---
 
@@ -1008,15 +890,11 @@ Some of the labels are:
 
 PARALLEL
 - MPI_TEST for parallel tests.
-- MPI_TEST_FORT for just parallel Fortran tests.
 
 SERIAL
 - CPP for C++ tests.
 - HL_CPP for high-level C++ tests.
-- FORTRAN for Fortran tests.
-- HL_FORTRAN for high-level Fortran tests.
 - HL for high-level tests.
-- JUnit for Java tests.
 - H5WATCH for tests that use the h5watch SWMR program.
 - SWMR for tests that use the SWMR feature.
 - h5_api for the API tests.
@@ -1028,7 +906,6 @@ SERIAL
 - H5COPY for the h5copy tool tests.
 - H5DIFF for the h5diff tool tests.
 - H5DUMP for the h5dump tool tests.
-- H5FC for the h5fc tool tests.
 - H5IMPORT for the h5import tool tests.
 - H5JAM for the h5jam tool tests.
 - H5LS for the h5ls tool tests.
@@ -1044,10 +921,6 @@ ctest . --tests-regex "CPP"
 ```
 
 To run tests with multiple labels, use the `|` operator to separate the labels.
-To run tests with the `MPI_TEST` and `FORTRAN` labels, use:
-```bash
-ctest . --tests-regex "MPI_TEST|FORTRAN"
-```
 
 To exclude tests with a specific label, use the `--exclude-regex` (or `-E`) option with `ctest`.
 
@@ -1056,70 +929,6 @@ see the CMake documentation:
 https://cmake.org/cmake/help/latest/manual/ctest.1.html#regular-expressions.
 
 ---
-
-<a id="section-xiv"></a>
-## XIV. Java FFM Testing
-
-HDF5 2.0 includes comprehensive Foreign Function & Memory (FFM) API tests for Java 25+.
-
-### FFM Test Organization
-
-Tests are organized by HDF5 module in `java/jtest/`:
-
-Module Test Files:
-  - TestH5ffm.java     - General library operations
-                         H5open, H5close, memory management, version info
-  - TestH5Affm.java    - Attribute operations
-  - TestH5Dffm.java    - Dataset operations
-  - TestH5Effm.java    - Error handling
-  - TestH5Fffm.java    - File operations
-  - TestH5FDffm.java   - File drivers
-  - TestH5Gffm.java    - Group operations
-  - TestH5Iffm.java    - Identifier management
-  - TestH5Lffm.java    - Link operations
-  - TestH5Offm.java    - Object operations
-  - TestH5Pffm.java    - Property lists
-  - TestH5PLffm.java   - Plugin management
-  - TestH5Rffm.java    - References
-  - TestH5Sffm.java    - Dataspace operations
-  - TestH5Tffm.java    - Datatype operations
-  - TestH5VLffm.java   - VOL connector
-  - TestH5Zffm.java    - Filter operations
-
-### Running FFM Tests
-
-To run all FFM tests:
-```bash
-ctest -R "JUnitFFM" -V
-```
-
-To run specific module tests:
-```bash
-ctest -R "JUnit-TestH5Affm" -V    # Attributes
-ctest -R "JUnit-TestH5Pffm" -V    # Properties
-ctest -R "JUnit-TestH5Tffm" -V    # Datatypes
-ctest -R "JUnit-TestH5Sffm" -V    # Dataspaces
-```
-
-Test Requirements:
-
-- Java 25+ with `--enable-native-access=ALL-UNNAMED`
-- FFM bindings JAR (`javahdf5-*.jar`)
-- JUnit 4.x test framework
-- HDF5 native libraries in `LD_LIBRARY_PATH`
-
-FFM Test Patterns:
-- All tests use `Arena.ofConfined()` for memory management
-- Proper cleanup in try-with-resources blocks
-- Return value checking with `isSuccess()` / `isValidId()`
-- See `java/jtest/FfmTestSupport.java` for utility methods
-
-ROS3 VFD (S3 Object Storage):
-
-- Tests are compatible with both plain and ROS3-enabled builds
-- Use `-DHDF5_ENABLE_ROS3_VFD=ON` with any Maven CMake preset for ROS3 builds
-- Example: `cmake --preset ci-MinShar-GNUC-Maven -DHDF5_ENABLE_ROS3_VFD=ON`
-- Same test suite validates both feature sets
 
 ---
 *For further assistance, send email to help@hdfgroup.org*

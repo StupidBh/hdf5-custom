@@ -268,61 +268,6 @@
       }
     },
     {
-      "name": "ci-Maven",
-      "hidden": true,
-      "cacheVariables": {
-        "HDF5_ENABLE_MAVEN_DEPLOY": "ON",
-        "HDF5_MAVEN_SNAPSHOT": "OFF"
-      }
-    },
-    {
-      "name": "ci-Maven-Snapshot",
-      "hidden": true,
-      "cacheVariables": {
-        "HDF5_ENABLE_MAVEN_DEPLOY": "ON",
-        "HDF5_MAVEN_SNAPSHOT": "ON"
-      }
-    },
-    {
-      "name": "ci-Maven-Minimal",
-      "hidden": true,
-      "cacheVariables": {
-        "HDF5_BUILD_EXAMPLES": "OFF",
-        "BUILD_TESTING": "OFF",
-        "HDF5_BUILD_TOOLS": "OFF",
-        "HDF5_BUILD_FORTRAN": "OFF",
-        "HDF5_BUILD_CPP_LIB": "OFF",
-        "HDF5_BUILD_JAVA": "ON",
-        "HDF5_ENABLE_MAVEN_DEPLOY": "ON",
-        "HDF5_MAVEN_SNAPSHOT": "OFF"
-      }
-    },
-    {
-      "name": "ci-Maven-Minimal-Snapshot",
-      "hidden": true,
-      "inherits": [
-        "ci-Maven-Minimal"
-      ],
-      "cacheVariables": {
-        "HDF5_MAVEN_SNAPSHOT": "ON"
-      }
-    },
-    {
-      "name": "ci-Maven-Testing",
-      "description": "Maven Configuration with Testing Enabled - For debugging FFM/JNI issues",
-      "hidden": true,
-      "cacheVariables": {
-        "HDF5_BUILD_EXAMPLES": "ON",
-        "BUILD_TESTING": "ON",
-        "HDF5_BUILD_TOOLS": "ON",
-        "HDF5_BUILD_FORTRAN": "OFF",
-        "HDF5_BUILD_CPP_LIB": "OFF",
-        "HDF5_BUILD_JAVA": "ON",
-        "HDF5_ENABLE_MAVEN_DEPLOY": "OFF",
-        "HDF5_MAVEN_SNAPSHOT": "OFF"
-      }
-    },
-    {
       "name": "ci-StdShar",
       "hidden": true,
       "inherits": [
@@ -335,7 +280,6 @@
           "type": "STRING",
           "value": "hdf5::"
         },
-        "HDF5_INSTALL_MOD_FORTRAN": "NO",
         "HDF5_ENABLE_ALL_WARNINGS": "ON",
         "HDF5_MINGW_STATIC_GCC_LIBS": "ON",
         "HDF_TEST_EXPRESS": "2"
@@ -347,7 +291,6 @@
       "inherits": [
         "ci-x64-Release-MSVC",
         "ci-CPP",
-        "ci-Java",
         "ci-StdShar"
       ]
     },
@@ -357,39 +300,6 @@
       "inherits": [
         "ci-arm64-Release-MSVC",
         "ci-CPP",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-MSVC-FFM",
-      "description": "MSVC Standard Config for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-CPP",
-        "ci-Java-FFM",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-MSVC-Fortran",
-      "description": "MSVC Standard Config for x64 (Release)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-CPP",
-        "ci-Fortran",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-MSVC-Fortran-FFM",
-      "description": "MSVC Standard Config for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-CPP",
-        "ci-Fortran",
-        "ci-Java-FFM",
         "ci-StdShar"
       ]
     },
@@ -399,19 +309,6 @@
       "inherits": [
         "ci-x64-Release-Clang",
         "ci-CPP",
-        "ci-Fortran",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-Clang-FFM",
-      "description": "Clang Standard Config for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-CPP",
-        "ci-Fortran",
-        "ci-Java-FFM",
         "ci-StdShar"
       ]
     },
@@ -421,17 +318,6 @@
       "inherits": [
         "ci-macos-Release-Clang",
         "ci-CPP",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-macos-Clang-FFM",
-      "description": "Clang Standard Config for macos for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-macos-Release-Clang",
-        "ci-CPP",
-        "ci-Java-FFM",
         "ci-StdShar"
       ]
     },
@@ -441,39 +327,14 @@
       "inherits": [
         "ci-macos-Release-GNUC",
         "ci-CPP",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-macos-GNUC-FFM",
-      "description": "GNUC Standard Config for macos for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-macos-Release-GNUC",
-        "ci-CPP",
-        "ci-Java-FFM",
         "ci-StdShar"
       ]
     },
     {
       "name": "ci-StdShar-GNUC",
-      "description": "GNUC Standard Config for x64 with Java JNI (Java 11+)",
       "inherits": [
         "ci-x64-Release-GNUC",
         "ci-CPP",
-        "ci-Fortran",
-        "ci-Java",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-GNUC-FFM",
-      "description": "GNUC Standard Config for x64 with Java FFM (Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-CPP",
-        "ci-Fortran",
-        "ci-Java-FFM",
         "ci-StdShar"
       ]
     },
@@ -491,182 +352,7 @@
       "inherits": [
         "ci-x64-Release-Intel",
         "ci-CPP",
-        "ci-Fortran",
-        "ci-Java",
         "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-StdShar-Intel-FFM",
-      "description": "Intel Standard Config for x64 with Java FFM (Requires Java 25+) (Release)",
-      "inherits": [
-        "ci-x64-Release-Intel",
-        "ci-CPP",
-        "ci-Fortran",
-        "ci-Java-FFM",
-        "ci-StdShar"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven",
-      "description": "GNUC Minimal Config for x64 with Maven deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-Snapshot",
-      "description": "GNUC Minimal Config for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven",
-      "description": "MSVC Minimal Config for x64 with Maven deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-Snapshot",
-      "description": "MSVC Minimal Config for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven",
-      "description": "Clang Minimal Config for x64 with Maven deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-Snapshot",
-      "description": "Clang Minimal Config for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM",
-      "description": "GNUC Minimal Config for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "description": "GNUC Minimal Config for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM",
-      "description": "MSVC Minimal Config for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "description": "MSVC Minimal Config for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM",
-      "description": "Clang Minimal Config for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "description": "Clang Minimal Config for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java-FFM",
-        "ci-Maven-Minimal-Snapshot"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-FFM",
-      "description": "GNUC Test-Enabled Config for FFM (Java 25+) - For debugging Windows FFM issues",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java-FFM",
-        "ci-Maven-Testing"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-FFM",
-      "description": "MSVC Test-Enabled Config for FFM (Java 25+) - For debugging Windows FFM issues",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java-FFM",
-        "ci-Maven-Testing"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-FFM",
-      "description": "Clang Test-Enabled Config for FFM (Java 25+) - For debugging macOS FFM issues",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java-FFM",
-        "ci-Maven-Testing"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-JNI",
-      "description": "GNUC Test-Enabled Config for JNI (Java 11+) - For debugging JNI issues",
-      "inherits": [
-        "ci-x64-Release-GNUC",
-        "ci-Java",
-        "ci-Maven-Testing"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-JNI",
-      "description": "MSVC Test-Enabled Config for JNI (Java 11+) - For debugging Windows JNI issues",
-      "inherits": [
-        "ci-x64-Release-MSVC",
-        "ci-Java",
-        "ci-Maven-Testing"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-JNI",
-      "description": "Clang Test-Enabled Config for JNI (Java 11+) - For debugging macOS JNI issues",
-      "inherits": [
-        "ci-x64-Release-Clang",
-        "ci-Java",
-        "ci-Maven-Testing"
       ]
     }
   ],
@@ -688,25 +374,9 @@
       ]
     },
     {
-      "name": "ci-StdShar-MSVC-FFM",
-      "description": "MSVC Standard Build for x64 with Java FFM (Requires Java 25+) (Release)",
-      "configurePreset": "ci-StdShar-MSVC-FFM",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
       "name": "ci-StdShar-Clang",
       "description": "Clang Standard Build for x64 (Release)",
       "configurePreset": "ci-StdShar-Clang",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-StdShar-Clang-FFM",
-      "description": "Clang Standard Build for x64 with Java FFM (Requires Java 25+) (Release)",
-      "configurePreset": "ci-StdShar-Clang-FFM",
       "inherits": [
         "ci-x64-Release-Clang"
       ]
@@ -720,25 +390,7 @@
       ]
     },
     {
-      "name": "ci-StdShar-macos-Clang-FFM",
-      "description": "Clang Standard Build for macos with Java FFM (Requires Java 25+) (Release)",
-      "configurePreset": "ci-StdShar-macos-Clang-FFM",
-      "inherits": [
-        "ci-macos-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-StdShar-macos-GNUC-FFM",
-      "description": "GNUC Standard Build for macos (Release)",
-      "configurePreset": "ci-StdShar-macos-GNUC-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-macos-Release-GNUC"
-      ]
-    },
-    {
       "name": "ci-StdShar-macos-GNUC",
-      "description": "GNUC Standard Build for macos with Java FFM (Requires Java 25+) (Release)",
       "configurePreset": "ci-StdShar-macos-GNUC",
       "verbose": true,
       "inherits": [
@@ -749,15 +401,6 @@
       "name": "ci-StdShar-GNUC",
       "description": "GNUC Standard Build for x64 (Release)",
       "configurePreset": "ci-StdShar-GNUC",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-StdShar-GNUC-FFM",
-      "description": "GNUC Standard Build for x64 with Java FFM (Requires Java 25+) (Release)",
-      "configurePreset": "ci-StdShar-GNUC-FFM",
       "verbose": true,
       "inherits": [
         "ci-x64-Release-GNUC"
@@ -780,177 +423,6 @@
       "inherits": [
         "ci-x64-Release-Intel"
       ]
-    },
-    {
-      "name": "ci-StdShar-Intel-FFM",
-      "description": "Intel Standard Build for x64 with Java FFM (Requires Java 25+) (Release)",
-      "configurePreset": "ci-StdShar-Intel-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Intel"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven",
-      "description": "GNUC Minimal Build for x64 with Maven deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-GNUC-Maven",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-Snapshot",
-      "description": "GNUC Minimal Build for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-GNUC-Maven-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven",
-      "description": "MSVC Minimal Build for x64 with Maven deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-MSVC-Maven",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-Snapshot",
-      "description": "MSVC Minimal Build for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-MSVC-Maven-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven",
-      "description": "Clang Minimal Build for x64 with Maven deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-Clang-Maven",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-Snapshot",
-      "description": "Clang Minimal Build for x64 with Maven snapshot deployment (JNI - Java 8+)",
-      "configurePreset": "ci-MinShar-Clang-Maven-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM",
-      "description": "GNUC Minimal Build for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "description": "GNUC Minimal Build for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM",
-      "description": "MSVC Minimal Build for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "description": "MSVC Minimal Build for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM",
-      "description": "Clang Minimal Build for x64 with Maven deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "description": "Clang Minimal Build for x64 with Maven snapshot deployment (FFM - Requires Java 25+)",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-FFM",
-      "description": "GNUC Test-Enabled Build for FFM (Java 25+)",
-      "configurePreset": "ci-Testing-GNUC-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-FFM",
-      "description": "MSVC Test-Enabled Build for FFM (Java 25+)",
-      "configurePreset": "ci-Testing-MSVC-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-FFM",
-      "description": "Clang Test-Enabled Build for FFM (Java 25+)",
-      "configurePreset": "ci-Testing-Clang-FFM",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-JNI",
-      "description": "GNUC Test-Enabled Build for JNI (Java 11+)",
-      "configurePreset": "ci-Testing-GNUC-JNI",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-JNI",
-      "description": "MSVC Test-Enabled Build for JNI (Java 11+)",
-      "configurePreset": "ci-Testing-MSVC-JNI",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-JNI",
-      "description": "Clang Test-Enabled Build for JNI (Java 11+)",
-      "configurePreset": "ci-Testing-Clang-JNI",
-      "verbose": true,
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
     }
   ],
   "testPresets": [
@@ -969,22 +441,8 @@
       ]
     },
     {
-      "name": "ci-StdShar-MSVC-FFM",
-      "configurePreset": "ci-StdShar-MSVC-FFM",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
       "name": "ci-StdShar-Clang",
       "configurePreset": "ci-StdShar-Clang",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-StdShar-Clang-FFM",
-      "configurePreset": "ci-StdShar-Clang-FFM",
       "inherits": [
         "ci-x64-Release-Clang"
       ]
@@ -1002,18 +460,6 @@
       }
     },
     {
-      "name": "ci-StdShar-macos-Clang-FFM",
-      "configurePreset": "ci-StdShar-macos-Clang-FFM",
-      "inherits": [
-        "ci-macos-Release-Clang"
-      ],
-      "execution": {
-        "noTestsAction": "error",
-        "timeout": 180,
-        "jobs": 2
-      }
-    },
-    {
       "name": "ci-StdShar-macos-GNUC",
       "configurePreset": "ci-StdShar-macos-GNUC",
       "inherits": [
@@ -1021,22 +467,8 @@
       ]
     },
     {
-      "name": "ci-StdShar-macos-GNUC-FFM",
-      "configurePreset": "ci-StdShar-macos-GNUC-FFM",
-      "inherits": [
-        "ci-macos-Release-GNUC"
-      ]
-    },
-    {
       "name": "ci-StdShar-GNUC",
       "configurePreset": "ci-StdShar-GNUC",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-StdShar-GNUC-FFM",
-      "configurePreset": "ci-StdShar-GNUC-FFM",
       "inherits": [
         "ci-x64-Release-GNUC"
       ]
@@ -1061,155 +493,10 @@
       }
     },
     {
-      "name": "ci-StdShar-win-Intel-FFM",
-      "configurePreset": "ci-StdShar-Intel-FFM",
-      "inherits": [
-        "ci-x64-Release-Intel"
-      ],
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
       "name": "ci-StdShar-Intel",
       "configurePreset": "ci-StdShar-Intel",
       "inherits": [
         "ci-x64-Release-Intel"
-      ]
-    },
-    {
-      "name": "ci-StdShar-Intel-FFM",
-      "configurePreset": "ci-StdShar-Intel-FFM",
-      "inherits": [
-        "ci-x64-Release-Intel"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven",
-      "configurePreset": "ci-MinShar-GNUC-Maven",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-GNUC-Maven-Snapshot",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven",
-      "configurePreset": "ci-MinShar-MSVC-Maven",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-MSVC-Maven-Snapshot",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven",
-      "configurePreset": "ci-MinShar-Clang-Maven",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-Clang-Maven-Snapshot",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-FFM",
-      "configurePreset": "ci-Testing-GNUC-FFM",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-FFM",
-      "configurePreset": "ci-Testing-MSVC-FFM",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-FFM",
-      "configurePreset": "ci-Testing-Clang-FFM",
-      "inherits": [
-        "ci-x64-Release-Clang"
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-JNI",
-      "configurePreset": "ci-Testing-GNUC-JNI",
-      "inherits": [
-        "ci-x64-Release-GNUC"
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-JNI",
-      "configurePreset": "ci-Testing-MSVC-JNI",
-      "inherits": [
-        "ci-x64-Release-MSVC"
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-JNI",
-      "configurePreset": "ci-Testing-Clang-JNI",
-      "inherits": [
-        "ci-x64-Release-Clang"
       ]
     }
   ],
@@ -1225,18 +512,8 @@
       "inherits": "ci-arm64-Release-MSVC"
     },
     {
-      "name": "ci-StdShar-MSVC-FFM",
-      "configurePreset": "ci-StdShar-MSVC-FFM",
-      "inherits": "ci-x64-Release-MSVC"
-    },
-    {
       "name": "ci-StdShar-Clang",
       "configurePreset": "ci-StdShar-Clang",
-      "inherits": "ci-x64-Release-Clang"
-    },
-    {
-      "name": "ci-StdShar-Clang-FFM",
-      "configurePreset": "ci-StdShar-Clang-FFM",
       "inherits": "ci-x64-Release-Clang"
     },
     {
@@ -1245,28 +522,13 @@
       "inherits": "ci-macos-Release-Clang"
     },
     {
-      "name": "ci-StdShar-macos-Clang-FFM",
-      "configurePreset": "ci-StdShar-macos-Clang-FFM",
-      "inherits": "ci-macos-Release-Clang"
-    },
-    {
       "name": "ci-StdShar-macos-GNUC",
       "configurePreset": "ci-StdShar-macos-GNUC",
       "inherits": "ci-macos-Release-GNUC"
     },
     {
-      "name": "ci-StdShar-macos-GNUC-FFM",
-      "configurePreset": "ci-StdShar-macos-GNUC-FFM",
-      "inherits": "ci-macos-Release-GNUC"
-    },
-    {
       "name": "ci-StdShar-GNUC",
       "configurePreset": "ci-StdShar-GNUC",
-      "inherits": "ci-x64-Release-GNUC"
-    },
-    {
-      "name": "ci-StdShar-GNUC-FFM",
-      "configurePreset": "ci-StdShar-GNUC-FFM",
       "inherits": "ci-x64-Release-GNUC"
     },
     {
@@ -1278,71 +540,6 @@
       "name": "ci-StdShar-Intel",
       "configurePreset": "ci-StdShar-Intel",
       "inherits": "ci-x64-Release-Intel"
-    },
-    {
-      "name": "ci-StdShar-Intel-FFM",
-      "configurePreset": "ci-StdShar-Intel-FFM",
-      "inherits": "ci-x64-Release-Intel"
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven",
-      "configurePreset": "ci-MinShar-GNUC-Maven",
-      "inherits": "ci-x64-Release-GNUC"
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-GNUC-Maven-Snapshot",
-      "inherits": "ci-x64-Release-GNUC"
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven",
-      "configurePreset": "ci-MinShar-MSVC-Maven",
-      "inherits": "ci-x64-Release-MSVC"
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-MSVC-Maven-Snapshot",
-      "inherits": "ci-x64-Release-MSVC"
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven",
-      "configurePreset": "ci-MinShar-Clang-Maven",
-      "inherits": "ci-x64-Release-Clang"
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-Snapshot",
-      "configurePreset": "ci-MinShar-Clang-Maven-Snapshot",
-      "inherits": "ci-x64-Release-Clang"
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM",
-      "inherits": "ci-x64-Release-GNUC"
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "inherits": "ci-x64-Release-GNUC"
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM",
-      "inherits": "ci-x64-Release-MSVC"
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "inherits": "ci-x64-Release-MSVC"
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM",
-      "inherits": "ci-x64-Release-Clang"
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "configurePreset": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "inherits": "ci-x64-Release-Clang"
     }
   ],
   "workflowPresets": [
@@ -1388,27 +585,6 @@
         }
       ]
     },
-   {
-      "name": "ci-StdShar-MSVC-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-MSVC-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-MSVC-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-MSVC-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-MSVC-FFM"
-        }
-      ]
-    },
     {
       "name": "ci-StdShar-Clang",
       "steps": [
@@ -1427,27 +603,6 @@
         {
           "type": "package",
           "name": "ci-StdShar-Clang"
-        }
-      ]
-    },
-    {
-      "name": "ci-StdShar-Clang-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-Clang-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-Clang-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-Clang-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-Clang-FFM"
         }
       ]
     },
@@ -1473,27 +628,6 @@
       ]
     },
     {
-      "name": "ci-StdShar-macos-Clang-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-macos-Clang-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-macos-Clang-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-macos-Clang-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-macos-Clang-FFM"
-        }
-      ]
-    },
-    {
       "name": "ci-StdShar-macos-GNUC",
       "steps": [
         {
@@ -1515,27 +649,6 @@
       ]
     },
     {
-      "name": "ci-StdShar-macos-GNUC-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-macos-GNUC-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-macos-GNUC-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-macos-GNUC-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-macos-GNUC-FFM"
-        }
-      ]
-    },
-    {
       "name": "ci-StdShar-GNUC",
       "steps": [
         {
@@ -1553,27 +666,6 @@
         {
           "type": "package",
           "name": "ci-StdShar-GNUC"
-        }
-      ]
-    },
-    {
-      "name": "ci-StdShar-GNUC-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-GNUC-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-GNUC-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-GNUC-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-GNUC-FFM"
         }
       ]
     },
@@ -1620,27 +712,6 @@
       ]
     },
     {
-      "name": "ci-StdShar-Intel-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-Intel-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-Intel-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-Intel-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-Intel-FFM"
-        }
-      ]
-    },
-    {
       "name": "ci-StdShar-win-Intel",
       "steps": [
         {
@@ -1658,333 +729,6 @@
         {
           "type": "package",
           "name": "ci-StdShar-Intel"
-        }
-      ]
-    },
-    {
-      "name": "ci-StdShar-win-Intel-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-StdShar-Intel-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-StdShar-Intel-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-StdShar-win-Intel-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-StdShar-Intel-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-GNUC-Maven"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-GNUC-Maven"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-GNUC-Maven"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-GNUC-Maven-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-GNUC-Maven-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-GNUC-Maven-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-MSVC-Maven"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-MSVC-Maven"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-MSVC-Maven"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-MSVC-Maven-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-MSVC-Maven-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-MSVC-Maven-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-Clang-Maven"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-Clang-Maven"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-Clang-Maven"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-Clang-Maven-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-Clang-Maven-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-Clang-Maven-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-GNUC-Maven-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-GNUC-Maven-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-GNUC-Maven-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-GNUC-Maven-FFM-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-MSVC-Maven-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-MSVC-Maven-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-MSVC-Maven-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-MSVC-Maven-FFM-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-Clang-Maven-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-Clang-Maven-FFM"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-Clang-Maven-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-MinShar-Clang-Maven-FFM-Snapshot",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-MinShar-Clang-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "build",
-          "name": "ci-MinShar-Clang-Maven-FFM-Snapshot"
-        },
-        {
-          "type": "package",
-          "name": "ci-MinShar-Clang-Maven-FFM-Snapshot"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-GNUC-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-GNUC-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-GNUC-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-MSVC-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-MSVC-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-MSVC-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-FFM",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-Clang-FFM"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-Clang-FFM"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-Clang-FFM"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-GNUC-JNI",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-GNUC-JNI"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-GNUC-JNI"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-GNUC-JNI"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-MSVC-JNI",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-MSVC-JNI"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-MSVC-JNI"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-MSVC-JNI"
-        }
-      ]
-    },
-    {
-      "name": "ci-Testing-Clang-JNI",
-      "steps": [
-        {
-          "type": "configure",
-          "name": "ci-Testing-Clang-JNI"
-        },
-        {
-          "type": "build",
-          "name": "ci-Testing-Clang-JNI"
-        },
-        {
-          "type": "test",
-          "name": "ci-Testing-Clang-JNI"
         }
       ]
     }

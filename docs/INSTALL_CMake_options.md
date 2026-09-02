@@ -1,6 +1,6 @@
 # HDF5 CMake build options
 
-The tables below document the CMake options that can be set to control how HDF5 is built. Options are typically set by passing them in the form of `-D<OPTION>=<VALUE>` when configuring HDF5. For example, `-DHDF5_BUILD_FORTRAN=ON` will enable building of the HDF5 Fortran wrappers. See [the CMake documentation](https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry) for a short description of option types and their associated values.
+The tables below document the CMake options that can be set to control how HDF5 is built. Options are typically set by passing them in the form of `-D<OPTION>=<VALUE>` when configuring HDF5. For example, `-DHDF5_BUILD_CPP_LIB=ON` will enable building of the HDF5 C++ wrapper. See [the CMake documentation](https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry) for a short description of option types and their associated values.
 
 Options settings for typical HDF5 configurations can be found in the [cacheinit.cmake](../config/cmake/cacheinit.cmake) and [CMakePresets.json](../CMakePresets.json) files. 
 
@@ -15,8 +15,6 @@ Options settings for typical HDF5 configurations can be found in the [cacheinit.
   * [Compiler options](#compiler-options)
   * [MinGW-specific options](#mingw-specific-options)
 * [Programming language wrappers options](#programming-language-wrappers-options)
-  * [Fortran options](#pl_fortran)
-  * [Java options](#pl_java)
   * [C++ options](#pl_cxx)
   * [High-level library options](#hl_lib)
 * [Parallel HDF5 options](#parallel-hdf5-options)
@@ -91,9 +89,7 @@ These options control how HDF5 gets installed. Options dealing with paths are ge
 | `HDF5_USE_GNU_DIRS` | `BOOL` | Varies by platform | If `ON`, uses the GNU Coding Standard CMake install directory variables when setting up for installing the HDF5 library. See [GNUInstallDirs](https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html) for more information. |
 | `HDF5_INSTALL_BIN_DIR` | `STRING` | `bin` | Specifies the directory to install executables in. |
 | `HDF5_INSTALL_LIB_DIR` | `STRING` | `lib` | Specifies the directory to install libraries in. |
-| `HDF5_INSTALL_JNI_LIB_DIR` | `STRING` | `lib` | Specifies the directory to install Java JNI libraries in. |
 | `HDF5_INSTALL_INCLUDE_DIR` | `STRING` | `include` | Specifies the directory to install header files in. |
-| `HDF5_INSTALL_MODULE_DIR` | `STRING` | `mod` (`HDF5_USE_GNU_DIRS=OFF`) <br /> `HDF5_INSTALL_INCLUDE_DIR/mod` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install Fortran .mod files in. |
 | `HDF5_INSTALL_CMAKE_DIR` | `STRING` | `cmake` (`HDF5_USE_GNU_DIRS=OFF`) <br /> `HDF5_INSTALL_LIB_DIR/cmake/hdf5` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install CMake files in. |
 | `HDF5_INSTALL_DATA_DIR` | `STRING` | `.` (for `MSVC` and `HDF5_USE_GNU_DIRS=OFF`) <br /> `share` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install miscellaneous data files in. |
 | `HDF5_INSTALL_DOC_DIR` | `STRING` | `HDF5_INSTALL_DATA_DIR` (`HDF5_USE_GNU_DIRS=OFF`) <br /> `HDF5_INSTALL_DATA_DIR/doc/hdf5` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install documentation files in. |
@@ -147,30 +143,6 @@ These are options that are specific to building HDF5 with MinGW.
 ## Programming language wrappers options
 
 These are options which are specific to HDF5's wrappers for programming languages.
-
-### Fortran options
-<a name="pl_fortran"></a>
-
-| CMake option | Type | Default | Description |
-|:-------------|:-----|:--------|:------------|
-| `HDF5_BUILD_FORTRAN` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 Fortran wrapper interface. |
-| `HDF5_INSTALL_MOD_FORTRAN` | `STRING` | `SHARED` if HDF5 shared libraries are built; `STATIC` otherwise | If `SHARED` or `STATIC`, installs Fortran .mod files to a subdirectory (named `shared` or `static`) of the installation's `include` directory. Valid values are `SHARED`, `STATIC` and `NO`. |
-
-### Java options
-<a name="pl_java"></a>
-
-| CMake option | Type | Default | Description |
-|:-------------|:-----|:--------|:------------|
-| `HDF5_BUILD_JAVA` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 Java wrapper interface. |
-| `HDF5_ENABLE_JNI` | `BOOL` | `ON` if `HDF5_BUILD_JAVA` is `ON` | If `ON`, enables building of the HDF5 Java JNI (Java Native Interface) bindings. Otherwise, enables building of the HDF5 Java FFM (Foreign Function and Memory) bindings, which requires the `jextract` tool to be found by CMake. |
-| `HDF5_JAVA_PACK_JRE` | `BOOL` | `OFF` | If `ON`, packages a Java JRE with an HDF5 installation. |
-| `HDF5_ENABLE_MAVEN_DEPLOY` | `BOOL` | `OFF` | If `ON`, enables Maven repository deployment support. |
-| `HDF5_MAVEN_SNAPSHOT` | `BOOL` | `OFF` | If `ON`, adds "-SNAPSHOT" to version portion of names of Maven artifacts. |
-| `HDF5_JAVA_LOGGING_JAR` | `FILEPATH` | Bundled `java/lib/slf4j-api-2.0.16.jar` | Path to the SLF4J API jar. |
-| `HDF5_JAVA_LOGGING_NOP_JAR` | `FILEPATH` | Bundled `java/lib/ext/slf4j-nop-2.0.16.jar` | Path to the SLF4J NOP binding jar. |
-| `HDF5_JAVA_LOGGING_SIMPLE_JAR` | `FILEPATH` | Bundled `java/lib/ext/slf4j-simple-2.0.16.jar` | Path to the SLF4J simple binding jar. |
-| `HDF5_JAVA_JUNIT_JAR` | `FILEPATH` | Bundled `java/lib/org.junit.jar` | Path to the JUnit 4 jar. |
-| `HDF5_JAVA_HAMCREST_JAR` | `FILEPATH` | Bundled `java/lib/org.hamcrest.jar` | Path to the Hamcrest jar. |
 
 ### C++ options
 <a name="pl_cxx"></a>
@@ -301,8 +273,6 @@ These are options which can be set for controlling how the HDF5 example programs
 |:-------------|:-----|:--------|:------------|
 | `HDF5_BUILD_EXAMPLES` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 library (C) example programs. |
 | `USE_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, build the HDF5 library example programs against shared HDF5 libraries. Otherwise, use static HDF5 libraries. |
-| `H5EXAMPLE_BUILD_FORTRAN` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library Fortran example programs. |
-| `H5EXAMPLE_BUILD_JAVA` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library Java example programs. |
 | `H5EXAMPLE_BUILD_CXX` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library C++ example programs. |
 | `H5EXAMPLE_BUILD_HL` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library high-level C example programs. |
 | `H5EXAMPLE_ENABLE_PARALLEL` | `BOOL` | `OFF` | If `ON`, enables building of the parallel HDF5 library example programs. |
@@ -354,8 +324,6 @@ These are options which control how HDF5 testing is built and executed.
 | `HDF5_TEST_SERIAL` | `BOOL` | `ON` | If `ON`, enables testing of HDF5's serial (i.e., non-parallel) tests. |
 | `HDF5_TEST_PARALLEL` | `BOOL` | `ON` (if `HDF5_ENABLE_PARALLEL` is `ON`) | If `ON`, enables testing of HDF5's parallel tests. |
 | `HDF5_TEST_TOOLS` | `BOOL` | `ON` (if `HDF5_BUILD_TOOLS` is `ON`) | If `ON`, enables testing of HDF5's tool programs. |
-| `HDF5_TEST_FORTRAN` | `BOOL` | `ON` (if `HDF5_BUILD_FORTRAN` is `ON`) | If `ON`, enables testing of HDF5's Fortran wrapper interface. |
-| `HDF5_TEST_JAVA` | `BOOL` | `ON` (if `HDF5_BUILD_JAVA` is `ON`) | If `ON`, enables testing of HDF5's Java wrapper interface. |
 | `HDF5_TEST_CPP` | `BOOL` | `ON` (if `HDF5_BUILD_CPP_LIB` is `ON`) | If `ON`, enables testing of HDF5's C++ wrapper interface. |
 | `HDF5_TEST_EXAMPLES` | `BOOL` | `ON` (if `HDF5_BUILD_EXAMPLES` is `ON`) | If `ON`, enables testing of HDF5's example programs. |
 | `HDF5_TEST_API` | `BOOL` | `ON` | If `ON`, enables testing of HDF5's API tests. |
@@ -380,7 +348,6 @@ These are options that control how the HDF5 compiler wrapper scripts are built.
 | CMake option | Type | Default | Description |
 |:-------------|:-----|:--------|:------------|
 | `HDF5_H5CC_C_COMPILER` | `STRING` | C compiler set at configure time for serial HDF5. <br /> MPI C compiler set at configure time for parallel HDF5 (usually `mpicc` or similar). | The program to use for compiling programs with `h5cc`. |
-| `HDF5_H5CC_Fortran_COMPILER` | `STRING` | Fortran compiler set at configure time for serial HDF5. <br /> MPI Fortran compiler set at configure time for parallel HDF5 (usually `mpif90` or similar). | The program to use for compiling programs with `h5fc` / `h5pfc`. |
 | `HDF5_H5CC_CXX_COMPILER` | `STRING` | C++ compiler set at configure time. | The program to use for compiling programs with `h5c++`. |
 
 ## Debugging options
@@ -449,11 +416,9 @@ Some HDF5 feature configuration options are incompatible with each other and wil
     - `HDF5_ENABLE_THREADSAFE`
     - `HDF5_BUILD_CPP_LIB`
 
-- The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are incompatible with the high-level, Fortran, Java and C++ interfaces, as locking is not hoisted into the higher-level API calls. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following options must be disabled:
+- The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are incompatible with the high-level and C++ interfaces, as locking is not hoisted into the higher-level API calls. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following options must be disabled:
 
     - `HDF5_BUILD_HL_LIB`
-    - `HDF5_BUILD_FORTRAN`
-    - `HDF5_BUILD_JAVA`
     - `HDF5_BUILD_CPP_LIB`
 
 - The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are mutually exclusive, only one or the other may be enabled.

@@ -9,7 +9,6 @@ if (WIN32)
 else ()
   set (CMAKE_CXX_COMPILER icpx)
 endif ()
-set (CMAKE_Fortran_COMPILER ifx)
 
 # the following is used if cross-compiling
 set (CMAKE_CROSSCOMPILING_EMULATOR "")

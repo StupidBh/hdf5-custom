@@ -48,27 +48,22 @@ Following are the MPI routines for initializing MPI and the communicator and fin
 <table>
 <tr>
 <th>C</th>
-<th>Fortran</th>
 <th>Description</th>
 </tr>
 <tr>
 <td>MPI_Init</td>
-<td>MPI_INIT</td>
 <td>Initialize MPI (MPI_COMM_WORLD usually)</td>
 </tr>
 <tr>
 <td>MPI_Comm_size</td>
-<td>MPI_COMM_SIZE</td>
 <td>Define how many processes are contained in the communicator</td>
 </tr>
 <tr>
 <td>MPI_Comm_rank</td>
-<td>MPI_COMM_RANK</td>
 <td>Define the process ID number within the communicator (from 0 to n-1)</td>
 </tr>
 <tr>
 <td>MPI_Finalize</td>
-<td>MPI_FINALIZE</td>
 <td>Exiting MPI</td>
 </tr>
 </table>
@@ -133,31 +128,9 @@ Following is example code for creating an access template in HDF5:
     36 plist_id = H5Pcreate(H5P_FILE_ACCESS); 37 H5Pset_fapl_mpio(plist_id, comm, info);
 \endcode
 
-<em>Fortran</em>
-\code
-    23       comm = MPI_COMM_WORLD
-    24       info = MPI_INFO_NULL
-    25
-    26       CALL MPI_INIT(mpierror)
-    27       CALL MPI_COMM_SIZE(comm, mpi_size, mpierror)
-    28       CALL MPI_COMM_RANK(comm, mpi_rank, mpierror)
-    29       !
-    30       ! Initialize FORTRAN interface 
-    31       !
-    32       CALL h5open_f(error)
-    33
-    34       !
-    35       ! Setup file access property list with parallel I/O access.
-    36       !
-    37 CALL h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, error) 38 CALL h5pset_fapl_mpio_f(plist_id, comm, info, error)
-\endcode
-
 The following example programs create an HDF5 file using Parallel HDF5:
 
 <a href="https://\SRCURL/HDF5Examples/C/H5PAR/ph5_file_create.c">C: ph5_file_create.c</a>
-
-<a href="https://\SRCURL/HDF5Examples/FORTRAN/H5PAR/ph5_f90_file_create.F90">F90: ph5_f90_file_create.F90</a>
-
 
 \subsection subsec_pintro_create_dset Creating and Accessing a Dataset with PHDF5
 The programming model for creating and accessing a dataset is as follows:
@@ -187,15 +160,6 @@ Following are the parameters required by this call:
                         H5FD_MPIO_COLLECTIVE  - use collective I/O access
 \endcode
 
-<em>Fortran</em>
-\code
-    h5pset_dxpl_mpi_f (prp_id, data_xfer_mode, hdferr)
-         prp_id         IN: Property List Identifier (INTEGER (HID_T))
-         data_xfer_mode IN: Data transfer mode  (INTEGER)
-                              H5FD_MPIO_INDEPENDENT_F (0)
-                              H5FD_MPIO_COLLECTIVE_F (1)
-         hdferr         IN: Error code  (INTEGER)
-\endcode
 </li>
 <li>
 Access the dataset with the defined transfer property list.
@@ -222,25 +186,9 @@ The following code demonstrates a collective write using Parallel HDF5:
    102                plist_id, data);
 \endcode
 
-<em>Fortran</em>
-\code
-   108       ! Create property list for collective dataset write
-   109       !
-   110       CALL h5pcreate_f (H5P_DATASET_XFER_F, plist_id, error) 111 CALL h5pset_dxpl_mpio_f (plist_id, H5FD_MPIO_COLLECTIVE_F, error)
-   112
-   113       !
-   114       ! Write the dataset collectively.
-   115       !
-   116       CALL h5dwrite_f (dset_id, H5T_NATIVE_INTEGER, data, dimsfi, error, &
-   117          file_space_id = filespace, mem_space_id = memspace, xfer_prp = plist_id)
-\endcode
-
 The following example programs create an HDF5 dataset using Parallel HDF5:
 
 <a href="https://\SRCURL/HDF5Examples/C/H5PAR/ph5_dataset.c">C: ph5_dataset.c</a>
-
-<a href="https://\SRCURL/HDF5Examples/FORTRAN/H5PAR/ph5_f90_dataset.F90">F90: ph5_f90_dataset.F90</a>
-
 
 \subsubsection subsec_pintro_hyperslabs Hyperslabs
 The programming model for writing and reading hyperslabs is:

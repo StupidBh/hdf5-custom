@@ -29,8 +29,7 @@
 macro (H5_SET_LIB_OPTIONS libtarget libname libtype libpackage)
   set (LIB_OUT_NAME "${libname}")
   # SOVERSION passed in ARGN when shared
-  # No versioning for Java JNI libraries
-  if (${libtype} MATCHES "SHARED" AND NOT ${libpackage} STREQUAL "JAVA")
+  if (${libtype} MATCHES "SHARED")
     set (PACKAGE_SOVERSION ${HDF5_${libpackage}_PACKAGE_SOVERSION})
     set (PACKAGE_COMPATIBILITY ${H5_${libpackage}_SOVERS_INTERFACE}.0.0)
     set (PACKAGE_CURRENT ${H5_${libpackage}_SOVERS_INTERFACE}.${H5_${libpackage}_SOVERS_MINOR}.0)

@@ -70,7 +70,7 @@ CMake introduced presets in version 3.19. HDF Group provides a file in the sourc
 
 * **Library Source File:** Builds HDF5 with the options for building a typical shared library with the common languages for a platform. The features include building the tools, examples, plugins, and the shared and static libraries.
 
-* **HDF5Examples Source File:** Builds the examples with the components that were enabled by the options selected when the install HDF5 library was built. The typical library built by HDF5 and available from the HDF5 Releases page includes C, Java, and Fortran compilers along with the tools, examples, plugins, and the shared and static libraries.
+* **HDF5Examples Source File:** Builds the examples with the components that were enabled by the options selected when the installed HDF5 library was built. The typical library available from the HDF5 Releases page includes C and C++ support along with the tools, examples, plugins, and the shared and static libraries.
 
 ### 4.2. Discussion
 

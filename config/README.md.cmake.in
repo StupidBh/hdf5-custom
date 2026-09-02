@@ -6,10 +6,9 @@ This directory contains the binary (release) distribution of
     @BINARY_PLATFORM@.
 
 It was built with the following options:
-    -- @LIB_TYPE@ C/C++/Fortran libraries
+    -- @LIB_TYPE@ C/C++ libraries
     -- SZIP (encoder enabled) and ZLIB
     -- HDF5 tools
-    -- Java @Java_VERSION@
 
 The contents of this directory are:
 

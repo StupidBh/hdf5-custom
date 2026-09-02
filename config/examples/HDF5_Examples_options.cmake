@@ -17,8 +17,6 @@
 ####         H5EXAMPLE_BUILD_C:BOOL=ON                                                         ###
 ####         H5EXAMPLE_BUILD_HL:BOOL=ON                                                        ###
 ####         H5EXAMPLE_BUILD_CXX:BOOL=OFF                                                      ###
-####         H5EXAMPLE_BUILD_FORTRAN:BOOL=OFF                                                  ###
-####         H5EXAMPLE_BUILD_JAVA:BOOL=OFF                                                     ###
 ####         H5EXAMPLE_BUILD_FILTERS:BOOL=OFF                                                  ###
 ####         H5EXAMPLE_BUILD_TESTING:BOOL=OFF                                                  ###
 ####         H5EXAMPLE_ENABLE_PARALLEL:BOOL=OFF                                                ###
@@ -51,12 +49,6 @@
 
 ### enable C++ builds
 #set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_CXX:BOOL=ON")
-
-### enable Fortran builds
-#set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_FORTRAN:BOOL=ON")
-
-### enable JAVA builds
-#set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_JAVA:BOOL=ON")
 
 #############################################################################################
 ### enable FILTERS builds

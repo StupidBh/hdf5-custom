@@ -27,7 +27,7 @@ In summary:
 \li The Property List API supports unusual cases when creating and accessing HDF5 objects.
 
 \section secLBPListProg Programming Model
-Default properties are specified by simply passing in #H5P_DEFAULT (C) / H5P_DEFAULT_F (F90) for
+Default properties are specified by passing in #H5P_DEFAULT for
 the property list parameter in those functions for which properties can be changed.
 
 The programming model for changing a property list is as follows:
@@ -317,13 +317,9 @@ There are examples for different languages, where examples of using #H5Literate 
 
 The h5ex_g_traverse example traverses a file using H5Literate:
 \li C: <a href="https://\SRCURL/HDF5Examples/C/H5G/h5ex_g_traverse.c">h5ex_g_traverse.c</a>
-\li F90: <a href="https://\SRCURL/HDF5Examples/FORTRAN/H5G/h5ex_g_traverse.F90">h5ex_g_traverse_F03.f90</a>
-
-The h5ex_g_visit example traverses a file using H5Ovisit and H5Lvisit:
+\li F90: The h5ex_g_visit example traverses a file using H5Ovisit and H5Lvisit:
 \li C: <a href="https://\SRCURL/HDF5Examples/C/H5G/h5ex_g_visit.c">h5ex_g_visit.c</a>
-\li F90:  <a href="https://\SRCURL/HDF5Examples/FORTRAN/H5G/h5ex_g_visit.F90">h5ex_g_visit_F03.f90</a>
-
-<hr>
+\li F90:  <hr>
 Previous Chapter \ref LBComDset - Next Chapter \ref LBQuiz
 
 Navigate back: \ref index "Main" / \ref GettingStarted / \ref LearnBasics
@@ -740,7 +736,6 @@ See the \ref secLBCompilingVS section for compiling with Visual Studio.
 \section secLBCompilingLinux Compile Scripts
 When the library is built, the following compile shell scripts are included:
 \li h5cc:  pkg-config based compile shell script for HDF5 C programs
-\li h5fc:  pkg-config based compile shell script for HDF5 F90 programs
 \li h5c++: pkg-config based compile shell script for HDF5 C++ programs
 
 These scripts are easily used to compile single file applications, such as those included in the tutorial.
@@ -748,8 +743,7 @@ These scripts are easily used to compile single file applications, such as those
 <tr>
 <th><strong>Warning</strong>
 </th>
-<td>The h5cc/h5fc/h5c++ pkg-config compile scripts are included when building with configure. These
-versions rely on the pkg-config files in the lib/pkgconfig.
+<td>The h5cc and h5c++ compile scripts rely on the pkg-config files in lib/pkgconfig.
 </td>
 </tr>
 </table>
@@ -757,9 +751,6 @@ versions rely on the pkg-config files in the lib/pkgconfig.
 <h4>Examples of Using the Unix Compile Scripts:</h4>
 Following are examples of compiling and running an application with the Unix compile scripts:
 \code
-   h5fc myprog.f90
-   ./a.out
-
    h5cc -o myprog myprog.c
    ./myprog
 \endcode
@@ -771,9 +762,9 @@ To see how the libraries linked in with a compile script were configured and bui
 \endcode
 
 <h4>Detailed Description of Unix Compile Scripts:</h4>
-The h5cc, h5c++, and h5fc pkg-config compile scripts come with the HDF5 binary distributions (include files,
-libraries, and utilities) for the platforms we support. The h5c++ and h5fc utilities are ONLY present
-if the library was built with C++ and Fortran.
+The h5cc and h5c++ pkg-config compile scripts come with the HDF5 binary distributions (include files,
+libraries, and utilities) for the platforms we support. The h5c++ utility is present only
+if the library was built with C++.
 
 <h4>USING_HDF5_CMake.md:</h4>
 
@@ -833,8 +824,6 @@ they are specified is important on Linux:
 \code
 HDF5 High Level C++ APIs
 HDF5 C++ Library
-HDF5 High Level Fortran APIs
-HDF5 Fortran Library
 HDF5 High Level C APIs
 HDF5 C Library
 \endcode
@@ -843,8 +832,6 @@ HDF5 C Library
 \code
 libhdf5_hl_cpp.a
 libhdf5_cpp.a
-libhdf5_hl_fortran.a
-libhdf5_fortran.a
 libhdf5_hl.a
 libhdf5.a
 \endcode
@@ -853,8 +840,6 @@ libhdf5.a
 \code
 libhdf5_hl_cpp.a
 libhdf5_cpp.a
-libhdf5_hl_fortran.a
-libhdf5_fortran.a
 libhdf5_hl.a
 libhdf5.a
 \endcode
@@ -864,8 +849,6 @@ libhdf5.a
 \code
 libhdf5_hl_cpp.lib
 libhdf5_cpp.lib
-libhdf5_hl_fortran.lib
-libhdf5_fortran.lib
 libhdf5_hl.lib
 libhdf5.lib
 \endcode
@@ -886,8 +869,6 @@ libhdf5.lib
 \code
 HDF5 High Level C++ APIs
 HDF5 C++ Library
-HDF5 High Level Fortran APIs
-HDF5 Fortran Library
 HDF5 High Level C APIs
 HDF5 C Library
 \endcode
@@ -896,8 +877,6 @@ HDF5 C Library
 \code
 libhdf5_hl_cpp.so
 libhdf5_cpp.so
-libhdf5_hl_fortran.so
-libhdf5_fortran.so
 libhdf5_hl.so
 libhdf5.so
 \endcode
@@ -906,8 +885,6 @@ libhdf5.so
 \code
 libhdf5_hl_cpp.dylib
 libhdf5_cpp.dylib
-libhdf5_hl_fortran.dylib
-libhdf5_fortran.dylib
 libhdf5_hl.dylib
 libhdf5.dylib
 \endcode
@@ -916,8 +893,6 @@ libhdf5.dylib
 \code
 hdf5_hl_cpp.lib
 hdf5_cpp.lib
-hdf5_hl_fortran.lib
-hdf5_fortran.lib
 hdf5_hl.lib
 hdf5.lib
 \endcode

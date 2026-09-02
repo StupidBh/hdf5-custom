@@ -63,7 +63,6 @@ jobs:
 
           # Set env vars
           echo "CC=mpicc" >> $GITHUB_ENV
-          echo "FC=mpif90" >> $GITHUB_ENV
           echo "F77=mpif90" >> $GITHUB_ENV
 
       - name: Checkout
@@ -82,8 +81,6 @@ jobs:
             -DHDF5_BUILD_TOOLS:BOOL=ON \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DBUILD_STATIC_LIBS:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
-            -DHDF5_BUILD_JAVA:BOOL=OFF \
             -DBUILD_TESTING:BOOL=OFF \
             -DHDF5_BUILD_EXAMPLES:BOOL=OFF \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON \

@@ -39,10 +39,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -56,8 +55,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -101,10 +98,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -118,8 +114,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -158,10 +152,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -175,8 +168,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -215,10 +206,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -232,8 +222,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -270,10 +258,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12
+          sudo apt install gcc-12 g++-12
           echo "CC=gcc-12" >> $GITHUB_ENV
           echo "CXX=g++-12" >> $GITHUB_ENV
-          echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -287,8 +274,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -325,10 +310,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12
+          sudo apt install gcc-12 g++-12
           echo "CC=gcc-12" >> $GITHUB_ENV
           echo "CXX=g++-12" >> $GITHUB_ENV
-          echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -342,8 +326,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -364,62 +346,6 @@ jobs:
         run: ctest . --parallel 2 -C Debug
         working-directory: ${{ runner.workspace }}/build
 
-  build_v2_0_win:
-    name: "Intel DBG v2.0.0 default API no deprecated"
-    runs-on: windows-2022
-    steps:
-      # SETUP
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Get Sources
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup Doxygen
-        uses: ./.github/actions/setup-doxygen
-
-      - name: Install Dependencies (Windows)
-        run: choco install ninja
-
-      - name: install oneAPI (Windows)
-        uses: fortran-lang/setup-fortran@195bac823dc6e05bb7c706311ad4540ffc34d5b9 # v1
-        id: setup-fortran
-        with:
-          compiler: intel
-          version: '2025.0'
-
-      - name: Setup Java
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
-        with:
-          java-version: 11
-          distribution: 'temurin'
-
-      - name: Configure (Windows)
-        shell: pwsh
-        env:
-          FC: ${{ steps.setup-fortran.outputs.fc }}
-          CC: ${{ steps.setup-fortran.outputs.cc }}
-        run: |
-          mkdir "${{ runner.workspace }}/build"
-          Set-Location -Path "${{ runner.workspace }}\\build"
-          cmake -C ${{ github.workspace }}/config/cmake/cacheinit.cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DHDF5_ENABLE_ALL_WARNINGS=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_CPP_LIB:BOOL=ON -DHDF5_BUILD_FORTRAN=ON -DHDF5_BUILD_JAVA=ON -DHDF5_BUILD_DOC=OFF -DLIBAEC_USE_LOCALCONTENT=OFF -DZLIB_USE_LOCALCONTENT=OFF -DHDF5_ENABLE_MIRROR_VFD:BOOL=ON -DHDF5_ENABLE_DIRECT_VFD:BOOL=OFF -DHDF5_ENABLE_DEPRECATED_SYMBOLS:BOOL=OFF -DHDF5_DEFAULT_API_VERSION:STRING=v200 ${{ github.workspace }}
-
-      - name: Build (Windows)
-        shell: pwsh
-        env:
-          FC: ${{ steps.setup-fortran.outputs.fc }}
-          CC: ${{ steps.setup-fortran.outputs.cc }}
-        run: |
-          cmake --build . --parallel 3 --config Debug
-        working-directory: ${{ runner.workspace }}/build
-
-      - name: Run Tests (Windows)
-        shell: pwsh
-        env:
-          FC: ${{ steps.setup-fortran.outputs.fc }}
-          CC: ${{ steps.setup-fortran.outputs.cc }}
-        run: |
-          ctest . --parallel 2 -C Debug
-        working-directory: ${{ runner.workspace }}/build
-
   build_system_zlib:
     name: "gcc system zlib"
     runs-on: ubuntu-latest
@@ -437,10 +363,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12 zlib1g-dev
+          sudo apt install gcc-12 g++-12 zlib1g-dev
           echo "CC=gcc-12" >> $GITHUB_ENV
           echo "CXX=g++-12" >> $GITHUB_ENV
-          echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -455,8 +380,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS:BOOL=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN:BOOL=ON \
-            -DHDF5_BUILD_JAVA:BOOL=ON \
             -DHDF5_BUILD_DOC:BOOL=OFF \
             -DHDF5_ENABLE_MIRROR_VFD:BOOL=ON \
             -DHDF5_ENABLE_DIRECT_VFD:BOOL=ON \
@@ -498,10 +421,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12
+          sudo apt install gcc-12 g++-12
           echo "CC=gcc-12" >> $GITHUB_ENV
           echo "CXX=g++-12" >> $GITHUB_ENV
-          echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -516,8 +438,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -554,10 +474,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12
+          sudo apt install gcc-12 g++-12
           echo "CC=gcc-12" >> $GITHUB_ENV
           echo "CXX=g++-12" >> $GITHUB_ENV
-          echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -572,8 +491,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DHDF5_ENABLE_MIRROR_VFD:BOOL=ON \
             -DHDF5_ENABLE_DIRECT_VFD:BOOL=ON \
@@ -610,10 +527,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -629,8 +545,6 @@ jobs:
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=OFF \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \
@@ -661,10 +575,9 @@ jobs:
            sudo apt-get update
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # CONFIGURE
       - name: Configure
@@ -680,8 +593,6 @@ jobs:
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
-            -DHDF5_BUILD_FORTRAN=ON \
-            -DHDF5_BUILD_JAVA=ON \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=OFF \
             -DZLIB_USE_LOCALCONTENT=OFF \

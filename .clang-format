@@ -132,8 +132,3 @@ StatementMacros:
 #llvm11: WhitespaceSensitiveMacros:
 #llvm11:   - STRINGIZE
 #llvm11:   - PP_STRINGIZE
----
-Language:      Java
-BreakAfterJavaFieldAnnotations: true
-JavaImportGroups: ['java', 'hdf', 'hdf.hdf5lib', 'org']
-...

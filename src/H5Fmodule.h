@@ -2605,68 +2605,6 @@
  * doing this. However, it is beyond the scope of the current effort, and thus we will not pursue the matter
  * further unless there is interest in our doing so.
  *
- * \subsection subsec_file_image_java Java Signatures for File Image Operations API Calls
- * Java function call signatures for the file image operation APIs have not yet been implemented, and there
- * are no immediate plans for implementation.
- *
- * \subsection subsec_file_image_fort Fortran Signatures for File Image Operations API Calls
- * Fortran function call signatures for the file image operation APIs are described in this section.
- *
- * \subsubsection subsubsec_file_image_fort_low Fortran Low-Level APIs
- * The Fortran low-level APIs make use of Fortran 2003’s ISO_C_BINDING module in order to achieve portable
- * and standard conforming interoperability with the C APIs. The C pointer (C_PTR) and function pointer
- * (C_FUN_PTR) types are returned from the intrinsic procedures C_LOC(X) and C_FUNLOC(X), respectively,
- * defined in the ISO_C_BINDING module. The argument X is the data or function to which the C pointers point
- * to and must have the TARGET attribute in the calling program. Note that the variable name lengths of the
- * Fortran equivalent of the predefined C constants were shortened to less than 31 characters in order to be
- * Fortran standard compliant.
- *
- * <table>
- * <tr><th>h5pget_file_image_f</th></tr>
- * <tr><td>
- * \code
- *      SUBROUTINE h5pget_file_image_f(fapl_id, buf_ptr, buf_len_ptr, hdferr)
- *          IMPLICIT NONE
- *          INTEGER(HID_T) , INTENT(IN)               :: fapl_id
- *          TYPE(C_PTR)    , INTENT(IN), DIMENSION(*) :: buf_ptr
- *          INTEGER(SIZE_T), INTENT(OUT)              :: buf_len_ptr
- *          INTEGER        , INTENT(OUT)              :: hdferr
- * \endcode
- * </td></tr>
- * </table>
- *
- * <table>
- * <tr><th>h5pset_file_image_f</th></tr>
- * <tr><td>
- * \code
- *       SUBROUTINE h5pset_file_image_f(fapl_id, buf_ptr, buf_len, hdferr)
- *           IMPLICIT NONE
- *           INTEGER(HID_T) , INTENT(IN)  :: fapl_id
- *           TYPE(C_PTR)    , INTENT(IN)  :: buf_ptr
- *           INTEGER(SIZE_T), INTENT(IN)  :: buf_len
- *           INTEGER        , INTENT(OUT) :: hdferr
- * \endcode
- * </td></tr>
- * </table>
- *
- * <table>
- * <tr><th>h5fget_file_image_f</th></tr>
- * <tr><td>
- * \code
- *       SUBROUTINE h5fget_file_image_f(file_id, buf_ptr, buf_len, hdferr, buf_size)
- *           IMPLICIT NONE
- *           INTEGER(HID_T) , INTENT(IN)              :: file_id
- *           TYPE(C_PTR)    , INTENT(INOUT)           :: buf_ptr
- *           INTEGER(SIZE_T), INTENT(IN)              :: buf_len
- *           INTEGER        , INTENT(OUT)             :: hdferr
- *           INTEGER(SIZE_T), INTENT(OUT)  , OPTIONAL :: buf_size
- * \endcode
- * </td></tr>
- * </table>
- *
- * \subsubsection subsubsec_file_image_fort_high Fortran High-Level APIs
- * Fortran function call signatures for the file image operation APIs have not yet been implemented yet.
- *
  * Previous Chapter \ref sec_vol - Next Chapter \ref sec_async
  *
  * <hr>

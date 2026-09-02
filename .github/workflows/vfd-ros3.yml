@@ -16,16 +16,6 @@ on:
         required: false
         default: "skip"
         type: string
-      java_version:
-        description: "Java version for testing (11, 17, 21, 24, latest, auto)"
-        required: false
-        default: "auto"
-        type: string
-      force_java_implementation:
-        description: "Force specific Java implementation (auto, ffm, jni)"
-        required: false
-        default: "jni"
-        type: string
 
 permissions:
   contents: read
@@ -60,7 +50,7 @@ jobs:
             os: macos-latest
             test_ros3: OFF
 
-    name: "ROS3 VFD (${{ matrix.os_name }} ${{ inputs.build_mode }}-${{ inputs.force_java_implementation }})"
+    name: "ROS3 VFD (${{ matrix.os_name }} ${{ inputs.build_mode }})"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install aws-c-s3 (Windows)
@@ -102,25 +92,6 @@ jobs:
         if: ${{ matrix.os_name == 'MacOS Clang' }}
         run: brew install aws-c-s3
 
-      - name: Set up Java (if specified or FFM required)
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
-        with:
-          distribution: ${{ inputs.force_java_implementation == 'ffm' && 'oracle' || 'temurin' }}
-          java-version: |
-            ${{
-              inputs.force_java_implementation == 'ffm' && '25' ||
-              inputs.java_version == 'latest' && '24' ||
-              inputs.java_version
-            }}
-
-      - name: Verify Java Setup
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        run: |
-          java -version
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "Selected Java implementation: ${{ inputs.force_java_implementation }}"
-
       - name: Set environment for MSVC (Windows)
         if: ${{ matrix.os_name == 'Windows MSVC' }}
         run: |
@@ -130,12 +101,6 @@ jobs:
 
       - name: Get HDF5 sources
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup jextract (FFM builds only)
-        if: ${{ inputs.force_java_implementation == 'ffm' }}
-        uses: ./.github/actions/setup-jextract
-        with:
-          java-version: '25'
 
       # For Windows, use vcpkg toolchain file to allow find_package() calls to resolve
       # NOTE: VCPKG_USE_LEGACY_APPLOCAL is a temporary fix for an issue with vcpkg
@@ -156,7 +121,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON \
@@ -165,7 +129,6 @@ jobs:
             -DHDF5_ENABLE_ROS3_VFD:BOOL=ON \
             -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=${{ matrix.test_ros3 }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
-            -DHDF5_ENABLE_JNI:BOOL=${{ inputs.force_java_implementation == 'jni' }} \
             $GITHUB_WORKSPACE
         shell: bash
 
@@ -181,7 +144,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON \
@@ -190,7 +152,6 @@ jobs:
             -DHDF5_ENABLE_ROS3_VFD:BOOL=ON \
             -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=${{ matrix.test_ros3 }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
-            -DHDF5_ENABLE_JNI:BOOL=${{ inputs.force_java_implementation == 'jni' }} \
             $GITHUB_WORKSPACE
         shell: bash
 
@@ -265,25 +226,6 @@ jobs:
         if: ${{ matrix.os_name == 'MacOS Clang' }}
         run: brew install aws-c-s3
 
-      - name: Set up Java (if specified or FFM required)
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
-        with:
-          distribution: ${{ inputs.force_java_implementation == 'ffm' && 'oracle' || 'temurin' }}
-          java-version: |
-            ${{
-              inputs.force_java_implementation == 'ffm' && '25' ||
-              inputs.java_version == 'latest' && '24' ||
-              inputs.java_version
-            }}
-
-      - name: Verify Java Setup
-        if: inputs.java_version != 'auto' || inputs.force_java_implementation == 'ffm'
-        run: |
-          java -version
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "Selected Java implementation: ${{ inputs.force_java_implementation }}"
-
       - name: Set environment for MSVC (Windows)
         if: ${{ matrix.os_name == 'Windows MSVC' }}
         run: |
@@ -293,12 +235,6 @@ jobs:
 
       - name: Get HDF5 sources
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup jextract (FFM builds only)
-        if: ${{ inputs.force_java_implementation == 'ffm' }}
-        uses: ./.github/actions/setup-jextract
-        with:
-          java-version: '25'
 
       # For Windows, use vcpkg toolchain file to allow find_package() calls to resolve
       # NOTE: VCPKG_USE_LEGACY_APPLOCAL is a temporary fix for an issue with vcpkg
@@ -319,7 +255,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON \
@@ -328,7 +263,6 @@ jobs:
             -DHDF5_ENABLE_ROS3_VFD:BOOL=ON \
             -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=${{ matrix.test_ros3 }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
-            -DHDF5_ENABLE_JNI:BOOL=${{ inputs.force_java_implementation == 'jni' }} \
             $GITHUB_WORKSPACE
         shell: bash
 
@@ -344,7 +278,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS=ON \
             -DHDF5_ENABLE_WARNINGS_AS_ERRORS=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
-            -DHDF5_BUILD_FORTRAN:BOOL=OFF \
             -DHDF5_BUILD_CPP_LIB:BOOL=ON \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON \
@@ -353,7 +286,6 @@ jobs:
             -DHDF5_ENABLE_ROS3_VFD:BOOL=ON \
             -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=${{ matrix.test_ros3 }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
-            -DHDF5_ENABLE_JNI:BOOL=${{ inputs.force_java_implementation == 'jni' }} \
             $GITHUB_WORKSPACE
         shell: bash
 

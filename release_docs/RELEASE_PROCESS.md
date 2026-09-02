@@ -9,7 +9,7 @@ At regularly scheduled intervals throughout each year, The HDF Group releases a 
 Depending on the software being released, there may be specific guidelines that are followed or steps that are performed in addition to the 'standard' maintenance release procedure - in such a case, product-specific tabs are provided within the page to view information specific to only that product.
 
 ## Description (HDF5):
-Twice each year, The HDF Group releases a new version of the HDF5 C, C++, and Fortran libraries and command line utilities and associated documentation set. This is referred to as a maintenance release of HDF5. The main purpose of a maintenance release is to address defects reported against previous releases of the software, to port HDF5 to new operating environments, and to improve maintainability by way of refactoring code and improving documentation. A maintenance release may also include new functionality in the C, C++, and Fortran libraries and/or command line utilities if requested and/or funded by the user community and/or The HDF Group's customers. The new features included in a maintenance release expand the feature set only and do not change the HDF5 file format, with the exception of addressing critical defects that corrupt data.
+Twice each year, The HDF Group releases a new version of the HDF5 C and C++ libraries, command line utilities, and associated documentation set. This is referred to as a maintenance release of HDF5. The main purpose of a maintenance release is to address defects reported against previous releases of the software, to port HDF5 to new operating environments, and to improve maintainability by way of refactoring code and improving documentation. A maintenance release may also include new functionality in the C and C++ libraries and/or command line utilities if requested and/or funded by the user community and/or The HDF Group's customers. The new features included in a maintenance release expand the feature set only and do not change the HDF5 file format, with the exception of addressing critical defects that corrupt data.
 
 Maintenance releases are always backward compatible with regards to the HDF5 file format, meaning that:
 - New libraries and command line utilities can access HDF5 files created by the previous versions of the libraries.
@@ -121,7 +121,7 @@ For more information on the HDF5 versioning and backward and forward compatibili
 11. This should be automated and currently github binaries are not signed.
     - Follow the [How to sign binaries with digital certificates(this is missing)]() work instructions to sign each Windows and Mac binary package with a digital certificate.
 12. Once binaries are ready to be tested, send an e-mail notification or update the Confluence test dashboard page indicating source and binary test assignments and when results should be made available.
-13. Use the pre-release source packages to build and test HDF5 on assigned platforms by hand. Build both shared and static libraries, Fortran, C++, and szip, and any additional configurations required on specific remote platforms based on customer support needs.
+13. Use the pre-release source packages to build and test HDF5 on assigned platforms by hand. Build both shared and static libraries, C++, and szip, and any additional configurations required on specific remote platforms based on customer support needs.
 14. Use the pre-release binary packages found in /mnt/scr1/pre-release/hdf5/vXYZ/pre-\<n\>/binaries/{UNIX, Windows} to test according to the binary testing procedures for your assigned platforms.
 15. Initial Testing:
     - Installation Using Installer Binary
@@ -184,31 +184,17 @@ For more information on the HDF5 versioning and backward and forward compatibili
 4. Select the actions tab and the release build workflow, then click the 'Run workflow' drop-down.
     - Choose the release branch
     - Enter the 'Release version tag' name as 'X.Y.Z'
-    - **Maven Deployment (Optional):** Set 'deploy_maven' to true if Maven deployment is desired
-    - **Maven Repository:** Choose between 'github-packages' or 'maven-central-staging' for deployment target
     - Press "Run Workflow"
-5. **Maven Artifact Deployment (If Enabled):**
-    - **Prerequisites:** Ensure Maven deployment permissions are configured (see `MAVEN_DEPLOYMENT_PERMISSIONS.md`)
-    - **Testing Phase:** The workflow starts with `dry_run: true` to test permissions without actual deployment
-    - **Multi-Platform Artifacts:** The staging workflow generates artifacts for Linux, Windows, macOS x86_64, and macOS aarch64
-    - **Java Examples Testing:** Comprehensive validation of Java examples (org.hdfgroup:hdf5-java-examples) across all platforms with Maven artifacts
-    - **Deployment Process:**
-      - `maven-staging.yml` workflow generates artifacts for all platforms
-      - `maven-deploy.yml` workflow deploys filtered main HDF5 JARs (jarhdf5-*.jar) only
-      - Monitor both workflows for successful completion
-    - **Troubleshooting:** Check debug output in workflow logs for permission or authentication issues
-    - **Go-Live:** After successful dry run testing, set `dry_run: false` in `.github/workflows/release.yml`
-    - Verify artifacts are properly uploaded to GitHub Packages or Maven Central staging
-6. Review the release files in Github
-7. Edit the Github Release and change status to Release
+5. Review the release files in Github
+6. Edit the Github Release and change status to Release
     - Change status from Pre-release to Release
-8. Select publish-release build from workflow, then click the 'Run workflow' drop-down.
+7. Select publish-release build from workflow, then click the 'Run workflow' drop-down.
     - Choose the release branch
     - Enter the ‘HDF5 Release version tag’ name as 'X.Y.Z'
     - Enter the 'HDF5 Release file name base' as 'hdf5-X.Y.Z'
     - Enter the 'HDF5 target bucket directory' as 'vX_Y/vX_Y_Z'
     - Press "Run Workflow"
-9. Release hdf5_plugins following the same steps.
+8. Release hdf5_plugins following the same steps.
 
 ### 11. Add the contents of the CHANGELOG.md file in the release code to the HISTORY-X_Y file in the **support** branch, just below the introductory lines at the top of the HISTORY file.
 

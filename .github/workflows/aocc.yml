@@ -47,7 +47,6 @@ jobs:
           bash install.sh
           source $GITHUB_WORKSPACE/setenv_AOCC.sh
           which clang
-          which flang
           clang -v
 
       - name: Cache OpenMPI ${{ env.MPIVERDOT }} installation
@@ -64,7 +63,7 @@ jobs:
           wget https://download.open-mpi.org/release/open-mpi/v5.0/openmpi-${{ env.MPIVERDOT }}.tar.gz
           tar zxvf openmpi-${{ env.MPIVERDOT }}.tar.gz
           cd openmpi-${{ env.MPIVERDOT }}
-          ./configure CC=$GITHUB_WORKSPACE/aocc-compiler-${{ env.AOCCVERDOT }}/bin/clang FC=$GITHUB_WORKSPACE/aocc-compiler-${{ env.AOCCVERDOT }}/bin/flang --prefix=$GITHUB_WORKSPACE/openmpi-${{ env.MPIVERDOT }}-install
+          ./configure CC=$GITHUB_WORKSPACE/aocc-compiler-${{ env.AOCCVERDOT }}/bin/clang --prefix=$GITHUB_WORKSPACE/openmpi-${{ env.MPIVERDOT }}-install
           make
           make install
 
@@ -85,8 +84,6 @@ jobs:
           -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
           -DLIBAEC_USE_LOCALCONTENT=OFF \
           -DZLIB_USE_LOCALCONTENT=OFF \
-          -DHDF5_BUILD_FORTRAN:BOOL=OFF \
-          -DHDF5_BUILD_JAVA:BOOL=OFF \
           -DMPIEXEC_MAX_NUMPROCS:STRING="2" \
           $GITHUB_WORKSPACE
           #cat src/libhdf5.settings

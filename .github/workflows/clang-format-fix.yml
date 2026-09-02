@@ -27,11 +27,11 @@ jobs:
       with:
         persist-credentials: false # Prevents tokens from being written to Git config files
 
-    - name: Fix C and Java formatting issues detected by clang-format
+    - name: Fix C and C++ formatting issues detected by clang-format
       uses: DoozyX/clang-format-lint-action@bcb4eb2cb0d707ee4f3e5cc3b456eb075f12cf73 # v0.20
       with:
         source: '.'
-        extensions: 'c,h,cpp,hpp,java'
+        extensions: 'c,h,cpp,hpp'
         clangFormatVersion: 17
         inplace: True
         style: file

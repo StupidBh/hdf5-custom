@@ -336,8 +336,6 @@ Navigate back: \ref index "Main"
 \li \ref subsec_vol_lang
     <ul>
         <li> \ref subsubsec_vol_lang_c
-        <li> \ref subsubsec_vol_lang_fort
-        <li> \ref subsubsec_vol_lang_java
     </ul>
 \li \ref subsec_vol_cl
 \li \ref subsec_vol_compat
@@ -366,13 +364,6 @@ Navigate back: \ref index "Main"
         <li> \ref subsubsec_file_image_example_dp
         <li> \ref subsubsec_file_image_example_template
     </ul>
-\li \ref subsec_file_image_java
-\li \ref subsec_file_image_fort
-    <ul>
-        <li> \ref subsubsec_file_image_fort_low
-        <li> \ref subsubsec_file_image_fort_high
-    </ul>
-
 \ref sec_async
 \li \ref subsec_async_intro
 

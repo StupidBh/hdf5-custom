@@ -396,9 +396,7 @@ of which is given below:
 This structure is defined in \c H5ACpublic.h. Each field is discussed below and in
 the associated header comment.
 
-The C API allows you to get and set this structure directly. Unfortunately, the
-Fortran API has to do this with individual parameters for each of the fields
-(with the exception of version).
+The C API allows you to get and set this structure directly.
 
 While the API calls are discussed individually in the reference manual, the
 following high-level discussion of what fields to change for different purposes

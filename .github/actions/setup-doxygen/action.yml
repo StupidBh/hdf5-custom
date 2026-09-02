@@ -1,5 +1,5 @@
 name: 'Setup Doxygen'
-description: 'Install Doxygen with version that supports Fortran cross-references'
+description: 'Install the Doxygen version used to build HDF5 documentation'
 inputs:
   version:
     description: 'Doxygen version to install'

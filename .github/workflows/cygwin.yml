@@ -41,7 +41,7 @@ jobs:
       - name: Install Cygwin
         uses: cygwin/cygwin-install-action@a3d72946b163026bbd0fa9a88379ccbda4bd86bb # master
         with:
-          packages: cmake gcc-fortran make ninja zlib-devel flex bison perl
+          packages: cmake make ninja zlib-devel flex bison perl
 
       - name: Set file base name (Cygwin)
         id: set-file-base
@@ -97,9 +97,7 @@ jobs:
             set (SITE_BUILDNAME_SUFFIX "${{ steps.set-file-base.outputs.FILE_BASE }}")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} --log-level=NOTICE")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_GENERATE_HEADERS:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PLUGIN_SUPPORT:BOOL=ON")

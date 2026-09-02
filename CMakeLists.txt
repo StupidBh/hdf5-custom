@@ -7,7 +7,7 @@
 #
 # - Enforces out-of-source builds for safety and cleanliness.
 # - Supports configuration as a subproject (HDF5_EXTERNALLY_CONFIGURED).
-# - Provides options for building shared/static libraries, tools, examples, and bindings (C++, Fortran, Java).
+# - Provides options for building shared/static libraries, tools, examples, and C++ bindings.
 # - Handles versioning, installation paths, and library naming customization.
 # - Integrates with external dependencies (zlib, szip, MPI, HDFS, etc.).
 # - Supports advanced features: thread-safety, concurrency, plugins, code coverage, and more.
@@ -186,13 +186,6 @@ set (HDF5_HL_LIB_CORE           "_hl")
 set (HDF5_HL_CPP_LIB_CORE       "_hl_cpp")
 set (HDF5_TOOLS_LIB_CORE        "_tools")
 set (HDF5_UTILS_LIB_CORE        "_utils")
-set (HDF5_F90_LIB_CORE          "_fortran")
-set (HDF5_F90_C_LIB_CORE        "_f90cstub")
-set (HDF5_F90_TEST_LIB_CORE     "_test_fortran")
-set (HDF5_F90_C_TEST_LIB_CORE   "_test_f90cstub")
-set (HDF5_HL_F90_LIB_CORE       "_hl_fortran")
-set (HDF5_HL_F90_C_LIB_CORE     "_hl_f90cstub")
-set (HDF5_JAVA_JNI_LIB_CORE     "_java")
 
 set (HDF5_LIB_CORENAME              "${HDF5_LIB_BASE}")
 set (HDF5_TEST_LIB_CORENAME         "${HDF5_LIB_BASE}${HDF5_TEST_LIB_CORE}")
@@ -202,17 +195,6 @@ set (HDF5_HL_LIB_CORENAME           "${HDF5_LIB_BASE}${HDF5_HL_LIB_CORE}")
 set (HDF5_HL_CPP_LIB_CORENAME       "${HDF5_LIB_BASE}${HDF5_HL_CPP_LIB_CORE}")
 set (HDF5_TOOLS_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_TOOLS_LIB_CORE}")
 set (HDF5_UTILS_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_UTILS_LIB_CORE}")
-set (HDF5_F90_LIB_CORENAME          "${HDF5_LIB_BASE}${HDF5_F90_LIB_CORE}")
-set (HDF5_F90_C_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_F90_C_LIB_CORE}")
-set (HDF5_F90_TEST_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_F90_TEST_LIB_CORE}")
-set (HDF5_F90_C_TEST_LIB_CORENAME   "${HDF5_LIB_BASE}${HDF5_F90_C_TEST_LIB_CORE}")
-set (HDF5_HL_F90_LIB_CORENAME       "${HDF5_LIB_BASE}${HDF5_HL_F90_LIB_CORE}")
-set (HDF5_HL_F90_C_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_HL_F90_C_LIB_CORE}")
-set (HDF5_JAVA_JNI_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_JAVA_JNI_LIB_CORE}")
-set (HDF5_JAVA_HDF5_LIB_CORENAME    "jarhdf5")
-set (HDF5_JAVA_TEST_LIB_CORENAME    "jartest5")
-set (HDF5_JAVA_JSRC_LIB_CORENAME    "javahdf5")
-set (HDF5_JAVA_JTEST_LIB_CORENAME   "javatest5")
 
 #-----------------------------------------------------------------------------
 # Set the true names of all the libraries if customized by external project
@@ -225,19 +207,6 @@ set (HDF5_HL_LIB_NAME           "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HD
 set (HDF5_HL_CPP_LIB_NAME       "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_HL_CPP_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_TOOLS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_TOOLS_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_UTILS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_UTILS_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_F90_LIB_NAME          "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_F90_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_F90_C_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_F90_C_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_F90_TEST_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_F90_TEST_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_F90_C_TEST_LIB_NAME   "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_F90_C_TEST_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_HL_F90_LIB_NAME       "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_HL_F90_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_HL_F90_C_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_HL_F90_C_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-#Because the loading mechanism of the JNI library requires a fixed name, the name of the JNI library cannot be customized
-#set (HDF5_JAVA_JNI_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_JAVA_JNI_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_JAVA_JNI_LIB_NAME     "${HDF5_LIB_BASE}${HDF5_JAVA_JNI_LIB_CORE}")
-set (HDF5_JAVA_HDF5_LIB_NAME    "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_JAVA_HDF5_LIB_CORENAME}${HDF5_LIB_INFIX}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_JAVA_TEST_LIB_NAME    "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_JAVA_TEST_LIB_CORENAME}${HDF5_LIB_INFIX}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_JAVA_JSRC_LIB_NAME    "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_JAVA_JSRC_LIB_CORENAME}${HDF5_LIB_INFIX}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_JAVA_JTEST_LIB_NAME   "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_JAVA_JTEST_LIB_CORENAME}${HDF5_LIB_INFIX}${HDF5_EXTERNAL_LIB_SUFFIX}")
 
 #-----------------------------------------------------------------------------
 # Set the target names of all the libraries
@@ -250,12 +219,6 @@ set (HDF5_HL_LIB_TARGET           "${HDF5_HL_LIB_CORENAME}-static")
 set (HDF5_HL_CPP_LIB_TARGET       "${HDF5_HL_CPP_LIB_CORENAME}-static")
 set (HDF5_TOOLS_LIB_TARGET        "${HDF5_TOOLS_LIB_CORENAME}-static")
 set (HDF5_UTILS_LIB_TARGET        "${HDF5_UTILS_LIB_CORENAME}-static")
-set (HDF5_F90_LIB_TARGET          "${HDF5_F90_LIB_CORENAME}-static")
-set (HDF5_F90_C_LIB_TARGET        "${HDF5_F90_C_LIB_CORENAME}-static")
-set (HDF5_F90_TEST_LIB_TARGET     "${HDF5_F90_TEST_LIB_CORENAME}-static")
-set (HDF5_F90_C_TEST_LIB_TARGET   "${HDF5_F90_C_TEST_LIB_CORENAME}-static")
-set (HDF5_HL_F90_LIB_TARGET       "${HDF5_HL_F90_LIB_CORENAME}-static")
-set (HDF5_HL_F90_C_LIB_TARGET     "${HDF5_HL_F90_C_LIB_CORENAME}-static")
 set (HDF5_LIBSH_TARGET            "${HDF5_LIB_CORENAME}-shared")
 set (HDF5_TEST_LIBSH_TARGET       "${HDF5_TEST_LIB_CORENAME}-shared")
 set (HDF5_TEST_PAR_LIBSH_TARGET   "${HDF5_TEST_PAR_LIB_CORENAME}-shared")
@@ -264,17 +227,6 @@ set (HDF5_HL_LIBSH_TARGET         "${HDF5_HL_LIB_CORENAME}-shared")
 set (HDF5_HL_CPP_LIBSH_TARGET     "${HDF5_HL_CPP_LIB_CORENAME}-shared")
 set (HDF5_TOOLS_LIBSH_TARGET      "${HDF5_TOOLS_LIB_CORENAME}-shared")
 set (HDF5_UTILS_LIBSH_TARGET      "${HDF5_UTILS_LIB_CORENAME}-shared")
-set (HDF5_F90_LIBSH_TARGET        "${HDF5_F90_LIB_CORENAME}-shared")
-set (HDF5_F90_C_LIBSH_TARGET      "${HDF5_F90_C_LIB_CORENAME}-shared")
-set (HDF5_F90_TEST_LIBSH_TARGET   "${HDF5_F90_TEST_LIB_CORENAME}-shared")
-set (HDF5_F90_C_TEST_LIBSH_TARGET "${HDF5_F90_C_TEST_LIB_CORENAME}-shared")
-set (HDF5_HL_F90_LIBSH_TARGET     "${HDF5_HL_F90_LIB_CORENAME}-shared")
-set (HDF5_HL_F90_C_LIBSH_TARGET   "${HDF5_HL_F90_C_LIB_CORENAME}-shared")
-set (HDF5_JAVA_JNI_LIB_TARGET     "${HDF5_JAVA_JNI_LIB_CORENAME}")
-set (HDF5_JAVA_HDF5_LIB_TARGET    "${HDF5_JAVA_HDF5_LIB_CORENAME}")
-set (HDF5_JAVA_TEST_LIB_TARGET    "${HDF5_JAVA_TEST_LIB_CORENAME}")
-set (HDF5_JAVA_JSRC_LIB_TARGET    "${HDF5_JAVA_JSRC_LIB_CORENAME}")
-set (HDF5_JAVA_JTEST_LIB_TARGET   "${HDF5_JAVA_JTEST_LIB_CORENAME}")
 
 #-----------------------------------------------------------------------------
 # Define some CMake variables for use later in the project
@@ -297,17 +249,6 @@ set (HDF5_TOOLS_ROOT_DIR       ${HDF5_SOURCE_DIR}/tools)
 set (HDF5_TOOLS_SRC_DIR        ${HDF5_SOURCE_DIR}/tools/src)
 set (HDF5_TOOLS_TST_DIR        ${HDF5_SOURCE_DIR}/tools/test)
 set (HDF5_UTILS_DIR            ${HDF5_SOURCE_DIR}/utils)
-set (HDF5_F90_SRC_DIR          ${HDF5_SOURCE_DIR}/fortran)
-set (HDF5_JAVA_SRC_PATH            ${HDF5_SOURCE_DIR}/java)
-set (HDF5_JAVA_SRCJNI_PATH         ${HDF5_SOURCE_DIR}/java/src-jni)
-set (HDF5_JAVA_SRCJNI_JNI_SRC_DIR  ${HDF5_SOURCE_DIR}/java/src-jni/jni)
-set (HDF5_JAVA_LIB_DIR             ${HDF5_SOURCE_DIR}/java/lib)
-set (HDF5_JAVA_JSRC_DIR            ${HDF5_SOURCE_DIR}/java/jsrc)
-set (HDF5_JAVA_LOGGING_JAR         ${HDF5_SOURCE_DIR}/java/lib/slf4j-api-2.0.16.jar CACHE FILEPATH "Path to SLF4J API jar")
-set (HDF5_JAVA_LOGGING_NOP_JAR     ${HDF5_SOURCE_DIR}/java/lib/ext/slf4j-nop-2.0.16.jar CACHE FILEPATH "Path to SLF4J NOP binding jar")
-set (HDF5_JAVA_LOGGING_SIMPLE_JAR  ${HDF5_SOURCE_DIR}/java/lib/ext/slf4j-simple-2.0.16.jar CACHE FILEPATH "Path to SLF4J simple binding jar")
-set (HDF5_JAVA_JUNIT_JAR           ${HDF5_JAVA_LIB_DIR}/org.junit.jar CACHE FILEPATH "Path to JUnit jar")
-set (HDF5_JAVA_HAMCREST_JAR        ${HDF5_JAVA_LIB_DIR}/org.hamcrest.jar CACHE FILEPATH "Path to Hamcrest jar")
 set (HDF5_DOCS_DIR                 ${HDF5_SOURCE_DIR}/docs)
 set (HDF5_DOXYGEN_DIR              ${HDF5_DOCS_DIR}/doxygen)
 
@@ -840,10 +781,6 @@ if (HDF5_ENABLE_PARALLEL)
 
   set (CMAKE_REQUIRED_LIBRARIES "${MPI_C_LIBRARIES}")
   set (CMAKE_REQUIRED_INCLUDES "${MPI_C_INCLUDE_DIRS}")
-  # Used by Fortran + MPI
-  CHECK_SYMBOL_EXISTS (MPI_Comm_c2f "mpi.h"  H5_HAVE_MPI_MULTI_LANG_Comm)
-  CHECK_SYMBOL_EXISTS (MPI_Info_c2f "mpi.h"  H5_HAVE_MPI_MULTI_LANG_Info)
-
   # Used by Parallel Compression feature
   set (PARALLEL_FILTERED_WRITES ON)
   CHECK_SYMBOL_EXISTS (MPI_Ibarrier "mpi.h" H5_HAVE_MPI_Ibarrier)
@@ -1046,13 +983,6 @@ if (HDF5_ENABLE_THREADSAFE)
       message (VERBOSE " **** Allowing unsupported parallel and thread-safety options **** ")
     endif ()
   endif ()
-  if (HDF5_BUILD_FORTRAN)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** Fortran and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported Fortran and thread-safety options **** ")
-    endif ()
-  endif ()
   if (HDF5_BUILD_CPP_LIB)
     if (NOT HDF5_ALLOW_UNSUPPORTED)
       message (FATAL_ERROR " **** C++ and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
@@ -1091,13 +1021,6 @@ if (HDF5_ENABLE_CONCURRENCY)
       message (FATAL_ERROR " **** Parallel and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
     else ()
       message (VERBOSE " **** Allowing unsupported parallel and multi-threaded concurrency options **** ")
-    endif ()
-  endif ()
-  if (HDF5_BUILD_FORTRAN)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** Fortran and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported Fortran and multi-threaded concurrency options **** ")
     endif ()
   endif ()
   if (HDF5_BUILD_CPP_LIB)
@@ -1149,47 +1072,6 @@ set (HDF5_H5CC_C_COMPILER ${_HDF5_H5CC_C_COMPILER} CACHE STRING "C compiler to u
 mark_as_advanced (HDF5_H5CC_C_COMPILER)
 
 #-----------------------------------------------------------------------------
-# Java implementation detection for version value
-# Note: Java version detection happens after find_package(Java)
-# Everything else is set by the Java subdirectory based on actual Java version
-#-----------------------------------------------------------------------------
-if (HDF5_BUILD_JAVA)
-  if (NOT BUILD_SHARED_LIBS)
-    message (FATAL_ERROR "\nJava requires shared libraries!\n")
-  else ()
-    find_package (Java)
-    message (VERBOSE "Java version is ${Java_VERSION_STRING}")
-
-    # Pin the Java language toolchain to the JDK that find_package(Java) just
-    # probed. FindJava searches JAVA_HOME via HINTS, which outrank $PATH, but
-    # the toolchain enabled by project(... Java) in java/ searches
-    # $ENV{JAVA_HOME}/bin only as a low-priority PATHS entry, below $PATH. The
-    # two can therefore land on different JDKs - on macOS the toolchain picks
-    # the /usr/bin stubs, which re-resolve through JAVA_HOME on every
-    # invocation, so javac and java can differ and the resulting class files
-    # fail to load. Java_VERSION_STRING also gates the FFM/JNI choice in
-    # java/CMakeLists.txt, so it must describe the JDK that actually builds.
-    #
-    # Each variable is filled in independently. The guard in
-    # CMakeDetermineJavaCompiler.cmake is if(NOT CMAKE_Java_COMPILER) and it
-    # closes only after the runtime and archive lookups, so a caller passing
-    # just -DCMAKE_Java_COMPILER= suppresses the other two entirely and leaves
-    # CMAKE_Java_RUNTIME empty. Filling them one at a time keeps an explicit
-    # override working while still completing the toolchain.
-    if (NOT CMAKE_Java_COMPILER AND Java_JAVAC_EXECUTABLE)
-      set (CMAKE_Java_COMPILER "${Java_JAVAC_EXECUTABLE}")
-    endif ()
-    if (NOT CMAKE_Java_RUNTIME AND Java_JAVA_EXECUTABLE)
-      set (CMAKE_Java_RUNTIME "${Java_JAVA_EXECUTABLE}")
-    endif ()
-    if (NOT CMAKE_Java_ARCHIVE AND Java_JAR_EXECUTABLE)
-      set (CMAKE_Java_ARCHIVE "${Java_JAR_EXECUTABLE}")
-    endif ()
-    message (VERBOSE "Java toolchain: ${CMAKE_Java_COMPILER} / ${CMAKE_Java_RUNTIME} / ${CMAKE_Java_ARCHIVE}")
-  endif ()
-endif ()
-
-#-----------------------------------------------------------------------------
 # Option to build documentation
 # NOTE: This block must appear before add_subdirectory(src) so that
 # DOXYGEN_FOUND and related variables are visible in src/CMakeLists.txt
@@ -1206,17 +1088,6 @@ if (HDF5_BUILD_DOC AND EXISTS "${HDF5_DOXYGEN_DIR}" AND IS_DIRECTORY "${HDF5_DOX
       set (HDF5_DOXY_WARNINGS "NO")
     endif ()
     message (STATUS "Found Doxygen version: ${DOXYGEN_VERSION}")
-
-    # Set the default directory for the Java sources for doxygen
-    if (Java_VERSION_STRING VERSION_GREATER_EQUAL "25.0.0")
-      if (HDF5_ENABLE_JNI)
-        set (DOXYGEN_JAVA_DIR ${HDF5_JAVA_SRCJNI_PATH})
-      else ()
-        set (DOXYGEN_JAVA_DIR ${HDF5_JAVA_SRC_PATH})
-      endif ()
-    else ()
-      set (DOXYGEN_JAVA_DIR ${HDF5_JAVA_SRCJNI_PATH})
-    endif ()
 
     # Doxygen content and configuration files shared by all doc targets.
     # Defined here once to avoid duplication. CONFIGURE_DEPENDS tells
@@ -1326,26 +1197,6 @@ if (EXISTS "${HDF5_SOURCE_DIR}/hl" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl")
 endif ()
 
 #-----------------------------------------------------------------------------
-# Option to build Fortran bindings/tests
-# Make sure this appears before the CONFIGURE_FILE step
-# so that fortran name mangling is detected before writing H5pubconf.h
-#-----------------------------------------------------------------------------
-# Set default name mangling : overridden by Fortran detection in fortran dir
-set (H5_FC_FUNC  "H5_FC_FUNC(name,NAME) name ## _" CACHE INTERNAL "Fortran name mangling macro for C identifiers without underscores")
-set (H5_FC_FUNC_ "H5_FC_FUNC_(name,NAME) name ## _" CACHE INTERNAL "Fortran name mangling macro for C identifiers with underscores")
-if (EXISTS "${HDF5_SOURCE_DIR}/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/fortran")
-  if (HDF5_BUILD_FORTRAN)
-    add_subdirectory (fortran)
-    if (HDF5_BUILD_HL_LIB)
-      if (EXISTS "${HDF5_SOURCE_DIR}/hl/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/fortran")
-        #-- Build the High Level Fortran source codes
-        add_subdirectory (hl/fortran)
-      endif ()
-    endif ()
-  endif ()
-endif ()
-
-#-----------------------------------------------------------------------------
 # Option to build HDF5 C++ Library
 #-----------------------------------------------------------------------------
 if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
@@ -1364,7 +1215,7 @@ if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
     add_subdirectory (c++)
     if (HDF5_BUILD_HL_LIB)
       if (EXISTS "${HDF5_SOURCE_DIR}/hl/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/c++")
-        #-- Build the High Level Fortran source codes
+        #-- Build the High Level C++ source codes
         add_subdirectory (hl/c++)
       endif ()
     endif ()
@@ -1375,22 +1226,6 @@ endif ()
 # Generate the H5pubconf.h file containing user settings needed by compilation
 #-----------------------------------------------------------------------------
 configure_file (${HDF5_SRC_DIR}/H5pubconf.h.in ${HDF5_SRC_BINARY_DIR}/H5pubconf.h @ONLY)
-
-#-----------------------------------------------------------------------------
-# Option to build HDF5 Java Library
-#-----------------------------------------------------------------------------
-if (EXISTS "${HDF5_SOURCE_DIR}/java" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/java")
-  if (HDF5_BUILD_JAVA)
-    if (NOT BUILD_SHARED_LIBS)
-      message (FATAL_ERROR "\nJava requires shared libraries!\n")
-    else ()
-      if (HDF5_ENABLE_MAVEN_DEPLOY)
-        message (STATUS "Maven deployment enabled for ${HDF5_JAVA_ARTIFACT_ID}")
-      endif ()
-      add_subdirectory (java)
-    endif ()
-  endif ()
-endif ()
 
 #-----------------------------------------------------------------------------
 # Option to build examples
@@ -1422,42 +1257,6 @@ if (HDF5_BUILD_DOC AND DOXYGEN_FOUND)
   if (HDF5_BUILD_HL_LIB)
     get_property (_hdf5_hl_doxy_inputs GLOBAL PROPERTY HDF5_DOXYGEN_HL_INPUTS)
     list (APPEND _hdf5_doxy_inputs ${_hdf5_hl_doxy_inputs})
-  endif ()
-
-  # Java sources: only when Java bindings are enabled. DOXYGEN_JAVA_DIR
-  # (set in the HDF5_BUILD_DOC block above) selects the correct path
-  # regardless of whether the JNI or pure-Java tree was chosen.
-  if (HDF5_BUILD_JAVA)
-    list (APPEND _hdf5_doxy_inputs
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/H5.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/HDF5Constants.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/HDFArray.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/HDFNativeData.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5Exception.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5IdException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5AttributeException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5BtreeException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5DataFiltersException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5DatasetInterfaceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5DataspaceInterfaceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5DataStorageException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5DatatypeInterfaceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5ExternalFileListException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5FileInterfaceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5FunctionArgumentException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5FunctionEntryExitException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5HeapException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5InternalErrorException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5JavaException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5LibraryException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5LowLevelIOException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5MetaDataCacheException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5ObjectHeaderException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5PropertyListInterfaceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5ReferenceException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5ResourceUnavailableException.java"
-      "${DOXYGEN_JAVA_DIR}/hdf/hdf5lib/exceptions/HDF5SymbolTableException.java"
-    )
   endif ()
 
   # Shared doxygen content inputs (*.dox, *.html, *.css, etc.) — defined

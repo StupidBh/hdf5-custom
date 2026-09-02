@@ -49,8 +49,6 @@ jobs:
               -DCMAKE_BUILD_TYPE=Release \
               -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
               -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-              -DHDF5_BUILD_FORTRAN=OFF \
-              -DHDF5_BUILD_JAVA=OFF \
               -DHDF5_BUILD_DOC=OFF \
               -DLIBAEC_USE_LOCALCONTENT=OFF \
               -DZLIB_USE_LOCALCONTENT=OFF \

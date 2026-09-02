@@ -6,7 +6,7 @@
  * <em>Working with region references, hyperslab selections,
  * and bit-fields (H5LR, H5LT)</em>
  *
- * The following reference manual entries describe high-level HDF5 C and Fortran APIs
+ * The following reference manual entries describe high-level HDF5 C APIs
  * for working with region references, hyperslab selections, and bit-fields.
  * These functions were created as part of a project supporting
  * NPP/NPOESS Data Production and Exploitation (
@@ -616,4 +616,3 @@ H5_HLRDLL herr_t  H5LTread_region(const char *file,
  */
 H5_HLRDLL herr_t H5LTread_bitfield_value(hid_t dset_id, int num_values, const unsigned *offset,
                  const unsigned *lengths, hid_t space, int *buf);
-

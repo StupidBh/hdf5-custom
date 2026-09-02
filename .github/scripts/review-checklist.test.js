@@ -72,12 +72,12 @@ function asyncTest(name, fn) {
 // matchesPattern — anchored directory patterns
 // ----------------------------------------------------------------
 
-test('anchored dir: fortran/src/H5f.F90 matches /fortran/', () => {
-  assert.strictEqual(matchesPattern('fortran/src/H5f.F90', '/fortran/'), true);
+test('anchored dir: filters/src/H5f.F90 matches /filters/', () => {
+  assert.strictEqual(matchesPattern('filters/src/H5f.F90', '/filters/'), true);
 });
 
-test('anchored dir: src/H5public.h does not match /fortran/', () => {
-  assert.strictEqual(matchesPattern('src/H5public.h', '/fortran/'), false);
+test('anchored dir: src/H5public.h does not match /filters/', () => {
+  assert.strictEqual(matchesPattern('src/H5public.h', '/filters/'), false);
 });
 
 test('anchored dir: src/H5FDsubfiling/foo.c matches /src/H5FDsubfiling/', () => {
@@ -159,8 +159,8 @@ test('unanchored directory: tools/src/foo.c matches src/', () => {
 // labelFromPattern
 // ----------------------------------------------------------------
 
-test('labelFromPattern: /fortran/ => "fortran"', () => {
-  assert.strictEqual(labelFromPattern('/fortran/'), 'fortran');
+test('labelFromPattern: /filters/ => "filters"', () => {
+  assert.strictEqual(labelFromPattern('/filters/'), 'filters');
 });
 
 test('labelFromPattern: *.cmake => "*.cmake"', () => {
@@ -199,7 +199,7 @@ test('attributeFiles: file in /src/ is not stolen by /src/H5FDsubfiling/', () =>
 
 test('attributeFiles: unmatched file appears in no area', () => {
   const areas = [{ pattern: '/src/', label: 'src', owners: ['alice'] }];
-  const files = [{ filename: 'fortran/H5f.F90', changes: 3 }];
+  const files = [{ filename: 'filters/H5f.F90', changes: 3 }];
   const byArea = attributeFiles(files, areas);
   assert.strictEqual(byArea.get('/src/').length, 0);
 });
@@ -603,15 +603,15 @@ test('buildBody: drive-by change-requester (not a CODEOWNER or requested reviewe
 test('buildBody: change-requester is scoped to the area their comments touch, not every area', () => {
   const areas = [
     makeArea('src',     ['alice'], 10, [{ filename: 'src/H5F.c', changes: 10 }]),
-    makeArea('fortran', ['bob'],   10, [{ filename: 'fortran/H5f.F90', changes: 10 }]),
+    makeArea('filters', ['bob'],   10, [{ filename: 'filters/H5f.F90', changes: 10 }]),
   ];
   const changeRequestFiles = new Map([['dan', new Set(['src/H5F.c'])]]);
   const body = buildBody(areas, new Set(), new Set(['alice', 'bob']), changeRequestFiles);
   const lines = body.split('\n');
   const srcIdx     = lines.findIndex(l => l.includes('**src**'));
-  const fortranIdx = lines.findIndex(l => l.includes('**fortran**'));
+  const filtersIdx = lines.findIndex(l => l.includes('**filters**'));
   assert.ok(lines[srcIdx + 1].includes('⚠️ Changes requested by @dan'));
-  assert.ok(!lines[fortranIdx + 1] || !lines[fortranIdx + 1].includes('@dan'));
+  assert.ok(!lines[filtersIdx + 1] || !lines[filtersIdx + 1].includes('@dan'));
 });
 
 test('buildBody: multiple change-requesters on the same area each get their own line', () => {
@@ -1336,36 +1336,36 @@ asyncTest('coordinateReviewers: bot-sourced review_requested is not treated as a
 // ----------------------------------------------------------------
 
 test('resolveAreaPicks: a valid sticky assignment is kept over a fresh load-balanced pick', () => {
-  const area = makeArea('fortran', ['alice', 'bob'], 50);
+  const area = makeArea('filters', ['alice', 'bob'], 50);
   const { picks, log } = resolveAreaPicks([area], {
     existingRequested: new Set(['alice', 'bob']), // avalanche: both currently requested
-    assignedByArea: new Map([['fortran', 'alice']]),
+    assignedByArea: new Map([['filters', 'alice']]),
     prAuthor: 'charlie',
     // Rigged so a fresh pick would land on bob, not alice — proves alice
     // survives because of the sticky assignment, not by coincidence.
     reviewerLoad: { alice: 99, bob: 0 },
     LINE_THRESHOLD: 300, AREA_THRESHOLDS: {}, PUBLIC_HEADER: /public\.h$/,
   });
-  assert.strictEqual(picks.get('fortran'), 'alice');
+  assert.strictEqual(picks.get('filters'), 'alice');
   assert.ok(log.some(l => l.includes('sticky')));
 });
 
 test('resolveAreaPicks: a sticky assignment no longer requested falls back to a fresh pick', () => {
   // alice was the sticky pick but has since been removed from the PR
   // (e.g. an explicit removal) — must not "keep" someone who isn't there.
-  const area = makeArea('fortran', ['alice', 'bob'], 50);
+  const area = makeArea('filters', ['alice', 'bob'], 50);
   const { picks } = resolveAreaPicks([area], {
     existingRequested: new Set(['bob']),
-    assignedByArea: new Map([['fortran', 'alice']]),
+    assignedByArea: new Map([['filters', 'alice']]),
     prAuthor: 'charlie',
     reviewerLoad: {},
     LINE_THRESHOLD: 300, AREA_THRESHOLDS: {}, PUBLIC_HEADER: /public\.h$/,
   });
-  assert.strictEqual(picks.get('fortran'), 'bob');
+  assert.strictEqual(picks.get('filters'), 'bob');
 });
 
 test('resolveAreaPicks: a single already-requested owner is kept without invoking the load-balancer', () => {
-  const area = makeArea('fortran', ['alice', 'bob'], 50);
+  const area = makeArea('filters', ['alice', 'bob'], 50);
   const { picks, log } = resolveAreaPicks([area], {
     existingRequested: new Set(['bob']), // no avalanche — only bob requested
     assignedByArea: new Map(), // no sticky record yet
@@ -1373,12 +1373,12 @@ test('resolveAreaPicks: a single already-requested owner is kept without invokin
     reviewerLoad: { bob: 99, alice: 0 }, // fresh pick would prefer alice
     LINE_THRESHOLD: 300, AREA_THRESHOLDS: {}, PUBLIC_HEADER: /public\.h$/,
   });
-  assert.strictEqual(picks.get('fortran'), 'bob');
+  assert.strictEqual(picks.get('filters'), 'bob');
   assert.ok(log.some(l => l.includes('no avalanche')));
 });
 
 test('resolveAreaPicks: no sticky and no single owner falls back to a fresh load-balanced pick', () => {
-  const area = makeArea('fortran', ['alice', 'bob'], 50);
+  const area = makeArea('filters', ['alice', 'bob'], 50);
   const { picks } = resolveAreaPicks([area], {
     existingRequested: new Set(['alice', 'bob']),
     assignedByArea: new Map(),
@@ -1386,7 +1386,7 @@ test('resolveAreaPicks: no sticky and no single owner falls back to a fresh load
     reviewerLoad: { alice: 0, bob: 99 },
     LINE_THRESHOLD: 300, AREA_THRESHOLDS: {}, PUBLIC_HEADER: /public\.h$/,
   });
-  assert.strictEqual(picks.get('fortran'), 'alice');
+  assert.strictEqual(picks.get('filters'), 'alice');
 });
 
 // ----------------------------------------------------------------
@@ -1394,10 +1394,10 @@ test('resolveAreaPicks: no sticky and no single owner falls back to a fresh load
 // ----------------------------------------------------------------
 
 test('serializeAssigned/parseAssigned round-trip', () => {
-  const map = new Map([['fortran', 'alice'], ['.github', 'bob']]);
+  const map = new Map([['filters', 'alice'], ['.github', 'bob']]);
   const body = `some text\n${serializeAssigned(map)}\nmore text`;
   const parsed = parseAssigned(body);
-  assert.strictEqual(parsed.get('fortran'), 'alice');
+  assert.strictEqual(parsed.get('filters'), 'alice');
   assert.strictEqual(parsed.get('.github'), 'bob');
 });
 

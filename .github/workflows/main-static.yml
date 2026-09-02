@@ -60,8 +60,6 @@ jobs:
             os: windows-latest
             shared: OFF
             cpp: ON
-            fortran: OFF
-            java: OFF
             docs: OFF
             libaecfc: ON
             localaec: OFF
@@ -79,8 +77,6 @@ jobs:
             os: ubuntu-latest
             shared: OFF
             cpp: ON
-            fortran: ON
-            java: OFF
             docs: OFF
             libaecfc: ON
             localaec: OFF
@@ -98,8 +94,6 @@ jobs:
             os: macos-latest
             shared: OFF
             cpp: ON
-            fortran: OFF
-            java: OFF
             docs: OFF
             libaecfc: ON
             localaec: OFF
@@ -174,8 +168,6 @@ jobs:
             -DHDF5_ENABLE_ALL_WARNINGS:BOOL=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=${{ matrix.cpp }} \
-            -DHDF5_BUILD_FORTRAN:BOOL=${{ matrix.fortran }} \
-            -DHDF5_BUILD_JAVA:BOOL=OFF \
             -DHDF5_BUILD_DOC:BOOL=OFF \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=${{ matrix.zlibfc }} \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=${{ matrix.libaecfc }} \
@@ -200,4 +192,3 @@ jobs:
         run: ctest . --parallel 2 -C ${{ inputs.build_mode }}
         working-directory: ${{ runner.workspace }}/build
         if: ${{ matrix.run_tests }}
-

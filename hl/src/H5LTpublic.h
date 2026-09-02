@@ -26,8 +26,7 @@ typedef enum H5LT_lang_t {
     H5LT_LANG_ERR = -1, /*this is the first*/
     H5LT_DDL      = 0,  /*for DDL*/
     H5LT_C        = 1,  /*for C*/
-    H5LT_FORTRAN  = 2,  /*for Fortran*/
-    H5LT_NO_LANG  = 3   /*this is the last*/
+    H5LT_NO_LANG  = 2   /*this is the last*/
 } H5LT_lang_t;
 
 #ifdef __cplusplus
@@ -83,15 +82,11 @@ extern "C" {
  * It has the following sets of functions listed below.
  *
  * \note \Bold{Programming hints:}
- * \note To use any of these functions or subroutines,
- *       you must first include the relevant include file (C) or
- *       module (Fortran) in your application.
+ * \note To use any of these functions, include the relevant header file
+ *       in your application.
  * \note The following line includes the HDF5 Lite package, H5LT,
  *       in C applications:
  *       \code #include "hdf5_hl.h" \endcode
- * \note This line includes the H5LT module in Fortran applications:
- *       \code use h5lt \endcode
- *
  * <table>
  * <tr valign="top"><td style="border: none;">
  *
@@ -143,8 +138,6 @@ extern "C" {
  *      - \ref H5LTset_attribute_ullong
  *      - \ref H5LTset_attribute_float
  *      - \ref H5LTset_attribute_double
- *      - <code>H5LTset_attribute_f</code> (fortran ONLY)
- *
  *   - Get attribute functions
  *      - \ref H5LTget_attribute
  *      - \ref H5LTget_attribute_string

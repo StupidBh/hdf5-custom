@@ -133,7 +133,7 @@
  * extensible and has the current dimension sizes 60x30x9x717. When compressed with \b gzip compression
  * with level 6, the compression ratio is 1.076<sup>2</sup>. We used HDF5 command line tools
  * \ref sec_cltools_h5dump and \ref sec_cltools_h5ls
- * and the HDF Java-based browser HDFView to find various properties of the dataset that would help us to
+ * and the HDFView browser to find various properties of the dataset that would help us to
  * understand performance problems and propose solutions. If the reader decides to follow the discussion
  * using a “hands on” approach, the examples below illustrate how to use \ref sec_cltools_h5dump and
  * \ref sec_cltools_h5ls to get the

@@ -43,10 +43,9 @@ jobs:
            sudo apt-get install ninja-build graphviz
            sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
            sudo apt install libaec0 libaec-dev
-           sudo apt install gcc-12 g++-12 gfortran-12
+           sudo apt install gcc-12 g++-12
            echo "CC=gcc-12" >> $GITHUB_ENV
            echo "CXX=g++-12" >> $GITHUB_ENV
-           echo "FC=gfortran-12" >> $GITHUB_ENV
 
       # Get files created by release script
       - name: Get tgz-tarball (Linux)
@@ -82,8 +81,6 @@ jobs:
                  -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON \
                  -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
                  -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-                 -DHDF5_BUILD_FORTRAN=OFF \
-                 -DHDF5_BUILD_JAVA=OFF \
                  -DHDF5_BUILD_DOC=OFF \
                  -DLIBAEC_USE_LOCALCONTENT=OFF \
                  -DZLIB_USE_LOCALCONTENT=OFF \
@@ -169,7 +166,7 @@ jobs:
         run: |
           mkdir "${{ runner.workspace }}/build"
           Set-Location -Path "${{ runner.workspace }}\\build"
-          cmake -C ${{ github.workspace }}/hdfsrc/config/cmake/cacheinit.cmake -G Ninja -DCMAKE_BUILD_TYPE=Developer -DBUILD_SHARED_LIBS=ON -DHDF5_ENABLE_ALL_WARNINGS=ON -DHDF5_ENABLE_DEBUG_H5B2=ON -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_CPP_LIB=OFF -DHDF5_BUILD_FORTRAN=OFF -DHDF5_BUILD_JAVA=OFF -DHDF5_BUILD_DOC=OFF -DLIBAEC_USE_LOCALCONTENT=OFF -DZLIB_USE_LOCALCONTENT=OFF -DHDF_TEST_EXPRESS=0 ${{ github.workspace }}/hdfsrc
+          cmake -C ${{ github.workspace }}/hdfsrc/config/cmake/cacheinit.cmake -G Ninja -DCMAKE_BUILD_TYPE=Developer -DBUILD_SHARED_LIBS=ON -DHDF5_ENABLE_ALL_WARNINGS=ON -DHDF5_ENABLE_DEBUG_H5B2=ON -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_CPP_LIB=OFF -DHDF5_BUILD_DOC=OFF -DLIBAEC_USE_LOCALCONTENT=OFF -DZLIB_USE_LOCALCONTENT=OFF -DHDF_TEST_EXPRESS=0 ${{ github.workspace }}/hdfsrc
 
       - name: Build
         run: cmake --build . --parallel 3 --config Developer
@@ -249,8 +246,6 @@ jobs:
                -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON \
                -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
                -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-               -DHDF5_BUILD_FORTRAN=OFF \
-               -DHDF5_BUILD_JAVA=OFF \
                -DHDF5_BUILD_DOC=OFF \
                -DLIBAEC_USE_LOCALCONTENT=OFF \
                -DZLIB_USE_LOCALCONTENT=OFF \
@@ -341,8 +336,6 @@ jobs:
                -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON \
                -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
                -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-               -DHDF5_BUILD_FORTRAN=OFF \
-               -DHDF5_BUILD_JAVA=OFF \
                -DHDF5_BUILD_DOC=OFF \
                -DLIBAEC_USE_LOCALCONTENT=OFF \
                -DZLIB_USE_LOCALCONTENT=OFF \

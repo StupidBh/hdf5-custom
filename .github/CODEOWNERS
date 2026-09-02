@@ -7,8 +7,6 @@
 * @jhendersonHDF
 
 # ── Language bindings ─────────────────────────────────────────────────────────
-/fortran/             @brtnfld @bmribler
-/java/                @jhendersonHDF @mattjala
 /c++/                 @bmribler @glennsong09
 
 # ── Core C library ────────────────────────────────────────────────────────────
@@ -45,4 +43,3 @@
 
 # The HDF Group website verification — must stay in sync with hdfgroup.org
 /.github/.well-known  @lkurz @lrknox
-

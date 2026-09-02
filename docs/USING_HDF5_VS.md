@@ -20,7 +20,7 @@ If you are building on 64-bit Windows, find the "Platform" dropdown and select "
 
 Select Linker->Input and beginning with the "Additional Dependencies" line,
 enter the library names. The external libraries should be listed first, followed
-by the HDF5 library, and then optionally the HDF5 High Level, Fortran or C++
+by the HDF5 library, and then optionally the HDF5 High Level or C++
 libraries. For example, to compile a C++ application, enter: `hdf5.lib hdf5_cpp.lib`.
 
 For static linking:
@@ -41,13 +41,10 @@ Find the box "Show directories for", choose "Library files", add the
 library path (i.e. `c:\Program Files\HDF_Group\HDF5\2.0.x\lib`)
 to the library directories.
 
-If using Fortran libraries, you will also need to setup the path
-for the Intel Fortran compiler.
-
 Select Project->Properties->Linker->Input and beginning with the
 "Additional Dependencies" line, enter the library names. The
 external libraries should be listed first, followed by the HDF5
-library, and then optionally the HDF5 High Level, Fortran or C++
+library, and then optionally the HDF5 High Level or C++
 libraries. For example, to compile a C++ application, enter:
 `hdf5.lib hdf5_cpp.lib`.
 

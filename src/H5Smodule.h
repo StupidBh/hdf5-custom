@@ -114,10 +114,6 @@
  * maximum integer value on the system, so the library restriction can be raised in the future if higher
  * dimensionality is required.
  *
- * Note that most of the time Fortran applications calling HDF5 will work with dataspaces of rank less than
- * or equal to seven, since seven is the maximum number of dimensions in a Fortran array. But dataspace rank
- * is not limited to seven for Fortran applications.
- *
  * The current dimensions of a dataspace, also referred to as the dataspace extent, define the bounding box
  * for dataset elements that can participate in I/O operations.
  *
@@ -181,8 +177,8 @@
  *     H5Sset_extent_simple(space_id, rank, current_dims, max_dims);
  * \endcode
  *
- * Alternatively, the convenience APIs H5Screate_simple/h5screate_simple_f can replace the
- * H5Screate/h5screate_f and H5Sset_extent_simple/h5sset_extent_simple_f calls.
+ * Alternatively, the convenience API H5Screate_simple can replace the
+ * H5Screate and H5Sset_extent_simple calls.
  * \code
  *     space_id = H5Screate_simple(rank, current_dims, max_dims);
  * \endcode
@@ -207,39 +203,36 @@
  * The created dataspace will have current and maximum dimensions of 20 and 100 correspondingly, and the
  * sizes of those dimensions cannot be changed.
  *
- * <h4>C versus Fortran Dataspaces</h4>
+ * <h4>Row-major versus Column-major Dataspaces</h4>
  *
  * Dataspace dimensions are numbered from 1 to rank. HDF5 uses C storage conventions, assuming that the
  * last listed dimension is the fastest‐changing dimension and the first‐listed dimension is the slowest
  * changing. The HDF5 file format storage layout specification adheres to the C convention and the HDF5
  * Library adheres to the same convention when storing dataspace dimensions in the file. This affects how
- * C programs and tools interpret data written from Fortran programs and vice versa. The example below
- * illustrates the issue.
+ * row-major programs and tools interpret data produced by column-major programs and vice versa. The
+ * example below illustrates the issue using C and Fortran storage conventions.
  *
- * When a Fortran application describes a dataspace to store an array as A(20,100), it specifies the value of
+ * A column-major application describing an array as A(20,100) specifies the value of
  * the first dimension to be 20 and the second to be 100. Since Fortran stores data by columns, the
  * first‐listed dimension with the value 20 is the fastest‐changing dimension and the last‐listed dimension
- * with the value 100 is the slowest‐changing. In order to adhere to the HDF5 storage convention, the HDF5
- * Fortran wrapper transposes dimensions, so the first dimension becomes the last. The dataspace dimensions
- * stored in the file will be 100,20 instead of 20,100 in order to correctly describe the Fortran data that
+ * with the value 100 is the slowest‐changing. To adhere to the HDF5 storage convention, a column-major
+ * caller transposes dimensions, so the first dimension becomes the last. The dataspace dimensions
+ * stored in the file will be 100,20 instead of 20,100 in order to correctly describe data that
  * is stored in 100 columns, each containing 20 elements.
  *
- * When a Fortran application reads the data back, the HDF5 Fortran wrapper transposes the dimensions
- * once more, returning the first dimension to be 20 and the second to be 100, describing correctly the sizes
- * of the array that should be used to read data in the Fortran array A(20,100).
+ * A column-major caller reading the data transposes the dimensions once more, returning the first dimension
+ * as 20 and the second as 100, which correctly describes the array A(20,100).
  *
  * When a C application reads data back, the dimensions will come out as 100 and 20, correctly describing
  * the size of the array to read data into, since the data was written as 100 records of 20 elements each.
- * Therefore C tools such as \ref sec_cltools_h5dump and \ref sec_cltools_h5ls always display transposed
- * dimensions and values for the data written by a Fortran application.
+ * Therefore C tools such as \ref sec_cltools_h5dump and \ref sec_cltools_h5ls display transposed
+ * dimensions and values for data stored using column-major conventions.
  *
  * Consider the following simple example of equivalent C 3 x 5 and Fortran 5 x 3 arrays. As illustrated in
  * the figure below, a C application will store a 3 x 5 2‐dimensional array as three 5‐element rows. In order
- * to store the same data in the same order, a Fortran application must view the array as a 5 x 3 array with
- * three 5‐element columns. The dataspace of this dataset, as written from Fortran, will therefore be
- * described as 5 x 3 in the application but stored and described in the file according to the C convention
- * as a 3 x 5 array. This ensures that C and Fortran applications will always read the data in the order in
- * which it was written. The HDF5 Fortran interface handles this transposition automatically.
+ * to store the same data in the same order, a column-major application must view the array as a 5 x 3 array
+ * with three 5‐element columns. Its dataspace is described as 5 x 3 by the caller but stored and described
+ * in the file according to the C convention as a 3 x 5 array.
  * \code
  * // C
  *     \#define NX          3 // dataset dimensions
@@ -260,33 +253,6 @@
  *     dims[0]  = NX;
  *     dims[1]  = NY;
  *     dataspace = H5Screate_simple(RANK, dims, NULL);
- * \endcode
- *
- * \code
- * ! Fortran
- *     INTEGER, PARAMETER :: NX = 3
- *     INTEGER, PARAMETER :: NX = 5
- *     . . .
- *     INTEGER(HSIZE_T), DIMENSION(2) :: dims = (/NY, NX/) ! Dataset dimensions
- *     . . .
- *     !
- *     ! Initialize data
- *     !
- *     do i = 1, NY
- *         do j = 1, NX
- *             data(i,j) = i + (j-1)*NY
- *         enddo
- *     enddo
- *     !
- *     ! Data
- *     !
- *     ! 1 6 11
- *     ! 2 7 12
- *     ! 3 8 13
- *     ! 4 9 14
- *     ! 5 10 15
- *     . . .
- *     CALL h5screate_simple_f(rank, dims, dspace_id, error)
  * \endcode
  *
  *   <table>
@@ -335,12 +301,11 @@
  *   </table>
  *
  * <em>Note: The HDF5 Library stores arrays along the fastest‐changing dimension. This approach is often
- * referred to as being “in C order.” C, C++, and Java work with arrays in row‐major order. In other words,
+ * referred to as being “in C order.” C and C++ work with arrays in row‐major order. In other words,
  * the row, or the last dimension, is the fastest‐changing dimension. Fortran, on the other hand, handles
  * arrays in column‐major order making the column, or the first dimension, the fastest‐changing dimension.
- * Therefore, the C and Fortran arrays illustrated in the top portion of this figure are stored identically
- * in an HDF5 file. This ensures that data written by any language can be meaningfully read, interpreted,
- * and manipulated by any other.</em>
+ * Therefore, row-major and column-major arrays can be stored identically in an HDF5 file when dimensions
+ * are transposed appropriately.</em>
  *
  * <h4>Finding Dataspace Characteristics</h4>
  *
@@ -1482,217 +1447,6 @@
  *     6, 7, 8, 9, 10,
  *     11, 12, 13, 14, 15
  *   }
- * }
- *
- * \endcode
- *
- * <em>h5_write.f90</em>
- * \code
- * ----------
- * PROGRAM DSETEXAMPLE
- *
- * USE HDF5 ! This module contains all necessary modules
- *
- * IMPLICIT NONE
- *
- * CHARACTER(LEN=7), PARAMETER :: filename = "SDSf.h5" ! File name
- * CHARACTER(LEN=14), PARAMETER :: dsetname = "Fortran Matrix" ! Dataset name
- * INTEGER, PARAMETER :: NX = 3
- * INTEGER, PARAMETER :: NY = 5
- *
- * INTEGER(HID_T) :: file_id ! File identifier
- * INTEGER(HID_T) :: dset_id ! Dataset identifier
- * INTEGER(HID_T) :: dspace_id ! Dataspace identifier
- *
- * INTEGER(HSIZE_T), DIMENSION(2) :: dims = (/3,5/) ! Dataset dimensions
- * INTEGER :: rank = 2 ! Dataset rank
- * INTEGER :: data(NX,NY)
- * INTEGER :: error ! Error flag
- * INTEGER :: i, j
- *
- * !
- * ! Initialize data
- * !
- *   do i = 1, NX
- *     do j = 1, NY
- *       data(i,j) = j + (i-1)*NY
- *     enddo
- *   enddo
- * !
- * ! Data
- * !
- * ! 1 2 3 4 5
- * ! 6 7 8 9 10
- * ! 11 12 13 14 15
- *
- * !
- * ! Initialize FORTRAN interface.
- * !
- * CALLh5open_f(error)
- *
- * !
- * ! Create a new file using default properties.
- * !
- * CALL h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, error)
- *
- * !
- * ! Create the dataspace.
- * !
- * CALL h5screate_simple_f(rank, dims, dspace_id, error)
- *
- * !
- * ! Create and write dataset using default properties.
- * !
- * CALL h5dcreate_f(file_id, dsetname, H5T_NATIVE_INTEGER, dspace_id, &
- *                  dset_id, error, H5P_DEFAULT_F, H5P_DEFAULT_F, &
- *                  H5P_DEFAULT_F)
- *
- * CALL h5dwrite_f(dset_id, H5T_NATIVE_INTEGER, data, dims, error)
- *
- * !
- * ! End access to the dataset and release resources used by it.
- * !
- * CALL h5dclose_f(dset_id, error)
- *
- * !
- * ! Terminate access to the data space.
- * !
- * CALL h5sclose_f(dspace_id, error)
- *
- * !
- * ! Close the file.
- * !
- * CALL h5fclose_f(file_id, error)
- *
- * !
- * ! Close FORTRAN interface.
- * !
- * CALL h5close_f(error)
- *
- * END PROGRAM DSETEXAMPLE
- *
- * SDSf.out
- * --------
- * HDF5 "SDSf.h5" {
- * GROUP "/" {
- *   DATASET "Fortran Matrix" {
- *   DATATYPE H5T_STD_I32BE
- *   DATASPACE SIMPLE { ( 5, 3 ) / ( 5, 3 ) }
- *     DATA {
- *       1, 6, 11,
- *       2, 7, 12,
- *       3, 8, 13,
- *       4, 9, 14,
- *       5, 10, 15
- *     }
- *   }
- * }
- * }
- *
- * \endcode
- *
- * <em>h5_write_tr.f90</em>
- * \code
- * PROGRAM DSETEXAMPLE
- *
- * USE HDF5 ! This module contains all necessary modules
- *
- * IMPLICIT NONE
- *
- * CHARACTER(LEN=10), PARAMETER :: filename = "SDSf_tr.h5" ! File name
- * CHARACTER(LEN=24), PARAMETER :: dsetname = "Fortran Transpose Matrix"! Dataset name
- *
- * INTEGER, PARAMETER :: NX = 3
- * INTEGER, PARAMETER :: NY = 5
- *
- * INTEGER(HID_T) :: file_id    ! File identifier
- * INTEGER(HID_T) :: dset_id    ! Dataset identifier
- * INTEGER(HID_T) :: dspace_id  ! Dataspace identifier
- *
- * INTEGER(HSIZE_T), DIMENSION(2) :: dims = (/NY, NX/) ! Dataset dimensions
- * INTEGER :: rank = 2 ! Dataset rank
- * INTEGER :: data(NY,NX)
- *
- * INTEGER :: error ! Error flag
- * INTEGER :: i, j
- *
- * !
- * ! Initialize data
- * !
- *   do i = 1, NY
- *     do j = 1, NX
- *       data(i,j) = i + (j-1)*NY
- *     enddo
- *   enddo
- *
- * !
- * ! Data
- * !
- * ! 1 6 11
- * ! 2 7 12
- * ! 3 8 13
- * ! 4 9 14
- * ! 5 10 15
- *
- * !
- * ! Initialize FORTRAN interface.
- * !
- * CALL h5open_f(error)
- *
- * !
- * ! Create a new file using default properties.
- * !
- * CALL h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, error)
- *
- * !
- * ! Create the dataspace.
- * !
- * CALL h5screate_simple_f(rank, dims, dspace_id, error)
- *
- * !
- * ! Create and write dataset using default properties.
- * !
- * CALL h5dcreate_f(file_id, dsetname, H5T_NATIVE_INTEGER, dspace_id, &
- *                  dset_id, error, H5P_DEFAULT_F, H5P_DEFAULT_F, &
- *                  H5P_DEFAULT_F)
- * CALL h5dwrite_f(dset_id, H5T_NATIVE_INTEGER, data, dims, error)
- *
- * !
- * ! End access to the dataset and release resources used by it.
- * !
- * CALL h5dclose_f(dset_id, error)
- *
- * !
- * ! Terminate access to the data space.
- * !
- * CALL h5sclose_f(dspace_id, error)
- *
- * !
- * ! Close the file.
- * !
- * CALL h5fclose_f(file_id, error)
- *
- * !
- * ! Close FORTRAN interface.
- * !
- * CALL h5close_f(error)
- *
- * END PROGRAM DSETEXAMPLE
- *
- * SDSf_tr.out
- * -----------
- * HDF5 "SDSf_tr.h5" {
- * GROUP "/" {
- *   DATASET "Fortran Transpose Matrix" {
- *   DATATYPE H5T_STD_I32LE
- *   DATASPACE SIMPLE { ( 3, 5 ) / ( 3, 5 ) }
- *     DATA {
- *         1, 2, 3, 4, 5,
- *         6, 7, 8, 9, 10,
- *         11, 12, 13, 14, 15
- *     }
- *   }
- * }
  * }
  *
  * \endcode

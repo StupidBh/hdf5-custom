@@ -1996,33 +1996,26 @@ filled according to the value of this property. The padding can be:
  *
  * <h4>Defining Compound Datatypes</h4>
  *
- * Compound datatypes are conceptually similar to a C struct or Fortran derived types. The
+ * Compound datatypes are conceptually similar to record types such as a C struct. The
  * compound datatype defines a contiguous sequence of bytes, which are formatted using one up to
  * 2^16 datatypes (members). A compound datatype may have any number of members in any
  * order, and the members may have any datatype, including compound. Thus, complex nested
  * compound datatypes can be created. The total size of the compound datatype is greater than or
  * equal to the sum of the size of its members, up to a maximum of 2^32 bytes. HDF5 does not
- * support datatypes with distinguished records or the equivalent of C unions or Fortran
- * EQUIVALENCE statements.
+ * support datatypes with overlapping members, such as C unions.
  *
- * Typically, a C struct or Fortran derived type is defined to store a data point in memory.
+ * Typically, a C struct is defined to store a data point in memory.
  * The offsets of the members in memory represent their positions relative to the beginning of
  * an instance of the struct. The HDF5 C library includes a macro, #HOFFSET (s, m), which
  * calculates the offset of member \Emph{m} within struct \Emph{s}. Alternatively, the
  * `offsetof(s, m)` macro, defined in \Emph{stddef.h}, serves the same purpose as the
- * `HOFFSET` macro. For Fortran users, the HDF5 library provides the function
- * \ref h5lib::h5offsetof to determine the offset of a member. To find the size of a
- * scalar derived type, the Fortran function equivalent of the \Emph{sizeof} can be used.
- * Note, in the past, the HDF5 Fortran applications had to calculate offsets by using sizes of
- * members datatypes and by considering the order of members in the Fortran derived type, thus
- * offsets of Fortran structure members corresponded to the offsets within a packed datatype
- * (see explanation below) stored in an HDF5 file.
+ * `HOFFSET` macro.
  *
  * Each member of a compound datatype must have a descriptive name which is the key used to
  * uniquely identify the member within the compound datatype. A member name in an HDF5
- * datatype does not necessarily have to be the same as the name of the member in the C struct or
- * Fortran derived type, although this is often the case. Nor does one need to define all members of
- * the C struct or Fortran derived type in the HDF5 compound datatype (or vice versa).
+ * datatype does not necessarily have to be the same as the name of the member in the C struct,
+ * although this is often the case. Nor does one need to define all members of the C struct in the
+ * HDF5 compound datatype (or vice versa).
  *
  * Unlike atomic datatypes which are derived from other atomic datatypes, compound datatypes are
  * created from scratch. First, one creates an empty compound datatype and specifies its total size.
@@ -2048,47 +2041,6 @@ filled according to the value of this property. The padding can be:
  *   H5Tinsert (complex_id, “imaginary”, HOFFSET(complex_t,im),
  *   H5T_NATIVE_DOUBLE);
  * \endcode
- *
- * The example below shows a way of creating an HDF5 Fortran compound datatype to describe a
- * complex number. This is a Fortran derived type with two components, “real” and “imaginary”,
- * and each component is DOUBLE PRECISION. An equivalent Fortran TYPE whose type is defined
- * by the TYPE complex_t is shown.
- *
- * <em>A compound datatype for complex numbers in Fortran</em>
- *
- * <div class="tabbed">
- * - <b class="tab-title">Fortran 2003</b>
- * \code
- *   TYPE complex_t
- *       DOUBLE PRECISION re ! real part
- *       DOUBLE PRECISION im ! imaginary part
- *   END TYPE complex_t
- *   TYPE(complex_t), DIMENSION(1:8), TARGET :: cmplx
- *
- *   CalcSize = H5OFFSETOF(C_LOC(cmplx(1)), C_LOC(cmplx(2))
- *   CALL h5tcreate_f(H5T_COMPOUND_F, CalcSize, type_id, error)
- *   offset = H5OFFSETOF(C_LOC(cmplx),C_LOC(cmplx%re))
- *   CALL h5tinsert_f(type_id, “real”, offset, H5T_NATIVE_DOUBLE, error)
- *   offset = H5OFFSETOF(C_LOC(cmplx),C_LOC(cmplx%im))
- *   CALL h5tinsert_f(type_id, “imaginary”, offset, H5T_NATIVE_DOUBLE, error)
- * \endcode
- * - <b class="tab-title">Fortran (Obsolete)</b>
- * \code
- *   TYPE complex_t
- *       DOUBLE PRECISION re ! real part
- *       DOUBLE PRECISION im ! imaginary part
- *   END TYPE complex_t
- *
- *   CALL h5tget_size_f(H5T_NATIVE_DOUBLE, re_size, error)
- *   CALL h5tget_size_f(H5T_NATIVE_DOUBLE, im_size, error)
- *   complex_t_size = re_size + im_size
- *   CALL h5tcreate_f(H5T_COMPOUND_F, complex_t_size, type_id, error)
- *   offset = 0
- *   CALL h5tinsert_f(type_id, “real”, offset, H5T_NATIVE_DOUBLE, error)
- *   offset = offset + re_size
- *   CALL h5tinsert_f(type_id, “imaginary”, offset, H5T_NATIVE_DOUBLE, error)
- * \endcode
- * </div>
  *
  * Important Note: The compound datatype is created with a size sufficient to hold all its members.
  * In the C example above, the size of the C struct and the #HOFFSET macro are used as a
@@ -2212,19 +2164,6 @@ filled according to the value of this property. The padding can be:
  * \code
  *   hid_t s2_tid = H5Tcopy (s1_tid);
  *   H5Tpack (s2_tid);
- * \endcode
- *
- * The example below illustrates the sequence of Fortran calls used to create a packed compound
- * datatype. Before Fortran 2003, an HDF5 Fortran compound datatype did not represent a compound
- * datatype in memory. Therefore, compound data was ALWAYS written by field, as explained in the
- * next section. Packing was only necessary if the offset of each consecutive member was not equal
- * to the sum of the sizes of the previous members. However, with the introduction of Fortran 2003,
- * this is no longer the case, and the same considerations that apply to C also apply to Fortran.
- *
- * <em>Create a packed compound datatype in Fortran</em>
- * \code
- *   CALL h5tcopy_f(s1_id, s2_id, error)
- *   CALL h5tpack_f(s2_id, error)
  * \endcode
  *
  * <h4>Creating and Writing Datasets with Compound Datatypes</h4>
@@ -2389,150 +2328,12 @@ filled according to the value of this property. The padding can be:
  *   }
  * \endcode
  *
- * <em>Create and write a dataset with a compound datatype in Fortran</em>
- *
- * <div class="tabbed">
- * - <b class="tab-title">Fortran 2003</b>
- * The following example demonstrates how to create and write a dataset using a compound
- * datatype in Fortran 2003.
- * \code
- *   TYPE s1_t
- *     INTEGER :: a
- *     REAL :: b
- *     DOUBLE PRECISION :: c
- *   END TYPE
- *   TYPE(s1_t), TARGET, DIMENSION(1:LENGTH) :: data
- *
- *   ! Initialize data
- *   DO i = 1, LENGTH
- *     data[i].a = i-1
- *     data[i].b = (i-1)*(i-1)
- *     data[i].c = 1./(i)
- *   }
- *
- *   ...
- *   type_size = H5OFFSETOF(C_LOC(data(1)), C_LOC(data(2)))
- *   CALL H5Tcreate_f(H5T_COMPOUND_F, type_size, s1_tid, error)
- *   offset = H5OFFSETOF(C_LOC(data(1)), C_LOC(data(1)%a))
- *   CALL H5Tinsert_f(s1_tid, “a_name”, offset, H5T_NATIVE_INTEGER, error)
- *   offset = H5OFFSETOF(C_LOC(data(1)), C_LOC(data(1)%b))
- *   CALL H5Tinsert_f(s1_tid, “b_name”, offset, H5T_NATIVE_REAL, error)
- *   offset = H5OFFSETOF(C_LOC(data(1)), C_LOC(data(1)%c))
- *   CALL H5Tinsert_f(s1_tid, “c_name”, offset, H5T_NATIVE_DOUBLE, error)
- *
- *   ...
- *
- *   CALL H5Dcreate_f(file_id, “SDScompound.h5”, s1_t, space_id, dataset_id, error)
- *   CALL H5Dwrite_f(dataset_id, s1_tid, C_LOC(data(1)), error)
- * \endcode
- * - <b class="tab-title">Fortran (Obsolete)</b>
- * The following example demonstrates creating and writing a dataset with a compound datatype
- * using pre-Fortran 2003 standards. As illustrated in Fortran 90, writing and reading compound
- * datatypes is always done by fields. The content of the written file matches the example
- * provided previously.
- * \code
- *   ! One cannot write an array of a derived datatype in
- *   ! Fortran 90.
- *   TYPE s1_t
- *     INTEGER a
- *     REAL b
- *     DOUBLE PRECISION c
- *   END TYPE s1_t
- *   TYPE(s1_t) d(LENGTH)
- *   ! Therefore, the following code initializes an array
- *   ! corresponding to each field in the derived datatype
- *   ! and writesthose arrays to the dataset
- *
- *   INTEGER, DIMENSION(LENGTH) :: a
- *   REAL, DIMENSION(LENGTH) :: b
- *   DOUBLE PRECISION, DIMENSION(LENGTH) :: c
- *
- *   ! Initialize data
- *     do i = 1, LENGTH
- *       a(i) = i-1
- *       b(i) = (i-1) * (i-1)
- *       c(i) = 1./i
- *     enddo
- *
- *   ...
- *
- *   ! Set dataset transfer property to preserve partially
- *   ! initialized fields during write/read to/from dataset
- *   ! with compound datatype.
- *   !
- *   CALL h5pcreate_f(H5P_DATASET_XFER_F, plist_id, error)
- *   CALL h5pset_preserve_f(plist_id, .TRUE., error)
- *
- *   ...
- *
- *   !
- *   ! Create compound datatype.
- *   !
- *   ! First calculate total size by calculating sizes of
- *   ! each member
- *   !
- *   CALL h5tget_size_f(H5T_NATIVE_INTEGER, type_sizei, error)
- *   CALL h5tget_size_f(H5T_NATIVE_REAL, type_sizer, error)
- *   CALL h5tget_size_f(H5T_NATIVE_DOUBLE, type_sized, error)
- *   type_size = type_sizei + type_sizer + type_sized
- *   CALL h5tcreate_f(H5T_COMPOUND_F, type_size, dtype_id, error)
- *   !
- *   ! Insert members
- *   !
- *   !
- *   ! INTEGER member
- *   !
- *   offset = 0
- *   CALL h5tinsert_f(dtype_id, “a_name”, offset, H5T_NATIVE_INTEGER, error)
- *   !
- *   ! REAL member
- *   !
- *   offset = offset + type_sizei
- *   CALL h5tinsert_f(dtype_id, “b_name”, offset, H5T_NATIVE_REAL, error)
- *   !
- *   ! DOUBLE PRECISION member
- *   !
- *   offset = offset + type_sizer
- *   CALL h5tinsert_f(dtype_id, “c_name”, offset, H5T_NATIVE_DOUBLE, error)
- *   !
- *   ! Create the dataset with compound datatype.
- *   !
- *   CALL h5dcreate_f(file_id, dsetname, dtype_id, dspace_id, &dset_id, error, H5P_DEFAULT_F,
- *   H5P_DEFAULT_F, H5P_DEFAULT_F)
- *   !
- *
- *   ...
- *
- *   ! Create memory types. We have to create a compound
- *   ! datatype for each member we want to write.
- *   !
- *   CALL h5tcreate_f(H5T_COMPOUND_F, type_sizei, dt1_id, error)
- *   offset = 0
- *   CALL h5tinsert_f(dt1_id, “a_name”, offset, H5T_NATIVE_INTEGER, error)
- *   !
- *   CALL h5tcreate_f(H5T_COMPOUND_F, type_sizer, dt2_id, error)
- *   offset = 0
- *   CALL h5tinsert_f(dt2_id, “b_name”, offset, H5T_NATIVE_REAL, error)
- *   !
- *   CALL h5tcreate_f(H5T_COMPOUND_F, type_sized, dt3_id, error)
- *   offset = 0
- *   CALL h5tinsert_f(dt3_id, “c_name”, offset, H5T_NATIVE_DOUBLE, error)
- *   !
- *   ! Write data by fields in the datatype. Fields order
- *   ! is not important.
- *   !
- *   CALL h5dwrite_f(dset_id, dt3_id, c, data_dims, error, xfer_prp = plist_id)
- *   CALL h5dwrite_f(dset_id, dt2_id, b, data_dims, error, xfer_prp = plist_id)
- *   CALL h5dwrite_f(dset_id, dt1_id, a, data_dims, error, xfer_prp = plist_id)
- * \endcode
- * </div>
- *
  * <h4>Reading Datasets with Compound Datatypes</h4>
  *
  * Reading datasets with compound datatypes may be a challenge. For general applications there is
  * no way to know a priori the corresponding C structure. Also, C structures cannot be allocated on
- * the fly during discovery of the dataset's datatype. For general C, C++, Fortran and Java
- * application the following steps will be required to read and to interpret data from the dataset with
+ * the fly during discovery of the dataset's datatype. In general, the following steps will be
+ * required to read and interpret data from a dataset with
  * compound datatype:
  * \li 1. Get the identifier of the compound datatype in the file with the #H5Dget_type call
  * \li 2. Find the number of the compound datatype members with the #H5Tget_nmembers call

@@ -68,34 +68,27 @@ extern "C" {
  * each field have the same data type.
  *
  * \note \Bold{Programming hints:}
- * \note To use any of these functions or subroutines,
- *       you must first include the relevant include file (C) or
- *       module (Fortran) in your application.
+ * \note To use any of these functions, include the relevant header file
+ *       in your application.
  * \note The following line includes the HDF5 Table package, H5TB,
  *       in C applications:
  *       \code #include "hdf5_hl.h" \endcode
- * \note To include the H5TB module in Fortran applications specify:
- *       \code use h5tb \endcode
- *       Fortran applications must also include \ref H5open before
- *       any HDF5 calls to initialize global variables and \ref H5close
- *       after all HDF5 calls to close the Fortran interface.
- *
  * <table>
  * <tr valign="top"><td style="border: none;">
  *
  * - Creation
  *   - \ref H5TBmake_table
  * - Storage
- *   - \ref H5TBappend_records (No Fortran)
- *   - \ref H5TBwrite_records (No Fortran)
+ *   - \ref H5TBappend_records
+ *   - \ref H5TBwrite_records
  *   - \ref H5TBwrite_fields_name
  *   - \ref H5TBwrite_fields_index
  *
  * - Modification
- *   - \ref H5TBdelete_record (No Fortran)
- *   - \ref H5TBinsert_record (No Fortran)
- *   - \ref H5TBadd_records_from (No Fortran)
- *   - \ref H5TBcombine_tables (No Fortran)
+ *   - \ref H5TBdelete_record
+ *   - \ref H5TBinsert_record
+ *   - \ref H5TBadd_records_from
+ *   - \ref H5TBcombine_tables
  *   - \ref H5TBinsert_field
  *   - \ref H5TBdelete_field
  *
@@ -103,7 +96,7 @@ extern "C" {
  *
  * - Retrieval
  *   - \ref H5TBread_table
- *   - \ref H5TBread_records (No Fortran)
+ *   - \ref H5TBread_records
  *   - \ref H5TBread_fields_name
  *   - \ref H5TBread_fields_index
  *

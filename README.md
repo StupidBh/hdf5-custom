@@ -40,7 +40,6 @@ tools, and services at [The HDF Group's website](https://www.hdfgroup.org/).
 - [Forum and News](#forum-and-news)
 - [Release Schedule](#release-schedule)
 - [Downloads and Source Code](#downloads-and-source-code)
-- [Java Maven Artifacts](#java-maven-artifacts)
 - [Contributing](#contributing)
 - [How to Cite HDF5](#how-to-cite-hdf5)
 - [Build Status](#build-status)
@@ -136,10 +135,6 @@ Click the badges to view the detailed project board with current release items.
 ### HPC Testing Results
 
 [View HPC configure/build/test results on CDash](https://my.cdash.org/index.php?project=HDF5)
-
-## Java Maven Artifacts
-
-HDF5 Java bindings and examples are available as Maven artifacts. For detailed usage instructions including dependency configuration, repository setup, and platform-specific builds, see [HDF5Examples/JAVA/README-MAVEN.md](HDF5Examples/JAVA/README-MAVEN.md).
 
 ## Contributing
 

@@ -2,8 +2,7 @@
 
 This directory contains example programs for the installed APIs and scripts to 
 compile and run them.  Examples in the c and hl/c subdirectories are always 
-installed, and those in fortran, hl/fortran, c++ and hl/c++ will be installed 
-when fortran or c++ are enabled.
+installed, and those in c++ and hl/c++ will be installed when C++ is enabled.
 
 Running the run-all-ex.sh script in this directory will run the scripts and in 
 turn the examples in all the subdirectories where examples are installed.  The 
@@ -13,5 +12,5 @@ example programs.  Note that h5redeploy must be run if these binaries are
 copied or extracted in a directory other than the one where they were initially 
 installed.  Compile scripts from other locations can be used by setting an 
 environment variable prefix to the path of the directory containing the bin 
-directory with the compile scripts h5cc, h5fc, etc.  For example, export 
-prefix=/usr/local/hdf5 to use h5cc, h5fc, etc. in /usr/local/hdf5/bin.  
+directory with the compile scripts h5cc and h5c++. For example, export
+prefix=/usr/local/hdf5 to use those scripts in /usr/local/hdf5/bin.

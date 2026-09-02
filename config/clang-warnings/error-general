@@ -43,13 +43,6 @@
 #       -Werror=unused-parameter
 #
 #
-# NOTE: JNI files are not compatible with these warnings as errors
-#     jni/h5pDCPLImp.c,jni/nativeData.c,jni/h5util.c,jni/h5rImp.c
-#     jni/h5sImp.c,jni/h5tImp.c
-#       -Werror=cast-align
-#     jni/h5util.c
-#       -Werror=format(-overflow)
-#
 -Wformat
 #
 #
@@ -75,4 +68,3 @@
 #       -Werror=unused-variable
 #     h5_elink_unix2win.c,h5_extlink.c,h5_attribute.c
 #       -Werror=unused-parameter
-

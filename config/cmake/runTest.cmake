@@ -28,12 +28,11 @@ if (NOT DEFINED TEST_EXPECT)
   message (VERBOSE "Optional TEST_EXPECT is not defined")
 endif ()
 
-message (STATUS "ARGS: ${TEST_EMULATOR}/'${TEST_JAVA}' ${TEST_PROGRAM} ${TEST_ARGS}")
+message (STATUS "ARGS: ${TEST_EMULATOR} ${TEST_PROGRAM} ${TEST_ARGS}")
 
 include (${CMAKE_CURRENT_LIST_DIR}/runExecute.cmake)
 
 EXECUTE_TEST (TEST_FOLDER ${TEST_FOLDER}
-               TEST_JAVA ${TEST_JAVA}
                TEST_PROGRAM ${TEST_PROGRAM}
                TEST_ARGS ${TEST_ARGS}
                TEST_EMULATOR ${TEST_EMULATOR}
@@ -44,7 +43,6 @@ EXECUTE_TEST (TEST_FOLDER ${TEST_FOLDER}
                TEST_ENV_VALUE ${TEST_ENV_VALUE}
                TEST_KEYSTORE_DIR ${TEST_KEYSTORE_DIR}
                TEST_INPUT ${TEST_INPUT}
-               TEST_CLASSPATH ${TEST_CLASSPATH}
                TEST_NOERRDISPLAY ${TEST_NOERRDISPLAY}
 )
 
@@ -100,4 +98,3 @@ endif ()
 
 # everything went fine...
 message (STATUS "${TEST_PROGRAM} Passed")
-

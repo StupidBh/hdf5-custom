@@ -64,7 +64,6 @@ jobs:
       - name: Set MPI Environment Variables (${{ matrix.mpi }})
         run: |
           echo "CC=mpicc" >> $GITHUB_ENV
-          echo "FC=mpif90" >> $GITHUB_ENV
 
       - name: Set file base name (${{ matrix.mpi }})
         id: set-file-base
@@ -132,9 +131,7 @@ jobs:
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DMPIEXEC_MAX_NUMPROCS:STRING=2")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PARALLEL:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SUBFILING_VFD:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_ENCODING:BOOL=OFF")
@@ -174,7 +171,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install ninja-build graphviz curl
           sudo apt install libssl3 libssl-dev libcurl4 libcurl4-openssl-dev
-          sudo apt install gcc-12 g++-12 gfortran-12
+          sudo apt install gcc-12 g++-12
           sudo apt install libaec0 libaec-dev
 
       - name: Install CMake
@@ -192,7 +189,6 @@ jobs:
       - name: Set MPI Environment Variables (${{ matrix.mpi }})
         run: |
           echo "CC=mpicc" >> $GITHUB_ENV
-          echo "FC=mpif90" >> $GITHUB_ENV
 
       - name: Set file base name (${{ matrix.mpi }})
         id: set-file-base
@@ -252,9 +248,7 @@ jobs:
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DMPIEXEC_MAX_NUMPROCS:STRING=2")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PARALLEL:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SUBFILING_VFD:BOOL=ON")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_ENCODING:BOOL=OFF")
@@ -295,7 +289,6 @@ jobs:
       - name: Set MPI Environment Variables (${{ matrix.mpi }})
         run: |
           echo "CC=mpicc" >> $GITHUB_ENV
-          echo "FC=mpif90" >> $GITHUB_ENV
 
       - name: Set file base name (${{ matrix.mpi }})
         id: set-file-base
@@ -354,9 +347,7 @@ jobs:
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DMPIEXEC_MAX_NUMPROCS:STRING=2")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_PARALLEL:BOOL=ON")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SUBFILING_VFD:BOOL=ON")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_JAVA:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_CPP_LIB:BOOL=OFF")
-            set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_BUILD_FORTRAN:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=OFF")
             set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DHDF5_ENABLE_SZIP_ENCODING:BOOL=OFF")

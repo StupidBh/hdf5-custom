@@ -57,15 +57,11 @@ extern "C" {
  * The HDF5 Images API uses the \ref H5LT.
  *
  * \note \Bold{Programming hints:}
- * \note To use any of these functions or subroutines,
- *       you must first include the relevant include file (C) or
- *       module (Fortran) in your application.
+ * \note To use any of these functions, include the relevant header file
+ *       in your application.
  * \note The following line includes the HDF5 Images package, H5IM,
  *       in C applications:
  *       \code #include "hdf5_hl.h" \endcode
- * \note This line includes the H5IM module in Fortran applications:
- *       \code use h5im \endcode
- *
  * - \ref H5IMget_image_info
  *    \n Gets information about an image dataset (dimensions,
  *       interlace mode and number of associated palettes).

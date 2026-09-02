@@ -33,56 +33,6 @@
    values correctly. */
 #cmakedefine H5_DISABLE_SOME_LDOUBLE_CONV @H5_DISABLE_SOME_LDOUBLE_CONV@
 
-/* Define to dummy `main' function (if any) required to link to the Fortran
-   libraries. */
-#cmakedefine H5_FC_DUMMY_MAIN @H5_FC_DUMMY_MAIN@
-
-/* Define if F77 and FC dummy `main' functions are identical. */
-#cmakedefine H5_FC_DUMMY_MAIN_EQ_F77 @H5_FC_DUMMY_MAIN_EQ_F77@
-
-/* Define to a macro mangling the given C identifier (in lower and upper
-   case), which must not contain underscores, for linking with Fortran. */
-#define @H5_FC_FUNC@
-
-/* Same as H5_FC_FUNC, but for C identifiers containing underscores. */
-#define @H5_FC_FUNC_@
-
-/* Define if Fortran C_BOOL is different from default LOGICAL */
-#cmakedefine H5_FORTRAN_C_BOOL_IS_UNIQUE
-
-/* Define if we have Fortran intrinsic C_SIZEOF */
-#cmakedefine H5_FORTRAN_HAVE_C_SIZEOF @H5_FORTRAN_HAVE_C_SIZEOF@
-
-/* Define if we have Fortran intrinsic SIZEOF */
-#cmakedefine H5_FORTRAN_HAVE_SIZEOF @H5_FORTRAN_HAVE_SIZEOF@
-
-/* Define if we have Fortran intrinsic STORAGE_SIZE */
-#cmakedefine H5_FORTRAN_HAVE_STORAGE_SIZE @H5_FORTRAN_HAVE_STORAGE_SIZE@
-
-/* Define if Fortran supports allocatable character */
-#cmakedefine H5_FORTRAN_HAVE_CHAR_ALLOC @H5_FORTRAN_HAVE_CHAR_ALLOC@
-
-/* Determine the size of C long double */
-#cmakedefine H5_FORTRAN_SIZEOF_LONG_DOUBLE @H5_FORTRAN_SIZEOF_LONG_DOUBLE@
-
-/* Define Fortran compiler ID */
-#define H5_Fortran_COMPILER_ID @CMAKE_Fortran_COMPILER_ID@
-
-/* Define number of valid Fortran INTEGER KINDs (must be defined before F_IKIND)*/
-#cmakedefine H5_H5CONFIG_F_NUM_IKIND @H5_H5CONFIG_F_NUM_IKIND@
-
-/* Define valid Fortran INTEGER KINDs */
-#cmakedefine H5_H5CONFIG_F_IKIND @H5_H5CONFIG_F_IKIND@
-
-/* Define number of valid Fortran REAL KINDs (must be defined before F_RKIND) */
-#cmakedefine H5_H5CONFIG_F_NUM_RKIND @H5_H5CONFIG_F_NUM_RKIND@
-
-/* Define valid Fortran REAL KINDs */
-#cmakedefine H5_H5CONFIG_F_RKIND @H5_H5CONFIG_F_RKIND@
-
-/* Define valid Fortran REAL KINDs Sizeof */
-#cmakedefine H5_H5CONFIG_F_RKIND_SIZEOF @H5_H5CONFIG_F_RKIND_SIZEOF@
-
 /* Define to 1 if you have the `alarm' function. */
 #cmakedefine H5_HAVE_ALARM @H5_HAVE_ALARM@
 
@@ -137,9 +87,6 @@
 /* Determine if _Float16 is available */
 #cmakedefine H5_HAVE__FLOAT16 @H5_HAVE__FLOAT16@
 
-/* Determine if __float128 will be used in the Fortran wrappers */
-#cmakedefine H5_HAVE_FLOAT128 @H5_HAVE_FLOAT128@
-
 /* Define to 1 if you have the `flock' function. */
 #cmakedefine H5_HAVE_FLOCK @H5_HAVE_FLOCK@
 
@@ -148,9 +95,6 @@
 
 /* Define to 1 if you have the `fseeko' function. */
 #cmakedefine H5_HAVE_FSEEKO @H5_HAVE_FSEEKO@
-
-/* Determine if INTEGER*16 is available */
-#cmakedefine H5_HAVE_Fortran_INTEGER_SIZEOF_16 @H5_HAVE_Fortran_INTEGER_SIZEOF_16@
 
 /* Define to 1 if you have the `GetConsoleScreenBufferInfo' function. */
 #cmakedefine H5_HAVE_GETCONSOLESCREENBUFFERINFO @H5_HAVE_GETCONSOLESCREENBUFFERINFO@
@@ -216,12 +160,6 @@
 /* Define whether the Mirror virtual file driver (VFD) will be compiled */
 #cmakedefine H5_HAVE_MIRROR_VFD @H5_HAVE_MIRROR_VFD@
 
-/* Define if MPI_Comm_c2f and MPI_Comm_f2c exist */
-#cmakedefine H5_HAVE_MPI_MULTI_LANG_Comm @H5_HAVE_MPI_MULTI_LANG_Comm@
-
-/* Define if MPI_Info_c2f and MPI_Info_f2c exist */
-#cmakedefine H5_HAVE_MPI_MULTI_LANG_Info @H5_HAVE_MPI_MULTI_LANG_Info@
-
 /* Define to 1 if you have the <netdb.h> header file. */
 #cmakedefine H5_HAVE_NETDB_H @H5_HAVE_NETDB_H@
 
@@ -239,9 +177,6 @@
 
 /* Define if we have parallel support */
 #cmakedefine H5_HAVE_PARALLEL @H5_HAVE_PARALLEL@
-
-/* Define if MPI Fortran supports mpi_f08 module */
-#cmakedefine H5_HAVE_MPI_F08 @H5_HAVE_MPI_F08@
 
 /* Define if we have support for writing to filtered datasets in parallel */
 #cmakedefine H5_HAVE_PARALLEL_FILTERED_WRITES @H5_HAVE_PARALLEL_FILTERED_WRITES@
@@ -428,12 +363,6 @@
 
 /* Define to the version of this package. */
 #define H5_PACKAGE_VERSION "@HDF5_PACKAGE_VERSION_STRING@"
-
-/* Determine the maximum decimal precision in C */
-#define H5_PAC_C_MAX_REAL_PRECISION @H5_PAC_C_MAX_REAL_PRECISION@
-
-/* Define Fortran Maximum Real Decimal Precision */
-#define H5_PAC_FC_MAX_REAL_PRECISION @H5_PAC_FC_MAX_REAL_PRECISION@
 
 /* The size of `bool', as computed by sizeof. */
 #cmakedefine H5_SIZEOF_BOOL @H5_SIZEOF_BOOL@

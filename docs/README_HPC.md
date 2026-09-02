@@ -28,7 +28,7 @@ You should first consult with your system support staff for information on:
 - How to run an MPI application
 - How to access the parallel file system
 
-Sample MPI-IO C and Fortran programs are provided in Appendix A. Use them to
+Sample MPI-IO C programs are provided in Appendix A. Use them to
 test your MPI compiler and parallel file system before building HDF5.
 
 ### 1.2. Prerequisites for HPC Systems
@@ -120,7 +120,6 @@ CMake can usually find MPI automatically. To specify explicitly:
 
 ```bash
 cmake -DCMAKE_C_COMPILER=mpicc \
-      -DCMAKE_Fortran_COMPILER=mpif90 \
       -DHDF5_ENABLE_PARALLEL=ON \
       ..
 ```
@@ -129,7 +128,6 @@ Or use MPI compiler wrappers:
 
 ```bash
 export CC=mpicc
-export FC=mpif90
 cmake -DHDF5_ENABLE_PARALLEL=ON ..
 ```
 
@@ -140,7 +138,6 @@ cmake -DHDF5_ENABLE_PARALLEL=ON ..
 | `-DHDF5_ENABLE_PARALLEL=ON` | Enable parallel HDF5 (required) |
 | `-DBUILD_SHARED_LIBS=ON` | Build shared libraries |
 | `-DBUILD_STATIC_LIBS=ON` | Build static libraries |
-| `-DHDF5_BUILD_FORTRAN=ON` | Build Fortran interface |
 | `-DHDF5_BUILD_CPP_LIB=OFF` | C++ disabled in parallel builds |
 | `-DHDF5_ENABLE_THREADSAFE=OFF` | Thread safety disabled in parallel builds |
 | `-DHDF5_ENABLE_SUBFILING_VFD=ON` | Enable subfiling VFD (parallel I/O optimization) |
@@ -198,7 +195,7 @@ Add after `HDF5config.cmake,` separated by commas:
 |--------|-------------|
 | `HPC=sbatch` | Use SLURM batch system |
 | `HPC=bsub` | Use LSF batch system |
-| `MPI=true` | Enable parallel (disables C++, Java, threadsafe) |
+| `MPI=true` | Enable parallel (disables C++ and threadsafe) |
 | `LOCAL_BATCH_SCRIPT_ARGS="--account=<acct>"` | Supply batch job account information |
 
 #### Examples
@@ -227,7 +224,7 @@ mkdir build && cd build
 
 ### 5.2. Run CMake Configure
 
-Example for parallel build with Fortran on HPC system:
+Example for a parallel build on an HPC system:
 
 ```bash
 cmake \
@@ -235,9 +232,7 @@ cmake \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=/install/path \
   -DHDF5_ENABLE_PARALLEL:BOOL=ON \
-  -DHDF5_BUILD_FORTRAN:BOOL=ON \
   -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-  -DHDF5_BUILD_JAVA:BOOL=OFF \
   -DHDF5_ENABLE_THREADSAFE:BOOL=OFF \
   -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF \
   -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=OFF \
@@ -374,7 +369,7 @@ To run specific test suites:
 ```bash
 ctest -R "H5TEST"              # Core library tests
 ctest -R "MPI_TEST"            # Parallel/MPI tests
-ctest -R "CPP|FORTRAN"         # C++ and Fortran tests
+ctest -R "CPP"                 # C++ tests
 ctest -E "MPI_TEST"            # Exclude parallel tests
 ctest --parallel 4             # Run 4 tests in parallel
 ```
@@ -427,20 +422,17 @@ reflect that write(), even if calls are made by different processes.
 
 ## Appendix A. Sample MPI-IO Programs
 
-Here are sample MPI-IO C and Fortran programs to test your MPI compiler and
+Here is a sample MPI-IO C program to test your MPI compiler and
 parallel file system before building HDF5. The programs assume they run in
 a parallel file system (create test files in current directory). For more
 examples, please refer to the following directories:
-HDF5Examples/C/H5PAR and HDF5Examples/FORTRAN/H5PAR
+HDF5Examples/C/H5PAR
 
 ### Example Compiling and Running
 
 ```bash
 mpicc Sample_mpio.c -o c.out
 mpiexec -np 4 c.out
-
-mpif90 Sample_mpio.f90 -o f.out
-mpiexec -np 4 f.out
 ```
 
 ### Sample_mpio.c
@@ -560,42 +552,4 @@ int main(int ac, char **av)
     MPI_Finalize();
     return 0;
 }
-```
-
-### Sample_mpio.f90
-
-```fortran
-!
-! The following example demonstrates how to create and close a parallel
-! file using MPI-IO calls.
-!
-! USE MPI is the proper way to bring in MPI definitions but many
-! MPI Fortran compiler supports the pseudo standard of INCLUDE.
-! So, HDF5 uses the INCLUDE statement instead.
-!
-
-     PROGRAM MPIOEXAMPLE
-
-     USE mpi
-
-     IMPLICIT NONE
-
-     CHARACTER(LEN=80), PARAMETER :: filename = "filef.h5" ! File name
-     INTEGER     ::   ierror  ! Error flag
-     INTEGER     ::   fh      ! File handle
-     INTEGER     ::   amode   ! File access mode
-
-     call MPI_INIT(ierror)
-     amode = MPI_MODE_RDWR + MPI_MODE_CREATE + MPI_MODE_DELETE_ON_CLOSE
-     call MPI_FILE_OPEN(MPI_COMM_WORLD, filename, amode, MPI_INFO_NULL, fh, ierror)
-     print *, "Trying to create ", filename
-     if ( ierror .eq. MPI_SUCCESS ) then
-        print *, "MPI_FILE_OPEN succeeded"
-        call MPI_FILE_CLOSE(fh, ierror)
-     else
-        print *, "MPI_FILE_OPEN failed"
-     endif
-
-     call MPI_FINALIZE(ierror);
-     END PROGRAM
 ```

@@ -1,8 +1,5 @@
 # .gitignore file for HDF5
 
-# Java .classes files
-**/java/.classes
-
 # Backup files
 # Editor-specific extensions should go in your ~/.gitconfig, but we
 # include the standard Unix backup '~' extension since autoheader

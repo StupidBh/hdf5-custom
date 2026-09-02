@@ -10,7 +10,6 @@ if (NOT DEFINED ENV{CXX})
 set (CMAKE_CXX_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-g++)
 endif ()
 if (NOT DEFINED ENV{FC})
-set (CMAKE_Fortran_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-gfortran)
 # set the resource compiler (RHBZ #652435)
 endif ()
 if (NOT DEFINED ENV{RC})
@@ -28,6 +27,4 @@ set (CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 set (CMAKE_AR:FILEPATH /usr/bin/${TOOLCHAIN_PREFIX}-ar)
 set (CMAKE_RANLIB:FILEPATH /usr/bin/${TOOLCHAIN_PREFIX}-ranlib)
-
-set (HDF5_USE_PREGEN_DIR "${CMAKE_CURRENT_LIST_DIR}/fortpregen/gfortran" CACHE PATH "Path to pregenerated Fortran files")
 

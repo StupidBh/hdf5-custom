@@ -24,14 +24,12 @@ jobs:
         # Test combinations of key options
         include:
           # Shared libraries with OpenMPI
-          - name: "macOS-26 Shared OpenMPI Fortran Java"
+          - name: "macOS-26 Shared OpenMPI"
             os: macos-26
             mpi: openmpi
             shared_libs: ON
             static_libs: OFF
             cpp: OFF
-            fortran: OFF
-            java: ON
             hl: ON
             threadsafe: OFF
             parallel: ON
@@ -42,14 +40,12 @@ jobs:
             szip: ON
 
           # Shared libraries with MPICH
-          - name: "macOS-26 Shared MPICH Fortran"
+          - name: "macOS-26 Shared MPICH"
             os: macos-26
             mpi: mpich
             shared_libs: ON
             static_libs: OFF
             cpp: OFF
-            fortran: ON
-            java: OFF
             hl: ON
             threadsafe: OFF
             parallel: ON
@@ -66,8 +62,6 @@ jobs:
             shared_libs: OFF
             static_libs: ON
             cpp: OFF
-            fortran: OFF
-            java: OFF
             hl: ON
             threadsafe: OFF
             parallel: ON
@@ -84,8 +78,6 @@ jobs:
             shared_libs: ON
             static_libs: ON
             cpp: ON
-            fortran: ON
-            java: OFF
             hl: ON
             threadsafe: OFF
             parallel: ON
@@ -102,8 +94,6 @@ jobs:
             shared_libs: ON
             static_libs: ON
             cpp: ON
-            fortran: OFF
-            java: OFF
             hl: OFF
             threadsafe: ON
             parallel: OFF
@@ -120,8 +110,6 @@ jobs:
             shared_libs: ON
             static_libs: OFF
             cpp: OFF
-            fortran: OFF
-            java: OFF
             hl: OFF
             threadsafe: OFF
             parallel: OFF
@@ -138,8 +126,6 @@ jobs:
             shared_libs: ON
             static_libs: OFF
             cpp: OFF
-            fortran: OFF
-            java: OFF
             hl: ON
             threadsafe: OFF
             parallel: ON
@@ -157,8 +143,6 @@ jobs:
             shared_libs: ON
             static_libs: ON
             cpp: ON
-            fortran: OFF
-            java: OFF
             hl: OFF
             threadsafe: OFF
             parallel: ON
@@ -209,8 +193,6 @@ jobs:
         CMAKE_OPTS="$CMAKE_OPTS -DBUILD_SHARED_LIBS=${{ matrix.shared_libs }}"
         CMAKE_OPTS="$CMAKE_OPTS -DBUILD_STATIC_LIBS=${{ matrix.static_libs }}"
         CMAKE_OPTS="$CMAKE_OPTS -DHDF5_BUILD_CPP_LIB=${{ matrix.cpp }}"
-        CMAKE_OPTS="$CMAKE_OPTS -DHDF5_BUILD_FORTRAN=${{ matrix.fortran }}"
-        CMAKE_OPTS="$CMAKE_OPTS -DHDF5_BUILD_JAVA=${{ matrix.java }}"
         CMAKE_OPTS="$CMAKE_OPTS -DHDF5_BUILD_HL_LIB=${{ matrix.hl }}"
         CMAKE_OPTS="$CMAKE_OPTS -DHDF5_ENABLE_THREADSAFE=${{ matrix.threadsafe }}"
         CMAKE_OPTS="$CMAKE_OPTS -DHDF5_ENABLE_PARALLEL=${{ matrix.parallel }}"
@@ -229,11 +211,6 @@ jobs:
           CMAKE_OPTS="$CMAKE_OPTS -DPLUGIN_USE_LOCALCONTENT=OFF"
         fi
 
-        # Set Fortran compiler if needed
-        if [[ "${{ matrix.fortran }}" == "ON" ]]; then
-          CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_Fortran_COMPILER=gfortran-15"
-        fi
-
         # MPI configuration
         if [[ "${{ matrix.parallel }}" == "ON" ]]; then
           CMAKE_OPTS="$CMAKE_OPTS -DMPIEXEC_MAX_NUMPROCS=2"
@@ -242,8 +219,6 @@ jobs:
             CMAKE_OPTS="$CMAKE_OPTS -DMPIEXEC_PREFLAGS=--oversubscribe"
           elif [[ "${{ matrix.mpi }}" == "mpich" ]]; then
             CMAKE_OPTS="$CMAKE_OPTS -DMPI_C_COMPILER=mpicc"
-            CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_Fortran_COMPILER=mpifort"
-            mpifort --version
           fi
         fi
 

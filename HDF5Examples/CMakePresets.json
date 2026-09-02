@@ -9,8 +9,14 @@
       "hidden": true,
       "cacheVariables": {
         "CPACK_PACKAGE_VERSION": "2.0.4",
-        "HDF5_NAMESPACE": {"type": "STRING", "value": "hdf5::"},
-        "HDF5_PACKAGE_NAME": {"type": "STRING", "value": "hdf5"},
+        "HDF5_NAMESPACE": {
+          "type": "STRING",
+          "value": "hdf5::"
+        },
+        "HDF5_PACKAGE_NAME": {
+          "type": "STRING",
+          "value": "hdf5"
+        },
         "H5EXAMPLE_BUILD_TESTING": "ON"
       }
     },
@@ -19,20 +25,6 @@
       "hidden": true,
       "cacheVariables": {
         "H5EXAMPLE_BUILD_HL": "ON"
-      }
-    },
-    {
-      "name": "ci-StdJava",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_JAVA": "ON"
-      }
-    },
-    {
-      "name": "ci-StdFortran",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_FORTRAN": "ON"
       }
     },
     {
@@ -45,7 +37,10 @@
     {
       "name": "ci-StdShar",
       "hidden": true,
-      "inherits": ["ci-base", "ci-base-examples"],
+      "inherits": [
+        "ci-base",
+        "ci-base-examples"
+      ],
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "ON",
         "H5EXAMPLE_USE_SHARED_LIBS": "ON"
@@ -56,8 +51,6 @@
       "description": "MSVC Standard Config for x64 (Release)",
       "inherits": [
         "ci-x64-Release-MSVC",
-        "ci-StdJava",
-        "ci-StdFortran",
         "ci-StdShar"
       ]
     },
@@ -66,8 +59,6 @@
       "description": "Clang Standard Config for x64 (Release)",
       "inherits": [
         "ci-x64-Release-Clang",
-        "ci-StdJava",
-        "ci-StdFortran",
         "ci-StdShar"
       ]
     },
@@ -76,8 +67,6 @@
       "description": "GNUC Standard Config for x64 (Release)",
       "inherits": [
         "ci-x64-Release-GNUC",
-        "ci-StdJava",
-        "ci-StdFortran",
         "ci-StdShar"
       ]
     },
@@ -86,7 +75,6 @@
       "description": "Clang Standard Config for macos (Release)",
       "inherits": [
         "ci-macos-arm64-Release-Clang",
-        "ci-StdJava",
         "ci-StdShar"
       ]
     },
@@ -95,7 +83,6 @@
       "description": "GNUC Standard Config for macos (Release)",
       "inherits": [
         "ci-macos-arm64-Release-GNUC",
-        "ci-StdJava",
         "ci-StdShar"
       ]
     },
@@ -104,8 +91,6 @@
       "description": "Intel Standard Config for x64 (Release)",
       "inherits": [
         "ci-x64-Release-Intel",
-        "ci-StdJava",
-        "ci-StdFortran",
         "ci-StdShar"
       ]
     }
@@ -233,57 +218,120 @@
     {
       "name": "ci-StdShar-MSVC",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-MSVC"},
-        {"type": "build", "name": "ci-StdShar-MSVC"},
-        {"type": "test", "name": "ci-StdShar-MSVC"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-MSVC"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-MSVC"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-MSVC"
+        }
       ]
     },
     {
       "name": "ci-StdShar-Clang",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-Clang"},
-        {"type": "build", "name": "ci-StdShar-Clang"},
-        {"type": "test", "name": "ci-StdShar-Clang"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-Clang"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-Clang"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-Clang"
+        }
       ]
     },
     {
       "name": "ci-StdShar-macos-Clang",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-macos-Clang"},
-        {"type": "build", "name": "ci-StdShar-macos-Clang"},
-        {"type": "test", "name": "ci-StdShar-macos-Clang"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-macos-Clang"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-macos-Clang"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-macos-Clang"
+        }
       ]
     },
     {
       "name": "ci-StdShar-GNUC",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-GNUC"},
-        {"type": "build", "name": "ci-StdShar-GNUC"},
-        {"type": "test", "name": "ci-StdShar-GNUC"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-GNUC"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-GNUC"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-GNUC"
+        }
       ]
     },
     {
       "name": "ci-StdShar-macos-GNUC",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-macos-GNUC"},
-        {"type": "build", "name": "ci-StdShar-macos-GNUC"},
-        {"type": "test", "name": "ci-StdShar-macos-GNUC"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-macos-GNUC"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-macos-GNUC"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-macos-GNUC"
+        }
       ]
     },
     {
       "name": "ci-StdShar-Intel",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-Intel"},
-        {"type": "build", "name": "ci-StdShar-Intel"},
-        {"type": "test", "name": "ci-StdShar-Intel"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-Intel"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-Intel"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-Intel"
+        }
       ]
     },
     {
       "name": "ci-StdShar-win-Intel",
       "steps": [
-        {"type": "configure", "name": "ci-StdShar-Intel"},
-        {"type": "build", "name": "ci-StdShar-Intel"},
-        {"type": "test", "name": "ci-StdShar-win-Intel"}
+        {
+          "type": "configure",
+          "name": "ci-StdShar-Intel"
+        },
+        {
+          "type": "build",
+          "name": "ci-StdShar-Intel"
+        },
+        {
+          "type": "test",
+          "name": "ci-StdShar-win-Intel"
+        }
       ]
     }
   ]

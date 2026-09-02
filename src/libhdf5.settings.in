@@ -44,14 +44,6 @@ Languages:
                Shared C Library: @H5_ENABLE_SHARED_LIB@
                Static C Library: @H5_ENABLE_STATIC_LIB@
 
-                        Fortran: @HDF5_BUILD_FORTRAN@
-               Fortran Compiler: @CMAKE_Fortran_COMPILER@ @CMAKE_Fortran_COMPILER_VERSION@
-                  Fortran Flags: @CMAKE_Fortran_FLAGS@ @HDF5_BUILD_MODE_Fortran_FLAGS@
-               H5 Fortran Flags: @HDF5_CMAKE_Fortran_FLAGS@
-               AM Fortran Flags: @AM_FCFLAGS@
-         Shared Fortran Library: @H5_ENABLE_SHARED_LIB@
-         Static Fortran Library: @H5_ENABLE_STATIC_LIB@
-               Module Directory: @CMAKE_Fortran_MODULE_DIRECTORY@
 
                             C++: @HDF5_BUILD_CPP_LIB@
                    C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
@@ -60,9 +52,6 @@ Languages:
                    AM C++ Flags: @AM_CXXFLAGS@
              Shared C++ Library: @H5_ENABLE_SHARED_LIB@
              Static C++ Library: @H5_ENABLE_STATIC_LIB@
-
-                           JAVA: @HDF5_BUILD_JAVA@
-                  JAVA Compiler: @CMAKE_Java_COMPILER@ @Java_VERSION@
 
 Features:
 ---------

@@ -68,8 +68,6 @@ macro (EXTERNAL_HDF5_LIBRARY compress_type)
 # Adjust variables for building HDF5
     set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build Shared Libraries" FORCE)
     set (HDF5_BUILD_CPP_LIB OFF CACHE BOOL "Build C++ support" FORCE)
-    set (HDF5_BUILD_FORTRAN OFF CACHE BOOL "Build FORTRAN support" FORCE)
-    set (HDF5_BUILD_JAVA OFF CACHE BOOL "Build JAVA support" FORCE)
     set (BUILD_TESTING OFF CACHE BOOL "Build JHDF5 Unit Testing" FORCE)
     set (HDF5_BUILD_EXAMPLES OFF CACHE BOOL "Build JHDF5 Library Examples" FORCE)
     set (HDF5_BUILD_HL_LIB OFF CACHE BOOL "Build JHDF5 HIGH Level HDF5 Library" FORCE)
@@ -119,37 +117,20 @@ macro (HDF5_SUPPORT EXTNAME) #EXTNAME is the extension name used in the parent p
         set (FIND_HDF_COMPONENTS C shared)
       else ()
         set (FIND_HDF_COMPONENTS C static)
-        set (HDF_BUILD_JAVA OFF CACHE BOOL "Build Java support" FORCE)
-        message (STATUS "Using static HDF5 - disable build of Java examples")
-      endif ()
-      if (HDF_BUILD_FORTRAN)
-        set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} Fortran)
-      endif ()
-      if (HDF_BUILD_JAVA)
-        set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} Java)
-        set (HDF5_Java_FOUND 1) #default setting for 1.10.1 and earlier
       endif ()
       message (STATUS "HDF5 find comps: ${FIND_HDF_COMPONENTS}")
       set (SEARCH_PACKAGE_NAME ${HDF5_PACKAGE_NAME})
 
       find_package (HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS ${FIND_HDF_COMPONENTS})
       message (STATUS "HDF5 C libs:${HDF5_FOUND} static:${HDF5_static_C_FOUND} and shared:${HDF5_shared_C_FOUND}")
-      message (STATUS "HDF5 Fortran libs: static:${HDF5_static_Fortran_FOUND} and shared:${HDF5_shared_Fortran_FOUND}")
-      message (STATUS "HDF5 Java libs: ${HDF5_Java_FOUND}")
       if (HDF5_FOUND)
         if (NOT HDF5_static_C_FOUND AND NOT HDF5_shared_C_FOUND)
           #find library from non-dual-binary package
           set (FIND_HDF_COMPONENTS C)
-          if (HDF_BUILD_FORTRAN)
-            set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} Fortran)
-          endif ()
-          if (HDF_BUILD_JAVA)
-            set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} Java)
-         endif ()
           message (STATUS "HDF5 find comps: ${FIND_HDF_COMPONENTS}")
 
           find_package (HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS ${FIND_HDF_COMPONENTS})
-          message (STATUS "HDF5 libs:${HDF5_FOUND} C:${HDF5_C_FOUND} Fortran:${HDF5_Fortran_FOUND} Java:${HDF5_Java_FOUND}")
+          message (STATUS "HDF5 libs:${HDF5_FOUND} C:${HDF5_C_FOUND}")
           set (H5${EXTNAME}_HDF5_LINK_LIBS ${H5${EXTNAME}_HDF5_LINK_LIBS} ${HDF5_LIBRARIES})
           if (HDF5_PROVIDES_SHARED_LIBS)
             add_definitions (-DH5_BUILT_AS_DYNAMIC_LIB)
@@ -160,10 +141,6 @@ macro (HDF5_SUPPORT EXTNAME) #EXTNAME is the extension name used in the parent p
             set_property (TARGET ${HDF5_NAMESPACE}h5dump PROPERTY IMPORTED_LOCATION "${HDF5_TOOLS_DIR}/h5dumpdll")
           else ()
             set_property (TARGET ${HDF5_NAMESPACE}h5dump PROPERTY IMPORTED_LOCATION "${HDF5_TOOLS_DIR}/h5dump")
-          endif ()
-          if (HDF_BUILD_JAVA)
-            set (CMAKE_JAVA_INCLUDE_PATH "${CMAKE_JAVA_INCLUDE_PATH};${HDF5_JAVA_INCLUDE_DIRS}")
-            message (STATUS "HDF5 jars:${HDF5_JAVA_INCLUDE_DIRS}")
           endif ()
           set (H5${EXTNAME}_HDF5_DUMP_EXECUTABLE $<TARGET_FILE:${HDF5_NAMESPACE}h5dump>)
         else ()
@@ -185,39 +162,6 @@ macro (HDF5_SUPPORT EXTNAME) #EXTNAME is the extension name used in the parent p
             set (H5${EXTNAME}_HDF5_DUMP_EXECUTABLE $<TARGET_FILE:${HDF5_NAMESPACE}h5dump>)
           endif()
 
-          if (NOT HDF5_static_Fortran_FOUND AND NOT HDF5_shared_Fortran_FOUND)
-            set (HDF_BUILD_FORTRAN OFF CACHE BOOL "Build FORTRAN support" FORCE)
-            message (STATUS "HDF5 Fortran libs not found - disable build of Fortran examples")
-          else ()
-            if (HDF_BUILD_FORTRAN AND ${HDF5_PROVIDES_FORTRAN})
-              if (BUILD_SHARED_LIBS AND HDF5_shared_Fortran_FOUND)
-                set (H5${EXTNAME}_HDF5_LINK_LIBS ${H5${EXTNAME}_HDF5_LINK_LIBS} ${HDF5_FORTRAN_SHARED_LIBRARY})
-              elseif (HDF5_static_Fortran_FOUND)
-                set (H5${EXTNAME}_HDF5_LINK_LIBS ${H5${EXTNAME}_HDF5_LINK_LIBS} ${HDF5_FORTRAN_STATIC_LIBRARY})
-              else ()
-                set (HDF_BUILD_FORTRAN OFF CACHE BOOL "Build FORTRAN support" FORCE)
-                message (STATUS "HDF5 Fortran libs not found - disable build of Fortran examples")
-              endif ()
-            endif ()
-          endif ()
-          if (HDF_BUILD_JAVA)
-            if (${HDF5_PROVIDES_JAVA})
-              set (CMAKE_JAVA_INCLUDE_PATH "${CMAKE_JAVA_INCLUDE_PATH};${HDF5_JAVA_INCLUDE_DIRS}")
-              if (HDF5_PROVIDES_JNI AND HDF5_Java_FOUND)
-                set (H5${EXTNAME}_JAVA_LIBRARY ${HDF5_JAVA_LIBRARY})
-                set (H5${EXTNAME}_JAVA_LIBRARIES ${HDF5_JAVA_LIBRARY})
-                message (STATUS "HDF5 lib:${H5${EXTNAME}_JAVA_LIBRARY} jars:${HDF5_JAVA_INCLUDE_DIRS}}")
-              else ()
-                set (H5${EXTNAME}_JAVA_LIBRARY "${HDF5_JAVA_LIBRARY};${HDF5_JAVA_HDF5_LIBRARY}")
-                set (H5${EXTNAME}_JAVA_LIBRARIES ${H5${EXTNAME}_JAVA_LIBRARY})
-              endif ()
-            else ()
-              set (HDF_BUILD_JAVA OFF CACHE BOOL "Build Java support" FORCE)
-              message (STATUS "HDF5 Java libs not found - disable build of Java examples")
-            endif ()
-          else ()
-            set (HDF_BUILD_JAVA OFF CACHE BOOL "Build Java support" FORCE)
-          endif ()
         endif ()
       else ()
         find_package (HDF5) # Legacy find
@@ -252,9 +196,6 @@ macro (HDF5_SUPPORT EXTNAME) #EXTNAME is the extension name used in the parent p
       set (H5${EXTNAME}_HDF5_HAVE_HDF5 1)
       message (STATUS "HDF5-${HDF5_VERSION_STRING} used")
     endif ()
-    if (HDF_BUILD_FORTRAN)
-     list (APPEND H5${EXTNAME}_HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIR_FORTRAN})
-    endif ()
   endif ()
   message (STATUS "HDF5 link libs: ${H5${EXTNAME}_HDF5_LINK_LIBS} Includes: ${H5${EXTNAME}_HDF5_INCLUDE_DIRS}")
 endmacro ()
@@ -266,9 +207,7 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     #-----------------------------------------------------------------------------
     # Languages:
     #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_PROVIDES_FORTRAN     ${HDF5_PACKAGE_NAME}_BUILD_FORTRAN)
     set (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB     ${HDF5_PACKAGE_NAME}_BUILD_CPP_LIB)
-    set (${HDF5_PACKAGE_NAME}_PROVIDES_JAVA        ${HDF5_PACKAGE_NAME}_BUILD_JAVA)
     #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
@@ -300,9 +239,7 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     #-----------------------------------------------------------------------------
     # Languages:
     #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_BUILD_FORTRAN     ${HDF5_PACKAGE_NAME}_PROVIDES_FORTRAN)
     set (${HDF5_PACKAGE_NAME}_BUILD_CPP_LIB     ${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB)
-    set (${HDF5_PACKAGE_NAME}_BUILD_JAVA        ${HDF5_PACKAGE_NAME}_PROVIDES_JAVA)
     #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
@@ -331,4 +268,3 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     set (${HDF5_PACKAGE_NAME}_ENABLE_PLUGIN_SUPPORT ${HDF5_PACKAGE_NAME}_PROVIDES_PLUGIN_SUPPORT)
   endif ()
 endmacro ()
-

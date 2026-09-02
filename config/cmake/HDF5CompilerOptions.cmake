@@ -28,6 +28,9 @@ if (HDF5_PLATFORM_COMPILE_DEFINITIONS)
   list (REMOVE_DUPLICATES HDF5_PLATFORM_COMPILE_DEFINITIONS)
   target_compile_definitions (hdf5_platform INTERFACE ${HDF5_PLATFORM_COMPILE_DEFINITIONS})
 endif ()
+if (HDF5_PLATFORM_EXECUTABLE_LINK_OPTIONS)
+  target_link_options (hdf5_platform INTERFACE ${HDF5_PLATFORM_EXECUTABLE_LINK_OPTIONS})
+endif ()
 if (WIN32)
   target_compile_definitions (hdf5_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
   if (MSVC)
@@ -47,6 +50,12 @@ function (hdf5_configure_cxx_build_options)
 endfunction ()
 
 function (hdf5_target_use_platform target)
+  get_target_property (target_type ${target} TYPE)
+  if (target_type STREQUAL "EXECUTABLE")
+    target_link_options (${target} PRIVATE
+        "$<TARGET_PROPERTY:hdf5_platform,INTERFACE_LINK_OPTIONS>"
+    )
+  endif ()
   target_compile_options (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_assertions,INTERFACE_COMPILE_OPTIONS>"
   )

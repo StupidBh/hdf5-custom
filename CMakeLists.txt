@@ -30,11 +30,6 @@
 cmake_minimum_required (VERSION 4.0)
 project (HDF5 C)
 
-if (POLICY CMP0144)
-  # CMake >= 3.27 <PACKAGENAME> is the upper-cased package name.
-  cmake_policy (SET CMP0144 NEW)
-endif ()
-
 #-----------------------------------------------------------------------------
 # Instructions for use : Normal Build
 #

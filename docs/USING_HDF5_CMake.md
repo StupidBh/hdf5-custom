@@ -24,7 +24,7 @@
 <a id="section-i"></a>
 ## I. Preconditions
 
-1. We suggest you obtain the latest CMake for your platform from the Kitware web site. The HDF5 `z.y.x` product requires a **minimum CMake version of 3.26**.
+1. We suggest you obtain the latest CMake for your platform from the Kitware web site. The HDF5 `z.y.x` product requires a **minimum CMake version of 4.0**.
 
 2. You have installed the HDF5 library built with CMake, by executing the HDF Install Utility (the `*.msi` file in the binary package for Windows or the `*.sh` on Linux). You can obtain pre-built binaries from The HDF Group's website at [www.hdfgroup.org](https://www.hdfgroup.org).
 
@@ -148,7 +148,7 @@ The files that support building with CMake are all of the files in the `config/c
 Given the preconditions in Section I, create a `CMakeLists.txt` file at the source root. Include the following text in the file:
 
 ```cmake
-cmake_minimum_required (VERSION 3.26)
+cmake_minimum_required (VERSION 4.0)
 project (HDF5MyApp C)
 
 set (LIB_TYPE STATIC) # or SHARED

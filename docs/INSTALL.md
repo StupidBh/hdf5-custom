@@ -66,7 +66,7 @@ You want to build HDF5 with CMake or use an installed HDF5 binary with CMake, bu
 
 ### 4.1. Solution
 
-CMake introduced presets in version 3.19. HDF Group provides a file in the source, `CMakePresets.json`, requiring CMake 3.26 or higher. This file is in the HDF5 library source as well as the `HDF5Examples` source of the installed binary.
+CMake introduced presets in version 3.19. HDF Group provides a file in the source, `CMakePresets.json`, requiring CMake 4.0 or higher. This file is in the HDF5 library source as well as the `HDF5Examples` source of the installed binary.
 
 * **Library Source File:** Builds HDF5 with the options for building a typical shared library with the common languages for a platform. The features include building the tools, examples, plugins, and the shared and static libraries.
 

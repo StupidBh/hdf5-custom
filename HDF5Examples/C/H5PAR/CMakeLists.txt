@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.26)
+cmake_minimum_required (VERSION 4.0)
 project (H5PAR_C C)
 
 #-----------------------------------------------------------------------------

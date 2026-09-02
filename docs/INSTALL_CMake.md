@@ -37,7 +37,7 @@
      * `HDF5_ENABLE_PLUGIN_SUPPORT:BOOL=ON`
 
 ### CMake version
-1. We suggest you obtain the latest CMake from the Kitware web site. The HDF5 2."X"."Y" product requires a **minimum CMake version 3.26**.
+1. We suggest you obtain the latest CMake from the Kitware web site. The HDF5 2."X"."Y" product requires a **minimum CMake version 4.0**.
 
 > **Note:** To change the install prefix from the platform defaults initialize the CMake variable, `CMAKE_INSTALL_PREFIX`. Users of build scripts will use the `INSTALLDIR` option.
 >
@@ -51,7 +51,7 @@
 ⭐ This is the **RECOMMENDED** method for building HDF5 2.0 and later.
 
 ### Prerequisites
-* **CMake 3.26 or later** (required for HDF5 2.0)
+* **CMake 4.0 or later** (required for HDF5 2.0)
 * **Ninja build system** (recommended, should be downloaded if not available)
 * **Compiler:** GCC, MSVC, or Clang
 
@@ -97,7 +97,7 @@ See [Section XI]((#section-xi)) for creating custom preset configurations.
 * ✅ **Simpler** - No external files to download
 * ✅ **Faster** - Optimized settings included
 * ✅ **Consistent** - Same settings across platforms
-* ✅ **Modern** - CMake 3.26 best practices
+* ✅ **Modern** - CMake 4.0 best practices
 * ✅ **Flexible** - Easy to customize via `CMakeUserPresets.json`
 
 ### Individual Preset Commands (Advanced)
@@ -354,7 +354,7 @@ Go through these steps:
 <a id="section-v"></a>
 ## V. Further Considerations
 
-1. We suggest you obtain the latest CMake from the Kitware web site. The HDF5 2."X"."Y" product **requires a minimum CMake version 3.26**.
+1. We suggest you obtain the latest CMake from the Kitware web site. The HDF5 2."X"."Y" product **requires a minimum CMake version 4.0**.
 
 2. If you plan to use Zlib/Zlib-ng, Szip (aka libaec) and/or HDF5 filter plugins, refer to the instructions in [INSTALL_Filters.md](./INSTALL_Filters.md).
 
@@ -826,7 +826,7 @@ Then you can change or add options for your specific case.
 * `CMakePresets.json` is for project-wide build details (**don't modify**).
 * `CMakeUserPresets.json` is for local build customizations (modify to your heart's content).
 
-The HDF Group presets require CMake 3.26 and use the Ninja build system.
+The HDF Group presets require CMake 4.0 and use the Ninja build system.
 Ninja may need to be installed separately on some platforms.
 
 Hidden presets (marked `"hidden": true`) are used for inheritance and

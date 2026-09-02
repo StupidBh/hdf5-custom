@@ -1,6 +1,6 @@
 # HDF5 Build System Summary
 
-HDF5 2.0 uses CMake 3.26 or later and requires out-of-source builds. The
+HDF5 2.0 uses CMake 4.0 or later and requires out-of-source builds. The
 primary configuration files are `CMakeLists.txt`, `CMakeBuildOptions.cmake`,
 `CMakeTests.cmake`, `CMakeInstallation.cmake`, `CMakeVOL.cmake`, and
 `CMakePlugins.cmake`.

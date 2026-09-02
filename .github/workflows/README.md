@@ -59,7 +59,7 @@ There are a few that only get triggered manually.
     * using no filters
     * in debug mode and -Werror compiler option
     * in release mode and -Werror compiler option
-    * with minimum CMake Version 3.18
+    * with minimum CMake Version 4.0
 - main.yml configure, build, test, and package HDF5 on Ubuntu, macOS, and Windows
 - main-static.yml configure, build, test static only HDF5 on Ubuntu, macOS, and Windows
 - bintest.yml test binary packages created by main.yml

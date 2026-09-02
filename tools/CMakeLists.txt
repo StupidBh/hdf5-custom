@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.26)
+cmake_minimum_required (VERSION 4.0)
 project (HDF5_TOOLS C)
 
 add_subdirectory (lib)

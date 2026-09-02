@@ -2,7 +2,7 @@
 # Creates test executables and scripts for signing plugin files
 # Supports both static and shared builds
 
-cmake_minimum_required (VERSION 3.26)
+cmake_minimum_required (VERSION 4.0)
 project (HDF5_TOOLS_TEST_H5SIGN C)
 
 # Create a dummy plugin generator for testing

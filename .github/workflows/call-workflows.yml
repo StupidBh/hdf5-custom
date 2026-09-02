@@ -153,7 +153,7 @@ jobs:
         name: "Minimum Release Workflows"
         uses: ./.github/workflows/main.yml
         with:
-            cmake_version: "3.26.0"
+            cmake_version: "4.0.0"
             concurrent: ""
             thread_safety: ""
             build_mode: "Release"

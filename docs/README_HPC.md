@@ -18,7 +18,7 @@ CMake. The document covers:
 
 PHDF5 requires:
 
-- CMake version 3.26 or greater
+- CMake version 4.0 or greater
 - An MPI compiler with MPI-IO support
 - A POSIX compliant parallel file system (see References)
 
@@ -41,7 +41,7 @@ When building on HPC systems:
 
 2. **Load required modules:**
    - Desired compiler modules (and set CC, FC, CXX if needed)
-   - CMake version 3.26 or greater
+   - CMake version 4.0 or greater
    - MPI implementation module
 
 3. **For Cray and other systems with recommend compiler wrappers,** set compiler environment variables AFTER loading modules:
@@ -87,7 +87,7 @@ For release or snapshot tar files, extract them to your working directory.
 
 ### 3.1. Using CMake Presets (Recommended for General Builds)
 
-For building with CMake 3.26 or greater using presets:
+For building with CMake 4.0 or greater using presets:
 
 ```bash
 cd hdf5

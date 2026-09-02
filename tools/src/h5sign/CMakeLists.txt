@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.26)
+cmake_minimum_required (VERSION 4.0)
 project (HDF5_TOOLS_SRC_H5SIGN C)
 
 #-----------------------------------------------------------------------------

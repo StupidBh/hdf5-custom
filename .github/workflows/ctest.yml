@@ -23,7 +23,7 @@ on:
         required: true
         default: snapshots
       cmake_version:
-        description: "3.26.0 or later, latest"
+        description: "4.0.0 or later, latest"
         required: true
         type: string
     secrets:

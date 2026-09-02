@@ -163,7 +163,7 @@ endif ()
 
 if (MINGW OR CYGWIN)
   set (CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE")
-  add_definitions ("-D_GNU_SOURCE")
+  list (APPEND HDF5_PLATFORM_COMPILE_DEFINITIONS _GNU_SOURCE)
 endif ()
 
 #-----------------------------------------------------------------------------

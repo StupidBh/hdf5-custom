@@ -22,6 +22,7 @@ add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
 
 target_compile_options (hdf5_warnings INTERFACE "${HDF5_CMAKE_C_WARNING_FLAGS}")
 target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}")
+target_compile_definitions (hdf5_platform INTERFACE ${HDF5_PLATFORM_COMPILE_DEFINITIONS})
 if (WIN32)
   target_compile_definitions (hdf5_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
   if (MSVC)

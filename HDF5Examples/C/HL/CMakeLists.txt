@@ -8,6 +8,7 @@ include (C_sourcefiles.cmake)
 
 foreach (example_name ${common_examples})
   add_executable (${EXAMPLE_VARNAME}_${example_name} ${PROJECT_SOURCE_DIR}/${example_name}.c)
+  hdf5_example_target_use_platform (${EXAMPLE_VARNAME}_${example_name})
   target_compile_options (${EXAMPLE_VARNAME}_${example_name}
       PRIVATE
           "$<$<BOOL:${${EXAMPLE_VARNAME}_USE_16_API}>:-DH5_USE_16_API>"

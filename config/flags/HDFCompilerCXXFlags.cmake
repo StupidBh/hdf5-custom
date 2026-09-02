@@ -85,7 +85,11 @@ if (CMAKE_CXX_COMPILER_LOADED)
     include (${HDF_CONFIG_DIR}/flags/HDFClangCXXFlags.cmake)
   endif ()
 
-  list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
+  if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    list (PREPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
+  else ()
+    list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
+  endif ()
 
   #-----------------------------------------------------------------------------
   # HDF5 library compile options - to be made available to all targets

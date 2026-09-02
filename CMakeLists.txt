@@ -652,29 +652,8 @@ endif ()
 
 include (${HDF_CONFIG_DIR}/flags/HDFCompilerFlags.cmake)
 include (${HDF_CONFIG_DIR}/cmake/HDF5CompilerOptions.cmake)
-include (${HDF_CONFIG_DIR}/cmake/HDF5Dependencies.cmake)
 set (CMAKE_MODULE_PATH ${HDF_CONFIG_DIR} ${HDF_RESOURCES_DIR} ${CMAKE_MODULE_PATH})
-
-#-----------------------------------------------------------------------------
-# Option to Enable HDFS
-#-----------------------------------------------------------------------------
-if (HDF5_ENABLE_HDFS)
-  find_package (JNI REQUIRED)
-  if (JNI_FOUND)
-    set (H5_HAVE_LIBJVM 1)
-  endif ()
-  find_package (HDFS REQUIRED)
-  if (HDFS_FOUND)
-    set (H5_HAVE_LIBHDFS 1)
-    set (H5_HAVE_HDFS_H 1)
-    if (NOT MSVC)
-      list (APPEND LINK_LIBS -pthread)
-    endif ()
-  else ()
-    set (HDF5_ENABLE_HDFS OFF CACHE BOOL "Enable HDFS" FORCE)
-    message (FATAL_ERROR "Set to use libhdfs library, but could not find or use libhdfs. Please verify that the path to HADOOP_HOME is valid, and/or reconfigure without HDF5_ENABLE_HDFS")
-  endif ()
-endif ()
+include (${HDF_CONFIG_DIR}/cmake/HDF5Dependencies.cmake)
 
 #-----------------------------------------------------------------------------
 # Option to Require Digitally Signed plugins

@@ -22,9 +22,8 @@ if(NOT kwsys_POPULATED)
 endif()
 FetchContent_MakeAvailable(KWSYS)
 
-include_directories(${kwsys_BINARY_DIR})
-
 add_executable(h5_api_test_driver h5_api_test_driver.cpp)
+target_include_directories(h5_api_test_driver PRIVATE "${kwsys_BINARY_DIR}")
 if (COMMAND hdf5_target_use_platform)
   hdf5_target_use_platform (h5_api_test_driver)
 endif ()

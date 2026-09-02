@@ -559,19 +559,6 @@ else ()
   set (H5_NO_DEPRECATED_SYMBOLS 1)
 endif ()
 
-#-----------------------------------------------------------------------------
-# When building utility executables that generate other (source) files :
-# we make use of the following variables defined in the root CMakeLists.
-# Certain systems may add /Debug or /Release to output paths
-# and we need to call the executable from inside the CMake configuration
-#-----------------------------------------------------------------------------
-if (WIN32)
-  add_compile_definitions (_CRT_SECURE_NO_WARNINGS)
-  if (MSVC)
-    add_compile_definitions (_BIND_TO_CURRENT_VCLIBS_VERSION=1 _CONSOLE)
-  endif ()
-endif ()
-
 if (MSVC)
   set (CMAKE_MFC_FLAG 0)
   set (WIN_COMPILE_FLAGS "")

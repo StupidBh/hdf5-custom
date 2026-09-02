@@ -206,6 +206,15 @@ endfunction ()
 option (HDF5_ENABLE_MAP_API "Build the map API" OFF)
 mark_as_advanced (HDF5_ENABLE_MAP_API)
 
+function (hdf5_configure_map_api)
+  if (HDF5_ENABLE_MAP_API)
+    set (H5_HAVE_MAP_API 1)
+    return (PROPAGATE H5_HAVE_MAP_API)
+  endif ()
+
+  set (HDF5_ENABLE_MAP_API OFF CACHE BOOL "Build the map API" FORCE)
+endfunction ()
+
 option (HDF5_BUILD_DOC "Build documentation" OFF)
 
 option (HDF5_BUILD_PARALLEL_TOOLS "Build MPI-enabled HDF5 tools" OFF)

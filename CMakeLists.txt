@@ -658,11 +658,7 @@ hdf5_validate_concurrency_options ()
 #-----------------------------------------------------------------------------
 # Option to build the map API
 #-----------------------------------------------------------------------------
-if (HDF5_ENABLE_MAP_API)
-  set (H5_HAVE_MAP_API 1)
-else ()
-  set (HDF5_ENABLE_MAP_API OFF CACHE BOOL "Build the map API" FORCE)
-endif ()
+hdf5_configure_map_api ()
 
 #-----------------------------------------------------------------------------
 # Option to override the compiler for h5cc

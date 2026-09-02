@@ -1201,6 +1201,7 @@ if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
     endif ()
 
     include (${HDF_CONFIG_DIR}/flags/HDFCompilerCXXFlags.cmake)
+    hdf5_configure_cxx_build_options ()
 
     add_subdirectory (c++)
     if (HDF5_BUILD_HL_LIB)

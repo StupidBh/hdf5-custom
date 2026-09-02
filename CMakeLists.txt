@@ -717,24 +717,7 @@ endif ()
 include (UserMacros.cmake)
 include (config/CacheURLs.cmake)
 
-#-----------------------------------------------------------------------------
-# Include filter (zlib, szip, etc.) support
-#-----------------------------------------------------------------------------
-unset (SETTINGS_EXTERNAL_FILTERS)
-include (${HDF_CONFIG_DIR}/HDF5UseZLIB.cmake)
-include (${HDF_CONFIG_DIR}/HDF5UseLibaec.cmake)
-
-# Process list of filters for libhdf5.settings (and the H5build_settings string)
-list (REMOVE_DUPLICATES SETTINGS_EXTERNAL_FILTERS)
-string (REPLACE ";" " " SETTINGS_EXTERNAL_FILTERS "${SETTINGS_EXTERNAL_FILTERS}")
-
-# Print out compression libraries linked for debugging
-message (VERBOSE "LINK_COMP_LIBS=${LINK_COMP_LIBS}")
-hdf5_configure_dependencies (
-    "${LINK_LIBS}"
-    "${LINK_COMP_LIBS}"
-    "${LINK_PUB_LIBS}"
-)
+hdf5_configure_compression_dependencies ()
 
 #-----------------------------------------------------------------------------
 # Include external VOL connectors

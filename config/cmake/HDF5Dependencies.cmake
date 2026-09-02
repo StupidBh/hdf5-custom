@@ -67,6 +67,25 @@ function (hdf5_target_link_compression_dependencies target visibility)
   endif ()
 endfunction ()
 
+# Compression setup must run after UserMacros.cmake has applied any dependency
+# overrides. A macro retains the root directory's generated-header variables.
+macro (hdf5_configure_compression_dependencies)
+  unset (SETTINGS_EXTERNAL_FILTERS)
+  include (${HDF_CONFIG_DIR}/HDF5UseZLIB.cmake)
+  include (${HDF_CONFIG_DIR}/HDF5UseLibaec.cmake)
+
+  # Process the filter list for libhdf5.settings and H5build_settings.
+  list (REMOVE_DUPLICATES SETTINGS_EXTERNAL_FILTERS)
+  string (REPLACE ";" " " SETTINGS_EXTERNAL_FILTERS "${SETTINGS_EXTERNAL_FILTERS}")
+
+  message (VERBOSE "LINK_COMP_LIBS=${LINK_COMP_LIBS}")
+  hdf5_configure_dependencies (
+      "${LINK_LIBS}"
+      "${LINK_COMP_LIBS}"
+      "${LINK_PUB_LIBS}"
+  )
+endmacro ()
+
 #-----------------------------------------------------------------------------
 # Option to Enable HDFS
 #-----------------------------------------------------------------------------

@@ -40,12 +40,16 @@ function (hdf5_configure_cxx_build_options)
   )
 endfunction ()
 
+function (hdf5_target_use_platform target)
+  target_compile_definitions (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_platform,INTERFACE_COMPILE_DEFINITIONS>"
+  )
+endfunction ()
+
 function (hdf5_target_use_build_options target)
   target_compile_options (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_warnings,INTERFACE_COMPILE_OPTIONS>"
       "$<TARGET_PROPERTY:hdf5_build_options,INTERFACE_COMPILE_OPTIONS>"
   )
-  target_compile_definitions (${target} PRIVATE
-      "$<TARGET_PROPERTY:hdf5_platform,INTERFACE_COMPILE_DEFINITIONS>"
-  )
+  hdf5_target_use_platform (${target})
 endfunction ()

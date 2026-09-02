@@ -652,6 +652,7 @@ endif ()
 
 include (${HDF_CONFIG_DIR}/flags/HDFCompilerFlags.cmake)
 include (${HDF_CONFIG_DIR}/cmake/HDF5CompilerOptions.cmake)
+include (${HDF_CONFIG_DIR}/cmake/HDF5Dependencies.cmake)
 set (CMAKE_MODULE_PATH ${HDF_CONFIG_DIR} ${HDF_RESOURCES_DIR} ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------
@@ -941,6 +942,7 @@ string (REPLACE ";" " " SETTINGS_EXTERNAL_FILTERS "${SETTINGS_EXTERNAL_FILTERS}"
 
 # Print out compression libraries linked for debugging
 message (VERBOSE "LINK_COMP_LIBS=${LINK_COMP_LIBS}")
+hdf5_configure_dependencies ("${LINK_LIBS};${LINK_COMP_LIBS}" "${LINK_PUB_LIBS}")
 
 #-----------------------------------------------------------------------------
 # Include external VOL connectors

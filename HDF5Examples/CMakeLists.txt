@@ -14,6 +14,9 @@ project (H5EXAMPLES C)
 add_library (hdf5_examples_platform INTERFACE IMPORTED GLOBAL)
 
 function (hdf5_example_target_use_platform target)
+  target_include_directories (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_INCLUDE_DIRECTORIES>"
+  )
   target_compile_definitions (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_COMPILE_DEFINITIONS>"
   )
@@ -107,9 +110,7 @@ if (H5_HAVE_PARALLEL)
   INCLUDE_DIRECTORIES (${MPI_C_INCLUDE_DIRS})
 endif ()
 
-set_directory_properties(PROPERTIES INCLUDE_DIRECTORIES 
-    "${H5EXAMPLE_HDF5_INCLUDE_DIRS}"
-)
+target_include_directories (hdf5_examples_platform INTERFACE "${H5EXAMPLE_HDF5_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Dashboard and Testing Settings

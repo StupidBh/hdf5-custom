@@ -51,9 +51,9 @@ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   #
   # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
   # warnings that are emitted. If you need it, add it at configure time.
-  ADD_H5_FLAGS (HDF5_CMAKE_C_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/general")
-  ADD_H5_FLAGS (H5_CFLAGS "${HDF_CONFIG_DIR}/clang-warnings/error-general")
-  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_FLAGS}")
+  ADD_H5_FLAGS (HDF5_CMAKE_C_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/general")
+  ADD_H5_FLAGS (HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/error-general")
+  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ endif ()
 #-----------------------------------------------------------------------------
 if (HDF5_ENABLE_DEV_WARNINGS)
   message (STATUS "....HDF5 developer group warnings are enabled")
-  ADD_H5_FLAGS (H5_CFLAGS "${HDF_CONFIG_DIR}/clang-warnings/developer-general")
+  ADD_H5_FLAGS (HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/developer-general")
 
   # Turn on -Winline warnings now only for non-Debug and
   # non-Developer builds. For at least GNU compilers this
@@ -70,8 +70,8 @@ if (HDF5_ENABLE_DEV_WARNINGS)
   # optimization flag and will produce warnings about functions
   # not being considered for inlining
   if (NOT ${HDF_CFG_NAME} MATCHES "Debug" AND NOT ${HDF_CFG_NAME} MATCHES "Developer")
-    list (APPEND H5_CFLAGS "-Winline")
+    list (APPEND HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "-Winline")
   endif ()
 else ()
-  ADD_H5_FLAGS (H5_CFLAGS "${HDF_CONFIG_DIR}/clang-warnings/no-developer-general")
+  ADD_H5_FLAGS (HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/no-developer-general")
 endif ()

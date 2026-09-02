@@ -85,6 +85,8 @@ if (CMAKE_CXX_COMPILER_LOADED)
     include (${HDF_CONFIG_DIR}/flags/HDFClangCXXFlags.cmake)
   endif ()
 
+  list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_WARNING_FLAGS})
+
   #-----------------------------------------------------------------------------
   # HDF5 library compile options - to be made available to all targets
   #-----------------------------------------------------------------------------
@@ -128,7 +130,7 @@ if (CMAKE_CXX_COMPILER_LOADED)
         list (APPEND HDF5_CMAKE_CXX_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
       endif ()
     else ()
-      list (APPEND HDF5_CMAKE_CXX_FLAGS ${H5_CXXFLAGS})
+      list (APPEND HDF5_CMAKE_CXX_FLAGS ${HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS})
     endif ()
   endif ()
 

@@ -40,8 +40,8 @@ if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
   #
   # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
   # warnings that are emitted. If you need it, add it at configure time.
-  ADD_H5_FLAGS (HDF5_CMAKE_CXX_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/general")
-  message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_FLAGS}")
+  ADD_H5_FLAGS (HDF5_CMAKE_CXX_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/general")
+  message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_WARNING_FLAGS}")
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ endif ()
 #-----------------------------------------------------------------------------
 if (HDF5_ENABLE_DEV_WARNINGS)
   message (STATUS "....HDF5 CXX developer group warnings are enabled")
-  ADD_H5_FLAGS (H5_CXXFLAGS "${HDF_CONFIG_DIR}/clang-warnings/developer-general")
+  ADD_H5_FLAGS (HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/developer-general")
 else ()
-  ADD_H5_FLAGS (H5_CXXFLAGS "${HDF_CONFIG_DIR}/clang-warnings/no-developer-general")
+  ADD_H5_FLAGS (HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/clang-warnings/no-developer-general")
 endif ()

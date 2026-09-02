@@ -78,6 +78,8 @@ if (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
   include (${HDF_CONFIG_DIR}/flags/HDFClangFlags.cmake)
 endif ()
 
+list (APPEND HDF5_CMAKE_C_FLAGS ${HDF5_CMAKE_C_WARNING_FLAGS})
+
 #-----------------------------------------------------------------------------
 # HDF5 library compile options - to be made available to all targets
 #-----------------------------------------------------------------------------
@@ -167,7 +169,7 @@ if (HDF5_ENABLE_ALL_WARNINGS)
       list (APPEND HDF5_CMAKE_C_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
     endif ()
   else ()
-    list (APPEND HDF5_CMAKE_C_FLAGS ${H5_CFLAGS})
+    list (APPEND HDF5_CMAKE_C_FLAGS ${HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS})
   endif ()
 endif ()
 
@@ -229,4 +231,3 @@ elseif ("${HDF_CFG_NAME}" STREQUAL "RelWithDebInfo")
 else ()
   set (HDF5_BUILD_MODE_C_FLAGS     "")
 endif ()
-

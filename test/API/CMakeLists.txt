@@ -132,7 +132,7 @@ target_include_directories (h5_api_test
       "${HDF5_SRC_BINARY_DIR}"
       "${HDF5_TEST_BINARY_DIR}"
 )
-target_compile_options (h5_api_test PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5_api_test)
 target_compile_definitions (h5_api_test PRIVATE "${HDF5_TEST_COMPILE_DEFS_PRIVATE}")
 # Always prefer linking the shared HDF5 library by default
 if (BUILD_SHARED_LIBS)

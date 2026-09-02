@@ -16,7 +16,7 @@ set (H5WATCH_SOURCES
 
 #-- Add h5watch program
 add_executable (h5watch ${H5WATCH_SOURCES})
-target_compile_options(h5watch PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5watch)
 target_include_directories (h5watch PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5watch STATIC)
@@ -41,7 +41,7 @@ if (BUILD_TESTING AND HDF5_TEST_SWMR AND HDF5_TEST_SERIAL)
       ${HDF5_HL_TOOLS_H5WATCH_SOURCE_DIR}/extend_dset.c
   )
   add_executable (extend_dset ${extend_dset_SOURCES})
-  target_compile_options(extend_dset PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+  hdf5_target_use_build_options (extend_dset)
   target_include_directories (extend_dset PRIVATE "${HDF5_HL_TST_DIR};${HDF5_HL_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
   if (HDF5_BUILD_STATIC_TOOLS)
     TARGET_C_PROPERTIES (extend_dset STATIC)
@@ -60,7 +60,7 @@ if (BUILD_TESTING AND HDF5_TEST_SWMR AND HDF5_TEST_SERIAL)
   endif ()
 
   add_executable (h5watchgentest ${HDF5_HL_TOOLS_H5WATCH_SOURCE_DIR}/h5watchgentest.c)
-  target_compile_options(h5watchgentest PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+  hdf5_target_use_build_options (h5watchgentest)
   target_include_directories (h5watchgentest PRIVATE "${HDF5_HL_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
   if (HDF5_BUILD_STATIC_TOOLS)
     TARGET_C_PROPERTIES (h5watchgentest STATIC)

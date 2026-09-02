@@ -943,9 +943,9 @@ string (REPLACE ";" " " SETTINGS_EXTERNAL_FILTERS "${SETTINGS_EXTERNAL_FILTERS}"
 # Print out compression libraries linked for debugging
 message (VERBOSE "LINK_COMP_LIBS=${LINK_COMP_LIBS}")
 hdf5_configure_dependencies (
-    "${LINK_LIBS};${LINK_COMP_LIBS}"
-    "${LINK_PUB_LIBS}"
     "${LINK_LIBS}"
+    "${LINK_COMP_LIBS}"
+    "${LINK_PUB_LIBS}"
 )
 
 #-----------------------------------------------------------------------------

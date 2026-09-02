@@ -11,7 +11,12 @@ project (H5EXAMPLES C)
 
 # Keep the examples independently configurable while allowing an enclosing
 # HDF5 build to provide its target-scoped platform requirements.
+add_library (hdf5_examples_platform INTERFACE IMPORTED GLOBAL)
+
 function (hdf5_example_target_use_platform target)
+  target_compile_definitions (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_COMPILE_DEFINITIONS>"
+  )
   if (COMMAND hdf5_target_use_platform)
     hdf5_target_use_platform (${target})
   endif ()

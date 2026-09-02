@@ -83,7 +83,7 @@ macro (BASIC_SETTINGS varname)
       endif ()
     endif ()
     if (WIN32)
-      add_definitions (-D_CRT_SECURE_NO_WARNINGS)
+      target_compile_definitions (hdf5_examples_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
     endif ()
     # Borland uses -w- to suppress warnings.
     if (BORLAND)

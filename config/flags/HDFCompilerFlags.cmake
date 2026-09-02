@@ -218,6 +218,10 @@ set (HDF5_CMAKE_C_FLAGS
     ${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}
 )
 
+# Preserve the established build-report field while platform flags move from
+# CMAKE_C_FLAGS to target-scoped usage requirements.
+set (HDF5_REPORTED_C_FLAGS "${CMAKE_C_FLAGS}${HDF5_REPORTED_C_FLAGS_SUFFIX}")
+
 #-----------------------------------------------------------------------------
 # The build mode flags are not added to CMAKE_C_FLAGS, so create a separate
 # variable for them so they can be written out to libhdf5.settings and

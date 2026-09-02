@@ -424,6 +424,10 @@ foreach (contract_file IN LISTS generated_contract_files)
       string (REGEX REPLACE " _BACKTRACE_TRIPLES \"[^\"]*\"" "" contract_content
         "${contract_content}"
       )
+    elseif (contract_file MATCHES "(^|/)libhdf5\\.settings$")
+      string (REGEX REPLACE "Configured on: [^\r\n]*" "Configured on: <DATE>" contract_content
+        "${contract_content}"
+      )
     endif ()
     _hdf5_contract_normalize ("${contract_content}" normalized_content)
     string (SHA256 content_hash "${normalized_content}")

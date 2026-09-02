@@ -151,8 +151,7 @@ if(CODE_COVERAGE AND NOT CODE_COVERAGE_ADDED)
     # processing
     add_custom_target (
       ccov-libs
-      COMMAND ;
-      COMMENT "libs ready for coverage report.")
+      COMMAND ${CMAKE_COMMAND} -E echo "libs ready for coverage report.")
 
   elseif(CMAKE_C_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # Messages
@@ -418,10 +417,10 @@ function(target_code_coverage TARGET_NAME)
         endforeach()
 
         if(EXCLUDE_REGEX)
-          set(EXCLUDE_COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX} --output-file
-                              ${COVERAGE_INFO})
+          set(EXCLUDE_COMMAND COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX}
+                                      --output-file ${COVERAGE_INFO})
         else()
-          set(EXCLUDE_COMMAND ;)
+          set(EXCLUDE_COMMAND)
         endif()
 
         if(NOT ${target_code_coverage_EXTERNAL})
@@ -440,7 +439,7 @@ function(target_code_coverage TARGET_NAME)
             ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --base-directory
             ${CMAKE_SOURCE_DIR} --capture ${EXTERNAL_OPTION} --output-file
             ${COVERAGE_INFO}
-          COMMAND ${EXCLUDE_COMMAND}
+          ${EXCLUDE_COMMAND}
           DEPENDS ${TARGET_NAME})
 
         # Generates HTML output of the coverage information for perusal
@@ -456,8 +455,7 @@ function(target_code_coverage TARGET_NAME)
       add_custom_command(
         TARGET ccov-${target_code_coverage_COVERAGE_TARGET_NAME}
         POST_BUILD
-        COMMAND ;
-        COMMENT
+        COMMAND ${CMAKE_COMMAND} -E echo
           "Open ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/${target_code_coverage_COVERAGE_TARGET_NAME}/index.html in your browser to view the coverage report."
       )
 
@@ -640,7 +638,7 @@ function(add_code_coverage_all_targets)
       set(COVERAGE_INFO "${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/all-merged.info")
 
       # Nothing required for gcov
-      add_custom_target (ccov-all-processing COMMAND ;)
+      add_custom_target (ccov-all-processing)
 
       # Exclusion regex string creation
       set(EXCLUDE_REGEX)
@@ -650,10 +648,10 @@ function(add_code_coverage_all_targets)
       endforeach()
 
       if(EXCLUDE_REGEX)
-        set(EXCLUDE_COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX} --output-file
-                            ${COVERAGE_INFO})
+        set(EXCLUDE_COMMAND COMMAND ${LCOV_PATH} ${EXCLUDE_REGEX}
+                                    --output-file ${COVERAGE_INFO})
       else()
-        set(EXCLUDE_COMMAND ;)
+        set(EXCLUDE_COMMAND)
       endif()
 
       # Capture coverage data
@@ -662,7 +660,7 @@ function(add_code_coverage_all_targets)
         COMMAND ${CMAKE_COMMAND} -E rm -f ${COVERAGE_INFO}
         COMMAND ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --capture
                 --output-file ${COVERAGE_INFO}
-        COMMAND ${EXCLUDE_COMMAND}
+        ${EXCLUDE_COMMAND}
         DEPENDS ccov-all-processing)
 
       # Generates HTML output of all targets for perusal
@@ -677,8 +675,7 @@ function(add_code_coverage_all_targets)
     add_custom_command(
       TARGET ccov-all
       POST_BUILD
-      COMMAND ;
-      COMMENT
+      COMMAND ${CMAKE_COMMAND} -E echo
         "Open ${CMAKE_COVERAGE_OUTPUT_DIRECTORY}/all-merged/index.html in your browser to view the coverage report."
     )
   endif()

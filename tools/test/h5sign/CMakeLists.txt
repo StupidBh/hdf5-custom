@@ -15,6 +15,7 @@ target_include_directories (h5signgentest
     "${HDF5_SRC_DIR}"  # For H5PLsig.h
     $<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>
 )
+hdf5_target_use_platform (h5signgentest)
 
 if (BUILD_STATIC_LIBS)
   TARGET_C_PROPERTIES (h5signgentest STATIC)
@@ -35,6 +36,7 @@ target_include_directories (h5signverifytest
     "${HDF5_SRC_DIR}"  # For H5PLsig.h and H5PLpkg.h
     $<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>
 )
+hdf5_target_use_platform (h5signverifytest)
 
 if (BUILD_STATIC_LIBS)
   TARGET_C_PROPERTIES (h5signverifytest STATIC)

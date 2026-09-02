@@ -137,11 +137,6 @@ endif ()
 #-----------------------------------------------------------------------------
 # Option to Require Digitally Signed plugins
 #-----------------------------------------------------------------------------
-option (HDF5_REQUIRE_SIGNED_PLUGINS "Require digitally signed plugins" OFF)
-
-cmake_dependent_option (HDF5_LOCK_PLUGIN_KEYSTORE "Disable HDF5_PLUGIN_KEYSTORE environment variable override (security hardening)" OFF "HDF5_REQUIRE_SIGNED_PLUGINS" OFF)
-mark_as_advanced(HDF5_LOCK_PLUGIN_KEYSTORE)
-
 if (HDF5_REQUIRE_SIGNED_PLUGINS)
   # KeyStore directory for multiple trusted public keys
   set(HDF5_PLUGIN_KEYSTORE_DIR "" CACHE PATH

@@ -88,6 +88,13 @@ option (HDF5_BUILD_TOOLS "Build HDF5 Tools" ON)
 option (HDF5_ENABLE_PLUGIN_SUPPORT "Enable PLUGIN Filters" OFF)
 mark_as_advanced (HDF5_ENABLE_PLUGIN_SUPPORT)
 
+option (HDF5_REQUIRE_SIGNED_PLUGINS "Require digitally signed plugins" OFF)
+cmake_dependent_option (HDF5_LOCK_PLUGIN_KEYSTORE
+  "Disable HDF5_PLUGIN_KEYSTORE environment variable override (security hardening)"
+  OFF "HDF5_REQUIRE_SIGNED_PLUGINS" OFF
+)
+mark_as_advanced (HDF5_LOCK_PLUGIN_KEYSTORE)
+
 option (HDF5_BUILD_HL_LIB "Build HIGH Level HDF5 Library" ON)
 
 option (HDF5_BUILD_CPP_LIB "Build HDF5 C++ Library" OFF)

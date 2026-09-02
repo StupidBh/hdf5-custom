@@ -19,3 +19,5 @@ add_library (hdf5_warnings INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_platform INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_dependencies INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
+
+target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_FLAGS}")

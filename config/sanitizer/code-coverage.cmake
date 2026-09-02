@@ -493,24 +493,50 @@ function(target_code_coverage TARGET_NAME)
   endif()
 endfunction()
 
-# Adds code coverage instrumentation to all targets in the current directory and
-# any subdirectories. To add coverage instrumentation to only specific targets,
-# use `target_code_coverage`.
-function(add_code_coverage)
+# Returns code coverage usage requirements for a caller-owned target.
+function(code_coverage_get_options COMPILE_OPTIONS_VAR LINK_OPTIONS_VAR LINK_LIBRARIES_VAR)
+  set(coverage_compile_options)
+  set(coverage_link_options)
+  set(coverage_link_libraries)
+
   if(CODE_COVERAGE)
     if(CMAKE_C_COMPILER_ID MATCHES "IntelLLVM" OR 
        CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM" OR 
        CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang" OR 
        CMAKE_CXX_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
-      add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
-      add_link_options(-fprofile-instr-generate -fcoverage-mapping)
+      list(APPEND coverage_compile_options -fprofile-instr-generate
+                                             -fcoverage-mapping)
+      list(APPEND coverage_link_options -fprofile-instr-generate
+                                          -fcoverage-mapping)
     elseif(CMAKE_C_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES
                                                 "GNU")
-      add_compile_options(
+      list(APPEND coverage_compile_options
         -fprofile-arcs -ftest-coverage
         $<$<COMPILE_LANGUAGE:CXX>:-fno-elide-constructors> -fno-default-inline)
-      link_libraries(gcov)
+      list(APPEND coverage_link_libraries gcov)
     endif()
+  endif()
+
+  set(${COMPILE_OPTIONS_VAR} "${coverage_compile_options}")
+  set(${LINK_OPTIONS_VAR} "${coverage_link_options}")
+  set(${LINK_LIBRARIES_VAR} "${coverage_link_libraries}")
+  return(PROPAGATE ${COMPILE_OPTIONS_VAR} ${LINK_OPTIONS_VAR} ${LINK_LIBRARIES_VAR})
+endfunction()
+
+# Adds code coverage instrumentation to all targets in the current directory and
+# any subdirectories. To add coverage instrumentation to only specific targets,
+# use `target_code_coverage`.
+function(add_code_coverage)
+  code_coverage_get_options(coverage_compile_options coverage_link_options
+                            coverage_link_libraries)
+  if(coverage_compile_options)
+    add_compile_options(${coverage_compile_options})
+  endif()
+  if(coverage_link_options)
+    add_link_options(${coverage_link_options})
+  endif()
+  if(coverage_link_libraries)
+    link_libraries(${coverage_link_libraries})
   endif()
 endfunction()
 

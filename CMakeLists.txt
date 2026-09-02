@@ -521,8 +521,10 @@ endif ()
 if (HDF5_ENABLE_COVERAGE)
   include (${HDF_CONFIG_DIR}/sanitizer/code-coverage.cmake)
   if (CODE_COVERAGE AND CODE_COVERAGE_ADDED)
-    message (VERBOSE "Add instrumentation to all targets")
-    add_code_coverage () # Adds instrumentation to all targets
+    message (VERBOSE "Add target-scoped instrumentation")
+    code_coverage_get_options (HDF5_SANITIZER_COMPILE_OPTIONS HDF5_SANITIZER_LINK_OPTIONS
+      HDF5_SANITIZER_LINK_LIBRARIES
+    )
   else ()
     message (VERBOSE "Use --coverage option")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage")

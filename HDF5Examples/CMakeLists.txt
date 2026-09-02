@@ -9,6 +9,14 @@
 cmake_minimum_required (VERSION 4.0)
 project (H5EXAMPLES C)
 
+# Keep the examples independently configurable while allowing an enclosing
+# HDF5 build to provide its target-scoped platform requirements.
+function (hdf5_example_target_use_platform target)
+  if (COMMAND hdf5_target_use_platform)
+    hdf5_target_use_platform (${target})
+  endif ()
+endfunction ()
+
 #-----------------------------------------------------------------------------
 # Define some CMake variables for use later in the project
 #-----------------------------------------------------------------------------

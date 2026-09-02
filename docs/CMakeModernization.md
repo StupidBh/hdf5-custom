@@ -56,6 +56,7 @@ API unless export correctness requires otherwise:
 
 - `hdf5_build_options`
 - `hdf5_warnings`
+- `hdf5_assertions`
 - `hdf5_platform`
 - `hdf5_dependencies`
 - `hdf5_sanitizers`

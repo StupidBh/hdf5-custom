@@ -16,12 +16,14 @@ include_guard (GLOBAL)
 # repository root through these configuration-only targets.
 add_library (hdf5_build_options INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_warnings INTERFACE IMPORTED GLOBAL)
+add_library (hdf5_assertions INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_platform INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_dependencies INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
 
 target_compile_options (hdf5_warnings INTERFACE "${HDF5_CMAKE_C_WARNING_FLAGS}")
 target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}")
+target_compile_options (hdf5_assertions INTERFACE "${HDF5_ASSERT_COMPILE_OPTION}")
 if (HDF5_PLATFORM_COMPILE_DEFINITIONS)
   list (REMOVE_DUPLICATES HDF5_PLATFORM_COMPILE_DEFINITIONS)
   target_compile_definitions (hdf5_platform INTERFACE ${HDF5_PLATFORM_COMPILE_DEFINITIONS})
@@ -45,6 +47,9 @@ function (hdf5_configure_cxx_build_options)
 endfunction ()
 
 function (hdf5_target_use_platform target)
+  target_compile_options (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_assertions,INTERFACE_COMPILE_OPTIONS>"
+  )
   target_compile_definitions (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_platform,INTERFACE_COMPILE_DEFINITIONS>"
   )

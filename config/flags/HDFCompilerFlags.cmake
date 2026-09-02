@@ -23,7 +23,10 @@ message (VERBOSE "Warnings Configuration: C default: ${CMAKE_C_FLAGS}")
 # not hurt other versions, and this will work into the
 # future
 if (MSVC)
-  add_definitions (-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+  list (APPEND HDF5_PLATFORM_COMPILE_DEFINITIONS
+      _CRT_SECURE_NO_DEPRECATE
+      _CRT_NONSTDC_NO_DEPRECATE
+  )
   set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stack:10000000")
 endif ()
 
@@ -41,9 +44,6 @@ if (HDF5_DISABLE_COMPILER_WARNINGS)
     set (HDF5_WARNINGS_BLOCKED 1)
     string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
-  endif ()
-  if (WIN32)
-    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
   endif ()
   # Borland uses -w- to suppress warnings.
   if (BORLAND)

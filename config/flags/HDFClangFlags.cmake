@@ -34,7 +34,10 @@ endif ()
 # not hurt other versions, and this will work into the
 # future
 if (MSVC OR _CLANG_MSVC_WINDOWS)
-  add_definitions (-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+  list (APPEND HDF5_PLATFORM_COMPILE_DEFINITIONS
+      _CRT_SECURE_NO_DEPRECATE
+      _CRT_NONSTDC_NO_DEPRECATE
+  )
 endif ()
 
 #-----------------------------------------------------------------------------

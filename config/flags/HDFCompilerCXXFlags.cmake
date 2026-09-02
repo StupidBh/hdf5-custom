@@ -54,10 +54,6 @@ if (CMAKE_CXX_COMPILER_LOADED)
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
     endif ()
-    if (WIN32)
-      add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-    endif ()
-
     # Most compilers use -w to suppress warnings.
     if (NOT HDF5_WARNINGS_BLOCKED)
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")

@@ -145,6 +145,59 @@ option (BUILD_TESTING "Build HDF5 Unit Testing" ON)
 #################################
 # Options with multiple choices #
 #################################
+set (HDF5_DEFAULT_API_VERSION "v200" CACHE STRING "Enable v2.0 API (v16, v18, v110, v112, v114, v200)")
+set_property (CACHE HDF5_DEFAULT_API_VERSION PROPERTY STRINGS v16 v18 v110 v112 v114 v200)
+
+function (hdf5_configure_default_api_version)
+  set (H5_USE_16_API_DEFAULT 0)
+  if (HDF5_DEFAULT_API_VERSION MATCHES "v16")
+    set (H5_USE_16_API_DEFAULT 1)
+  endif ()
+
+  set (H5_USE_18_API_DEFAULT 0)
+  if (HDF5_DEFAULT_API_VERSION MATCHES "v18")
+    set (H5_USE_18_API_DEFAULT 1)
+  endif ()
+
+  set (H5_USE_110_API_DEFAULT 0)
+  if (HDF5_DEFAULT_API_VERSION MATCHES "v110")
+    set (H5_USE_110_API_DEFAULT 1)
+  endif ()
+
+  set (H5_USE_112_API_DEFAULT 0)
+  if (HDF5_DEFAULT_API_VERSION MATCHES "v112")
+    set (H5_USE_112_API_DEFAULT 1)
+  endif ()
+
+  set (H5_USE_114_API_DEFAULT 0)
+  if (HDF5_DEFAULT_API_VERSION MATCHES "v114")
+    set (H5_USE_114_API_DEFAULT 1)
+  endif ()
+
+  set (H5_USE_200_API_DEFAULT 0)
+  set (propagate_default_api_version FALSE)
+  if (NOT HDF5_DEFAULT_API_VERSION)
+    set (HDF5_DEFAULT_API_VERSION "v200")
+    set (propagate_default_api_version TRUE)
+  endif ()
+  if (DEFAULT_API_VERSION MATCHES "v200")
+    set (H5_USE_200_API_DEFAULT 1)
+  endif ()
+
+  set (api_mapping_variables
+      H5_USE_16_API_DEFAULT
+      H5_USE_18_API_DEFAULT
+      H5_USE_110_API_DEFAULT
+      H5_USE_112_API_DEFAULT
+      H5_USE_114_API_DEFAULT
+      H5_USE_200_API_DEFAULT
+  )
+  if (propagate_default_api_version)
+    return (PROPAGATE HDF5_DEFAULT_API_VERSION ${api_mapping_variables})
+  endif ()
+  return (PROPAGATE ${api_mapping_variables})
+endfunction ()
+
 set (allow_external_support_types "NO" "GIT" "TGZ")
 set (HDF5_ALLOW_EXTERNAL_SUPPORT "NO" CACHE STRING "If not set to NO, specifies where to obtain sources when building or using external libraries (NO GIT TGZ)")
 set_property (CACHE HDF5_ALLOW_EXTERNAL_SUPPORT PROPERTY STRINGS ${allow_external_support_types})

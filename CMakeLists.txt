@@ -621,58 +621,7 @@ include (${HDF_CONFIG_DIR}/cmake/HDF5Dependencies.cmake)
 message (VERBOSE "LINK_LIBS=${LINK_LIBS}")
 message (VERBOSE "LINK_PUB_LIBS=${LINK_PUB_LIBS}")
 
-set (HDF5_DEFAULT_API_VERSION "v200" CACHE STRING "Enable v2.0 API (v16, v18, v110, v112, v114, v200)")
-set_property (CACHE HDF5_DEFAULT_API_VERSION PROPERTY STRINGS v16 v18 v110 v112 v114 v200)
-#-----------------------------------------------------------------------------
-# Option to use 1.6.x API
-#-----------------------------------------------------------------------------
-set (H5_USE_16_API_DEFAULT 0)
-if (HDF5_DEFAULT_API_VERSION MATCHES "v16")
-  set (H5_USE_16_API_DEFAULT 1)
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to use 1.8.x API
-#-----------------------------------------------------------------------------
-set (H5_USE_18_API_DEFAULT 0)
-if (HDF5_DEFAULT_API_VERSION MATCHES "v18")
-  set (H5_USE_18_API_DEFAULT 1)
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to use 1.10.x API
-#-----------------------------------------------------------------------------
-set (H5_USE_110_API_DEFAULT 0)
-if (HDF5_DEFAULT_API_VERSION MATCHES "v110")
-  set (H5_USE_110_API_DEFAULT 1)
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to use 1.12.x API
-#-----------------------------------------------------------------------------
-set (H5_USE_112_API_DEFAULT 0)
-if (HDF5_DEFAULT_API_VERSION MATCHES "v112")
-  set (H5_USE_112_API_DEFAULT 1)
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to use 1.14.x API
-#-----------------------------------------------------------------------------
-set (H5_USE_114_API_DEFAULT 0)
-if (HDF5_DEFAULT_API_VERSION MATCHES "v114")
-  set (H5_USE_114_API_DEFAULT 1)
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to use 2.x.y API
-#-----------------------------------------------------------------------------
-set (H5_USE_200_API_DEFAULT 0)
-if (NOT HDF5_DEFAULT_API_VERSION)
-  set (HDF5_DEFAULT_API_VERSION "v200")
-endif ()
-if (DEFAULT_API_VERSION MATCHES "v200")
-  set (H5_USE_200_API_DEFAULT 1)
-endif ()
+hdf5_configure_default_api_version ()
 
 #-----------------------------------------------------------------------------
 # Include user macros

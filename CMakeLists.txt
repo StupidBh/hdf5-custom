@@ -653,47 +653,7 @@ hdf5_validate_threadsafe_options ()
 #-----------------------------------------------------------------------------
 # Option to use multi-threaded concurrency
 #-----------------------------------------------------------------------------
-if (HDF5_ENABLE_CONCURRENCY)
-  # check for unsupported options
-  if (WIN32)
-    if (BUILD_STATIC_LIBS)
-      message (FATAL_ERROR " **** multi-threaded concurrency option not supported with static library **** ")
-    endif ()
-  endif ()
-  if (HDF5_ENABLE_PARALLEL)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** Parallel and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported parallel and multi-threaded concurrency options **** ")
-    endif ()
-  endif ()
-  if (HDF5_BUILD_CPP_LIB)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** C++ and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported C++ and multi-threaded concurrency options **** ")
-    endif ()
-  endif ()
-  if (HDF5_BUILD_HL_LIB)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** HL and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported HL and multi-threaded concurrency options **** ")
-    endif ()
-  endif ()
-
-  # Check for threading package
-  if (NOT Threads_FOUND)
-    message (FATAL_ERROR " **** multi-threaded concurrency option requires a threading package and none was found **** ")
-  endif ()
-
-  # Multi-threaded concurrency and threadsafe options are mutually exclusive
-  if (HDF5_ENABLE_THREADSAFE)
-    message (FATAL_ERROR " **** multi-threaded concurrency and threadsafe options are mutually exclusive **** ")
-  endif ()
-
-  set (H5_HAVE_CONCURRENCY 1)
-endif ()
+hdf5_validate_concurrency_options ()
 
 #-----------------------------------------------------------------------------
 # Option to build the map API

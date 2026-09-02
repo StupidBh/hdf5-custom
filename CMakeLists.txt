@@ -651,6 +651,7 @@ else ()
 endif ()
 
 include (${HDF_CONFIG_DIR}/flags/HDFCompilerFlags.cmake)
+include (${HDF_CONFIG_DIR}/cmake/HDF5CompilerOptions.cmake)
 set (CMAKE_MODULE_PATH ${HDF_CONFIG_DIR} ${HDF_RESOURCES_DIR} ${CMAKE_MODULE_PATH})
 
 #-----------------------------------------------------------------------------

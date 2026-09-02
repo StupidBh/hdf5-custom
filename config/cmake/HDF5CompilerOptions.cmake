@@ -21,3 +21,9 @@ add_library (hdf5_dependencies INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
 
 target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_FLAGS}")
+
+function (hdf5_target_use_build_options target)
+  target_compile_options (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_build_options,INTERFACE_COMPILE_OPTIONS>"
+  )
+endfunction ()

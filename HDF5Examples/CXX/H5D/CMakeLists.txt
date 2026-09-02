@@ -9,6 +9,7 @@ include (C_sourcefiles.cmake)
 if (HDF5_VERSION_MAJOR VERSION_GREATER_EQUAL "1.8")
   foreach (example_name ${examples})
     add_executable (${EXAMPLE_VARNAME}_cpp_ex_${example_name} ${PROJECT_SOURCE_DIR}/${example_name}.cpp)
+    hdf5_example_target_use_platform (${EXAMPLE_VARNAME}_cpp_ex_${example_name})
     target_compile_options (${EXAMPLE_VARNAME}_cpp_ex_${example_name}
         PRIVATE
             "$<$<BOOL:${${EXAMPLE_VARNAME}_USE_16_API}>:-DH5_USE_16_API>"

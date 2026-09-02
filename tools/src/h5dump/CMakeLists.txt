@@ -21,7 +21,7 @@ add_executable (h5dump
     ${HDF5_TOOLS_SRC_H5DUMP_SOURCE_DIR}/h5dump_xml.h
 )
 target_include_directories (h5dump PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
-target_compile_options(h5dump PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5dump)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5dump STATIC)
   target_link_libraries (h5dump PRIVATE ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})

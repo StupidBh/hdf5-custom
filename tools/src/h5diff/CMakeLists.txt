@@ -16,7 +16,7 @@ add_executable (h5diff
     ${HDF5_TOOLS_SRC_H5DIFF_SOURCE_DIR}/h5diff_common.h
 )
 target_include_directories (h5diff PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
-target_compile_options(h5diff PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5diff)
 #target_compile_definitions (h5diff PRIVATE H5_TOOLS_DEBUG)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5diff STATIC)
@@ -46,7 +46,7 @@ if (H5_HAVE_PARALLEL)
       ${HDF5_TOOLS_SRC_H5DIFF_SOURCE_DIR}/ph5diff_main.c
   )
   target_include_directories (ph5diff PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
-  target_compile_options(ph5diff PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+  hdf5_target_use_build_options (ph5diff)
   if (HDF5_BUILD_STATIC_TOOLS)
     TARGET_C_PROPERTIES (ph5diff STATIC)
     target_link_libraries (ph5diff PRIVATE ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET} "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:MPI::MPI_C>")

@@ -12,7 +12,7 @@ project (HDF5_TOOLS_SRC_H5FC C)
 # --------------------------------------------------------------------
 add_executable (h5format_convert ${HDF5_TOOLS_SRC_H5FC_SOURCE_DIR}/h5format_convert.c)
 target_include_directories (h5format_convert PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
-target_compile_options(h5format_convert PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5format_convert)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5format_convert STATIC)
   target_link_libraries (h5format_convert PRIVATE ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})

@@ -12,7 +12,7 @@ project (HDF5_TOOLS_SRC_H5STAT C)
 # --------------------------------------------------------------------
 add_executable (h5stat ${HDF5_TOOLS_SRC_H5STAT_SOURCE_DIR}/h5stat.c)
 target_include_directories (h5stat PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
-target_compile_options(h5stat PRIVATE "${HDF5_CMAKE_C_FLAGS}")
+hdf5_target_use_build_options (h5stat)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5stat STATIC)
   target_link_libraries (h5stat PRIVATE ${HDF5_TOOLS_LIB_TARGET} ${HDF5_LIB_TARGET})

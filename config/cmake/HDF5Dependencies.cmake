@@ -23,6 +23,9 @@ function (hdf5_configure_dependencies system_libraries compression_libraries pub
 endfunction ()
 
 function (hdf5_target_link_dependencies target)
+  get_property (private_compile_definitions TARGET hdf5_dependencies
+      PROPERTY INTERFACE_COMPILE_DEFINITIONS
+  )
   get_property (system_libraries TARGET hdf5_dependencies
       PROPERTY HDF5_SYSTEM_LINK_LIBRARIES
   )
@@ -33,6 +36,9 @@ function (hdf5_target_link_dependencies target)
       PROPERTY HDF5_PUBLIC_LINK_LIBRARIES
   )
 
+  if (private_compile_definitions)
+    target_compile_definitions (${target} PRIVATE ${private_compile_definitions})
+  endif ()
   if (system_libraries OR compression_libraries)
     target_link_libraries (${target} PRIVATE ${system_libraries} ${compression_libraries})
   endif ()
@@ -189,7 +195,9 @@ if (HDF5_REQUIRE_SIGNED_PLUGINS)
   # Use the HDF5_PLUGIN_KEYSTORE environment variable instead if the path
   # should not be visible in the binary.
   if (HDF5_PLUGIN_KEYSTORE_DIR)
-    add_compile_definitions(H5PL_KEYSTORE_DIR="${HDF5_PLUGIN_KEYSTORE_DIR}")
+    target_compile_definitions (hdf5_dependencies INTERFACE
+        H5PL_KEYSTORE_DIR="${HDF5_PLUGIN_KEYSTORE_DIR}"
+    )
   else ()
     message(NOTICE "No compile-time KeyStore directory configured; "
       "set HDF5_PLUGIN_KEYSTORE environment variable at runtime.")
@@ -200,7 +208,7 @@ if (HDF5_REQUIRE_SIGNED_PLUGINS)
 
   # Security: Disable environment variable override if requested
   if (HDF5_LOCK_PLUGIN_KEYSTORE)
-    add_compile_definitions(H5PL_DISABLE_ENV_KEYSTORE)
+    target_compile_definitions (hdf5_dependencies INTERFACE H5PL_DISABLE_ENV_KEYSTORE)
     message(VERBOSE "HDF5_PLUGIN_KEYSTORE environment variable override: DISABLED (security hardening)")
   endif ()
 

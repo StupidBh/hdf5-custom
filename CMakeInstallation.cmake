@@ -511,6 +511,23 @@ The HDF5 data model, file format, API, library, and tools are open and distribut
     endif ()
   endif ()
 
+  set (CPACK_SOURCE_IGNORE_FILES
+      "/CVS/"
+      "/\\.svn/"
+      "/\\.bzr/"
+      "/\\.hg/"
+      "/\\.git/"
+      "\\.swp$"
+      "\\.#"
+      "/#"
+      "/\\.codex/"
+      "/\\.idea/"
+      "/\\.vs/"
+      "/build[^/]*/"
+      "/cmake-build-[^/]*/"
+      "/_CPack_Packages/"
+  )
+
   include (CPack)
 
   # The following sets packaging specific categories and descriptions

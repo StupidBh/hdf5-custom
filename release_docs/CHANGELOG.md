@@ -126,6 +126,13 @@ functionality.
 
 ## Configuration
 
+### Excluded local build data from source packages
+
+   CPack source archives could include in-tree build directories and local IDE
+   metadata, producing oversized and machine-specific packages. Source package
+   generation now excludes common CMake build trees, CPack staging data, and
+   local CLion, Visual Studio, and Codex metadata.
+
 ### Restored build-tree CMake package consumption
 
    The generated build-tree `hdf5-config.cmake` referenced install-tree include

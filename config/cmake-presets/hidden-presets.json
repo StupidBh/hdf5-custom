@@ -108,42 +108,6 @@
         "HDF5_USE_SANITIZER": "Address",
         "HDF5_ENABLE_SANITIZERS": "ON"
       }
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-asan",
-      "hidden": true,
-      "inherits": "ci-x64-Debug-GNUC",
-      "cacheVariables": {
-        "HDF5_USE_SANITIZER": "Address",
-        "HDF5_ENABLE_SANITIZERS": "ON"
-      }
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-tsan",
-      "hidden": true,
-      "inherits": "ci-x64-Debug-GNUC",
-      "cacheVariables": {
-        "HDF5_USE_SANITIZER": "Thread",
-        "HDF5_ENABLE_SANITIZERS": "ON"
-      }
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-lsan",
-      "hidden": true,
-      "inherits": "ci-x64-Debug-GNUC",
-      "cacheVariables": {
-        "HDF5_USE_SANITIZER": "Leak",
-        "HDF5_ENABLE_SANITIZERS": "ON"
-      }
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-ubsan",
-      "hidden": true,
-      "inherits": "ci-x64-Debug-GNUC",
-      "cacheVariables": {
-        "HDF5_USE_SANITIZER": "Undefined",
-        "HDF5_ENABLE_SANITIZERS": "ON"
-      }
     }
   ],
   "buildPresets": [
@@ -191,38 +155,6 @@
     {
       "name": "ci-x64-Debug-MSVC-asan",
       "configurePreset": "ci-x64-Debug-MSVC-asan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-asan",
-      "configurePreset": "ci-x64-Debug-GNUC-asan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-tsan",
-      "configurePreset": "ci-x64-Debug-GNUC-tsan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-lsan",
-      "configurePreset": "ci-x64-Debug-GNUC-lsan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-ubsan",
-      "configurePreset": "ci-x64-Debug-GNUC-ubsan",
       "hidden": true,
       "inherits": [
         "ci-base"
@@ -285,38 +217,6 @@
       "inherits": [
         "ci-base"
       ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-asan",
-      "configurePreset": "ci-x64-Debug-GNUC-asan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-tsan",
-      "configurePreset": "ci-x64-Debug-GNUC-tsan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-lsan",
-      "configurePreset": "ci-x64-Debug-GNUC-lsan",
-      "hidden": true,
-      "inherits": [
-        "ci-base"
-      ]
-    },
-    {
-      "name": "ci-x64-Debug-GNUC-ubsan",
-      "configurePreset": "ci-x64-Debug-GNUC-ubsan",
-      "inherits": [
-        "ci-base"
-      ],
-      "hidden": true
     }
   ],
   "packagePresets": [

@@ -24,9 +24,9 @@ endif ()
 
 if (WIN32 AND "x${CMAKE_C_SIMULATE_ID}" STREQUAL "xMSVC")
   set (_CLANG_MSVC_WINDOWS 1)
-  if("x${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "xGNU")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker -stack:20000000")
-  endif()
+  if ("x${CMAKE_C_COMPILER_FRONTEND_VARIANT}" STREQUAL "xGNU")
+    list (APPEND HDF5_PLATFORM_EXECUTABLE_LINK_OPTIONS "SHELL:-Xlinker -stack:20000000")
+  endif ()
 endif ()
 
 # Disable deprecation warnings for standard C functions.

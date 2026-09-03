@@ -434,10 +434,6 @@ add_custom_target (h5diff_vol_files ALL COMMENT "Copying files needed by h5diff 
 # Overwrite system dependent files (Windows) and not VS2015
 #
 set (COPY_WINDOWS_FILES false)
-# MinGW tests may depend on host system
-#if (MINGW)
-#  set (COPY_WINDOWS_FILES true)
-#endif ()
 if (WIN32 AND MSVC_VERSION LESS 1900)
   set (COPY_WINDOWS_FILES true)
 endif ()

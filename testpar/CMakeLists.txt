@@ -65,11 +65,8 @@ if (BUILD_STATIC_LIBS)
   hdf5_target_link_system_dependencies (${HDF5_TEST_PAR_LIB_TARGET} PUBLIC)
   target_link_libraries (${HDF5_TEST_PAR_LIB_TARGET}
       PUBLIC ${HDF5_LIB_TARGET}
-      PRIVATE "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
+      PRIVATE "$<$<PLATFORM_ID:Windows>:ws2_32.lib>"
   )
-  if (MINGW)
-    target_link_libraries (${HDF5_TEST_PAR_LIB_TARGET} PRIVATE "wsock32.lib")
-  endif ()
   H5_SET_LIB_OPTIONS (${HDF5_TEST_PAR_LIB_TARGET} ${HDF5_TEST_PAR_LIB_NAME} STATIC 0)
   set_target_properties (${HDF5_TEST_PAR_LIB_TARGET} PROPERTIES FOLDER libraries/test/par)
 
@@ -105,11 +102,8 @@ if (BUILD_SHARED_LIBS)
   hdf5_target_link_system_dependencies (${HDF5_TEST_PAR_LIBSH_TARGET} PUBLIC)
   target_link_libraries (${HDF5_TEST_PAR_LIBSH_TARGET}
       PUBLIC ${HDF5_LIBSH_TARGET}
-      PRIVATE "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
+      PRIVATE "$<$<PLATFORM_ID:Windows>:ws2_32.lib>"
   )
-  if (MINGW)
-    target_link_libraries (${HDF5_TEST_PAR_LIBSH_TARGET} PRIVATE "wsock32.lib")
-  endif ()
   H5_SET_LIB_OPTIONS (${HDF5_TEST_PAR_LIBSH_TARGET} ${HDF5_TEST_PAR_LIB_NAME} SHARED "LIB")
   set_target_properties (${HDF5_TEST_PAR_LIBSH_TARGET} PROPERTIES FOLDER libraries/test/par)
 
@@ -182,14 +176,14 @@ macro (ADD_H5P_EXE file)
     target_link_libraries (${file}
         PRIVATE ${HDF5_TEST_LIB_TARGET} ${HDF5_TEST_PAR_LIB_TARGET} ${HDF5_LIB_TARGET}
                 "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:MPI::MPI_C>"
-                "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
+                "$<$<PLATFORM_ID:Windows>:ws2_32.lib>"
     )
   else ()
     TARGET_C_PROPERTIES (${file} SHARED)
     target_link_libraries (${file}
         PRIVATE ${HDF5_TEST_LIBSH_TARGET} ${HDF5_TEST_PAR_LIBSH_TARGET} ${HDF5_LIBSH_TARGET}
                 "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:MPI::MPI_C>"
-                "$<$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:MinGW>>:ws2_32.lib>"
+                "$<$<PLATFORM_ID:Windows>:ws2_32.lib>"
     )
   endif ()
   set_target_properties (${file} PROPERTIES FOLDER test/par)

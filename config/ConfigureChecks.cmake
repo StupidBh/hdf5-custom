@@ -70,21 +70,10 @@ endmacro ()
 # ----------------------------------------------------------------------
 set (WINDOWS)
 
-if (MINGW)
-  set (${HDF_PREFIX}_HAVE_MINGW 1)
-  set (WINDOWS 1) # MinGW tries to imitate Windows
-  set (CMAKE_REQUIRED_FLAGS "-DWIN32_LEAN_AND_MEAN=1 -DNOGDI=1")
-  set (__USE_MINGW_ANSI_STDIO 1)
-endif ()
-
-if (WIN32 AND NOT MINGW)
-  if (NOT UNIX)
-    set (WINDOWS 1)
-    set (CMAKE_REQUIRED_FLAGS "/DWIN32_LEAN_AND_MEAN=1 /DNOGDI=1")
-    if (MSVC)
-      set (${HDF_PREFIX}_HAVE_VISUAL_STUDIO 1)
-    endif ()
-  endif ()
+if (WIN32)
+  set (WINDOWS 1)
+  set (CMAKE_REQUIRED_FLAGS "/DWIN32_LEAN_AND_MEAN=1 /DNOGDI=1")
+  set (${HDF_PREFIX}_HAVE_VISUAL_STUDIO 1)
   message (TRACE "MSVC=${MSVC}")
   message (TRACE "HAVE_VISUAL_STUDIO=${${HDF_PREFIX}_HAVE_VISUAL_STUDIO}")
 endif ()
@@ -94,16 +83,12 @@ if (WINDOWS)
   set (${HDF_PREFIX}_HAVE_WIN32_API 1)
   set (${HDF_PREFIX}_HAVE_LIBM 1)
   set (${HDF_PREFIX}_HAVE_STRDUP 1)
-  if (NOT MINGW)
-    set (${HDF_PREFIX}_HAVE_GETHOSTNAME 1)
-  endif ()
-  if (NOT UNIX AND NOT CYGWIN)
-    set (${HDF_PREFIX}_HAVE_GETCONSOLESCREENBUFFERINFO 1)
-    set (${HDF_PREFIX}_HAVE_TIMEZONE 1)
-    set (${HDF_PREFIX}_HAVE_GETTIMEOFDAY 1)
-    set (${HDF_PREFIX}_HAVE_LIBWS2_32 1)
-    set (${HDF_PREFIX}_HAVE_LIBWSOCK32 1)
-  endif ()
+  set (${HDF_PREFIX}_HAVE_GETHOSTNAME 1)
+  set (${HDF_PREFIX}_HAVE_GETCONSOLESCREENBUFFERINFO 1)
+  set (${HDF_PREFIX}_HAVE_TIMEZONE 1)
+  set (${HDF_PREFIX}_HAVE_GETTIMEOFDAY 1)
+  set (${HDF_PREFIX}_HAVE_LIBWS2_32 1)
+  set (${HDF_PREFIX}_HAVE_LIBWSOCK32 1)
   message (TRACE "HAVE_TIMEZONE=${${HDF_PREFIX}_HAVE_TIMEZONE}")
 endif ()
 
@@ -161,7 +146,7 @@ else ()
   set (C_INCLUDE_QUADMATH_H 0)
 endif ()
 
-if (MINGW OR CYGWIN)
+if (CYGWIN)
   set (CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE")
   list (APPEND HDF5_PLATFORM_COMPILE_DEFINITIONS _GNU_SOURCE)
 endif ()
@@ -169,7 +154,7 @@ endif ()
 #-----------------------------------------------------------------------------
 #  Library checks
 #-----------------------------------------------------------------------------
-if (MINGW OR NOT WINDOWS)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   CHECK_LIBRARY_EXISTS_CONCAT ("m" ceil     ${HDF_PREFIX}_HAVE_LIBM)
   CHECK_LIBRARY_EXISTS_CONCAT ("dl" dlopen     ${HDF_PREFIX}_HAVE_LIBDL)
   CHECK_LIBRARY_EXISTS_CONCAT ("ws2_32" WSAStartup  ${HDF_PREFIX}_HAVE_LIBWS2_32)
@@ -279,8 +264,8 @@ endif ()
 #
 # https://docs.oracle.com/cd/E23824_01/html/821-1474/lfcompile-5.html
 
-# MinGW and Cygwin
-if (MINGW OR CYGWIN)
+# Cygwin
+if (CYGWIN)
   set (CMAKE_REQUIRED_DEFINITIONS
       "${CMAKE_REQUIRED_DEFINITIONS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
   )
@@ -346,15 +331,11 @@ HDF_CHECK_TYPE_SIZE (ssize_t      ${HDF_PREFIX}_SIZEOF_SSIZE_T)
 if (NOT ${HDF_PREFIX}_SIZEOF_SSIZE_T)
   set (${HDF_PREFIX}_SIZEOF_SSIZE_T 0)
 endif ()
-if (MINGW OR NOT WINDOWS)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   HDF_CHECK_TYPE_SIZE (ptrdiff_t    ${HDF_PREFIX}_SIZEOF_PTRDIFF_T)
 endif ()
 
-if (NOT MINGW)
-  HDF_CHECK_TYPE_SIZE (off_t        ${HDF_PREFIX}_SIZEOF_OFF_T)
-else ()
-  set (${HDF_PREFIX}_SIZEOF_OFF_T   4)
-endif ()
+HDF_CHECK_TYPE_SIZE (off_t        ${HDF_PREFIX}_SIZEOF_OFF_T)
 HDF_CHECK_TYPE_SIZE (time_t         ${HDF_PREFIX}_SIZEOF_TIME_T)
 
 #-----------------------------------------------------------------------------
@@ -365,7 +346,7 @@ HDF_CHECK_TYPE_SIZE (time_t         ${HDF_PREFIX}_SIZEOF_TIME_T)
 set (CMAKE_EXTRA_INCLUDE_FILES stdbool.h)
 HDF_CHECK_TYPE_SIZE (_Bool        ${HDF_PREFIX}_SIZEOF_BOOL)
 
-if (MINGW OR NOT WINDOWS)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # ----------------------------------------------------------------------
   # Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
   # to be done after any POSIX/BSD defines to ensure that the test gets
@@ -390,7 +371,7 @@ if (MINGW OR NOT WINDOWS)
   )
     HDF_FUNCTION_TEST (${time_test})
   endforeach ()
-  if (NOT CYGWIN AND NOT MINGW)
+  if (NOT CYGWIN)
       HDF_FUNCTION_TEST (HAVE_TIMEZONE)
   endif ()
 
@@ -418,12 +399,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # Check for some functions that are used
 #
-if (NOT MINGW)
-  # alarm(2) support is spotty in MinGW, so assume it doesn't exist
-  #
-  # https://lists.gnu.org/archive/html/bug-gnulib/2013-03/msg00040.html
-  CHECK_FUNCTION_EXISTS (alarm             ${HDF_PREFIX}_HAVE_ALARM)
-endif ()
+CHECK_FUNCTION_EXISTS (alarm             ${HDF_PREFIX}_HAVE_ALARM)
 CHECK_FUNCTION_EXISTS (fcntl             ${HDF_PREFIX}_HAVE_FCNTL)
 CHECK_FUNCTION_EXISTS (flock             ${HDF_PREFIX}_HAVE_FLOCK)
 CHECK_FUNCTION_EXISTS (fork              ${HDF_PREFIX}_HAVE_FORK)
@@ -591,7 +567,7 @@ endif ()
 # ----------------------------------------------------------------------
 
 # Find the library containing clock_gettime()
-if (MINGW OR NOT WINDOWS)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   CHECK_FUNCTION_EXISTS (clock_gettime CLOCK_GETTIME_IN_LIBC)
   CHECK_LIBRARY_EXISTS (rt clock_gettime "" CLOCK_GETTIME_IN_LIBRT)
   CHECK_LIBRARY_EXISTS (posix4 clock_gettime "" CLOCK_GETTIME_IN_LIBPOSIX4)

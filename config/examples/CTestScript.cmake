@@ -81,7 +81,7 @@ set (NEED_REPOSITORY_CHECKOUT 0)
 set (CTEST_CMAKE_COMMAND "\"${CMAKE_COMMAND}\"")
 if (CTEST_USE_TAR_SOURCE)
   ## --------------------------
-  if (WIN32 AND NOT MINGW)
+  if (WIN32)
     message (STATUS "extracting... [${CMAKE_EXECUTABLE_NAME} -E tar -xvf ${CTEST_DASHBOARD_ROOT}\\${CTEST_USE_TAR_SOURCE}.zip]")
     execute_process (COMMAND ${CMAKE_EXECUTABLE_NAME} -E tar -xvf ${CTEST_DASHBOARD_ROOT}\\${CTEST_USE_TAR_SOURCE}.zip RESULT_VARIABLE rv)
   else ()

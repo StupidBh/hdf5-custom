@@ -834,7 +834,7 @@ if ("H5TEST-del_many_dense_attrs" MATCHES "${HDF5_DISABLE_TESTS_REGEX}")
 endif ()
 
 #-- Adding test for err_compat
-if (HDF5_ENABLE_DEPRECATED_SYMBOLS AND NOT MINGW)
+if (HDF5_ENABLE_DEPRECATED_SYMBOLS)
   add_test (NAME H5TEST-err_compat COMMAND "${CMAKE_COMMAND}"
       -D "TEST_PROGRAM=$<TARGET_FILE:err_compat>"
       -D "TEST_ARGS:STRING="
@@ -872,7 +872,7 @@ if ("H5TEST-err_compat" MATCHES "${HDF5_DISABLE_TESTS_REGEX}")
 endif ()
 
 #-- Adding test for error_test
-if (HDF5_DEFAULT_API_VERSION MATCHES "v16" OR MINGW)
+if (HDF5_DEFAULT_API_VERSION MATCHES "v16")
   add_test (NAME H5TEST-error_test COMMAND "${CMAKE_COMMAND}"
       -D "TEST_PROGRAM=$<TARGET_FILE:error_test>"
       -D "TEST_ARGS:STRING="

@@ -430,28 +430,12 @@ foreach (external_vol_tgt ${HDF5_EXTERNAL_VOL_TARGETS})
 endforeach () # per-VOL loop
 add_custom_target (h5diff_vol_files ALL COMMENT "Copying files needed by h5diff VOL tests" DEPENDS ${h5diff_vol_files_list})
 
-#
-# Overwrite system dependent files (Windows) and not VS2015
-#
-set (COPY_WINDOWS_FILES false)
-if (WIN32 AND MSVC_VERSION LESS 1900)
-  set (COPY_WINDOWS_FILES true)
-endif ()
-if (COPY_WINDOWS_FILES)
-  foreach (h5_tstfiles ${LIST_WIN_TEST_FILES})
-    HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}w.txt" "${PROJECT_BINARY_DIR}/testfiles/${h5_tstfiles}.txt" "h5diff_files")
-    if (H5_HAVE_PARALLEL)
-      HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}w.txt" "${PROJECT_BINARY_DIR}/PAR/testfiles/${h5_tstfiles}.txt" "h5diff_files")
-    endif ()
-  endforeach ()
-else ()
-  foreach (h5_tstfiles ${LIST_WIN_TEST_FILES})
-    HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}.txt" "${PROJECT_BINARY_DIR}/testfiles/${h5_tstfiles}.txt" "h5diff_files")
-    if (H5_HAVE_PARALLEL)
-      HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}.txt" "${PROJECT_BINARY_DIR}/PAR/testfiles/${h5_tstfiles}.txt" "h5diff_files")
-    endif ()
-  endforeach ()
-endif ()
+foreach (h5_tstfiles ${LIST_WIN_TEST_FILES})
+  HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}.txt" "${PROJECT_BINARY_DIR}/testfiles/${h5_tstfiles}.txt" "h5diff_files")
+  if (H5_HAVE_PARALLEL)
+    HDFTEST_COPY_FILE ("${HDF5_TOOLS_TST_DIR}/h5diff/expected/${h5_tstfiles}.txt" "${PROJECT_BINARY_DIR}/PAR/testfiles/${h5_tstfiles}.txt" "h5diff_files")
+  endif ()
+endforeach ()
 add_custom_target (h5diff_files ALL COMMENT "Copying files needed by h5diff tests" DEPENDS ${h5diff_files_list})
 
 ##############################################################################

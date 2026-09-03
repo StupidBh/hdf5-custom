@@ -128,11 +128,6 @@ macro (IDE_GENERATED_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   string (REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH})
   source_group (${source_group_path} FILES ${HEADERS} ${SOURCES})
 
-  #-- The following is needed if we ever start to use OS X Frameworks but only
-  #--  works on CMake 2.6 and greater
-  #set_property (SOURCE ${HEADERS}
-  #       PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
-  #)
 endmacro ()
 
 #-------------------------------------------------------------------------------
@@ -146,11 +141,6 @@ macro (IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   string (REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
   source_group (${source_group_path} FILES ${HEADERS} ${SOURCES})
 
-  #-- The following is needed if we ever start to use OS X Frameworks but only
-  #--  works on CMake 2.6 and greater
-  #set_property (SOURCE ${HEADERS}
-  #       PROPERTY MACOSX_PACKAGE_LOCATION Headers/${NAME}
-  #)
 endmacro ()
 
 #-------------------------------------------------------------------------------
@@ -325,6 +315,8 @@ macro (HDF_README_PROPERTIES)
         set (BINARY_PLATFORM "${BINARY_PLATFORM}, using VISUAL STUDIO 2022")
       elseif (${CMAKE_C_COMPILER_VERSION} MATCHES "^19.4.*")
         set (BINARY_PLATFORM "${BINARY_PLATFORM}, using VISUAL STUDIO 2022")
+      elseif (${CMAKE_C_COMPILER_VERSION} MATCHES "^19.5.*")
+        set (BINARY_PLATFORM "${BINARY_PLATFORM}, using VISUAL STUDIO 2026")
       else ()
         set (BINARY_PLATFORM "${BINARY_PLATFORM}, using VISUAL STUDIO ????")
       endif ()

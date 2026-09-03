@@ -63,7 +63,6 @@ Several files in the [docs/][u4] directory provide platform-specific details:
 | [INSTALL_CMake.md](docs/INSTALL_CMake.md) | Building with CMake |
 | [README_HPC.md](docs/README_HPC.md) | Building and configuring Parallel HDF5 on HPC systems |
 | [INSTALL_Windows.md](docs/INSTALL_Windows.md) | Windows installation |
-| [INSTALL_Cygwin.md](docs/INSTALL_Cygwin.md) | Cygwin installation |
 | [USING_HDF5_CMake.md](docs/USING_HDF5_CMake.md) | Building HDF5 applications with CMake |
 | [USING_CMake_Examples.md](docs/USING_CMake_Examples.md) | Building and testing HDF5 examples with CMake |
 

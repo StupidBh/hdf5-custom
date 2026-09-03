@@ -4,9 +4,9 @@
 >
 > More information about using CMake can be found at the Kitware site, [www.cmake.org](https://www.cmake.org).
 >
-> CMake uses the command line; however, the visual CMake tool is available for the configuration step. The steps are similar for all of the operating systems supported by CMake.
+> CMake uses the command line; however, the visual CMake tool is available for the configuration step.
 >
-> 1. CMake for HDF5 development should be usable on any system where CMake is supported. Please send us any comments on how CMake support can be improved on any system.
+> 1. HDF5 source builds support Windows x64 with MSVC and Linux x86_64 with GCC. A downstream application may use another toolchain only when it is ABI-compatible with the installed HDF5 package.
 > 2. See the appendix at the bottom of this file for an example of using a `ctest` script for building and testing. See [INSTALL_CMake.md](./INSTALL_CMake.md) for more information.
 > 3. See the [CMake Config Mode Search Procedure](https://cmake.org/cmake/help/latest/command/find_package.html) for more information on finding packages.
 
@@ -78,7 +78,7 @@ Go through these steps to build HDF5 applications with CMake. *(The application 
 These steps are described in more detail below.
 
 ### 1. Run CMake
-The visual CMake executable is named `cmake-gui.exe` on Windows and should be available in your Start menu. For Linux, UNIX, and Mac users the executable is named `cmake-gui` and can be found where CMake was installed.
+The visual CMake executable is named `cmake-gui.exe` on Windows and should be available in your Start menu. On Linux, the executable is named `cmake-gui`.
 
 Specify the source and build directories. **Make the build and source directories different.** For example on Windows, if the source is at `c:\MyHDFstuff\hdf5`, then use `c:\MyHDFstuff\hdf5\build` or `c:\MyHDFstuff\build\hdf5` for the build directory.
 
@@ -89,14 +89,10 @@ Users can perform the configuration step without using the visual `cmake-gui` pr
 cmake -G "<generator>" [-D<options>] <sourcepath>
 ```
 
-Where `<generator>` is (examples):
-* `MinGW Makefiles`
-* `NMake Makefiles`
-* `Unix Makefiles`
-* `Visual Studio 15 2017`
-* `Visual Studio 15 2017 Win64`
-* `Visual Studio 16 2019` *(in addition VS2019 will need to set the `-A` option, [Win32, x64, ARM, ARM64])*
-* `Visual Studio 17 2022` *(in addition VS2022 will need to set the `-A` option, [Win32, x64, ARM, ARM64])*
+For the supported source-build environments, use `Visual Studio 18 2026`
+with `-A x64` on Windows, or `Ninja` or `Unix Makefiles` on Linux.
+For an independent downstream application, select a generator and compiler
+that are compatible with the installed HDF5 binaries.
 
 `<options>` can include:
 * `BUILD_TESTING:BOOL=ON`
@@ -104,7 +100,7 @@ Where `<generator>` is (examples):
 
 ### 2. Configure the cache settings
 
-**2.1 Visual CMake users** Click the Configure button. If this is the first time you are running `cmake-gui` in this directory, you will be prompted for the generator you wish to use (for example on Windows, Visual Studio 16 2019). CMake will read in the `CMakeLists.txt` files from the source directory and display options for the HDF5 project. After the first configure you can adjust the cache settings and/or specify locations of other programs.
+**2.1 Visual CMake users** Click the Configure button. On Windows, select Visual Studio 18 2026 and x64. CMake will read the `CMakeLists.txt` files from the source directory and display options for the application. After the first configure you can adjust the cache settings and/or specify locations of other programs.
 
 Any conflicts or new values will be highlighted by the configure process in red. Once you are happy with all the settings and there are no more values in red, click the Generate button to produce the appropriate build files.
 
@@ -113,11 +109,11 @@ Any conflicts or new values will be highlighted by the configure process in red.
 
 **2.2 Alternative command line example** On Windows in the `c:\MyHDFstuff\hdf5\build` directory:
 ```cmd
-cmake -G "Visual Studio 16 2019" -A "x64" -DBUILD_TESTING:BOOL=ON ..
+cmake -G "Visual Studio 18 2026" -A x64 -DBUILD_TESTING:BOOL=ON ..
 ```
 
 ### 3. Build HDF5 Applications
-On Windows, you can build HDF5 applications using either the Visual Studio Environment or the command line. The command line is normally used on Linux, Unix, and Mac.
+On Windows, you can build HDF5 applications using either the Visual Studio environment or the command line. The command line is normally used on Linux.
 
 To build from the command line, navigate to your build directory and execute the following:
 ```bash

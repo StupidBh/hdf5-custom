@@ -98,10 +98,9 @@ These options control how HDF5 gets installed. Options dealing with paths are ge
 | `HDF5_INSTALL_CMAKE_DIR` | `STRING` | `cmake` (`HDF5_USE_GNU_DIRS=OFF`) <br /> `HDF5_INSTALL_LIB_DIR/cmake/hdf5` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install CMake files in. |
 | `HDF5_INSTALL_DATA_DIR` | `STRING` | `.` (for `MSVC` and `HDF5_USE_GNU_DIRS=OFF`) <br /> `share` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install miscellaneous data files in. |
 | `HDF5_INSTALL_DOC_DIR` | `STRING` | `HDF5_INSTALL_DATA_DIR` (`HDF5_USE_GNU_DIRS=OFF`) <br /> `HDF5_INSTALL_DATA_DIR/doc/hdf5` (`HDF5_USE_GNU_DIRS=ON`) | Specifies the directory to install documentation files in. |
-| `HDF5_BUILD_WITH_INSTALL_NAME` | `BOOL` | `OFF` | **MacOS only** If `ON`, builds shared library CMake targets with the "install_name" field set to the installation path. See the related CMake property [INSTALL_NAME_DIR](https://cmake.org/cmake/help/latest/prop_tgt/INSTALL_NAME_DIR.html#prop_tgt:INSTALL_NAME_DIR). |
 | `HDF5_DISABLE_PDB_FILES` | `BOOL` | `OFF` | **Windows only** If `ON`, do not install PDB files. |
 
-> **NOTE:** The `HDF5_USE_GNU_DIRS` option is usually recommended for Linux platforms, but may be useful on other platforms. See the CMake documentation for more details.
+> **NOTE:** The `HDF5_USE_GNU_DIRS` option is usually recommended on Linux, but may also be useful on Windows. See the CMake documentation for more details.
 
 ### Packaging options
 
@@ -113,9 +112,6 @@ These options control how platform-specific binary installers and source package
 | `HDF5_NO_PACKAGES` | `BOOL` | `OFF` | If `ON`, disables CPack support and the ability to create HDF5 packages. |
 | `HDF5_PACKAGE_EXTLIBS` | `BOOL` | `OFF` | If `ON`, HDF5 packages created with CPack will include any external libraries that were built alongside HDF5, such as zlib. **NOTE:** Be aware that this could overwrite system libraries if these packages are installed to a system-wide location. |
 | `HDF5_PACK_EXAMPLES` | `BOOL` | `OFF` | If `ON`, HDF5 packages created with CPack will include the HDF5 example programs. |
-| `HDF5_BUILD_FRAMEWORKS` | `BOOL` | `OFF` | If `ON`, builds HDF5 as a framework bundle when built on MacOS. |
-| `HDF5_PACK_MACOSX_DMG` | `BOOL` | `ON` | If `ON`, CPack will create a .dmg image package for HDF5 when built on MacOS. |
-| `HDF5_PACK_MACOSX_FRAMEWORK` | `BOOL` | `OFF` | If `ON`, CPack will create a framework bundle for HDF5 when built on MacOS. |
 | `HDF_PACKAGE_NAMESPACE` | `STRING` | `hdf5::` | Specifies a string to use for namespacing CMake targets created by HDF5. |
 | `HDF_PACKAGE_EXT` | `STRING` | `""` (empty string) | Specifies a suffix to add to the names of several files included in HDF5 packages created. |
 
@@ -283,7 +279,6 @@ These are options which can be set for controlling how the HDF5 example programs
 | `H5EXAMPLE_USE_16_API` | `BOOL` | `OFF` | If `ON`, compile the HDF5 library examples programs using the HDF5 1.6 API. |
 | `H5EXAMPLE_USE_GNU_DIRS` | `BOOL` | Varies by platform | If `ON`, uses the GNU Coding Standard CMake install directory variables when setting up for installing the HDF5 library example programs. See [GNUInstallDirs](https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html) for more information. |
 | `H5EXAMPLE_DISABLE_COMPILER_WARNINGS` | `BOOL` | `OFF` | If `ON`, disables most or all compiler warnings when building the HDF5 library example programs. |
-| `H5EXAMPLE_BUILD_FRAMEWORKS` | `BOOL` | `OFF` | If `ON`, the HDF5 library example programs will be built as a framework bundle when built on MacOS. |
 
 ### Filter plugin examples options
 
@@ -377,11 +372,11 @@ These options enable sanitizers, code coverage and code formatting tools
 
 | CMake option | Type | Default | Description |
 |:-------------|:-----|:--------|:------------|
-| `HDF5_ENABLE_SANITIZERS` | `BOOL` | `OFF` | If `ON`, enables the option to build HDF5 with several different sanitizers, depending on the compiler. |
-| `HDF5_USE_SANITIZER` | `STRING` | `""` (empty string) | Specifies which sanitizer(s) to use when building HDF5. Valid values vary depending on the compiler; see the sanitizers [README.md](../config/sanitizer/README.md) for information on how to set this option. |
+| `HDF5_ENABLE_SANITIZERS` | `BOOL` | `OFF` | If `ON`, enables supported sanitizer instrumentation. The retained implementation supports AddressSanitizer with MSVC. |
+| `HDF5_USE_SANITIZER` | `STRING` | `""` (empty string) | Set to `Address` to use AddressSanitizer with MSVC. See the sanitizers [README.md](../config/sanitizer/README.md). |
 | `HDF5_ENABLE_USING_MEMCHECKER` | `BOOL` | `OFF` | If `ON`, indicates that a memory checker such as Valgrind will be used when testing HDF5. This fixes up some code and testing to prevent false positives and other issues. |
 | `HDF5_ENABLE_ANALYZER_TOOLS` | `BOOL` | `OFF` | If `ON`, enables the use of some Clang tools, such as `clang-tidy` and `include-what-you-use`. See [README.md](../config/sanitizer/README.md) for information on how to use these tools. |
-| `HDF5_ENABLE_COVERAGE` / `CODE_COVERAGE` | `BOOL` | `OFF` | If `ON`, enables the use of code coverage tools. See [README.md](../config/sanitizer/README.md) for information on how to use these tools. Both options should be simultaneously enabled/disabled. |
+| `HDF5_ENABLE_COVERAGE` / `CODE_COVERAGE` | `BOOL` | `OFF` | If `ON`, enables GCC coverage instrumentation and lcov report targets on Linux. See [README.md](../config/sanitizer/README.md). Both options should be simultaneously enabled or disabled. |
 | `HDF5_ENABLE_FORMATTERS` | `BOOL` | `OFF` | If `ON`, enables code formatting with `clang-format`. |
 
 ## Deprecated options

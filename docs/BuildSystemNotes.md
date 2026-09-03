@@ -33,7 +33,7 @@ or static libraries, and optional features. Typical workflows are:
 
 ```bash
 cmake --workflow --preset ci-StdShar-GNUC --fresh
-cmake --workflow --preset ci-StdShar-Clang --fresh
+cmake --workflow --preset ci-StdShar-GNUC-S3 --fresh
 cmake --workflow --preset ci-StdShar-MSVC --fresh
 ```
 
@@ -44,9 +44,10 @@ directories under `install/<presetName>`.
 
 CTest covers the core C library, C++ wrapper, high-level library, tools,
 examples, VFDs, VOL connectors, and parallel MPI configurations. GitHub
-Actions exercise Windows with MSVC, Linux with GCC or Clang, macOS with Clang,
-alternative environments, static analysis, release packaging, and selected
-third-party integrations.
+Actions project-build jobs exercise Windows x64 with MSVC and Linux x86_64
+with GCC. Separate workflows perform formatting, static analysis, release
+packaging, and selected third-party integrations without expanding the
+supported source-build matrix.
 
 Use targeted CTest expressions while developing and a full preset workflow
 before release:

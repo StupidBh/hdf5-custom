@@ -61,7 +61,7 @@ The table below shows the equivalent CMake build options that match those from A
 | doxygen[Compile the HDF5 doxygen files [default=no]] | HDF5_BUILD_DOC "Build documentation" [OFF] |  |
 | doxygen-errors[Error on HDF5 doxygen warnings [default=no]] | HDF5_ENABLE_DOXY_WARNINGS "Enable fail if doxygen parsing has warnings." [OFF] |  |
 | **Autotools Dev Options** | **CMake Dev Options** | **Notes** |
-| sanitize-checks[default=none] | HDF5_USE_SANITIZER ["Compile with a sanitizer. Options are: Address, Memory, MemoryWithOrigins, Undefined, Thread, Leak, 'Address;Undefined', CFI"] | Requires HDF5_ENABLE_SANITIZERS "execute the Clang sanitizer" [OFF] |
+| sanitize-checks[default=none] | HDF5_USE_SANITIZER ["Compile with AddressSanitizer on MSVC"] | Requires HDF5_ENABLE_SANITIZERS [OFF] |
 | asserts[Determines whether NDEBUG is defined or not, which controls assertions. [default=yes if debug build, otherwise no]] | HDF5_ENABLE_ASSERTS "Determines whether NDEBUG is defined to control assertions." [OFF] |  |
 | developer-warnings[Determines whether developer warnings will be emitted. [default=no]] | HDF5_ENABLE_DEV_WARNINGS "Enable HDF5 developer group warnings" [OFF |  |
 | show-all-warnings[Enable showing all compiler warnings (for developer debugging). [default=no]] | HDF5_SHOW_ALL_WARNINGS "Show all warnings (i.e. not suppress "noisy" ones internally)" [OFF] |  |

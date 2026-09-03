@@ -85,7 +85,7 @@ $ cd <source-folder>
 # Execute the workflow
 $ cmake --workflow --preset ci-StdShar-<compiler-type> --fresh
 ```
-> **Note:** `<compiler-type>` should be replaced with `GNUC`, `MSVC`, or `Clang`.
+> **Note:** `<compiler-type>` should be replaced with `GNUC` on Linux or `MSVC` on Windows.
 
 The above example will create a `build` folder in the source parent directory, which will contain the results of the build, including installation package files when the library is built.
 

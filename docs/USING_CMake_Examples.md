@@ -56,7 +56,7 @@
 <a id="using-presets"></a>
 ### 1. Using presets
 
-> **NOTE:** The `CMakePresets.json` files created by HDF Group are intended to be used with the Ninja build system, which may need to be installed separately on some platforms.
+> **NOTE:** The supplied presets use Visual Studio 18 2026 on Windows and Ninja on Linux.
 
 Files in the `HDF5 install/HDF5Examples` directory:
 * `CMakePresets.json`
@@ -71,12 +71,11 @@ Create a directory to run the examples, i.e., `\test_hdf5`. Copy the `HDF5Exampl
   cmake -S <path-to-source> --list-presets
   ```
 
-* Using individual command presets (where `<compiler-type>` is `GNUC` or `MSVC` or `Clang`):
+* Using individual command presets (where `<compiler-type>` is `GNUC` on Linux or `MSVC` on Windows):
   ```bash
   cmake --preset ci-StdShar-<compiler-type>
   cmake --build --preset ci-StdShar-<compiler-type>
   ctest --preset ci-StdShar-<compiler-type>
-  cpack --preset ci-StdShar-<compiler-type>
   ```
 
 * Using the workflow preset to configure, build, and test the standard configuration:
@@ -100,9 +99,7 @@ Default build process:
 Configuration Details:
 * The default source folder is defined as `HDF5Examples`. It can be changed with the `CTEST_SOURCE_NAME` script option.
 * The default installation folder is defined for the platform. It can be changed with the `INSTALLDIR` script option. *(Note: Windows has issues with spaces and paths - The path will need to be set correctly.)*
-* The default ctest configuration is defined as `Release`. It can be changed with the `CTEST_CONFIGURATION_TYPE` script option (must be the same as the value used with the `-C` command line option).
-  * On Windows, you can set the `CTEST_VSVERS` script option to either `64_VS2022` or `64_VS2019`.
-  * Alternately, set `CTEST_CMAKE_GENERATOR` option to `"Visual Studio 16 2019"` or `"Visual Studio 17 2022"`, and `CMAKE_GENERATOR_ARCHITECTURE` to `"x64"`.
+* The default ctest configuration is `Release`. It can be changed with the `CTEST_CONFIGURATION_TYPE` script option (which must match the `-C` command line value). The installed script retains the generator and architecture used to build the HDF5 package.
 * The default build configuration is defined to build and use **static libraries**. Shared libraries and other options can be changed by editing the `HDF5_Examples_options.cmake` file.
 
 Execution:
@@ -122,10 +119,10 @@ When executed, the `ctest` script will save the results to the log file `test.lo
 
 #### A. Visual Configuration
 
-The visual CMake executable is named `cmake-gui.exe` on Windows and should be available in your Start menu. For Linux, UNIX, and Mac users the executable is named `cmake-gui` or the ncurses-based `ccmake` and can be found where CMake was installed.
+The visual CMake executable is named `cmake-gui.exe` on Windows and should be available in your Start menu. On Linux, use `cmake-gui` or the ncurses-based `ccmake`.
 
 1. Specify the source and build directories. **Make the build and source directories different.** For example on Windows, if the source is at `C:\MyHDFstuff\hdf5ex`, then use `C:\MyHDFstuff\hdf5ex\build`.
-2. Click the **Configure** button. Prompted for the generator (e.g., Visual Studio 15), CMake will read the `CMakeLists.txt` files and display options.
+2. Click the **Configure** button. Select Visual Studio 18 2026 with x64 on Windows, or Ninja or Unix Makefiles on Linux.
 3. Adjust cache settings as needed (conflicts are highlighted in red).
 4. Click the **Generate** button to produce the appropriate build files.
    * On Windows, solution/project files are created.
@@ -139,14 +136,8 @@ Users can perform the configuration step without using the visual program. Execu
 cmake -G "<generator>" [-D<options>] <sourcepath>
 ```
 
-Where `<generator>` is (examples):
-* `MSYS Makefiles`
-* `MinGW Makefiles`
-* `NMake Makefiles`
-* `Unix Makefiles`
-* `Visual Studio 15 2017`
-* `Visual Studio 16 2019` *(add `-A` option for [Win32, x64, ARM, ARM64])*
-* `Visual Studio 17 2022` *(add `-A` option for [Win32, x64, ARM, ARM64])*
+Where `<generator>` is `Visual Studio 18 2026` with `-A x64` on Windows,
+or `Ninja` or `Unix Makefiles` on Linux.
 
 Where `<options>` is:
 * `H5EXAMPLE_BUILD_TESTING:BOOL=ON`
@@ -157,7 +148,7 @@ If the hdf5 library was built with a namespace (i.e., `hdf5::`), add:
 
 Example command line on Windows in `c:\MyHDFstuff\hdf5ex\build`:
 ```cmd
-cmake -G "Visual Studio 16 2019" -DH5EXAMPLE_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON ..
+cmake -G "Visual Studio 18 2026" -A x64 -DH5EXAMPLE_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON ..
 ```
 
 #### C. Build HDF5 examples
@@ -185,14 +176,13 @@ The files that support building with CMake are all of the files in the `config/c
 <a id="section-iii"></a>
 ## III. Defaults in the CMakePresets.json file
 
-```json
-"generator": "Ninja"
+```text
+"generator": "Visual Studio 18 2026" (Windows) or "Ninja" (Linux)
 "binaryDir": "${sourceParentDir}/build/${presetName}"
 "name": "ci-StdShar"
 "BUILD_SHARED_LIBS": "ON"
 "USE_SHARED_LIBS": "ON"
 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-"H5EXAMPLE_BUILD_CXX": "ON"
 "HDF5_NAMESPACE": {"type": "STRING", "value": "hdf5::"}
 "HDF5_PACKAGE_NAME": {"type": "STRING", "value": "hdf5"}
 "H5EXAMPLE_BUILD_TESTING": "ON"
@@ -203,7 +193,7 @@ The files that support building with CMake are all of the files in the `config/c
 <a id="section-iv"></a>
 ## IV. Defaults in the HDF5_Examples_options.cmake file
 
-```cmake
+```text
 BUILD_SHARED_LIBS:BOOL=OFF
 H5EXAMPLE_BUILD_C:BOOL=ON
 H5EXAMPLE_BUILD_HL:BOOL=OFF

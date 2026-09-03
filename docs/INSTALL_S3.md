@@ -36,11 +36,6 @@ HDF5 installs this library in the following ways in CI testing.
   ```
   *(Make sure to set `CMAKE_TOOLCHAIN_FILE` to point to `vcpkg.cmake` when configuring HDF5)*
 
-* **MacOS:**
-  ```bash
-  brew install aws-c-s3
-  ```
-
 ---
 
 <a id="section-iii"></a>
@@ -57,7 +52,7 @@ If you are unable to obtain the `aws-c-s3` library from a package manager or oth
 git clone https://github.com/aws/aws-lc.git
 git clone https://github.com/aws/s2n-tls.git
 
-# All platforms:
+# Windows and Linux:
 git clone https://github.com/awslabs/aws-c-common.git
 git clone https://github.com/awslabs/aws-checksums.git
 git clone https://github.com/awslabs/aws-c-cal.git

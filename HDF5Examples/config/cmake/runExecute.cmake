@@ -73,8 +73,6 @@ endif ()
 if (TEST_LIBRARY_DIRECTORY) # Directory to add to PATH
   if (WIN32)
     set (ENV{PATH} "$ENV{PATH};${TEST_LIBRARY_DIRECTORY}")
-  elseif (APPLE)
-    set (ENV{DYLD_LIBRARY_PATH} "$ENV{DYLD_LIBRARY_PATH}:${TEST_LIBRARY_DIRECTORY}")
   else ()
     set (ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${TEST_LIBRARY_DIRECTORY}")
   endif ()

@@ -22,7 +22,7 @@
 #
 # Main sections:
 #   - Include CMake check modules
-#   - Platform and compiler detection (Windows, Darwin, Linux, etc.)
+#   - Platform and compiler detection for Windows and Linux
 #   - Header/library/function/type checks
 #   - Platform-specific flags and definitions
 #   - Type size checks for C99 and system types
@@ -46,11 +46,6 @@ include (CheckStructHasMember)
 include (CMakePushCheckState)
 
 set (HDF_PREFIX "H5")
-
-# Check for Darwin (not just Apple - we also want to catch OpenDarwin)
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set (${HDF_PREFIX}_HAVE_DARWIN 1)
-endif ()
 
 #-----------------------------------------------------------------------------
 # This MACRO checks IF the symbol exists in the library and IF it
@@ -277,9 +272,7 @@ HDF_CHECK_TYPE_SIZE (char           ${HDF_PREFIX}_SIZEOF_CHAR)
 HDF_CHECK_TYPE_SIZE (short          ${HDF_PREFIX}_SIZEOF_SHORT)
 HDF_CHECK_TYPE_SIZE (int            ${HDF_PREFIX}_SIZEOF_INT)
 HDF_CHECK_TYPE_SIZE (unsigned       ${HDF_PREFIX}_SIZEOF_UNSIGNED)
-if (NOT APPLE)
-  HDF_CHECK_TYPE_SIZE (long         ${HDF_PREFIX}_SIZEOF_LONG)
-endif ()
+HDF_CHECK_TYPE_SIZE (long         ${HDF_PREFIX}_SIZEOF_LONG)
 HDF_CHECK_TYPE_SIZE ("long long"    ${HDF_PREFIX}_SIZEOF_LONG_LONG)
 
 HDF_CHECK_TYPE_SIZE (float          ${HDF_PREFIX}_SIZEOF_FLOAT)

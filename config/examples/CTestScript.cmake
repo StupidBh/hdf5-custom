@@ -64,19 +64,6 @@ else ()
 endif ()
 
 #-----------------------------------------------------------------------------
-# MacOS machines need special options
-#-----------------------------------------------------------------------------
-if (APPLE)
-  # Compiler choice
-  execute_process (COMMAND xcrun --find cc OUTPUT_VARIABLE XCODE_CC OUTPUT_STRIP_TRAILING_WHITESPACE)
-  execute_process (COMMAND xcrun --find c++ OUTPUT_VARIABLE XCODE_CXX OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set (ENV{CC} "${XCODE_CC}")
-  set (ENV{CXX} "${XCODE_CXX}")
-
-  set (BUILD_OPTIONS "${BUILD_OPTIONS} -DCTEST_USE_LAUNCHERS:BOOL=ON")
-endif ()
-
-#-----------------------------------------------------------------------------
 set (NEED_REPOSITORY_CHECKOUT 0)
 set (CTEST_CMAKE_COMMAND "\"${CMAKE_COMMAND}\"")
 if (CTEST_USE_TAR_SOURCE)

@@ -37,11 +37,6 @@ if (NOT DEFINED H5PL_ALLOW_EXTERNAL_SUPPORT)
   set (H5PL_ALLOW_EXTERNAL_SUPPORT "${HDF5_ALLOW_EXTERNAL_SUPPORT}" CACHE STRING "If not set to NO, specifies where to obtain sources when building or using external libraries (NO GIT TGZ)" FORCE)
 endif ()
 
-# On Windows with Intel compilers, disable ZFP plugin (not supported)
-if (WIN32 AND (CMAKE_C_COMPILER_ID MATCHES "Intel[Ll][Ll][Vv][Mm]" OR CMAKE_C_COMPILER_ID MATCHES "Intel"))
-  set (ENABLE_ZFP OFF CACHE BOOL "" FORCE)
-endif ()
-
 # Set path for plugin TGZ file if not already defined
 if (NOT DEFINED H5PL_TGZPATH)
   set (H5PL_TGZPATH "${TGZPATH}" CACHE PATH "PATH for finding plugin tgz file" FORCE)

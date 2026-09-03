@@ -497,8 +497,8 @@ endif ()
 #-----------------------------------------------------------------------------
 if (BUILD_STATIC_EXECS)
   if (NOT WIN32)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+    list (APPEND HDF5_PLATFORM_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:C,CXX>:-static>")
+    list (APPEND HDF5_PLATFORM_EXECUTABLE_LINK_OPTIONS "$<$<LINK_LANGUAGE:C,CXX>:-static>")
   endif ()
 endif ()
 

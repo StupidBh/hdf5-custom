@@ -28,6 +28,11 @@ refactoring and update it after each coherent batch. Keep it aligned with the di
 document, currently `docs/CMakeModernizationProgress.md`, and never add absolute local paths, transient build
 directories, or machine-specific logs.
 
+Detailed plans for compatibility-changing refactoring directions live under `docs/refactoring/`. Create or
+update the relevant plan before implementation, keep its state and validation gates explicit, and link proposed
+or active directions from `REFACTORING_PROGRESS.md`. A written plan is not evidence that its implementation or
+deferred platform validation has completed.
+
 ## Build, Test, and Development Commands
 
 Use an out-of-source MSVC 18 build:

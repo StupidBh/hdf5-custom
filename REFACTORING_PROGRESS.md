@@ -15,6 +15,12 @@ The detailed implementation plan for the current direction is
 target architecture and compatibility contract are defined in
 [`docs/CMakeModernization.md`](docs/CMakeModernization.md).
 
+A proposed follow-on compatibility change would reduce the supported CMake
+matrix to Windows/MSVC and Linux/GCC. Its detailed plan is
+[`docs/refactoring/CMakePlatformSupportReduction.md`](docs/refactoring/CMakePlatformSupportReduction.md).
+It has not started and must not be treated as part of the behavior-preserving
+modernization until its support-contract phase is approved and committed.
+
 ## Active Direction
 
 - Direction: CMake 4 build-system modernization

@@ -104,9 +104,7 @@ add_custom_target (HDF5_VFDTEST_LIB_files ALL COMMENT "Copying files needed by H
       vol
   )
 
-  if (NOT CYGWIN)
-    list (REMOVE_ITEM H5_VFD_SKIP_TESTS big cache)
-  endif ()
+  list (REMOVE_ITEM H5_VFD_SKIP_TESTS big cache)
 
   # Windows only macro
   macro (CHECK_VFD_TEST vfdtest vfdname resultcode)
@@ -229,9 +227,7 @@ add_custom_target (HDF5_VFDTEST_LIB_files ALL COMMENT "Copying files needed by H
     if (NOT "istore" IN_LIST H5_VFD_${vfdname}_SKIP_TESTS)
       set_tests_properties (VFD-${vfdname}-istore PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
     endif ()
-    if (NOT CYGWIN)
-      set_tests_properties (VFD-${vfdname}-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
-    endif ()
+    set_tests_properties (VFD-${vfdname}-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
     if (HDF5_TEST_FHEAP_VFD)
       add_test (NAME VFD-${vfdname}-fheap
           COMMAND "${CMAKE_COMMAND}"

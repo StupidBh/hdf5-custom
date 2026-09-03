@@ -399,23 +399,17 @@ foreach (h5_test ${H5_TESTS})
           WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
       )
     else ()
-      if ("${h5_test}" STREQUAL "big" AND CYGWIN)
-        add_test (NAME H5TEST-${h5_test}
-            COMMAND ${CMAKE_COMMAND} -E echo "SKIP ${test}"
-        )
-      else ()
-        add_test (NAME H5TEST-${h5_test} COMMAND "${CMAKE_COMMAND}"
-            -D "TEST_PROGRAM=$<TARGET_FILE:${h5_test}>"
-            -D "TEST_ARGS:STRING="
-            -D "TEST_EXPECT=0"
-            -D "TEST_SKIP_COMPARE=TRUE"
-            -D "TEST_OUTPUT=${h5_test}.txt"
-            -D "TEST_LIBRARY_DIRECTORY=${CMAKE_TEST_OUTPUT_DIRECTORY}"
-            #-D "TEST_REFERENCE=${test}.out"
-            -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
-            -P "${HDF_RESOURCES_DIR}/runTest.cmake"
-        )
-      endif ()
+      add_test (NAME H5TEST-${h5_test} COMMAND "${CMAKE_COMMAND}"
+          -D "TEST_PROGRAM=$<TARGET_FILE:${h5_test}>"
+          -D "TEST_ARGS:STRING="
+          -D "TEST_EXPECT=0"
+          -D "TEST_SKIP_COMPARE=TRUE"
+          -D "TEST_OUTPUT=${h5_test}.txt"
+          -D "TEST_LIBRARY_DIRECTORY=${CMAKE_TEST_OUTPUT_DIRECTORY}"
+          #-D "TEST_REFERENCE=${test}.out"
+          -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
+          -P "${HDF_RESOURCES_DIR}/runTest.cmake"
+      )
       set_tests_properties (H5TEST-${h5_test} PROPERTIES
           FIXTURES_REQUIRED clear_H5TEST
           ENVIRONMENT "srcdir=${HDF5_TEST_BINARY_DIR}/H5TEST"
@@ -434,44 +428,42 @@ set_tests_properties (H5TESTXPR-btree2 PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIME
 
 
 #-- Adding test for cache
-if (NOT CYGWIN)
-  add_test (
-      NAME H5TEST-cache-clear-objects
-      COMMAND ${CMAKE_COMMAND} -E remove
-          cache_test.h5
-      WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
+add_test (
+    NAME H5TEST-cache-clear-objects
+    COMMAND ${CMAKE_COMMAND} -E remove
+        cache_test.h5
+    WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
+)
+set_tests_properties (H5TEST-cache-clear-objects PROPERTIES FIXTURES_SETUP clear_cache)
+add_test (
+    NAME H5TEST-cache-clean-objects
+    COMMAND ${CMAKE_COMMAND} -E remove
+        cache_test.h5
+    WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
+)
+set_tests_properties (H5TEST-cache-clean-objects PROPERTIES FIXTURES_CLEANUP clear_cache)
+if (HDF5_ENABLE_USING_MEMCHECKER)
+  add_test (NAME H5TEST-cache COMMAND $<TARGET_FILE:cache>)
+else ()
+  add_test (NAME H5TEST-cache COMMAND "${CMAKE_COMMAND}"
+      -D "TEST_PROGRAM=$<TARGET_FILE:cache>"
+      -D "TEST_ARGS:STRING="
+      -D "TEST_EXPECT=0"
+      -D "TEST_SKIP_COMPARE=TRUE"
+      -D "TEST_OUTPUT=cache.txt"
+      #-D "TEST_REFERENCE=cache.out"
+      -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
+      -P "${HDF_RESOURCES_DIR}/runTest.cmake"
   )
-  set_tests_properties (H5TEST-cache-clear-objects PROPERTIES FIXTURES_SETUP clear_cache)
-  add_test (
-      NAME H5TEST-cache-clean-objects
-      COMMAND ${CMAKE_COMMAND} -E remove
-          cache_test.h5
-      WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
-  )
-  set_tests_properties (H5TEST-cache-clean-objects PROPERTIES FIXTURES_CLEANUP clear_cache)
-  if (HDF5_ENABLE_USING_MEMCHECKER)
-    add_test (NAME H5TEST-cache COMMAND $<TARGET_FILE:cache>)
-  else ()
-    add_test (NAME H5TEST-cache COMMAND "${CMAKE_COMMAND}"
-        -D "TEST_PROGRAM=$<TARGET_FILE:cache>"
-        -D "TEST_ARGS:STRING="
-        -D "TEST_EXPECT=0"
-        -D "TEST_SKIP_COMPARE=TRUE"
-        -D "TEST_OUTPUT=cache.txt"
-        #-D "TEST_REFERENCE=cache.out"
-        -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
-        -P "${HDF_RESOURCES_DIR}/runTest.cmake"
-    )
-  endif ()
-  set_tests_properties (H5TEST-cache PROPERTIES
-      FIXTURES_REQUIRED clear_cache
-      ENVIRONMENT "srcdir=${HDF5_TEST_BINARY_DIR}/H5TEST"
-      WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
-  )
-  set_tests_properties (H5TEST-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
-  if ("H5TEST-cache" MATCHES "${HDF5_DISABLE_TESTS_REGEX}")
-    set_tests_properties (H5TEST-cache PROPERTIES DISABLED true)
-  endif ()
+endif ()
+set_tests_properties (H5TEST-cache PROPERTIES
+    FIXTURES_REQUIRED clear_cache
+    ENVIRONMENT "srcdir=${HDF5_TEST_BINARY_DIR}/H5TEST"
+    WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
+)
+set_tests_properties (H5TEST-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
+if ("H5TEST-cache" MATCHES "${HDF5_DISABLE_TESTS_REGEX}")
+  set_tests_properties (H5TEST-cache PROPERTIES DISABLED true)
 endif ()
 
 #-- Adding test for cache_image

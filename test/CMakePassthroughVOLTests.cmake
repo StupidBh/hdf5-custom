@@ -83,9 +83,7 @@ add_custom_target (HDF5_VOLTEST_LIB_files ALL COMMENT "Copying files needed by H
       external_env
       vds_env
   )
-  if (NOT CYGWIN)
-    list (REMOVE_ITEM H5_VOL_SKIP_TESTS big cache)
-  endif ()
+  list (REMOVE_ITEM H5_VOL_SKIP_TESTS big cache)
 
   # Windows only macro
   macro (CHECK_VOL_TEST voltest volname volinfo resultcode)
@@ -200,9 +198,7 @@ add_custom_target (HDF5_VOLTEST_LIB_files ALL COMMENT "Copying files needed by H
     set_tests_properties (VOL-${volname}-flush1 PROPERTIES TIMEOUT 10)
     set_tests_properties (VOL-${volname}-flush2 PROPERTIES TIMEOUT 10)
     set_tests_properties (VOL-${volname}-istore PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
-    if (NOT CYGWIN)
-      set_tests_properties (VOL-${volname}-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
-    endif ()
+    set_tests_properties (VOL-${volname}-cache PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
     if (HDF5_TEST_FHEAP_PASSTHROUGH_VOL)
       add_test (NAME VOL-${volname}-fheap
           COMMAND "${CMAKE_COMMAND}"
@@ -233,4 +229,3 @@ add_custom_target (HDF5_VOLTEST_LIB_files ALL COMMENT "Copying files needed by H
       ADD_VOL_TEST (${volname} "${volinfo}" 0)
     endforeach ()
   endforeach ()
-

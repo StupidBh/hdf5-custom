@@ -93,6 +93,12 @@ functionality.
 
 ## Library
 
+### Restored compilation of four error-cleanup paths
+
+   Restore missing statement terminators after `HDONE_ERROR` calls in event-set,
+   fixed-array, fractal-heap, and datatype cleanup paths. Their accidental removal
+   prevented the core C library from compiling.
+
 ### Fixed memory leaks and ID reference count issues when pushing an error to an error stack that is full
 
    When an error is pushed to an error stack, the library may make a copy of the file

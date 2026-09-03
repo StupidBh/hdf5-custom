@@ -933,7 +933,7 @@ done:
     /* Release hold on indirect block */
     if (iblock_held) {
         if (H5HF__iblock_decr(iblock) < 0) {
-            HDONE_ERROR(H5E_HEAP, H5E_CANTDEC, FAIL, "can't decrement reference count on shared indirect block")
+            HDONE_ERROR(H5E_HEAP, H5E_CANTDEC, FAIL, "can't decrement reference count on shared indirect block");
         }
     }
 

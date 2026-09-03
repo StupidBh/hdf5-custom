@@ -303,7 +303,7 @@ done:
     if (!ret_value) {
         /* Release the data block, if it was protected */
         if (dblock && H5AC_unprotect(hdr->f, H5AC_FARRAY_DBLOCK, dblock->addr, dblock, H5AC__NO_FLAGS_SET) < 0) {
-            HDONE_ERROR(H5E_FARRAY, H5E_CANTUNPROTECT, NULL, "unable to unprotect fixed array data block, address = %llu", (unsigned long long)dblock->addr)
+            HDONE_ERROR(H5E_FARRAY, H5E_CANTUNPROTECT, NULL, "unable to unprotect fixed array data block, address = %llu", (unsigned long long)dblock->addr);
         }
     }
 

@@ -673,7 +673,7 @@ done:
     /* Clean up */
     if (H5I_INVALID_HID != err_stack_id) {
         if (H5I_dec_ref(err_stack_id) < 0) {
-            HDONE_ERROR(H5E_EVENTSET, H5E_CANTDEC, FAIL, "unable to decrement ref count on error stack for failed operation")
+            HDONE_ERROR(H5E_EVENTSET, H5E_CANTDEC, FAIL, "unable to decrement ref count on error stack for failed operation");
         }
     }
 

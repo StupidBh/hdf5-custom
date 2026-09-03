@@ -2963,7 +2963,7 @@ hid_t H5Tget_super(hid_t type)
 done:
     if (H5I_INVALID_HID == ret_value) {
         if (super && H5T_close_real(super) < 0) {
-            HDONE_ERROR(H5E_DATATYPE, H5E_CANTRELEASE, H5I_INVALID_HID, "unable to release super datatype info")
+            HDONE_ERROR(H5E_DATATYPE, H5E_CANTRELEASE, H5I_INVALID_HID, "unable to release super datatype info");
         }
     }
 

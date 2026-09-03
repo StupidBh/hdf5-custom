@@ -48,11 +48,30 @@ macro (BASIC_SETTINGS varname)
   #-----------------------------------------------------------------------------
   # Compiler specific flags : Shouldn't there be compiler tests for these
   #-----------------------------------------------------------------------------
-  if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-  endif ()
-  if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_CXX_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_CXX_FLAGS}")
+  if (CMAKE_ANSI_CFLAGS AND
+      (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR
+       (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")))
+    separate_arguments (_hdf5_example_ansi_cflags NATIVE_COMMAND "${CMAKE_ANSI_CFLAGS}")
+    foreach (_hdf5_example_ansi_cflag IN LISTS _hdf5_example_ansi_cflags)
+      if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        target_compile_options (hdf5_examples_platform INTERFACE
+            "$<$<COMPILE_LANGUAGE:C>:${_hdf5_example_ansi_cflag}>"
+        )
+        target_link_options (hdf5_examples_platform INTERFACE
+            "$<$<LINK_LANGUAGE:C>:${_hdf5_example_ansi_cflag}>"
+        )
+      endif ()
+      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options (hdf5_examples_platform INTERFACE
+            "$<$<COMPILE_LANGUAGE:CXX>:${_hdf5_example_ansi_cflag}>"
+        )
+        target_link_options (hdf5_examples_platform INTERFACE
+            "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_ansi_cflag}>"
+        )
+      endif ()
+    endforeach ()
+    unset (_hdf5_example_ansi_cflag)
+    unset (_hdf5_example_ansi_cflags)
   endif ()
 
   #-----------------------------------------------------------------------------

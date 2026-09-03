@@ -9,6 +9,12 @@
 # If you do not have access to either file, you may request a copy from
 # help@hdfgroup.org.
 #
+# Sanitizers used to define CMAKE_CXX_FLAGS before enabling C++, suppressing
+# CMake's platform defaults. Preserve that initialization behavior while the
+# sanitizer options themselves remain target-scoped.
+if (DEFINED HDF5_CXX_FLAGS_BEFORE_SANITIZER)
+  set (CMAKE_CXX_FLAGS "${HDF5_CXX_FLAGS_BEFORE_SANITIZER}")
+endif ()
 ENABLE_LANGUAGE (CXX)
 
 set (CMAKE_CXX_STANDARD 11)
@@ -17,7 +23,11 @@ set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_SANITIZER_FLAGS} ${CMAKE_CXX_FLAGS}")
-set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+if (DEFINED HDF5_REPORTED_CXX_FLAGS_BASE)
+  set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_SANITIZER_FLAGS} ${HDF5_REPORTED_CXX_FLAGS_BASE}")
+else ()
+  set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif ()
 message (VERBOSE "Warnings Configuration: CXX default: ${CMAKE_CXX_FLAGS}")
 #-----------------------------------------------------------------------------
 # Compiler specific flags
@@ -160,7 +170,7 @@ if (CMAKE_CXX_COMPILER_LOADED)
       ${HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS}
   )
 
-  if (NOT MSVC AND NOT _CLANG_MSVC_WINDOWS)
+  if (NOT MSVC AND NOT _CLANG_MSVC_WINDOWS AND NOT DEFINED HDF5_REPORTED_CXX_FLAGS_BASE)
     set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   endif ()
 

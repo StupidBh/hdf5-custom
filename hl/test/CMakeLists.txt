@@ -25,7 +25,7 @@ configure_file (${HDF5_HL_TEST_SOURCE_DIR}/H5srcdir_str.h.in H5srcdir_str.h  @ON
 macro (HL_ADD_EXE hl_name)
   add_executable (hl_${hl_name} ${hl_name}.c)
   hdf5_target_use_build_options (hl_${hl_name})
-  target_include_directories (hl_${hl_name} PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+  target_include_directories (hl_${hl_name} PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
   if (NOT BUILD_SHARED_LIBS)
     TARGET_C_PROPERTIES (hl_${hl_name} STATIC)
     target_link_libraries (hl_${hl_name} PRIVATE
@@ -63,7 +63,7 @@ HL_ADD_EXE (test_h5do_compat)
 # test_packet has two source files
 add_executable (hl_test_packet test_packet.c test_packet_vlen.c)
 hdf5_target_use_build_options (hl_test_packet)
-target_include_directories (hl_test_packet PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (hl_test_packet PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (hl_test_packet STATIC)
   target_link_libraries (hl_test_packet PRIVATE
@@ -94,7 +94,7 @@ endif ()
 # --------------------------------------------------------------------
 add_executable (hl_gen_test_ds gen_test_ds.c)
 hdf5_target_use_build_options (hl_gen_test_ds)
-target_include_directories (hl_gen_test_ds PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (hl_gen_test_ds PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (hl_gen_test_ds STATIC)
   target_link_libraries (hl_gen_test_ds PRIVATE
@@ -121,7 +121,7 @@ endif ()
 
 add_executable (hl_gen_test_ld gen_test_ld.c)
 hdf5_target_use_build_options (hl_gen_test_ld)
-target_include_directories (hl_gen_test_ld PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (hl_gen_test_ld PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (hl_gen_test_ld STATIC)
   target_link_libraries (hl_gen_test_ld PRIVATE

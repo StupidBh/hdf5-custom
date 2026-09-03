@@ -19,7 +19,7 @@
 # Compiler specific flags
 #-----------------------------------------------------------------------------
 if (${HDF_CFG_NAME} MATCHES "Debug" OR ${HDF_CFG_NAME} MATCHES "Developer")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -ftrapv -fno-common")
+  HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -Og -ftrapv -fno-common)
 endif ()
 
 if (WIN32 AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")

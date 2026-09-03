@@ -11,7 +11,7 @@ project (HDF5_TOOLS_SRC_H5IMPORT C)
 # Add the h5import executables
 # --------------------------------------------------------------------
 add_executable (h5import ${HDF5_TOOLS_SRC_H5IMPORT_SOURCE_DIR}/h5import.c ${HDF5_TOOLS_SRC_H5IMPORT_SOURCE_DIR}/h5import.h)
-target_include_directories (h5import PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (h5import PRIVATE "${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (h5import)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5import STATIC)

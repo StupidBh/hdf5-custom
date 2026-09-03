@@ -184,7 +184,6 @@ extern "C" {
  *          dataspace identifier is illegal. Failure to release a dataspace with this
  *          call will result in resource leaks.
  *
- * \version 1.4.0 Fortran subroutine introduced in this release.
  * \since 1.0.0
  *
  */
@@ -258,7 +257,6 @@ H5_DLL hid_t H5Scombine_select(hid_t space1_id, H5S_seloper_t op, hid_t space2_i
  *          returned from this function should be released with H5Sclose()
  *          or resource leaks will occur.
  *
- * \version 1.4.0   Fortran subroutine introduced.
  * \since 1.0.0
  *
  */
@@ -290,7 +288,6 @@ H5_DLL hid_t H5Scopy(hid_t space_id);
  *          The dataspace identifier returned by this function can be released with
  *          H5Sclose() so that resource leaks will not occur.
  *
- * \version 1.4.0 Fortran subroutine introduced.
  * \since 1.0.0
  *
  */
@@ -342,7 +339,6 @@ H5_DLL hid_t H5Screate(H5S_class_t type);
  *       selections from a dataspace and is used in Parallel HDF5 when a process
  *       does not have or need to write data.
  *
- * \version 1.4.0 Fortran subroutine introduced.
  *
  * \since 1.0.0
  *
@@ -437,7 +433,6 @@ H5_DLL herr_t H5Sencode2(hid_t obj_id, void *buf, size_t *nalloc, hid_t fapl);
  * \details H5Sextent_copy() copies the extent from \p src_id to \p dst_id.
  *          This action may change the type of the dataspace.
  *
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */
@@ -526,7 +521,6 @@ H5_DLL htri_t H5Sget_regular_hyperslab(hid_t spaceid, hsize_t start[], hsize_t s
  *
  * \version 1.6.0 The \p start and \p end parameters have changed from type
  *          \p hsize_t * to \p hssize_t *.
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.2.0
  *
  */
@@ -658,7 +652,6 @@ H5_DLL hssize_t H5Sget_select_hyper_nblocks(hid_t spaceid);
  *          selection type, and is the correct way to retrieve the number
  *          of elements in a selection.
  *
- * \version 1.4.0 Fortran subroutine introduced in this release.
  * \since 1.0.0
  *
  */
@@ -724,7 +717,6 @@ H5_DLL H5S_sel_type H5Sget_select_type(hid_t spaceid);
  *          If a value in the returned array \p maxdims is #H5S_UNLIMITED (-1),
  *          the maximum size of that dimension is unlimited.
  *
- * \version 1.4.0 Fortran subroutine introduced.
  * \since 1.0.0
  *
  */
@@ -742,7 +734,6 @@ H5_DLL int H5Sget_simple_extent_dims(hid_t space_id, hsize_t dims[], hsize_t max
  * \details H5Sget_simple_extent_ndims() determines the dimensionality (or
  *          rank) of a dataspace.
  *
- * \version 1.4.0 Fortran subroutine introduced.
  * \since 1.0.0
  *
  */
@@ -761,7 +752,6 @@ H5_DLL int H5Sget_simple_extent_ndims(hid_t space_id);
  *          in a dataspace \p space_id. For example, a simple 3-dimensional
  *          dataspace with dimensions 2, 3, and 4 would have 24 elements.
  *
- * \version 1.4.0 Fortran subroutine introduced.
  * \since 1.0.0
  *
  */
@@ -779,7 +769,6 @@ H5_DLL hssize_t H5Sget_simple_extent_npoints(hid_t space_id);
  * \details H5Sget_simple_extent_type() determines the current class of a
  *          dataspace \p space_id.
  *
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */
@@ -821,7 +810,6 @@ H5_DLL htri_t H5Sis_regular_hyperslab(hid_t spaceid);
  * \note Currently, all dataspace objects are simple dataspaces; complex
  *       dataspace support will be added in the future.
  *
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */
@@ -873,7 +861,6 @@ H5_DLL herr_t H5Smodify_select(hid_t space1_id, H5S_seloper_t op, hid_t space2_i
  *          an error, despite the reference manual stating that it had the
  *          behavior described above.
  *
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */
@@ -1130,7 +1117,6 @@ H5_DLL herr_t H5Sselect_copy(hid_t dst_id, hid_t src_id);
  *          \n      0 0 0 0 13 5 11 17 7 21 29 21
  *
  * \version 1.6.4 C coord parameter type changed to \p const hsize_t.
- * \version 1.6.4 Fortran \p coord parameter type changed to \p INTEGER(HSIZE_T).
  * \since 1.0.0
  *
  */
@@ -1226,18 +1212,13 @@ H5_DLL herr_t H5Sselect_elements(hid_t space_id, H5S_seloper_t op, size_t num_el
  *          For example, consider a 2-dimensional dataspace with hyperslab
  *          selection settings as follows: the \p start offset is specified as
  *          [1,1], \p stride is [4,4], \p count is [3,7], and \p block is [2,2].
- *          In C, these settings will specify a hyperslab consisting of 21
+ *          These settings specify a hyperslab consisting of 21
  *          2x2 blocks of array elements starting with location (1,1) with the
  *          selected blocks at locations (1,1), (5,1), (9,1), (1,5), (5,5), etc.;
- *          in Fortran, they will specify a hyperslab consisting of 21 2x2
- *          blocks of array elements starting with location (2,2), since \p start
- *          is 0-based indexed, with the selected blocks at
- *          locations (2,2), (6,2), (10,2), (2,6), (6,6), etc.
  *
  *          Regions selected with this function call default to C order
  *          iteration when I/O is performed.
  *
- * \version 1.4.0 Fortran subroutine introduced in this release.
  * \since 1.0.0
  *
  */
@@ -1338,7 +1319,6 @@ H5_DLL htri_t H5Sselect_shape_same(hid_t space1_id, hid_t space2_id);
  *          \p space_id is within the extent of the dataspace if the current
  *          offset for the dataspace is used.
  *
- * \version 1.4.0 Fortran subroutine introduced in this release.
  * \since 1.0.0
  *
  */
@@ -1357,7 +1337,6 @@ H5_DLL htri_t H5Sselect_valid(hid_t spaceid);
  *
  * \version 1.10.7, 1.12.1  The function behavior changed. The previous
  *                          behavior was to set the class to #H5S_NO_CLASS.
- * \version 1.4.0           Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */
@@ -1385,7 +1364,6 @@ H5_DLL herr_t H5Sset_extent_none(hid_t space_id);
  *          Any previous extent is removed from the dataspace, the dataspace
  *          type is set to #H5S_SIMPLE, and the extent is set as specified.
  *
- * \version 1.4.0 Fortran subroutine was introduced.
  * \since 1.0.0
  *
  */

@@ -55,20 +55,14 @@ my $genericize = 1;
 
 # Info about last name / line / offset for file
 my $last_c_name;
-my $last_fort_name;
-my $last_fort_line;
-my $last_fort_offset;
 
 # Info about source files
 my %c_files;
 my %c_files_counted;
 my %cpp_files;
 my %cpp_files_counted;
-my %fort_files;
-my %fort_files_counted;
 my $c_lines = 0;
 my $cpp_lines = 0;
-my $fort_lines = 0;
 
 # Display usage
 sub do_help {
@@ -132,7 +126,7 @@ sub line_count {
 }
 
 # Recursively search a directory hierarchy for source files
-# Adds results to the global %c_files, %cpp_files, and %fort_files hashes
+# Adds results to the global %c_files and %cpp_files hashes
 sub parse_tree {
     my ($root_path) = @_;
 #print "root_path = $root_path\n";
@@ -145,16 +139,8 @@ sub parse_tree {
 	    # Check for different kinds of source files
 	    # Use lists here: https://gist.github.com/ppisarczyk/43962d06686722d26d176fad46879d41#file-programming_languages_extensions-json
 
-            # FORTRAN source file
-	    if($bn =~ /.*(\.f90)|(\.f)|(\.f03)|(\.f08)|(\.f77)|(\.f95)|(\.for)|(\.fpp)$/i) {
-		$bn =~ s/(\.f90)|(\.f)|(\.f03)|(\.f08)|(\.f77)|(\.f95)|(\.for)|(\.fpp)$//ig;
-		if(!exists $fort_files{$bn}) {
-		    $fort_files{$bn} = [ $name ];
-		} else {
-		    push @{ $fort_files{$bn} }, $name;
-		}
             # C++ source file
-	    } elsif($bn =~ /.*(\.cpp)|(\.c\+\+)|(\.cc)|(\.cp)|(\.cxx)$/i) {
+	    if($bn =~ /.*(\.cpp)|(\.c\+\+)|(\.cc)|(\.cp)|(\.cxx)$/i) {
 		$bn =~ s/(\.cpp)|(\.c\+\+)|(\.cc)|(\.cp)|(\.cxx)$//ig;
 		if(!exists $cpp_files{$bn}) {
 		    $cpp_files{$bn} = [ $name ];
@@ -176,7 +162,6 @@ sub parse_tree {
 
 #print Dumper \%c_files;
 #print Dumper \%cpp_files;
-#print Dumper \%fort_files;
 }
 
 sub count_file_loc {
@@ -235,16 +220,14 @@ sub count_source_loc {
     my $filetype;
     my $filename;
 
-    ($filetype, $filename) = $compile_line =~ /^\s+(CC|FC|CXX|PPFC)\s+(\S*)\.l*o$/x;
+    ($filetype, $filename) = $compile_line =~ /^\s+(CC|CXX)\s+(\S*)\.l*o$/x;
     if($filename =~ /\//) {
         $filename = basename($filename);
     }
 #print "filetype = '$filetype'\n";
 #print "filename = '$filename'\n";
 
-    if($filetype =~ /FC|PPFC/) {        # FORTRAN source file
-        count_file_loc($filename, "FORTRAN", \%fort_files, \%fort_files_counted, \$fort_lines);
-    } elsif($filetype =~ /CXX/) {       # C++ source file
+    if($filetype =~ /CXX/) {            # C++ source file
         count_file_loc($filename, "C++", \%cpp_files, \%cpp_files_counted, \$cpp_lines);
     } elsif($filetype =~ /CC/) {        # C source file
         count_file_loc($filename, "C", \%c_files, \%c_files_counted, \$c_lines);
@@ -396,12 +379,6 @@ while (<>) {
     my $extra;
     my $extra2;
 
-    # Retain last FORTRAN compile line, which comes a few lines before warning
-    if($_ =~ /.*((\.inc)|(\.f90)|(\.f)|(\.f03)|(\.f08)|(\.f77)|(\.f95)|(\.for)|(\.fpp))\:.*/i) {
-        ($last_fort_name, $last_fort_line, $last_fort_offset) = split /\:/, $_;
-        ($last_fort_line, $toss) = split /\./, $last_fort_line;
-    }
-
     # Retain last C/C++ compile line, which possibly comes a few lines before warning
     if($_ =~ /.*[A-Za-z0-9_]\.[cC]:.*/) {
         ($last_c_name, $toss) = split /\:/, $_;
@@ -415,7 +392,7 @@ while (<>) {
     # Compute LOC for compiled source files, if warning density requested
     if(exists $options{d}) {
         # Check for compilation line
-        if($_ =~ /^\s+(CC|FC|CXX|PPFC)\s+/) {
+        if($_ =~ /^\s+(CC|CXX)\s+/) {
             count_source_loc($_);
         }
     }
@@ -451,34 +428,6 @@ while (<>) {
     if($_ =~ /^(cc1|<command-line>): warning:.*/) {
         $name = $last_c_name;
         ($toss, $toss, $warning, $extra, $extra2) = split /\:/, $_;
-    # Check for file-scope gcc Fortran warning output
-    } elsif($_ =~ /f\d\d\d: Warning:/) {
-        # These are interspersed with the "compiling a file" output
-        # when compiling with `make -j` and thus difficult to tie to
-        # any particular file. They are due to things like inappropriate
-        # build options and don't have a line number.
-        #
-        # They start with f, as in f951
-        $name = "(generic)";
-        $line = int(rand(1000000)); # Hack to avoid counting as duplictates
-
-        ($warning) = $_ =~ /\[(.*)\]/x;
-    # Check for FORTRAN warning output
-    } elsif($_ =~ /^Warning:.*/) {
-        $name = $last_fort_name;
-        $line = $last_fort_line;
-        $offset = $last_fort_offset;
-        ($toss, $warning, $extra, $extra2) = split /\:/, $_;
-
-        # Check for improperly parsed filename or line
-        if($name =~ /^$/) {
-            print "Filename is a null string! Input line #$. is: '$_'";
-            next
-        }
-        if($line =~ /^$/) {
-            print "Line is a null string! Input line #$. is: '$_'";
-            next
-        }
     # Check for non-GCC warning (Solaris/Oracle?)
     } elsif($_ =~ /^\".*, line [0-9]+: *[Ww]arning:.*/) {
         ($name, $toss, $warning, $extra, $extra2) = split /\:/, $_;
@@ -610,24 +559,12 @@ while (<>) {
 	    $warning =~ s/^[A-Za-z_0-9\/]*:/'-':/g;
 	}
 
-	# Genericize FORTRAN "at (<n>)" into "at (-)", "REAL(<n>)" into "REAL(-)",
-	# 	and "INTEGER(<n>)" into "INTEGER(-)"
-	if($warning =~ /.*at\s\([0-9]+\).*/) {
-	    $warning =~ s/at\s\([0-9]+\)/at \(-\)/g;
-	}
-	if($warning =~ /.*REAL\([0-9]+\).*/) {
-	    $warning =~ s/REAL\([0-9]+\)/REAL\(-\)/g;
-	}
-	if($warning =~ /.*INTEGER\([0-9]+\).*/) {
-	    $warning =~ s/INTEGER\([0-9]+\)/INTEGER\(-\)/g;
-	}
-
 	# Genericize standalone numbers in warnings
 	if($warning =~ /(\s|')-?[0-9]+(\s|')/) {
 	    $warning =~ s/-?[0-9]+/-/g;
 	}
 
-	# Genericize unusual GCC/G++/GFORTRAN warnings that aren't handled above
+	# Genericize unusual GCC/G++ warnings that aren't handled above
 	if($warning =~ /\[deprecation\] [A-Za-z_0-9]*\([A-Za-z_,0-9]*\) in [A-Za-z_0-9]* has been deprecated.*/) {
 	    $warning =~ s/[A-Za-z_0-9]*\([A-Za-z_,0-9]*\) in [A-Za-z_0-9]*/-\(-\) in -/g;
 	}
@@ -670,9 +607,6 @@ if(exists $options{d}) {
     sanity_check_loc("C", \%c_files, \%c_files_counted);
 }
 if(exists $options{d}) {
-    sanity_check_loc("FORTRAN", \%fort_files, \%fort_files_counted);
-}
-if(exists $options{d}) {
     sanity_check_loc("C++", \%cpp_files, \%cpp_files_counted);
 }
 
@@ -684,8 +618,8 @@ if(exists $options{d}) {
 print "\nTotal unique [non-ignored] warnings: $totalcount\n";
 # Display warning density, if requested
 if(exists $options{d}) {
-    print "Lines of code compiled: <total> (C/C++/FORTRAN): ", ($c_lines + $cpp_lines + $fort_lines), " ($c_lines/$cpp_lines/$fort_lines)\n";
-    printf "Warning density (<# of warnings> / <# of LOC compiled>): %10.10f\n", $totalcount / ($c_lines + $cpp_lines + $fort_lines);
+    print "Lines of code compiled: <total> (C/C++): ", ($c_lines + $cpp_lines), " ($c_lines/$cpp_lines)\n";
+    printf "Warning density (<# of warnings> / <# of LOC compiled>): %10.10f\n", $totalcount / ($c_lines + $cpp_lines);
 }
 print "Ignored notes / supplemental warning lines [not counted in unique warnings]: $notecount\n";
 print "Duplicated warning lines [not counted in unique warnings]: $dupcount\n";
@@ -780,4 +714,3 @@ if(exists $options{i}) {
 	print "$x\n";
     }
 }
-

@@ -58,8 +58,7 @@
  *              structure with those properties.
  *
  *              Note that these operations can raise floating-point
- *              exceptions and building with some compiler options
- *              (especially Fortran) can cause problems.
+ *              exceptions, and some compiler options can cause problems.
  *-------------------------------------------------------------------------
  */
 #define DETECT_F(TYPE, INFO)                                                                                 \

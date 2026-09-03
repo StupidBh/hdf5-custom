@@ -120,7 +120,7 @@ typedef enum H5T_str_t {
     H5T_STR_ERROR       = -1, /**< error                           */
     H5T_STR_NULLTERM    = 0,  /**< null terminate like in C        */
     H5T_STR_NULLPAD     = 1,  /**< pad with nulls                  */
-    H5T_STR_SPACEPAD    = 2,  /**< pad with spaces like in Fortran */
+    H5T_STR_SPACEPAD    = 2,  /**< pad with spaces                  */
     H5T_STR_RESERVED_3  = 3,  /**< reserved for later use		     */
     H5T_STR_RESERVED_4  = 4,  /**< reserved for later use		     */
     H5T_STR_RESERVED_5  = 5,  /**< reserved for later use		     */
@@ -646,12 +646,10 @@ H5_DLLVAR hid_t H5T_UNIX_D64LE_g;
 #define H5T_C_S1 (H5OPEN H5T_C_S1_g)
 H5_DLLVAR hid_t H5T_C_S1_g;
 
-/*
- * Types particular to Fortran.
- */
+/* Space-padded string prototype. */
 /**
  * \ingroup PDTS
- * String datatype in Fortran (as defined for the HDF5 C library)
+ * Space-padded string datatype prototype
  * \since 1.0.0
  */
 #define H5T_FORTRAN_S1 (H5OPEN H5T_FORTRAN_S1_g)
@@ -1620,7 +1618,6 @@ H5_DLL hid_t H5Tget_create_plist(hid_t type_id);
  *          return committed datatypes with H5Dget_type() are able to share
  *          the datatype with other datasets in the same file.
  *
- * \version 1.8.0 Fortran API was added
  *
  * \since 1.0.0
  *
@@ -3012,9 +3009,8 @@ H5_DLL herr_t H5Tset_cset(hid_t type_id, H5T_cset_t cset);
  * \details H5Tset_strpad() defines the type of padding used for a string
  *          datatype.
  *
- *          The method used to store character strings differs with the
- *          programming language.  C usually null terminates strings while
- *          Fortran left-justifies and space-pads strings.
+ *          Character strings can use null termination, null padding, or
+ *          space padding.
  *
  *          Valid values of \p strpad are as follows:
  *          \str_pad_type
@@ -3252,8 +3248,8 @@ H5_DLL hid_t H5Topen1(hid_t loc_id, const char *name);
  *          limited to #H5S_MAX_RANK and must be greater than 0 (zero). All
  *          dimension sizes specified in dims must be greater than 0 (zero).
  *
- *          The array \p perm is designed to contain the dimension permutation,
- *          i.e. C versus FORTRAN array order.   (The parameter perm is
+ *          The array \p perm is designed to contain the dimension permutation
+ *          between row-major and column-major order. (The parameter is
  *          currently unused and is not yet implemented.)
  *
  * \version 1.8.0 Function H5Tarray_create() renamed to H5Tarray_create1()

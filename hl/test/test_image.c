@@ -548,9 +548,9 @@ test_generate(void)
 
     /*
     !The first line of the ASCII file contains the dimension of the array :
-    ! IMAX, JMAX, KMAX. The integers are stored with the FORTRAN format I5.
+    ! IMAX, JMAX, KMAX. The integers use fixed-width I5 fields.
     !The second line contains the exclusion value, the minimum and the maximum value of this
-    ! file. These numbers are stored with the FORTRAN format E12.5.
+    ! file. These numbers use fixed-width E12.5 fields.
     ! The remaining lines contains the data of the array, with 5 numbers per line
     ! (except the last line for each I-line).
     ! The array is stored in horizontal slices from sea surface to sea bottom and from

@@ -1080,7 +1080,7 @@
  * atomic type, a small array, or another compound datatype.
  *
  * The provision for nested compound datatypes allows these structures to become quite complex.
- * An HDF5 compound datatype has some similarities to a C struct or a Fortran common block.
+ * An HDF5 compound datatype has some similarities to a record or a C struct.
  * Though not originally designed with databases in mind, HDF5 compound datatypes are
  * sometimes used in a way that is similar to a database record. Compound datatypes can become
  * either a powerful tool or a complex and difficult-to-debug construct. Reasonable caution is

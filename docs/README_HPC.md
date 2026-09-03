@@ -40,7 +40,7 @@ When building on HPC systems:
    this typically causes test failures.
 
 2. **Load required modules:**
-   - Desired compiler modules (and set CC, FC, CXX if needed)
+   - Desired compiler modules (and set CC and CXX if needed)
    - CMake version 4.0 or greater
    - MPI implementation module
 
@@ -48,7 +48,6 @@ When building on HPC systems:
 
    ```bash
    export CC=cc
-   export FC=ftn
    export CXX=CC
    ```
 
@@ -390,7 +389,7 @@ This is available on Linux kernels 2.4 and greater.
 
 ### 8.2. Cray Systems
 
-- Use `CC=cc`, `FC=ftn`, `CXX=CC` after loading compiler modules
+- Use `CC=cc` and `CXX=CC` after loading compiler modules
 - Unload `craype-hugepages2M` if loaded (**Note**: This is situational advice and is not a universal rule, but it may be a valid troubleshooting step if you encounter memory-related performance issues or allocation errors.)
 - Disable shared libraries if encountering linking issues:
   ```bash

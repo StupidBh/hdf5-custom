@@ -815,7 +815,6 @@ H5_DLL herr_t H5Pcopy_prop(hid_t dst_id, hid_t src_id, const char *name);
  * \version 1.12.0 The #H5P_VOL_INITIALIZE property list class was added
  * \version 1.8.15 For each class, the class name returned by
  *                 H5Pget_class_name() was added.
- *                 The list of possible Fortran values was updated.
  * \version 1.8.0 The following property list classes were added at this
  *                release: #H5P_DATASET_ACCESS, #H5P_GROUP_CREATE,
  *                #H5P_GROUP_ACCESS, #H5P_DATATYPE_CREATE,
@@ -4698,7 +4697,6 @@ H5_DLL herr_t H5Pset_fclose_degree(hid_t fapl_id, H5F_close_degree_t degree);
  *    \li Callback #H5FD_file_image_callbacks_t
  *    \li Callback #H5FD_file_image_op_t
  *
- * \version 1.8.13 Fortran subroutine added in this release.
  * \since 1.8.9
  *
  */
@@ -6884,7 +6882,6 @@ H5_DLL herr_t H5Pset_layout(hid_t plist_id, H5D_layout_t layout);
  *          By nature, the N-Bit filter should not be used together with
  *          other I/O filters.
  *
- * \version 1.8.8 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -6993,7 +6990,6 @@ H5_DLL herr_t H5Pset_nbit(hid_t plist_id);
  *          application using the scale-offset filter must store data with
  *          chunked storage.
  *
- * \version 1.8.8 Fortran90 subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -7998,8 +7994,6 @@ H5_DLL herr_t H5Pget_hyper_vector_size(hid_t fapl_id, size_t *size /*out*/);
  *
  * \since 1.0.0
  *
- * \version 1.6.0 The flag parameter was changed from INTEGER to LOGICAL to
- *                better match the C API. (Fortran 90)
  * \version 1.8.2 Deprecated.
  *
  */

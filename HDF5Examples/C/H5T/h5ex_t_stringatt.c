@@ -39,8 +39,8 @@ main(void)
     file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
-     * Create file and memory datatypes.  For this example we will save
-     * the strings as FORTRAN strings, therefore they do not need space
+     * Create file and memory datatypes. For this example, save the strings
+     * with space padding, so they do not need space
      * for the null terminator in the file.
      */
     filetype = H5Tcopy(H5T_FORTRAN_S1);

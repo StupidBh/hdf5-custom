@@ -5177,14 +5177,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcdeabcdeabcdefghij", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Truncated Fortran-string test failed");
+        puts("    Truncated space-padded string test failed");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcde     abcde     ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Extended Fortran-string test failed");
+        puts("    Extended space-padded string test failed");
         goto error;
     }
     free(buf);
@@ -5241,7 +5241,7 @@ test_conv_str_1(void)
         goto error;
 
     /*
-     * Test C string to Fortran and vice versa.
+     * Test null-terminated to space-padded string conversion and vice versa.
      */
     if ((src_type = mkstr((size_t)10, H5T_STR_NULLTERM)) < 0)
         goto error;
@@ -5254,14 +5254,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcdefghi abcdefghi ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C string to Fortran test 1");
+        puts("    Null-terminated to space-padded string test 1");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcdefghi\0abcdefghi\0", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C string test 1");
+        puts("    Space-padded to null-terminated string test 1");
         goto error;
     }
     if (H5Tclose(dst_type) < 0)
@@ -5273,14 +5273,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcdeabcdeabcdefgh\0\0", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C string to Fortran test 2");
+        puts("    Null-terminated to space-padded string test 2");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcde\0\0\0\0\0abcde\0\0\0\0\0", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C string test 2");
+        puts("    Space-padded to null-terminated string test 2");
         goto error;
     }
     if (H5Tclose(src_type) < 0)
@@ -5296,14 +5296,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcd      abcd      ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C string to Fortran test 3");
+        puts("    Null-terminated to space-padded string test 3");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcd\0abcd\0abcd      ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C string test 3");
+        puts("    Space-padded to null-terminated string test 3");
         goto error;
     }
     free(buf);
@@ -5314,7 +5314,7 @@ test_conv_str_1(void)
         goto error;
 
     /*
-     * Test C buffer to Fortran and vice versa.
+     * Test null-padded to space-padded buffer conversion and vice versa.
      */
     if ((src_type = mkstr((size_t)10, H5T_STR_NULLPAD)) < 0)
         goto error;
@@ -5327,14 +5327,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcdefghijabcdefghij", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C buffer to Fortran test 1");
+        puts("    Null-padded to space-padded buffer test 1");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcdefghijabcdefghij", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C buffer test 1");
+        puts("    Space-padded to null-padded buffer test 1");
         goto error;
     }
     if (H5Tclose(dst_type) < 0)
@@ -5346,14 +5346,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcdeabcdeabcdefgh\0\0", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C buffer to Fortran test 2");
+        puts("    Null-padded to space-padded buffer test 2");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcde\0\0\0\0\0abcde\0\0\0\0\0", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C buffer test 2");
+        puts("    Space-padded to null-padded buffer test 2");
         goto error;
     }
     if (H5Tclose(src_type) < 0)
@@ -5369,14 +5369,14 @@ test_conv_str_1(void)
         goto error;
     if (memcmp(buf, "abcd      abcd      ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    C buffer to Fortran test 3");
+        puts("    Null-padded to space-padded buffer test 3");
         goto error;
     }
     if (H5Tconvert(dst_type, src_type, (size_t)2, buf, NULL, H5P_DEFAULT) < 0)
         goto error;
     if (memcmp(buf, "abcd\0abcd\0abcd      ", (size_t)20) != 0) {
         H5_FAILED();
-        puts("    Fortran to C buffer test 3");
+        puts("    Space-padded to null-padded buffer test 3");
         goto error;
     }
     if (H5Tclose(src_type) < 0)
@@ -5415,7 +5415,7 @@ error:
 /*-------------------------------------------------------------------------
  * Function:    test_conv_str_2
  *
- * Purpose:    Tests C-to-Fortran and Fortran-to-C string conversion speed.
+ * Purpose:    Tests null-terminated and space-padded string conversion speed.
  *
  * Return:    Success:    0
  *        Failure:    number of errors

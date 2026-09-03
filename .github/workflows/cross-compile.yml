@@ -68,7 +68,6 @@ jobs:
              -DHDF5_PACK_EXAMPLES:BOOL=ON \
              -DHDF5_PACKAGE_EXTLIBS:BOOL=ON \
              -DHDF5_TEST_API:BOOL=OFF \
-             -DHDF5_USE_PREGEN:BOOL=ON \
              $GITHUB_WORKSPACE
         shell: bash
 

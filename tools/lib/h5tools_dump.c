@@ -2404,7 +2404,7 @@ h5tools_print_datatype(FILE *stream, h5tools_str_t *buffer, const h5tool_format_
                 goto found_string_type;
             }
 
-            /* If not equal to C variable-length string, check Fortran type. */
+            /* If not equal to the null-terminated prototype, check the space-padded type. */
             if (H5Tclose(str_type) < 0)
                 H5TOOLS_ERROR((-1), "H5Tclose failed");
             str_type = H5Tcopy(H5T_FORTRAN_S1);

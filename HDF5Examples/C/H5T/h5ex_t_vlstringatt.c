@@ -44,8 +44,8 @@ main(void)
     file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
-     * Create file and memory datatypes.  For this example we will save
-     * the strings as FORTRAN strings.
+     * Create file and memory datatypes. For this example, use the
+     * space-padded string prototype for file storage.
      */
     filetype = H5Tcopy(H5T_FORTRAN_S1);
     status   = H5Tset_size(filetype, H5T_VARIABLE);

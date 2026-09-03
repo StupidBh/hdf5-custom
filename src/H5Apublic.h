@@ -909,9 +909,6 @@ H5_DLL hid_t H5Aopen_by_name_async(hid_t loc_id, const char *obj_name, const cha
  * \par Example
  * \snippet H5A_examples.c read
  *
- * \version 1.8.8  Fortran updated to Fortran2003.
- * \version 1.4.2  The \p dims parameter was added to the Fortran API in this
- *                 release.
  * \since   1.0.0
  *
  * \see H5Awrite()
@@ -997,8 +994,6 @@ H5_DLL herr_t H5Arename_by_name_async(hid_t loc_id, const char *obj_name, const 
  * \par Example
  * \snippet H5A_examples.c update
  *
- * \version 1.8.8   Fortran updated to Fortran2003.
- * \version 1.4.2   Fortran \p dims parameter added in this release
  * \since 1.0.0
  * \see H5Aread()
  *

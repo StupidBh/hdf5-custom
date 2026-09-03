@@ -1048,7 +1048,7 @@ H5_DLL herr_t H5Dread_multi_async(size_t count, hid_t dset_id[], hid_t mem_type_
  *          If \p mem_type_id is either a fixed-length or variable-length
  *          string, it is important to set the string length when defining
  *          the datatype. String datatypes are derived from #H5T_C_S1
- *          (or #H5T_FORTRAN_S1 for Fortran codes), which defaults
+ *          (or #H5T_FORTRAN_S1 for space-padded strings), which defaults
  *          to 1 character in size. See H5Tset_size() and Creating
  *          variable-length string datatypes.
  *

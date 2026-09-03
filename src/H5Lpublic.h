@@ -1544,8 +1544,6 @@ typedef herr_t (*H5L_iterate1_t)(hid_t group, const char *name, const H5L_info1_
  *          terminator.
  *
  * \version 1.12.0 Function was deprecated.
- * \version 1.8.2 Fortran subroutine added in this release.
- * \version 1.8.4 Fortran subroutine syntax changed in this release.
  *
  * \since 1.8.0
  *
@@ -1603,8 +1601,6 @@ H5_DLL herr_t H5Lget_info1(hid_t loc_id, const char *name, H5L_info1_t *linfo /*
  *          \p group_name can be a dot (\c .).
  *
  * \version 1.12.0 Function was renamed to H5Lget_index_by_idx1() and deprecated.
- * \version 1.8.4 Fortran subroutine syntax changed in this release.
- * \version 1.8.2 Fortran subroutine added in this release.
  *
  * \since 1.8.0
  *
@@ -1754,7 +1750,6 @@ H5_DLL herr_t H5Literate1(hid_t grp_id, H5_index_t idx_type, H5_iter_order_t ord
  *
  * \version 1.12.0 Function H5Literate_by_name() was renamed to
  *                 H5Literate_by_name1() and deprecated.
- * \version 1.8.8 Fortran subroutine added.
  *
  * \since 1.8.0
  *

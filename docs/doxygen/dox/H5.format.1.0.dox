@@ -1397,7 +1397,7 @@ cases noted here.
           but conversion in the opposite direction simply truncates the value.</dd>
       <dt><code>2</code> Space pad.</dt>
       <dd>Space characters are added to the end of the value during conversions from short values to long values
-          but conversion in the opposite direction simply truncates the value. This is the Fortran
+          but conversion in the opposite direction simply truncates the value. This is the space-padded
           representation of the string.</dd>
       <dt><code>3-15</code> Reserved.</dt>
       <dd>These values are reserved for future use.</dd>
@@ -1626,7 +1626,7 @@ with a recursive datatype message.
     <dt>2 Space pad</dt>
     <dd>Space characters are added to the end of the value during conversion from a short string to a
         longer string. Conversion from a long string to a shorter string simply truncates the value.
-        This is the Fortran representation of the string.</dd>
+        This is the space-padded representation of the string.</dd>
     <dt>3-15 Reserved</dt>
     <dd>These values are reserved for future use.</dd>
   </dl></td>

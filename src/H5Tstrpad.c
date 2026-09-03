@@ -25,10 +25,9 @@
 /*-------------------------------------------------------------------------
  * Function:	H5Tget_strpad
  *
- * Purpose:	The method used to store character strings differs with the
- *		programming language: C usually null terminates strings while
- *		Fortran left-justifies and space-pads strings.	This property
- *		defines the storage mechanism for the string.
+ * Purpose:	Character strings can use null termination, null padding, or
+ *		space padding. This property defines the storage mechanism for
+ *		the string.
  *
  * Return:	Success:	The character set of a string type.
  *
@@ -65,10 +64,9 @@ done:
 /*-------------------------------------------------------------------------
  * Function:	H5Tset_strpad
  *
- * Purpose:	The method used to store character strings differs with the
- *		programming language: C usually null terminates strings while
- *		Fortran left-justifies and space-pads strings.	This property
- *		defines the storage mechanism for the string.
+ * Purpose:	Character strings can use null termination, null padding, or
+ *		space padding. This property defines the storage mechanism for
+ *		the string.
  *
  *		When converting from a long string to a short string if the
  *		short string is H5T_STR_NULLPAD or H5T_STR_SPACEPAD then the

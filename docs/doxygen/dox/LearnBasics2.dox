@@ -640,35 +640,10 @@ into a long integer buffer.)
 </table>
 
 <table>
-<caption>Some HDF5 pre-defined native datatypes and corresponding standard (file) type</caption>
-<tr>
-<th><strong>F90 Type</strong></th>
-<th><strong>HDF5 Memory Type</strong></th>
-<th><strong>HDF5 File Type*</strong></th>
-</tr>
-<tr>
-<td>integer</td>
-<td>H5T_NATIVE_INTEGER</td>
-<td>#H5T_STD_I32BE(8,16) or #H5T_STD_I32LE(8,16)</td>
-</tr>
-<tr>
-<td>real</td>
-<td>H5T_NATIVE_REAL</td>
-<td>#H5T_IEEE_F32BE or #H5T_IEEE_F32LE</td>
-</tr>
-<tr>
-<td>double-precision</td>
-<td>#H5T_NATIVE_DOUBLE</td>
-<td>#H5T_IEEE_F64BE or #H5T_IEEE_F64LE</td>
-</tr>
-</table>
-
-<table>
 <tr>
 <td>* Note that the HDF5 File Types listed are those that are most commonly created.
-  The file type created depends on the compiler switches and platforms being
-  used. For example, on the Cray an integer is 64-bit, and using #H5T_NATIVE_INT (C)
-  or H5T_NATIVE_INTEGER (F90) would result in an #H5T_STD_I64BE file type.</td>
+  The file type created depends on the native type widths and byte order of the
+  platform in use.</td>
 </tr>
 </table>
 
@@ -786,16 +761,15 @@ for working with existing array datatypes.
 The function #H5Tarray_create creates a new array datatype object. Parameters specify
 \li the base datatype of each element of the array,
 \li the rank of the array, i.e., the number of dimensions,
-\li the size of each dimension, and
-\li the dimension permutation of the array, i.e., whether the elements of the array are listed in C or FORTRAN order.
+\li the size of each dimension.
 
 <h4>Working with existing array datatypes</h4>
 When working with existing arrays, one must first determine the rank, or number of dimensions, of the array.
 
-The function #H5Tget_array_dims returns the rank of a specified array datatype.
+The function #H5Tget_array_ndims returns the rank of a specified array datatype.
 
 In many instances, one needs further information. The function #H5Tget_array_dims retrieves the
-permutation of the array and the size of each dimension.
+size of each dimension.
 
 \subsection subsecLBDtypeSpecCmpd Compound
 
@@ -984,7 +958,7 @@ This example introduces several H5Sget_select_* functions used to obtain informa
 
 \subsection subsecLBDtypeSpecStr String
 A simple example of creating a derived datatype is using the string datatype,
-#H5T_C_S1 (#H5T_FORTRAN_S1) to create strings of more than one character. Strings
+#H5T_C_S1 to create strings of more than one character. Strings
 can be stored as either fixed or variable length, and may have different rules
 for padding of unused storage.
 

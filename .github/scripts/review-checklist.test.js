@@ -72,8 +72,8 @@ function asyncTest(name, fn) {
 // matchesPattern — anchored directory patterns
 // ----------------------------------------------------------------
 
-test('anchored dir: filters/src/H5f.F90 matches /filters/', () => {
-  assert.strictEqual(matchesPattern('filters/src/H5f.F90', '/filters/'), true);
+test('anchored dir: filters/src/H5Zfilter.c matches /filters/', () => {
+  assert.strictEqual(matchesPattern('filters/src/H5Zfilter.c', '/filters/'), true);
 });
 
 test('anchored dir: src/H5public.h does not match /filters/', () => {
@@ -199,7 +199,7 @@ test('attributeFiles: file in /src/ is not stolen by /src/H5FDsubfiling/', () =>
 
 test('attributeFiles: unmatched file appears in no area', () => {
   const areas = [{ pattern: '/src/', label: 'src', owners: ['alice'] }];
-  const files = [{ filename: 'filters/H5f.F90', changes: 3 }];
+  const files = [{ filename: 'filters/H5Zfilter.c', changes: 3 }];
   const byArea = attributeFiles(files, areas);
   assert.strictEqual(byArea.get('/src/').length, 0);
 });
@@ -603,7 +603,7 @@ test('buildBody: drive-by change-requester (not a CODEOWNER or requested reviewe
 test('buildBody: change-requester is scoped to the area their comments touch, not every area', () => {
   const areas = [
     makeArea('src',     ['alice'], 10, [{ filename: 'src/H5F.c', changes: 10 }]),
-    makeArea('filters', ['bob'],   10, [{ filename: 'filters/H5f.F90', changes: 10 }]),
+    makeArea('filters', ['bob'],   10, [{ filename: 'filters/H5Zfilter.c', changes: 10 }]),
   ];
   const changeRequestFiles = new Map([['dan', new Set(['src/H5F.c'])]]);
   const body = buildBody(areas, new Set(), new Set(['alice', 'bob']), changeRequestFiles);

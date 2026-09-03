@@ -11,9 +11,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
- * Purpose:	This file contains inline definitions for "generic" routines
- *          supporting a "shared message interface" (ala Java) for object
- *          header messages that can be shared.  This interface is
+ * Purpose:	This file contains inline definitions for generic routines
+ *          supporting a shared-message interface for object header messages
+ *          that can be shared. This interface is
  *          dependent on a bunch of macros being defined which define
  *          the name of the interface and "real" methods which need to
  *          be implemented for each message class that supports the

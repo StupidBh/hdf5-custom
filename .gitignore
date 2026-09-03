@@ -11,7 +11,6 @@
 /build*
 src/H5config.h.in
 
-/.classpath
 .claude/
 /CLAUDE.md
 /CMakeUserPresets.json

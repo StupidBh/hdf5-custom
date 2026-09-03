@@ -81,8 +81,6 @@ set (CTEST_CUSTOM_MEMCHECK_IGNORE
     CPP_ex_tutr-clean-objects
     HL_ex-clear-objects
     HL_ex-clean-objects
-    f90_ex-clear-objects
-    f90_ex-clean-objects
     HL_CPP_ptableTest-clear-objects
     HL_CPP_ptableTest-clean-objects
     HL_CPP_ex_ptExampleFL-clear-objects

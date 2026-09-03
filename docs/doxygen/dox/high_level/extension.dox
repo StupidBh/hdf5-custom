@@ -89,7 +89,6 @@
  *          If \p path does not exist in \p loc_id then the function will
  *          create the path specified by \p path automatically.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -153,7 +152,6 @@ H5_HLRDLL herr_t H5LRmake_dataset(hid_t loc_id,
  *          the values in the buffer. Please note that rank may vary from one
  *          dataset to another.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -194,7 +192,6 @@ H5_HLRDLL herr_t H5LRcreate_region_references(hid_t obj_id,
  *          hyperslab region starting at element (2,2) to element (5,4)
  *          then \p block_coord would be {2, 2, 5, 4}.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -235,7 +232,6 @@ H5_HLRDLL herr_t H5LRcopy_reference(hid_t obj_id, hdset_reg_ref_t *ref, const ch
  *          copied directly to the \p path and \p block_coord will be
  *          disregarded.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -305,7 +301,6 @@ H5_HLRDLL herr_t H5LRcopy_region(hid_t obj_id,
  *          - #H5R_DATASET_REGION   Dataset region reference
  *          - #H5R_OBJECT           Object reference
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -353,7 +348,6 @@ H5_HLRDLL herr_t H5LRcreate_ref_to_all(hid_t loc_id, const char *group_path,
  *          and the buffer must be at least \c sizeof(int) * \p numelem  bytes
  *          in size. This buffer must be allocated by the application.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -443,7 +437,6 @@ H5_HLRDLL herr_t H5LRread_region(hid_t obj_id,
  *          \p rank* \p numelem.
  *
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -500,7 +493,6 @@ H5_HLRDLL herr_t H5LRget_region_info(hid_t obj_id,
  *          dataset will be copied directly to the \p path_dest and
  *          \p block_coord_dset will be disregarded.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -549,7 +541,6 @@ H5_HLRDLL herr_t H5LTcopy_region(const char *file_src,
  *          Buffer \p buf should be big enough to hold selected elements
  *          of the type that corresponds to the \p mem_type
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *
@@ -606,7 +597,6 @@ H5_HLRDLL herr_t  H5LTread_region(const char *file,
  *          the \p num_values values for the
  *          \c num_selected_elem<sup>th</sup> element.
  *
- * \version 1.1 Fortran wrapper introduced in this release.
  *
  * \since 1.0
  *

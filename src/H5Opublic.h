@@ -261,7 +261,6 @@ extern "C" {
  *          When it is no longer needed, the opened object should be closed with
  *          H5Oclose(), H5Gclose(), H5Tclose(), or H5Dclose().
  *
- * \version 1.8.1 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -348,7 +347,6 @@ H5_DLL hid_t H5Oopen_by_token(hid_t loc_id, H5O_token_t token);
  *          resource leaks will not develop.  H5Oclose() can be used to close groups, datasets,
  *          or committed datatypes.
  *
- * \version 1.8.1 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -455,7 +453,6 @@ H5_DLL hid_t H5Oopen_by_idx_async(hid_t loc_id, const char *group_name, H5_index
  *          function description, provides a step-by-step description of
  *          that verification process.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.5
  *
@@ -766,7 +763,6 @@ H5_DLL herr_t H5Oget_native_info_by_idx(hid_t loc_id, const char *group_name, H5
  *      the object will not be linked into the HDF5 file structure
  *      and will be deleted when the file is closed.
  *
- * \version 1.8.1 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -801,7 +797,6 @@ H5_DLL herr_t H5Olink(hid_t obj_id, hid_t new_loc_id, const char *new_name, hid_
  * \warning Improper use can lead to inaccessible data, wasted space in the file,
  *          or <b><em>file corruption</em></b>.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -836,7 +831,6 @@ H5_DLL herr_t H5Oincr_refcount(hid_t object_id);
  * \warning Improper use can lead to inaccessible data, wasted space in the file,
  *          or <b><em>file corruption</em></b>.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -927,7 +921,6 @@ H5_DLL herr_t H5Odecr_refcount(hid_t object_id);
  *        discussion of copying committed datatypes (PDF) in
  *        Advanced Topics in HDF5
  *
- * \version 1.8.9 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -977,7 +970,6 @@ H5_DLL herr_t H5Ocopy_async(hid_t src_loc_id, const char *src_name, hid_t dst_lo
  *          will be attached to the object to which the attribute belongs
  *          and not to the attribute itself.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -1026,7 +1018,6 @@ H5_DLL herr_t H5Oset_comment(hid_t obj_id, const char *comment);
  *          link access property list can come into play when traversing
  *          links to access an object.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -1066,7 +1057,6 @@ H5_DLL herr_t H5Oset_comment_by_name(hid_t loc_id, const char *name, const char 
  *          If an object does not have a comment, an empty string is
  *          returned in \p comment.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -1118,7 +1108,6 @@ H5_DLL ssize_t H5Oget_comment(hid_t obj_id, char *comment, size_t bufsize);
  *          link access property list can come into play when traversing
  *          links to access an object.
  *
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -1345,7 +1334,6 @@ H5_DLL herr_t H5Ovisit_by_name3(hid_t loc_id, const char *obj_name, H5_index_t i
  *          H5Oclose() is not used to close a dataspace, attribute, property
  *          list, or file.
  *
- * \version 1.8.8 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -1808,7 +1796,6 @@ typedef herr_t (*H5O_iterate1_t)(hid_t obj, const char *name, const H5O_info1_t 
  *          important; if time has elapsed and the object has been deleted from the file,
  *          the address will be invalid, and file corruption can result.
  *
- * \version 1.8.4 Fortran subroutine added in this release.
  *
  * \since 1.8.0
  *
@@ -1850,7 +1837,6 @@ H5_DLL hid_t H5Oopen_by_addr(hid_t loc_id, haddr_t addr);
  *                 and the macro #H5Oget_info was created.
  * \version 1.8.15 Added a note about the valid values for the \c version
  *                 field in the H5O_hdr_info_t structure.
- * \version 1.8.11 Fortran subroutine introduced in this release.
  * \version 1.8.10 Added #H5O_type_t structure to the Description section. \n
  *                 Separated H5O_hdr_info_t structure from #H5O_info_t in the
  *                 Description section. \n
@@ -1892,8 +1878,6 @@ H5_DLL herr_t H5Oget_info1(hid_t loc_id, H5O_info1_t *oinfo);
  *                 H5Oget_info_by_name1() was copied to H5Oget_info_by_name().
  * \version 1.10.3 Function H5Oget_info_by_name() was copied to H5Oget_info_by_name1()
  *                 and the macro #H5Oget_info_by_name was created.
- * \version 1.8.8 Fortran 2003 subroutine and \c h5o_info_t derived type introduced
- *                in this release.
  *
  * \since 1.8.0
  *
@@ -1937,7 +1921,6 @@ H5_DLL herr_t H5Oget_info_by_name1(hid_t loc_id, const char *name, H5O_info1_t *
  *                 H5Oget_info_by_idx() was copied to H5Oget_info_by_idx1().
  * \version 1.10.3 Function H5Oget_info_by_idx() was copied to H5Oget_info_by_idx1()
  *                 and the macro #H5Oget_info_by_idx was created.
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -2154,7 +2137,6 @@ H5_DLL herr_t H5Oget_info_by_idx2(hid_t loc_id, const char *group_name, H5_index
  *          H5Ovisit1() was copied to H5Ovisit().
  * \version 1.10.3 Function H5Ovisit() was copied to H5Ovisit1(),
  *          and the macro #H5Ovisit was created.
- * \version 1.8.8 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *
@@ -2264,7 +2246,6 @@ H5_DLL herr_t H5Ovisit1(hid_t obj_id, H5_index_t idx_type, H5_iter_order_t order
  *          H5Ovisit_by_name1() was copied to #H5Ovisit_by_name.
  * \version 1.10.3 The H5Ovisit_by_name() function was renamed to H5Ovisit_by_name1(),
  *          and the macro #H5Ovisit_by_name was created.
- * \version 1.8.11 Fortran subroutine introduced in this release.
  *
  * \since 1.8.0
  *

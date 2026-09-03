@@ -1355,7 +1355,7 @@ H5T__init_package(void)
     string = dt; /* Keep type for later */
 
     /*------------------------------------------------------------
-     * The `Fortran' architecture
+     * The space-padded string architecture
      *------------------------------------------------------------
      */
 

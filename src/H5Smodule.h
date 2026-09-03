@@ -209,11 +209,10 @@
  * last listed dimension is the fastest‐changing dimension and the first‐listed dimension is the slowest
  * changing. The HDF5 file format storage layout specification adheres to the C convention and the HDF5
  * Library adheres to the same convention when storing dataspace dimensions in the file. This affects how
- * row-major programs and tools interpret data produced by column-major programs and vice versa. The
- * example below illustrates the issue using C and Fortran storage conventions.
+ * row-major programs and tools interpret data produced by column-major programs and vice versa.
  *
  * A column-major application describing an array as A(20,100) specifies the value of
- * the first dimension to be 20 and the second to be 100. Since Fortran stores data by columns, the
+ * the first dimension to be 20 and the second to be 100. In column-major storage, the
  * first‐listed dimension with the value 20 is the fastest‐changing dimension and the last‐listed dimension
  * with the value 100 is the slowest‐changing. To adhere to the HDF5 storage convention, a column-major
  * caller transposes dimensions, so the first dimension becomes the last. The dataspace dimensions
@@ -228,8 +227,8 @@
  * Therefore C tools such as \ref sec_cltools_h5dump and \ref sec_cltools_h5ls display transposed
  * dimensions and values for data stored using column-major conventions.
  *
- * Consider the following simple example of equivalent C 3 x 5 and Fortran 5 x 3 arrays. As illustrated in
- * the figure below, a C application will store a 3 x 5 2‐dimensional array as three 5‐element rows. In order
+ * Consider equivalent row-major 3 x 5 and column-major 5 x 3 arrays. A row-major application stores a
+ * 3 x 5 two-dimensional array as three 5-element rows. In order
  * to store the same data in the same order, a column-major application must view the array as a 5 x 3 array
  * with three 5‐element columns. Its dataspace is described as 5 x 3 by the caller but stored and described
  * in the file according to the C convention as a 3 x 5 array.
@@ -255,55 +254,10 @@
  *     dataspace = H5Screate_simple(RANK, dims, NULL);
  * \endcode
  *
- *   <table>
- *     <caption align=top>Comparing C and Fortran dataspaces</caption>
- *     <tr>
- *       <td>
- *       A dataset stored by a C program in a 3 x 5 array:
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- * \image html Dspace_CvsF1.gif
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- *       The same dataset stored by a Fortran program in a 5 x 3 array:
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- * \image html Dspace_CvsF2.gif
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- *       The first dataset above as written to an HDF5 file from C or the second dataset above as written
- *       from Fortran:
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- * \image html Dspace_CvsF3.gif
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- *       The first dataset above as written to an HDF5 file from Fortran:
- *       </td>
- *     </tr>
- *     <tr>
- *       <td>
- * \image html Dspace_CvsF4.gif
- *       </td>
- *     </tr>
- *   </table>
- *
  * <em>Note: The HDF5 Library stores arrays along the fastest‐changing dimension. This approach is often
  * referred to as being “in C order.” C and C++ work with arrays in row‐major order. In other words,
- * the row, or the last dimension, is the fastest‐changing dimension. Fortran, on the other hand, handles
- * arrays in column‐major order making the column, or the first dimension, the fastest‐changing dimension.
+ * the row, or the last dimension, is the fastest‐changing dimension. In column-major order, the column,
+ * or the first dimension, is the fastest-changing dimension.
  * Therefore, row-major and column-major arrays can be stored identically in an HDF5 file when dimensions
  * are transposed appropriately.</em>
  *

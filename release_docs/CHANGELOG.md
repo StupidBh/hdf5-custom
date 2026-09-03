@@ -34,9 +34,6 @@ For releases prior to version 2.0.0, please see the release.txt file and for mor
 ## Enhanced Features:
 
 
-## Java Enhancements:
-
-
 ## Acknowledgements:
 
 We would like to thank the many HDF5 community members who contributed to this release of HDF5.
@@ -58,6 +55,14 @@ MSVC while its implementation required MinGW, so it could not affect a
 supported build. These build-system changes do not alter HDF5 file-format
 compatibility or the C ABI on retained platforms.
 
+## Java and Fortran product modules removed
+
+The Java and Fortran libraries, examples, tests, build options, packaging,
+and CI entry points are no longer part of this fork. The JNI discovery used
+by the optional HDFS VFD and C-level file-format compatibility types such as
+`H5T_FORTRAN_S1` remain available because they serve retained C library
+functionality.
+
 
 # 🪦 Deprecations
 
@@ -71,11 +76,7 @@ compatibility or the C ABI on retained platforms.
 
 ## Parallel Library
 
-## Fortran Library
-
 ## C++ Library
-
-## Java Library
 
 ## Tools
 
@@ -117,8 +118,6 @@ compatibility or the C ABI on retained platforms.
 
    Fixes CVE-2026-19025
 
-## Java Library
-
 ## Configuration
 
 ### Fixed version handling in installed CMake package version configuration file
@@ -136,10 +135,10 @@ compatibility or the C ABI on retained platforms.
   Only the standalone build was affected. Examples built as part of the HDF5
   build inherit the library's own C++ standard.
 
-### Fixed the examples skipping the HL, Fortran and C++ programs in some configurations
+### Fixed the examples skipping the HL and C++ programs in some configurations
 
   When built standalone against an installed HDF5, the examples chose between
-  the shared and static HL, Fortran and C++ libraries using `BUILD_SHARED_LIBS`,
+  the shared and static HL and C++ libraries using `BUILD_SHARED_LIBS`,
   while the C library used `H5EXAMPLE_USE_SHARED_LIBS`. Since
   `H5EXAMPLE_USE_SHARED_LIBS` determines which component is requested from
   `find_package`, and therefore which `HDF5_<linkage>_<lang>_FOUND` variables
@@ -165,68 +164,13 @@ compatibility or the C ABI on retained platforms.
 
 ## Performance
 
-## Fortran API
-
-### h5open_f now re-initializes the Fortran interface after h5close_f
-
-   An h5open_f / h5close_f / h5open_f sequence could leave the Fortran interface
-   uninitialized. The second h5open_f reported success, but the predefined type
-   handles were left holding identifiers that h5close_f had released, so later calls
-   failed. Whether this happened depended on the Fortran compiler.
-
-   Fixes GitHub issue #6642
-
-### h5fget_obj_ids_f no longer returns the Fortran interface's own identifiers
-
-   h5fget_obj_count_f excludes the objects h5open_f opens to represent the predefined
-   types, but h5fget_obj_ids_f returned them, so the two disagreed about the same query
-   and an application walking the list found datatypes it never opened. Both now report
-   only what the application has open, matching the C API.
-
-   Fixes GitHub issue #6648
-
-### h5fget_obj_count_f and h5fget_obj_ids_f document their object type argument
-
-   Both listed the object types as alternatives without mentioning that they may be
-   combined with IOR(), which the C API supports and both have always passed through.
-
-### h5fget_obj_count_f no longer returns negative counts
-
-   With the Fortran interface open, counting a single object type across all files
-   subtracted the objects opened by h5open_f, so queries for files, groups, and
-   datasets returned a negative count and reported success. A negative count is now
-   reported as an error.
-
 ## High-Level Library
 
-## Fortran High-Level APIs
-
 ## Documentation
-
-## F90 APIs
 
 ## C++ APIs
 
 ## Testing
-
-### Fortran test programs no longer exit successfully after a fatal error
-
-   The Fortran tests ended unrecoverable failures with STOP, which exits with a
-   success status, so a run that aborted part way through was reported as passing.
-
-### New test for the object count and identifier list
-
-   The Fortran tests had no coverage of h5fget_obj_ids_f over all files, and none that
-   compared it against h5fget_obj_count_f. A new test opens objects of several types
-   and checks that the two agree, that object types combined with IOR() count as the
-   sum of their parts, and that a buffer shorter than the number of open objects is
-   filled with the application's own.
-
-### The h5open/h5close test checks that the interface re-initializes
-
-   Its object counts were taken while the Fortran interface was closed, where no such
-   call is permitted. They now run after the interface has been reopened, and confirm
-   that the predefined types are usable again.
 
 # ✨ Support for new platforms and languages
 
@@ -266,11 +210,6 @@ Current test results are available [here](https://my.cdash.org/index.php?project
    - H5TEST-testhdf5-base
    - MPI_TEST_t_filters_parallel
 
-  Sporadic failures (even with lower -O levels):
-
-   - Java JUnit-TestH5Pfapl
-   - Java JUnit-TestH5D
-
   Also, NVHPC will fail to compile the test/tselect.c test file with a compiler error of `use of undefined value` when the optimization level is -O2 or higher.
 
    This is confirmed to be a [bug in the nvc compiler](https://forums.developer.nvidia.com/t/hdf5-no-longer-compiles-with-nv-23-9/269045) that has been fixed as of 23.11. If you are using an affected version of the NVidia compiler, the work-around is to set the optimization level to -O1.
@@ -284,10 +223,6 @@ Current test results are available [here](https://my.cdash.org/index.php?project
 - The subsetting option in `ph5diff` currently will fail and should be avoided
 
    The subsetting option works correctly in serial `h5diff`.
-
-- Flang Fortran compilation will fail (last check version 17) due to not yet implemented: (1) derived type argument passed by value (H5VLff.F90), and (2) support for REAL with KIND = 2 in intrinsic SPACING used in testing.
-
-- Fortran tests HDF5_1_8.F90 and HDF5_F03.F90 will fail with Cray compilers greater than version 16.0 due to a compiler bug. The latest version verified as failing was version 17.0.
 
 - Several tests currently fail on certain platforms:
    MPI_TEST-t_bigio fails with spectrum-mpi on ppc64le platforms.

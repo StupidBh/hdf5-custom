@@ -257,7 +257,7 @@ StrType::setCset(H5T_cset_t cset) const
 ///\return      String storage mechanism, which can be:
 ///             \li \c H5T_STR_NULLTERM (0) - Null terminate (as C does)
 ///             \li \c H5T_STR_NULLPAD (0) - Pad with zeros
-///             \li \c H5T_STR_SPACEPAD (0) - pad with spaces (as FORTRAN does)
+///             \li \c H5T_STR_SPACEPAD (0) - pad with spaces
 ///\exception   H5::DataTypeIException
 //--------------------------------------------------------------------------
 H5T_str_t

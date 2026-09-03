@@ -5816,7 +5816,7 @@ implemented in the HDF5 Library:
       <td><code>2</code></td>
       <td>Space Pad: Space characters are added to the end of the value during conversions from short values
           to long values but conversion in the opposite direction simply truncates the value. This is the
-          Fortran representation of the string.</td>
+          space-padded representation of the string.</td>
       </tr>
       <tr>
       <td><code>3-15</code></td>
@@ -6406,7 +6406,7 @@ There are no properties defined for the reference class.
         <td align="center"><code>2</code></td>
         <td>Space pad: Space characters are added to the end of the value during conversion from a short string
             to a longer string. Conversion from a long string to a shorter string simply truncates the value.
-            This is the Fortran representation of the string.</td>
+            This is the space-padded representation of the string.</td>
       </tr>
       <tr>
         <td align="center"><code>3-15</code></td>

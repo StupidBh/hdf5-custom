@@ -88,8 +88,7 @@ Navigate back: \ref index "Main"
   <DD>
     <P>A family of HDF5 datatypes whose elements are records with named fields
     of other HDF5 datatypes. Currently, on ASCII field names are supported.</P>
-    <P>Similar to a <CODE>struct</CODE> in C or a <CODE>COMMON</CODE> block in
-    Fortran.</P>
+    <P>Similar to a record or a C <CODE>struct</CODE>.</P>
 </DD>
 </DL>
 

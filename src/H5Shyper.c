@@ -6166,8 +6166,8 @@ done:
         This function is only called is only being called from H5D_chunk_mem_cb
         in src/H5Dchunk.c, when the library is iterating over a memory
         selection, so the coordinates passed to H5S_hyper_add_span_element will
-        always be in increasing order (according to a row-major (i.e. C, not
-        FORTRAN) scan) over the dataset. Therefore, for every input of
+        always be in increasing order according to a row-major scan over the
+        dataset. Therefore, for every input of
         coordinates, only the last span element (i.e., the tail pointer) in
         one dimension is checked against the input.
 

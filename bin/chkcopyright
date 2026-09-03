@@ -43,7 +43,6 @@ FIXEDLOG=/tmp/h5chkright_fixed.$$
 FIXFAILEDLOG=/tmp/h5chkright_fixfailed.$$
 
 C_COPYRIGHT=/tmp/h5chkright_C.$$	# C style copyright
-FTN_COPYRIGHT=/tmp/h5chkright_FTN.$$	# Fortran style copyright
 HTM_COPYRIGHT=/tmp/h5chkright_HTM.$$	# HTML style copyright
 SH_COPYRIGHT=/tmp/h5chkright_SH.$$	# SHELL style copyright
 SH_COPYRIGHT2=/tmp/h5chkright_SH2.$$	# SHELL style copyright, 2nd style.
@@ -113,19 +112,6 @@ BUILDCOPYRIGHT()
  * distribution tree, or in https://www.hdfgroup.org/licenses.               *
  * If you do not have access to either file, you may request a copy from     *
  * help@hdfgroup.org.                                                        *
-EOF
-
-    # Fortran9X source Copyright notice
-    cat > ${FTN_COPYRIGHT} << \EOF
-!   Copyright by The HDF Group.                                               *
-!   All rights reserved.                                                      *
-!                                                                             *
-!   This file is part of HDF5.  The full HDF5 copyright notice, including     *
-!   terms governing use, modification, and redistribution, is contained in    *
-!   the LICENSE file, which can be found at the root of the source code       *
-!   distribution tree, or in https://www.hdfgroup.org/licenses.               *
-!   If you do not have access to either file, you may request a copy from     *
-!   help@hdfgroup.org.                                                        *
 EOF
 
     # HTML file Copyright notice
@@ -204,7 +190,7 @@ EOF
 # skip          Files to be skipped
 # prune         Directories to be skipped.  Notice this prunes all directories
 #               with the same name.  E.g.,
-#               "prune test" skips test, fortran/test, c++/test, ...
+#               "prune test" skips all directories named test.
 #		(See -name option in the find command.)
 # prunepath     Directory or file to be skipped.  Notice this is different from
 #               prunes since it matches the exact pathname. E.g.,
@@ -458,28 +444,6 @@ C_SOURCE()
 }
 
 
-# Check Fortran90 source files
-#
-FORTRAN_SOURCE()
-{
-    f=$1
-    case `MATCH_COPYRIGHT $FTN_COPYRIGHT $f` in
-    PASSED)
-	PASSED $f
-	return
-	;;
-    FAILED)
-	# show the difference
-	FAILED $f
-	$DIFF ${EXTRACTEDFILE} ${FTN_COPYRIGHT}
-	if [ -n "$FIXIT" ]; then
-	    FIX_COPYRIGHT $FTN_COPYRIGHT $f
-	fi
-	;;
-    esac
-}
-
-
 # Check HTML Files
 #
 HTML_FILE()
@@ -610,9 +574,6 @@ GUESS_File_Type()
     elif grep '\/\*' < $tmpfile > /dev/null; then
 	# Found some lines containing '/*'.  It may be a C/C++ style file.
 	echo C_SOURCE
-    elif grep '^!' < $tmpfile > /dev/null; then
-	# Some lines start with a "!".  It may be a Fortran 9X style file.
-	echo FORTRAN_SOURCE
     elif grep '^#' < $tmpfile > /dev/null; then
 	# Some lines start with a "#".  It may be a shell like type.
 	# Put this after C_SOURCE which may have #define and such lines.
@@ -647,7 +608,6 @@ UNKNOWN_FILE()
 	case $xftype in
 	    SHELL_FILE) 	    SHELL_FILE $f;;
 	    C_SOURCE) 	    C_SOURCE $f;;
-	    FORTRAN_SOURCE) 	    FORTRAN_SOURCE $f;;
 	    SHELL_FILE) 	    SHELL_FILE $f;;
 	    HTML_FILE) 	    HTML_FILE $f;;
 	    UNKNOWN_TYPE) 	    UNKNOWN_TYPE $f;;
@@ -748,9 +708,6 @@ while read file; do
 	*.c | *.h | *.cpp )
 	    C_SOURCE ${file}
 	    ;;
-	*.f90 )
-	    FORTRAN_SOURCE ${file}
-	    ;;
 	*.htm | *.html )
 	    HTML_FILE ${file}
 	    ;;
@@ -784,7 +741,7 @@ while read file; do
 	    # Ignore Windows binary or special files.
 	    # .dsp & .dsw are Visual Studio project files.
 	    # .sln are .NET solution files.
-	    # .js are Microsoft Java Script files.
+	    # .js files contain scripts.
 	    continue
 	    ;;
 	*CVS/* )
@@ -817,7 +774,7 @@ if [ -f $FIXFAILEDLOG ]; then
 fi
 
 # Cleanup
-rm -f $C_COPYRIGHT $FTN_COPYRIGHT $HTM_COPYRIGHT $SH_COPYRIGHT $SH_COPYRIGHT2
+rm -f $C_COPYRIGHT $HTM_COPYRIGHT $SH_COPYRIGHT $SH_COPYRIGHT2
 rm -f $EXCEPTIONS $EXTRACTEDFILE
 rm -f $PASSEDLOG $SKIPPEDLOG $FAILEDLOG $FIXEDLOG $FIXFAILEDLOG
 

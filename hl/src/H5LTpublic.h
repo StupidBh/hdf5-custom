@@ -209,9 +209,6 @@ extern "C" {
  *          For example, setting \p type_id to #H5T_NATIVE_INT will result in a dataset
  *          of <em>signed \e integer datatype</em>.
  *
- * \version 1.10.0 Fortran 2003 subroutine added to accept a C address of the data buffer.
- * \version 1.8.7 Fortran subroutine modified in this release to accommodate arrays
- *                with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTmake_dataset(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims,
@@ -287,8 +284,6 @@ H5HL_DLL herr_t H5LTmake_dataset_short(hid_t loc_id, const char *dset_name, int 
  *          The dataset's datatype will be <em>native signed integer</em>,
  *          #H5T_NATIVE_INT.
  *
- * \version Fortran subroutine modified in this release to accommodate
- *          arrays with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTmake_dataset_int(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims,
@@ -340,8 +335,6 @@ H5HL_DLL herr_t H5LTmake_dataset_long(hid_t loc_id, const char *dset_name, int r
  *          The dataset's datatype will be <em>native floating point</em>,
  *          #H5T_NATIVE_FLOAT.
  *
- * \version 1.8.7 Fortran subroutine modified in this release to accommodate
- *                arrays with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTmake_dataset_float(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims,
@@ -368,8 +361,6 @@ H5HL_DLL herr_t H5LTmake_dataset_float(hid_t loc_id, const char *dset_name, int 
  *          The dataset's datatype will be
  *          <em>native floating-point double</em>, #H5T_NATIVE_DOUBLE.
  *
- * \version 1.8.7 Fortran subroutine modified in this release to accommodate
- *                arrays with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTmake_dataset_double(hid_t loc_id, const char *dset_name, int rank, const hsize_t *dims,
@@ -420,10 +411,6 @@ H5HL_DLL herr_t H5LTmake_dataset_string(hid_t loc_id, const char *dset_name, con
  * \details H5LTread_dataset() reads a dataset named \p dset_name
  *          attached to the object specified by the identifier \p loc_id.
  *
- * \version 1.10.0  Fortran 2003 subroutine added to accept a C
- *                  address of the data buffer.
- * \version 1.8.7   Fortran subroutine modified in this release to
- *                  accommodate arrays with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTread_dataset(hid_t loc_id, const char *dset_name, hid_t type_id, void *buffer);
@@ -482,8 +469,6 @@ H5HL_DLL herr_t H5LTread_dataset_short(hid_t loc_id, const char *dset_name, shor
  *          attached to the object specified by the identifier \p loc_id.
  *          The HDF5 datatype is #H5T_NATIVE_INT.
  *
- * \version 1.8.7 Fortran subroutine modified in this release to
- *                accommodate arrays with more than three dimensions.
  *
  */
 H5HL_DLL herr_t H5LTread_dataset_int(hid_t loc_id, const char *dset_name, int *buffer);
@@ -523,8 +508,6 @@ H5HL_DLL herr_t H5LTread_dataset_long(hid_t loc_id, const char *dset_name, long 
  *          attached to the object specified by the identifier \p loc_id.
  *          The HDF5 datatype is #H5T_NATIVE_FLOAT.
  *
- * \version 1.8.7 Fortran subroutine modified in this release to
- *                accommodate arrays with more than three dimensions.
  */
 H5HL_DLL herr_t H5LTread_dataset_float(hid_t loc_id, const char *dset_name, float *buffer);
 
@@ -544,8 +527,6 @@ H5HL_DLL herr_t H5LTread_dataset_float(hid_t loc_id, const char *dset_name, floa
  *          attached to the object specified by the identifier \p loc_id.
  *          The HDF5 datatype is #H5T_NATIVE_DOUBLE.
  *
- * \version 1.8.7 Fortran subroutine modified in this release to
- *                accommodate arrays with more than three dimensions.
  */
 H5HL_DLL herr_t H5LTread_dataset_double(hid_t loc_id, const char *dset_name, double *buffer);
 
@@ -1034,11 +1015,6 @@ H5HL_DLL herr_t H5LTget_attribute(hid_t loc_id, const char *obj_name, const char
  *          \p attr_name that is attached to the object specified
  *          by the name \p obj_name.  The datatype is a string.
  *
- * \version 1.8.9 The content of the buffer returned by the Fortran
- *                subroutine has changed in this release:\n
- *                If the returned buffer requires padding,
- *                h5ltget_attribute_string_f() now employs space
- *                padding; this buffer was previously returned with a C NULL terminator.
  *
  */
 H5HL_DLL herr_t H5LTget_attribute_string(hid_t loc_id, const char *obj_name, const char *attr_name,

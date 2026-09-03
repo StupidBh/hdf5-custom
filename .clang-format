@@ -9,7 +9,6 @@ BraceWrapping:
   #llvm11:   BeforeLambdaBody: false
   #llvm11:   BeforeWhile:     false
 BreakBeforeBraces: Stroustrup
-BreakAfterJavaFieldAnnotations: true
 BreakStringLiterals: true
 ColumnLimit:     110
 IndentWidth:     4

@@ -413,13 +413,12 @@
  *     </tr>
  *     <tr>
  *       <td>
- * C <br \> FORTRAN
+ * STRING
  *       </td>
  *       <td span='3'>
- * Types which are specific to the C or Fortran programming languages
- * are defined in these architectures. For instance, #H5T_C_S1 defines a
- * base string type with null termination which can be used to derive string
- * types of other lengths.
+ * String prototype types are defined in these architectures. For instance,
+ * #H5T_C_S1 defines a base string type with null termination which can be
+ * used to derive string types of other lengths.
  *       </td>
  *     </tr>
  *     <tr>
@@ -1759,15 +1758,12 @@ filled according to the value of this property. The padding can be:
  *       </td>
  *       <td>
  * The string datatype has a fixed length, but the string may be shorter than the length. This
- * property defines the storage mechanism for the left over bytes. The method used to store
- * character strings differs with the programming language:
- * \li C usually null terminates strings
- * \li Fortran left-justifies and space-pads strings
+ * property defines the storage mechanism for the leftover bytes.
  *
  * Valid string padding values, as passed in the parameter strpad, are as follows:
- * \li #H5T_STR_NULLTERM: Null terminate (as C does)
+ * \li #H5T_STR_NULLTERM: Null terminate
  * \li #H5T_STR_NULLPAD: Pad with zeros
- * \li #H5T_STR_SPACEPAD: Pad with spaces (as FORTRAN does)
+ * \li #H5T_STR_SPACEPAD: Pad with spaces
  *       </td>
  *     </tr>
  *   </table>

@@ -2538,9 +2538,8 @@ H5LT_dtype_to_text(hid_t dtype, char *dt_str, H5LT_lang_t lang, size_t *slen, bo
                 goto next;
             }
 
-            /* If not equal to C variable-length string, check Fortran type.
-             * Actually H5Tequal can't tell difference between H5T_C_S1 and
-             * H5T_FORTRAN_S1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+            /* Check the space-padded string prototype. H5Tequal cannot distinguish
+             * H5T_C_S1 from H5T_FORTRAN_S1 without the padding and size properties. */
             if (H5Tclose(str_type) < 0)
                 goto out;
             if ((str_type = H5Tcopy(H5T_FORTRAN_S1)) < 0)
@@ -3097,7 +3096,7 @@ H5LTget_attribute_long(hid_t loc_id, const char *obj_name, const char *attr_name
  *
  * Return: Success: 0, Failure: -1
  *
- * Comments: This function was added to support INTEGER*8 Fortran types
+ * Comments: This function supports 64-bit integer attributes.
  *
  *-------------------------------------------------------------------------
  */

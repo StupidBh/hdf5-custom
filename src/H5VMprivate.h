@@ -21,7 +21,7 @@
 /* Vector-Vector sequence operation callback */
 typedef herr_t (*H5VM_opvv_func_t)(hsize_t dst_off, hsize_t src_off, size_t len, void *udata);
 
-/* Vector comparison functions like Fortran66 comparison operators */
+/* Element-wise vector comparison functions */
 #define H5VM_vector_eq_s(N, V1, V2) (H5VM_vector_cmp_s(N, V1, V2) == 0)
 #define H5VM_vector_lt_s(N, V1, V2) (H5VM_vector_cmp_s(N, V1, V2) < 0)
 #define H5VM_vector_gt_s(N, V1, V2) (H5VM_vector_cmp_s(N, V1, V2) > 0)

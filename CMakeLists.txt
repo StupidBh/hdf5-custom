@@ -431,13 +431,6 @@ set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 set (HDF5_COMP_INCLUDE_DIRECTORIES)
 
 #-----------------------------------------------------------------------------
-# Mac OS X Options
-#-----------------------------------------------------------------------------
-if (HDF5_BUILD_FRAMEWORKS AND NOT BUILD_SHARED_LIBS)
-  set (BUILD_SHARED_LIBS ON CACHE BOOL "Build Shared Libraries" FORCE)
-endif ()
-
-#-----------------------------------------------------------------------------
 # Option to Build Shared and Static libs, default is both
 #-----------------------------------------------------------------------------
 hdf5_validate_library_options ()

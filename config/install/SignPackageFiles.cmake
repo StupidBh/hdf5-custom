@@ -8,8 +8,6 @@ elseif (CPACK_GENERATOR MATCHES "WIX" OR CPACK_GENERATOR MATCHES "NSIS")
     set (CPACK_TARGET_FILE_DIRECTORY "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/libraries")
 elseif (CPACK_GENERATOR MATCHES "ZIP")
     set (CPACK_TARGET_FILE_DIRECTORY "${CPACK_TEMPORARY_INSTALL_DIRECTORY}")
-elseif (CPACK_GENERATOR MATCHES "DragNDrop")
-    set (CPACK_TARGET_FILE_DIRECTORY "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/ALL_IN_ONE/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
 else ()
     set (CPACK_TARGET_FILE_DIRECTORY "${CPACK_TEMPORARY_INSTALL_DIRECTORY}/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
 endif ()
@@ -20,16 +18,6 @@ foreach (targetfile IN LISTS target_list)
         execute_process (COMMAND $ENV{SIGNTOOLDIR}/signtool
           sign /v /debug /fd SHA256 /tr http://timestamp.acs.microsoft.com /td SHA256
           /dlib "Microsoft.Trusted.Signing.Client/bin/x64/Azure.CodeSigning.Dlib.dll" /dmdf ${CPACK_ORIG_SOURCE_DIR}/credentials.json
-          ${targetfile}
-        )
-        execute_process (
-          COMMAND ${CMAKE_COMMAND} -E echo "Signing the target ${targetfile}"
-        )
-    elseif (APPLE)
-        # Sign the targets
-        execute_process (COMMAND codesign
-          --force --timestamp --options runtime --entitlements ${CPACK_ORIG_SOURCE_DIR}/config/install/distribution.entitlements 
-          --verbose=4 --strict --sign "$ENV{SIGNER}"
           ${targetfile}
         )
         execute_process (

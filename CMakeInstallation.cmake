@@ -20,7 +20,7 @@
 # Key Features:
 # - Installs HDF5 libraries, headers, utilities, documentation, and CMake config files.
 # - Generates hdf5-config.cmake and version files for build and install trees.
-# - Supports Windows (NSIS, WiX), macOS (DMG, Framework), and Linux (DEB, RPM, TGZ) packaging.
+# - Supports Windows (NSIS, WiX) and Linux (DEB, RPM, TGZ) packaging.
 # - Handles installation of example files and release documentation.
 # - Configures CPack variables and component groups for flexible packaging.
 #
@@ -272,12 +272,6 @@ if (NOT HDF5_EXTERNALLY_CONFIGURED)
             ${HDF5_DOCS_DIR}/INSTALL_Windows.md
         )
       endif ()
-      if (CYGWIN)
-        set (release_files
-            ${release_files}
-            ${HDF5_DOCS_DIR}/INSTALL_Cygwin.md
-        )
-      endif ()
       if (HDF5_ENABLE_PARALLEL)
         set (release_files
             ${release_files}
@@ -303,9 +297,6 @@ if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT HDF5_NO_PACKAGES)
     set (CPACK_PACKAGE_VERSION "${HDF5_PACKAGE_VERSION_STRING}")
   else ()
     set (CPACK_PACKAGE_VERSION "${HDF5_PACKAGE_VERSION}")
-  endif ()
-  if (CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "ARM64")
-    set (CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-winarm64")
   endif ()
   set (CPACK_PACKAGE_VERSION_MAJOR "${HDF5_PACKAGE_VERSION_MAJOR}")
   set (CPACK_PACKAGE_VERSION_MINOR "${HDF5_PACKAGE_VERSION_MINOR}")
@@ -338,13 +329,8 @@ if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT HDF5_NO_PACKAGES)
     #  - "NSIS package/display name" (text used in the installer GUI)
     #  - Registry key used to store info about the installation
     set (CPACK_NSIS_PACKAGE_NAME "${HDF5_PACKAGE_STRING}")
-    if (CMAKE_CL_64)
-      set (CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
-      set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} (Win64)")
-    else ()
-      set (CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
-      set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-    endif ()
+    set (CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+    set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} (Win64)")
     # set the install/uninstall icon used for the installer itself
     # There is a bug in NSI that does not handle full unix paths properly.
     set (CPACK_NSIS_MUI_ICON "${HDF_CONFIG_DIR}\\\\install\\\\hdf.ico")
@@ -411,44 +397,6 @@ if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT HDF5_NO_PACKAGES)
       endif ()
       configure_file (${HDF_CONFIG_DIR}/install/patch.xml.in ${HDF5_BINARY_DIR}/patch.xml @ONLY)
       set(CPACK_WIX_PATCH_FILE "${HDF5_BINARY_DIR}/patch.xml")
-    endif ()
-  elseif (APPLE)
-    list (APPEND CPACK_GENERATOR "STGZ")
-    option (HDF5_PACK_MACOSX_DMG  "Package the HDF5 Library using DragNDrop" ON)
-    if (HDF5_PACK_MACOSX_DMG)
-      list (APPEND CPACK_GENERATOR "DragNDrop")
-    endif ()
-    set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
-    set (CPACK_PACKAGING_INSTALL_PREFIX "/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
-    set (CPACK_PACKAGE_ICON "${HDF_CONFIG_DIR}/install/hdf.icns")
-
-    option (HDF5_PACK_MACOSX_FRAMEWORK  "Package the HDF5 Library in a Frameworks" OFF)
-    if (HDF5_PACK_MACOSX_FRAMEWORK AND HDF5_BUILD_FRAMEWORKS)
-      set (CPACK_BUNDLE_NAME "${HDF5_PACKAGE_STRING}")
-      set (CPACK_BUNDLE_LOCATION "/")    # make sure CMAKE_INSTALL_PREFIX ends in /
-      set (CMAKE_INSTALL_PREFIX "/${CPACK_BUNDLE_NAME}.framework/Versions/${CPACK_PACKAGE_VERSION}/${CPACK_PACKAGE_NAME}/")
-      set (CPACK_BUNDLE_ICON "${HDF_CONFIG_DIR/install}/hdf.icns")
-      set (CPACK_BUNDLE_PLIST "${HDF5_BINARY_DIR}/CMakeFiles/Info.plist")
-      set (CPACK_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}")
-      #-----------------------------------------------------------------------------
-      # Configure the Info.plist file for the install bundle
-      #-----------------------------------------------------------------------------
-      configure_file (
-          ${HDF_CONFIG_DIR}/install/CPack.Info.plist.in
-          ${HDF5_BINARY_DIR}/CMakeFiles/Info.plist @ONLY
-      )
-      configure_file (
-          ${HDF_CONFIG_DIR}/install/PkgInfo.in
-          ${HDF5_BINARY_DIR}/CMakeFiles/PkgInfo @ONLY
-      )
-      configure_file (
-          ${HDF_CONFIG_DIR}/install/version.plist.in
-          ${HDF5_BINARY_DIR}/CMakeFiles/version.plist @ONLY
-      )
-      install (
-          FILES ${HDF5_BINARY_DIR}/CMakeFiles/PkgInfo
-          DESTINATION ..
-      )
     endif ()
   else ()
     list (APPEND CPACK_GENERATOR "STGZ")

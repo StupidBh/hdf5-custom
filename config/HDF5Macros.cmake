@@ -24,8 +24,7 @@
 
 #-------------------------------------------------------------------------------
 # H5_SET_LIB_OPTIONS: Macro to set library versioning, SOVERSION, and platform-
-#     specific install properties for HDF5 targets, including Apple and Windows
-#     specifics, and support for CMake frameworks.
+#     specific install properties for HDF5 targets.
 macro (H5_SET_LIB_OPTIONS libtarget libname libtype libpackage)
   set (LIB_OUT_NAME "${libname}")
   # SOVERSION passed in ARGN when shared
@@ -44,37 +43,8 @@ macro (H5_SET_LIB_OPTIONS libtarget libname libtype libpackage)
     else ()
         set_target_properties (${libtarget} PROPERTIES SOVERSION ${LIBHDF_VERSION})
     endif ()
-    if (CMAKE_C_OSX_CURRENT_VERSION_FLAG)
-      set_property (TARGET ${libtarget} APPEND PROPERTY
-          LINK_FLAGS "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}${PACKAGE_CURRENT} ${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}${PACKAGE_COMPATIBILITY}"
-      )
-    endif ()
   endif ()
   HDF_SET_LIB_OPTIONS (${libtarget} ${LIB_OUT_NAME} ${libtype})
-
-  #-- Apple Specific install_name for libraries
-  if (APPLE)
-    cmake_dependent_option (HDF5_BUILD_WITH_INSTALL_NAME "Build with library install_name set to the installation path" OFF APPLE OFF)
-    mark_as_advanced (HDF5_BUILD_WITH_INSTALL_NAME)
-    if (HDF5_BUILD_WITH_INSTALL_NAME)
-      set_target_properties (${libtarget} PROPERTIES
-          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-          BUILD_WITH_INSTALL_RPATH ${HDF5_BUILD_WITH_INSTALL_NAME}
-      )
-    endif ()
-    if (HDF5_BUILD_FRAMEWORKS)
-      if (${libtype} MATCHES "SHARED")
-        # adapt target to build frameworks instead of dylibs
-        set_target_properties (${libtarget} PROPERTIES
-            XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-            FRAMEWORK TRUE
-            FRAMEWORK_VERSION ${HDF5_PACKAGE_VERSION_MAJOR}
-            MACOSX_FRAMEWORK_IDENTIFIER org.hdfgroup.${libtarget}
-            MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${HDF5_PACKAGE_VERSION_MAJOR}
-            MACOSX_FRAMEWORK_BUNDLE_VERSION ${HDF5_PACKAGE_VERSION_MAJOR})
-      endif ()
-    endif ()
-  endif ()
 endmacro ()
 
 # H5_SET_VFD_LIST: Macro to initialize the list of VFDs (Virtual File Drivers)

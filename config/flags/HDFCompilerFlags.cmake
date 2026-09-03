@@ -14,7 +14,7 @@ macro (HDF5_ADD_COMPILER_OPTIONS language report_position)
     list (APPEND HDF5_${language}_COMPILER_COMPILE_OPTIONS
         "$<$<COMPILE_LANGUAGE:${language}>:${compiler_option}>"
     )
-    if (MSVC OR CMAKE_${language}_SIMULATE_ID STREQUAL "MSVC")
+    if (MSVC)
       list (APPEND HDF5_${language}_COMPILER_EXECUTABLE_LINK_OPTIONS
           "$<$<LINK_LANGUAGE:${language}>:${compiler_option}>"
       )
@@ -64,41 +64,17 @@ if (HDF5_DISABLE_COMPILER_WARNINGS)
   # MSVC uses /w to suppress warnings.  It also complains if another
   # warning level is given, so remove it.
   if (MSVC)
-    set (HDF5_WARNINGS_BLOCKED 1)
     string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
-  endif ()
-  # Borland uses -w- to suppress warnings.
-  if (BORLAND)
-    set (HDF5_WARNINGS_BLOCKED 1)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
-  endif ()
-
-  # Most compilers use -w to suppress warnings.
-  if (NOT HDF5_WARNINGS_BLOCKED)
+  else ()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
   endif ()
 endif ()
 
-if (CMAKE_C_COMPILER_ID MATCHES "NVHPC" )
-  include (${HDF_CONFIG_DIR}/flags/HDFNvhpcFlags.cmake)
-endif ()
-
-if (CMAKE_C_COMPILER_ID MATCHES "GNU")
-  include (${HDF_CONFIG_DIR}/flags/HDFGnuFlags.cmake)
-endif ()
-
-if (CMAKE_C_COMPILER_ID MATCHES "Intel")
-  include (${HDF_CONFIG_DIR}/flags/HDFIntelFlags.cmake)
-endif ()
-
-if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+if (MSVC)
   include (${HDF_CONFIG_DIR}/flags/HDFMsvcFlags.cmake)
-endif ()
-
-#because this will match other compilers with clang in the name this should be checked last
-if (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
-  include (${HDF_CONFIG_DIR}/flags/HDFClangFlags.cmake)
+else ()
+  include (${HDF_CONFIG_DIR}/flags/HDFGnuFlags.cmake)
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -118,30 +94,16 @@ if (HDF5_ENABLE_WARNINGS_AS_ERRORS)
   message (STATUS "...some warnings will be interpreted as errors")
 endif ()
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-  # -erroff is an Oracle Developer Studio (SunPro) option. gcc quietly ignores
-  # it (it parses the leading -e as the linker entry option) but clang rejects
-  # it, so only hand it to the compiler that understands it. Each flag must be
-  # a separate list element or they are passed as one bogus argument.
-  if (CMAKE_C_COMPILER_ID MATCHES "SunPro")
-    list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "-erroff=%none")
-  endif ()
-  list (APPEND HDF5_CMAKE_C_BUILD_OPTION_FLAGS "-DBSD_COMP")
-else ()
-  # General flags
-  #
-  # Note that some of the flags listed here really should be developer
-  # flags (listed in a separate variable, below) but we put them here
-  # because they are not raised by the current code and we'd like to
-  # know if they do start showing up.
-  #
-  # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
-  # warnings that are emitted. If you need it, add it at configure time.
-  if (CMAKE_C_COMPILER_ID STREQUAL "PGI")
-    list (APPEND HDF5_CMAKE_C_WARNING_FLAGS "-Minform=inform")
-  endif ()
-  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
-endif ()
+# General flags
+#
+# Note that some of the flags listed here really should be developer
+# flags (listed in a separate variable, below) but we put them here
+# because they are not raised by the current code and we'd like to
+# know if they do start showing up.
+#
+# NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
+# warnings that are emitted. If you need it, add it at configure time.
+message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Option to allow the user to enable developer warnings

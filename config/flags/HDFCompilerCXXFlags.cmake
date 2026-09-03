@@ -34,22 +34,10 @@ message (VERBOSE "Warnings Configuration: CXX default: ${CMAKE_CXX_FLAGS}")
 # Compiler specific flags
 #-----------------------------------------------------------------------------
 # MSVC 14.28 enables C5105, but the Windows SDK 10.0.18362.0 triggers it.
-if ((_CLANG_MSVC_WINDOWS OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") AND CMAKE_CXX_COMPILER_LOADED)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_LOADED)
   string (APPEND HDF5_REPORTED_CXX_FLAGS " /EHsc")
   if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.28)
     string (APPEND HDF5_REPORTED_CXX_FLAGS " -wd5105")
-  endif ()
-endif ()
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL SunPro AND CMAKE_CXX_COMPILER_LOADED)
-  if (NOT DEFINED CMAKE_CXX${CMAKE_CXX_STANDARD}_STANDARD_COMPILE_OPTION)
-    if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.13)
-      if (NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD EQUAL 98)
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
-      endif ()
-    else ()
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -library=stlport4")
-    endif ()
   endif ()
 endif ()
 
@@ -62,69 +50,37 @@ if (CMAKE_CXX_COMPILER_LOADED)
     # MSVC uses /w to suppress warnings.  It also complains if another
     # warning level is given, so remove it.
     if (MSVC)
-      set (HDF5_WARNINGS_BLOCKED 1)
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " HDF5_REPORTED_CXX_FLAGS
           "${HDF5_REPORTED_CXX_FLAGS}"
       )
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
       string (APPEND HDF5_REPORTED_CXX_FLAGS " /W0")
-    endif ()
-    # Most compilers use -w to suppress warnings.
-    if (NOT HDF5_WARNINGS_BLOCKED)
+    else ()
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
     endif ()
   endif ()
 
-  if (CMAKE_CXX_COMPILER_ID MATCHES "NVHPC" )
-    include (${HDF_CONFIG_DIR}/flags/HDFNvhpcCXXFlags.cmake)
-  endif ()
-
-  if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    include (${HDF_CONFIG_DIR}/flags/HDFGnuCXXFlags.cmake)
-  endif ()
-
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    include (${HDF_CONFIG_DIR}/flags/HDFIntelCXXFlags.cmake)
-  endif ()
-
-  if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  if (MSVC)
     include (${HDF_CONFIG_DIR}/flags/HDFMsvcCXXFlags.cmake)
-  endif ()
-
-  #because this will match other compilers with clang in the name this should be checked last
-  if (CMAKE_CXX_COMPILER_ID MATCHES "[Cc]lang")
-    include (${HDF_CONFIG_DIR}/flags/HDFClangCXXFlags.cmake)
+  else ()
+    include (${HDF_CONFIG_DIR}/flags/HDFGnuCXXFlags.cmake)
   endif ()
 
   #-----------------------------------------------------------------------------
   # HDF5 library compile options - to be made available to all targets
   #-----------------------------------------------------------------------------
 
-  if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-    # -erroff is an Oracle Developer Studio (SunPro) option. gcc quietly ignores
-    # it (it parses the leading -e as the linker entry option) but clang rejects
-    # it, so only hand it to the compiler that understands it. Each flag must be
-    # a separate list element or they are passed as one bogus argument.
-    if (CMAKE_CXX_COMPILER_ID MATCHES "SunPro")
-      list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "-erroff=%none")
-    endif ()
-    list (APPEND HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS "-DBSD_COMP")
-  else ()
-    # General flags
-    #
-    # Note that some of the flags listed here really should be developer
-    # flags (listed in a separate variable, below) but we put them here
-    # because they are not raised by the current code and we'd like to
-    # know if they do start showing up.
-    #
-    # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
-    # warnings that are emitted. If you need it, add it at configure time.
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "PGI")
-      list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS "-Minform=inform")
-    endif ()
-    message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_WARNING_FLAGS}")
-  endif ()
+  # General flags
+  #
+  # Note that some of the flags listed here really should be developer
+  # flags (listed in a separate variable, below) but we put them here
+  # because they are not raised by the current code and we'd like to
+  # know if they do start showing up.
+  #
+  # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
+  # warnings that are emitted. If you need it, add it at configure time.
+  message (VERBOSE "CMAKE_CXX_FLAGS_GENERAL=${HDF5_CMAKE_CXX_WARNING_FLAGS}")
 
   #-----------------------------------------------------------------------------
   # Option to allow the user to enable all warnings
@@ -171,7 +127,7 @@ if (CMAKE_CXX_COMPILER_LOADED)
       ${HDF5_CMAKE_CXX_BUILD_OPTION_FLAGS}
   )
 
-  if (NOT MSVC AND NOT _CLANG_MSVC_WINDOWS AND NOT DEFINED HDF5_REPORTED_CXX_FLAGS_BASE)
+  if (NOT MSVC AND NOT DEFINED HDF5_REPORTED_CXX_FLAGS_BASE)
     set (HDF5_REPORTED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
   endif ()
   string (PREPEND HDF5_REPORTED_CXX_FLAGS "${HDF5_REPORTED_CXX_FLAGS_PREFIX}")

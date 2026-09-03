@@ -9,6 +9,29 @@
 # If you do not have access to either file, you may request a copy from
 # help@hdfgroup.org.
 #
+macro (HDF5_ADD_COMPILER_OPTIONS language report_position)
+  foreach (compiler_option IN ITEMS ${ARGN})
+    list (APPEND HDF5_${language}_COMPILER_COMPILE_OPTIONS
+        "$<$<COMPILE_LANGUAGE:${language}>:${compiler_option}>"
+    )
+    if (MSVC OR CMAKE_${language}_SIMULATE_ID STREQUAL "MSVC")
+      list (APPEND HDF5_${language}_COMPILER_EXECUTABLE_LINK_OPTIONS
+          "$<$<LINK_LANGUAGE:${language}>:${compiler_option}>"
+      )
+    else ()
+      list (APPEND HDF5_${language}_COMPILER_LINK_OPTIONS
+          "$<$<LINK_LANGUAGE:${language}>:${compiler_option}>"
+      )
+    endif ()
+    if ("${report_position}" STREQUAL "PREFIX")
+      string (APPEND HDF5_REPORTED_${language}_FLAGS_PREFIX "${compiler_option} ")
+    elseif ("${report_position}" STREQUAL "SUFFIX")
+      string (APPEND HDF5_REPORTED_${language}_FLAGS_SUFFIX " ${compiler_option}")
+    endif ()
+  endforeach ()
+  unset (compiler_option)
+endmacro ()
+
 set (CMAKE_C_STANDARD 11)
 set (CMAKE_C_STANDARD_REQUIRED TRUE)
 
@@ -220,7 +243,9 @@ set (HDF5_CMAKE_C_FLAGS
 
 # Preserve the established build-report field while platform flags move from
 # CMAKE_C_FLAGS to target-scoped usage requirements.
-set (HDF5_REPORTED_C_FLAGS "${CMAKE_C_FLAGS}${HDF5_REPORTED_C_FLAGS_SUFFIX}")
+set (HDF5_REPORTED_C_FLAGS
+    "${HDF5_REPORTED_C_FLAGS_PREFIX}${CMAKE_C_FLAGS}${HDF5_REPORTED_C_FLAGS_SUFFIX}"
+)
 
 #-----------------------------------------------------------------------------
 # The build mode flags are not added to CMAKE_C_FLAGS, so create a separate

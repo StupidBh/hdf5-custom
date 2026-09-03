@@ -18,21 +18,27 @@
 # Compiler specific flags
 #-----------------------------------------------------------------------------
 
-  set (CMAKE_CXX_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_CXX_FLAGS}")
+  if (CMAKE_ANSI_CFLAGS)
+    separate_arguments (gnu_ansi_cxx_options NATIVE_COMMAND "${CMAKE_ANSI_CFLAGS}")
+    HDF5_ADD_COMPILER_OPTIONS (CXX PREFIX ${gnu_ansi_cxx_options})
+    unset (gnu_ansi_cxx_options)
+  else ()
+    string (APPEND HDF5_REPORTED_CXX_FLAGS_PREFIX " ")
+  endif ()
   if (${HDF_CFG_NAME} MATCHES "Debug" OR ${HDF_CFG_NAME} MATCHES "Developer")
     if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -ftrapv -fno-common")
+      HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -Og -ftrapv -fno-common)
     endif ()
   else ()
     if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstdarg-opt")
+      HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -fstdarg-opt)
     endif ()
     if (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
       if (HDF5_ENABLE_BUILD_DIAGS)
         message (STATUS "... default color and URL extended diagnostic messages enabled")
       else ()
         message (STATUS "... disable color and URL extended diagnostic messages")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-urls=never -fno-diagnostics-color")
+        HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -fdiagnostics-urls=never -fno-diagnostics-color)
       endif ()
     endif ()
   endif ()
@@ -177,13 +183,13 @@ endif ()
 # This is in here to help some of the GCC based IDES like Eclipse
 # and code blocks parse the compiler errors and warnings better.
 #-----------------------------------------------------------------------------
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+  HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -fmessage-length=0)
 
 #-----------------------------------------------------------------------------
 # This option will force/override the default setting for all configurations
 #-----------------------------------------------------------------------------
 if (HDF5_ENABLE_SYMBOLS MATCHES "YES")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -g)
 elseif (HDF5_ENABLE_SYMBOLS MATCHES "NO")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s")
+  HDF5_ADD_COMPILER_OPTIONS (CXX SUFFIX -s)
 endif ()

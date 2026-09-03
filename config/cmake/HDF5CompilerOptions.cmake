@@ -21,6 +21,15 @@ add_library (hdf5_platform INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_dependencies INTERFACE IMPORTED GLOBAL)
 add_library (hdf5_sanitizers INTERFACE IMPORTED GLOBAL)
 
+set_property (TARGET hdf5_platform PROPERTY HDF5_COMPILER_COMPILE_OPTIONS
+    ${HDF5_C_COMPILER_COMPILE_OPTIONS}
+)
+set_property (TARGET hdf5_platform PROPERTY HDF5_COMPILER_LINK_OPTIONS
+    ${HDF5_C_COMPILER_LINK_OPTIONS}
+)
+set_property (TARGET hdf5_platform PROPERTY HDF5_COMPILER_EXECUTABLE_LINK_OPTIONS
+    ${HDF5_C_COMPILER_EXECUTABLE_LINK_OPTIONS}
+)
 target_compile_options (hdf5_warnings INTERFACE "${HDF5_CMAKE_C_WARNING_FLAGS}")
 target_compile_options (hdf5_build_options INTERFACE "${HDF5_CMAKE_C_BUILD_OPTION_FLAGS}")
 target_compile_options (hdf5_assertions INTERFACE "${HDF5_ASSERT_COMPILE_OPTION}")
@@ -56,6 +65,15 @@ function (hdf5_configure_cxx_build_options)
   if (HDF5_PLATFORM_CXX_COMPILE_OPTIONS)
     target_compile_options (hdf5_platform INTERFACE ${HDF5_PLATFORM_CXX_COMPILE_OPTIONS})
   endif ()
+  set_property (TARGET hdf5_platform APPEND PROPERTY HDF5_COMPILER_COMPILE_OPTIONS
+      ${HDF5_CXX_COMPILER_COMPILE_OPTIONS}
+  )
+  set_property (TARGET hdf5_platform APPEND PROPERTY HDF5_COMPILER_LINK_OPTIONS
+      ${HDF5_CXX_COMPILER_LINK_OPTIONS}
+  )
+  set_property (TARGET hdf5_platform APPEND PROPERTY HDF5_COMPILER_EXECUTABLE_LINK_OPTIONS
+      ${HDF5_CXX_COMPILER_EXECUTABLE_LINK_OPTIONS}
+  )
 endfunction ()
 
 function (hdf5_target_use_instrumentation target)
@@ -83,8 +101,32 @@ function (hdf5_target_use_instrumentation target)
   endif ()
 endfunction ()
 
+function (hdf5_target_use_compiler_options target)
+  get_target_property (compiler_options_applied ${target} HDF5_COMPILER_OPTIONS_APPLIED)
+  if (compiler_options_applied)
+    return ()
+  endif ()
+
+  target_compile_options (${target} PRIVATE
+      "$<GENEX_EVAL:$<TARGET_PROPERTY:hdf5_platform,HDF5_COMPILER_COMPILE_OPTIONS>>"
+  )
+  get_target_property (target_type ${target} TYPE)
+  if (target_type MATCHES "^(EXECUTABLE|SHARED_LIBRARY|MODULE_LIBRARY)$")
+    target_link_options (${target} PRIVATE
+        "$<GENEX_EVAL:$<TARGET_PROPERTY:hdf5_platform,HDF5_COMPILER_LINK_OPTIONS>>"
+    )
+  endif ()
+  if (target_type STREQUAL "EXECUTABLE")
+    target_link_options (${target} PRIVATE
+        "$<GENEX_EVAL:$<TARGET_PROPERTY:hdf5_platform,HDF5_COMPILER_EXECUTABLE_LINK_OPTIONS>>"
+    )
+  endif ()
+  set_property (TARGET ${target} PROPERTY HDF5_COMPILER_OPTIONS_APPLIED TRUE)
+endfunction ()
+
 function (hdf5_target_use_platform target)
   hdf5_target_use_instrumentation (${target})
+  hdf5_target_use_compiler_options (${target})
   get_target_property (target_type ${target} TYPE)
   if (target_type STREQUAL "EXECUTABLE")
     target_link_options (${target} PRIVATE
@@ -102,6 +144,7 @@ endfunction ()
 
 function (hdf5_target_use_build_options target)
   hdf5_target_use_instrumentation (${target})
+  hdf5_target_use_compiler_options (${target})
   target_compile_options (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_warnings,INTERFACE_COMPILE_OPTIONS>"
       "$<TARGET_PROPERTY:hdf5_build_options,INTERFACE_COMPILE_OPTIONS>"

@@ -18,16 +18,22 @@
 # Compiler specific flags
 #-----------------------------------------------------------------------------
 
-  set (CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+  if (CMAKE_ANSI_CFLAGS)
+    separate_arguments (gnu_ansi_c_options NATIVE_COMMAND "${CMAKE_ANSI_CFLAGS}")
+    HDF5_ADD_COMPILER_OPTIONS (C PREFIX ${gnu_ansi_c_options})
+    unset (gnu_ansi_c_options)
+  else ()
+    string (APPEND HDF5_REPORTED_C_FLAGS_PREFIX " ")
+  endif ()
   if (${HDF_CFG_NAME} MATCHES "Debug" OR ${HDF_CFG_NAME} MATCHES "Developer")
     if (NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0)
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Og -ftrapv -fno-common")
+      HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -Og -ftrapv -fno-common)
     endif ()
   else ()
     if (NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 5.0 AND
         NOT CMAKE_C_CLANG_TIDY)
       # `clang-tidy` does not understand -fstdarg-opt
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstdarg-opt")
+      HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -fstdarg-opt)
     endif ()
     if (NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 10.0)
       #-----------------------------------------------------------------------------
@@ -41,7 +47,7 @@
         message (STATUS "... default color and URL extended diagnostic messages enabled")
       else ()
         message (STATUS "... disable color and URL extended diagnostic messages")
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-urls=never -fno-diagnostics-color")
+        HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -fdiagnostics-urls=never -fno-diagnostics-color)
       endif ()
     endif ()
   endif ()
@@ -182,13 +188,13 @@ endif ()
 # This is in here to help some of the GCC based IDES like Eclipse
 # and code blocks parse the compiler errors and warnings better.
 #-----------------------------------------------------------------------------
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
+  HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -fmessage-length=0)
 
 #-----------------------------------------------------------------------------
 # This option will force/override the default setting for all configurations
 #-----------------------------------------------------------------------------
 if (HDF5_ENABLE_SYMBOLS MATCHES "YES")
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fno-omit-frame-pointer")
+  HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -g -fno-omit-frame-pointer)
 elseif (HDF5_ENABLE_SYMBOLS MATCHES "NO")
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s")
+  HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -s)
 endif ()

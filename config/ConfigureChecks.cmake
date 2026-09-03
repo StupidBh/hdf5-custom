@@ -129,7 +129,7 @@ CHECK_INCLUDE_FILE_CONCAT ("netdb.h"         ${HDF_PREFIX}_HAVE_NETDB_H)
 CHECK_INCLUDE_FILE_CONCAT ("arpa/inet.h"     ${HDF_PREFIX}_HAVE_ARPA_INET_H)
 if (WINDOWS)
   CHECK_INCLUDE_FILE_CONCAT ("shlwapi.h"         ${HDF_PREFIX}_HAVE_SHLWAPI_H)
-  # Checking for StrStrIA in the library is not reliable for mingw32 to stdcall
+  # Checking for StrStrIA in the library is not reliable for this stdcall symbol
   set (LINK_PUB_LIBS ${LINK_PUB_LIBS} "shlwapi")
 endif ()
 
@@ -144,11 +144,6 @@ if (${INCLUDE_QUADMATH_H})
   set (C_INCLUDE_QUADMATH_H 1)
 else ()
   set (C_INCLUDE_QUADMATH_H 0)
-endif ()
-
-if (CYGWIN)
-  set (CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE")
-  list (APPEND HDF5_PLATFORM_COMPILE_DEFINITIONS _GNU_SOURCE)
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -264,13 +259,6 @@ endif ()
 #
 # https://docs.oracle.com/cd/E23824_01/html/821-1474/lfcompile-5.html
 
-# Cygwin
-if (CYGWIN)
-  set (CMAKE_REQUIRED_DEFINITIONS
-      "${CMAKE_REQUIRED_DEFINITIONS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE"
-  )
-endif ()
-
 #-----------------------------------------------------------------------------
 #  Check the size in bytes of all the int and float types
 #-----------------------------------------------------------------------------
@@ -371,9 +359,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   )
     HDF_FUNCTION_TEST (${time_test})
   endforeach ()
-  if (NOT CYGWIN)
-      HDF_FUNCTION_TEST (HAVE_TIMEZONE)
-  endif ()
+  HDF_FUNCTION_TEST (HAVE_TIMEZONE)
 
   # ----------------------------------------------------------------------
   # Does the struct stat have the st_blocks field?  This field is not POSIX.
@@ -389,9 +375,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   CHECK_FUNCTION_EXISTS (_getvideoconfig   ${HDF_PREFIX}_HAVE__GETVIDEOCONFIG)
   CHECK_FUNCTION_EXISTS (gettextinfo       ${HDF_PREFIX}_HAVE_GETTEXTINFO)
   CHECK_FUNCTION_EXISTS (_scrsize          ${HDF_PREFIX}_HAVE__SCRSIZE)
-  if (NOT CYGWIN)
-    CHECK_FUNCTION_EXISTS (GetConsoleScreenBufferInfo    ${HDF_PREFIX}_HAVE_GETCONSOLESCREENBUFFERINFO)
-  endif ()
+  CHECK_FUNCTION_EXISTS (GetConsoleScreenBufferInfo    ${HDF_PREFIX}_HAVE_GETCONSOLESCREENBUFFERINFO)
   CHECK_SYMBOL_EXISTS (TIOCGWINSZ "sys/ioctl.h" ${HDF_PREFIX}_HAVE_TIOCGWINSZ)
   CHECK_SYMBOL_EXISTS (TIOCGETD   "sys/ioctl.h" ${HDF_PREFIX}_HAVE_TIOCGETD)
 endif ()

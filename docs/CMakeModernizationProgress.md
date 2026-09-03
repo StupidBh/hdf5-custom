@@ -8,8 +8,8 @@ actually landed, what is being worked on, and what remains unverified.
 ## Current Snapshot
 
 - Last updated: 2026-09-03
-- Progress anchor: `6b14c86e4` (`cmake: Use MPI target includes for test libraries`)
-- Implementation commits after the plan was accepted: 117
+- Progress anchor: `0b9e21c34` (`cmake: Use MPI target includes for parallel tests`)
+- Implementation commits after the plan was accepted: 123
 - Current stage: target-scoped build infrastructure and removal of remaining
   directory-global compiler and linker state
 - Overall state: the baseline and CMake 4 correctness stages are complete;
@@ -75,8 +75,9 @@ the current stage.
   dependency module.
 - Classified system, public, and compression dependencies and routed core and
   representative serial/parallel test targets through explicit ownership.
-- Routed MPI include requirements for the core, high-level, tools, and serial
-  test libraries through `MPI::MPI_C` instead of repeated path expressions.
+- Routed MPI include requirements for core, high-level, tool, utility, serial
+  test, and parallel test libraries and executables through `MPI::MPI_C`
+  instead of repeated path expressions.
 - Preserved JNI discovery for the HDFS VFD.
 
 ### Platform and instrumentation behavior
@@ -117,12 +118,14 @@ the remaining flag writes before further migrations were selected:
   validation rather than mechanical removal.
 
 The current dependency work removes repeated MPI include expressions from
-targets that already consume `MPI::MPI_C`. The static and shared core,
-high-level, tools, and serial test libraries are complete. Executable and test
-target families remain separate follow-on batches because their dependency
-paths and supported option combinations differ. In particular, parallel HDF5
-and the C++ library are mutually exclusive unless `HDF5_ALLOW_UNSUPPORTED` is
-enabled, so C++ MPI cleanup is not being validated as a supported matrix row.
+targets that already consume `MPI::MPI_C`. The supported C target batches for
+core, high-level, tools, utilities, serial tests, and parallel tests are
+complete. Remaining expressions need separate classification because they
+belong to standalone examples, package configuration, dependency-specific
+targets whose prerequisites are unavailable, or C++ targets. In particular,
+parallel HDF5 and the C++ library are mutually exclusive unless
+`HDF5_ALLOW_UNSUPPORTED` is enabled, so C++ MPI cleanup is not being validated
+as a supported matrix row.
 
 ## Remaining Work
 
@@ -170,15 +173,28 @@ and standalone example builds. Recent checkpoints specifically verified:
 - unchanged Microsoft MPI contracts across the imported-target include
   migrations: 1,295 core records, 1,409 high-level records, 2,176 tools
   records, and 8,212 serial-test records, followed by successful Release
-  builds of each affected static and shared library; and
+  builds of each affected static and shared library;
+- byte-identical generated Visual Studio projects after removing repeated MPI
+  include expressions from 18 tool executable projects, 14 high-level
+  executable and test projects, one utility test project, 36 tool-test
+  projects, 142 core-test projects, and 21 parallel-test projects. Those
+  projects retained 144, 112, 8, 288, 1,136, and 168 Microsoft MPI include
+  records respectively through target propagation;
+- successful MSVC 18 Release builds of all targets in those six batches except
+  the OpenSSL-dependent signed-plugin targets, whose prerequisite is
+  unavailable. Focused execution passed all 11 high-level tests, all three
+  H5IMPORT fixture tests, all six selected H5COPY tests, all nine core API
+  version tests, and all five selected parallel MPI tests and fixtures with a
+  maximum of six MPI ranks; and
 - a complete default MSVC 18 Release build and CTest run at
   `HDF_TEST_EXPRESS=3`: all 2,817 enabled tests passed and 37 configured tests
   remained disabled out of 2,854 registered tests.
 
-The MinGW-w64 results exercise GNU compiler branches on Windows. They are not
-Linux/GCC validation. Native Linux/GCC, Clang or clang-cl, NVHPC, and Intel
-compiler validation remains unavailable in the current environment and is an
-explicit matrix gap.
+MSVC 18 is the primary Windows validation toolchain. The MinGW-w64 results are
+supplementary checks for GNU compiler branches on Windows; they neither replace
+MSVC validation nor constitute Linux/GCC validation. Native Linux/GCC, Clang or
+clang-cl, NVHPC, and Intel compiler validation remains unavailable in the
+current environment and is an explicit matrix gap.
 
 The CMake File API does not expose the additional target-level `LINK_FLAGS`
 copy used to preserve historical MPI executable propagation. That check used

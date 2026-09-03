@@ -13,7 +13,7 @@ set (chunk_SOURCES
     ${HDF5_TOOLS_TEST_PERFORM_SOURCE_DIR}/chunk.c
 )
 add_executable(chunk ${chunk_SOURCES})
-target_include_directories (chunk PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (chunk PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (chunk)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (chunk STATIC)
@@ -35,7 +35,7 @@ set (iopipe_SOURCES
     ${HDF5_TOOLS_TEST_PERFORM_SOURCE_DIR}/iopipe.c
 )
 add_executable (iopipe ${iopipe_SOURCES})
-target_include_directories (iopipe PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (iopipe PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (iopipe)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (iopipe STATIC)
@@ -57,7 +57,7 @@ set (chunk_cache_SOURCES
     ${HDF5_TOOLS_TEST_PERFORM_SOURCE_DIR}/chunk_cache.c
 )
 add_executable (chunk_cache ${chunk_cache_SOURCES})
-target_include_directories (chunk_cache PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (chunk_cache PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (chunk_cache)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (chunk_cache STATIC)
@@ -79,7 +79,7 @@ set (overhead_SOURCES
     ${HDF5_TOOLS_TEST_PERFORM_SOURCE_DIR}/overhead.c
 )
 add_executable (overhead ${overhead_SOURCES})
-target_include_directories (overhead PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (overhead PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (overhead)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (overhead STATIC)
@@ -101,7 +101,7 @@ set (perf_meta_SOURCES
     ${HDF5_TOOLS_TEST_PERFORM_SOURCE_DIR}/perf_meta.c
 )
 add_executable (perf_meta ${perf_meta_SOURCES})
-target_include_directories (perf_meta PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (perf_meta PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (perf_meta)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (perf_meta STATIC)
@@ -129,7 +129,7 @@ if (H5_ZLIB_HEADER)
     target_compile_definitions (zip_perf PRIVATE H5_HAVE_ZLIBNG_H=1 H5_ZLIB_HEADER="${H5_ZLIB_HEADER}")
   endif ()
 endif ()
-target_include_directories (zip_perf PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (zip_perf PRIVATE "${HDF5_TEST_SRC_DIR};${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (zip_perf)
 if (NOT BUILD_SHARED_LIBS)
   TARGET_C_PROPERTIES (zip_perf STATIC)

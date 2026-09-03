@@ -10,7 +10,7 @@ project (HDF5_TOOLS_TEST_MISC C)
 # Add the misc test executables
 # --------------------------------------------------------------------
 add_executable (h5clear_gentest ${HDF5_TOOLS_TEST_MISC_SOURCE_DIR}/h5clear_gentest.c)
-target_include_directories (h5clear_gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (h5clear_gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (h5clear_gentest)
 if (HDF5_BUILD_STATIC_TOOLS)
   TARGET_C_PROPERTIES (h5clear_gentest STATIC)
@@ -33,7 +33,7 @@ add_subdirectory (vds)
 
 
 add_executable (h5repart_test ${HDF5_TOOLS_TEST_MISC_SOURCE_DIR}/repart_test.c)
-target_include_directories (h5repart_test PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (h5repart_test PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (h5repart_test)
 if (BUILD_STATIC_LIBS)
   TARGET_C_PROPERTIES (h5repart_test STATIC)
@@ -52,7 +52,7 @@ if (HDF5_ENABLE_FORMATTERS)
 endif ()
 
 add_executable (clear_open_chk ${HDF5_TOOLS_TEST_MISC_SOURCE_DIR}/clear_open_chk.c)
-target_include_directories (clear_open_chk PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+target_include_directories (clear_open_chk PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (clear_open_chk)
 if (BUILD_STATIC_LIBS)
   TARGET_C_PROPERTIES (clear_open_chk STATIC)

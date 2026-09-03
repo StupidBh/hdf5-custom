@@ -19,7 +19,7 @@ if (BUILD_SHARED_LIBS)
   # Add the dynamic library for the h5copy tool plugin
   add_library (${H5COPY_TOOL_PLUGIN_LIB_TARGET} SHARED dynlib_copy.c)
   # Set include directories for the plugin build
-  target_include_directories (${H5COPY_TOOL_PLUGIN_LIB_TARGET} PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+  target_include_directories (${H5COPY_TOOL_PLUGIN_LIB_TARGET} PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
   hdf5_target_use_platform (${H5COPY_TOOL_PLUGIN_LIB_TARGET})
   # Set C properties and link libraries
   TARGET_C_PROPERTIES (${H5COPY_TOOL_PLUGIN_LIB_TARGET} SHARED)

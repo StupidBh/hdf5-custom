@@ -24,8 +24,7 @@ set (HDF5_TOOLS_MISC
 # Build main gentest
 add_executable(h5gentest ${HDF5_TOOLS_TEST_SOURCE_DIR}/h5gentest.c)
 target_include_directories (h5gentest PRIVATE
-  "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};"
-  "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+  "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
 hdf5_target_use_platform (h5gentest)
 
 if (HDF5_BUILD_STATIC_TOOLS)
@@ -44,10 +43,10 @@ target_include_directories(h5gentest PRIVATE
 foreach(tool ${HDF5_TOOLS};${HDF5_TOOLS_MISC})
   if (${tool} IN_LIST HDF5_TOOLS_MISC)
     add_library(${tool}gentest OBJECT ${HDF5_TOOLS_TEST_SOURCE_DIR}/misc/${tool}gentest.c)
-    target_include_directories (${tool}gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_TOOLS_TST_DIR};${HDF5_TOOLS_ROOT_DIR}/misc;${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+    target_include_directories (${tool}gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_TOOLS_TST_DIR};${HDF5_TOOLS_ROOT_DIR}/misc;${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_BINARY_DIR}")
   else()
     add_library(${tool}gentest OBJECT ${HDF5_TOOLS_TEST_SOURCE_DIR}/${tool}/${tool}gentest.c)
-    target_include_directories (${tool}gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_TOOLS_TST_DIR};${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+    target_include_directories (${tool}gentest PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_TOOLS_TST_DIR};${HDF5_TOOLS_ROOT_DIR}/lib;${HDF5_SRC_BINARY_DIR}")
   endif()
   hdf5_target_use_platform (${tool}gentest)
 

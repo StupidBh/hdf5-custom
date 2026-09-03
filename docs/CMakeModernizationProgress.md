@@ -8,8 +8,8 @@ actually landed, what is being worked on, and what remains unverified.
 ## Current Snapshot
 
 - Last updated: 2026-09-03
-- Progress anchor: `964090aed` (`cmake: Scope standalone MPI linker flags`)
-- Implementation commits after the plan was accepted: 113
+- Progress anchor: `6b14c86e4` (`cmake: Use MPI target includes for test libraries`)
+- Implementation commits after the plan was accepted: 117
 - Current stage: target-scoped build infrastructure and removal of remaining
   directory-global compiler and linker state
 - Overall state: the baseline and CMake 4 correctness stages are complete;
@@ -75,6 +75,8 @@ the current stage.
   dependency module.
 - Classified system, public, and compression dependencies and routed core and
   representative serial/parallel test targets through explicit ownership.
+- Routed MPI include requirements for the core, high-level, tools, and serial
+  test libraries through `MPI::MPI_C` instead of repeated path expressions.
 - Preserved JNI discovery for the HDFS VFD.
 
 ### Platform and instrumentation behavior
@@ -100,8 +102,8 @@ the repository's CMake files as a single change.
 
 ## Active Work
 
-The project-level linker flag batch is complete. The follow-on audit classifies
-the remaining flag writes before the next migrations are selected:
+The project-level linker flag batch is complete. The follow-on audit classified
+the remaining flag writes before further migrations were selected:
 
 - the 32-bit toolchain files own architecture and linker search flags at the
   toolchain boundary;
@@ -114,9 +116,13 @@ the remaining flag writes before the next migrations are selected:
   reports. They require dedicated compatibility work and compiler-specific
   validation rather than mechanical removal.
 
-The next target-scoping work can therefore proceed from explicit product and
-dependency ownership instead of treating every remaining `CMAKE_*_FLAGS`
-reference as the same class of defect.
+The current dependency work removes repeated MPI include expressions from
+targets that already consume `MPI::MPI_C`. The static and shared core,
+high-level, tools, and serial test libraries are complete. Executable and test
+target families remain separate follow-on batches because their dependency
+paths and supported option combinations differ. In particular, parallel HDF5
+and the C++ library are mutually exclusive unless `HDF5_ALLOW_UNSUPPORTED` is
+enabled, so C++ MPI cleanup is not being validated as a supported matrix row.
 
 ## Remaining Work
 
@@ -153,14 +159,18 @@ and standalone example builds. Recent checkpoints specifically verified:
   and `CPP_testhdf5` passing;
 - equivalent GNU compile and compiler-driver link option sets across all 121
   standalone example targets for the latest flag migrations;
-- preserved MSVC warning suppression for the existing C example targets; and
+- preserved MSVC warning suppression for the existing C example targets;
 - successful representative GNU C, HL, C++, and C++ HL example runs;
 - Microsoft MPI linker flag propagation for 19 executable and three shared
   library projects in every Visual Studio configuration, followed by a
   successful Release build, link, and run of `h5dump`;
 - equivalent linker argument multisets for all 85 standalone example
   executables with Microsoft MPI, followed by a successful Release build of
-  `ex_h5ex_d_alloc`; and
+  `ex_h5ex_d_alloc`;
+- unchanged Microsoft MPI contracts across the imported-target include
+  migrations: 1,295 core records, 1,409 high-level records, 2,176 tools
+  records, and 8,212 serial-test records, followed by successful Release
+  builds of each affected static and shared library; and
 - a complete default MSVC 18 Release build and CTest run at
   `HDF_TEST_EXPRESS=3`: all 2,817 enabled tests passed and 37 configured tests
   remained disabled out of 2,854 registered tests.

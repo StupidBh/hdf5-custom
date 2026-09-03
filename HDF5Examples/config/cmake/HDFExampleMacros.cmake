@@ -81,32 +81,36 @@ macro (BASIC_SETTINGS varname)
   #-----------------------------------------------------------------------------
   option (H5EXAMPLE_DISABLE_COMPILER_WARNINGS "Disable compiler warnings" OFF)
   if (H5EXAMPLE_DISABLE_COMPILER_WARNINGS)
-    # MSVC uses /w to suppress warnings.  It also complains if another
-    # warning level is given, so remove it.
     if (MSVC)
-      set (H5EXAMPLE_WARNINGS_BLOCKED 1)
+      # MSVC diagnoses conflicting warning levels even when /w is last.
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+      set (_hdf5_example_c_warning_suppression "/w")
       if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
+        set (_hdf5_example_cxx_warning_suppression "/w")
       endif ()
-    endif ()
-    if (WIN32)
-      target_compile_definitions (hdf5_examples_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
-    endif ()
-    # Borland uses -w- to suppress warnings.
-    if (BORLAND)
-     set (H5EXAMPLE_WARNINGS_BLOCKED 1)
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
+    elseif (BORLAND)
+      set (_hdf5_example_c_warning_suppression "-w-")
+    else ()
+      set (_hdf5_example_c_warning_suppression "-w")
+      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set (_hdf5_example_cxx_warning_suppression "-w")
+      endif ()
     endif ()
 
-    # Most compilers use -w to suppress warnings.
-    if (NOT H5EXAMPLE_WARNINGS_BLOCKED)
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-      endif ()
+    target_compile_options (hdf5_examples_platform INTERFACE
+        "$<$<COMPILE_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
+        "$<$<COMPILE_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
+    )
+    target_link_options (hdf5_examples_platform INTERFACE
+        "$<$<LINK_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
+        "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
+    )
+    unset (_hdf5_example_c_warning_suppression)
+    unset (_hdf5_example_cxx_warning_suppression)
+
+    if (WIN32)
+      target_compile_definitions (hdf5_examples_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
     endif ()
   endif ()
 

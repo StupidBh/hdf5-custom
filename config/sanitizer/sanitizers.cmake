@@ -78,7 +78,7 @@ message(STATUS "HDF5_USE_SANITIZER=${HDF5_USE_SANITIZER}, CMAKE_C_COMPILER_ID=${
 if(HDF5_USE_SANITIZER)
   # C++ may not be enabled yet. Capture the value that the previous global
   # mutation reported before enable_language(CXX) initializes its flags.
-  set(HDF5_CXX_FLAGS_BEFORE_SANITIZER "${CMAKE_CXX_FLAGS}")
+  set(HDF5_CXX_FLAGS_BEFORE_INSTRUMENTATION "${CMAKE_CXX_FLAGS}")
   set(HDF5_REPORTED_CXX_FLAGS_BASE "${CMAKE_CXX_FLAGS}")
 
   if(CMAKE_C_COMPILER_ID MATCHES "IntelLLVM" OR CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")

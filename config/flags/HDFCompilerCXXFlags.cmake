@@ -9,11 +9,11 @@
 # If you do not have access to either file, you may request a copy from
 # help@hdfgroup.org.
 #
-# Sanitizers used to define CMAKE_CXX_FLAGS before enabling C++, suppressing
-# CMake's platform defaults. Preserve that initialization behavior while the
-# sanitizer options themselves remain target-scoped.
-if (DEFINED HDF5_CXX_FLAGS_BEFORE_SANITIZER)
-  set (CMAKE_CXX_FLAGS "${HDF5_CXX_FLAGS_BEFORE_SANITIZER}")
+# Instrumentation used to define CMAKE_CXX_FLAGS before enabling C++,
+# suppressing CMake's platform defaults. Preserve that initialization behavior
+# while the instrumentation options themselves remain target-scoped.
+if (DEFINED HDF5_CXX_FLAGS_BEFORE_INSTRUMENTATION)
+  set (CMAKE_CXX_FLAGS "${HDF5_CXX_FLAGS_BEFORE_INSTRUMENTATION}")
 endif ()
 ENABLE_LANGUAGE (CXX)
 

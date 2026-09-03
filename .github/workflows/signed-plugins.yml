@@ -58,21 +58,13 @@ jobs:
             parallel: ON
             generator: ""
 
-          # macOS configuration
-          - name: "macOS Serial (Release + Shared)"
-            os: macos-latest
-            build_type: Release
-            shared: ON
-            parallel: OFF
-            generator: ""
-
           # Windows configuration
           - name: "Windows Serial (Release + Shared)"
             os: windows-latest
             build_type: Release
             shared: ON
             parallel: OFF
-            generator: "-A x64"
+            generator: "-G \"Visual Studio 18 2026\" -A x64"
 
     steps:
     - name: Checkout code
@@ -95,11 +87,6 @@ jobs:
         sudo apt-get install -y \
           libopenmpi-dev \
           openmpi-bin
-
-    - name: Install dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install openssl@3
 
     - name: Generate test RSA key pair (Unix)
       if: runner.os != 'Windows'

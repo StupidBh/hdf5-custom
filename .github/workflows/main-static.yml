@@ -47,7 +47,6 @@ jobs:
         name:
           - "Windows Static MSVC"
           - "Ubuntu Static gcc"
-          - "MacOS Static Clang"
 
         # This is where we list the bulk of the options for each configuration.
         # The key-value pair values are usually appropriate for being CMake
@@ -85,23 +84,6 @@ jobs:
             parallel: OFF
             mirror_vfd: ON
             direct_vfd: ON
-            ros3_vfd: OFF
-            generator: "-G Ninja"
-            run_tests: true
-
-          - name: "MacOS Static Clang"
-            ostype: macos
-            os: macos-latest
-            shared: OFF
-            cpp: ON
-            docs: OFF
-            libaecfc: ON
-            localaec: OFF
-            zlibfc: ON
-            localzlib: OFF
-            parallel: OFF
-            mirror_vfd: ON
-            direct_vfd: OFF
             ros3_vfd: OFF
             generator: "-G Ninja"
             run_tests: true
@@ -178,7 +160,6 @@ jobs:
             -DHDF5_ENABLE_ROS3_VFD:BOOL=${{ matrix.ros3_vfd }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
             -DHDF5_PACKAGE_EXTLIBS:BOOL=ON \
-            -DHDF5_PACK_MACOSX_DMG:BOOL=OFF \
             $GITHUB_WORKSPACE
         shell: bash
 

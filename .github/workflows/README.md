@@ -6,7 +6,6 @@ There are a few that only get triggered manually.
 ## Scheduled Workflows
 - daily-schedule.yml executes the daily-build.yml which first checks that there are changes
     * tarball.yml to create a source.zip and source.tar.gz
-    * cygwin.yml to test on cygwin
     * script.yml to test and report to my.cdash
     * par-script.yml to test with released MPI and report to my.cdash
     * par-source.yml to test with MPI default branch and report to my.cdash
@@ -60,13 +59,10 @@ There are a few that only get triggered manually.
     * in debug mode and -Werror compiler option
     * in release mode and -Werror compiler option
     * with minimum CMake Version 4.0
-- main.yml configure, build, test, and package HDF5 on Ubuntu, macOS, and Windows
-- main-static.yml configure, build, test static only HDF5 on Ubuntu, macOS, and Windows
+- main.yml configures, builds, tests, and packages HDF5 on Ubuntu and Windows
+- main-static.yml configures, builds, and tests static HDF5 on Ubuntu and Windows
 - bintest.yml test binary packages created by main.yml
 - main-par.yml configure, build, and test HDF5 with openmpi
 - main-par-spc.yml configure, build, and test HDF5 with HDF5_ENABLE_WARNINGS_AS_ERRORS=ON
-- aocc.yml configure, build, and test HDF5 with AOCC and OpenMPI
 - testxpr.yml configure, build, and test HDF5 with HDF_TEST_EXPRESS=0
 - julia.yml configure and build HDF5, then test Julia hdf5 source
-- msys2.yml configure, build, and test HDF5 on mingw32, mingw64, ucrt64, clang64
-- i386.yml configure, build, and test HDF5 on 32-bit Linux

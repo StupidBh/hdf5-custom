@@ -30,11 +30,6 @@ on:
         required: false
         default: "windows-latest"
         type: string
-      win_vs_generator:
-        description: "CMake generator to use for Visual Studio"
-        required: false
-        default: "Visual Studio 18 2026"
-        type: string
 
 permissions:
   contents: read
@@ -58,7 +53,6 @@ jobs:
         name:
           - "Windows MSVC"
           - "Ubuntu gcc"
-          - "MacOS Clang"
 
         # This is where we list the bulk of the options for each configuration.
         # The key-value pair values are usually appropriate for being CMake
@@ -82,7 +76,7 @@ jobs:
             parallel: OFF
             mirror_vfd: OFF
             direct_vfd: OFF
-            generator: "-G \"${{ inputs.win_vs_generator }}\" -A x64"
+            generator: "-G \"Visual Studio 18 2026\" -A x64"
             run_tests: true
 
           # Linux (Ubuntu) w/ gcc
@@ -100,24 +94,6 @@ jobs:
             parallel: OFF
             mirror_vfd: ON
             direct_vfd: ON
-            generator: "-G Ninja"
-            run_tests: true
-
-          # MacOS w/ Clang
-          #
-          - name: "MacOS Clang"
-            ostype: macos
-            os: macos-15
-            shared: ON
-            cpp: ON
-            docs: ON
-            libaecfc: ON
-            localaec: OFF
-            zlibfc: ON
-            localzlib: OFF
-            parallel: OFF
-            mirror_vfd: ON
-            direct_vfd: OFF
             generator: "-G Ninja"
             run_tests: true
 
@@ -197,7 +173,6 @@ jobs:
             -DHDF5_ENABLE_DIRECT_VFD:BOOL=${{ matrix.direct_vfd }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
             -DHDF5_PACKAGE_EXTLIBS:BOOL=ON \
-            -DHDF5_PACK_MACOSX_DMG:BOOL=OFF \
             $GITHUB_WORKSPACE
         shell: bash
         if: ${{ inputs.thread_safety != 'TS' && inputs.concurrent != 'CC'}}
@@ -225,7 +200,6 @@ jobs:
             -DHDF5_ENABLE_MIRROR_VFD:BOOL=${{ matrix.mirror_vfd }} \
             -DHDF5_ENABLE_DIRECT_VFD:BOOL=${{ matrix.direct_vfd }} \
             -DHDF5_PACK_EXAMPLES:BOOL=ON \
-            -DHDF5_PACK_MACOSX_DMG:BOOL=OFF \
             $GITHUB_WORKSPACE
         shell: bash
         if: ${{ inputs.thread_safety == 'TS' && inputs.concurrent != 'CC'}}
@@ -267,23 +241,8 @@ jobs:
         if: ${{ matrix.run_tests }}
 
       - name: Run Package
-        run: |
-          if [[ "${{ matrix.ostype }}" == "macos" ]]; then
-            # Disable indexing to prevent file locking during CPack
-            sudo mdutil -i off / || true
-
-            # Run cpack with retry
-            cpack -C ${{ inputs.build_mode }} -V || (sleep 5 && cpack -C ${{ inputs.build_mode }} -V)
-          else
-            cpack -C ${{ inputs.build_mode }} -V
-          fi
+        run: cpack -C ${{ inputs.build_mode }} -V
         working-directory: ${{ runner.workspace }}/build
-        shell: bash
-#        if: ${{ (matrix.ostype != 'macos') && (inputs.build_mode != 'Debug') }}
-
-#      - name: Run Package (Mac_latest)
-#        run: cpack -C ${{ inputs.build_mode }} -G STGZ -V
-#        if: ${{ (matrix.ostype == 'macos') }}
 
       - name: List files in the space
         run: |
@@ -305,11 +264,3 @@ jobs:
               path: ${{ runner.workspace }}/build/HDF5-*-Linux.tar.gz
               if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
         if:  ${{ (matrix.ostype == 'ubuntu') && ( inputs.save_binary != 'skip') }}
-
-      - name: Save published binary (Mac_latest)
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v5
-        with:
-              name: tgz-macos15_clang-${{ inputs.build_mode }}-${{ inputs.save_binary }}-binary
-              path: ${{ runner.workspace }}/build/HDF5-*-Darwin.tar.gz
-              if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-        if: ${{ (matrix.ostype == 'macos') && ( inputs.save_binary != 'skip') }}

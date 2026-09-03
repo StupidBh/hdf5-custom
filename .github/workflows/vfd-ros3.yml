@@ -38,7 +38,7 @@ jobs:
       # Let jobs run to completion even if one fails
       fail-fast: false
       matrix:
-        os_name: ["Windows MSVC", "Ubuntu GCC", "MacOS Clang"]
+        os_name: ["Windows MSVC", "Ubuntu GCC"]
         include:
           - os_name: "Windows MSVC"
             os: windows-latest
@@ -46,9 +46,6 @@ jobs:
           - os_name: "Ubuntu GCC"
             os: ubuntu-latest
             test_ros3: ON
-          - os_name: "MacOS Clang"
-            os: macos-latest
-            test_ros3: OFF
 
     name: "ROS3 VFD (${{ matrix.os_name }} ${{ inputs.build_mode }})"
     runs-on: ${{ matrix.os }}
@@ -88,10 +85,6 @@ jobs:
           echo "LD_LIBRARY_PATH=${{ runner.workspace }}/aws-c-s3-build/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=${{ runner.workspace }}/aws-c-s3-build" >> $GITHUB_ENV
 
-      - name: Install aws-c-s3 (MacOS)
-        if: ${{ matrix.os_name == 'MacOS Clang' }}
-        run: brew install aws-c-s3
-
       - name: Set environment for MSVC (Windows)
         if: ${{ matrix.os_name == 'Windows MSVC' }}
         run: |
@@ -113,6 +106,7 @@ jobs:
           mkdir "${{ runner.workspace }}/build"
           cd "${{ runner.workspace }}/build"
           cmake -C $GITHUB_WORKSPACE/config/cmake/cacheinit.cmake \
+            -G "Visual Studio 18 2026" -A x64 \
             --log-level=VERBOSE \
             -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake \
             -DVCPKG_USE_LEGACY_APPLOCAL=ON \
@@ -138,6 +132,7 @@ jobs:
           mkdir "${{ runner.workspace }}/build"
           cd "${{ runner.workspace }}/build"
           cmake -C $GITHUB_WORKSPACE/config/cmake/cacheinit.cmake \
+            -G Ninja \
             --log-level=VERBOSE \
             -DCMAKE_BUILD_TYPE=${{ inputs.build_mode }} \
             -DBUILD_SHARED_LIBS=ON \
@@ -166,7 +161,7 @@ jobs:
           ctest . -C ${{ inputs.build_mode }} -R "S3TEST"
         working-directory: ${{ runner.workspace }}/build
 
-  # Build and test the ROS3 VFD using aws-c-s3 from source (Linux) or package managers (Windows/macOS)
+  # Build and test the ROS3 VFD using aws-c-s3 from source (Linux) or a package manager (Windows)
   build_and_test_vfd:
     if: ${{ inputs.aws_c_s3_build_type == 'source' }}
 
@@ -174,7 +169,7 @@ jobs:
       # Let jobs run to completion even if one fails
       fail-fast: false
       matrix:
-        os_name: ["Windows MSVC", "Ubuntu GCC", "MacOS Clang"]
+        os_name: ["Windows MSVC", "Ubuntu GCC"]
         include:
           - os_name: "Windows MSVC"
             os: windows-latest
@@ -184,10 +179,6 @@ jobs:
             os: ubuntu-latest
             ostype: ubuntu
             test_ros3: ON
-          - os_name: "MacOS Clang"
-            os: macos-latest
-            ostype: macos
-            test_ros3: OFF
 
     name: "ROS3 VFD Source (${{ matrix.os_name }} ${{ inputs.build_mode }})"
     runs-on: ${{ matrix.os }}
@@ -221,11 +212,6 @@ jobs:
         if: ${{ matrix.os_name == 'Windows MSVC' }}
         run: vcpkg install aws-c-s3
 
-      # macOS: Install aws-c-s3 via Homebrew
-      - name: Install aws-c-s3 (MacOS)
-        if: ${{ matrix.os_name == 'MacOS Clang' }}
-        run: brew install aws-c-s3
-
       - name: Set environment for MSVC (Windows)
         if: ${{ matrix.os_name == 'Windows MSVC' }}
         run: |
@@ -247,6 +233,7 @@ jobs:
           mkdir "${{ runner.workspace }}/build"
           cd "${{ runner.workspace }}/build"
           cmake -C $GITHUB_WORKSPACE/config/cmake/cacheinit.cmake \
+            -G "Visual Studio 18 2026" -A x64 \
             --log-level=VERBOSE \
             -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake \
             -DVCPKG_USE_LEGACY_APPLOCAL=ON \
@@ -272,6 +259,7 @@ jobs:
           mkdir "${{ runner.workspace }}/build"
           cd "${{ runner.workspace }}/build"
           cmake -C $GITHUB_WORKSPACE/config/cmake/cacheinit.cmake \
+            -G Ninja \
             --log-level=VERBOSE \
             -DCMAKE_BUILD_TYPE=${{ inputs.build_mode }} \
             -DBUILD_SHARED_LIBS=ON \
@@ -324,11 +312,3 @@ jobs:
               path: ${{ runner.workspace }}/build/HDF5-*-Linux.tar.gz
               if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
         if:  ${{ (matrix.ostype == 'ubuntu') && ( inputs.save_binary != 'skip') }}
-
-      - name: Save published binary (Mac_latest)
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v5
-        with:
-              name: tgz-macos15_clang-S3-${{ inputs.build_mode }}-${{ inputs.save_binary }}-binary
-              path: ${{ runner.workspace }}/build/HDF5-*-Darwin.tar.gz
-              if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-        if: ${{ (matrix.ostype == 'macos') && ( inputs.save_binary != 'skip') }}

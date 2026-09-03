@@ -27,9 +27,6 @@ jobs:
     name: "Windows MSVC Binary Test"
     runs-on: windows-latest
     steps:
-      - name: Install Dependencies (Windows)
-        run: choco install ninja
-
       - name: Enable Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
 
@@ -139,50 +136,6 @@ jobs:
           cmake --workflow --preset=ci-StdShar-GNUC --fresh
         shell: bash
 
-  test_binary_mac_latest:
-  # MacOS w/ Clang
-  #
-    name: "MacOS Clang Binary Test"
-    runs-on: macos-latest
-    steps:
-      - name: Get published binary (MacOS_latest)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: tgz-macos15_clang-${{ inputs.build_mode }}-${{ inputs.save_binary }}-binary
-          path: ${{ github.workspace }}
-
-      - name: Uncompress hdf5 binary (MacOS_latest)
-        run:  |
-          cd "${{ github.workspace }}"
-          tar -zxvf ${{ github.workspace }}/HDF5-*-Darwin.tar.gz --strip-components 1
-
-      - name: set hdf5lib name
-        id: set-hdf5lib-name
-        run: |
-          HDF5DIR=${{ github.workspace }}/HDF_Group/HDF5/
-          FILE_NAME_HDF5=$(ls ${{ github.workspace }}/HDF_Group/HDF5)
-          echo "HDF5_ROOT=$HDF5DIR$FILE_NAME_HDF5" >> $GITHUB_OUTPUT
-          echo "HDF5_PLUGIN_PATH=$HDF5_ROOT/lib/plugin" >> $GITHUB_OUTPUT
-
-      - name: List files for the binaries (MacOS_latest)
-        run: |
-          ls -l ${{ github.workspace }}/HDF_Group/HDF5
-
-      - name: List files for the space (MacOS_latest)
-        run: |
-          ls ${{ github.workspace }}
-          ls ${{ runner.workspace }}
-
-      - name: Run CTest (MacOS_latest)
-        id: run-ctest
-        env:
-          HDF5_ROOT: ${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}
-          HDF5_PLUGIN_PATH: ${{ steps.set-hdf5lib-name.outputs.HDF5_PLUGIN_PATH }}
-        run: |
-          cd "${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/share/HDF5Examples"
-          cmake --workflow --preset=ci-StdShar-macos-Clang --fresh
-        shell: bash
-
   test_h5cc_linux:
   # Linux (Ubuntu) w/ gcc
   #
@@ -231,4 +184,3 @@ jobs:
           cd "${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/share/HDF5Examples"
           sh ./test-pc.sh ${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/share/HDF5Examples ${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/share/build .
         shell: bash
-

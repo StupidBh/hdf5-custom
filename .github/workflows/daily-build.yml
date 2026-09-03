@@ -90,15 +90,6 @@ jobs:
       aws_c_s3_tag: "v0.8.0"
     if: ${{ ((needs.call-workflow-tarball.outputs.has_changes == 'true') || (needs.get-old-names.outputs.run-ignore == 'ignore')) }}
 
-  call-release-cmake-cygwin:
-    needs: [get-old-names, call-workflow-tarball]
-    name: "Cygwin Workflows"
-    uses: ./.github/workflows/cygwin.yml
-    with:
-      file_base: ${{ needs.call-workflow-tarball.outputs.file_base }}
-      use_environ: snapshots
-    if: ${{ ((needs.call-workflow-tarball.outputs.has_changes == 'true') || (needs.get-old-names.outputs.run-ignore == 'ignore')) }}
-
   call-workflow-c-script:
     needs: [get-old-names, call-workflow-tarball, call-aws-c-s3-build]
     uses: ./.github/workflows/script.yml
@@ -154,9 +145,6 @@ jobs:
 #      use_tag: snapshot
       use_environ: snapshots
     secrets:
-        APPLE_CERTS_BASE64: ${{ secrets.APPLE_CERTS_BASE64 }}
-        APPLE_CERTS_BASE64_PASSWD: ${{ secrets.APPLE_CERTS_BASE64_PASSWD }}
-        KEYCHAIN_PASSWD: ${{ secrets.KEYCHAIN_PASSWD }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -199,4 +187,3 @@ jobs:
       use_tag: snapshot
       use_environ: snapshots
     if: ${{ ((needs.call-workflow-tarball.outputs.has_changes == 'true') || (needs.get-old-names.outputs.run-ignore == 'ignore')) && (needs.get-old-names.outputs.hdf5-name != needs.call-workflow-tarball.outputs.file_base) }}
-

@@ -21,7 +21,6 @@ jobs:
       fail-fast: false
       matrix:
         os_name: ["Ubuntu"]
-#        os_name: ["Ubuntu", "MacOS"]
         mpi_lib: ["OpenMPI"]
 #        mpi_lib: ["OpenMPI", "MPICH"]
         include:
@@ -30,12 +29,6 @@ jobs:
             mpi_lib: "OpenMPI"
 #          - os_name: "Ubuntu"
 #            os: ubuntu-latest
-#            mpi_lib: "MPICH"
-#          - os_name: "MacOS"
-#            os: macos-latest
-#            mpi_lib: "OpenMPI"
-#          - os_name: "MacOS"
-#            os: macos-latest
 #            mpi_lib: "MPICH"
 
     # Sets the job's name from the properties

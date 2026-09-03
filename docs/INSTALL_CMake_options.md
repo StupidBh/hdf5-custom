@@ -19,7 +19,6 @@ Options settings for typical HDF5 configurations can be found in the [cacheinit.
   * [Installation options](#installation-options)
   * [Packaging options](#packaging-options)
   * [Compiler options](#compiler-options)
-  * [MinGW-specific options](#mingw-specific-options)
 * [Programming language wrappers options](#programming-language-wrappers-options)
   * [C++ options](#pl_cxx)
   * [High-level library options](#hl_lib)
@@ -136,15 +135,6 @@ These options are generally passed through to the compiler to influence most or 
 | `HDF5_ENABLE_SYMBOLS` | `STRING` | `OFF` | If `YES`, adds compilation flags to enable debugging symbols, independent of the build type and optimization level. If `NO`, adds compilation flags to strip debugging symbols. Valid values are `YES`, `NO` and `OFF`. |
 | `HDF5_ENABLE_PROFILING` | `BOOL` | `OFF` | If `ON`, adds compilation flags for profiling, independent of the build type. |
 | `HDF5_ENABLE_OPTIMIZATION` | `BOOL` | `OFF` | If `ON`, adds compilation flags for optimization, independent of the build type. |
-
-### MinGW-specific options
-
-These are options that are specific to building HDF5 with MinGW.
-
-| CMake option | Type | Default | Description |
-|:-------------|:-----|:--------|:------------|
-| `HDF5_MINGW_STATIC_GCC_LIBS` | `BOOL` | `OFF` | If `ON`, statically link `libgcc` / `libstdc++` when using a MinGW toolchain. |
-| `HDF5_MSVC_NAMING_CONVENTION` | `BOOL` | `OFF` | If `ON`, use MSVC naming convention for shared HDF5 libraries when using a MinGW toolchain. |
 
 ## Programming language wrappers options
 

@@ -281,7 +281,6 @@
           "value": "hdf5::"
         },
         "HDF5_ENABLE_ALL_WARNINGS": "ON",
-        "HDF5_MINGW_STATIC_GCC_LIBS": "ON",
         "HDF_TEST_EXPRESS": "2"
       }
     },

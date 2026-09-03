@@ -44,8 +44,6 @@ set (HDF5_NO_PACKAGES ON CACHE BOOL "CPACK - Disable packaging" FORCE)
 
 set (HDF_TEST_EXPRESS "2" CACHE STRING "Control testing framework (0-3)" FORCE)
 
-set (HDF5_MINGW_STATIC_GCC_LIBS ON CACHE BOOL "Statically link libgcc/libstdc++" FORCE)
-
 set (HDF5_ALLOW_EXTERNAL_SUPPORT "TGZ" CACHE STRING "If not set to NO, specifies where to obtain sources when building or using external libraries (NO GIT TGZ)" FORCE)
 
 ########################

@@ -114,11 +114,6 @@ if (BUILD_SHARED_LIBS)
   target_link_libraries (${HDF5_CPP_LIBSH_TARGET}
       PUBLIC ${HDF5_LIBSH_TARGET}
   )
-  if (MINGW AND HDF5_MINGW_STATIC_GCC_LIBS)
-    target_link_options (${HDF5_CPP_LIBSH_TARGET}
-        PRIVATE -static-libgcc -static-libstdc++
-    )
-  endif ()
   set_global_variable (HDF5_LIBRARIES_TO_EXPORT "${HDF5_LIBRARIES_TO_EXPORT};${HDF5_CPP_LIBSH_TARGET}")
   H5_SET_LIB_OPTIONS (${HDF5_CPP_LIBSH_TARGET} ${HDF5_CPP_LIB_NAME} SHARED "CXX")
   set_target_properties (${HDF5_CPP_LIBSH_TARGET} PROPERTIES FOLDER libraries/cpp)

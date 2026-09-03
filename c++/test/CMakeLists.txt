@@ -55,11 +55,6 @@ if (NOT BUILD_SHARED_LIBS)
 else ()
   TARGET_C_PROPERTIES (cpp_testhdf5 SHARED)
   target_link_libraries (cpp_testhdf5 PRIVATE ${HDF5_CPP_LIBSH_TARGET} ${HDF5_LIBSH_TARGET} ${HDF5_TEST_LIBSH_TARGET})
-  if (MINGW AND HDF5_MINGW_STATIC_GCC_LIBS)
-    target_link_options (${HDF5_CPP_LIBSH_TARGET}
-        PRIVATE -static-libgcc -static-libstdc++
-    )
-  endif ()
 endif ()
 set_target_properties (cpp_testhdf5 PROPERTIES FOLDER test/cpp)
 

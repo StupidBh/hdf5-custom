@@ -80,9 +80,6 @@ mark_as_advanced (HDF5_ENABLE_PREADWRITE)
 option (HDF5_ENABLE_DEPRECATED_SYMBOLS "Enable deprecated public API symbols" ON)
 mark_as_advanced (HDF5_ENABLE_DEPRECATED_SYMBOLS)
 
-option (HDF5_MINGW_STATIC_GCC_LIBS "Statically link libgcc/libstdc++" OFF)
-mark_as_advanced (HDF5_MINGW_STATIC_GCC_LIBS)
-
 option (HDF5_ENABLE_TRACE "Enable API tracing capability" OFF)
 mark_as_advanced (HDF5_ENABLE_TRACE)
 if (HDF5_ENABLE_TRACE)

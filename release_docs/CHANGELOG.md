@@ -43,6 +43,21 @@ We would like to thank the many HDF5 community members who contributed to this r
 
 # ⚠️ Breaking Changes
 
+## CMake builds now support only Windows/MSVC and Linux/GCC
+
+The supported CMake build matrix is now Windows x64 with MSVC 18 and the
+Visual Studio 18 2026 generator, plus Linux x86_64 with GCC/G++ and Ninja or
+Unix Makefiles. MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel, NVHPC, AOCC,
+macOS, BSD, Emscripten, and other combinations are no longer supported.
+Windows builds with MSVC and Ninja are also unsupported. Unsupported
+environments fail during CMake configuration.
+
+The MinGW-only `HDF5_MINGW_STATIC_GCC_LIBS` option is removed. The ineffective
+`HDF5_MSVC_NAMING_CONVENTION` option is also removed; it was exposed only for
+MSVC while its implementation required MinGW, so it could not affect a
+supported build. These build-system changes do not alter HDF5 file-format
+compatibility or the C ABI on retained platforms.
+
 
 # 🪦 Deprecations
 

@@ -2,7 +2,9 @@
 
 ## Status
 
-- State: Proposed
+- State: In progress
+- Support contract approved: 2026-09-03
+- Current phase: Phase 1 - central toolchain validation
 - Planning baseline: `3d4e59b21`
 - Primary available environment: Windows with MSVC 18
 - Unavailable local environment: Linux with GCC
@@ -12,7 +14,7 @@
 
 Reduce the supported CMake build matrix to two platform and compiler pairs:
 
-| Platform | Supported compiler | Primary generator |
+| Platform | Supported compiler | Supported generators |
 | --- | --- | --- |
 | Windows | MSVC | Visual Studio 18 2026, x64 |
 | Linux | GCC | Ninja or Unix Makefiles |
@@ -24,6 +26,21 @@ instead of being accepted through unverified compatibility branches.
 This is an intentional compatibility change. It is separate from the existing
 behavior-preserving CMake 4 modernization plan, whose current contract retains
 existing toolchains and options.
+
+## Approved Validation Baselines
+
+The retained Windows baseline is Windows x64 with the MSVC 18 toolset supplied
+by Visual Studio 18 2026 and the `Visual Studio 18 2026` generator. Ninja with
+MSVC is not supported; accepting the compiler does not imply accepting another
+Windows generator.
+
+The retained Linux baseline for the deferred native validation gate is Ubuntu
+24.04 LTS on x86_64, CMake 4.0.3, GCC/G++ 13.3.0, and Ninja 1.11.1. The Unix
+Makefiles generator is also supported and requires a focused configure/build
+check during the Linux gate. These pinned versions define the reproducible
+validation floor; later patch releases within the same toolchain families are
+not excluded, but another operating system, architecture, or compiler family
+does not become supported implicitly.
 
 ## Motivation
 

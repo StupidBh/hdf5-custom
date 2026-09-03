@@ -11,28 +11,39 @@ machine without reconstructing its state from chat history or local build
 artifacts.
 
 The detailed implementation plan for the current direction is
-[`docs/CMakeModernizationProgress.md`](docs/CMakeModernizationProgress.md). The
-target architecture and compatibility contract are defined in
-[`docs/CMakeModernization.md`](docs/CMakeModernization.md).
-
-A proposed follow-on compatibility change would reduce the supported CMake
-matrix to Windows/MSVC and Linux/GCC. Its detailed plan is
 [`docs/refactoring/CMakePlatformSupportReduction.md`](docs/refactoring/CMakePlatformSupportReduction.md).
-It has not started and must not be treated as part of the behavior-preserving
-modernization until its support-contract phase is approved and committed.
+It intentionally changes the compatibility contract by reducing the CMake
+matrix to Windows/MSVC and Linux/GCC. The underlying target architecture and
+the paused behavior-preserving modernization state remain recorded in
+[`docs/CMakeModernization.md`](docs/CMakeModernization.md) and
+[`docs/CMakeModernizationProgress.md`](docs/CMakeModernizationProgress.md).
 
 ## Active Direction
 
-- Direction: CMake 4 build-system modernization
-- Status: In progress
-- Implementation anchor: `0b9e21c34`
-- Implementation commits after plan acceptance: 123
+- Direction: CMake supported-platform reduction
+- Status: In progress; support contract approved and Phase 1 is next
+- Planning anchor: `c70273f0c`
+- Behavior implementation anchor: none
+- Behavior implementation commits after support-contract approval: 0
 
-The project is CMake 4-ready, but its complete build organization is not yet
-modernized. The correct current description is "CMake 4.0 baseline complete;
-build-system modernization in progress."
+The CMake build now supports Windows x64 with MSVC 18 and the Visual Studio 18
+2026 generator, plus Linux x86_64 with GCC/G++ and Ninja or Unix Makefiles.
+The platform gate and compatibility-code removals have not landed yet, so the
+source still contains unsupported paths that must not be mistaken for support.
 
 ## Completed
+
+- Approved the Windows/MSVC and Linux/GCC support contract and documented the
+  unsupported platform, compiler, and generator combinations.
+- Fixed the deferred Linux validation baseline at Ubuntu 24.04 LTS x86_64,
+  CMake 4.0.3, GCC/G++ 13.3.0, and Ninja 1.11.1, with a separate Unix
+  Makefiles configure/build check.
+- Declared Visual Studio 18 2026 as the only supported Windows generator;
+  Ninja with MSVC is outside the supported matrix.
+
+The completed CMake 4 modernization foundation remains available at
+implementation anchor `0b9e21c34` and is detailed in
+`docs/CMakeModernizationProgress.md`. In summary, that work:
 
 - Raised active project entry points and retained standalone examples and
   scripts to a CMake 4.0 minimum.
@@ -54,58 +65,45 @@ build-system modernization in progress."
 
 ## Remaining
 
-- Finish classifying the remaining global compiler flag mutations. Preserve
-  toolchain-owned flags, temporary feature-check state, and build-type state;
-  migrate only genuine target requirements.
-- Complete product dependency and target-name migration for the remaining core,
-  high-level, C++, tool, utility, test, and example paths.
-- Convert supported external dependencies to consistent imported-target and
-  modern FetchContent flows for system, bundled, local, and offline use.
-- Modernize CTest helpers, fixtures, resource locks, launchers,
-  expected-failure handling, environment setup, MPI execution, and standalone
-  example tests.
-- Separate install, export, package configuration, pkg-config, runtime
-  dependency, component, and CPack logic from the root coordinator.
-- Validate build-tree and install-tree `find_package`, `add_subdirectory()`,
-  FetchContent, pkg-config, and standalone-example consumers.
-- Remove transitional helpers, unused macros, target-name variables, and
-  remaining directory-global state after all callers have migrated.
-- Reduce the root `CMakeLists.txt` to option loading, platform and dependency
-  setup, target orchestration, testing, installation, and packaging
-  coordination.
+- Add and test one central platform/compiler/generator validation module for
+  the root project and retained standalone examples.
+- Remove MinGW/MSYS2 toolchains, presets, workflows, private cache options,
+  active CMake branches, and current documentation in bounded commits.
+- Remove other unsupported compiler and operating-system dispatch without
+  disturbing shared Linux/GCC behavior.
+- Review source-level MinGW guards separately, especially installed public
+  headers.
+- Complete the required Windows/MSVC build, test, install, package, and
+  consumer matrix.
+- Run the deferred native Linux/GCC matrix on the pinned baseline before
+  declaring the direction complete.
+- Resume the remaining target-scoped modernization work only after this
+  compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Resume from implementation anchor `0b9e21c34`; do not repeat the completed MPI
-target-include batches. The next dependency pass should re-audit the remaining
-direct `MPI_C_INCLUDE_DIRS` uses and classify them before editing:
-
-- consumer-facing compatibility variables and package configuration;
-- standalone C and C++ examples;
-- targets gated by unavailable OpenSSL, mirror VFD, MFU, or CIRCLE
-  prerequisites; and
-- the unsupported C++ plus parallel combination, which requires
-  `HDF5_ALLOW_UNSUPPORTED=ON` and is not a supported validation row.
-
-For each selected batch, capture a generated-build baseline first, make one
-scoped change, compare the affected target contracts or generated project
-files, build the affected targets, run the narrowest relevant CTest set, and
-commit the implementation atomically. Update this handoff only after a coherent
-batch, not after every individual commit.
+Implement Phase 1 from
+`docs/refactoring/CMakePlatformSupportReduction.md`: add one reusable module
+under `config/cmake/` that validates C after root-project language detection
+and validates C++ when enabled. Apply it to retained standalone entry points,
+add script-level negative-policy tests, and prove the default MSVC configure
+contract is unchanged apart from the policy itself. Do not delete MinGW paths
+in the same commit.
 
 ## Validation State
 
-- Primary validated toolchain: MSVC 18 on Windows, Release configuration.
+- Retained locally available toolchain: MSVC 18 on Windows x64 with the Visual
+  Studio 18 2026 generator.
 - Complete default MSVC result: 2,817 enabled tests passed and 37 configured
   tests remained disabled at `HDF_TEST_EXPRESS=3`.
 - Latest MPI target-include batches: affected Visual Studio projects remained
   byte-identical, affected targets built successfully, and focused Microsoft
   MPI tests passed with no more than six MPI ranks.
-- Supplementary coverage: MinGW-w64 exercises GNU branches on Windows only. It
-  is neither the primary Windows validation nor Linux/GCC validation.
-- Unavailable or incomplete coverage: native Linux/GCC, Clang or clang-cl,
-  NVHPC, Intel, broader optional dependencies, installation and package
-  contracts, and external consumer configurations.
+- Historical MinGW-w64 results are baseline evidence only; MinGW is now outside
+  the support contract and cannot substitute for native Linux/GCC validation.
+- Unavailable or incomplete retained coverage: native Linux/GCC, broader
+  optional dependencies, installation and package contracts, and external
+  consumer configurations.
 
 When continuing on a machine that provides a missing toolchain or dependency,
 use it to close the corresponding validation gap and record the exact supported

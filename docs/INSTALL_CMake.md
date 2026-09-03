@@ -39,6 +39,15 @@
 ### CMake version
 1. We suggest you obtain the latest CMake from the Kitware web site. The HDF5 2."X"."Y" product requires a **minimum CMake version 4.0**.
 
+### Supported build environments
+
+The CMake build supports Windows x64 with MSVC 18 and the Visual Studio 18
+2026 generator, and Linux x86_64 with GCC/G++ using Ninja or Unix Makefiles.
+Ninja with MSVC is not supported. MinGW, MSYS2, Cygwin, Clang and clang-cl,
+Intel, NVHPC, AOCC, macOS, BSD, Emscripten, and other platform/compiler
+combinations are unsupported. `HDF5_ALLOW_UNSUPPORTED` does not bypass this
+build-environment policy.
+
 > **Note:** To change the install prefix from the platform defaults initialize the CMake variable, `CMAKE_INSTALL_PREFIX`. Users of build scripts will use the `INSTALLDIR` option.
 >
 > **Note:** See the CMake documentation for more information on setting the logging levels: [`CMAKE_MESSAGE_LOG_LEVEL`](https://cmake.org/cmake/help/latest/variable/CMAKE_MESSAGE_LOG_LEVEL.html).
@@ -52,8 +61,8 @@
 
 ### Prerequisites
 * **CMake 4.0 or later** (required for HDF5 2.0)
-* **Ninja build system** (recommended, should be downloaded if not available)
-* **Compiler:** GCC, MSVC, or Clang
+* **Generator:** Visual Studio 18 2026 on Windows; Ninja or Unix Makefiles on Linux
+* **Compiler:** MSVC 18 on Windows or GCC/G++ on Linux
 
 ### Quick Start (3 steps)
 1. Change to the HDF5 source directory:
@@ -62,9 +71,8 @@
    ```
 2. Execute a workflow preset:
    ```bash
-   cmake --workflow --preset ci-StdShar-GNUC --fresh       # Linux/Mac with GCC
+   cmake --workflow --preset ci-StdShar-GNUC --fresh       # Linux with GCC
    cmake --workflow --preset ci-StdShar-MSVC --fresh       # Windows with MSVC
-   cmake --workflow --preset ci-StdShar-Clang --fresh      # Linux/Mac with Clang
    ```
 3. Find your build artifacts in:
    ```text
@@ -87,7 +95,6 @@ cmake --list-presets
 * **Standard Builds:**
   * `ci-StdShar-GNUC`        (Standard shared libraries - GCC)
   * `ci-StdShar-MSVC`        (Standard shared libraries - MSVC)
-  * `ci-StdShar-Clang`       (Standard shared libraries - Clang)
   * `ci-MinShar-GNUC`        (Minimal shared libraries - GCC)
 > **Note:** For ROS3 (S3 support), add `-DHDF5_ENABLE_ROS3_VFD=ON` to any preset.
 
@@ -101,7 +108,7 @@ See [Section XI]((#section-xi)) for creating custom preset configurations.
 * ✅ **Flexible** - Easy to customize via `CMakeUserPresets.json`
 
 ### Individual Preset Commands (Advanced)
-If you prefer to run preset steps individually (where `<compiler-type>` is `GNUC`, `MSVC`, or `Clang`):
+If you prefer to run preset steps individually (where `<compiler-type>` is `GNUC` or `MSVC`):
 
 ```bash
 cd /path/to/hdf5-source

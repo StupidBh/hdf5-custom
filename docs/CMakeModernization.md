@@ -17,6 +17,14 @@ change source code to accommodate build-system changes, or conflate language dia
 
 The following behavior is frozen before build logic is changed:
 
+The separately approved
+[CMake supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
+supersedes this contract for platform/compiler support, generator support, and
+cache options used only by removed toolchains. The retained matrix is Windows
+x64 with MSVC 18 and the Visual Studio 18 2026 generator, plus Linux x86_64
+with GCC/G++ and Ninja or Unix Makefiles. Other combinations are no longer
+compatibility requirements.
+
 - Cache options keep their names, types, defaults, allowed values, and advanced/non-advanced status unless a
   separately approved compatibility change says otherwise.
 - Static and shared library targets, executable targets, test targets, output names, prefixes, suffixes, version
@@ -162,7 +170,7 @@ Per-commit checks are selected according to the affected behavior. Milestone che
 | --- | --- |
 | Library form | static only, shared only, static and shared |
 | Components | C, HL, C++, tools, utilities, tests, examples |
-| Toolchain | MSVC, GCC, Clang; supported single- and multi-config generators |
+| Toolchain | Windows x64/MSVC 18 with Visual Studio 18 2026; Linux x86_64/GCC and G++ with Ninja or Unix Makefiles |
 | Configuration | Debug and Release |
 | Concurrency | default serial, thread-safe, multi-thread concurrency, MPI |
 | Dependencies | system and bundled zlib/libaec where available, plugins, VOL |

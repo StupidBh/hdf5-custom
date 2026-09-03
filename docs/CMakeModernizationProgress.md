@@ -19,8 +19,11 @@ actually landed, what is being worked on, and what remains unverified.
 
 No C or C++ implementation change is part of this work. Existing options,
 targets, generated products, install layout, and consumer-visible behavior
-remain compatibility requirements. Java and Fortran remain unsupported, and
-the JNI discovery required by the HDFS VFD remains in scope.
+remain compatibility requirements except where the separately approved
+[CMake supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
+removes unsupported toolchains and their private options. The retained build
+matrix is Windows x64/MSVC 18 and Linux x86_64/GCC. Java and Fortran remain
+unsupported, and the JNI discovery required by the HDFS VFD remains in scope.
 
 ## Stage Status
 
@@ -190,11 +193,12 @@ and standalone example builds. Recent checkpoints specifically verified:
   `HDF_TEST_EXPRESS=3`: all 2,817 enabled tests passed and 37 configured tests
   remained disabled out of 2,854 registered tests.
 
-MSVC 18 is the primary Windows validation toolchain. The MinGW-w64 results are
-supplementary checks for GNU compiler branches on Windows; they neither replace
-MSVC validation nor constitute Linux/GCC validation. Native Linux/GCC, Clang or
-clang-cl, NVHPC, and Intel compiler validation remains unavailable in the
-current environment and is an explicit matrix gap.
+MSVC 18 is the retained Windows validation toolchain. The earlier MinGW-w64
+results are historical baseline evidence only; MinGW is no longer a supported
+way to exercise GNU branches on Windows and those results do not constitute
+Linux/GCC validation. Native Linux/GCC validation remains unavailable in the
+current environment. Clang, clang-cl, NVHPC, and Intel are outside the reduced
+support matrix and are no longer validation gaps.
 
 The CMake File API does not expose the additional target-level `LINK_FLAGS`
 copy used to preserve historical MPI executable propagation. That check used
@@ -204,8 +208,8 @@ the normalized File API contract alone.
 Still required before review or declaration of completion:
 
 - static-only, shared-only, and combined-library configurations;
-- Debug and Release coverage on MSVC, GCC, and Clang;
-- native Linux/GCC, Clang or clang-cl, NVHPC, and Intel compiler coverage;
+- Debug and Release coverage on MSVC and GCC;
+- native Linux/GCC coverage;
 - thread-safe, multi-thread concurrency, and broader MPI test configurations;
 - system and bundled compression, plugins, VOL, ROS3, HDFS, and subfiling where
   the required environment is available;

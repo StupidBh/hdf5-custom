@@ -123,3 +123,12 @@ Target `develop` and open an issue except for minor edits. Complete the PR templ
 ## Supported Scope
 
 Java and Fortran modules are unsupported. Do not restore their sources, options, examples, CI, install components, or targets. Preserve format-level C compatibility constants and required HDFS VFD JNI discovery.
+
+The CMake build supports exactly two platform/compiler combinations: Windows
+x64 with MSVC 18 from Visual Studio 18 2026, and Linux x86_64 with GCC/G++.
+The supported Windows generator is Visual Studio 18 2026; Ninja with MSVC is
+not supported. The supported Linux generators are Ninja and Unix Makefiles.
+MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel, NVHPC, AOCC, macOS, BSD,
+Emscripten, and all other platform/compiler combinations are unsupported.
+`HDF5_ALLOW_UNSUPPORTED` applies only to documented HDF5 feature combinations;
+it does not bypass the platform/compiler policy.

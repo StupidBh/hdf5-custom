@@ -8,8 +8,8 @@ actually landed, what is being worked on, and what remains unverified.
 ## Current Snapshot
 
 - Last updated: 2026-09-03
-- Progress anchor: `7f0613c4f` (`cmake: Scope standalone example ANSI flags`)
-- Implementation commits after the plan was accepted: 104
+- Progress anchor: `964090aed` (`cmake: Scope standalone MPI linker flags`)
+- Implementation commits after the plan was accepted: 113
 - Current stage: target-scoped build infrastructure and removal of remaining
   directory-global compiler and linker state
 - Overall state: the baseline and CMake 4 correctness stages are complete;
@@ -79,8 +79,9 @@ the current stage.
 
 ### Platform and instrumentation behavior
 
-- Migrated Windows, GNU, CRT, assertion, plugin, zlib-ng, include-path, and
-  executable-stack requirements to target ownership for the affected targets.
+- Migrated Windows, GNU, Clang, NVHPC, Intel, CRT, assertion, plugin, zlib-ng,
+  include-path, and executable-stack requirements to target ownership for the
+  affected targets.
 - Kept MSVC compile flags out of linker options where they did not previously
   belong, while preserving compiler-driver propagation where it was part of
   existing behavior.
@@ -89,6 +90,9 @@ the current stage.
 - Migrated standalone example include directories, platform definitions,
   diagnostic formatting, warning suppression, linkage definitions, MPI include
   paths, and documented ANSI flags to `hdf5_examples_platform`.
+- Migrated static-executable, legacy coverage, clang-cl executable-stack, and
+  MPI link requirements away from project-level linker flag variables while
+  preserving their established target sets and propagation behavior.
 
 All implementation changes above were committed as independent checkpoints.
 Each can be inspected or reverted with normal Git operations without replacing
@@ -96,20 +100,23 @@ the repository's CMake files as a single change.
 
 ## Active Work
 
-The current batch removes the last clearly identified project-level global
-compiler and linker mutations while preserving their exact compile and
-compiler-driver link propagation. The remaining known groups are:
+The project-level linker flag batch is complete. The follow-on audit classifies
+the remaining flag writes before the next migrations are selected:
 
-- `BUILD_STATIC_EXECS` static link behavior;
-- the legacy code-coverage fallback in the root project;
-- remaining GNU, Clang, NVHPC, and Intel compiler flag mutations;
-- the clang-cl executable stack linker option;
-- MPI linker flags in the main project; and
-- MPI linker flags in the standalone examples.
+- the 32-bit toolchain files own architecture and linker search flags at the
+  toolchain boundary;
+- `CMAKE_REQUIRED_*` values and the saved/restored `CMAKE_C_FLAGS` values in
+  feature checks are temporary probe state;
+- custom `Developer` configuration flags define a build type rather than a
+  project-wide target requirement; and
+- the remaining C and C++ compiler flag mutations preserve user flag cleanup,
+  warning suppression, legacy compiler initialization, and generated build
+  reports. They require dedicated compatibility work and compiler-specific
+  validation rather than mechanical removal.
 
-Toolchain-file flags and temporary `CMAKE_REQUIRED_*` values used by feature
-checks are audited separately. They are not automatically considered global
-project-state defects because they may be the correct CMake ownership boundary.
+The next target-scoping work can therefore proceed from explicit product and
+dependency ownership instead of treating every remaining `CMAKE_*_FLAGS`
+reference as the same class of defect.
 
 ## Remaining Work
 
@@ -134,24 +141,46 @@ project-state defects because they may be the correct CMake ownership boundary.
 ## Validation Status
 
 Completed checks include repeated normalized contract comparisons, focused
-MSVC and GNU configure/build probes, representative test execution, and
-standalone example builds. Recent checkpoints specifically verified:
+MSVC and Windows GNU configure/build probes, representative test execution,
+and standalone example builds. Recent checkpoints specifically verified:
 
-- unchanged default MSVC contract data across the scoped migrations;
-- unchanged GNU coverage contract data;
+- all 17,560 records in the default MSVC contract remained unchanged across
+  the scoped migrations;
+- MinGW-w64 GCC and G++ 13.2 preserved the compile argument multisets of all 27
+  affected targets and the exact `libhdf5.settings` SHA-256 value; `h5dump` and
+  `hdf5_cpp-shared` built successfully, and `h5dump -V` reported version 2.3.0;
 - the same 219-target MSVC AddressSanitizer instrumentation set, with `h5dump`
   and `CPP_testhdf5` passing;
 - equivalent GNU compile and compiler-driver link option sets across all 121
   standalone example targets for the latest flag migrations;
 - preserved MSVC warning suppression for the existing C example targets; and
-- successful representative GNU C, HL, C++, and C++ HL example runs.
+- successful representative GNU C, HL, C++, and C++ HL example runs;
+- Microsoft MPI linker flag propagation for 19 executable and three shared
+  library projects in every Visual Studio configuration, followed by a
+  successful Release build, link, and run of `h5dump`;
+- equivalent linker argument multisets for all 85 standalone example
+  executables with Microsoft MPI, followed by a successful Release build of
+  `ex_h5ex_d_alloc`; and
+- a complete default MSVC 18 Release build and CTest run at
+  `HDF_TEST_EXPRESS=3`: all 2,817 enabled tests passed and 37 configured tests
+  remained disabled out of 2,854 registered tests.
+
+The MinGW-w64 results exercise GNU compiler branches on Windows. They are not
+Linux/GCC validation. Native Linux/GCC, Clang or clang-cl, NVHPC, and Intel
+compiler validation remains unavailable in the current environment and is an
+explicit matrix gap.
+
+The CMake File API does not expose the additional target-level `LINK_FLAGS`
+copy used to preserve historical MPI executable propagation. That check used
+the generated Visual Studio projects and an actual link instead of relying on
+the normalized File API contract alone.
 
 Still required before review or declaration of completion:
 
-- the full 2,854-test MSVC 18 Release CTest suite after the current milestone;
 - static-only, shared-only, and combined-library configurations;
 - Debug and Release coverage on MSVC, GCC, and Clang;
-- thread-safe, multi-thread concurrency, and MPI configurations;
+- native Linux/GCC, Clang or clang-cl, NVHPC, and Intel compiler coverage;
+- thread-safe, multi-thread concurrency, and broader MPI test configurations;
 - system and bundled compression, plugins, VOL, ROS3, HDFS, and subfiling where
   the required environment is available;
 - install/export/package artifact comparison; and

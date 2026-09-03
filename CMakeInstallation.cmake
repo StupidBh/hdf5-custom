@@ -202,6 +202,12 @@ if (HDF5_PACK_EXAMPLES)
     COMPONENT hdfdocuments
   )
   install (
+      FILES ${HDF_RESOURCES_DIR}/HDF5PlatformSupport.cmake
+      DESTINATION ${HDF5_INSTALL_DATA_DIR}/HDF5Examples/config/cmake
+      RENAME HDF5PlatformSupportImpl.cmake
+      COMPONENT hdfdocuments
+  )
+  install (
       FILES
           ${HDF5_DOCS_DIR}/USING_CMake_Examples.md
       DESTINATION ${HDF5_INSTALL_DATA_DIR}

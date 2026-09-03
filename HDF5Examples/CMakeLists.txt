@@ -9,6 +9,9 @@
 cmake_minimum_required (VERSION 4.0)
 project (H5EXAMPLES C)
 
+include (${CMAKE_CURRENT_LIST_DIR}/config/cmake/HDF5PlatformSupport.cmake)
+hdf5_validate_platform_support (LANGUAGES C)
+
 # Keep the examples independently configurable while allowing an enclosing
 # HDF5 build to provide its target-scoped platform requirements.
 add_library (hdf5_examples_platform INTERFACE IMPORTED GLOBAL)

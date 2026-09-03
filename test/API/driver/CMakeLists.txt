@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 4.0)
 project(H5_API_TEST_DRIVER CXX)
 
+include (${CMAKE_CURRENT_LIST_DIR}/../../../config/cmake/HDF5PlatformSupport.cmake)
+hdf5_validate_platform_support (LANGUAGES CXX)
+
 if (NOT KWSYS_USE_LOCALCONTENT)
   set (KWSYS_URL ${KWSYS_TGZ_ORIGPATH}/${KWSYS_TGZ_NAME})
 else ()

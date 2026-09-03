@@ -89,7 +89,6 @@ target_include_directories (
     "${HDF5_SRC_BINARY_DIR}"
     "${HDF5_TEST_BINARY_DIR}"
     "${HDF5_TEST_API_SRC_DIR}"
-    "$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>"
 )
 hdf5_target_use_build_options (h5_api_test_parallel)
 target_compile_definitions (

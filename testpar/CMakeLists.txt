@@ -52,7 +52,7 @@ set (HDF5_TESTPAR_COMPILE_DEFS_PRIVATE
 if (BUILD_STATIC_LIBS)
   add_library (${HDF5_TEST_PAR_LIB_TARGET} STATIC ${TEST_PAR_LIB_SOURCES} ${TEST_PAR_LIB_HEADERS})
   target_include_directories (${HDF5_TEST_PAR_LIB_TARGET}
-      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR};${HDF5_TEST_PAR_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
+      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR};${HDF5_TEST_PAR_BINARY_DIR}"
       INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_INCLUDE_DIR}>"
   )
   hdf5_target_use_build_options (${HDF5_TEST_PAR_LIB_TARGET})
@@ -91,7 +91,7 @@ endif ()
 if (BUILD_SHARED_LIBS)
   add_library (${HDF5_TEST_PAR_LIBSH_TARGET} SHARED ${TEST_PAR_LIB_SOURCES} ${TEST_PAR_LIB_HEADERS})
   target_include_directories (${HDF5_TEST_PAR_LIBSH_TARGET}
-      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR};${HDF5_TEST_PAR_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
+      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_TEST_SRC_DIR};${HDF5_SRC_BINARY_DIR};${HDF5_TEST_PAR_BINARY_DIR}"
       INTERFACE "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${HDF5_INSTALL_INCLUDE_DIR}>"
   )
   hdf5_target_use_build_options (${HDF5_TEST_PAR_LIBSH_TARGET})
@@ -146,7 +146,7 @@ endif ()
 #-- Adding test for testhdf5
 add_executable (testphdf5 ${testphdf5_SOURCES})
 target_include_directories (testphdf5
-    PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
+    PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}"
 )
 hdf5_target_use_build_options (testphdf5)
 target_compile_definitions(testphdf5 PRIVATE "${HDF5_TESTPAR_COMPILE_DEFS_PRIVATE}")
@@ -173,7 +173,7 @@ endif ()
 macro (ADD_H5P_EXE file)
   add_executable (${file} ${HDF5_TEST_PAR_SOURCE_DIR}/${file}.c)
   target_include_directories (${file}
-      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};${MPI_C_INCLUDE_DIRS}"
+      PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}"
   )
   hdf5_target_use_build_options (${file})
   target_compile_definitions(${file} PRIVATE "${HDF5_TESTPAR_COMPILE_DEFS_PRIVATE}")

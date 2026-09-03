@@ -21,6 +21,12 @@ supported.
 The default build enables static and shared libraries, tests, tools, the high-level library, and examples. C++,
 parallel HDF5, thread safety, multi-thread concurrency, and external compression filters are off by default.
 
+`REFACTORING_PROGRESS.md` is the root-level record of the current refactoring progress. Use it as the concise
+status entry point for whether the CMake modernization is complete, which stages remain, and what validation
+gaps are still open. Keep it synchronized with the detailed `docs/CMakeModernizationProgress.md` ledger after
+each coherent refactoring batch that changes the overall assessment, stage status, validation boundary, or
+progress anchor.
+
 ## Build, Test, and Development Commands
 
 Use an out-of-source MSVC 18 build:

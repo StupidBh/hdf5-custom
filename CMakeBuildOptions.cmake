@@ -63,7 +63,7 @@ mark_as_advanced (BUILD_STATIC_EXECS)
 
 option (HDF5_ENABLE_ANALYZER_TOOLS "enable the use of Clang tools" OFF)
 mark_as_advanced (HDF5_ENABLE_ANALYZER_TOOLS)
-option (HDF5_ENABLE_SANITIZERS "execute the Clang sanitizer" OFF)
+option (HDF5_ENABLE_SANITIZERS "Enable supported sanitizer instrumentation" OFF)
 mark_as_advanced (HDF5_ENABLE_SANITIZERS)
 option (HDF5_ENABLE_FORMATTERS "format source files" OFF)
 mark_as_advanced (HDF5_ENABLE_FORMATTERS)

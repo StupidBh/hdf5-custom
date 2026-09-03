@@ -18,15 +18,7 @@
 
 #############################################################################################
 ####      maximum parallel processor count for build and test       ####
-#set (MAX_PROC_COUNT 8)
-
-#############################################################################################
-####      alternate toolsets (Windows usually)        ####
-#set (CMAKE_GENERATOR_TOOLSET "Intel C++ Compiler 17.0")
-
-#############################################################################################
-### use a toolchain file (supported everywhere)       ####
-#set (ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DCMAKE_TOOLCHAIN_FILE:STRING=config/toolchain/intel.cmake")
+#set (MAX_PROC_COUNT 6)
 
 #############################################################################################
 ####      Only build static libraries       ####

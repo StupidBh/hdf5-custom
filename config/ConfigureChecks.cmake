@@ -151,9 +151,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   CHECK_LIBRARY_EXISTS_CONCAT ("wsock32" gethostbyname ${HDF_PREFIX}_HAVE_LIBWSOCK32)
 endif ()
 
-# UCB (BSD) compatibility library
-CHECK_LIBRARY_EXISTS_CONCAT ("ucb"    gethostname  ${HDF_PREFIX}_HAVE_LIBUCB)
-
 # For other tests to use the same libraries
 set (HDF5_REQUIRED_LIBRARIES ${HDF5_REQUIRED_LIBRARIES} ${LINK_LIBS})
 

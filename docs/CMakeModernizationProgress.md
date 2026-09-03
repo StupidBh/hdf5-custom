@@ -10,8 +10,8 @@ actually landed, what is being worked on, and what remains unverified.
 - Last updated: 2026-09-03
 - Progress anchor: `0b9e21c34` (`cmake: Use MPI target includes for parallel tests`)
 - Implementation commits after the plan was accepted: 123
-- Current stage: target-scoped build infrastructure and removal of remaining
-  directory-global compiler and linker state
+- Current stage: paused at the target-scoped build infrastructure milestone
+  while the approved platform-reduction direction is active
 - Overall state: the baseline and CMake 4 correctness stages are complete;
   target-scoped infrastructure is well under way, but more than half of the
   full modernization scope remains because dependency, test, install, package,
@@ -20,10 +20,18 @@ actually landed, what is being worked on, and what remains unverified.
 No C or C++ implementation change is part of this work. Existing options,
 targets, generated products, install layout, and consumer-visible behavior
 remain compatibility requirements except where the separately approved
-[CMake supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
-removes unsupported toolchains and their private options. The retained build
-matrix is Windows x64/MSVC 18 and Linux x86_64/GCC. Java and Fortran remain
-unsupported, and the JNI discovery required by the HDFS VFD remains in scope.
+[project supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
+first removes unsupported CMake toolchains and private options, then removes
+source-level compatibility paths that exist only for rejected environments.
+The retained build matrix is Windows x64/MSVC 18 and Linux x86_64/GCC. Java and
+Fortran remain unsupported, and the JNI discovery required by the HDFS VFD
+remains in scope.
+
+The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
+CMake implementation at `b317dedc9`, and its current documentation at
+`6ad3399ec`. Its current status is: CMake platform reduction implemented;
+Windows/MSVC validation blocked by pre-existing C syntax errors; Linux/GCC
+native validation deferred. Stages 2 through 4 have not started.
 
 ## Stage Status
 
@@ -106,8 +114,9 @@ the repository's CMake files as a single change.
 
 ## Active Work
 
-The project-level linker flag batch is complete. The follow-on audit classified
-the remaining flag writes before further migrations were selected:
+Modernization work is paused while the platform-reduction direction reaches a
+stable handoff. At the pause point, the project-level linker flag batch was
+complete and the follow-on audit had classified the remaining flag writes:
 
 - the 32-bit toolchain files own architecture and linker search flags at the
   toolchain boundary;
@@ -120,7 +129,7 @@ the remaining flag writes before further migrations were selected:
   reports. They require dedicated compatibility work and compiler-specific
   validation rather than mechanical removal.
 
-The current dependency work removes repeated MPI include expressions from
+The paused dependency work removes repeated MPI include expressions from
 targets that already consume `MPI::MPI_C`. The supported C target batches for
 core, high-level, tools, utilities, serial tests, and parallel tests are
 complete. Remaining expressions need separate classification because they
@@ -193,6 +202,15 @@ and standalone example builds. Recent checkpoints specifically verified:
   `HDF_TEST_EXPRESS=3`: all 2,817 enabled tests passed and 37 configured tests
   remained disabled out of 2,854 registered tests.
 
+The intervening platform-reduction Stage 1 validation established that all 12
+firewall cases, root and standalone-example preset listing, default and
+C++-enabled MSVC configurations, a 17,323-record no-delta File API comparison,
+and clean source-package generation pass. The current default Release build is
+blocked by missing semicolons in four C source files attributed to pre-Stage 1
+commit `b22b55872`; consequently current CTest, install, binary-package,
+example, and consumer evidence is unavailable. This does not supersede the
+older successful modernization baseline above.
+
 MSVC 18 is the retained Windows validation toolchain. The earlier MinGW-w64
 results are historical baseline evidence only; MinGW is no longer a supported
 way to exercise GNU branches on Windows and those results do not constitute
@@ -207,6 +225,8 @@ the normalized File API contract alone.
 
 Still required before review or declaration of completion:
 
+- completion of the platform-reduction Windows gate after its source blocker is
+  resolved, followed by the deferred native Linux/GCC gate;
 - static-only, shared-only, and combined-library configurations;
 - Debug and Release coverage on MSVC and GCC;
 - native Linux/GCC coverage;

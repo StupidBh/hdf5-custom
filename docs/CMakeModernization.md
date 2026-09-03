@@ -18,12 +18,19 @@ change source code to accommodate build-system changes, or conflate language dia
 The following behavior is frozen before build logic is changed:
 
 The separately approved
-[CMake supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
+[project supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
 supersedes this contract for platform/compiler support, generator support, and
-cache options used only by removed toolchains. The retained matrix is Windows
-x64 with MSVC 18 and the Visual Studio 18 2026 generator, plus Linux x86_64
-with GCC/G++ and Ninja or Unix Makefiles. Other combinations are no longer
-compatibility requirements.
+cache options and source compatibility paths used only by removed toolchains.
+The retained matrix is Windows x64 with MSVC 18 and the Visual Studio 18 2026
+generator, plus Linux x86_64 with GCC/G++ and Ninja or Unix Makefiles. Other
+combinations are no longer compatibility requirements.
+
+The support contract is anchored at `912fb436b`, its Stage 1 CMake
+implementation at `b317dedc9`, and its current support-documentation update at
+`6ad3399ec`. The CMake reduction is implemented, but Windows/MSVC validation is
+blocked by pre-existing C syntax errors and native Linux/GCC validation is
+deferred. The modernization remains paused; this status does not start the
+platform plan's source-reduction stages.
 
 - Cache options keep their names, types, defaults, allowed values, and advanced/non-advanced status unless a
   separately approved compatibility change says otherwise.

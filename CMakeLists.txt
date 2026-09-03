@@ -589,12 +589,8 @@ endif ()
 #-----------------------------------------------------------------------------
 # Option to embed library info into executables
 #-----------------------------------------------------------------------------
-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  set (H5_HAVE_EMBEDDED_LIBINFO 0)
-else ()
-  if (HDF5_ENABLE_EMBEDDED_LIBINFO)
-    set (H5_HAVE_EMBEDDED_LIBINFO 1)
-  endif ()
+if (HDF5_ENABLE_EMBEDDED_LIBINFO)
+  set (H5_HAVE_EMBEDDED_LIBINFO 1)
 endif ()
 
 include (${HDF_CONFIG_DIR}/flags/HDFCompilerFlags.cmake)

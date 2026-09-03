@@ -17,6 +17,12 @@ function (hdf5_example_target_use_platform target)
   target_include_directories (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_INCLUDE_DIRECTORIES>"
   )
+  target_compile_options (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_COMPILE_OPTIONS>"
+  )
+  target_link_options (${target} PRIVATE
+      "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_LINK_OPTIONS>"
+  )
   target_compile_definitions (${target} PRIVATE
       "$<TARGET_PROPERTY:hdf5_examples_platform,INTERFACE_COMPILE_DEFINITIONS>"
   )

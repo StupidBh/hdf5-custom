@@ -60,10 +60,20 @@ macro (BASIC_SETTINGS varname)
   # and code blocks parse the compiler errors and warnings better.
   #-----------------------------------------------------------------------------
   if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
+    target_compile_options (hdf5_examples_platform INTERFACE
+        "$<$<COMPILE_LANGUAGE:C>:-fmessage-length=0>"
+    )
+    target_link_options (hdf5_examples_platform INTERFACE
+        "$<$<LINK_LANGUAGE:C>:-fmessage-length=0>"
+    )
   endif ()
   if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+    target_compile_options (hdf5_examples_platform INTERFACE
+        "$<$<COMPILE_LANGUAGE:CXX>:-fmessage-length=0>"
+    )
+    target_link_options (hdf5_examples_platform INTERFACE
+        "$<$<LINK_LANGUAGE:CXX>:-fmessage-length=0>"
+    )
   endif ()
 
   #-----------------------------------------------------------------------------

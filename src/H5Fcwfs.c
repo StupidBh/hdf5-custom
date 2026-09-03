@@ -85,8 +85,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_cwfs_add(H5F_t *f, H5HG_heap_t *heap)
+herr_t H5F_cwfs_add(H5F_t* f, H5HG_heap_t* heap)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -103,23 +102,25 @@ H5F_cwfs_add(H5F_t *f, H5HG_heap_t *heap)
      * free space than this heap.
      */
     if (NULL == f->shared->cwfs) {
-        if (NULL == (f->shared->cwfs = (H5HG_heap_t **)H5MM_malloc(H5F_NCWFS * sizeof(H5HG_heap_t *))))
+        if (NULL == (f->shared->cwfs = (H5HG_heap_t**)H5MM_malloc(H5F_NCWFS * sizeof(H5HG_heap_t*)))) {
             HGOTO_ERROR(H5E_FILE, H5E_CANTALLOC, FAIL, "can't allocate CWFS for file");
+        }
         f->shared->cwfs[0] = heap;
-        f->shared->ncwfs   = 1;
+        f->shared->ncwfs = 1;
     }
     else if (H5F_NCWFS == f->shared->ncwfs) {
         int i; /* Local index variable */
 
-        for (i = H5F_NCWFS - 1; i >= 0; --i)
+        for (i = H5F_NCWFS - 1; i >= 0; --i) {
             if (H5HG_FREE_SIZE(f->shared->cwfs[i]) < H5HG_FREE_SIZE(heap)) {
-                memmove(f->shared->cwfs + 1, f->shared->cwfs, (size_t)i * sizeof(H5HG_heap_t *));
+                memmove(f->shared->cwfs + 1, f->shared->cwfs, (size_t)i * sizeof(H5HG_heap_t*));
                 f->shared->cwfs[0] = heap;
                 break;
             } /* end if */
+        }
     }
     else {
-        memmove(f->shared->cwfs + 1, f->shared->cwfs, f->shared->ncwfs * sizeof(H5HG_heap_t *));
+        memmove(f->shared->cwfs + 1, f->shared->cwfs, f->shared->ncwfs * sizeof(H5HG_heap_t*));
         f->shared->cwfs[0] = heap;
         f->shared->ncwfs += 1;
     } /* end else */
@@ -139,12 +140,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_cwfs_find_free_heap(H5F_t *f, size_t need, haddr_t *addr)
+herr_t H5F_cwfs_find_free_heap(H5F_t* f, size_t need, haddr_t* addr)
 {
-    unsigned cwfsno;              /* Local index for iterating over collections */
-    bool     found     = false;   /* Flag to indicate a heap with enough space was found */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned cwfsno;            /* Local index for iterating over collections */
+    bool found = false;         /* Flag to indicate a heap with enough space was found */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -169,12 +169,13 @@ H5F_cwfs_find_free_heap(H5F_t *f, size_t need, haddr_t *addr)
      *
      *                                        JRM - 5/24/04
      */
-    for (cwfsno = 0; cwfsno < f->shared->ncwfs; cwfsno++)
+    for (cwfsno = 0; cwfsno < f->shared->ncwfs; cwfsno++) {
         if (H5HG_FREE_SIZE(f->shared->cwfs[cwfsno]) >= need) {
             *addr = H5HG_ADDR(f->shared->cwfs[cwfsno]);
             found = true;
             break;
         } /* end if */
+    }
 
     /*
      * If we didn't find any collection with enough free space the check if
@@ -192,33 +193,33 @@ H5F_cwfs_find_free_heap(H5F_t *f, size_t need, haddr_t *addr)
                 htri_t was_extended; /* Whether the heap was extended */
 
                 was_extended =
-                    H5MF_try_extend(f, H5FD_MEM_GHEAP, H5HG_ADDR(f->shared->cwfs[cwfsno]),
-                                    (hsize_t)H5HG_SIZE(f->shared->cwfs[cwfsno]), (hsize_t)new_need);
-                if (was_extended < 0)
+                    H5MF_try_extend(f, H5FD_MEM_GHEAP, H5HG_ADDR(f->shared->cwfs[cwfsno]), (hsize_t)H5HG_SIZE(f->shared->cwfs[cwfsno]), (hsize_t)new_need);
+                if (was_extended < 0) {
                     HGOTO_ERROR(H5E_HEAP, H5E_CANTEXTEND, FAIL, "error trying to extend heap");
+                }
                 else if (was_extended == true) {
-                    if (H5HG_extend(f, H5HG_ADDR(f->shared->cwfs[cwfsno]), new_need) < 0)
-                        HGOTO_ERROR(H5E_HEAP, H5E_CANTRESIZE, FAIL,
-                                    "unable to extend global heap collection");
+                    if (H5HG_extend(f, H5HG_ADDR(f->shared->cwfs[cwfsno]), new_need) < 0) {
+                        HGOTO_ERROR(H5E_HEAP, H5E_CANTRESIZE, FAIL, "unable to extend global heap collection");
+                    }
                     *addr = H5HG_ADDR(f->shared->cwfs[cwfsno]);
                     found = true;
                     break;
                 } /* end if */
-            }     /* end if */
-        }         /* end for */
-    }             /* end if */
+            } /* end if */
+        } /* end for */
+    } /* end if */
 
     if (found) {
         /* Move the collection forward in the CWFS list, if it's not
          * already at the front
          */
         if (cwfsno > 0) {
-            H5HG_heap_t *tmp = f->shared->cwfs[cwfsno];
+            H5HG_heap_t* tmp = f->shared->cwfs[cwfsno];
 
-            f->shared->cwfs[cwfsno]     = f->shared->cwfs[cwfsno - 1];
+            f->shared->cwfs[cwfsno] = f->shared->cwfs[cwfsno - 1];
             f->shared->cwfs[cwfsno - 1] = tmp;
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -234,11 +235,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_cwfs_advance_heap(H5F_t *f, H5HG_heap_t *heap, bool add_heap)
+herr_t H5F_cwfs_advance_heap(H5F_t* f, H5HG_heap_t* heap, bool add_heap)
 {
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -247,16 +247,17 @@ H5F_cwfs_advance_heap(H5F_t *f, H5HG_heap_t *heap, bool add_heap)
     assert(f->shared);
     assert(heap);
 
-    for (u = 0; u < f->shared->ncwfs; u++)
+    for (u = 0; u < f->shared->ncwfs; u++) {
         if (f->shared->cwfs[u] == heap) {
             if (u) {
-                f->shared->cwfs[u]     = f->shared->cwfs[u - 1];
+                f->shared->cwfs[u] = f->shared->cwfs[u - 1];
                 f->shared->cwfs[u - 1] = heap;
             } /* end if */
             break;
         } /* end if */
+    }
     if (add_heap && u >= f->shared->ncwfs) {
-        f->shared->ncwfs                      = MIN(f->shared->ncwfs + 1, H5F_NCWFS);
+        f->shared->ncwfs = MIN(f->shared->ncwfs + 1, H5F_NCWFS);
         f->shared->cwfs[f->shared->ncwfs - 1] = heap;
     } /* end if */
 
@@ -274,11 +275,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_cwfs_remove_heap(H5F_shared_t *shared, H5HG_heap_t *heap)
+herr_t H5F_cwfs_remove_heap(H5F_shared_t* shared, H5HG_heap_t* heap)
 {
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -290,10 +290,10 @@ H5F_cwfs_remove_heap(H5F_shared_t *shared, H5HG_heap_t *heap)
     for (u = 0; u < shared->ncwfs; u++) {
         if (shared->cwfs[u] == heap) {
             shared->ncwfs -= 1;
-            memmove(shared->cwfs + u, shared->cwfs + u + 1, (shared->ncwfs - u) * sizeof(H5HG_heap_t *));
+            memmove(shared->cwfs + u, shared->cwfs + u + 1, (shared->ncwfs - u) * sizeof(H5HG_heap_t*));
             break;
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

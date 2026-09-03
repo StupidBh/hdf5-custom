@@ -24,11 +24,10 @@
 #define SUFFIX_LEN   8
 #define GROUP_SUFFIX ".h5group"
 
-static size_t append_to_group_name(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values,
-                                   size_t nbytes, size_t *buf_size, void **buf);
+static size_t append_to_group_name(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf);
 
 /* Filter class struct */
-const H5Z_class2_t FILTER_INFO[1] = {{
+const H5Z_class2_t FILTER_INFO[1] = { {
     H5Z_CLASS_T_VERS,       /* H5Z_class_t version              */
     FILTER4_ID,             /* Filter ID number                 */
     1,                      /* Encoding enabled                 */
@@ -37,15 +36,14 @@ const H5Z_class2_t FILTER_INFO[1] = {{
     NULL,                   /* The "can apply" callback         */
     NULL,                   /* The "set local" callback         */
     append_to_group_name,   /* The actual filter function       */
-}};
+} };
 
-H5PL_type_t
-H5PLget_plugin_type(void)
+H5PL_type_t H5PLget_plugin_type(void)
 {
     return H5PL_TYPE_FILTER;
 }
-const void *
-H5PLget_plugin_info(void)
+
+const void* H5PLget_plugin_info(void)
 {
     return FILTER_INFO;
 }
@@ -63,15 +61,14 @@ H5PLget_plugin_info(void)
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-append_to_group_name(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values, size_t nbytes,
-                     size_t *buf_size, void **buf)
+static size_t append_to_group_name(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf)
 {
     size_t new_name_size = 0; /* Return value */
 
     /* Check for the correct number of parameters */
-    if (cd_nelmts > 0)
+    if (cd_nelmts > 0) {
         return 0;
+    }
 
     /* Assignment to eliminate unused parameter warning. */
     (void)cd_values;
@@ -82,29 +79,30 @@ append_to_group_name(unsigned int flags, size_t cd_nelmts, const unsigned int *c
     }
     else {
         /* WRITE - Append the suffix to the group name */
-        void          *outbuf = NULL; /* Pointer to new buffer                    */
-        unsigned char *dst    = NULL; /* Temporary pointer to destination buffer  */
+        void* outbuf = NULL;       /* Pointer to new buffer                    */
+        unsigned char* dst = NULL; /* Temporary pointer to destination buffer  */
 
         /* Get memory for the new, larger string buffer using the
          * library's memory allocator.
          */
-        if (NULL == (dst = (unsigned char *)(outbuf = H5allocate_memory(nbytes + SUFFIX_LEN, 0))))
+        if (NULL == (dst = (unsigned char*)(outbuf = H5allocate_memory(nbytes + SUFFIX_LEN, 0)))) {
             return 0;
+        }
 
         /* Copy raw data */
-        memcpy((void *)dst, (const void *)(*buf), nbytes);
+        memcpy((void*)dst, (const void*)(*buf), nbytes);
 
         /* Append suffix to raw data for storage */
         dst += nbytes;
-        memcpy((void *)dst, (const void *)GROUP_SUFFIX, SUFFIX_LEN);
+        memcpy((void*)dst, (const void*)GROUP_SUFFIX, SUFFIX_LEN);
 
         /* Free the passed-in buffer using the library's allocator */
         H5free_memory(*buf);
 
         /* Set return values */
-        *buf_size     = nbytes + SUFFIX_LEN;
-        *buf          = outbuf;
-        outbuf        = NULL;
+        *buf_size = nbytes + SUFFIX_LEN;
+        *buf = outbuf;
+        outbuf = NULL;
         new_name_size = *buf_size;
     }
 

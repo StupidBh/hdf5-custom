@@ -37,8 +37,7 @@ H5FL_BLK_EXTERN(str_buf);
 **      Initialize data for RS testing
 **
 ****************************************************************/
-static void
-test_refstr_init(void)
+static void test_refstr_init(void)
 {
 } /* end test_refstr_init() */
 
@@ -48,12 +47,11 @@ test_refstr_init(void)
 **      Tests creating and closing ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_create(void)
+static void test_refstr_create(void)
 {
-    H5RS_str_t *rs;    /* Ref-counted string created */
-    unsigned    count; /* Reference count on string */
-    herr_t      ret;   /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    unsigned count; /* Reference count on string */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Creating & Closing Ref-Counted Strings\n"));
@@ -78,12 +76,11 @@ test_refstr_create(void)
 **      Tests reference counting on ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_count(void)
+static void test_refstr_count(void)
 {
-    H5RS_str_t *rs;    /* Ref-counted string created */
-    unsigned    count; /* Reference count on string */
-    herr_t      ret;   /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    unsigned count; /* Reference count on string */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Incrementing & Decrementing Ref-Counted Strings\n"));
@@ -124,13 +121,12 @@ test_refstr_count(void)
 **      Tests duplicating ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_dup(void)
+static void test_refstr_dup(void)
 {
-    H5RS_str_t *rs1;   /* Ref-counted string created */
-    H5RS_str_t *rs2;   /* Ref-counted string created */
-    unsigned    count; /* Reference count on string */
-    herr_t      ret;   /* Generic return value */
+    H5RS_str_t* rs1; /* Ref-counted string created */
+    H5RS_str_t* rs2; /* Ref-counted string created */
+    unsigned count;  /* Reference count on string */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Duplicating Ref-Counted Strings\n"));
@@ -173,14 +169,13 @@ test_refstr_dup(void)
 **      Tests comparing ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_cmp(void)
+static void test_refstr_cmp(void)
 {
-    H5RS_str_t *rs1; /* Ref-counted string created */
-    H5RS_str_t *rs2; /* Ref-counted string created */
-    int         cmp; /* Comparison value */
-    size_t      len; /* Length of string */
-    herr_t      ret; /* Generic return value */
+    H5RS_str_t* rs1; /* Ref-counted string created */
+    H5RS_str_t* rs2; /* Ref-counted string created */
+    int cmp;         /* Comparison value */
+    size_t len;      /* Length of string */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Comparing Ref-Counted Strings\n"));
@@ -199,8 +194,9 @@ test_refstr_cmp(void)
     cmp = H5RS_cmp(rs2, rs2);
     VERIFY(cmp, 0, "H5RS_cmp");
     cmp = H5RS_cmp(rs1, rs2);
-    if (cmp >= 0)
+    if (cmp >= 0) {
         TestErrPrintf("%d: string comparison incorrect!\n", __LINE__);
+    }
 
     /* Check the lengths of the strings also */
     len = H5RS_len(rs1);
@@ -222,14 +218,13 @@ test_refstr_cmp(void)
 **      Tests wrapping ref-counted strings around existing strings.
 **
 ****************************************************************/
-static void
-test_refstr_wrap(void)
+static void test_refstr_wrap(void)
 {
-    H5RS_str_t *rs;      /* Ref-counted string created */
-    const char *s;       /* Pointer to raw string in ref-counted string */
-    char        buf[16]; /* Buffer to wrap */
-    int         cmp;     /* Comparison value */
-    herr_t      ret;     /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    const char* s;  /* Pointer to raw string in ref-counted string */
+    char buf[16];   /* Buffer to wrap */
+    int cmp;        /* Comparison value */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Wrapping Ref-Counted Strings\n"));
@@ -258,12 +253,13 @@ test_refstr_wrap(void)
     /* Get pointer to raw string in ref-counted string */
     s = H5RS_get_str(rs);
     CHECK_PTR(s, "H5RS_get_str");
-    if (s == buf)
-        TestErrPrintf("%d: Should not have gotten the same pointer from reference-counted string!\n",
-                      __LINE__);
+    if (s == buf) {
+        TestErrPrintf("%d: Should not have gotten the same pointer from reference-counted string!\n", __LINE__);
+    }
     cmp = strcmp(s, buf);
-    if (cmp <= 0)
+    if (cmp <= 0) {
         TestErrPrintf("%d: string comparison incorrect!\n", __LINE__);
+    }
 
     /* Decrement reference count for string */
     ret = H5RS_decr(rs);
@@ -279,14 +275,13 @@ test_refstr_wrap(void)
 **      Tests appending printf-formatted output to ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_asprintf_cat(void)
+static void test_refstr_asprintf_cat(void)
 {
-    H5RS_str_t *rs;       /* Ref-counted string created */
-    const char *s;        /* Pointer to raw string in ref-counted string */
-    char        buf[256]; /* Buffer to compare against */
-    int         cmp;      /* Comparison value */
-    herr_t      ret;      /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    const char* s;  /* Pointer to raw string in ref-counted string */
+    char buf[256];  /* Buffer to compare against */
+    int cmp;        /* Comparison value */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Printf-formatted Output to Ref-Counted Strings\n"));
@@ -329,15 +324,14 @@ test_refstr_asprintf_cat(void)
 **      Tests appending strings to ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_acat(void)
+static void test_refstr_acat(void)
 {
-    H5RS_str_t *rs;                     /* Ref-counted string created */
-    const char *s;                      /* Pointer to raw string in ref-counted string */
-    char        buf[256];               /* Buffer to compare against */
-    char       *large_str, *large_str2; /* Large strings to append */
-    int         cmp;                    /* Comparison value */
-    herr_t      ret;                    /* Generic return value */
+    H5RS_str_t* rs;               /* Ref-counted string created */
+    const char* s;                /* Pointer to raw string in ref-counted string */
+    char buf[256];                /* Buffer to compare against */
+    char *large_str, *large_str2; /* Large strings to append */
+    int cmp;                      /* Comparison value */
+    herr_t ret;                   /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Appending Strings to Ref-Counted Strings\n"));
@@ -373,7 +367,7 @@ test_refstr_acat(void)
     CHECK_PTR(large_str, "malloc");
     memset(large_str, 'a', 1024);
     large_str[1023] = '\0';
-    ret             = H5RS_acat(rs, large_str);
+    ret = H5RS_acat(rs, large_str);
     CHECK(ret, FAIL, "H5RS_acat");
 
     /* Get pointer to raw string in ref-counted string */
@@ -385,7 +379,7 @@ test_refstr_acat(void)
     strcpy(large_str2, "foobar");
     memset(&large_str2[6], 'a', 1024);
     large_str2[1029] = '\0';
-    cmp              = strcmp(s, large_str2);
+    cmp = strcmp(s, large_str2);
     VERIFY(cmp, 0, "strcmp");
 
     /* Decrement reference count for string */
@@ -403,14 +397,13 @@ test_refstr_acat(void)
 **      Tests appending length-limited strings to ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_ancat(void)
+static void test_refstr_ancat(void)
 {
-    H5RS_str_t *rs;       /* Ref-counted string created */
-    const char *s;        /* Pointer to raw string in ref-counted string */
-    char        buf[256]; /* Buffer to compare against */
-    int         cmp;      /* Comparison value */
-    herr_t      ret;      /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    const char* s;  /* Pointer to raw string in ref-counted string */
+    char buf[256];  /* Buffer to compare against */
+    int cmp;        /* Comparison value */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Appending Strings to Ref-Counted Strings\n"));
@@ -452,14 +445,13 @@ test_refstr_ancat(void)
 **      Tests appending characters to ref-counted strings.
 **
 ****************************************************************/
-static void
-test_refstr_aputc(void)
+static void test_refstr_aputc(void)
 {
-    H5RS_str_t *rs;       /* Ref-counted string created */
-    const char *s;        /* Pointer to raw string in ref-counted string */
-    char        buf[256]; /* Buffer to compare against */
-    int         cmp;      /* Comparison value */
-    herr_t      ret;      /* Generic return value */
+    H5RS_str_t* rs; /* Ref-counted string created */
+    const char* s;  /* Pointer to raw string in ref-counted string */
+    char buf[256];  /* Buffer to compare against */
+    int cmp;        /* Comparison value */
+    herr_t ret;     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Appending Strings to Ref-Counted Strings\n"));
@@ -501,8 +493,7 @@ test_refstr_aputc(void)
 **      Wrap up data for ref-counted string testing
 **
 ****************************************************************/
-static void
-test_refstr_finalize(void)
+static void test_refstr_finalize(void)
 {
 } /* end test_refstr_finalize() */
 
@@ -511,8 +502,7 @@ test_refstr_finalize(void)
 **  test_refstr(): Main H5RS testing routine.
 **
 ****************************************************************/
-void
-test_refstr(void H5_ATTR_UNUSED *params)
+void test_refstr(void H5_ATTR_UNUSED* params)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Reference Counted Strings\n"));

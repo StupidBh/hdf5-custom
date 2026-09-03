@@ -15,23 +15,21 @@
  *              information in the superblock extension.
  */
 
-#include "H5Omodule.h" /* This source code file is part of the H5O module */
+#include "H5Omodule.h"   /* This source code file is part of the H5O module */
 
 #include "H5private.h"   /* Generic Functions			*/
 #include "H5Eprivate.h"  /* Error handling		  	*/
 #include "H5Opkg.h"      /* Object headers			*/
 #include "H5MMprivate.h" /* Memory management			*/
 
-static void  *H5O__btreek_decode(H5F_t *f, H5O_t *open_oh, unsigned mesg_flags, unsigned *ioflags,
-                                 size_t p_size, const uint8_t *p);
-static herr_t H5O__btreek_encode(H5F_t *f, bool disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t *p,
-                                 const void *_mesg);
-static void  *H5O__btreek_copy(const void *_mesg, void *_dest);
-static size_t H5O__btreek_size(const H5F_t *f, bool disable_shared, const void *_mesg);
-static herr_t H5O__btreek_debug(H5F_t *f, const void *_mesg, FILE *stream, int indent, int fwidth);
+static void* H5O__btreek_decode(H5F_t* f, H5O_t* open_oh, unsigned mesg_flags, unsigned* ioflags, size_t p_size, const uint8_t* p);
+static herr_t H5O__btreek_encode(H5F_t* f, bool disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t* p, const void* _mesg);
+static void* H5O__btreek_copy(const void* _mesg, void* _dest);
+static size_t H5O__btreek_size(const H5F_t* f, bool disable_shared, const void* _mesg);
+static herr_t H5O__btreek_debug(H5F_t* f, const void* _mesg, FILE* stream, int indent, int fwidth);
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_BTREEK[1] = {{
+const H5O_msg_class_t H5O_MSG_BTREEK[1] = { {
     H5O_BTREEK_ID,          /*message id number                     */
     "v1 B-tree 'K' values", /*message name for debugging            */
     sizeof(H5O_btreek_t),   /*native message size                   */
@@ -52,7 +50,7 @@ const H5O_msg_class_t H5O_MSG_BTREEK[1] = {{
     NULL,                   /* get creation index		        */
     NULL,                   /* set creation index		        */
     H5O__btreek_debug       /*debug the message			*/
-}};
+} };
 
 /* Current version of v1 B-tree 'K' value information */
 #define H5O_BTREEK_VERSION 0
@@ -67,14 +65,16 @@ const H5O_msg_class_t H5O_MSG_BTREEK[1] = {{
  *              Failure:    NULL
  *-------------------------------------------------------------------------
  */
-static void *
-H5O__btreek_decode(H5F_t H5_ATTR_NDEBUG_UNUSED *f, H5O_t H5_ATTR_UNUSED *open_oh,
-                   unsigned H5_ATTR_UNUSED mesg_flags, unsigned H5_ATTR_UNUSED *ioflags, size_t p_size,
-                   const uint8_t *p)
+static void* H5O__btreek_decode(H5F_t H5_ATTR_NDEBUG_UNUSED* f,
+                                H5O_t H5_ATTR_UNUSED* open_oh,
+                                unsigned H5_ATTR_UNUSED mesg_flags,
+                                unsigned H5_ATTR_UNUSED* ioflags,
+                                size_t p_size,
+                                const uint8_t* p)
 {
-    const uint8_t *p_end     = p + p_size - 1; /* End of input buffer */
-    H5O_btreek_t  *mesg      = NULL;           /* Native message */
-    void          *ret_value = NULL;           /* Return value */
+    const uint8_t* p_end = p + p_size - 1; /* End of input buffer */
+    H5O_btreek_t* mesg = NULL;             /* Native message */
+    void* ret_value = NULL;                /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -82,32 +82,39 @@ H5O__btreek_decode(H5F_t H5_ATTR_NDEBUG_UNUSED *f, H5O_t H5_ATTR_UNUSED *open_oh
     assert(p);
 
     /* Version of message */
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
-    if (*p++ != H5O_BTREEK_VERSION)
+    }
+    if (*p++ != H5O_BTREEK_VERSION) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTLOAD, NULL, "bad version number for message");
+    }
 
     /* Allocate space for message */
-    if (NULL == (mesg = (H5O_btreek_t *)H5MM_calloc(sizeof(H5O_btreek_t))))
+    if (NULL == (mesg = (H5O_btreek_t*)H5MM_calloc(sizeof(H5O_btreek_t)))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed for v1 B-tree 'K' message");
+    }
 
     /* Retrieve non-default B-tree 'K' values */
-    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     UINT16DECODE(p, mesg->btree_k[H5B_CHUNK_ID]);
-    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     UINT16DECODE(p, mesg->btree_k[H5B_SNODE_ID]);
-    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     UINT16DECODE(p, mesg->sym_leaf_k);
 
     /* Set return value */
-    ret_value = (void *)mesg;
+    ret_value = (void*)mesg;
 
 done:
-    if (NULL == ret_value)
+    if (NULL == ret_value) {
         H5MM_free(mesg);
+    }
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O__btreek_decode() */
 
@@ -120,11 +127,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__btreek_encode(H5F_t H5_ATTR_UNUSED *f, bool H5_ATTR_UNUSED disable_shared, size_t H5_ATTR_UNUSED p_size,
-                   uint8_t *p, const void *_mesg)
+static herr_t H5O__btreek_encode(H5F_t H5_ATTR_UNUSED* f, bool H5_ATTR_UNUSED disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t* p, const void* _mesg)
 {
-    const H5O_btreek_t *mesg = (const H5O_btreek_t *)_mesg;
+    const H5O_btreek_t* mesg = (const H5O_btreek_t*)_mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -153,21 +158,20 @@ H5O__btreek_encode(H5F_t H5_ATTR_UNUSED *f, bool H5_ATTR_UNUSED disable_shared, 
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5O__btreek_copy(const void *_mesg, void *_dest)
+static void* H5O__btreek_copy(const void* _mesg, void* _dest)
 {
-    const H5O_btreek_t *mesg      = (const H5O_btreek_t *)_mesg;
-    H5O_btreek_t       *dest      = (H5O_btreek_t *)_dest;
-    void               *ret_value = NULL; /* Return value */
+    const H5O_btreek_t* mesg = (const H5O_btreek_t*)_mesg;
+    H5O_btreek_t* dest = (H5O_btreek_t*)_dest;
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Sanity check */
     assert(mesg);
 
-    if (!dest && NULL == (dest = (H5O_btreek_t *)H5MM_malloc(sizeof(H5O_btreek_t))))
-        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL,
-                    "memory allocation failed for shared message table message");
+    if (!dest && NULL == (dest = (H5O_btreek_t*)H5MM_malloc(sizeof(H5O_btreek_t)))) {
+        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed for shared message table message");
+    }
 
     /* All this message requires is a shallow copy */
     *dest = *mesg;
@@ -190,9 +194,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-H5O__btreek_size(const H5F_t H5_ATTR_UNUSED *f, bool H5_ATTR_UNUSED disable_shared,
-                 const void H5_ATTR_UNUSED *_mesg)
+static size_t H5O__btreek_size(const H5F_t H5_ATTR_UNUSED* f, bool H5_ATTR_UNUSED disable_shared, const void H5_ATTR_UNUSED* _mesg)
 {
     size_t ret_value = 0;
 
@@ -218,10 +220,9 @@ H5O__btreek_size(const H5F_t H5_ATTR_UNUSED *f, bool H5_ATTR_UNUSED disable_shar
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__btreek_debug(H5F_t H5_ATTR_UNUSED *f, const void *_mesg, FILE *stream, int indent, int fwidth)
+static herr_t H5O__btreek_debug(H5F_t H5_ATTR_UNUSED* f, const void* _mesg, FILE* stream, int indent, int fwidth)
 {
-    const H5O_btreek_t *mesg = (const H5O_btreek_t *)_mesg;
+    const H5O_btreek_t* mesg = (const H5O_btreek_t*)_mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -232,12 +233,9 @@ H5O__btreek_debug(H5F_t H5_ATTR_UNUSED *f, const void *_mesg, FILE *stream, int 
     assert(indent >= 0);
     assert(fwidth >= 0);
 
-    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth,
-            "Chunked storage internal B-tree 'K' value:", mesg->btree_k[H5B_CHUNK_ID]);
-    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth,
-            "Symbol table node internal B-tree 'K' value:", mesg->btree_k[H5B_SNODE_ID]);
-    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth,
-            "Symbol table node leaf 'K' value:", mesg->sym_leaf_k);
+    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Chunked storage internal B-tree 'K' value:", mesg->btree_k[H5B_CHUNK_ID]);
+    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Symbol table node internal B-tree 'K' value:", mesg->btree_k[H5B_SNODE_ID]);
+    fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Symbol table node leaf 'K' value:", mesg->sym_leaf_k);
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5O__btreek_debug() */

@@ -13,9 +13,9 @@
 #include "H5private.h"
 
 #ifdef H5_HAVE_WIN32_API
-#define OPEN_FLAGS "wb"
+    #define OPEN_FLAGS "wb"
 #else
-#define OPEN_FLAGS "w"
+    #define OPEN_FLAGS "w"
 #endif
 
 /*
@@ -28,13 +28,12 @@
  *
  */
 
-int
-main(void)
+int main(void)
 {
-    int   nrow = 3, ncol = 4, npln = 5;
-    int   i, j, k;
-    FILE *sp;
-    char  machine_order[3] = {0, 0, 0};
+    int nrow = 3, ncol = 4, npln = 5;
+    int i, j, k;
+    FILE* sp;
+    char machine_order[3] = { 0, 0, 0 };
 
     float row4[3], col4[4], pln4[5];
     float rowo4 = 11.0F, colo4 = 21.0F, plno4 = 51.0F;
@@ -67,10 +66,12 @@ main(void)
     /* Initialize machine endian */
     volatile uint32_t ibyte = 0x01234567;
     /* 0 for big endian, 1 for little endian. */
-    if ((*((volatile uint8_t *)(&ibyte))) == 0x67)
+    if ((*((volatile uint8_t*)(&ibyte))) == 0x67) {
         strcpy(machine_order, "LE");
-    else
+    }
+    else {
         strcpy(machine_order, "BE");
+    }
 
     /*
      * initialize the row, column, and plane vectors
@@ -111,29 +112,29 @@ main(void)
     pln4i8[0] = plno4i8;
 
     for (i = 1; i < nrow; i++) {
-        row4[i]    = row4[i - 1] + rowi4;
-        row8[i]    = row8[i - 1] + rowi8;
-        row4i[i]   = row4i[i - 1] + rowi4i;
+        row4[i] = row4[i - 1] + rowi4;
+        row8[i] = row8[i - 1] + rowi8;
+        row4i[i] = row4i[i - 1] + rowi4i;
         row4i64[i] = row4i64[i - 1] + rowi4i64;
         row4i16[i] = (short)(row4i16[i - 1] + rowi4i16);
-        row4i8[i]  = (char)(row4i8[i - 1] + rowi4i8);
+        row4i8[i] = (char)(row4i8[i - 1] + rowi4i8);
     }
 
     for (j = 1; j < ncol; j++) {
-        col4[j]    = col4[j - 1] + coli4;
-        col8[j]    = col8[j - 1] + coli8;
-        col4i[j]   = col4i[j - 1] + coli4i;
+        col4[j] = col4[j - 1] + coli4;
+        col8[j] = col8[j - 1] + coli8;
+        col4i[j] = col4i[j - 1] + coli4i;
         col4i64[j] = col4i64[j - 1] + coli4i64;
         col4i16[j] = (short)(col4i16[j - 1] + coli4i16);
-        col4i8[j]  = (char)(col4i8[j - 1] + coli4i8);
+        col4i8[j] = (char)(col4i8[j - 1] + coli4i8);
     }
     for (k = 1; k < npln; k++) {
-        pln4[k]    = pln4[k - 1] + plni4;
-        pln8[k]    = pln8[k - 1] + plni8;
-        pln4i[k]   = pln4i[k - 1] + plni4i;
+        pln4[k] = pln4[k - 1] + plni4;
+        pln8[k] = pln8[k - 1] + plni8;
+        pln4i[k] = pln4i[k - 1] + plni4i;
         pln4i64[k] = pln4i64[k - 1] + plni4i64;
         pln4i16[k] = (short)(pln4i16[k - 1] + plni4i16);
-        pln4i8[k]  = (char)(pln4i8[k - 1] + plni4i8);
+        pln4i8[k] = (char)(pln4i8[k - 1] + plni4i8);
     }
 
     /*
@@ -142,18 +143,20 @@ main(void)
      * element value = sum of row value, col, and plane values
      */
 
-    for (i = 0; i < nrow; i++)
-        for (j = 0; j < ncol; j++)
+    for (i = 0; i < nrow; i++) {
+        for (j = 0; j < ncol; j++) {
             for (k = 0; k < npln; k++) {
                 b64r3[k][i][j] = row8[i] + col8[j] + pln8[k];
                 b32i3[k][i][j] = row4i[i] + col4i[j] + pln4i[k];
                 b16i3[k][i][j] = (short)(row4i16[i] + col4i16[j] + pln4i16[k]);
-                b8i3[k][i][j]  = (char)(row4i8[i] + col4i8[j] + pln4i8[k]);
+                b8i3[k][i][j] = (char)(row4i8[i] + col4i8[j] + pln4i8[k]);
             }
+        }
+    }
 
 #ifndef UNICOS
 
-#ifdef REBUILDTEXTFILES
+    #ifdef REBUILDTEXTFILES
     /*-------------------------------------------------------------------------
      * TOOLTEST txtin8.txt -c $srcdir/testfiles/txtin8.conf -o txtin8.h5
      *-------------------------------------------------------------------------
@@ -162,8 +165,9 @@ main(void)
     sp = fopen("txtin8.txt", "w");
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
-            for (j = 0; j < ncol; j++)
+            for (j = 0; j < ncol; j++) {
                 (void)fprintf(sp, "%10u", b8i3[k][i][j]);
+            }
             (void)fprintf(sp, "\n");
         }
     }
@@ -177,8 +181,9 @@ main(void)
     sp = fopen("txtin16.txt", "w");
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
-            for (j = 0; j < ncol; j++)
+            for (j = 0; j < ncol; j++) {
                 (void)fprintf(sp, "%10u", b16i3[k][i][j]);
+            }
             (void)fprintf(sp, "\n");
         }
     }
@@ -192,13 +197,14 @@ main(void)
     sp = fopen("txtin32.txt", "w");
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
-            for (j = 0; j < ncol; j++)
+            for (j = 0; j < ncol; j++) {
                 (void)fprintf(sp, "%10d", b32i3[k][i][j]);
+            }
             (void)fprintf(sp, "\n");
         }
     }
     (void)fclose(sp);
-#endif
+    #endif
 
     /*-------------------------------------------------------------------------
      * TOOLTEST binin32.bin -c binin32.conf -o binin32.h5
@@ -209,7 +215,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b32i3[k][i][j], sizeof(int), 1, sp);
+                (void)fwrite((char*)&b32i3[k][i][j], sizeof(int), 1, sp);
             }
         }
     }
@@ -237,7 +243,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b32i3[k][i][j], sizeof(unsigned int), 1, sp);
+                (void)fwrite((char*)&b32i3[k][i][j], sizeof(unsigned int), 1, sp);
             }
         }
     }
@@ -264,7 +270,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b16i3[k][i][j], sizeof(short), 1, sp);
+                (void)fwrite((char*)&b16i3[k][i][j], sizeof(short), 1, sp);
             }
         }
     }
@@ -292,7 +298,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b16i3[k][i][j], sizeof(unsigned short), 1, sp);
+                (void)fwrite((char*)&b16i3[k][i][j], sizeof(unsigned short), 1, sp);
             }
         }
     }
@@ -321,7 +327,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b8i3[k][i][j], sizeof(char), 1, sp);
+                (void)fwrite((char*)&b8i3[k][i][j], sizeof(char), 1, sp);
             }
         }
     }
@@ -359,7 +365,7 @@ main(void)
     for (k = 0; k < npln; k++) {
         for (i = 0; i < nrow; i++) {
             for (j = 0; j < ncol; j++) {
-                (void)fwrite((char *)&b64r3[k][i][j], sizeof(double), 1, sp);
+                (void)fwrite((char*)&b64r3[k][i][j], sizeof(double), 1, sp);
             }
         }
     }
@@ -387,13 +393,14 @@ main(void)
 
     {
         /* test CR+LF (13,10) and EOF (26) in windows */
-        char bin8w[4] = {13, 10, 26, 0};
+        char bin8w[4] = { 13, 10, 26, 0 };
 
         sp = fopen("binin8w.bin", OPEN_FLAGS);
         for (i = 0; i < 4; i++) {
             char c = bin8w[i];
-            if (fwrite(&c, sizeof(char), 1, sp) != 1)
+            if (fwrite(&c, sizeof(char), 1, sp) != 1) {
                 printf("error writing file\n");
+            }
         }
         fclose(sp);
 

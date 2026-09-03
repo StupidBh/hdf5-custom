@@ -79,16 +79,16 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VL__reparse_def_vol_conn_variable_test(void)
+herr_t H5VL__reparse_def_vol_conn_variable_test(void)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     /* Re-check for the HDF5_VOL_CONNECTOR environment variable */
-    if (H5VL__set_def_conn() < 0)
+    if (H5VL__set_def_conn() < 0) {
         HGOTO_ERROR(H5E_VOL, H5E_CANTINIT, FAIL, "unable to initialize default VOL connector");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -103,23 +103,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5VL__is_native_connector_test(hid_t vol_id)
+htri_t H5VL__is_native_connector_test(hid_t vol_id)
 {
     H5VL_connector_t *native, *connector;
-    int               cmp_value;           /* Comparison result */
-    htri_t            ret_value = SUCCEED; /* Return value */
+    int cmp_value;              /* Comparison result */
+    htri_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check arguments */
-    if (NULL == (connector = H5I_object_verify(vol_id, H5I_VOL)))
+    if (NULL == (connector = H5I_object_verify(vol_id, H5I_VOL))) {
         HGOTO_ERROR(H5E_VOL, H5E_BADTYPE, FAIL, "not a VOL connector ID");
+    }
 
     /* For the time being, we disallow unregistering the native VOL connector */
     native = H5VL_NATIVE_conn_g;
-    if (H5VL_cmp_connector_cls(&cmp_value, connector->cls, native->cls) < 0)
+    if (H5VL_cmp_connector_cls(&cmp_value, connector->cls, native->cls) < 0) {
         HGOTO_ERROR(H5E_VOL, H5E_CANTCOMPARE, FAIL, "can't compare connector classes");
+    }
     ret_value = (0 == cmp_value);
 
 done:
@@ -136,21 +137,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5VL__register_using_vol_id_test(H5I_type_t type, void *object, hid_t vol_id)
+hid_t H5VL__register_using_vol_id_test(H5I_type_t type, void* object, hid_t vol_id)
 {
-    H5VL_connector_t *connector;
-    hid_t             ret_value = H5I_INVALID_HID; /* Return value */
+    H5VL_connector_t* connector;
+    hid_t ret_value = H5I_INVALID_HID; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check arguments */
-    if (NULL == (connector = H5I_object_verify(vol_id, H5I_VOL)))
+    if (NULL == (connector = H5I_object_verify(vol_id, H5I_VOL))) {
         HGOTO_ERROR(H5E_VOL, H5E_BADTYPE, H5I_INVALID_HID, "not a VOL connector ID");
+    }
 
     /* Get an ID for the object */
-    if ((ret_value = H5VL_register(type, object, connector, true)) < 0)
+    if ((ret_value = H5VL_register(type, object, connector, true)) < 0) {
         HGOTO_ERROR(H5E_VOL, H5E_CANTREGISTER, H5I_INVALID_HID, "unable to get an ID for the object");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

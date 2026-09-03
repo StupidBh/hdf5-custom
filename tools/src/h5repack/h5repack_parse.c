@@ -20,14 +20,14 @@
  * is ever refactored to a heap allocation.
  * free(NULL) is a safe no-op per C99, so no NULL guard is needed.
  * Exits on overflow, consistent with all other error handling in parse_filter. */
-#define PARSE_BUF_WRITE(buf, buf_sz, idx, ch, obj_list_ptr, input_str)                                       \
-    do {                                                                                                     \
-        if ((size_t)(idx) >= (buf_sz)-1) {                                                                   \
-            free(obj_list_ptr);                                                                              \
-            error_msg("filter parameter field too long in <%s>\n", (input_str));                             \
-            exit(EXIT_FAILURE);                                                                              \
-        }                                                                                                    \
-        (buf)[(idx)] = (ch);                                                                                 \
+#define PARSE_BUF_WRITE(buf, buf_sz, idx, ch, obj_list_ptr, input_str)           \
+    do {                                                                         \
+        if ((size_t)(idx) >= (buf_sz) - 1) {                                     \
+            free(obj_list_ptr);                                                  \
+            error_msg("filter parameter field too long in <%s>\n", (input_str)); \
+            exit(EXIT_FAILURE);                                                  \
+        }                                                                        \
+        (buf)[(idx)] = (ch);                                                     \
     } while (0)
 
 /*-------------------------------------------------------------------------
@@ -52,20 +52,19 @@
  * "A,B:NONE"
  *-------------------------------------------------------------------------
  */
-obj_list_t *
-parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t *options, int *is_glb)
+obj_list_t* parse_filter(const char* str, unsigned* n_objs, filter_info_t* filt, pack_opt_t* options, int* is_glb)
 {
-    size_t      i, m, u;
-    char        c;
-    size_t      len = strlen(str);
-    int         f = -1, k, l = -1, p = -1, q, end_obj = -1, no_param = 0;
-    unsigned    j, n;
-    char        sobj[MAX_NC_NAME];
-    char        scomp[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    char        stype[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    char        smask[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    obj_list_t *obj_list  = NULL;
-    unsigned    pixels_per_block;
+    size_t i, m, u;
+    char c;
+    size_t len = strlen(str);
+    int f = -1, k, l = -1, p = -1, q, end_obj = -1, no_param = 0;
+    unsigned j, n;
+    char sobj[MAX_NC_NAME];
+    char scomp[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    char stype[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    char smask[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    obj_list_t* obj_list = NULL;
+    unsigned pixels_per_block;
 
     /* initialize compression  info */
     memset(filt, 0, sizeof(filter_info_t));
@@ -78,8 +77,9 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
             end_obj = (int)i;
             break;
         }
-        if (c == ',')
+        if (c == ',') {
             n++;
+        }
     }
     n++;
 
@@ -87,28 +87,31 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
     if (end_obj <= 0) {
         /* apply to all objects */
         options->all_filter = 1;
-        *is_glb             = 1;
-        *n_objs             = 1;
+        *is_glb = 1;
+        *n_objs = 1;
     }
-    else
+    else {
         *n_objs = n;
+    }
 
-    obj_list = (obj_list_t *)malloc(n * sizeof(obj_list_t));
+    obj_list = (obj_list_t*)malloc(n * sizeof(obj_list_t));
     if (obj_list == NULL) {
         error_msg("could not allocate object list\n");
         return NULL;
     }
 
     /* get object list */
-    if (end_obj > 0)
+    if (end_obj > 0) {
         for (j = 0, k = 0, n = 0; j < (unsigned)end_obj; j++, k++) {
-            c       = str[j];
+            c = str[j];
             sobj[k] = c;
             if (c == ',' || j == (unsigned)(end_obj - 1)) {
-                if (c == ',')
+                if (c == ',') {
                     sobj[k] = '\0';
-                else
+                }
+                else {
                     sobj[k + 1] = '\0';
+                }
 
                 snprintf(obj_list[n].obj, MAX_NC_NAME, "%s", sobj);
                 memset(sobj, 0, sizeof(sobj));
@@ -116,10 +119,12 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                 k = -1;
             }
         }
+    }
     /* nothing after : */
     if (end_obj + 1 == (int)len) {
-        if (obj_list)
+        if (obj_list) {
             free(obj_list);
+        }
         error_msg("input Error: Invalid compression type in <%s>\n", str);
         exit(EXIT_FAILURE);
     }
@@ -144,27 +149,31 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                     for (m = 0, u = i + 1; u < len; u++, m++) {
                         if (str[u] == ',') {
                             stype[m] = '\0'; /* end digit of szip */
-                            l        = 0;    /* start EC or NN search */
+                            l = 0;           /* start EC or NN search */
                             u++;             /* skip ',' */
                         }
                         c = str[u];
                         if (!isdigit(c) && l == -1) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("compression parameter not digit in <%s>\n", str);
                             exit(EXIT_FAILURE);
                         }
-                        if (l == -1)
+                        if (l == -1) {
                             PARSE_BUF_WRITE(stype, sizeof(stype), m, c, obj_list, str);
+                        }
                         else {
                             PARSE_BUF_WRITE(smask, sizeof(smask), l, c, obj_list, str);
                             l++;
                             if (l == 2) {
                                 smask[l] = '\0';
-                                if (strcmp(smask, "NN") == 0)
+                                if (strcmp(smask, "NN") == 0) {
                                     filt->cd_values[j++] = H5_SZIP_NN_OPTION_MASK;
-                                else if (strcmp(smask, "EC") == 0)
+                                }
+                                else if (strcmp(smask, "EC") == 0) {
                                     filt->cd_values[j++] = H5_SZIP_EC_OPTION_MASK;
+                                }
                                 else {
                                     error_msg("szip mask must be 'NN' or 'EC' \n");
                                     exit(EXIT_FAILURE);
@@ -173,7 +182,7 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                             }
                         }
                     } /* u */
-                }     /*if */
+                } /*if */
 
                 /*-------------------------------------------------------------------------
                  * H5Z_FILTER_SCALEOFFSET
@@ -194,27 +203,31 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                     for (m = 0, u = i + 1; u < len; u++, m++) {
                         if (str[u] == ',') {
                             stype[m] = '\0'; /* end digit */
-                            l        = 0;    /* start 'IN' , 'DS', or 'ES' search */
+                            l = 0;           /* start 'IN' , 'DS', or 'ES' search */
                             u++;             /* skip ',' */
                         }
                         c = str[u];
                         if (!isdigit(c) && l == -1) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("compression parameter is not a digit in <%s>\n", str);
                             exit(EXIT_FAILURE);
                         }
-                        if (l == -1)
+                        if (l == -1) {
                             PARSE_BUF_WRITE(stype, sizeof(stype), m, c, obj_list, str);
+                        }
                         else {
                             PARSE_BUF_WRITE(smask, sizeof(smask), l, c, obj_list, str);
                             l++;
                             if (l == 2) {
                                 smask[l] = '\0';
-                                if (strcmp(smask, "IN") == 0)
+                                if (strcmp(smask, "IN") == 0) {
                                     filt->cd_values[j++] = H5Z_SO_INT;
-                                else if (strcmp(smask, "DS") == H5Z_SO_FLOAT_DSCALE)
+                                }
+                                else if (strcmp(smask, "DS") == H5Z_SO_FLOAT_DSCALE) {
                                     filt->cd_values[j++] = H5Z_SO_FLOAT_DSCALE;
+                                }
                                 else {
                                     error_msg("scale type must be 'IN' or 'DS' \n");
                                     exit(EXIT_FAILURE);
@@ -223,7 +236,7 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                             }
                         }
                     } /* u */
-                }     /*if */
+                } /*if */
 
                 /*-------------------------------------------------------------------------
                  * User Defined
@@ -241,33 +254,36 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                             stype[q] = '\0'; /* end digit */
                             if (l == -1) {
                                 filt->filtn = atoi(stype);
-                                l           = 0;
+                                l = 0;
                             }
                             else if (f == -1) {
                                 filt->filt_flag = (unsigned)strtoul(stype, NULL, 0);
-                                f               = 0;
+                                f = 0;
                             }
                             else if (p == -1) {
                                 filt->cd_nelmts = strtoull(stype, NULL, 0);
-                                p               = 0;
+                                p = 0;
                             }
                             else {
-                                if (filt->cd_nelmts > 0)
+                                if (filt->cd_nelmts > 0) {
                                     filt->cd_values[j++] = (unsigned)strtoul(stype, NULL, 0);
+                                }
                             }
                             q = 0;
                             u++; /* skip ',' */
                         }
                         c = str[u];
                         if (!isdigit(c) && l == -1) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("filter number parameter is not a digit in <%s>\n", str);
                             exit(EXIT_FAILURE);
                         }
                         else if (!isdigit(c) && f == -1) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("filter flag parameter is not a digit in <%s>\n", str);
                             exit(EXIT_FAILURE);
                         }
@@ -285,8 +301,9 @@ parse_filter(const char *str, unsigned *n_objs, filter_info_t *filt, pack_opt_t 
                     for (m = 0, u = i + 1; u < len; u++, m++) {
                         c = str[u];
                         if (!isdigit(c)) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("compression parameter is not a digit in <%s>\n", str);
                             exit(EXIT_FAILURE);
                         }
@@ -301,21 +318,26 @@ done_filter_params:;
                     /* the trailing token (no comma after it) was never committed inside
                      * the loop above; commit it to whichever UD field is still pending,
                      * mirroring the comma-triggered branch exactly */
-                    if (l == -1)
+                    if (l == -1) {
                         filt->filtn = atoi(stype);
-                    else if (f == -1)
+                    }
+                    else if (f == -1) {
                         filt->filt_flag = (unsigned)strtoul(stype, NULL, 0);
-                    else if (p == -1)
+                    }
+                    else if (p == -1) {
                         filt->cd_nelmts = strtoull(stype, NULL, 0);
-                    else if (filt->cd_nelmts > 0)
+                    }
+                    else if (filt->cd_nelmts > 0) {
                         filt->cd_values[j++] = (unsigned)strtoul(stype, NULL, 0);
+                    }
                 }
-                else
+                else {
                     filt->cd_values[j++] = (unsigned)strtoul(stype, NULL, 0);
+                }
             }
             else if (i == len - 1) { /*no more parameters */
                 scomp[k + 1] = '\0';
-                no_param     = 1;
+                no_param = 1;
             }
 
             /*-------------------------------------------------------------------------
@@ -328,7 +350,7 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             if (strcmp(scomp, "NONE") == 0) {
-                filt->filtn     = H5Z_FILTER_NONE;
+                filt->filtn = H5Z_FILTER_NONE;
                 filt->cd_nelmts = 0;
             }
 
@@ -337,11 +359,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "GZIP") == 0) {
-                filt->filtn     = H5Z_FILTER_DEFLATE;
+                filt->filtn = H5Z_FILTER_DEFLATE;
                 filt->cd_nelmts = 1;
                 if (no_param) { /*no more parameters, GZIP must have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("missing compression parameter in <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -352,11 +375,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "SZIP") == 0) {
-                filt->filtn     = H5Z_FILTER_SZIP;
+                filt->filtn = H5Z_FILTER_SZIP;
                 filt->cd_nelmts = 2;
                 if (no_param) { /*no more parameters, SZIP must have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("missing compression parameter in <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -367,11 +391,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "SHUF") == 0) {
-                filt->filtn     = H5Z_FILTER_SHUFFLE;
+                filt->filtn = H5Z_FILTER_SHUFFLE;
                 filt->cd_nelmts = 0;
                 if (m > 0) { /*shuffle does not have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("extra parameter in SHUF <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -381,11 +406,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "FLET") == 0) {
-                filt->filtn     = H5Z_FILTER_FLETCHER32;
+                filt->filtn = H5Z_FILTER_FLETCHER32;
                 filt->cd_nelmts = 0;
                 if (m > 0) { /* fletcher does not have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("extra parameter in FLET <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -395,11 +421,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "NBIT") == 0) {
-                filt->filtn     = H5Z_FILTER_NBIT;
+                filt->filtn = H5Z_FILTER_NBIT;
                 filt->cd_nelmts = 0;
                 if (m > 0) { /*nbit does not have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("extra parameter in NBIT <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -409,11 +436,12 @@ done_filter_params:;
              *-------------------------------------------------------------------------
              */
             else if (strcmp(scomp, "SOFF") == 0) {
-                filt->filtn     = H5Z_FILTER_SCALEOFFSET;
+                filt->filtn = H5Z_FILTER_SCALEOFFSET;
                 filt->cd_nelmts = 2;
                 if (no_param) { /*no more parameters, SOFF must have parameter */
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("missing compression parameter in <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
@@ -425,15 +453,17 @@ done_filter_params:;
             else if (strcmp(scomp, "UD") == 0) {
                 /* parameters does not match count */
                 if (filt->cd_nelmts != j) {
-                    if (obj_list)
+                    if (obj_list) {
                         free(obj_list);
+                    }
                     error_msg("incorrect number of compression parameters in <%s>\n", str);
                     exit(EXIT_FAILURE);
                 }
             }
             else {
-                if (obj_list)
+                if (obj_list) {
                     free(obj_list);
+                }
                 error_msg("invalid filter type in <%s>\n", str);
                 exit(EXIT_FAILURE);
             }
@@ -447,45 +477,48 @@ done_filter_params:;
      */
 
     switch (filt->filtn) {
+    /*-------------------------------------------------------------------------
+     * H5Z_FILTER_DEFLATE
+     *-------------------------------------------------------------------------
+     */
+    case H5Z_FILTER_DEFLATE:
+        if (filt->cd_values[0] > 9) {
+            if (obj_list) {
+                free(obj_list);
+            }
+            error_msg("invalid compression parameter in <%s>\n", str);
+            exit(EXIT_FAILURE);
+        }
+        break;
         /*-------------------------------------------------------------------------
-         * H5Z_FILTER_DEFLATE
+         * H5Z_FILTER_SZIP
          *-------------------------------------------------------------------------
          */
-        case H5Z_FILTER_DEFLATE:
-            if (filt->cd_values[0] > 9) {
-                if (obj_list)
-                    free(obj_list);
-                error_msg("invalid compression parameter in <%s>\n", str);
-                exit(EXIT_FAILURE);
+    case H5Z_FILTER_SZIP:
+        pixels_per_block = filt->cd_values[H5Z_SZIP_PARM_PPB];
+        if ((pixels_per_block % 2) == 1) {
+            if (obj_list) {
+                free(obj_list);
             }
-            break;
-            /*-------------------------------------------------------------------------
-             * H5Z_FILTER_SZIP
-             *-------------------------------------------------------------------------
-             */
-        case H5Z_FILTER_SZIP:
-            pixels_per_block = filt->cd_values[H5Z_SZIP_PARM_PPB];
-            if ((pixels_per_block % 2) == 1) {
-                if (obj_list)
-                    free(obj_list);
-                error_msg("pixels_per_block is not even in <%s>\n", str);
-                exit(EXIT_FAILURE);
+            error_msg("pixels_per_block is not even in <%s>\n", str);
+            exit(EXIT_FAILURE);
+        }
+        if (pixels_per_block > H5_SZIP_MAX_PIXELS_PER_BLOCK) {
+            if (obj_list) {
+                free(obj_list);
             }
-            if (pixels_per_block > H5_SZIP_MAX_PIXELS_PER_BLOCK) {
-                if (obj_list)
-                    free(obj_list);
-                error_msg("pixels_per_block is too large in <%s>\n", str);
-                exit(EXIT_FAILURE);
+            error_msg("pixels_per_block is too large in <%s>\n", str);
+            exit(EXIT_FAILURE);
+        }
+        if ((strcmp(smask, "NN") != 0) && (strcmp(smask, "EC") != 0)) {
+            if (obj_list) {
+                free(obj_list);
             }
-            if ((strcmp(smask, "NN") != 0) && (strcmp(smask, "EC") != 0)) {
-                if (obj_list)
-                    free(obj_list);
-                error_msg("szip mask must be 'NN' or 'EC' \n");
-                exit(EXIT_FAILURE);
-            }
-            break;
-        default:
-            break;
+            error_msg("szip mask must be 'NN' or 'EC' \n");
+            exit(EXIT_FAILURE);
+        }
+        break;
+    default: break;
     }
 
     return obj_list;
@@ -508,18 +541,19 @@ done_filter_params:;
  *
  *-------------------------------------------------------------------------
  */
-obj_list_t *
-parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about layout needed */
-             pack_opt_t *options)
+obj_list_t* parse_layout(const char* str,
+                         unsigned* n_objs,
+                         pack_info_t* pack, /* info about layout needed */
+                         pack_opt_t* options)
 {
-    obj_list_t *obj_list = NULL;
-    unsigned    i, j, n;
-    char        c;
-    size_t      len = strlen(str);
-    int         k, end_obj = -1, c_index;
-    char        sobj[MAX_NC_NAME];
-    char        sdim[10];
-    char        slayout[10];
+    obj_list_t* obj_list = NULL;
+    unsigned i, j, n;
+    char c;
+    size_t len = strlen(str);
+    int k, end_obj = -1, c_index;
+    char sobj[MAX_NC_NAME];
+    char sdim[10];
+    char slayout[10];
 
     memset(sdim, '\0', sizeof(sdim));
     memset(sobj, '\0', sizeof(sobj));
@@ -528,10 +562,12 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
     /* check for the end of object list and number of objects */
     for (i = 0, n = 0; i < len; i++) {
         c = str[i];
-        if (c == ':')
+        if (c == ':') {
             end_obj = (int)i;
-        if (c == ',')
+        }
+        if (c == ',') {
             n++;
+        }
     }
 
     if (end_obj == -1) { /* missing : chunk all */
@@ -539,7 +575,7 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
     }
 
     n++;
-    obj_list = (obj_list_t *)malloc(n * sizeof(obj_list_t));
+    obj_list = (obj_list_t*)malloc(n * sizeof(obj_list_t));
     if (obj_list == NULL) {
         error_msg("could not allocate object list\n");
         return NULL;
@@ -547,26 +583,30 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
     *n_objs = n;
 
     /* get object list */
-    if (end_obj > 0)
+    if (end_obj > 0) {
         for (j = 0, k = 0, n = 0; j < (unsigned)end_obj; j++, k++) {
-            c       = str[j];
+            c = str[j];
             sobj[k] = c;
             if (c == ',' || j == (unsigned)(end_obj - 1)) {
-                if (c == ',')
+                if (c == ',') {
                     sobj[k] = '\0';
-                else
+                }
+                else {
                     sobj[k + 1] = '\0';
+                }
                 snprintf(obj_list[n].obj, MAX_NC_NAME, "%s", sobj);
                 memset(sobj, 0, sizeof(sobj));
                 n++;
                 k = -1;
             }
         }
+    }
 
     /* nothing after : */
     if (end_obj + 1 == (int)len) {
-        if (obj_list)
+        if (obj_list) {
             free(obj_list);
+        }
         error_msg("in parse layout, no characters after : in <%s>\n", str);
         exit(EXIT_FAILURE);
     }
@@ -575,19 +615,22 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
     for (j = (unsigned)(end_obj + 1), n = 0; n <= 5; j++, n++) {
         if (n == 5) {
             slayout[n] = '\0'; /*cut string */
-            if (strcmp(slayout, "COMPA") == 0)
+            if (strcmp(slayout, "COMPA") == 0) {
                 pack->layout = H5D_COMPACT;
-            else if (strcmp(slayout, "CONTI") == 0)
+            }
+            else if (strcmp(slayout, "CONTI") == 0) {
                 pack->layout = H5D_CONTIGUOUS;
-            else if (strcmp(slayout, "CHUNK") == 0)
+            }
+            else if (strcmp(slayout, "CHUNK") == 0) {
                 pack->layout = H5D_CHUNKED;
+            }
             else {
                 error_msg("in parse layout, not a valid layout in <%s>\n", str);
                 exit(EXIT_FAILURE);
             }
         }
         else {
-            c          = str[j];
+            c = str[j];
             slayout[n] = c;
         }
     } /* j */
@@ -599,32 +642,35 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
          */
         k = 0;
         if (j > len) {
-            if (obj_list)
+            if (obj_list) {
                 free(obj_list);
+            }
             error_msg("in parse layout,  <%s> Chunk dimensions missing\n", str);
             exit(EXIT_FAILURE);
         }
 
         for (i = j, c_index = 0; i < len; i++) {
-            c       = str[i];
+            c = str[i];
             sdim[k] = c;
             k++; /*increment sdim index */
 
             if (!isdigit(c) && c != 'x' && c != 'N' && c != 'O' && c != 'N' && c != 'E') {
-                if (obj_list)
+                if (obj_list) {
                     free(obj_list);
+                }
                 error_msg("in parse layout, <%s> Not a valid character in <%s>\n", sdim, str);
                 exit(EXIT_FAILURE);
             }
 
             if (c == 'x' || i == len - 1) {
                 if (c == 'x') {
-                    sdim[k - 1]                        = '\0';
-                    k                                  = 0;
+                    sdim[k - 1] = '\0';
+                    k = 0;
                     pack->chunk.chunk_lengths[c_index] = strtoull(sdim, NULL, 0);
                     if (pack->chunk.chunk_lengths[c_index] == 0) {
-                        if (obj_list)
+                        if (obj_list) {
                             free(obj_list);
+                        }
                         error_msg("in parse layout, <%s> conversion to number in <%s>\n", sdim, str);
                         exit(EXIT_FAILURE);
                     }
@@ -632,24 +678,25 @@ parse_layout(const char *str, unsigned *n_objs, pack_info_t *pack, /* info about
                 }
                 else if (i == len - 1) { /*no more parameters */
                     sdim[k] = '\0';
-                    k       = 0;
+                    k = 0;
                     if (strcmp(sdim, "NONE") == 0) {
                         pack->chunk.rank = -2;
                     }
                     else {
                         pack->chunk.chunk_lengths[c_index] = strtoull(sdim, NULL, 0);
                         if (pack->chunk.chunk_lengths[c_index] == 0) {
-                            if (obj_list)
+                            if (obj_list) {
                                 free(obj_list);
+                            }
                             error_msg("in parse layout, <%s> conversion to number in <%s>\n", sdim, str);
                             exit(EXIT_FAILURE);
                         }
                         pack->chunk.rank = c_index + 1;
                     }
                 } /*if */
-            }     /*if c=='x' || i==len-1 */
-        }         /*i*/
-    }             /*H5D_CHUNKED*/
+            } /*if c=='x' || i==len-1 */
+        } /*i*/
+    } /*H5D_CHUNKED*/
 
     return obj_list;
 }

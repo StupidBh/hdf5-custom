@@ -19,11 +19,9 @@
 
 #define FILENAME "groups.h5"
 
-int
-main(void)
+int main(void)
 {
-
-    hid_t  file_id, group1_id, group2_id, group3_id; /* identifiers */
+    hid_t file_id, group1_id, group2_id, group3_id; /* identifiers */
     herr_t status;
 
     /* Create a new file using default properties. */

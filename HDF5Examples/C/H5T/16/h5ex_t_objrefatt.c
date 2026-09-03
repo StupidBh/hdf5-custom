@@ -20,23 +20,22 @@
 #define ATTRIBUTE "A1"
 #define DIM0      2
 
-int
-main(void)
+int main(void)
 {
-    hid_t       file;  /* File Handle */
-    hid_t       space; /* Dataspace Handle */
-    hid_t       dset;  /* Dataset Handle */
-    hid_t       obj;   /* Object Handle */
-    hid_t       attr;  /* Attribute Handle */
-    herr_t      status;
-    hsize_t     dims[1] = {DIM0};
-    hobj_ref_t  wdata[DIM0];  /* Write buffer */
-    hobj_ref_t *rdata = NULL; /* Read buffer */
-    H5G_obj_t   objtype;
-    ssize_t     size;
-    char       *name = NULL;
-    int         ndims;
-    int         i;
+    hid_t file;  /* File Handle */
+    hid_t space; /* Dataspace Handle */
+    hid_t dset;  /* Dataset Handle */
+    hid_t obj;   /* Object Handle */
+    hid_t attr;  /* Attribute Handle */
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    hobj_ref_t wdata[DIM0];   /* Write buffer */
+    hobj_ref_t* rdata = NULL; /* Read buffer */
+    H5G_obj_t objtype;
+    ssize_t size;
+    char* name = NULL;
+    int ndims;
+    int i;
 
     /*
      * Create a new file using the default properties.
@@ -46,15 +45,15 @@ main(void)
     /*
      * Create a dataset with a scalar dataspace.
      */
-    space  = H5Screate(H5S_SCALAR);
-    obj    = H5Dcreate(file, "DS2", H5T_STD_I32LE, space, H5P_DEFAULT);
+    space = H5Screate(H5S_SCALAR);
+    obj = H5Dcreate(file, "DS2", H5T_STD_I32LE, space, H5P_DEFAULT);
     status = H5Dclose(obj);
     status = H5Sclose(space);
 
     /*
      * Create a group.
      */
-    obj    = H5Gcreate(file, "G1", H5P_DEFAULT);
+    obj = H5Gcreate(file, "G1", H5P_DEFAULT);
     status = H5Gclose(obj);
 
     /*
@@ -69,8 +68,8 @@ main(void)
      * Create dataset with a scalar dataspace to serve as the parent
      * for the attribute.
      */
-    space  = H5Screate(H5S_SCALAR);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
+    space = H5Screate(H5S_SCALAR);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -82,7 +81,7 @@ main(void)
     /*
      * Create the attribute and write the object references to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, H5T_STD_REF_OBJ, space, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, H5T_STD_REF_OBJ, space, H5P_DEFAULT);
     status = H5Awrite(attr, H5T_STD_REF_OBJ, wdata);
 
     /*
@@ -112,7 +111,7 @@ main(void)
      */
     space = H5Aget_space(attr);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-    rdata = (hobj_ref_t *)malloc(dims[0] * sizeof(hobj_ref_t));
+    rdata = (hobj_ref_t*)malloc(dims[0] * sizeof(hobj_ref_t));
 
     /*
      * Read the data.
@@ -128,7 +127,7 @@ main(void)
         /*
          * Open the referenced object, get its name and type.
          */
-        obj     = H5Rdereference(dset, H5R_OBJECT, &rdata[i]);
+        obj = H5Rdereference(dset, H5R_OBJECT, &rdata[i]);
         objtype = H5Rget_obj_type(dset, H5R_OBJECT, &rdata[i]);
 
         /*
@@ -136,24 +135,22 @@ main(void)
          * the name.
          */
         size = 1 + H5Iget_name(obj, NULL, 0);
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
         size = H5Iget_name(obj, name, size);
 
         /*
          * Print the object type and close the object.
          */
         switch (objtype) {
-            case H5G_GROUP:
-                printf("Group");
-                status = H5Gclose(obj);
-                break;
-            case H5G_DATASET:
-                printf("Dataset");
-                status = H5Dclose(obj);
-                break;
-            case H5G_TYPE:
-                printf("Named Datatype");
-                status = H5Tclose(obj);
+        case H5G_GROUP:
+            printf("Group");
+            status = H5Gclose(obj);
+            break;
+        case H5G_DATASET:
+            printf("Dataset");
+            status = H5Dclose(obj);
+            break;
+        case H5G_TYPE: printf("Named Datatype"); status = H5Tclose(obj);
         }
 
         /*

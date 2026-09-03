@@ -19,24 +19,25 @@
 #define DIM0     4
 #define DIM1     7
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file  = H5I_INVALID_HID;
-    hid_t   space = H5I_INVALID_HID;
-    hid_t   dset  = H5I_INVALID_HID;
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
-    int     wdata[DIM0][DIM1]; /* Write buffer */
-    int     rdata[DIM0][DIM1]; /* Read buffer */
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    int rdata[DIM0][DIM1]; /* Read buffer */
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -88,8 +89,9 @@ main(void)
     printf("%s:\n", DATASET);
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

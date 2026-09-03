@@ -59,7 +59,7 @@
 /* Local Variables */
 /*******************/
 
-#ifdef H5_HAVE_C11_THREADS
+    #ifdef H5_HAVE_C11_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_key_create
  *
@@ -69,20 +69,21 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_create(H5TS_key_t *key, H5TS_key_destructor_func_t dtor)
+herr_t H5TS_key_create(H5TS_key_t* key, H5TS_key_destructor_func_t dtor)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == key))
+    if (H5_UNLIKELY(NULL == key)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Create the key */
-    if (H5_UNLIKELY(tss_create(key, dtor) != thrd_success))
+    if (H5_UNLIKELY(tss_create(key, dtor) != thrd_success)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -97,8 +98,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_delete(H5TS_key_t key)
+herr_t H5TS_key_delete(H5TS_key_t key)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -109,8 +109,8 @@ H5TS_key_delete(H5TS_key_t key)
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(SUCCEED)
 } /* end H5TS_key_delete() */
 
-#else
-#ifdef H5_HAVE_WIN_THREADS
+    #else
+        #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_key_create
  *
@@ -120,24 +120,26 @@ H5TS_key_delete(H5TS_key_t key)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_create(H5TS_key_t *key, H5TS_key_destructor_func_t dtor)
+herr_t H5TS_key_create(H5TS_key_t* key, H5TS_key_destructor_func_t dtor)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == key))
+    if (H5_UNLIKELY(NULL == key)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Fail if the key has a destructor callback, this is not supported by Windows */
-    if (NULL != dtor)
+    if (NULL != dtor) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Create the key */
-    if (H5_UNLIKELY(TLS_OUT_OF_INDEXES == (*key = TlsAlloc())))
+    if (H5_UNLIKELY(TLS_OUT_OF_INDEXES == (*key = TlsAlloc()))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -152,23 +154,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_delete(H5TS_key_t key)
+herr_t H5TS_key_delete(H5TS_key_t key)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Delete the key */
-    if (TLS_OUT_OF_INDEXES != key)
-        if (H5_UNLIKELY(0 == TlsFree(key)))
+    if (TLS_OUT_OF_INDEXES != key) {
+        if (H5_UNLIKELY(0 == TlsFree(key))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_key_delete() */
 
-#else
+        #else
 /*-------------------------------------------------------------------------
  * Function: H5TS_key_create
  *
@@ -178,20 +181,21 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_create(H5TS_key_t *key, H5TS_key_destructor_func_t dtor)
+herr_t H5TS_key_create(H5TS_key_t* key, H5TS_key_destructor_func_t dtor)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == key))
+    if (H5_UNLIKELY(NULL == key)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Create the key */
-    if (H5_UNLIKELY(pthread_key_create(key, dtor)))
+    if (H5_UNLIKELY(pthread_key_create(key, dtor))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -206,22 +210,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_key_delete(H5TS_key_t key)
+herr_t H5TS_key_delete(H5TS_key_t key)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Delete the key */
-    if (H5_UNLIKELY(pthread_key_delete(key)))
+    if (H5_UNLIKELY(pthread_key_delete(key))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_key_delete() */
 
-#endif
-#endif
+        #endif
+    #endif
 
 #endif /* H5_HAVE_THREADS */

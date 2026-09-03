@@ -44,9 +44,9 @@
 /* Local Prototypes */
 /********************/
 
-static hid_t open_skeleton(const char *filename, unsigned verbose);
-static int   addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long flush_count);
-static void  usage(void);
+static hid_t open_skeleton(const char* filename, unsigned verbose);
+static int addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long flush_count);
+static void usage(void);
 
 /*-------------------------------------------------------------------------
  * Function:    open_skeleton
@@ -66,50 +66,59 @@ static void  usage(void);
  *
  *-------------------------------------------------------------------------
  */
-static hid_t
-open_skeleton(const char *filename, unsigned verbose)
+static hid_t open_skeleton(const char* filename, unsigned verbose)
 {
-    hid_t    fid;    /* File ID for new HDF5 file */
-    hid_t    fapl;   /* File access property list */
-    hid_t    sid;    /* Dataspace ID */
-    hsize_t  dim[2]; /* Dataspace dimension */
-    unsigned u, v;   /* Local index variable */
+    hid_t fid;      /* File ID for new HDF5 file */
+    hid_t fapl;     /* File access property list */
+    hid_t sid;      /* Dataspace ID */
+    hsize_t dim[2]; /* Dataspace dimension */
+    unsigned u, v;  /* Local index variable */
 
     assert(filename);
 
     /* Create file access property list */
-    if ((fapl = h5_fileaccess()) < 0)
+    if ((fapl = h5_fileaccess()) < 0) {
         return -1;
+    }
 
     /* Set to use the latest library format */
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         return -1;
+    }
 
     /* Open the file */
-    if ((fid = H5Fopen(filename, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0) {
         return -1;
+    }
 
     /* Close file access property list */
-    if (H5Pclose(fapl) < 0)
+    if (H5Pclose(fapl) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Opening datasets\n");
+    }
 
     /* Open the datasets */
-    for (u = 0; u < NLEVELS; u++)
+    for (u = 0; u < NLEVELS; u++) {
         for (v = 0; v < symbol_count[u]; v++) {
-            if ((symbol_info[u][v].dsid = H5Dopen2(fid, symbol_info[u][v].name, H5P_DEFAULT)) < 0)
+            if ((symbol_info[u][v].dsid = H5Dopen2(fid, symbol_info[u][v].name, H5P_DEFAULT)) < 0) {
                 return -1;
-            if ((sid = H5Dget_space(symbol_info[u][v].dsid)) < 0)
+            }
+            if ((sid = H5Dget_space(symbol_info[u][v].dsid)) < 0) {
                 return -1;
-            if (2 != H5Sget_simple_extent_ndims(sid))
+            }
+            if (2 != H5Sget_simple_extent_ndims(sid)) {
                 return -1;
-            if (H5Sget_simple_extent_dims(sid, dim, NULL) < 0)
+            }
+            if (H5Sget_simple_extent_dims(sid, dim, NULL) < 0) {
                 return -1;
+            }
             symbol_info[u][v].nrecords = dim[1];
         } /* end for */
+    }
 
     return fid;
 }
@@ -137,16 +146,15 @@ open_skeleton(const char *filename, unsigned verbose)
  *
  *-------------------------------------------------------------------------
  */
-static int
-addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long flush_count)
+static int addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long flush_count)
 {
-    hid_t         tid;                                  /* Datatype ID for records */
-    hid_t         mem_sid;                              /* Memory dataspace ID */
-    hsize_t       start[2] = {0, 0}, count[2] = {1, 1}; /* Hyperslab selection values */
-    hsize_t       dim[2] = {1, 0};                      /* Dataspace dimensions */
-    symbol_t      buf[MAX_SIZE_CHANGE];                 /* Write buffer */
-    unsigned long op_to_flush;                          /* # of operations before flush */
-    unsigned long u, v;                                 /* Local index variables */
+    hid_t tid;                                        /* Datatype ID for records */
+    hid_t mem_sid;                                    /* Memory dataspace ID */
+    hsize_t start[2] = { 0, 0 }, count[2] = { 1, 1 }; /* Hyperslab selection values */
+    hsize_t dim[2] = { 1, 0 };                        /* Dataspace dimensions */
+    symbol_t buf[MAX_SIZE_CHANGE];                    /* Write buffer */
+    unsigned long op_to_flush;                        /* # of operations before flush */
+    unsigned long u, v;                               /* Local index variables */
 
     assert(fid > 0);
 
@@ -154,19 +162,21 @@ addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long fl
     memset(&buf, 0, sizeof(buf));
 
     /* Create a dataspace for the record to add */
-    if ((mem_sid = H5Screate_simple(2, count, NULL)) < 0)
+    if ((mem_sid = H5Screate_simple(2, count, NULL)) < 0) {
         return -1;
+    }
 
     /* Create datatype for appending records */
-    if ((tid = create_symbol_datatype()) < 0)
+    if ((tid = create_symbol_datatype()) < 0) {
         return -1;
+    }
 
     /* Add and remove records to random datasets, according to frequency
      * distribution */
     op_to_flush = flush_count;
     for (u = 0; u < nops; u++) {
-        symbol_info_t *symbol;   /* Symbol to write record to */
-        hid_t          file_sid; /* Dataset's space ID */
+        symbol_info_t* symbol; /* Symbol to write record to */
+        hid_t file_sid;        /* Dataset's space ID */
 
         /* Get a random dataset, according to the symbol distribution */
         symbol = choose_dataset();
@@ -179,56 +189,68 @@ addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long fl
             count[1] -= MAX_SIZE_CHANGE;
 
             /* Set the buffer's IDs (equal to its position) */
-            for (v = 0; v < count[1]; v++)
+            for (v = 0; v < count[1]; v++) {
                 buf[v].rec_id = (uint64_t)symbol->nrecords + (uint64_t)v;
+            }
 
             /* Set the memory space to the correct size */
-            if (H5Sset_extent_simple(mem_sid, 2, count, NULL) < 0)
+            if (H5Sset_extent_simple(mem_sid, 2, count, NULL) < 0) {
                 return -1;
+            }
 
             /* Get the coordinates to write */
             start[1] = symbol->nrecords;
 
             /* Cork the metadata cache, to prevent the object header from being
              * flushed before the data has been written */
-            if (H5Odisable_mdc_flushes(symbol->dsid) < 0)
+            if (H5Odisable_mdc_flushes(symbol->dsid) < 0) {
                 return -1;
+            }
 
             /* Extend the dataset's dataspace to hold the new record */
             symbol->nrecords += count[1];
             dim[1] = symbol->nrecords;
-            if (H5Dset_extent(symbol->dsid, dim) < 0)
+            if (H5Dset_extent(symbol->dsid, dim) < 0) {
                 return -1;
+            }
 
             /* Get the dataset's dataspace */
-            if ((file_sid = H5Dget_space(symbol->dsid)) < 0)
+            if ((file_sid = H5Dget_space(symbol->dsid)) < 0) {
                 return -1;
+            }
 
             /* Choose the last record in the dataset */
-            if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0)
+            if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0) {
                 return -1;
+            }
 
             /* Write record to the dataset */
-            if (H5Dwrite(symbol->dsid, tid, mem_sid, file_sid, H5P_DEFAULT, &buf) < 0)
+            if (H5Dwrite(symbol->dsid, tid, mem_sid, file_sid, H5P_DEFAULT, &buf) < 0) {
                 return -1;
+            }
 
             /* Uncork the metadata cache */
-            if (H5Oenable_mdc_flushes(symbol->dsid) < 0)
+            if (H5Oenable_mdc_flushes(symbol->dsid) < 0) {
                 return -1;
+            }
 
             /* Close the dataset's dataspace */
-            if (H5Sclose(file_sid) < 0)
+            if (H5Sclose(file_sid) < 0) {
                 return -1;
+            }
         } /* end if */
         else {
             /* Shrink the dataset's dataspace */
-            if (count[1] > symbol->nrecords)
+            if (count[1] > symbol->nrecords) {
                 symbol->nrecords = 0;
-            else
+            }
+            else {
                 symbol->nrecords -= count[1];
+            }
             dim[1] = symbol->nrecords;
-            if (H5Dset_extent(symbol->dsid, dim) < 0)
+            if (H5Dset_extent(symbol->dsid, dim) < 0) {
                 return -1;
+            }
         } /* end else */
 
         /* Check for flushing file */
@@ -239,30 +261,34 @@ addrem_records(hid_t fid, unsigned verbose, unsigned long nops, unsigned long fl
             /* Check for counter being reached */
             if (0 == op_to_flush) {
                 /* Flush contents of file */
-                if (H5Fflush(fid, H5F_SCOPE_GLOBAL) < 0)
+                if (H5Fflush(fid, H5F_SCOPE_GLOBAL) < 0) {
                     return -1;
+                }
 
                 /* Reset flush counter */
                 op_to_flush = flush_count;
             } /* end if */
-        }     /* end if */
-    }         /* end for */
+        } /* end if */
+    } /* end for */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Closing datasets\n");
+    }
 
     /* Close the datasets */
-    for (u = 0; u < NLEVELS; u++)
-        for (v = 0; v < symbol_count[u]; v++)
-            if (H5Dclose(symbol_info[u][v].dsid) < 0)
+    for (u = 0; u < NLEVELS; u++) {
+        for (v = 0; v < symbol_count[u]; v++) {
+            if (H5Dclose(symbol_info[u][v].dsid) < 0) {
                 return -1;
+            }
+        }
+    }
 
     return 0;
 }
 
-static void
-usage(void)
+static void usage(void)
 {
     printf("\n");
     printf("Usage error!\n");
@@ -281,70 +307,74 @@ usage(void)
     exit(EXIT_FAILURE);
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hid_t    fid;                /* File ID for file opened */
-    long     nops        = 0;    /* # of times to grow or shrink the dataset */
-    long     flush_count = 1000; /* # of records to write between flushing file */
-    unsigned verbose     = 1;    /* Whether to emit some informational messages */
-    unsigned use_seed    = 0;    /* Set to 1 if a seed was set on the command line */
-    unsigned random_seed = 0;    /* Random # seed */
-    unsigned u;                  /* Local index variable */
-    int      temp;
+    hid_t fid;                /* File ID for file opened */
+    long nops = 0;            /* # of times to grow or shrink the dataset */
+    long flush_count = 1000;  /* # of records to write between flushing file */
+    unsigned verbose = 1;     /* Whether to emit some informational messages */
+    unsigned use_seed = 0;    /* Set to 1 if a seed was set on the command line */
+    unsigned random_seed = 0; /* Random # seed */
+    unsigned u;               /* Local index variable */
+    int temp;
 
     /* Parse command line options */
-    if (argc < 2)
+    if (argc < 2) {
         usage();
+    }
     if (argc > 1) {
         u = 1;
         while (u < (unsigned)argc) {
             if (argv[u][0] == '-') {
                 switch (argv[u][1]) {
-                    /* # of records to write between flushing file */
-                    case 'f':
-                        flush_count = atol(argv[u + 1]);
-                        if (flush_count < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    /* Be quiet */
-                    case 'q':
-                        verbose = 0;
-                        u++;
-                        break;
-
-                    /* Random # seed */
-                    case 'r':
-                        use_seed = 1;
-                        temp     = atoi(argv[u + 1]);
-                        if (temp < 0)
-                            usage();
-                        else
-                            random_seed = (unsigned)temp;
-                        u += 2;
-                        break;
-
-                    default:
+                /* # of records to write between flushing file */
+                case 'f':
+                    flush_count = atol(argv[u + 1]);
+                    if (flush_count < 0) {
                         usage();
-                        break;
+                    }
+                    u += 2;
+                    break;
+
+                /* Be quiet */
+                case 'q':
+                    verbose = 0;
+                    u++;
+                    break;
+
+                /* Random # seed */
+                case 'r':
+                    use_seed = 1;
+                    temp = atoi(argv[u + 1]);
+                    if (temp < 0) {
+                        usage();
+                    }
+                    else {
+                        random_seed = (unsigned)temp;
+                    }
+                    u += 2;
+                    break;
+
+                default: usage(); break;
                 } /* end switch */
-            }     /* end if */
+            } /* end if */
             else {
                 /* Get the number of records to append */
                 nops = atol(argv[u]);
-                if (nops <= 0)
+                if (nops <= 0) {
                     usage();
+                }
 
                 u++;
             } /* end else */
-        }     /* end while */
-    }         /* end if */
-    if (nops <= 0)
+        } /* end while */
+    } /* end if */
+    if (nops <= 0) {
         usage();
-    if (flush_count >= nops)
+    }
+    if (flush_count >= nops) {
         usage();
+    }
 
     /* Emit informational message */
     if (verbose) {
@@ -364,16 +394,19 @@ main(int argc, char *argv[])
     fprintf(stderr, "Using writer random seed: %u\n", random_seed);
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Generating symbol names\n");
+    }
 
     /* Generate dataset names */
-    if (generate_symbols() < 0)
+    if (generate_symbols() < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Opening skeleton file: %s\n", FILENAME);
+    }
 
     /* Open file skeleton */
     if ((fid = open_skeleton(FILENAME, verbose)) < 0) {
@@ -385,8 +418,9 @@ main(int argc, char *argv[])
     h5_send_message(WRITER_MESSAGE, NULL, NULL);
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Adding and removing records\n");
+    }
 
     /* Grow and shrink datasets */
     if (addrem_records(fid, verbose, (unsigned long)nops, (unsigned long)flush_count) < 0) {
@@ -395,8 +429,9 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Releasing symbols\n");
+    }
 
     /* Clean up the symbols */
     if (shutdown_symbols() < 0) {
@@ -405,8 +440,9 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Closing objects\n");
+    }
 
     /* Close objects opened */
     if (H5Fclose(fid) < 0) {

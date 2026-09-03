@@ -19,12 +19,11 @@
 
 int nerrors = 0; /* errors count */
 
-static const char *FILENAME[] = {"after_mpi_fin", NULL};
+static const char* FILENAME[] = { "after_mpi_fin", NULL };
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    int      mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     MPI_Comm comm = MPI_COMM_WORLD;
 
     /* Initialize and finalize MPI */
@@ -32,8 +31,9 @@ main(int argc, char **argv)
     MPI_Comm_size(comm, &mpi_size);
     MPI_Comm_rank(comm, &mpi_rank);
 
-    if (MAINPROCESS)
+    if (MAINPROCESS) {
         TESTING("Usage of Serial HDF5 after MPI_Finalize() is called");
+    }
 
     MPI_Finalize();
 
@@ -42,7 +42,7 @@ main(int argc, char **argv)
     VRFY((H5open() >= 0), "H5open succeeded");
 
     if (mpi_rank == 0) {
-        char  filename[1024];
+        char filename[1024];
         hid_t file_id;
 
         h5_fixname(FILENAME[0], H5P_DEFAULT, filename, sizeof filename);
@@ -55,10 +55,12 @@ main(int argc, char **argv)
     VRFY((H5close() >= 0), "H5close succeeded");
 
     if (MAINPROCESS) {
-        if (0 == nerrors)
+        if (0 == nerrors) {
             PASSED();
-        else
+        }
+        else {
             H5_FAILED();
+        }
     }
 
     return (nerrors != 0);

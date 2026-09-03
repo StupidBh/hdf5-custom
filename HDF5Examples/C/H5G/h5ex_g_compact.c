@@ -18,27 +18,26 @@
 #define FILENAME2 "h5ex_g_compact2.h5"
 #define GROUP     "G1"
 
-int
-main(void)
+int main(void)
 {
-    hid_t      file  = H5I_INVALID_HID;
-    hid_t      group = H5I_INVALID_HID;
-    hid_t      fapl  = H5I_INVALID_HID;
-    herr_t     status;
+    hid_t file = H5I_INVALID_HID;
+    hid_t group = H5I_INVALID_HID;
+    hid_t fapl = H5I_INVALID_HID;
+    herr_t status;
     H5G_info_t ginfo;
-    hsize_t    size;
+    hsize_t size;
 
     /*
      * Set file access property list to use the earliest file format.
      * This will force the library to create original format groups.
      */
-    fapl   = H5Pcreate(H5P_FILE_ACCESS);
+    fapl = H5Pcreate(H5P_FILE_ACCESS);
     status = H5Pset_libver_bounds(fapl, H5F_LIBVER_EARLIEST, H5F_LIBVER_LATEST);
 
     /*
      * Create file 1.  This file will use original format groups.
      */
-    file  = H5Fcreate(FILENAME1, H5F_ACC_TRUNC, H5P_DEFAULT, fapl);
+    file = H5Fcreate(FILENAME1, H5F_ACC_TRUNC, H5P_DEFAULT, fapl);
     group = H5Gcreate(file, GROUP, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
@@ -47,17 +46,16 @@ main(void)
     status = H5Gget_info(group, &ginfo);
     printf("Group storage type for %s is: ", FILENAME1);
     switch (ginfo.storage_type) {
-        case H5G_STORAGE_TYPE_COMPACT:
-            printf("H5G_STORAGE_TYPE_COMPACT\n"); /* New compact format */
-            break;
-        case H5G_STORAGE_TYPE_DENSE:
-            printf("H5G_STORAGE_TYPE_DENSE\n"); /* New dense (indexed) format */
-            break;
-        case H5G_STORAGE_TYPE_SYMBOL_TABLE:
-            printf("H5G_STORAGE_TYPE_SYMBOL_TABLE\n"); /* Original format */
-            break;
-        case H5G_STORAGE_TYPE_UNKNOWN:
-            printf("H5G_STORAGE_TYPE_UNKNOWN\n"); /* Unknown format */
+    case H5G_STORAGE_TYPE_COMPACT:
+        printf("H5G_STORAGE_TYPE_COMPACT\n"); /* New compact format */
+        break;
+    case H5G_STORAGE_TYPE_DENSE:
+        printf("H5G_STORAGE_TYPE_DENSE\n"); /* New dense (indexed) format */
+        break;
+    case H5G_STORAGE_TYPE_SYMBOL_TABLE:
+        printf("H5G_STORAGE_TYPE_SYMBOL_TABLE\n");                       /* Original format */
+        break;
+    case H5G_STORAGE_TYPE_UNKNOWN: printf("H5G_STORAGE_TYPE_UNKNOWN\n"); /* Unknown format */
     }
 
     /*
@@ -65,7 +63,7 @@ main(void)
      */
     status = H5Gclose(group);
     status = H5Fclose(file);
-    file   = H5Fopen(FILENAME1, H5F_ACC_RDONLY, H5P_DEFAULT);
+    file = H5Fopen(FILENAME1, H5F_ACC_RDONLY, H5P_DEFAULT);
 
     /*
      * Obtain and print the file size.
@@ -88,7 +86,7 @@ main(void)
     /*
      * Create file 2 using the default access property list.
      */
-    file  = H5Fcreate(FILENAME2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file = H5Fcreate(FILENAME2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     group = H5Gcreate(file, GROUP, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
@@ -97,17 +95,16 @@ main(void)
     status = H5Gget_info(group, &ginfo);
     printf("Group storage type for %s is: ", FILENAME2);
     switch (ginfo.storage_type) {
-        case H5G_STORAGE_TYPE_COMPACT:
-            printf("H5G_STORAGE_TYPE_COMPACT\n"); /* New compact format */
-            break;
-        case H5G_STORAGE_TYPE_DENSE:
-            printf("H5G_STORAGE_TYPE_DENSE\n"); /* New dense (indexed) format */
-            break;
-        case H5G_STORAGE_TYPE_SYMBOL_TABLE:
-            printf("H5G_STORAGE_TYPE_SYMBOL_TABLE\n"); /* Original format */
-            break;
-        case H5G_STORAGE_TYPE_UNKNOWN:
-            printf("H5G_STORAGE_TYPE_UNKNOWN\n"); /* Unknown format */
+    case H5G_STORAGE_TYPE_COMPACT:
+        printf("H5G_STORAGE_TYPE_COMPACT\n"); /* New compact format */
+        break;
+    case H5G_STORAGE_TYPE_DENSE:
+        printf("H5G_STORAGE_TYPE_DENSE\n"); /* New dense (indexed) format */
+        break;
+    case H5G_STORAGE_TYPE_SYMBOL_TABLE:
+        printf("H5G_STORAGE_TYPE_SYMBOL_TABLE\n");                       /* Original format */
+        break;
+    case H5G_STORAGE_TYPE_UNKNOWN: printf("H5G_STORAGE_TYPE_UNKNOWN\n"); /* Unknown format */
     }
 
     /*
@@ -115,7 +112,7 @@ main(void)
      */
     status = H5Gclose(group);
     status = H5Fclose(file);
-    file   = H5Fopen(FILENAME2, H5F_ACC_RDONLY, fapl);
+    file = H5Fopen(FILENAME2, H5F_ACC_RDONLY, fapl);
 
     /*
      * Obtain and print the file size.

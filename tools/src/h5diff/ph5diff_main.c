@@ -38,17 +38,16 @@ static void ph5diff_worker(int);
  *-------------------------------------------------------------------------
  */
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    int         nID      = 0;
-    const char *fname1   = NULL;
-    const char *fname2   = NULL;
-    const char *objname1 = NULL;
-    const char *objname2 = NULL;
-    diff_opt_t  opts;
+    int nID = 0;
+    const char* fname1 = NULL;
+    const char* fname2 = NULL;
+    const char* objname1 = NULL;
+    const char* objname2 = NULL;
+    diff_opt_t opts;
 
-    MPI_Init(&argc, (char ***)&argv);
+    MPI_Init(&argc, (char***)&argv);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &nID);
     MPI_Comm_size(MPI_COMM_WORLD, &g_nTasks);
@@ -60,14 +59,14 @@ main(int argc, char *argv[])
     h5tools_init();
 
     outBuffOffset = 0;
-    g_Parallel    = 1;
+    g_Parallel = 1;
 
     if (g_nTasks == 1) {
         fprintf(rawerrorstream, "Only 1 task available...doing serial diff\n");
 
         g_Parallel = 0;
 
-        parse_command_line(argc, (const char *const *)argv, &fname1, &fname2, &objname1, &objname2, &opts);
+        parse_command_line(argc, (const char* const*)argv, &fname1, &fname2, &objname1, &objname2, &opts);
 
         h5diff(fname1, fname2, objname1, objname2, &opts);
 
@@ -75,11 +74,9 @@ main(int argc, char *argv[])
     }
     /* Parallel h5diff */
     else {
-
         /* Have the manager process the command-line */
         if (nID == 0) {
-            parse_command_line(argc, (const char *const *)argv, &fname1, &fname2, &objname1, &objname2,
-                               &opts);
+            parse_command_line(argc, (const char* const*)argv, &fname1, &fname2, &objname1, &objname2, &opts);
 
             h5diff(fname1, fname2, objname1, objname2, &opts);
 
@@ -112,8 +109,7 @@ main(int argc, char *argv[])
  *
  *-------------------------------------------------------------------------
  */
-static void
-ph5diff_worker(int nID)
+static void ph5diff_worker(int nID)
 {
     hid_t file1_id = H5I_INVALID_HID;
     hid_t file2_id = H5I_INVALID_HID;
@@ -149,8 +145,8 @@ ph5diff_worker(int nID)
         /* Check for work */
         else if (Status.MPI_TAG == MPI_TAG_ARGS) {
             struct diff_mpi_args args;
-            struct diffs_found   diffs;
-            unsigned             i;
+            struct diffs_found diffs;
+            unsigned i;
 
             /* Make certain we've received the filenames and opened the files already */
             if (file1_id < 0 || file2_id < 0) {
@@ -163,12 +159,13 @@ ph5diff_worker(int nID)
             MPI_Recv(&args, sizeof(args), MPI_BYTE, 0, MPI_TAG_ARGS, MPI_COMM_WORLD, &Status);
 
             /* Do the diff */
-            diffs.nfound  = diff(file1_id, args.name1, file2_id, args.name2, &(args.opts), &(args.argdata));
+            diffs.nfound = diff(file1_id, args.name1, file2_id, args.name2, &(args.opts), &(args.argdata));
             diffs.not_cmp = args.opts.not_cmp;
 
-            if ((outBuffOffset == 0) && !overflow_file)
+            if ((outBuffOffset == 0) && !overflow_file) {
                 /* Nothing to print. Send diffs to manager */
                 MPI_Send(&diffs, sizeof(diffs), MPI_BYTE, 0, MPI_TAG_DONE, MPI_COMM_WORLD);
+            }
             else {
                 /*
                  * If print buffer or overflow file have something in
@@ -181,9 +178,9 @@ ph5diff_worker(int nID)
 
                 if (outBuffOffset > 0) {
                     /* When get token, send all of our output to the manager task and then return the token */
-                    for (i = 0; i < outBuffOffset; i += PRINT_DATA_MAX_SIZE)
-                        MPI_Send(outBuff + i, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA,
-                                 MPI_COMM_WORLD);
+                    for (i = 0; i < outBuffOffset; i += PRINT_DATA_MAX_SIZE) {
+                        MPI_Send(outBuff + i, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA, MPI_COMM_WORLD);
+                    }
                 }
 
                 /* An overflow file exists, so we send its output to
@@ -191,7 +188,7 @@ ph5diff_worker(int nID)
                  */
                 if (overflow_file) {
                     char out_data[PRINT_DATA_MAX_SIZE + 1];
-                    int  tmp;
+                    int tmp;
 
                     memset(out_data, 0, PRINT_DATA_MAX_SIZE + 1);
                     i = 0;
@@ -200,16 +197,15 @@ ph5diff_worker(int nID)
                     while ((tmp = getc(overflow_file)) != EOF) {
                         *(out_data + i++) = (char)tmp;
                         if (i == PRINT_DATA_MAX_SIZE) {
-                            MPI_Send(out_data, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA,
-                                     MPI_COMM_WORLD);
+                            MPI_Send(out_data, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA, MPI_COMM_WORLD);
                             i = 0;
                             memset(out_data, 0, PRINT_DATA_MAX_SIZE + 1);
                         }
                     }
 
-                    if (i > 0)
-                        MPI_Send(out_data, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA,
-                                 MPI_COMM_WORLD);
+                    if (i > 0) {
+                        MPI_Send(out_data, PRINT_DATA_MAX_SIZE, MPI_CHAR, 0, MPI_TAG_PRINT_DATA, MPI_COMM_WORLD);
+                    }
 
                     fclose(overflow_file);
                     overflow_file = NULL;
@@ -250,19 +246,20 @@ ph5diff_worker(int nID)
  *
  *-------------------------------------------------------------------------
  */
-void
-print_manager_output(void)
+void print_manager_output(void)
 {
     /* If there was something we buffered, let's print it now */
     if (g_Parallel) {
-        if (outBuffOffset > 0)
+        if (outBuffOffset > 0) {
             printf("%s", outBuff);
+        }
 
         if (overflow_file) {
             int tmp;
             rewind(overflow_file);
-            while ((tmp = getc(overflow_file)) != EOF)
+            while ((tmp = getc(overflow_file)) != EOF) {
                 putchar(tmp);
+            }
             fclose(overflow_file);
             overflow_file = NULL;
         }
@@ -285,8 +282,7 @@ print_manager_output(void)
  *
  *-------------------------------------------------------------------------
  */
-void
-h5diff_exit(int status)
+void h5diff_exit(int status)
 {
     /* if in parallel mode, dismiss workers, close down MPI, then exit */
     if (g_Parallel) {
@@ -298,8 +294,7 @@ h5diff_exit(int status)
 
     MPI_Finalize();
 
-    status =
-        EXIT_SUCCESS; /* Reset exit status, since some mpiexec commands generate output on failure status */
+    status = EXIT_SUCCESS; /* Reset exit status, since some mpiexec commands generate output on failure status */
 
     h5tools_close();
 

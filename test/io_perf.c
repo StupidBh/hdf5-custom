@@ -40,42 +40,34 @@
 #define FILE_NAME    "chunk_non_contig_mem_io.h5"
 #define DATASET_NAME "chunked_dataset"
 #define DATASET_TYPE int
-#define CHUNK_DIM_0  4194304
-static void
-chunk_non_contig_mem_io(void H5_ATTR_UNUSED *params)
+#define CHUNK_DIM_0  4'194'304
+
+static void chunk_non_contig_mem_io(void H5_ATTR_UNUSED* params)
 {
-    hsize_t dims[2]       = {0};
-    hsize_t mem_dims[2]   = {0};
-    hsize_t chunk_dims[2] = {0};
-    hsize_t start[2]      = {0};
-    hsize_t count[2]      = {0};
-    hsize_t block[2]      = {0};
-    hid_t   file_id       = H5I_INVALID_HID;
-    hid_t   dset_id       = H5I_INVALID_HID;
-    hid_t   fapl_id       = H5I_INVALID_HID;
-    hid_t   space_id      = H5I_INVALID_HID;
-    hid_t   mem_space_id  = H5I_INVALID_HID;
-    hid_t   dcpl_id       = H5I_INVALID_HID;
-    size_t  num_chunks    = 0;
-    size_t  data_size     = 0;
-    void   *write_buf     = NULL;
-    void   *read_buf      = NULL;
-    int     TestExpress   = GetTestExpress();
+    hsize_t dims[2] = { 0 };
+    hsize_t mem_dims[2] = { 0 };
+    hsize_t chunk_dims[2] = { 0 };
+    hsize_t start[2] = { 0 };
+    hsize_t count[2] = { 0 };
+    hsize_t block[2] = { 0 };
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t space_id = H5I_INVALID_HID;
+    hid_t mem_space_id = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    size_t num_chunks = 0;
+    size_t data_size = 0;
+    void* write_buf = NULL;
+    void* read_buf = NULL;
+    int TestExpress = GetTestExpress();
 
     switch (TestExpress) {
-        case H5_TEST_EXPRESS_EXHAUSTIVE:
-            num_chunks = 1024;
-            break;
-        case H5_TEST_EXPRESS_FULL:
-            num_chunks = 512;
-            break;
-        case H5_TEST_EXPRESS_QUICK:
-            num_chunks = 128;
-            break;
-        case H5_TEST_EXPRESS_SMOKE_TEST:
-        default:
-            num_chunks = 64;
-            break;
+    case H5_TEST_EXPRESS_EXHAUSTIVE: num_chunks = 1024; break;
+    case H5_TEST_EXPRESS_FULL      : num_chunks = 512; break;
+    case H5_TEST_EXPRESS_QUICK     : num_chunks = 128; break;
+    case H5_TEST_EXPRESS_SMOKE_TEST:
+    default                        : num_chunks = 64; break;
     }
 
     MESSAGE(VERBO_NONE, ("Express test mode set to %d. Testing with %zu chunks\n", TestExpress, num_chunks));
@@ -126,8 +118,7 @@ chunk_non_contig_mem_io(void H5_ATTR_UNUSED *params)
         goto error;
     }
 
-    if ((dset_id = H5Dcreate2(file_id, DATASET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, dcpl_id,
-                              H5P_DEFAULT)) < 0) {
+    if ((dset_id = H5Dcreate2(file_id, DATASET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0) {
         fprintf(stderr, "Failed to create dataset\n");
         goto error;
     }
@@ -138,8 +129,9 @@ chunk_non_contig_mem_io(void H5_ATTR_UNUSED *params)
         goto error;
     }
 
-    for (size_t i = 0; i < data_size / sizeof(DATASET_TYPE); i++)
-        ((DATASET_TYPE *)write_buf)[i] = (DATASET_TYPE)1;
+    for (size_t i = 0; i < data_size / sizeof(DATASET_TYPE); i++) {
+        ((DATASET_TYPE*)write_buf)[i] = (DATASET_TYPE)1;
+    }
 
     mem_dims[0] = 1;
     mem_dims[1] = (hsize_t)CHUNK_DIM_0;
@@ -236,21 +228,28 @@ chunk_non_contig_mem_io(void H5_ATTR_UNUSED *params)
     free(read_buf);
     read_buf = NULL;
 
-    if (H5Pclose(dcpl_id) < 0)
+    if (H5Pclose(dcpl_id) < 0) {
         goto error;
-    if (H5Sclose(mem_space_id) < 0)
+    }
+    if (H5Sclose(mem_space_id) < 0) {
         goto error;
-    if (H5Sclose(space_id) < 0)
+    }
+    if (H5Sclose(space_id) < 0) {
         goto error;
-    if (H5Dclose(dset_id) < 0)
+    }
+    if (H5Dclose(dset_id) < 0) {
         goto error;
-    if (H5Fclose(file_id) < 0)
+    }
+    if (H5Fclose(file_id) < 0) {
         goto error;
+    }
 
-    if (H5Fdelete(FILE_NAME, fapl_id) < 0)
+    if (H5Fdelete(FILE_NAME, fapl_id) < 0) {
         goto error;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         goto error;
+    }
 
     return;
 
@@ -273,13 +272,13 @@ error:
     }
     H5E_END_TRY
 }
+
 #undef FILE_NAME
 #undef DATASET_NAME
 #undef DATASET_TYPE
 #undef CHUNK_DIM_0
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     /* Initialize testing framework */
     if (TestInit(argv[0], NULL, NULL, NULL, NULL, 0) < 0) {
@@ -287,8 +286,7 @@ main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    AddTest("chunk_non_contig_mem_io", chunk_non_contig_mem_io, NULL, NULL, NULL, 0,
-            "I/O on chunks that are non-contiguous with respect to memory layout");
+    AddTest("chunk_non_contig_mem_io", chunk_non_contig_mem_io, NULL, NULL, NULL, 0, "I/O on chunks that are non-contiguous with respect to memory layout");
 
     /* Display testing information */
     TestInfo(stdout);
@@ -308,8 +306,9 @@ main(int argc, char **argv)
     }
 
     /* Display test summary, if requested */
-    if (GetTestSummary())
+    if (GetTestSummary()) {
         TestSummary(stdout);
+    }
 
     /* Release test infrastructure */
     if (TestShutdown() < 0) {
@@ -319,8 +318,10 @@ main(int argc, char **argv)
 
     /* Exit failure if errors encountered; else exit success. */
     /* No need to print anything since PerformTests() already does. */
-    if (GetTestNumErrs() > 0)
+    if (GetTestNumErrs() > 0) {
         exit(EXIT_FAILURE);
-    else
+    }
+    else {
         exit(EXIT_SUCCESS);
+    }
 }

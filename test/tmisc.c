@@ -34,8 +34,8 @@
 
 /* Definitions for misc. test #1 */
 #define MISC1_FILE      "tmisc1.h5"
-#define MISC1_VAL       (13417386) /* 0xccbbaa */
-#define MISC1_VAL2      (15654348) /* 0xeeddcc */
+#define MISC1_VAL       (13'417'386) /* 0xccbbaa */
+#define MISC1_VAL2      (15'654'348) /* 0xeeddcc */
 #define MISC1_DSET_NAME "/scalar_set"
 
 /* Definitions for misc. test #2 */
@@ -44,8 +44,9 @@
 #define MISC2_ATT_NAME_1 "scalar_att_1"
 #define MISC2_ATT_NAME_2 "scalar_att_2"
 
-typedef struct {
-    char *string;
+typedef struct
+{
+    char* string;
 } misc2_struct;
 
 /* Definitions for misc. test #3 */
@@ -72,39 +73,45 @@ typedef struct {
 #define MISC5_DBGNELM1   2
 #define MISC5_DBGNELM2   1
 #define MISC5_DBGNELM3   1
-#define MISC5_DBGELVAL1  999999999
-#define MISC5_DBGELVAL2  888888888
-#define MISC5_DBGELVAL3  777777777
+#define MISC5_DBGELVAL1  999'999'999
+#define MISC5_DBGELVAL2  888'888'888
+#define MISC5_DBGELVAL3  777'777'777
 
-typedef struct {
-    int   st1_el1;
+typedef struct
+{
+    int st1_el1;
     hvl_t st1_el2;
 } misc5_struct1;
 
-typedef struct {
-    int   st2_el1;
+typedef struct
+{
+    int st2_el1;
     hvl_t st2_el2;
 } misc5_struct2;
 
-typedef struct {
+typedef struct
+{
     int st3_el1;
 } misc5_struct3;
 
-typedef struct {
+typedef struct
+{
     hid_t st3h_base;
     hid_t st3h_id;
 } misc5_struct3_hndl;
 
-typedef struct {
-    hid_t               st2h_base;
-    hid_t               st2h_id;
-    misc5_struct3_hndl *st2h_st3hndl;
+typedef struct
+{
+    hid_t st2h_base;
+    hid_t st2h_id;
+    misc5_struct3_hndl* st2h_st3hndl;
 } misc5_struct2_hndl;
 
-typedef struct {
-    hid_t               st1h_base;
-    hid_t               st1h_id;
-    misc5_struct2_hndl *st1h_st2hndl;
+typedef struct
+{
+    hid_t st1h_base;
+    hid_t st1h_id;
+    misc5_struct2_hndl* st1h_st2hndl;
 } misc5_struct1_hndl;
 
 /* Definitions for misc. test #6 */
@@ -128,12 +135,12 @@ typedef struct {
 #define MISC8_DSETNAME8 "Dataset8"
 
 #ifndef H5_HAVE_PARALLEL
-#define MISC8_DSETNAME2  "Dataset2"
-#define MISC8_DSETNAME3  "Dataset3"
-#define MISC8_DSETNAME6  "Dataset6"
-#define MISC8_DSETNAME7  "Dataset7"
-#define MISC8_DSETNAME9  "Dataset9"
-#define MISC8_DSETNAME10 "Dataset10"
+    #define MISC8_DSETNAME2  "Dataset2"
+    #define MISC8_DSETNAME3  "Dataset3"
+    #define MISC8_DSETNAME6  "Dataset6"
+    #define MISC8_DSETNAME7  "Dataset7"
+    #define MISC8_DSETNAME9  "Dataset9"
+    #define MISC8_DSETNAME10 "Dataset10"
 #endif
 
 #define MISC8_RANK       2
@@ -233,23 +240,23 @@ typedef struct {
 #define MISC20_SPACE2_DIM1 4
 
 #ifdef H5_HAVE_FILTER_SZIP
-/* Definitions for misc. test #21 */
-#define MISC21_FILE       "tmisc21.h5"
-#define MISC21_DSET_NAME  "Dataset"
-#define MISC21_SPACE_RANK 2
-#define MISC21_SPACE_DIM0 7639
-#define MISC21_SPACE_DIM1 6308
-#define MISC21_CHUNK_DIM0 2048
-#define MISC21_CHUNK_DIM1 2048
+    /* Definitions for misc. test #21 */
+    #define MISC21_FILE       "tmisc21.h5"
+    #define MISC21_DSET_NAME  "Dataset"
+    #define MISC21_SPACE_RANK 2
+    #define MISC21_SPACE_DIM0 7639
+    #define MISC21_SPACE_DIM1 6308
+    #define MISC21_CHUNK_DIM0 2048
+    #define MISC21_CHUNK_DIM1 2048
 
-/* Definitions for misc. test #22 */
-#define MISC22_FILE       "tmisc22.h5"
-#define MISC22_DSET_NAME  "Dataset"
-#define MISC22_SPACE_RANK 2
-#define MISC22_CHUNK_DIM0 512
-#define MISC22_CHUNK_DIM1 512
-#define MISC22_SPACE_DIM0 639
-#define MISC22_SPACE_DIM1 1308
+    /* Definitions for misc. test #22 */
+    #define MISC22_FILE       "tmisc22.h5"
+    #define MISC22_DSET_NAME  "Dataset"
+    #define MISC22_SPACE_RANK 2
+    #define MISC22_CHUNK_DIM0 512
+    #define MISC22_CHUNK_DIM1 512
+    #define MISC22_SPACE_DIM0 639
+    #define MISC22_SPACE_DIM1 1308
 #endif /* H5_HAVE_FILTER_SZIP */
 
 /* Definitions for misc. test #23 */
@@ -310,14 +317,14 @@ typedef struct {
 #define MISC30_FILE "tmisc30.h5"
 
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-/* Definitions for misc. test #31 */
-#define MISC31_FILE      "tmisc31.h5"
-#define MISC31_DSETNAME  "dset"
-#define MISC31_ATTRNAME1 "attr1"
-#define MISC31_ATTRNAME2 "attr2"
-#define MISC31_GROUPNAME "group"
-#define MISC31_PROPNAME  "misc31_prop"
-#define MISC31_DTYPENAME "dtype"
+    /* Definitions for misc. test #31 */
+    #define MISC31_FILE      "tmisc31.h5"
+    #define MISC31_DSETNAME  "dset"
+    #define MISC31_ATTRNAME1 "attr1"
+    #define MISC31_ATTRNAME2 "attr2"
+    #define MISC31_GROUPNAME "group"
+    #define MISC31_PROPNAME  "misc31_prop"
+    #define MISC31_DTYPENAME "dtype"
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
 
 /* Definitions for misc. test #33 */
@@ -357,12 +364,11 @@ typedef struct {
 **                      reusing the dataset name
 **
 ****************************************************************/
-static void
-test_misc1(void)
+static void test_misc1(void)
 {
-    int    i;
-    int    i_check;
-    hid_t  file, dataspace, dataset;
+    int i;
+    int i_check;
+    hid_t file, dataspace, dataset;
     herr_t ret;
 
     /* Output message about test being performed */
@@ -375,11 +381,10 @@ test_misc1(void)
     CHECK(dataspace, FAIL, "H5Screate");
 
     /* Write the dataset the first time. */
-    dataset =
-        H5Dcreate2(file, MISC1_DSET_NAME, H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset = H5Dcreate2(file, MISC1_DSET_NAME, H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset, FAIL, "H5Dcreate2");
 
-    i   = MISC1_VAL;
+    i = MISC1_VAL;
     ret = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &i);
     CHECK(ret, FAIL, "H5Dwrite");
 
@@ -391,11 +396,10 @@ test_misc1(void)
     CHECK(ret, FAIL, "H5Ldelete");
 
     /* Write the dataset for the second time with a different value. */
-    dataset =
-        H5Dcreate2(file, MISC1_DSET_NAME, H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset = H5Dcreate2(file, MISC1_DSET_NAME, H5T_NATIVE_INT, dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset, FAIL, "H5Dcreate2");
 
-    i   = MISC1_VAL2;
+    i = MISC1_VAL2;
     ret = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &i);
     CHECK(ret, FAIL, "H5Dwrite");
 
@@ -433,10 +437,9 @@ test_misc1(void)
 
 } /* end test_misc1() */
 
-static hid_t
-misc2_create_type(void)
+static hid_t misc2_create_type(void)
 {
-    hid_t  type, type_tmp;
+    hid_t type, type_tmp;
     herr_t ret;
 
     type_tmp = H5Tcopy(H5T_C_S1);
@@ -457,15 +460,14 @@ misc2_create_type(void)
     return type;
 }
 
-static void
-test_misc2_write_attribute(void)
+static void test_misc2_write_attribute(void)
 {
-    hid_t        file1, file2, root1, root2, dataspace, att1, att2;
-    hid_t        type;
-    herr_t       ret;
+    hid_t file1, file2, root1, root2, dataspace, att1, att2;
+    hid_t type;
+    herr_t ret;
     misc2_struct data, data_check;
-    char        *string_att1 = strdup("string attribute in file one");
-    char        *string_att2 = strdup("string attribute in file two");
+    char* string_att1 = strdup("string attribute in file one");
+    char* string_att2 = strdup("string attribute in file two");
 
     memset(&data, 0, sizeof(data));
     memset(&data_check, 0, sizeof(data_check));
@@ -543,13 +545,12 @@ test_misc2_write_attribute(void)
     free(string_att2);
 }
 
-static void
-test_misc2_read_attribute(const char *filename, const char *att_name)
+static void test_misc2_read_attribute(const char* filename, const char* att_name)
 {
-    hid_t        file, root, att;
-    hid_t        type;
-    hid_t        space;
-    herr_t       ret;
+    hid_t file, root, att;
+    hid_t type;
+    hid_t space;
+    herr_t ret;
     misc2_struct data_check;
 
     type = misc2_create_type();
@@ -587,6 +588,7 @@ test_misc2_read_attribute(const char *filename, const char *att_name)
     ret = H5Fclose(file);
     CHECK(ret, FAIL, "H5Fclose");
 }
+
 /****************************************************************
 **
 **  test_misc2(): test using the same VL-derived datatype in two
@@ -594,8 +596,7 @@ test_misc2_read_attribute(const char *filename, const char *att_name)
 **      datatype conversion functions
 **
 ****************************************************************/
-static void
-test_misc2(void)
+static void test_misc2(void)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing VL datatype in two different files\n"));
@@ -611,17 +612,16 @@ test_misc2(void)
 **      fill value
 **
 ****************************************************************/
-static void
-test_misc3(void)
+static void test_misc3(void)
 {
-    hid_t   file, dataspace, dataset, dcpl;
-    int     rank                   = MISC3_RANK;
-    hsize_t dims[MISC3_RANK]       = {MISC3_DIM1, MISC3_DIM2};
-    hsize_t chunk_dims[MISC3_RANK] = {MISC3_CHUNK_DIM1, MISC3_CHUNK_DIM2};
-    int     fill                   = MISC3_FILL_VALUE;
-    int     read_buf[MISC3_DIM1][MISC3_DIM2];
-    int     i, j;
-    herr_t  ret;
+    hid_t file, dataspace, dataset, dcpl;
+    int rank = MISC3_RANK;
+    hsize_t dims[MISC3_RANK] = { MISC3_DIM1, MISC3_DIM2 };
+    hsize_t chunk_dims[MISC3_RANK] = { MISC3_CHUNK_DIM1, MISC3_CHUNK_DIM2 };
+    int fill = MISC3_FILL_VALUE;
+    int read_buf[MISC3_DIM1][MISC3_DIM2];
+    int i, j;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing reading from chunked dataset with non-zero fill-value\n"));
@@ -653,9 +653,11 @@ test_misc3(void)
     ret = H5Dread(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &read_buf);
     CHECK(ret, FAIL, "H5Dread");
 
-    for (i = 0; i < MISC3_DIM1; i++)
-        for (j = 0; j < MISC3_DIM2; j++)
+    for (i = 0; i < MISC3_DIM1; i++) {
+        for (j = 0; j < MISC3_DIM2; j++) {
             VERIFY(read_buf[i][j], fill, "H5Dread");
+        }
+    }
 
     /* Release resources */
     ret = H5Pclose(dcpl);
@@ -677,12 +679,11 @@ test_misc3(void)
 **      valid.
 **
 ****************************************************************/
-static void
-test_misc4(void)
+static void test_misc4(void)
 {
-    hid_t       file1, file2, group1, group2, group3;
+    hid_t file1, file2, group1, group2, group3;
     H5O_info2_t oinfo1, oinfo2, oinfo3;
-    herr_t      ret;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing fileno working in H5O_info2_t\n"));
@@ -717,10 +718,12 @@ test_misc4(void)
     VERIFY(oinfo1.fileno, oinfo2.fileno, "H5Oget_info_by_name");
 
     /* Verify that the fileno values are not the same between file1 & file2 */
-    if (oinfo1.fileno == oinfo3.fileno)
+    if (oinfo1.fileno == oinfo3.fileno) {
         TestErrPrintf("Error on line %d: oinfo1.fileno != oinfo3.fileno\n", __LINE__);
-    if (oinfo2.fileno == oinfo3.fileno)
+    }
+    if (oinfo2.fileno == oinfo3.fileno) {
         TestErrPrintf("Error on line %d: oinfo2.fileno != oinfo3.fileno\n", __LINE__);
+    }
 
     /* Close the objects */
     ret = H5Gclose(group1);
@@ -747,13 +750,12 @@ test_misc4(void)
 
 /*********************** struct3 ***********************/
 
-static misc5_struct3_hndl *
-create_struct3(void)
+static misc5_struct3_hndl* create_struct3(void)
 {
-    misc5_struct3_hndl *str3hndl; /* New 'struct3' created */
-    herr_t              ret;      /* For error checking */
+    misc5_struct3_hndl* str3hndl; /* New 'struct3' created */
+    herr_t ret;                   /* For error checking */
 
-    str3hndl = (misc5_struct3_hndl *)malloc(sizeof(misc5_struct3_hndl));
+    str3hndl = (misc5_struct3_hndl*)malloc(sizeof(misc5_struct3_hndl));
     CHECK_PTR(str3hndl, "malloc");
 
     str3hndl->st3h_base = H5Tcreate(H5T_COMPOUND, sizeof(misc5_struct3));
@@ -768,8 +770,7 @@ create_struct3(void)
     return str3hndl;
 }
 
-static void
-delete_struct3(misc5_struct3_hndl *str3hndl)
+static void delete_struct3(misc5_struct3_hndl* str3hndl)
 {
     herr_t ret; /* For error checking */
 
@@ -782,21 +783,19 @@ delete_struct3(misc5_struct3_hndl *str3hndl)
     free(str3hndl);
 }
 
-static void
-set_struct3(misc5_struct3 *buf)
+static void set_struct3(misc5_struct3* buf)
 {
     buf->st3_el1 = MISC5_DBGELVAL3;
 }
 
 /*********************** struct2 ***********************/
 
-static misc5_struct2_hndl *
-create_struct2(void)
+static misc5_struct2_hndl* create_struct2(void)
 {
-    misc5_struct2_hndl *str2hndl; /* New 'struct2' created */
-    herr_t              ret;      /* For error checking */
+    misc5_struct2_hndl* str2hndl; /* New 'struct2' created */
+    herr_t ret;                   /* For error checking */
 
-    str2hndl = (misc5_struct2_hndl *)malloc(sizeof(misc5_struct2_hndl));
+    str2hndl = (misc5_struct2_hndl*)malloc(sizeof(misc5_struct2_hndl));
     CHECK_PTR(str2hndl, "malloc");
 
     str2hndl->st2h_base = H5Tcreate(H5T_COMPOUND, sizeof(misc5_struct2));
@@ -808,8 +807,7 @@ create_struct2(void)
     str2hndl->st2h_st3hndl = create_struct3();
     CHECK_PTR(str2hndl->st2h_st3hndl, "create_struct3");
 
-    ret = H5Tinsert(str2hndl->st2h_base, "st2_el2", HOFFSET(misc5_struct2, st2_el2),
-                    str2hndl->st2h_st3hndl->st3h_id);
+    ret = H5Tinsert(str2hndl->st2h_base, "st2_el2", HOFFSET(misc5_struct2, st2_el2), str2hndl->st2h_st3hndl->st3h_id);
     CHECK(ret, FAIL, "H5Tinsert");
 
     str2hndl->st2h_id = H5Tvlen_create(str2hndl->st2h_base);
@@ -818,8 +816,7 @@ create_struct2(void)
     return str2hndl;
 }
 
-static void
-delete_struct2(misc5_struct2_hndl *str2hndl)
+static void delete_struct2(misc5_struct2_hndl* str2hndl)
 {
     herr_t ret; /* For error checking */
 
@@ -834,36 +831,34 @@ delete_struct2(misc5_struct2_hndl *str2hndl)
     free(str2hndl);
 }
 
-static void
-set_struct2(misc5_struct2 *buf)
+static void set_struct2(misc5_struct2* buf)
 {
     unsigned i; /* Local index variable */
 
-    buf->st2_el1     = MISC5_DBGELVAL2;
+    buf->st2_el1 = MISC5_DBGELVAL2;
     buf->st2_el2.len = MISC5_DBGNELM3;
 
     buf->st2_el2.p = malloc((buf->st2_el2.len) * sizeof(misc5_struct3));
     CHECK_PTR(buf->st2_el2.p, "malloc");
 
-    for (i = 0; i < (buf->st2_el2.len); i++)
-        set_struct3(&(((misc5_struct3 *)(buf->st2_el2.p))[i]));
+    for (i = 0; i < (buf->st2_el2.len); i++) {
+        set_struct3(&(((misc5_struct3*)(buf->st2_el2.p))[i]));
+    }
 }
 
-static void
-clear_struct2(misc5_struct2 *buf)
+static void clear_struct2(misc5_struct2* buf)
 {
     free(buf->st2_el2.p);
 }
 
 /*********************** struct1 ***********************/
 
-static misc5_struct1_hndl *
-create_struct1(void)
+static misc5_struct1_hndl* create_struct1(void)
 {
-    misc5_struct1_hndl *str1hndl; /* New 'struct1' created */
-    herr_t              ret;      /* For error checking */
+    misc5_struct1_hndl* str1hndl; /* New 'struct1' created */
+    herr_t ret;                   /* For error checking */
 
-    str1hndl = (misc5_struct1_hndl *)malloc(sizeof(misc5_struct1_hndl));
+    str1hndl = (misc5_struct1_hndl*)malloc(sizeof(misc5_struct1_hndl));
     CHECK_PTR(str1hndl, "malloc");
 
     str1hndl->st1h_base = H5Tcreate(H5T_COMPOUND, sizeof(misc5_struct1));
@@ -875,8 +870,7 @@ create_struct1(void)
     str1hndl->st1h_st2hndl = create_struct2();
     CHECK_PTR(str1hndl->st1h_st2hndl, "create_struct2");
 
-    ret = H5Tinsert(str1hndl->st1h_base, "st1_el2", HOFFSET(misc5_struct1, st1_el2),
-                    str1hndl->st1h_st2hndl->st2h_id);
+    ret = H5Tinsert(str1hndl->st1h_base, "st1_el2", HOFFSET(misc5_struct1, st1_el2), str1hndl->st1h_st2hndl->st2h_id);
     CHECK(ret, FAIL, "H5Tinsert");
 
     str1hndl->st1h_id = H5Tvlen_create(str1hndl->st1h_base);
@@ -885,8 +879,7 @@ create_struct1(void)
     return str1hndl;
 }
 
-static void
-delete_struct1(misc5_struct1_hndl *str1hndl)
+static void delete_struct1(misc5_struct1_hndl* str1hndl)
 {
     herr_t ret; /* For error checking */
 
@@ -901,41 +894,40 @@ delete_struct1(misc5_struct1_hndl *str1hndl)
     free(str1hndl);
 }
 
-static void
-set_struct1(misc5_struct1 *buf)
+static void set_struct1(misc5_struct1* buf)
 {
     unsigned i; /* Local index variable */
 
-    buf->st1_el1     = MISC5_DBGELVAL1;
+    buf->st1_el1 = MISC5_DBGELVAL1;
     buf->st1_el2.len = MISC5_DBGNELM2;
 
     buf->st1_el2.p = malloc((buf->st1_el2.len) * sizeof(misc5_struct2));
     CHECK_PTR(buf->st1_el2.p, "malloc");
 
-    for (i = 0; i < (buf->st1_el2.len); i++)
-        set_struct2(&(((misc5_struct2 *)(buf->st1_el2.p))[i]));
+    for (i = 0; i < (buf->st1_el2.len); i++) {
+        set_struct2(&(((misc5_struct2*)(buf->st1_el2.p))[i]));
+    }
 }
 
-static void
-clear_struct1(misc5_struct1 *buf)
+static void clear_struct1(misc5_struct1* buf)
 {
     unsigned i;
 
-    for (i = 0; i < buf->st1_el2.len; i++)
-        clear_struct2(&(((misc5_struct2 *)(buf->st1_el2.p))[i]));
+    for (i = 0; i < buf->st1_el2.len; i++) {
+        clear_struct2(&(((misc5_struct2*)(buf->st1_el2.p))[i]));
+    }
     free(buf->st1_el2.p);
 }
 
-static void
-test_misc5(void)
+static void test_misc5(void)
 {
-    hid_t               loc_id, space_id, dataset_id;
-    hid_t               mem_type_id;
-    misc5_struct1_hndl *str1hndl;
-    hsize_t             dims[MISC5_DSETRANK];
-    hvl_t               buf;
-    unsigned            i, j, k;
-    herr_t              ret;
+    hid_t loc_id, space_id, dataset_id;
+    hid_t mem_type_id;
+    misc5_struct1_hndl* str1hndl;
+    hsize_t dims[MISC5_DSETRANK];
+    hvl_t buf;
+    unsigned i, j, k;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing several level deep nested compound & VL datatypes \n"));
@@ -949,31 +941,32 @@ test_misc5(void)
     CHECK_PTR(str1hndl, "create_struct1");
 
     /* Create the dataspace */
-    dims[0]  = MISC5_NELMTOPLVL;
+    dims[0] = MISC5_NELMTOPLVL;
     space_id = H5Screate_simple(MISC5_DSETRANK, dims, NULL);
     CHECK(space_id, FAIL, "H5Screate_simple");
 
     /* Create the dataset */
-    dataset_id = H5Dcreate2(loc_id, MISC5_DSETNAME, str1hndl->st1h_id, space_id, H5P_DEFAULT, H5P_DEFAULT,
-                            H5P_DEFAULT);
+    dataset_id = H5Dcreate2(loc_id, MISC5_DSETNAME, str1hndl->st1h_id, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset_id, FAIL, "H5Dcreate2");
 
     /* Create the variable-length buffer */
     buf.len = MISC5_DBGNELM1;
-    buf.p   = malloc((buf.len) * sizeof(misc5_struct1));
+    buf.p = malloc((buf.len) * sizeof(misc5_struct1));
     CHECK_PTR(buf.p, "malloc");
 
     /* Create the top-level VL information */
-    for (i = 0; i < MISC5_DBGNELM1; i++)
-        set_struct1(&(((misc5_struct1 *)(buf.p))[i]));
+    for (i = 0; i < MISC5_DBGNELM1; i++) {
+        set_struct1(&(((misc5_struct1*)(buf.p))[i]));
+    }
 
     /* Write the data out */
     ret = H5Dwrite(dataset_id, str1hndl->st1h_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, &buf);
     CHECK(ret, FAIL, "H5Dwrite");
 
     /* Release the top-level VL information */
-    for (j = 0; j < MISC5_DBGNELM1; j++)
-        clear_struct1(&(((misc5_struct1 *)(buf.p))[j]));
+    for (j = 0; j < MISC5_DBGNELM1; j++) {
+        clear_struct1(&(((misc5_struct1*)(buf.p))[j]));
+    }
 
     /* Free the variable-length buffer */
     free(buf.p);
@@ -1016,20 +1009,15 @@ test_misc5(void)
     /* Verify the correct information was read in */
     for (i = 0; i < (buf.len); i++) {
         /* printf("[%d]=%d\n",i, ((misc5_struct1 *)(buf.p))[i].st1_el1); */
-        VERIFY(((misc5_struct1 *)(buf.p))[i].st1_el1, MISC5_DBGELVAL1, "H5Dread");
-        for (j = 0; j < (((misc5_struct1 *)(buf.p))[i].st1_el2.len); j++) {
+        VERIFY(((misc5_struct1*)(buf.p))[i].st1_el1, MISC5_DBGELVAL1, "H5Dread");
+        for (j = 0; j < (((misc5_struct1*)(buf.p))[i].st1_el2.len); j++) {
             /* printf("   [%d]=%d\n",j, ((misc5_struct2 *)(((misc5_struct1 *)
              * (buf.p))[i].st1_el2.p))[j].st2_el1); */
-            VERIFY(((misc5_struct2 *)(((misc5_struct1 *)(buf.p))[i].st1_el2.p))[j].st2_el1, MISC5_DBGELVAL2,
-                   "H5Dread");
-            for (k = 0; k < (((misc5_struct2 *)(((misc5_struct1 *)(buf.p))[i].st1_el2.p))[j].st2_el2.len);
-                 k++) {
+            VERIFY(((misc5_struct2*)(((misc5_struct1*)(buf.p))[i].st1_el2.p))[j].st2_el1, MISC5_DBGELVAL2, "H5Dread");
+            for (k = 0; k < (((misc5_struct2*)(((misc5_struct1*)(buf.p))[i].st1_el2.p))[j].st2_el2.len); k++) {
                 /* printf("      [%d]=%d\n",k, ((misc5_struct3 *)(((misc5_struct2 *) (((misc5_struct1
                  * *)(buf.p))[i].  st1_el2.p))[j].st2_el2.p))[k].st3_el1); */
-                VERIFY(((misc5_struct3 *)(((misc5_struct2 *)(((misc5_struct1 *)(buf.p))[i].st1_el2.p))[j]
-                                              .st2_el2.p))[k]
-                           .st3_el1,
-                       MISC5_DBGELVAL3, "H5Dread");
+                VERIFY(((misc5_struct3*)(((misc5_struct2*)(((misc5_struct1*)(buf.p))[i].st1_el2.p))[j].st2_el2.p))[k].st3_el1, MISC5_DBGELVAL3, "H5Dread");
             } /* end for */
         }
     }
@@ -1062,14 +1050,13 @@ test_misc5(void)
 **      created correctly.
 **
 ****************************************************************/
-static void
-test_misc6(void)
+static void test_misc6(void)
 {
-    hid_t    loc_id, space_id, dataset_id;
-    hid_t    attr_id;
-    char     attr_name[16];
+    hid_t loc_id, space_id, dataset_id;
+    hid_t attr_id;
+    char attr_name[16];
     unsigned u;
-    herr_t   ret;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing object header continuation code \n"));
@@ -1083,8 +1070,7 @@ test_misc6(void)
     CHECK(space_id, FAIL, "H5Screate");
 
     /* Create the first dataset */
-    dataset_id =
-        H5Dcreate2(loc_id, MISC6_DSETNAME1, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset_id = H5Dcreate2(loc_id, MISC6_DSETNAME1, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset_id, FAIL, "H5Dcreate2");
 
     /* Close dataset */
@@ -1092,8 +1078,7 @@ test_misc6(void)
     CHECK(ret, FAIL, "H5Dclose");
 
     /* Create the second dataset */
-    dataset_id =
-        H5Dcreate2(loc_id, MISC6_DSETNAME2, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset_id = H5Dcreate2(loc_id, MISC6_DSETNAME2, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset_id, FAIL, "H5Dcreate2");
 
     /* Close dataset */
@@ -1162,12 +1147,11 @@ test_misc6(void)
 **      disk.  (i.e. not partially initialized)
 **
 ****************************************************************/
-static void
-test_misc7(void)
+static void test_misc7(void)
 {
-    hid_t  fid, did, tid, sid;
-    int    enum_value = 1;
-    bool   vol_is_native;
+    hid_t fid, did, tid, sid;
+    int enum_value = 1;
+    bool vol_is_native;
     herr_t ret;
 
     /* Output message about test being performed */
@@ -1287,31 +1271,30 @@ test_misc7(void)
 **      storage methods.
 **
 ****************************************************************/
-static void
-test_misc8(void)
+static void test_misc8(void)
 {
-    hid_t   fid, did, sid;
-    hid_t   fapl; /* File access property list */
-    hid_t   dcpl; /* Dataset creation property list */
-    int     rank                   = MISC8_RANK;
-    hsize_t dims[MISC8_RANK]       = {MISC8_DIM0, MISC8_DIM1};
-    hsize_t chunk_dims[MISC8_RANK] = {MISC8_CHUNK_DIM0, MISC8_CHUNK_DIM1};
+    hid_t fid, did, sid;
+    hid_t fapl; /* File access property list */
+    hid_t dcpl; /* Dataset creation property list */
+    int rank = MISC8_RANK;
+    hsize_t dims[MISC8_RANK] = { MISC8_DIM0, MISC8_DIM1 };
+    hsize_t chunk_dims[MISC8_RANK] = { MISC8_CHUNK_DIM0, MISC8_CHUNK_DIM1 };
     hsize_t storage_size; /* Number of bytes of raw data storage used */
-    int    *wdata;        /* Data to write */
-    int    *tdata;        /* Temporary pointer to data write */
+    int* wdata;           /* Data to write */
+    int* tdata;           /* Temporary pointer to data write */
 #ifndef H5_HAVE_PARALLEL
-    int *rdata;  /* Data to read */
-    int *tdata2; /* Temporary pointer to data to read */
+    int* rdata;  /* Data to read */
+    int* tdata2; /* Temporary pointer to data to read */
 #endif
-    unsigned u, v;              /* Local index variables */
-    int      mdc_nelmts;        /* Metadata number of elements */
-    size_t   rdcc_nelmts;       /* Raw data number of elements */
-    size_t   rdcc_nbytes;       /* Raw data number of bytes */
-    double   rdcc_w0;           /* Raw data write percentage */
-    hsize_t  start[MISC8_RANK]; /* Hyperslab start */
-    hsize_t  count[MISC8_RANK]; /* Hyperslab block count */
-    bool     vol_is_native;
-    herr_t   ret;
+    unsigned u, v;             /* Local index variables */
+    int mdc_nelmts;            /* Metadata number of elements */
+    size_t rdcc_nelmts;        /* Raw data number of elements */
+    size_t rdcc_nbytes;        /* Raw data number of bytes */
+    double rdcc_w0;            /* Raw data write percentage */
+    hsize_t start[MISC8_RANK]; /* Hyperslab start */
+    hsize_t count[MISC8_RANK]; /* Hyperslab block count */
+    bool vol_is_native;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing dataset storage sizes\n"));
@@ -1348,18 +1331,20 @@ test_misc8(void)
     }
 
     /* Allocate space for the data to write & read */
-    wdata = (int *)malloc(sizeof(int) * MISC8_DIM0 * MISC8_DIM1);
+    wdata = (int*)malloc(sizeof(int) * MISC8_DIM0 * MISC8_DIM1);
     CHECK_PTR(wdata, "malloc");
 #ifndef H5_HAVE_PARALLEL
-    rdata = (int *)malloc(sizeof(int) * MISC8_DIM0 * MISC8_DIM1);
+    rdata = (int*)malloc(sizeof(int) * MISC8_DIM0 * MISC8_DIM1);
     CHECK_PTR(rdata, "malloc");
 #endif
 
     /* Initialize values */
     tdata = wdata;
-    for (u = 0; u < MISC8_DIM0; u++)
-        for (v = 0; v < MISC8_DIM1; v++)
+    for (u = 0; u < MISC8_DIM0; u++) {
+        for (v = 0; v < MISC8_DIM1; v++) {
             *tdata++ = (int)(((u * MISC8_DIM1) + v) % 13);
+        }
+    }
 
     /* Create a simple dataspace */
     sid = H5Screate_simple(rank, dims, NULL);
@@ -1371,7 +1356,7 @@ test_misc8(void)
     start[1] = 1;
     count[0] = (MISC8_CHUNK_DIM0 * 2) - 1;
     count[1] = (MISC8_CHUNK_DIM1 * 2) - 1;
-    ret      = H5Sselect_hyperslab(sid, H5S_SELECT_SET, start, NULL, count, NULL);
+    ret = H5Sselect_hyperslab(sid, H5S_SELECT_SET, start, NULL, count, NULL);
     CHECK(ret, FAIL, "H5Sselect_hyperslab");
 
     /* Create a dataset creation property list */
@@ -1394,8 +1379,7 @@ test_misc8(void)
     /* Check the storage size */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1421,8 +1405,7 @@ test_misc8(void)
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1447,8 +1430,7 @@ test_misc8(void)
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1500,8 +1482,7 @@ test_misc8(void)
     /* Check the storage size */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1527,8 +1508,7 @@ test_misc8(void)
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1558,8 +1538,7 @@ test_misc8(void)
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1583,8 +1562,7 @@ test_misc8(void)
 
     /* Check the storage size after only four chunks are written */
     storage_size = H5Dget_storage_size(did);
-    VERIFY(storage_size, (hsize_t)(4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Write entire dataset */
     ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
@@ -1595,19 +1573,20 @@ test_misc8(void)
     CHECK(ret, FAIL, "H5Dread");
 
     /* Check values written */
-    tdata  = wdata;
+    tdata = wdata;
     tdata2 = rdata;
-    for (u = 0; u < MISC8_DIM0; u++)
-        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++)
-            if (*tdata != *tdata2)
-                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u,
-                              (unsigned)v, (int)*tdata, (int)*tdata2);
+    for (u = 0; u < MISC8_DIM0; u++) {
+        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++) {
+            if (*tdata != *tdata2) {
+                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u, (unsigned)v, (int)*tdata, (int)*tdata2);
+            }
+        }
+    }
 
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5Dget_storage_size");
+    VERIFY(storage_size, (hsize_t)(MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5Dget_storage_size");
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1636,13 +1615,13 @@ test_misc8(void)
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
 #ifdef H5_HAVE_FILTER_DEFLATE
-    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
+    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
 #else  /* Compression is not configured */
-    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
+    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
 #endif /* H5_HAVE_FILTER_DEFLATE */
 
     /* Close dataset ID */
@@ -1669,15 +1648,15 @@ test_misc8(void)
     /* Check the storage size after only four chunks are written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-#ifdef H5_HAVE_FILTER_DEFLATE
-    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#else  /* Compression is not configured */
-    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#endif /* H5_HAVE_FILTER_DEFLATE */
+    #ifdef H5_HAVE_FILTER_DEFLATE
+    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #else  /* Compression is not configured */
+    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #endif /* H5_HAVE_FILTER_DEFLATE */
 
     /* Write entire dataset */
     ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
@@ -1688,26 +1667,28 @@ test_misc8(void)
     CHECK(ret, FAIL, "H5Dread");
 
     /* Check values written */
-    tdata  = wdata;
+    tdata = wdata;
     tdata2 = rdata;
-    for (u = 0; u < MISC8_DIM0; u++)
-        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++)
-            if (*tdata != *tdata2)
-                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u,
-                              (unsigned)v, (int)*tdata, (int)*tdata2);
+    for (u = 0; u < MISC8_DIM0; u++) {
+        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++) {
+            if (*tdata != *tdata2) {
+                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u, (unsigned)v, (int)*tdata, (int)*tdata2);
+            }
+        }
+    }
 
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-#ifdef H5_HAVE_FILTER_DEFLATE
-    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#else
-    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#endif /*H5_HAVE_FILTER_DEFLATE*/
+    #ifdef H5_HAVE_FILTER_DEFLATE
+    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #else
+    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #endif /*H5_HAVE_FILTER_DEFLATE*/
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1732,15 +1713,15 @@ test_misc8(void)
     /* Check the storage size after only four chunks are written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-#ifdef H5_HAVE_FILTER_DEFLATE
-    if (storage_size >= (4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#else  /* Compression is not configured */
-    if (storage_size != (4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#endif /* H5_HAVE_FILTER_DEFLATE */
+    #ifdef H5_HAVE_FILTER_DEFLATE
+    if (storage_size >= (4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #else  /* Compression is not configured */
+    if (storage_size != (4 * MISC8_CHUNK_DIM0 * MISC8_CHUNK_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #endif /* H5_HAVE_FILTER_DEFLATE */
 
     /* Write entire dataset */
     ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
@@ -1751,26 +1732,28 @@ test_misc8(void)
     CHECK(ret, FAIL, "H5Dread");
 
     /* Check values written */
-    tdata  = wdata;
+    tdata = wdata;
     tdata2 = rdata;
-    for (u = 0; u < MISC8_DIM0; u++)
-        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++)
-            if (*tdata != *tdata2)
-                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u,
-                              (unsigned)v, (int)*tdata, (int)*tdata2);
+    for (u = 0; u < MISC8_DIM0; u++) {
+        for (v = 0; v < MISC8_DIM1; v++, tdata++, tdata2++) {
+            if (*tdata != *tdata2) {
+                TestErrPrintf("Error on line %d: u=%u, v=%d, *tdata=%d, *tdata2=%d\n", __LINE__, (unsigned)u, (unsigned)v, (int)*tdata, (int)*tdata2);
+            }
+        }
+    }
 
     /* Check the storage size after data is written */
     storage_size = H5Dget_storage_size(did);
     CHECK(storage_size, 0, "H5Dget_storage_size");
-#ifdef H5_HAVE_FILTER_DEFLATE
-    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#else
-    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT)))
-        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__,
-                      (unsigned)storage_size);
-#endif /*H5_HAVE_FILTER_DEFLATE*/
+    #ifdef H5_HAVE_FILTER_DEFLATE
+    if (storage_size >= (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: data wasn't compressed! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #else
+    if (storage_size != (MISC8_DIM0 * MISC8_DIM1 * H5Tget_size(H5T_NATIVE_INT))) {
+        TestErrPrintf("Error on line %d: wrong storage size! storage_size=%u\n", __LINE__, (unsigned)storage_size);
+    }
+    #endif /*H5_HAVE_FILTER_DEFLATE*/
 
     /* Close dataset ID */
     ret = H5Dclose(did);
@@ -1802,10 +1785,9 @@ test_misc8(void)
 **      files, H5Fcreate() must be used to open them.
 **
 ****************************************************************/
-static void
-test_misc9(void)
+static void test_misc9(void)
 {
-    hid_t  fapl, fid;
+    hid_t fapl, fid;
     herr_t ret;
 
     /* Output message about test being performed */
@@ -1838,25 +1820,23 @@ test_misc9(void)
 **      the library.  Also tests using file creation property in same way.
 **
 ****************************************************************/
-static void
-test_misc10(void)
+static void test_misc10(void)
 {
-    hid_t       file, file_new;                                     /* File IDs for old & new files */
-    hid_t       fcpl;                                               /* File creation property list */
-    hid_t       dataset, dataset_new;                               /* Dataset IDs for old & new datasets */
-    hid_t       dcpl;                                               /* Dataset creation property list */
-    hid_t       space, type;                                        /* Old dataset's dataspace & datatype */
-    const char *testfile = H5_get_srcdir_filename(MISC10_FILE_OLD); /* Corrected test file name */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    herr_t      ret;
+    hid_t file, file_new;                                           /* File IDs for old & new files */
+    hid_t fcpl;                                                     /* File creation property list */
+    hid_t dataset, dataset_new;                                     /* Dataset IDs for old & new datasets */
+    hid_t dcpl;                                                     /* Dataset creation property list */
+    hid_t space, type;                                              /* Old dataset's dataspace & datatype */
+    const char* testfile = H5_get_srcdir_filename(MISC10_FILE_OLD); /* Corrected test file name */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing using old dataset creation property list\n"));
 
     /* Check if VFD used is native file format compatible */
-    CHECK(h5_driver_is_default_vfd_compatible(H5P_DEFAULT, &driver_is_default_compatible), FAIL,
-          "h5_driver_is_default_vfd_compatible");
+    CHECK(h5_driver_is_default_vfd_compatible(H5P_DEFAULT, &driver_is_default_compatible), FAIL, "h5_driver_is_default_vfd_compatible");
     if (!driver_is_default_compatible) {
         MESSAGE(5, (" -- SKIPPED --\n"));
         return;
@@ -1925,25 +1905,24 @@ test_misc10(void)
 **      when the file is re-opened.
 **
 ****************************************************************/
-static void
-test_misc11(void)
+static void test_misc11(void)
 {
-    hid_t                 file;      /* File IDs for old & new files */
-    hid_t                 fcpl;      /* File creation property list */
-    hid_t                 fapl;      /* File access property list */
-    hsize_t               userblock; /* Userblock size retrieved from FCPL */
-    size_t                off_size;  /* Size of offsets in the file */
-    size_t                len_size;  /* Size of lengths in the file */
-    unsigned              sym_ik;    /* Symbol table B-tree initial 'K' value */
-    unsigned              istore_ik; /* Indexed storage B-tree initial 'K' value */
-    unsigned              sym_lk;    /* Symbol table B-tree leaf 'K' value */
-    unsigned              nindexes;  /* Shared message number of indexes */
-    H5F_info2_t           finfo;     /* global information about file */
-    H5F_fspace_strategy_t strategy;  /* File space strategy */
-    hsize_t               threshold; /* Free-space section threshold */
-    bool                  persist;   /* To persist free-space or not */
-    bool                  vol_is_native;
-    herr_t                ret; /* Generic return value */
+    hid_t file;                     /* File IDs for old & new files */
+    hid_t fcpl;                     /* File creation property list */
+    hid_t fapl;                     /* File access property list */
+    hsize_t userblock;              /* Userblock size retrieved from FCPL */
+    size_t off_size;                /* Size of offsets in the file */
+    size_t len_size;                /* Size of lengths in the file */
+    unsigned sym_ik;                /* Symbol table B-tree initial 'K' value */
+    unsigned istore_ik;             /* Indexed storage B-tree initial 'K' value */
+    unsigned sym_lk;                /* Symbol table B-tree leaf 'K' value */
+    unsigned nindexes;              /* Shared message number of indexes */
+    H5F_info2_t finfo;              /* global information about file */
+    H5F_fspace_strategy_t strategy; /* File space strategy */
+    hsize_t threshold;              /* Free-space section threshold */
+    bool persist;                   /* To persist free-space or not */
+    bool vol_is_native;
+    herr_t ret;                     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing file creation properties retrieved correctly\n"));
@@ -2113,33 +2092,31 @@ test_misc11(void)
 **      datasets that are extended.
 **
 ****************************************************************/
-static void
-test_misc12(void)
+static void test_misc12(void)
 {
-    const char *wdata[MISC12_SPACE1_DIM1] = {
-        "Four score and seven years ago our forefathers brought forth on this continent a new nation,",
-        "conceived in liberty and dedicated to the proposition that all men are created equal.",
-        "Now we are engaged in a great civil war,",
-        "testing whether that nation or any nation so conceived and so dedicated can long endure."};
-    const char *wdata1[MISC12_APPEND_SIZE] = {
-        "O Gloria inmarcesible! O Jubilo inmortal! En surcos de dolores, el",
-        "bien germina ya! Ceso la horrible noche, La libertad sublime",
-        "derrama las auroras de su invencible luz.", "La humanidad entera, que entre cadenas gime, comprende",
-        "las palabras del que murio en la cruz."};
-    char   *rdata[MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE]; /* Information read in */
-    hid_t   fid1;
-    hid_t   dataset;
-    hid_t   sid1, space, memspace;
-    hid_t   tid1, cparms;
-    hsize_t dims1[]     = {MISC12_SPACE1_DIM1};
-    hsize_t dimsn[]     = {MISC12_APPEND_SIZE};
-    hsize_t maxdims1[1] = {H5S_UNLIMITED};
-    hsize_t chkdims1[1] = {MISC12_CHUNK_SIZE};
-    hsize_t newsize[1]  = {MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE};
-    hsize_t offset[1]   = {MISC12_SPACE1_DIM1};
-    hsize_t count[1]    = {MISC12_APPEND_SIZE};
-    int     i;   /* counting variable */
-    herr_t  ret; /* Generic return value  */
+    const char* wdata[MISC12_SPACE1_DIM1] = { "Four score and seven years ago our forefathers brought forth on this continent a new nation,",
+                                              "conceived in liberty and dedicated to the proposition that all men are created equal.",
+                                              "Now we are engaged in a great civil war,",
+                                              "testing whether that nation or any nation so conceived and so dedicated can long endure." };
+    const char* wdata1[MISC12_APPEND_SIZE] = { "O Gloria inmarcesible! O Jubilo inmortal! En surcos de dolores, el",
+                                               "bien germina ya! Ceso la horrible noche, La libertad sublime",
+                                               "derrama las auroras de su invencible luz.",
+                                               "La humanidad entera, que entre cadenas gime, comprende",
+                                               "las palabras del que murio en la cruz." };
+    char* rdata[MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE]; /* Information read in */
+    hid_t fid1;
+    hid_t dataset;
+    hid_t sid1, space, memspace;
+    hid_t tid1, cparms;
+    hsize_t dims1[] = { MISC12_SPACE1_DIM1 };
+    hsize_t dimsn[] = { MISC12_APPEND_SIZE };
+    hsize_t maxdims1[1] = { H5S_UNLIMITED };
+    hsize_t chkdims1[1] = { MISC12_CHUNK_SIZE };
+    hsize_t newsize[1] = { MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE };
+    hsize_t offset[1] = { MISC12_SPACE1_DIM1 };
+    hsize_t count[1] = { MISC12_APPEND_SIZE };
+    int i;      /* counting variable */
+    herr_t ret; /* Generic return value  */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing VL-type in chunked dataset\n"));
@@ -2198,14 +2175,16 @@ test_misc12(void)
     ret = H5Dread(dataset, tid1, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata);
     CHECK(ret, FAIL, "H5Dread");
 
-    for (i = 0; i < MISC12_SPACE1_DIM1; i++)
-        if (strcmp(wdata[i], rdata[i]) != 0)
-            TestErrPrintf("Error on line %d: wdata[%d]=%s, rdata[%d]=%s\n", __LINE__, i, wdata[i], i,
-                          rdata[i]);
-    for (; i < (MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE); i++)
-        if (strcmp(wdata1[i - MISC12_SPACE1_DIM1], rdata[i]) != 0)
-            TestErrPrintf("Error on line %d: wdata1[%d]=%s, rdata[%d]=%s\n", __LINE__, i - MISC12_SPACE1_DIM1,
-                          wdata1[i - MISC12_SPACE1_DIM1], i, rdata[i]);
+    for (i = 0; i < MISC12_SPACE1_DIM1; i++) {
+        if (strcmp(wdata[i], rdata[i]) != 0) {
+            TestErrPrintf("Error on line %d: wdata[%d]=%s, rdata[%d]=%s\n", __LINE__, i, wdata[i], i, rdata[i]);
+        }
+    }
+    for (; i < (MISC12_SPACE1_DIM1 + MISC12_APPEND_SIZE); i++) {
+        if (strcmp(wdata1[i - MISC12_SPACE1_DIM1], rdata[i]) != 0) {
+            TestErrPrintf("Error on line %d: wdata1[%d]=%s, rdata[%d]=%s\n", __LINE__, i - MISC12_SPACE1_DIM1, wdata1[i - MISC12_SPACE1_DIM1], i, rdata[i]);
+        }
+    }
 
     ret = H5Sselect_all(space);
     CHECK(ret, FAIL, "H5Sselect_all");
@@ -2232,38 +2211,38 @@ test_misc12(void)
 } /* end test_misc12() */
 
 /* Various routines for misc. 13 test */
-static void
-misc13_init_data(unsigned *original_data)
+static void misc13_init_data(unsigned* original_data)
 {
     unsigned u;
 
-    for (u = 0; u < MISC13_DIM1; u++)
+    for (u = 0; u < MISC13_DIM1; u++) {
         original_data[u] = u;
+    }
 }
 
-static bool
-misc13_verify_data_match(const unsigned *original_data, const unsigned *read_data)
+static bool misc13_verify_data_match(const unsigned* original_data, const unsigned* read_data)
 {
     unsigned u;
 
-    for (u = 0; u < MISC13_DIM1; u++)
-        if (original_data[u] != read_data[u])
+    for (u = 0; u < MISC13_DIM1; u++) {
+        if (original_data[u] != read_data[u]) {
             return false;
+        }
+    }
 
     return true;
 }
 
-static void
-misc13_create_dataset(hid_t loc_id, const char *name, hid_t dcpl, const unsigned *data)
+static void misc13_create_dataset(hid_t loc_id, const char* name, hid_t dcpl, const unsigned* data)
 {
-    hid_t   dsid = H5I_INVALID_HID; /* Dataset ID */
-    hid_t   sid  = H5I_INVALID_HID; /* Dataspace ID */
-    hsize_t dims[MISC13_RANK];      /* Dataset dimensions */
-    herr_t  ret;                    /* Generic return value */
+    hid_t dsid = H5I_INVALID_HID; /* Dataset ID */
+    hid_t sid = H5I_INVALID_HID;  /* Dataspace ID */
+    hsize_t dims[MISC13_RANK];    /* Dataset dimensions */
+    herr_t ret;                   /* Generic return value */
 
     /* Create dataspace for use with dataset */
     dims[0] = MISC13_DIM1;
-    sid     = H5Screate_simple(MISC13_RANK, dims, NULL);
+    sid = H5Screate_simple(MISC13_RANK, dims, NULL);
     CHECK(sid, FAIL, "H5Screate_simple");
 
     /* Create contiguous dataset in root group */
@@ -2284,15 +2263,14 @@ misc13_create_dataset(hid_t loc_id, const char *name, hid_t dcpl, const unsigned
 
 } /* end misc13_create_dataset() */
 
-static void
-misc13_verify_dataset(hid_t loc_id, const char *name, const unsigned *data)
+static void misc13_verify_dataset(hid_t loc_id, const char* name, const unsigned* data)
 {
-    unsigned *read_data = NULL;            /* Data to write to dataset */
-    hid_t     dsid      = H5I_INVALID_HID; /* Dataset ID */
-    herr_t    ret;                         /* Generic return value */
+    unsigned* read_data = NULL;   /* Data to write to dataset */
+    hid_t dsid = H5I_INVALID_HID; /* Dataset ID */
+    herr_t ret;                   /* Generic return value */
 
     /* Create a data buffer for the dataset read */
-    read_data = (unsigned *)calloc(MISC13_DIM1, sizeof(unsigned));
+    read_data = (unsigned*)calloc(MISC13_DIM1, sizeof(unsigned));
     CHECK_PTR(read_data, "calloc");
 
     /* Open the contiguous dataset in the root group */
@@ -2316,16 +2294,15 @@ misc13_verify_dataset(hid_t loc_id, const char *name, const unsigned *data)
 
 } /* end misc13_verify_dataset() */
 
-static void
-misc13_create_hdf_file(const char *name, const unsigned *data)
+static void misc13_create_hdf_file(const char* name, const unsigned* data)
 {
-    hid_t   fid    = H5I_INVALID_HID; /* File ID */
-    hid_t   gid1   = H5I_INVALID_HID; /* Group ID (level 1) */
-    hid_t   gid2   = H5I_INVALID_HID; /* Group ID (level 2) */
-    hid_t   tid    = H5I_INVALID_HID; /* Datatype ID */
-    hid_t   dcplid = H5I_INVALID_HID; /* Dataset creation property list ID */
-    hsize_t chunk_dims[MISC13_RANK];  /* Chunk dimensions */
-    herr_t  ret;                      /* Generic return value */
+    hid_t fid = H5I_INVALID_HID;     /* File ID */
+    hid_t gid1 = H5I_INVALID_HID;    /* Group ID (level 1) */
+    hid_t gid2 = H5I_INVALID_HID;    /* Group ID (level 2) */
+    hid_t tid = H5I_INVALID_HID;     /* Datatype ID */
+    hid_t dcplid = H5I_INVALID_HID;  /* Dataset creation property list ID */
+    hsize_t chunk_dims[MISC13_RANK]; /* Chunk dimensions */
+    herr_t ret;                      /* Generic return value */
 
     /* Create file */
     fid = H5Fcreate(name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -2341,7 +2318,7 @@ misc13_create_hdf_file(const char *name, const unsigned *data)
 
     /* Use chunked storage for this DCPL */
     chunk_dims[0] = MISC13_CHUNK_DIM1;
-    ret           = H5Pset_chunk(dcplid, MISC13_RANK, chunk_dims);
+    ret = H5Pset_chunk(dcplid, MISC13_RANK, chunk_dims);
     CHECK(ret, FAIL, "H5Pset_chunk");
 
     /* Create contiguous dataset in root group */
@@ -2406,16 +2383,15 @@ misc13_create_hdf_file(const char *name, const unsigned *data)
 
 } /* end misc13_create_hdf_file() */
 
-static void
-misc13_insert_user_block(const char *old_name, const char *new_name, const char *str, size_t size)
+static void misc13_insert_user_block(const char* old_name, const char* new_name, const char* str, size_t size)
 {
-    FILE  *new_fp     = NULL; /* Pointers to new & old files */
-    FILE  *old_fp     = NULL;
-    void  *user_block = NULL; /* Pointer to user block to write to file */
-    void  *copy_buf   = NULL; /* Pointer to buffer for copying data */
-    size_t written;           /* Amount of data written to new file */
-    size_t read_in;           /* Amount of data read in from old file */
-    int    ret;               /* Generic status value */
+    FILE* new_fp = NULL;     /* Pointers to new & old files */
+    FILE* old_fp = NULL;
+    void* user_block = NULL; /* Pointer to user block to write to file */
+    void* copy_buf = NULL;   /* Pointer to buffer for copying data */
+    size_t written;          /* Amount of data written to new file */
+    size_t read_in;          /* Amount of data read in from old file */
+    int ret;                 /* Generic status value */
 
     /* Allocate space for the user block */
     user_block = calloc(size, (size_t)1);
@@ -2463,16 +2439,15 @@ misc13_insert_user_block(const char *old_name, const char *new_name, const char 
 
 } /* end misc13_insert_user_block() */
 
-static void
-misc13_verify_file(const char *name, const unsigned *data, hsize_t userblock_size, bool check_for_new_dataset)
+static void misc13_verify_file(const char* name, const unsigned* data, hsize_t userblock_size, bool check_for_new_dataset)
 {
-    hid_t   fid    = H5I_INVALID_HID; /* File ID */
-    hid_t   gid1   = H5I_INVALID_HID; /* Group IDs */
-    hid_t   gid2   = H5I_INVALID_HID; /* Group IDs */
-    hid_t   tid    = H5I_INVALID_HID; /* Datatype ID */
-    hid_t   fcplid = H5I_INVALID_HID; /* File creation property list ID */
-    hsize_t ub_size_out;              /* Userblock size retrieved from FCPL */
-    herr_t  ret;                      /* Generic return value */
+    hid_t fid = H5I_INVALID_HID;    /* File ID */
+    hid_t gid1 = H5I_INVALID_HID;   /* Group IDs */
+    hid_t gid2 = H5I_INVALID_HID;   /* Group IDs */
+    hid_t tid = H5I_INVALID_HID;    /* Datatype ID */
+    hid_t fcplid = H5I_INVALID_HID; /* File creation property list ID */
+    hsize_t ub_size_out;            /* Userblock size retrieved from FCPL */
+    herr_t ret;                     /* Generic return value */
 
     /* Open the file */
     fid = H5Fopen(name, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -2500,8 +2475,9 @@ misc13_verify_file(const char *name, const unsigned *data, hsize_t userblock_siz
     misc13_verify_dataset(fid, MISC13_DSET2_NAME, data);
 
     /* Verify the "new" contiguous dataset in the root group, if asked */
-    if (check_for_new_dataset)
+    if (check_for_new_dataset) {
         misc13_verify_dataset(fid, MISC13_DSET3_NAME, data);
+    }
 
     /* Open the named datatype in the root group */
     tid = H5Topen2(fid, MISC13_DTYPE_NAME, H5P_DEFAULT);
@@ -2553,11 +2529,10 @@ misc13_verify_file(const char *name, const unsigned *data, hsize_t userblock_siz
 
 } /* end misc13_verify_file() */
 
-static void
-misc13_add_to_new_file(const char *name, const unsigned *data)
+static void misc13_add_to_new_file(const char* name, const unsigned* data)
 {
-    hid_t  fid = H5I_INVALID_HID; /* File ID */
-    herr_t ret;                   /* Generic return value */
+    hid_t fid = H5I_INVALID_HID; /* File ID */
+    herr_t ret;                  /* Generic return value */
 
     /* Open the file */
     fid = H5Fopen(name, H5F_ACC_RDWR, H5P_DEFAULT);
@@ -2578,21 +2553,21 @@ misc13_add_to_new_file(const char *name, const unsigned *data)
 **      inserting a user block in front of an existing file.
 **
 ****************************************************************/
-static void
-test_misc13(void)
+static void test_misc13(void)
 {
-    unsigned *data = NULL;           /* Data to write to dataset */
-    hsize_t   userblock_size;        /* Correct size of userblock */
-    bool      check_for_new_dataset; /* Whether to check for the post-userblock-creation dataset */
-    bool      vol_is_native;
+    unsigned* data = NULL;      /* Data to write to dataset */
+    hsize_t userblock_size;     /* Correct size of userblock */
+    bool check_for_new_dataset; /* Whether to check for the post-userblock-creation dataset */
+    bool vol_is_native;
 
     /* Check if native VOL is being used */
     CHECK(h5_using_native_vol(H5P_DEFAULT, H5I_INVALID_HID, &vol_is_native), FAIL, "h5_using_native_vol");
-    if (!vol_is_native)
+    if (!vol_is_native) {
         return;
+    }
 
     /* Create a data buffer for the datasets */
-    data = (unsigned *)calloc(MISC13_DIM1, sizeof(unsigned));
+    data = (unsigned*)calloc(MISC13_DIM1, sizeof(unsigned));
     CHECK_PTR(data, "calloc");
 
     /* Initialize data to write */
@@ -2602,7 +2577,7 @@ test_misc13(void)
     misc13_create_hdf_file(MISC13_FILE_1, data);
 
     /* Verify file contents are correct */
-    userblock_size        = 0;
+    userblock_size = 0;
     check_for_new_dataset = false;
     misc13_verify_file(MISC13_FILE_1, data, userblock_size, check_for_new_dataset);
 
@@ -2610,7 +2585,7 @@ test_misc13(void)
     misc13_insert_user_block(MISC13_FILE_1, MISC13_FILE_2, "Test String", (size_t)MISC13_USERBLOCK_SIZE);
 
     /* Verify file contents are still correct */
-    userblock_size        = MISC13_USERBLOCK_SIZE;
+    userblock_size = MISC13_USERBLOCK_SIZE;
     check_for_new_dataset = false;
     misc13_verify_file(MISC13_FILE_2, data, userblock_size, check_for_new_dataset);
 
@@ -2618,7 +2593,7 @@ test_misc13(void)
     misc13_add_to_new_file(MISC13_FILE_2, data);
 
     /* Verify file contents are still correct */
-    userblock_size        = MISC13_USERBLOCK_SIZE;
+    userblock_size = MISC13_USERBLOCK_SIZE;
     check_for_new_dataset = true;
     misc13_verify_file(MISC13_FILE_2, data, userblock_size, check_for_new_dataset);
 
@@ -2633,15 +2608,14 @@ test_misc13(void)
 **      inserting a user block in front of an existing file.
 **
 ****************************************************************/
-static void
-test_misc14(void)
+static void test_misc14(void)
 {
-    hid_t  file_id;      /* File ID */
-    hid_t  fapl;         /* File access property list ID */
-    hid_t  DataSpace;    /* Dataspace ID */
-    hid_t  Dataset1;     /* Dataset ID #1 */
-    hid_t  Dataset2;     /* Dataset ID #2 */
-    hid_t  Dataset3;     /* Dataset ID #3 */
+    hid_t file_id;       /* File ID */
+    hid_t fapl;          /* File access property list ID */
+    hid_t DataSpace;     /* Dataspace ID */
+    hid_t Dataset1;      /* Dataset ID #1 */
+    hid_t Dataset2;      /* Dataset ID #2 */
+    hid_t Dataset3;      /* Dataset ID #3 */
     double data1 = 5.0;  /* Data to write for dataset #1 */
     double data2 = 10.0; /* Data to write for dataset #2 */
     double data3 = 15.0; /* Data to write for dataset #3 */
@@ -2667,16 +2641,14 @@ test_misc14(void)
     CHECK(file_id, FAIL, "H5Fcreate");
 
     /* Create first dataset & write data */
-    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset1, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data1);
     CHECK(ret, FAIL, "H5Dwrite");
 
     /* Create second dataset (to be unlinked).  */
-    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset2, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset2, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data2);
@@ -2685,8 +2657,9 @@ test_misc14(void)
     /* Check data from first dataset */
     ret = H5Dread(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data1))
+    if (!H5_DBL_ABS_EQUAL(rdata, data1)) {
         TestErrPrintf("Error on line %d: data1!=rdata\n", __LINE__);
+    }
 
     /* Unlink second dataset */
     ret = H5Ldelete(file_id, MISC14_DSET2_NAME, H5P_DEFAULT);
@@ -2699,8 +2672,9 @@ test_misc14(void)
     /* Verify the data from dataset #1 */
     ret = H5Dread(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data1))
+    if (!H5_DBL_ABS_EQUAL(rdata, data1)) {
         TestErrPrintf("Error on line %d: data1!=rdata\n", __LINE__);
+    }
 
     /* Close first dataset */
     ret = H5Dclose(Dataset1);
@@ -2717,16 +2691,14 @@ test_misc14(void)
     CHECK(file_id, FAIL, "H5Fcreate");
 
     /* Create first dataset & write data */
-    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset1, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data1);
     CHECK(ret, FAIL, "H5Dwrite");
 
     /* Create second dataset  */
-    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset2, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset2, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data2);
@@ -2735,8 +2707,9 @@ test_misc14(void)
     /* Check data from second dataset */
     ret = H5Dread(Dataset2, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data2))
+    if (!H5_DBL_ABS_EQUAL(rdata, data2)) {
         TestErrPrintf("Error on line %d: data2!=rdata\n", __LINE__);
+    }
 
     /* Unlink first dataset */
     ret = H5Ldelete(file_id, MISC14_DSET1_NAME, H5P_DEFAULT);
@@ -2749,8 +2722,9 @@ test_misc14(void)
     /* Verify the data from dataset #2 */
     ret = H5Dread(Dataset2, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data2))
+    if (!H5_DBL_ABS_EQUAL(rdata, data2)) {
         TestErrPrintf("Error on line %d: data2!=rdata\n", __LINE__);
+    }
 
     /* Close second dataset */
     ret = H5Dclose(Dataset2);
@@ -2767,24 +2741,21 @@ test_misc14(void)
     CHECK(file_id, FAIL, "H5Fcreate");
 
     /* Create first dataset & write data */
-    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset1 = H5Dcreate2(file_id, MISC14_DSET1_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset1, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data1);
     CHECK(ret, FAIL, "H5Dwrite");
 
     /* Create second dataset */
-    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset2 = H5Dcreate2(file_id, MISC14_DSET2_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset2, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset2, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data2);
     CHECK(ret, FAIL, "H5Dwrite");
 
     /* Create third dataset */
-    Dataset3 = H5Dcreate2(file_id, MISC14_DSET3_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT,
-                          H5P_DEFAULT);
+    Dataset3 = H5Dcreate2(file_id, MISC14_DSET3_NAME, H5T_NATIVE_DOUBLE, DataSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(Dataset2, FAIL, "H5Dcreate2");
 
     ret = H5Dwrite(Dataset3, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data3);
@@ -2793,14 +2764,16 @@ test_misc14(void)
     /* Check data from first dataset */
     ret = H5Dread(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data1))
+    if (!H5_DBL_ABS_EQUAL(rdata, data1)) {
         TestErrPrintf("Error on line %d: data1!=rdata\n", __LINE__);
+    }
 
     /* Check data from third dataset */
     ret = H5Dread(Dataset3, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data3))
+    if (!H5_DBL_ABS_EQUAL(rdata, data3)) {
         TestErrPrintf("Error on line %d: data3!=rdata\n", __LINE__);
+    }
 
     /* Unlink second dataset */
     ret = H5Ldelete(file_id, MISC14_DSET2_NAME, H5P_DEFAULT);
@@ -2813,14 +2786,16 @@ test_misc14(void)
     /* Verify the data from dataset #1 */
     ret = H5Dread(Dataset1, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data1))
+    if (!H5_DBL_ABS_EQUAL(rdata, data1)) {
         TestErrPrintf("Error on line %d: data1!=rdata\n", __LINE__);
+    }
 
     /* Verify the data from dataset #3 */
     ret = H5Dread(Dataset3, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdata);
     CHECK(ret, FAIL, "H5Dread");
-    if (!H5_DBL_ABS_EQUAL(rdata, data3))
+    if (!H5_DBL_ABS_EQUAL(rdata, data3)) {
         TestErrPrintf("Error on line %d: data3!=rdata\n", __LINE__);
+    }
 
     /* Close first dataset */
     ret = H5Dclose(Dataset1);
@@ -2848,13 +2823,12 @@ test_misc14(void)
 **      more than once correctly increments internal reference counts.
 **
 ****************************************************************/
-static void
-test_misc15(void)
+static void test_misc15(void)
 {
-    char   filename[MISC15_BUF_SIZE];
-    hid_t  file; /* File ID */
-    hid_t  fapl; /* File access property list */
-    herr_t ret;  /* Generic return value */
+    char filename[MISC15_BUF_SIZE];
+    hid_t file; /* File ID */
+    hid_t fapl; /* File access property list */
+    herr_t ret; /* Generic return value */
 
     fapl = h5_fileaccess();
     h5_fixname(MISC15_FILE, fapl, filename, MISC15_BUF_SIZE);
@@ -2907,18 +2881,17 @@ test_misc15(void)
 **  totally MISC16_SPACE_DIM by MISC16_SPACE_RANK strings.
 **
 ****************************************************************/
-static void
-test_misc16(void)
+static void test_misc16(void)
 {
-    hid_t   file; /* File ID */
-    herr_t  ret;  /* Generic return value */
-    char    wdata[MISC16_SPACE_DIM][MISC16_STR_SIZE];
-    char    rdata[MISC16_SPACE_DIM][MISC16_STR_SIZE]; /* Information read in */
-    hid_t   dataset;                                  /* Dataset ID            */
-    hid_t   sid;                                      /* Dataspace ID            */
-    hid_t   tid;                                      /* Datatype ID            */
-    hsize_t dims[] = {MISC16_SPACE_DIM};
-    int     i;
+    hid_t file;                                    /* File ID */
+    herr_t ret;                                    /* Generic return value */
+    char wdata[MISC16_SPACE_DIM][MISC16_STR_SIZE];
+    char rdata[MISC16_SPACE_DIM][MISC16_STR_SIZE]; /* Information read in */
+    hid_t dataset;                                 /* Dataset ID            */
+    hid_t sid;                                     /* Dataspace ID            */
+    hid_t tid;                                     /* Datatype ID            */
+    hsize_t dims[] = { MISC16_SPACE_DIM };
+    int i;
 
     memset(wdata, 0, sizeof(wdata));
     memset(rdata, 0, sizeof(rdata));
@@ -2963,17 +2936,19 @@ test_misc16(void)
     /* Compare data read in */
     for (i = 0; i < MISC16_SPACE_DIM; i++) {
         if (strlen(wdata[i]) != strlen(rdata[i])) {
-            TestErrPrintf(
-                "Line %u: VL data length don't match!, strlen(wdata[%d])=%d, strlen(rdata[%d])=%d\n",
-                (unsigned)__LINE__, (int)i, (int)strlen(wdata[i]), (int)i, (int)strlen(rdata[i]));
+            TestErrPrintf("Line %u: VL data length don't match!, strlen(wdata[%d])=%d, strlen(rdata[%d])=%d\n",
+                          (unsigned)__LINE__,
+                          (int)i,
+                          (int)strlen(wdata[i]),
+                          (int)i,
+                          (int)strlen(rdata[i]));
             continue;
         } /* end if */
         if (strcmp(wdata[i], rdata[i]) != 0) {
-            TestErrPrintf("Line %u: VL data values don't match!, wdata[%d]=%s, rdata[%d]=%s\n",
-                          (unsigned)__LINE__, (int)i, wdata[i], (int)i, rdata[i]);
+            TestErrPrintf("Line %u: VL data values don't match!, wdata[%d]=%s, rdata[%d]=%s\n", (unsigned)__LINE__, (int)i, wdata[i], (int)i, rdata[i]);
             continue;
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
     /* Close Dataset */
     ret = H5Dclose(dataset);
@@ -2998,18 +2973,17 @@ test_misc16(void)
 **  by MISC17_SPACE_DIM2.
 **
 ****************************************************************/
-static void
-test_misc17(void)
+static void test_misc17(void)
 {
-    hid_t   file; /* File ID */
-    herr_t  ret;  /* Generic return value */
-    char    wdata[MISC17_SPACE_DIM1][MISC17_SPACE_DIM2];
-    char    rdata[MISC17_SPACE_DIM1][MISC17_SPACE_DIM2]; /* Information read in */
-    hid_t   dataset;                                     /* Dataset ID            */
-    hid_t   sid;                                         /* Dataspace ID            */
-    hid_t   tid;                                         /* Datatype ID            */
-    hsize_t dims[] = {MISC17_SPACE_DIM1, MISC17_SPACE_DIM2};
-    int     i;
+    hid_t file;                                       /* File ID */
+    herr_t ret;                                       /* Generic return value */
+    char wdata[MISC17_SPACE_DIM1][MISC17_SPACE_DIM2];
+    char rdata[MISC17_SPACE_DIM1][MISC17_SPACE_DIM2]; /* Information read in */
+    hid_t dataset;                                    /* Dataset ID            */
+    hid_t sid;                                        /* Dataspace ID            */
+    hid_t tid;                                        /* Datatype ID            */
+    hsize_t dims[] = { MISC17_SPACE_DIM1, MISC17_SPACE_DIM2 };
+    int i;
 
     memset(wdata, 0, sizeof(wdata));
     memset(rdata, 0, sizeof(rdata));
@@ -3051,17 +3025,19 @@ test_misc17(void)
     /* Compare data in the way of strings. */
     for (i = 0; i < MISC17_SPACE_DIM1; i++) {
         if (strlen(wdata[i]) != strlen(rdata[i])) {
-            TestErrPrintf(
-                "Line %u: VL data length don't match!, strlen(wdata[%d])=%d, strlen(rdata[%d])=%d\n",
-                (unsigned)__LINE__, (int)i, (int)strlen(wdata[i]), (int)i, (int)strlen(rdata[i]));
+            TestErrPrintf("Line %u: VL data length don't match!, strlen(wdata[%d])=%d, strlen(rdata[%d])=%d\n",
+                          (unsigned)__LINE__,
+                          (int)i,
+                          (int)strlen(wdata[i]),
+                          (int)i,
+                          (int)strlen(rdata[i]));
             continue;
         } /* end if */
         if (strcmp(wdata[i], rdata[i]) != 0) {
-            TestErrPrintf("Line %u: VL data values don't match!, wdata[%d]=%s, rdata[%d]=%s\n",
-                          (unsigned)__LINE__, (int)i, wdata[i], (int)i, rdata[i]);
+            TestErrPrintf("Line %u: VL data values don't match!, wdata[%d]=%s, rdata[%d]=%s\n", (unsigned)__LINE__, (int)i, wdata[i], (int)i, rdata[i]);
             continue;
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
     /* Close Dataset */
     ret = H5Dclose(dataset);
@@ -3085,8 +3061,7 @@ test_misc17(void)
 **  struct.
 **
 ****************************************************************/
-static void
-test_misc18(void)
+static void test_misc18(void)
 {
     hid_t fid;        /* File ID */
     hid_t fapl;       /* File access property list */
@@ -3094,14 +3069,14 @@ test_misc18(void)
     hid_t did1, did2; /* Dataset IDs */
     hid_t aid;        /* Attribute ID */
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-    H5O_info1_t old_oinfo;           /* (deprecated) information about object */
-#endif                               /* H5_NO_DEPRECATED_SYMBOLS */
-    H5O_info2_t       oinfo;         /* Data model information about object */
-    H5O_native_info_t ninfo;         /* Native file format information about object */
-    char              attr_name[32]; /* Attribute name buffer */
-    unsigned          u;             /* Local index variable */
-    bool              vol_is_native;
-    herr_t            ret; /* Generic return value */
+    H5O_info1_t old_oinfo; /* (deprecated) information about object */
+#endif /* H5_NO_DEPRECATED_SYMBOLS */
+    H5O_info2_t oinfo;       /* Data model information about object */
+    H5O_native_info_t ninfo; /* Native file format information about object */
+    char attr_name[32];      /* Attribute name buffer */
+    unsigned u;              /* Local index variable */
+    bool vol_is_native;
+    herr_t ret;              /* Generic return value */
 
     /* Set earliest file format on FAPL */
     fapl = H5Pcreate(H5P_FILE_ACCESS);
@@ -3131,8 +3106,7 @@ test_misc18(void)
 
     if (vol_is_native) {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-        ret = H5Oget_info_by_name2(fid, MISC18_DSET1_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS,
-                                   H5P_DEFAULT);
+        ret = H5Oget_info_by_name2(fid, MISC18_DSET1_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS, H5P_DEFAULT);
         CHECK(ret, FAIL, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nmesgs, 6, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nchunks, 1, "H5Oget_info_by_name");
@@ -3159,8 +3133,7 @@ test_misc18(void)
 
     if (vol_is_native) {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-        ret = H5Oget_info_by_name2(fid, MISC18_DSET2_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS,
-                                   H5P_DEFAULT);
+        ret = H5Oget_info_by_name2(fid, MISC18_DSET2_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS, H5P_DEFAULT);
         CHECK(ret, FAIL, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nmesgs, 6, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nchunks, 1, "H5Oget_info_by_name");
@@ -3207,8 +3180,7 @@ test_misc18(void)
 
     if (vol_is_native) {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-        ret = H5Oget_info_by_name2(fid, MISC18_DSET1_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS,
-                                   H5P_DEFAULT);
+        ret = H5Oget_info_by_name2(fid, MISC18_DSET1_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS, H5P_DEFAULT);
         CHECK(ret, FAIL, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nmesgs, 24, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nchunks, 9, "H5Oget_info_by_name");
@@ -3231,8 +3203,7 @@ test_misc18(void)
 
     if (vol_is_native) {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-        ret = H5Oget_info_by_name2(fid, MISC18_DSET2_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS,
-                                   H5P_DEFAULT);
+        ret = H5Oget_info_by_name2(fid, MISC18_DSET2_NAME, &old_oinfo, H5O_INFO_HDR | H5O_INFO_NUM_ATTRS, H5P_DEFAULT);
         CHECK(ret, FAIL, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nmesgs, 24, "H5Oget_info_by_name");
         VERIFY(old_oinfo.hdr.nchunks, 9, "H5Oget_info_by_name");
@@ -3272,26 +3243,25 @@ test_misc18(void)
 **  test_misc19(): Test incrementing & decrementing ref count on IDs
 **
 ****************************************************************/
-static void
-test_misc19(void)
+static void test_misc19(void)
 {
-    hid_t         fid     = H5I_INVALID_HID; /* File ID                  */
-    hid_t         sid     = H5I_INVALID_HID; /* Dataspace ID             */
-    hid_t         did     = H5I_INVALID_HID; /* Dataset ID               */
-    hid_t         tid     = H5I_INVALID_HID; /* Datatype ID              */
-    hid_t         aid     = H5I_INVALID_HID; /* Attribute ID             */
-    hid_t         plid    = H5I_INVALID_HID; /* Property List ID         */
-    hid_t         pcid    = H5I_INVALID_HID; /* Property Class ID        */
-    hid_t         gid     = H5I_INVALID_HID; /* Group ID                 */
-    hid_t         ecid    = H5I_INVALID_HID; /* Error Class ID           */
-    hid_t         emid    = H5I_INVALID_HID; /* Error Message ID         */
-    hid_t         esid    = H5I_INVALID_HID; /* Error Stack ID           */
-    hid_t         vfdid   = H5I_INVALID_HID; /* Virtual File Driver ID   */
-    hid_t         volid   = H5I_INVALID_HID; /* Virtual Object Layer ID  */
-    H5FD_class_t *vfd_cls = NULL;            /* VFD class                */
-    H5VL_class_t *vol_cls = NULL;            /* VOL class                */
-    int           rc;                        /* Reference count          */
-    herr_t        ret;                       /* Generic return value     */
+    hid_t fid = H5I_INVALID_HID;   /* File ID                  */
+    hid_t sid = H5I_INVALID_HID;   /* Dataspace ID             */
+    hid_t did = H5I_INVALID_HID;   /* Dataset ID               */
+    hid_t tid = H5I_INVALID_HID;   /* Datatype ID              */
+    hid_t aid = H5I_INVALID_HID;   /* Attribute ID             */
+    hid_t plid = H5I_INVALID_HID;  /* Property List ID         */
+    hid_t pcid = H5I_INVALID_HID;  /* Property Class ID        */
+    hid_t gid = H5I_INVALID_HID;   /* Group ID                 */
+    hid_t ecid = H5I_INVALID_HID;  /* Error Class ID           */
+    hid_t emid = H5I_INVALID_HID;  /* Error Message ID         */
+    hid_t esid = H5I_INVALID_HID;  /* Error Stack ID           */
+    hid_t vfdid = H5I_INVALID_HID; /* Virtual File Driver ID   */
+    hid_t volid = H5I_INVALID_HID; /* Virtual Object Layer ID  */
+    H5FD_class_t* vfd_cls = NULL;  /* VFD class                */
+    H5VL_class_t* vol_cls = NULL;  /* VOL class                */
+    int rc;                        /* Reference count          */
+    herr_t ret;                    /* Generic return value     */
 
     /* Check H5I operations on files */
 
@@ -3811,22 +3781,21 @@ test_misc19(void)
 **                      message truncating dimensions
 **
 ****************************************************************/
-static void
-test_misc20(void)
+static void test_misc20(void)
 {
-    hid_t    fid;                                               /* File ID */
-    hid_t    sid;                                               /* 'Space ID */
-    hid_t    did;                                               /* Dataset ID */
-    hid_t    dcpl;                                              /* Dataset creation property list ID */
-    int      rank                          = MISC20_SPACE_RANK; /* Rank of dataspace */
-    hsize_t  big_dims[MISC20_SPACE_RANK]   = {MISC20_SPACE_DIM0, MISC20_SPACE_DIM1};   /* Large dimensions */
-    hsize_t  small_dims[MISC20_SPACE_RANK] = {MISC20_SPACE2_DIM0, MISC20_SPACE2_DIM1}; /* Small dimensions */
-    unsigned version;     /* Version of storage layout info */
-    hsize_t  contig_size; /* Size of contiguous storage size from layout into */
-    const char *testfile = H5_get_srcdir_filename(MISC20_FILE_OLD); /* Corrected test file name */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    herr_t      ret; /* Generic return value */
+    hid_t fid;                                                                          /* File ID */
+    hid_t sid;                                                                          /* 'Space ID */
+    hid_t did;                                                                          /* Dataset ID */
+    hid_t dcpl;                                                                         /* Dataset creation property list ID */
+    int rank = MISC20_SPACE_RANK;                                                       /* Rank of dataspace */
+    hsize_t big_dims[MISC20_SPACE_RANK] = { MISC20_SPACE_DIM0, MISC20_SPACE_DIM1 };     /* Large dimensions */
+    hsize_t small_dims[MISC20_SPACE_RANK] = { MISC20_SPACE2_DIM0, MISC20_SPACE2_DIM1 }; /* Small dimensions */
+    unsigned version;                                                                   /* Version of storage layout info */
+    hsize_t contig_size;                                                                /* Size of contiguous storage size from layout into */
+    const char* testfile = H5_get_srcdir_filename(MISC20_FILE_OLD);                     /* Corrected test file name */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing large dimension truncation fix\n"));
@@ -3843,8 +3812,7 @@ test_misc20(void)
         return;
     }
     /* Check if VFD used is native file format compatible */
-    CHECK(h5_driver_is_default_vfd_compatible(H5P_DEFAULT, &driver_is_default_compatible), FAIL,
-          "h5_driver_is_default_vfd_compatible");
+    CHECK(h5_driver_is_default_vfd_compatible(H5P_DEFAULT, &driver_is_default_compatible), FAIL, "h5_driver_is_default_vfd_compatible");
     if (!driver_is_default_compatible) {
         CHECK(H5Fclose(fid), FAIL, "H5Fclose");
         MESSAGE(5, (" -- SKIPPED --\n"));
@@ -3919,8 +3887,7 @@ test_misc20(void)
     /* Get the layout contiguous storage size */
     ret = H5D__layout_contig_size_test(did, &contig_size);
     CHECK(ret, FAIL, "H5D__layout_contig_size_test");
-    VERIFY(contig_size, (MISC20_SPACE_DIM0 * MISC20_SPACE_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5D__layout_contig_size_test");
+    VERIFY(contig_size, (MISC20_SPACE_DIM0 * MISC20_SPACE_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5D__layout_contig_size_test");
 
     /* Close datasset */
     ret = H5Dclose(did);
@@ -3938,8 +3905,7 @@ test_misc20(void)
     /* Get the layout contiguous storage size */
     ret = H5D__layout_contig_size_test(did, &contig_size);
     CHECK(ret, FAIL, "H5D__layout_contig_size_test");
-    VERIFY(contig_size, (MISC20_SPACE2_DIM0 * MISC20_SPACE2_DIM1 * H5Tget_size(H5T_NATIVE_INT)),
-           "H5D__layout_contig_size_test");
+    VERIFY(contig_size, (MISC20_SPACE2_DIM0 * MISC20_SPACE2_DIM1 * H5Tget_size(H5T_NATIVE_INT)), "H5D__layout_contig_size_test");
 
     /* Close datasset */
     ret = H5Dclose(did);
@@ -3969,8 +3935,7 @@ test_misc20(void)
     /* Get the layout contiguous storage size */
     ret = H5D__layout_contig_size_test(did, &contig_size);
     CHECK(ret, FAIL, "H5D__layout_contig_size_test");
-    VERIFY(contig_size, (MISC20_SPACE_DIM0 * MISC20_SPACE_DIM1 * H5Tget_size(H5T_STD_I32LE)),
-           "H5D__layout_contig_size_test");
+    VERIFY(contig_size, (MISC20_SPACE_DIM0 * MISC20_SPACE_DIM1 * H5Tget_size(H5T_STD_I32LE)), "H5D__layout_contig_size_test");
 
     /* Close datasset */
     ret = H5Dclose(did);
@@ -3997,22 +3962,21 @@ test_misc20(void)
 **                      don't exactly match the dataspace.
 **
 ****************************************************************/
-static void
-test_misc21(void)
+static void test_misc21(void)
 {
-    hid_t   fid, sid, dcpl, dsid;
-    char   *buf;
-    hsize_t dims[2]       = {MISC21_SPACE_DIM0, MISC21_SPACE_DIM1},
-            chunk_size[2] = {MISC21_CHUNK_DIM0, MISC21_CHUNK_DIM1};
+    hid_t fid, sid, dcpl, dsid;
+    char* buf;
+    hsize_t dims[2] = { MISC21_SPACE_DIM0, MISC21_SPACE_DIM1 }, chunk_size[2] = { MISC21_CHUNK_DIM0, MISC21_CHUNK_DIM1 };
     herr_t ret; /* Generic return value */
 
-    if (h5_szip_can_encode() != 1)
+    if (h5_szip_can_encode() != 1) {
         return;
+    }
     /* Output message about test being performed */
     MESSAGE(5, ("Testing late allocation time w/chunks & filters\n"));
 
     /* Allocate space for the buffer */
-    buf = (char *)calloc(MISC21_SPACE_DIM0 * MISC21_SPACE_DIM1, 1);
+    buf = (char*)calloc(MISC21_SPACE_DIM0 * MISC21_SPACE_DIM1, 1);
     CHECK_PTR(buf, "calloc");
 
     /* Create the file */
@@ -4063,32 +4027,31 @@ test_misc21(void)
 **                      Tests for precision and offset combo's.
 **
 ****************************************************************/
-static void
-test_misc22(void)
+static void test_misc22(void)
 {
-    hid_t   fapl; /* File access property list */
-    hid_t   fid, sid, dcpl, dsid, dcpl2;
-    char   *buf;
-    hsize_t dims[2]       = {MISC22_SPACE_DIM0, MISC22_SPACE_DIM1},
-            chunk_size[2] = {MISC22_CHUNK_DIM0, MISC22_CHUNK_DIM1};
+    hid_t fapl; /* File access property list */
+    hid_t fid, sid, dcpl, dsid, dcpl2;
+    char* buf;
+    hsize_t dims[2] = { MISC22_SPACE_DIM0, MISC22_SPACE_DIM1 }, chunk_size[2] = { MISC22_CHUNK_DIM0, MISC22_CHUNK_DIM1 };
     herr_t ret; /* Generic return value */
-    hid_t  dtype;
+    hid_t dtype;
     /* should extend test to signed ints */
     hid_t idts[4];
     /*  do the same for floats
         hid_t fdts[2]={H5T_NATIVE_FLOAT32,
                   H5T_NATIVE_FLOAT64}
     */
-    size_t       prec[4]    = {3, 11, 19, 27};
-    size_t       offsets[5] = {0, 3, 11, 19, 27};
-    int          i, j, k;
+    size_t prec[4] = { 3, 11, 19, 27 };
+    size_t offsets[5] = { 0, 3, 11, 19, 27 };
+    int i, j, k;
     unsigned int flags;
-    size_t       cd_nelmts = 32;
+    size_t cd_nelmts = 32;
     unsigned int cd_values[32];
-    size_t       correct;
+    size_t correct;
 
-    if (h5_szip_can_encode() != 1)
+    if (h5_szip_can_encode() != 1) {
         return;
+    }
     idts[0] = H5Tcopy(H5T_NATIVE_UINT8);
     idts[1] = H5Tcopy(H5T_NATIVE_UINT16);
     idts[2] = H5Tcopy(H5T_NATIVE_UINT32);
@@ -4098,7 +4061,7 @@ test_misc22(void)
     MESSAGE(5, ("Testing datatypes with SZIP filter\n"));
 
     /* Allocate space for the buffer */
-    buf = (char *)calloc(MISC22_SPACE_DIM0 * MISC22_SPACE_DIM1, 8);
+    buf = (char*)calloc(MISC22_SPACE_DIM0 * MISC22_SPACE_DIM1, 8);
     CHECK_PTR(buf, "calloc");
 
     /* Create a file access property list */
@@ -4123,16 +4086,18 @@ test_misc22(void)
 
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
-            if (prec[j] > (H5Tget_size(idts[i]) * 8))
+            if (prec[j] > (H5Tget_size(idts[i]) * 8)) {
                 continue; /* skip irrelevant combination */
+            }
             for (k = 0; k < 5; k++) {
-                if (offsets[k] > (H5Tget_size(idts[i]) * 8))
+                if (offsets[k] > (H5Tget_size(idts[i]) * 8)) {
                     continue; /* skip irrelevant combinations */
-                if ((prec[j] + offsets[k]) > (H5Tget_size(idts[i]) * 8))
+                }
+                if ((prec[j] + offsets[k]) > (H5Tget_size(idts[i]) * 8)) {
                     continue;
+                }
 
-                MESSAGE(5, ("  Testing datatypes size=%zu precision=%u offset=%d\n", H5Tget_size(idts[i]),
-                            (unsigned)prec[j], (unsigned)offsets[k]));
+                MESSAGE(5, ("  Testing datatypes size=%zu precision=%u offset=%d\n", H5Tget_size(idts[i]), (unsigned)prec[j], (unsigned)offsets[k]));
 
                 /* Create the DCPL */
                 dcpl = H5Pcreate(H5P_DATASET_CREATE);
@@ -4154,15 +4119,19 @@ test_misc22(void)
                 CHECK(ret, FAIL, "H5Tset_precision");
 
                 /* compute the correct PPB that should be set by SZIP */
-                if (offsets[k] == 0)
+                if (offsets[k] == 0) {
                     correct = prec[j];
-                else
+                }
+                else {
                     correct = H5Tget_size(idts[i]) * 8;
+                }
                 if (correct > 24) {
-                    if (correct <= 32)
+                    if (correct <= 32) {
                         correct = 32;
-                    else if (correct <= 64)
+                    }
+                    else if (correct <= 64) {
                         correct = 64;
+                    }
                 } /* end if */
 
                 /* Create the dataset */
@@ -4187,8 +4156,7 @@ test_misc22(void)
                 dcpl2 = H5Dget_create_plist(dsid);
                 CHECK(dcpl2, FAIL, "H5Dget_create_plist");
 
-                ret = H5Pget_filter_by_id2(dcpl2, H5Z_FILTER_SZIP, &flags, &cd_nelmts, cd_values, 0, NULL,
-                                           NULL);
+                ret = H5Pget_filter_by_id2(dcpl2, H5Z_FILTER_SZIP, &flags, &cd_nelmts, cd_values, 0, NULL, NULL);
                 CHECK(ret, FAIL, "H5Pget_filter_by_id2");
 
                 VERIFY(cd_values[2], (unsigned)correct, "SZIP filter returned value for precision");
@@ -4226,17 +4194,15 @@ test_misc22(void)
 **  test_misc23(): Test intermediate group creation.
 **
 ****************************************************************/
-static void
-test_misc23(void)
+static void test_misc23(void)
 {
-    hsize_t dims[]  = {10};
-    hid_t   file_id = 0, group_id = 0, type_id = 0, space_id = 0, tmp_id = 0, create_id = H5P_DEFAULT,
-          access_id = H5P_DEFAULT;
-    char        objname[MISC23_NAME_BUF_SIZE]; /* Name of object */
+    hsize_t dims[] = { 10 };
+    hid_t file_id = 0, group_id = 0, type_id = 0, space_id = 0, tmp_id = 0, create_id = H5P_DEFAULT, access_id = H5P_DEFAULT;
+    char objname[MISC23_NAME_BUF_SIZE]; /* Name of object */
     H5O_info2_t oinfo;
-    htri_t      tri_status;
-    ssize_t     namelen;
-    herr_t      status;
+    htri_t tri_status;
+    ssize_t namelen;
+    herr_t status;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing intermediate group creation\n"));
@@ -4540,8 +4506,7 @@ test_misc23(void)
      **********************************************************************/
 
     if (vol_cap_flags_g & H5VL_CAP_FLAG_EXTERNAL_LINKS) {
-        status =
-            H5Lcreate_external("fake_filename", "fake_path", file_id, "/A/B20/grp", create_id, access_id);
+        status = H5Lcreate_external("fake_filename", "fake_path", file_id, "/A/B20/grp", create_id, access_id);
         CHECK(status, FAIL, "H5Lcreate_external");
 
         tri_status = H5Lexists(file_id, "/A/B20/grp", access_id);
@@ -4553,8 +4518,7 @@ test_misc23(void)
      **********************************************************************/
 
     if (vol_cap_flags_g & H5VL_CAP_FLAG_UD_LINKS) {
-        status = H5Lcreate_ud(file_id, "/A/B21/grp", H5L_TYPE_EXTERNAL, "file\0obj", (size_t)9, create_id,
-                              access_id);
+        status = H5Lcreate_ud(file_id, "/A/B21/grp", H5L_TYPE_EXTERNAL, "file\0obj", (size_t)9, create_id, access_id);
         CHECK(status, FAIL, "H5Lcreate_ud");
 
         tri_status = H5Lexists(file_id, "/A/B21/grp", access_id);
@@ -4581,10 +4545,9 @@ test_misc23(void)
 **  test_misc24(): Test opening objects with inappropriate APIs
 **
 ****************************************************************/
-static void
-test_misc24(void)
+static void test_misc24(void)
 {
-    hid_t  file_id = 0, group_id = 0, type_id = 0, space_id = 0, dset_id = 0, tmp_id = 0;
+    hid_t file_id = 0, group_id = 0, type_id = 0, space_id = 0, dset_id = 0, tmp_id = 0;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -4602,8 +4565,7 @@ test_misc24(void)
     group_id = H5Gcreate2(file_id, MISC24_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(group_id, FAIL, "H5Gcreate2");
 
-    dset_id = H5Dcreate2(file_id, MISC24_DATASET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT,
-                         H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, MISC24_DATASET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dset_id, FAIL, "H5Dcreate2");
 
     type_id = H5Tcopy(H5T_NATIVE_INT);
@@ -4837,15 +4799,14 @@ test_misc24(void)
 **                      with new file
 **
 ****************************************************************/
-static void
-test_misc25a(void)
+static void test_misc25a(void)
 {
-    hid_t  fid;             /* File ID */
-    hid_t  gid, gid2, gid3; /* Group IDs */
-    hid_t  aid;             /* Attribute ID */
-    hid_t  sid;             /* Dataspace ID */
-    hid_t  tid;             /* Datatype ID */
-    herr_t ret;             /* Generic return value */
+    hid_t fid;             /* File ID */
+    hid_t gid, gid2, gid3; /* Group IDs */
+    hid_t aid;             /* Attribute ID */
+    hid_t sid;             /* Dataspace ID */
+    hid_t tid;             /* Datatype ID */
+    herr_t ret;            /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Exercise null object header message bug\n"));
@@ -5136,15 +5097,14 @@ test_misc25a(void)
 **                      the file produced by test/gen_mergemsg.c)
 **
 ****************************************************************/
-static void
-test_misc25b(void)
+static void test_misc25b(void)
 {
-    hid_t       fid;                                             /* File ID */
-    hid_t       gid;                                             /* Group ID */
-    const char *testfile = H5_get_srcdir_filename(MISC25B_FILE); /* Corrected test file name */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    herr_t      ret; /* Generic return value */
+    hid_t fid;                                                   /* File ID */
+    hid_t gid;                                                   /* Group ID */
+    const char* testfile = H5_get_srcdir_filename(MISC25B_FILE); /* Corrected test file name */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Exercise null object header message bug\n"));
@@ -5186,18 +5146,17 @@ test_misc25b(void)
 **  test_misc25c(): Exercise another null object header message merge bug.
 **
 ****************************************************************/
-static void
-test_misc25c(void)
+static void test_misc25c(void)
 {
-    hid_t  fid;  /* File ID */
-    hid_t  fapl; /* File access property list ID */
-    hid_t  gcpl; /* Group creation property list ID */
-    hid_t  sid;  /* Dataspace ID */
-    hid_t  did;  /* Dataset ID */
-    hid_t  gid;  /* Group ID */
-    hid_t  gid2; /* Group ID */
-    hid_t  aid;  /* Attribute ID */
-    herr_t ret;  /* Generic return value */
+    hid_t fid;  /* File ID */
+    hid_t fapl; /* File access property list ID */
+    hid_t gcpl; /* Group creation property list ID */
+    hid_t sid;  /* Dataspace ID */
+    hid_t did;  /* Dataset ID */
+    hid_t gid;  /* Group ID */
+    hid_t gid2; /* Group ID */
+    hid_t aid;  /* Attribute ID */
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Exercise another null object header message bug\n"));
@@ -5319,15 +5278,14 @@ test_misc25c(void)
 **                      pipelines works properly.
 **
 ****************************************************************/
-static void
-test_misc26(void)
+static void test_misc26(void)
 {
-    hid_t   fid;                 /* File ID */
-    hid_t   sid;                 /* Dataspace ID */
-    hid_t   did;                 /* Dataset ID */
-    hid_t   dcpl1, dcpl2, dcpl3; /* Property List IDs */
-    hsize_t dims[] = {1};
-    herr_t  ret; /* Generic return value */
+    hid_t fid;                 /* File ID */
+    hid_t sid;                 /* Dataspace ID */
+    hid_t did;                 /* Dataset ID */
+    hid_t dcpl1, dcpl2, dcpl3; /* Property List IDs */
+    hsize_t dims[] = { 1 };
+    herr_t ret;                /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Copying filter pipelines\n"));
@@ -5405,15 +5363,14 @@ test_misc26(void)
 ** (Note that this test file is generated by the "gen_bad_ohdr.c" code)
 **
 ****************************************************************/
-static void
-test_misc27(void)
+static void test_misc27(void)
 {
-    hid_t       fid;                                            /* File ID */
-    hid_t       gid;                                            /* Group ID */
-    const char *testfile = H5_get_srcdir_filename(MISC27_FILE); /* Corrected test file name */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    herr_t      ret; /* Generic return value */
+    hid_t fid;                                                  /* File ID */
+    hid_t gid;                                                  /* Group ID */
+    const char* testfile = H5_get_srcdir_filename(MISC27_FILE); /* Corrected test file name */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Corrupt object header handling\n"));
@@ -5467,25 +5424,24 @@ test_misc27(void)
 **                 evicting them.
 **
 ****************************************************************/
-static void
-test_misc28(void)
+static void test_misc28(void)
 {
-    hid_t   fid;        /* File ID */
-    hid_t   sidf;       /* File Dataspace ID */
-    hid_t   sidm;       /* Memory Dataspace ID */
-    hid_t   did;        /* Dataset ID */
-    hid_t   dcpl, fapl; /* Property List IDs */
-    hsize_t dims[]  = {MISC28_SIZE, MISC28_SIZE};
-    hsize_t mdims[] = {MISC28_SIZE};
-    hsize_t cdims[] = {1, 1};
-    hsize_t start[] = {0, 0};
-    hsize_t count[] = {MISC28_SIZE, 1};
-    size_t  nbytes_used;
-    int     nused;
-    char    buf[MISC28_SIZE];
-    int     i;
-    bool    vol_is_native;
-    herr_t  ret; /* Generic return value */
+    hid_t fid;        /* File ID */
+    hid_t sidf;       /* File Dataspace ID */
+    hid_t sidm;       /* Memory Dataspace ID */
+    hid_t did;        /* Dataset ID */
+    hid_t dcpl, fapl; /* Property List IDs */
+    hsize_t dims[] = { MISC28_SIZE, MISC28_SIZE };
+    hsize_t mdims[] = { MISC28_SIZE };
+    hsize_t cdims[] = { 1, 1 };
+    hsize_t start[] = { 0, 0 };
+    hsize_t count[] = { MISC28_SIZE, 1 };
+    size_t nbytes_used;
+    int nused;
+    char buf[MISC28_SIZE];
+    int i;
+    bool vol_is_native;
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Dataset chunk cache\n"));
@@ -5529,8 +5485,9 @@ test_misc28(void)
     }
 
     /* Initialize write buffer */
-    for (i = 0; i < MISC28_SIZE; i++)
+    for (i = 0; i < MISC28_SIZE; i++) {
         buf[i] = (char)i;
+    }
 
     /* Create memory dataspace and selection in file dataspace */
     sidm = H5Screate_simple(1, mdims, NULL);
@@ -5552,12 +5509,13 @@ test_misc28(void)
     }
 
     /* Initialize write buffer */
-    for (i = 0; i < MISC28_SIZE; i++)
+    for (i = 0; i < MISC28_SIZE; i++) {
         buf[i] = (char)(MISC28_SIZE - 1 - i);
+    }
 
     /* Select new hyperslab */
     start[1] = 1;
-    ret      = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
+    ret = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
     CHECK(ret, FAIL, "H5Sselect_hyperslab");
 
     /* Write hyperslab */
@@ -5590,7 +5548,7 @@ test_misc28(void)
 
     /* Select hyperslabe for reading */
     start[1] = 0;
-    ret      = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
+    ret = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
     CHECK(ret, FAIL, "H5Sselect_hyperslab");
 
     /* Read hypserslab */
@@ -5598,8 +5556,9 @@ test_misc28(void)
     CHECK(ret, FAIL, "H5Dread");
 
     /* Verify the data read */
-    for (i = 0; i < MISC28_SIZE; i++)
+    for (i = 0; i < MISC28_SIZE; i++) {
         VERIFY(buf[i], i, "H5Dread");
+    }
 
     if (vol_is_native) {
         /* Verify that all 10 chunks read have been cached */
@@ -5611,7 +5570,7 @@ test_misc28(void)
 
     /* Select new hyperslab */
     start[1] = 1;
-    ret      = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
+    ret = H5Sselect_hyperslab(sidf, H5S_SELECT_SET, start, NULL, count, NULL);
     CHECK(ret, FAIL, "H5Sselect_hyperslab");
 
     /* Read hyperslab */
@@ -5619,8 +5578,9 @@ test_misc28(void)
     CHECK(ret, FAIL, "H5Dread");
 
     /* Verify the data read */
-    for (i = 0; i < MISC28_SIZE; i++)
+    for (i = 0; i < MISC28_SIZE; i++) {
         VERIFY(buf[i], MISC28_SIZE - 1 - i, "H5Dread");
+    }
 
     if (vol_is_native) {
         /* Verify that the size of the cache remains at 10 */
@@ -5655,12 +5615,11 @@ test_misc28(void)
 **                 get raw data into the metadata accumulator.
 **
 ****************************************************************/
-static void
-test_misc29(void)
+static void test_misc29(void)
 {
-    bool   vol_is_native;
-    bool   driver_is_default_compatible;
-    hid_t  fid; /* File ID */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    hid_t fid;  /* File ID */
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -5698,17 +5657,14 @@ test_misc29(void)
     CHECK(ret, FAIL, "H5Fclose");
 } /* end test_misc29() */
 
-static int
-test_misc30_get_info_cb(hid_t loc_id, const char *name, const H5L_info2_t H5_ATTR_UNUSED *info,
-                        void H5_ATTR_UNUSED *op_data)
+static int test_misc30_get_info_cb(hid_t loc_id, const char* name, const H5L_info2_t H5_ATTR_UNUSED* info, void H5_ATTR_UNUSED* op_data)
 {
     H5O_info2_t object_info;
 
     return H5Oget_info_by_name3(loc_id, name, &object_info, H5O_INFO_BASIC, H5P_DEFAULT);
 }
 
-static int
-test_misc30_get_info(hid_t loc_id)
+static int test_misc30_get_info(hid_t loc_id)
 {
     return H5Literate2(loc_id, H5_INDEX_NAME, H5_ITER_INC, NULL, test_misc30_get_info_cb, NULL);
 }
@@ -5720,12 +5676,11 @@ test_misc30_get_info(hid_t loc_id)
 **                 block information to get lost.
 **
 ****************************************************************/
-static void
-test_misc30(void)
+static void test_misc30(void)
 {
-    hsize_t  file_size[] = {0, 0}; /* Sizes of file created */
-    unsigned get_info;             /* Whether to perform the get info call */
-    bool     vol_is_native;
+    hsize_t file_size[] = { 0, 0 }; /* Sizes of file created */
+    unsigned get_info;              /* Whether to perform the get info call */
+    bool vol_is_native;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Local heap dropping free block info\n"));
@@ -5738,9 +5693,9 @@ test_misc30(void)
     }
 
     for (get_info = false; get_info <= true; get_info++) {
-        hid_t  fid; /* File ID */
-        hid_t  gid; /* Group ID */
-        int    i;   /* Local index counter */
+        hid_t fid;  /* File ID */
+        hid_t gid;  /* Group ID */
+        int i;      /* Local index counter */
         herr_t ret; /* Generic return value */
 
         fid = H5Fcreate(MISC30_FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -5792,19 +5747,18 @@ test_misc30(void)
 *                  H5close().
 **
 ****************************************************************/
-static void
-test_misc31(void)
+static void test_misc31(void)
 {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-    hid_t  file_id;  /* File id */
-    hid_t  space_id; /* Dataspace id */
-    hid_t  dset_id;  /* Dataset id */
-    hid_t  attr_id;  /* Attribute id */
-    hid_t  group_id; /* Group id */
-    hid_t  dtype_id; /* Datatype id */
-    bool   vol_is_native;
-    herr_t ret; /* Generic return value */
-#endif          /* H5_NO_DEPRECATED_SYMBOLS */
+    hid_t file_id;  /* File id */
+    hid_t space_id; /* Dataspace id */
+    hid_t dset_id;  /* Dataset id */
+    hid_t attr_id;  /* Attribute id */
+    hid_t group_id; /* Group id */
+    hid_t dtype_id; /* Datatype id */
+    bool vol_is_native;
+    herr_t ret;     /* Generic return value */
+#endif /* H5_NO_DEPRECATED_SYMBOLS */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Deprecated routines initialize after H5close()\n"));
@@ -5899,11 +5853,10 @@ test_misc31(void)
  *                 functions.
  *
  ***************************************************************/
-static void
-test_misc32(void)
+static void test_misc32(void)
 {
-    void  *buffer;
-    void  *resized;
+    void* buffer;
+    void* resized;
     size_t size;
 
     /* Output message about test being performed */
@@ -5936,13 +5889,13 @@ test_misc32(void)
     CHECK_PTR_NULL(buffer, "H5allocate_memory"); /*BAD*/
     buffer = H5allocate_memory(0, true);
     CHECK_PTR_NULL(buffer, "H5allocate_memory"); /*BAD*/
-#endif                                           /* NDEBUG */
+#endif /* NDEBUG */
 
     /* RESIZE */
 
     /* Size zero returns NULL. Valgrind will confirm buffer is freed. */
-    size    = 1024;
-    buffer  = H5allocate_memory(size, true);
+    size = 1024;
+    buffer = H5allocate_memory(size, true);
     resized = H5resize_memory(buffer, 0);
     CHECK_PTR_NULL(resized, "H5resize_memory");
 
@@ -5955,7 +5908,7 @@ test_misc32(void)
 #ifdef NDEBUG
     resized = H5resize_memory(NULL, 0);
     CHECK_PTR_NULL(resized, "H5resize_memory"); /*BAD*/
-#endif                                          /* NDEBUG */
+#endif /* NDEBUG */
 
 } /* end test_misc32() */
 
@@ -5969,15 +5922,14 @@ test_misc32(void)
 **        the heap.  (See description in gen_bad_offset.c)
 **
 ****************************************************************/
-static void
-test_misc33(void)
+static void test_misc33(void)
 {
-    hid_t       fid      = H5I_INVALID_HID;                     /* File ID */
-    const char *testfile = H5_get_srcdir_filename(MISC33_FILE); /* Corrected test file name */
-    H5O_info2_t oinfo; /* Structure for object metadata information */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    herr_t      ret; /* Generic return value */
+    hid_t fid = H5I_INVALID_HID;                                /* File ID */
+    const char* testfile = H5_get_srcdir_filename(MISC33_FILE); /* Corrected test file name */
+    H5O_info2_t oinfo;                                          /* Structure for object metadata information */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing that bad offset into the heap returns error"));
@@ -6036,12 +5988,11 @@ test_misc33(void)
 **  test_misc34(): Ensure zero-size memory allocations work
 **
 ****************************************************************/
-static void
-test_misc34(void)
+static void test_misc34(void)
 {
-    void  *mem = NULL; /* allocated buffer     */
-    char  *dup = NULL; /* 'duplicated' string  */
-    size_t sz  = 0;    /* buffer size          */
+    void* mem = NULL; /* allocated buffer     */
+    char* dup = NULL; /* 'duplicated' string  */
+    size_t sz = 0;    /* buffer size          */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing O and NULL behavior in H5MM API calls"));
@@ -6058,12 +6009,12 @@ test_misc34(void)
      */
     mem = H5MM_xfree(mem);
 
-    sz  = 1024;
+    sz = 1024;
     mem = H5MM_realloc(mem, sz);
     CHECK_PTR(mem, "H5MM_realloc (case 1)");
     /* Don't free mem here! */
 
-    sz  = 0;
+    sz = 0;
     mem = H5MM_realloc(mem, sz);
     CHECK_PTR_NULL(mem, "H5MM_realloc (case 2)");
     mem = H5MM_xfree(mem);
@@ -6073,9 +6024,9 @@ test_misc34(void)
     mem = H5MM_xfree(mem);
 
     /* H5MM_xstrdup(): Ensure NULL returns NULL */
-    dup = H5MM_xstrdup((const char *)mem);
+    dup = H5MM_xstrdup((const char*)mem);
     CHECK_PTR_NULL(dup, "H5MM_xstrdup");
-    dup = (char *)H5MM_xfree((void *)dup);
+    dup = (char*)H5MM_xfree((void*)dup);
 
 } /* end test_misc34() */
 
@@ -6084,23 +6035,21 @@ test_misc34(void)
 **  test_misc35(): Check operation of free-list routines
 **
 ****************************************************************/
-static void
-test_misc35(void)
+static void test_misc35(void)
 {
-    hid_t   sid    = H5I_INVALID_HID;                                           /* Dataspace ID */
-    hsize_t dims[] = {MISC35_SPACE_DIM1, MISC35_SPACE_DIM2, MISC35_SPACE_DIM3}; /* Dataspace dims */
-    hsize_t coord[MISC35_NPOINTS][MISC35_SPACE_RANK] = /* Coordinates for point selection */
-        {{0, 10, 5}, {1, 2, 7},  {2, 4, 9}, {0, 6, 11}, {1, 8, 13},
-         {2, 12, 0}, {0, 14, 2}, {1, 0, 4}, {2, 1, 6},  {0, 3, 8}};
-    size_t reg_size_start; /* Initial amount of regular memory allocated */
-    size_t arr_size_start; /* Initial amount of array memory allocated */
-    size_t blk_size_start; /* Initial amount of block memory allocated */
-    size_t fac_size_start; /* Initial amount of factory memory allocated */
-    size_t reg_size_final; /* Final amount of regular memory allocated */
-    size_t arr_size_final; /* Final amount of array memory allocated */
-    size_t blk_size_final; /* Final amount of block memory allocated */
-    size_t fac_size_final; /* Final amount of factory memory allocated */
-    herr_t ret;            /* Return value */
+    hid_t sid = H5I_INVALID_HID;                                                  /* Dataspace ID */
+    hsize_t dims[] = { MISC35_SPACE_DIM1, MISC35_SPACE_DIM2, MISC35_SPACE_DIM3 }; /* Dataspace dims */
+    hsize_t coord[MISC35_NPOINTS][MISC35_SPACE_RANK] =                            /* Coordinates for point selection */
+        { { 0, 10, 5 }, { 1, 2, 7 }, { 2, 4, 9 }, { 0, 6, 11 }, { 1, 8, 13 }, { 2, 12, 0 }, { 0, 14, 2 }, { 1, 0, 4 }, { 2, 1, 6 }, { 0, 3, 8 } };
+    size_t reg_size_start;                                                        /* Initial amount of regular memory allocated */
+    size_t arr_size_start;                                                        /* Initial amount of array memory allocated */
+    size_t blk_size_start;                                                        /* Initial amount of block memory allocated */
+    size_t fac_size_start;                                                        /* Initial amount of factory memory allocated */
+    size_t reg_size_final;                                                        /* Final amount of regular memory allocated */
+    size_t arr_size_final;                                                        /* Final amount of array memory allocated */
+    size_t blk_size_final;                                                        /* Final amount of block memory allocated */
+    size_t fac_size_final;                                                        /* Final amount of factory memory allocated */
+    herr_t ret;                                                                   /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Free-list API calls"));
@@ -6111,7 +6060,7 @@ test_misc35(void)
     CHECK(sid, H5I_INVALID_HID, "H5Screate_simple");
 
     /* Select sequence of ten points */
-    ret = H5Sselect_elements(sid, H5S_SELECT_SET, (size_t)MISC35_NPOINTS, (const hsize_t *)coord);
+    ret = H5Sselect_elements(sid, H5S_SELECT_SET, (size_t)MISC35_NPOINTS, (const hsize_t*)coord);
     CHECK(ret, FAIL, "H5Sselect_elements");
 
     /* Close dataspace */
@@ -6145,14 +6094,18 @@ test_misc35(void)
     CHECK(ret, FAIL, "H5get_free_list_sizes");
 
     /* All the free list values should be <= previous values */
-    if (reg_size_final > reg_size_start)
+    if (reg_size_final > reg_size_start) {
         ERROR("reg_size_final > reg_size_start");
-    if (arr_size_final > arr_size_start)
+    }
+    if (arr_size_final > arr_size_start) {
         ERROR("arr_size_final > arr_size_start");
-    if (blk_size_final > blk_size_start)
+    }
+    if (blk_size_final > blk_size_start) {
         ERROR("blk_size_final > blk_size_start");
-    if (fac_size_final > fac_size_start)
+    }
+    if (fac_size_final > fac_size_start) {
         ERROR("fac_size_final > fac_size_start");
+    }
 
 } /* end test_misc35() */
 
@@ -6160,16 +6113,15 @@ test_misc35(void)
 static int test_misc36_context;
 
 /* 'atclose' callbacks for test_misc36 */
-static void
-test_misc36_cb1(void *_ctx)
+static void test_misc36_cb1(void* _ctx)
 {
-    int   *ctx = (int *)_ctx; /* Set up context pointer */
-    bool   is_terminating;    /* Flag indicating the library is terminating */
-    herr_t ret;               /* Return value */
+    int* ctx = (int*)_ctx; /* Set up context pointer */
+    bool is_terminating;   /* Flag indicating the library is terminating */
+    herr_t ret;            /* Return value */
 
     /* Check whether the library thinks it's terminating */
     is_terminating = false;
-    ret            = H5is_library_terminating(&is_terminating);
+    ret = H5is_library_terminating(&is_terminating);
     CHECK(ret, FAIL, "H5is_library_terminating");
     VERIFY(is_terminating, true, "H5is_library_terminating");
 
@@ -6180,16 +6132,15 @@ test_misc36_cb1(void *_ctx)
     *ctx = 1;
 }
 
-static void
-test_misc36_cb2(void *_ctx)
+static void test_misc36_cb2(void* _ctx)
 {
-    int   *ctx = (int *)_ctx; /* Set up context pointer */
-    bool   is_terminating;    /* Flag indicating the library is terminating */
-    herr_t ret;               /* Return value */
+    int* ctx = (int*)_ctx; /* Set up context pointer */
+    bool is_terminating;   /* Flag indicating the library is terminating */
+    herr_t ret;            /* Return value */
 
     /* Check whether the library thinks it's terminating */
     is_terminating = false;
-    ret            = H5is_library_terminating(&is_terminating);
+    ret = H5is_library_terminating(&is_terminating);
     CHECK(ret, FAIL, "H5is_library_terminating");
     VERIFY(is_terminating, true, "H5is_library_terminating");
 
@@ -6205,18 +6156,17 @@ test_misc36_cb2(void *_ctx)
 **  test_misc36(): Exercise H5atclose and H5is_library_terminating
 **
 ****************************************************************/
-static void
-test_misc36(void)
+static void test_misc36(void)
 {
-    bool   is_terminating; /* Flag indicating the library is terminating */
-    herr_t ret;            /* Return value */
+    bool is_terminating; /* Flag indicating the library is terminating */
+    herr_t ret;          /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("H5atclose and H5is_library_terminating API calls"));
 
     /* Check whether the library thinks it's terminating */
     is_terminating = true;
-    ret            = H5is_library_terminating(&is_terminating);
+    ret = H5is_library_terminating(&is_terminating);
     CHECK(ret, FAIL, "H5is_library_terminating");
     VERIFY(is_terminating, false, "H5is_library_terminating");
 
@@ -6226,7 +6176,7 @@ test_misc36(void)
 
     /* Check whether the library thinks it's terminating */
     is_terminating = true;
-    ret            = H5is_library_terminating(&is_terminating);
+    ret = H5is_library_terminating(&is_terminating);
     CHECK(ret, FAIL, "H5is_library_terminating");
     VERIFY(is_terminating, false, "H5is_library_terminating");
 
@@ -6238,7 +6188,7 @@ test_misc36(void)
 
     /* Check whether the library thinks it's terminating */
     is_terminating = true;
-    ret            = H5is_library_terminating(&is_terminating);
+    ret = H5is_library_terminating(&is_terminating);
     CHECK(ret, FAIL, "H5is_library_terminating");
     VERIFY(is_terminating, false, "H5is_library_terminating");
 
@@ -6275,14 +6225,13 @@ test_misc36(void)
 **      See HDFFV-11052/CVE-2020-10812 for details.
 **
 ****************************************************************/
-static void
-test_misc37(void)
+static void test_misc37(void)
 {
-    const char *testfile = H5_get_srcdir_filename(CVE_2020_10812_FILENAME);
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
-    hid_t       fid;
-    herr_t      ret;
+    const char* testfile = H5_get_srcdir_filename(CVE_2020_10812_FILENAME);
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    hid_t fid;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Fix for HDFFV-11052/CVE-2020-10812"));
@@ -6323,22 +6272,21 @@ test_misc37(void)
 **      object header.
 **
 ****************************************************************/
-static void
-test_misc38(void)
+static void test_misc38(void)
 {
-    const char *testfile  = H5_get_srcdir_filename(MISC38A_FILE); /* Corrected test file name */
-    const char *testfile2 = H5_get_srcdir_filename(MISC38B_FILE); /* Corrected test file name */
-    bool        driver_is_default_compatible;
-    hid_t       fapl = H5I_INVALID_HID; /* File access property list */
-    hid_t       fid  = H5I_INVALID_HID; /* File ID */
-    hid_t       did  = H5I_INVALID_HID; /* Dataset ID */
-    hid_t       sid  = H5I_INVALID_HID; /* Dataspace ID */
-    hid_t       tid  = H5I_INVALID_HID; /* Datatype ID */
-    hid_t       gid  = H5I_INVALID_HID; /* Group ID */
-    hid_t       aid  = H5I_INVALID_HID; /* Attribute ID */
-    size_t      type_size;              /* Size of dataset's datatype */
-    uint64_t    rfic_flags;             /* Value of RFIC flags property for FAPL & file */
-    herr_t      ret;
+    const char* testfile = H5_get_srcdir_filename(MISC38A_FILE);  /* Corrected test file name */
+    const char* testfile2 = H5_get_srcdir_filename(MISC38B_FILE); /* Corrected test file name */
+    bool driver_is_default_compatible;
+    hid_t fapl = H5I_INVALID_HID;                                 /* File access property list */
+    hid_t fid = H5I_INVALID_HID;                                  /* File ID */
+    hid_t did = H5I_INVALID_HID;                                  /* Dataset ID */
+    hid_t sid = H5I_INVALID_HID;                                  /* Dataspace ID */
+    hid_t tid = H5I_INVALID_HID;                                  /* Datatype ID */
+    hid_t gid = H5I_INVALID_HID;                                  /* Group ID */
+    hid_t aid = H5I_INVALID_HID;                                  /* Attribute ID */
+    size_t type_size;                                             /* Size of dataset's datatype */
+    uint64_t rfic_flags;                                          /* Value of RFIC flags property for FAPL & file */
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Fix for detecting numeric datatypes with unusually large numbers of unused bits"));
@@ -6375,7 +6323,7 @@ test_misc38(void)
 
     /* Get property to allow unusual datatypes to be opened */
     rfic_flags = H5F_RFIC_ALL;
-    ret        = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
+    ret = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
     CHECK(ret, FAIL, "H5Pget_relax_file_integrity_checks");
     VERIFY(rfic_flags, 0, "H5Pget_relax_file_integrity_checks");
 
@@ -6385,7 +6333,7 @@ test_misc38(void)
 
     /* Get property to allow unusual datatypes to be opened */
     rfic_flags = 0;
-    ret        = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
+    ret = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
     CHECK(ret, FAIL, "H5Pget_relax_file_integrity_checks");
     VERIFY(rfic_flags, H5F_RFIC_UNUSUAL_NUM_UNUSED_NUMERIC_BITS, "H5Pget_relax_file_integrity_checks");
 
@@ -6423,7 +6371,7 @@ test_misc38(void)
 
     /* Get property to allow unusual datatypes to be opened */
     rfic_flags = 0;
-    ret        = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
+    ret = H5Pget_relax_file_integrity_checks(fapl, &rfic_flags);
     CHECK(ret, FAIL, "H5Pget_relax_file_integrity_checks");
     VERIFY(rfic_flags, H5F_RFIC_UNUSUAL_NUM_UNUSED_NUMERIC_BITS, "H5Pget_relax_file_integrity_checks");
 
@@ -6546,35 +6494,37 @@ test_misc38(void)
 **      the library not to reuse type conversion paths
 **
 ****************************************************************/
-static void
-test_misc39(void)
+static void test_misc39(void)
 {
-    H5VL_object_t *file_vol_obj  = NULL;
-    const char    *buf[]         = {"attr_value"};
-    const char    *array_buf[]   = {"attr_value1", "attr_value2"};
-    hsize_t        array_dims[1] = {2};
-    herr_t         ret           = SUCCEED;
-    hid_t          file_id       = H5I_INVALID_HID;
-    hid_t          attr_id1      = H5I_INVALID_HID;
-    hid_t          attr_id2      = H5I_INVALID_HID;
-    hid_t          attr_id3      = H5I_INVALID_HID;
-    hid_t          attr_id4      = H5I_INVALID_HID;
-    hid_t          str_type      = H5I_INVALID_HID;
-    hid_t          array_type    = H5I_INVALID_HID;
-    hid_t          compound_type = H5I_INVALID_HID;
-    hid_t          vlen_type     = H5I_INVALID_HID;
-    hid_t          space_id      = H5I_INVALID_HID;
-    int            init_npaths   = 0;
-    char         **rbuf          = NULL;
-    char         **arr_rbuf      = NULL;
-    bool           vol_is_native;
-    typedef struct struct_type {
-        const char *buf;
+    H5VL_object_t* file_vol_obj = NULL;
+    const char* buf[] = { "attr_value" };
+    const char* array_buf[] = { "attr_value1", "attr_value2" };
+    hsize_t array_dims[1] = { 2 };
+    herr_t ret = SUCCEED;
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t attr_id1 = H5I_INVALID_HID;
+    hid_t attr_id2 = H5I_INVALID_HID;
+    hid_t attr_id3 = H5I_INVALID_HID;
+    hid_t attr_id4 = H5I_INVALID_HID;
+    hid_t str_type = H5I_INVALID_HID;
+    hid_t array_type = H5I_INVALID_HID;
+    hid_t compound_type = H5I_INVALID_HID;
+    hid_t vlen_type = H5I_INVALID_HID;
+    hid_t space_id = H5I_INVALID_HID;
+    int init_npaths = 0;
+    char** rbuf = NULL;
+    char** arr_rbuf = NULL;
+    bool vol_is_native;
+
+    typedef struct struct_type
+    {
+        const char* buf;
     } struct_type;
-    struct_type  cbuf          = {.buf = "attr_value"};
-    struct_type *compound_rbuf = NULL;
-    hvl_t        vlen_buf      = {.len = 2, .p = array_buf};
-    hvl_t       *vlen_rbuf     = NULL;
+
+    struct_type cbuf = { .buf = "attr_value" };
+    struct_type* compound_rbuf = NULL;
+    hvl_t vlen_buf = { .len = 2, .p = array_buf };
+    hvl_t* vlen_rbuf = NULL;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Fix for type conversion path table issue"));
@@ -6597,7 +6547,7 @@ test_misc39(void)
     }
 
     /* Retrieve file's VOL object field for further use */
-    file_vol_obj = H5F_VOL_OBJ((H5F_t *)H5VL_object(file_id));
+    file_vol_obj = H5F_VOL_OBJ((H5F_t*)H5VL_object(file_id));
 
     /*
      * Check reference count of file's VOL object field. At this point,
@@ -6634,8 +6584,7 @@ test_misc39(void)
      * Check the number of type conversion path table entries currently
      * stored in the cache. It shouldn't have changed yet.
      */
-    VERIFY(H5T__get_path_table_npaths(), init_npaths,
-           "checking number of type conversion path table entries");
+    VERIFY(H5T__get_path_table_npaths(), init_npaths, "checking number of type conversion path table entries");
 
     /* Increments file's VOL object reference count by 1 */
     attr_id1 = H5Acreate2(file_id, "varstr_attribute", str_type, space_id, H5P_DEFAULT, H5P_DEFAULT);
@@ -6644,8 +6593,7 @@ test_misc39(void)
     attr_id2 = H5Acreate2(file_id, "array_varstr_attribute", array_type, space_id, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(attr_id2, H5I_INVALID_HID, "H5Acreate2");
     /* Increments file's VOL object reference count by 1 */
-    attr_id3 =
-        H5Acreate2(file_id, "compound_varstr_attribute", compound_type, space_id, H5P_DEFAULT, H5P_DEFAULT);
+    attr_id3 = H5Acreate2(file_id, "compound_varstr_attribute", compound_type, space_id, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(attr_id3, H5I_INVALID_HID, "H5Acreate2");
     /* Increments file's VOL object reference count by 2 */
     attr_id4 = H5Acreate2(file_id, "vlen_varstr_attribute", vlen_type, space_id, H5P_DEFAULT, H5P_DEFAULT);
@@ -6655,8 +6603,7 @@ test_misc39(void)
      * Check the number of type conversion path table entries currently
      * stored in the cache. It shouldn't have changed yet.
      */
-    VERIFY(H5T__get_path_table_npaths(), init_npaths,
-           "checking number of type conversion path table entries");
+    VERIFY(H5T__get_path_table_npaths(), init_npaths, "checking number of type conversion path table entries");
 
     /*
      * Check reference count of file's VOL object field. At this point,
@@ -6687,8 +6634,7 @@ test_misc39(void)
      * uses the same conversion path, this check may fail and need to
      * be refactored.
      */
-    VERIFY(H5T__get_path_table_npaths(), init_npaths + 4,
-           "checking number of type conversion path table entries");
+    VERIFY(H5T__get_path_table_npaths(), init_npaths + 4, "checking number of type conversion path table entries");
 
     /*
      * Check reference count of file's VOL object field. At this point,
@@ -6710,9 +6656,9 @@ test_misc39(void)
     ret = H5Fclose(file_id);
     CHECK(ret, FAIL, "H5Fclose");
 
-    rbuf = malloc(sizeof(char *));
+    rbuf = malloc(sizeof(char*));
     CHECK_PTR(rbuf, "varstr read buf allocation");
-    arr_rbuf = malloc(array_dims[0] * sizeof(char *));
+    arr_rbuf = malloc(array_dims[0] * sizeof(char*));
     CHECK_PTR(arr_rbuf, "array varstr read buf allocation");
     compound_rbuf = malloc(sizeof(struct_type));
     CHECK_PTR(compound_rbuf, "compound varstr read buf allocation");
@@ -6724,7 +6670,7 @@ test_misc39(void)
         CHECK(file_id, H5I_INVALID_HID, "H5Fopen");
 
         /* Retrieve file's VOL object field for further use */
-        file_vol_obj = H5F_VOL_OBJ((H5F_t *)H5VL_object(file_id));
+        file_vol_obj = H5F_VOL_OBJ((H5F_t*)H5VL_object(file_id));
 
         /*
          * Check reference count of file's VOL object field. At this point,
@@ -6774,8 +6720,7 @@ test_misc39(void)
          * paths on file close during each iteration. The value should stay at
          * a constant "initial_num_paths + number of H5Aread calls above".
          */
-        VERIFY(H5T__get_path_table_npaths(), init_npaths + 4,
-               "checking number of type conversion path table entries");
+        VERIFY(H5T__get_path_table_npaths(), init_npaths + 4, "checking number of type conversion path table entries");
 
         /*
          * Check reference count of file's VOL object field. At this point,
@@ -6835,14 +6780,13 @@ test_misc39(void)
 **  H5Pset_link_phase_change().
 **
 ****************************************************************/
-static void
-test_misc40(void)
+static void test_misc40(void)
 {
-    hid_t  fid  = H5I_INVALID_HID; /* File ID */
-    hid_t  gid  = H5I_INVALID_HID; /* Group ID */
-    hid_t  fapl = H5I_INVALID_HID; /* File access property list ID */
-    hid_t  gcpl = H5I_INVALID_HID; /* Group creation property list ID */
-    herr_t ret  = H5I_INVALID_HID; /* Generic return value */
+    hid_t fid = H5I_INVALID_HID;  /* File ID */
+    hid_t gid = H5I_INVALID_HID;  /* Group ID */
+    hid_t fapl = H5I_INVALID_HID; /* File access property list ID */
+    hid_t gcpl = H5I_INVALID_HID; /* Group creation property list ID */
+    herr_t ret = H5I_INVALID_HID; /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Ensure H5Pset_est_link_info handles large values\n"));
@@ -6923,24 +6867,23 @@ test_misc40(void)
 **  to intermediate groups.
 **
 ****************************************************************/
-static void
-test_misc41(void)
+static void test_misc41(void)
 {
-    hid_t    lcpl        = H5I_INVALID_HID;
-    hid_t    gcpl        = H5I_INVALID_HID;
-    hid_t    gcpl2       = H5I_INVALID_HID;
-    hid_t    def_gcpl    = H5I_INVALID_HID;
-    hid_t    dcpl        = H5I_INVALID_HID;
-    hid_t    fid         = H5I_INVALID_HID;
-    hid_t    gid         = H5I_INVALID_HID;
-    hid_t    gid2        = H5I_INVALID_HID;
-    hid_t    def_gid     = H5I_INVALID_HID;
-    hid_t    did         = H5I_INVALID_HID;
-    hid_t    sid         = H5I_INVALID_HID;
-    hsize_t  dims[1]     = {10};
-    unsigned cr_order    = 0;
-    bool     track_times = false;
-    herr_t   status;
+    hid_t lcpl = H5I_INVALID_HID;
+    hid_t gcpl = H5I_INVALID_HID;
+    hid_t gcpl2 = H5I_INVALID_HID;
+    hid_t def_gcpl = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t gid = H5I_INVALID_HID;
+    hid_t gid2 = H5I_INVALID_HID;
+    hid_t def_gid = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    hid_t sid = H5I_INVALID_HID;
+    hsize_t dims[1] = { 10 };
+    unsigned cr_order = 0;
+    bool track_times = false;
+    herr_t status;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing object creation properties are propagated to intermediate groups\n"));
@@ -7139,8 +7082,7 @@ test_misc41(void)
 **  test_misc(): Main misc. test routine.
 **
 ****************************************************************/
-void
-test_misc(void H5_ATTR_UNUSED *params)
+void test_misc(void H5_ATTR_UNUSED* params)
 {
     bool default_driver = h5_using_default_driver(NULL);
 
@@ -7181,10 +7123,10 @@ test_misc(void H5_ATTR_UNUSED *params)
     test_misc20(); /* Test problems with truncated dimensions in version 2 of storage layout message */
 
 #ifdef H5_HAVE_FILTER_SZIP
-    test_misc21();  /* Test that "late" allocation time is treated the same as "incremental", for chunked
-                       datasets w/a filters */
-    test_misc22();  /* check szip bits per pixel */
-#endif              /* H5_HAVE_FILTER_SZIP */
+    test_misc21(); /* Test that "late" allocation time is treated the same as "incremental", for chunked
+                      datasets w/a filters */
+    test_misc22(); /* check szip bits per pixel */
+#endif /* H5_HAVE_FILTER_SZIP */
     test_misc23();  /* Test intermediate group creation */
     test_misc24();  /* Test inappropriate API opens of objects */
     test_misc25a(); /* Exercise null object header message merge bug */
@@ -7222,8 +7164,7 @@ test_misc(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_misc(void H5_ATTR_UNUSED *params)
+void cleanup_misc(void H5_ATTR_UNUSED* params)
 {
     if (GetTestCleanup()) {
         H5E_BEGIN_TRY

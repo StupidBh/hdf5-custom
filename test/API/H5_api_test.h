@@ -24,14 +24,14 @@
 
 /* Define H5VL_VERSION if not already defined */
 #ifndef H5VL_VERSION
-#define H5VL_VERSION 0
+    #define H5VL_VERSION 0
 #endif
 
 /* Define macro to wait forever depending on version */
 #if H5VL_VERSION >= 2
-#define H5_API_TEST_WAIT_FOREVER H5ES_WAIT_FOREVER
+    #define H5_API_TEST_WAIT_FOREVER H5ES_WAIT_FOREVER
 #else
-#define H5_API_TEST_WAIT_FOREVER UINT64_MAX
+    #define H5_API_TEST_WAIT_FOREVER UINT64_MAX
 #endif
 
 /******************************************************************************/
@@ -40,7 +40,7 @@
 #define TEST_FILE_NAME "H5_api_test.h5"
 extern char H5_api_test_filename[];
 
-extern const char *test_path_prefix;
+extern const char* test_path_prefix;
 
 /*
  * Environment variable specifying a prefix string to add to

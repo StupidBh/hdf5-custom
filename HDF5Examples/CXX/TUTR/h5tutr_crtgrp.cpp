@@ -25,8 +25,7 @@ using namespace H5;
 
 const H5std_string FILE_NAME("h5tutr_group.h5");
 
-int
-main(void)
+int main(void)
 {
     // Try block to detect exceptions raised by any of the calls inside it
     try {

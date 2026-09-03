@@ -18,23 +18,24 @@
 #define DIM0      4
 #define DIM1      7
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file, space, dset, attr; /* Handles */
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
-    int     wdata[DIM0][DIM1], /* Write buffer */
-        **rdata,               /* Read buffer */
+    hid_t file, space, dset, attr; /* Handles */
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    int wdata[DIM0][DIM1], /* Write buffer */
+        **rdata,           /* Read buffer */
         ndims;
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -44,8 +45,8 @@ main(void)
     /*
      * Create dataset with a null dataspace.
      */
-    space  = H5Screate(H5S_NULL);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -60,7 +61,7 @@ main(void)
      * regardless of the native integer type.  The HDF5 library
      * automatically converts between different integer types.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, H5T_STD_I64BE, space, H5P_DEFAULT, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, H5T_STD_I64BE, space, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Awrite(attr, H5T_NATIVE_INT, wdata[0]);
 
     /*
@@ -96,18 +97,19 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (int **)malloc(dims[0] * sizeof(int *));
+    rdata = (int**)malloc(dims[0] * sizeof(int*));
 
     /*
      * Allocate space for integer data.
      */
-    rdata[0] = (int *)malloc(dims[0] * dims[1] * sizeof(int));
+    rdata[0] = (int*)malloc(dims[0] * dims[1] * sizeof(int));
 
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * dims[1];
+    }
 
     /*
      * Read the data.
@@ -120,8 +122,9 @@ main(void)
     printf("%s:\n", ATTRIBUTE);
     for (i = 0; i < dims[0]; i++) {
         printf(" [");
-        for (j = 0; j < dims[1]; j++)
+        for (j = 0; j < dims[1]; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

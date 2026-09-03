@@ -74,11 +74,10 @@ H5FL_DEFINE_STATIC(H5HL_prfx_t);
  *
  *-------------------------------------------------------------------------
  */
-H5HL_prfx_t *
-H5HL__prfx_new(H5HL_t *heap)
+H5HL_prfx_t* H5HL__prfx_new(H5HL_t* heap)
 {
-    H5HL_prfx_t *prfx      = NULL; /* New local heap prefix */
-    H5HL_prfx_t *ret_value = NULL;
+    H5HL_prfx_t* prfx = NULL; /* New local heap prefix */
+    H5HL_prfx_t* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
@@ -86,12 +85,14 @@ H5HL__prfx_new(H5HL_t *heap)
     assert(heap);
 
     /* Allocate new local heap prefix */
-    if (NULL == (prfx = H5FL_CALLOC(H5HL_prfx_t)))
+    if (NULL == (prfx = H5FL_CALLOC(H5HL_prfx_t))) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTALLOC, NULL, "memory allocation failed for local heap prefix");
+    }
 
     /* Increment ref. count on heap data structure */
-    if (FAIL == H5HL__inc_rc(heap))
+    if (FAIL == H5HL__inc_rc(heap)) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTINC, NULL, "can't increment heap ref. count");
+    }
 
     /* Link the heap & the prefix */
     prfx->heap = heap;
@@ -102,9 +103,10 @@ H5HL__prfx_new(H5HL_t *heap)
 
 done:
     /* Ensure that the prefix memory is deallocated on errors */
-    if (!ret_value && prfx != NULL)
+    if (!ret_value && prfx != NULL) {
         /* H5FL_FREE always returns NULL so we can't check for errors */
         prfx = H5FL_FREE(H5HL_prfx_t, prfx);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5HL__prfx_new() */
@@ -118,8 +120,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HL__prfx_dest(H5HL_prfx_t *prfx)
+herr_t H5HL__prfx_dest(H5HL_prfx_t* prfx)
 {
     herr_t ret_value = SUCCEED;
 
@@ -134,8 +135,9 @@ H5HL__prfx_dest(H5HL_prfx_t *prfx)
         prfx->heap->prfx = NULL;
 
         /* Decrement ref. count on heap data structure */
-        if (FAIL == H5HL__dec_rc(prfx->heap))
+        if (FAIL == H5HL__dec_rc(prfx->heap)) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTDEC, FAIL, "can't decrement heap ref. count");
+        }
 
         /* Unlink heap from prefix */
         prfx->heap = NULL;

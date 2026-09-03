@@ -31,21 +31,23 @@
 #define DRIVER_INFO_MESSAGE_MAX_INFO   65536
 #define DRIVER_INFO_MESSAGE_MAX_LENGTH 65552 /* MAX_INFO + sizeof(info_header_t) */
 
-typedef struct _info_header { /* Header for a driver info message */
+typedef struct _info_header
+{ /* Header for a driver info message */
     uint8_t version;
     uint8_t unused_1;
     uint8_t unused_2;
     uint8_t unused_3;    /* Actual info message length, but  */
     int32_t info_length; /* CANNOT exceed 64k (65552) bytes  */
-    char    vfd_key[8];  /* 's' 'u' 'b' 'f' 'i' 'l' 'i' 'n'  */
+    char vfd_key[8];     /* 's' 'u' 'b' 'f' 'i' 'l' 'i' 'n'  */
 } info_header_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-H5_DLL herr_t H5FD__subfiling__truncate_sub_files(hid_t context_id, int64_t logical_file_eof, MPI_Comm comm);
-H5_DLL herr_t H5FD__subfiling__get_real_eof(hid_t context_id, int64_t *logical_eof_ptr);
+    H5_DLL herr_t H5FD__subfiling__truncate_sub_files(hid_t context_id, int64_t logical_file_eof, MPI_Comm comm);
+    H5_DLL herr_t H5FD__subfiling__get_real_eof(hid_t context_id, int64_t* logical_eof_ptr);
 
 #ifdef __cplusplus
 }

@@ -34,7 +34,7 @@
 
 #ifdef H5_HAVE_THREADS
 
-#ifndef H5_HAVE_STDATOMIC_H
+    #ifndef H5_HAVE_STDATOMIC_H
 
 /****************/
 /* Local Macros */
@@ -72,8 +72,7 @@
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_init_int(H5TS_atomic_int_t *obj, int desired)
+void H5TS_atomic_init_int(H5TS_atomic_int_t* obj, int desired)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -98,8 +97,7 @@ H5TS_atomic_init_int(H5TS_atomic_int_t *obj, int desired)
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_destroy_int(H5TS_atomic_int_t *obj)
+void H5TS_atomic_destroy_int(H5TS_atomic_int_t* obj)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -121,8 +119,7 @@ H5TS_atomic_destroy_int(H5TS_atomic_int_t *obj)
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_init_uint(H5TS_atomic_uint_t *obj, unsigned desired)
+void H5TS_atomic_init_uint(H5TS_atomic_uint_t* obj, unsigned desired)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -147,8 +144,7 @@ H5TS_atomic_init_uint(H5TS_atomic_uint_t *obj, unsigned desired)
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_destroy_uint(H5TS_atomic_uint_t *obj)
+void H5TS_atomic_destroy_uint(H5TS_atomic_uint_t* obj)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -170,8 +166,7 @@ H5TS_atomic_destroy_uint(H5TS_atomic_uint_t *obj)
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_init_voidp(H5TS_atomic_voidp_t *obj, void *desired)
+void H5TS_atomic_init_voidp(H5TS_atomic_voidp_t* obj, void* desired)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -196,8 +191,7 @@ H5TS_atomic_init_voidp(H5TS_atomic_voidp_t *obj, void *desired)
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_atomic_destroy_voidp(H5TS_atomic_voidp_t *obj)
+void H5TS_atomic_destroy_voidp(H5TS_atomic_voidp_t* obj)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -207,6 +201,6 @@ H5TS_atomic_destroy_voidp(H5TS_atomic_voidp_t *obj)
     FUNC_LEAVE_NOAPI_VOID_NAMECHECK_ONLY
 } /* end H5TS_atomic_destroy_voidp() */
 
-#endif /* H5_HAVE_STDATOMIC_H */
+    #endif /* H5_HAVE_STDATOMIC_H */
 
-#endif /* H5_HAVE_THREADS */
+#endif     /* H5_HAVE_THREADS */

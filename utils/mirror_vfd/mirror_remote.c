@@ -25,17 +25,16 @@
  *              If logging info pointer is NULL, uses logging defaults.
  * ----------------------------------------------------------------------------
  */
-void
-mirror_log(struct mirror_log_info *info, unsigned int level, const char *format, ...)
+void mirror_log(struct mirror_log_info* info, unsigned int level, const char* format, ...)
 {
-    FILE        *stream    = MIRROR_LOG_DEFAULT_STREAM;
+    FILE* stream = MIRROR_LOG_DEFAULT_STREAM;
     unsigned int verbosity = MIRROR_LOG_DEFAULT_VERBOSITY;
-    bool         custom    = false;
+    bool custom = false;
 
     if (info != NULL && info->magic == MIRROR_LOG_INFO_MAGIC) {
-        stream    = info->stream;
+        stream = info->stream;
         verbosity = info->verbosity;
-        custom    = true;
+        custom = true;
     }
 
     if (level == V_NONE) {
@@ -47,14 +46,9 @@ mirror_log(struct mirror_log_info *info, unsigned int level, const char *format,
         }
 
         switch (level) {
-            case (V_ERR):
-                fprintf(stream, "ERROR ");
-                break;
-            case (V_WARN):
-                fprintf(stream, "WARNING ");
-                break;
-            default:
-                break;
+        case (V_ERR) : fprintf(stream, "ERROR "); break;
+        case (V_WARN): fprintf(stream, "WARNING "); break;
+        default      : break;
         }
 
         if (format != NULL) {
@@ -76,10 +70,9 @@ mirror_log(struct mirror_log_info *info, unsigned int level, const char *format,
  *              If info pointer is NULL, uses logging defaults.
  * ----------------------------------------------------------------------------
  */
-void
-mirror_log_bytes(struct mirror_log_info *info, unsigned int level, size_t n_bytes, const unsigned char *buf)
+void mirror_log_bytes(struct mirror_log_info* info, unsigned int level, size_t n_bytes, const unsigned char* buf)
 {
-    FILE        *stream    = MIRROR_LOG_DEFAULT_STREAM;
+    FILE* stream = MIRROR_LOG_DEFAULT_STREAM;
     unsigned int verbosity = MIRROR_LOG_DEFAULT_VERBOSITY;
 
     if (buf == NULL) {
@@ -87,13 +80,13 @@ mirror_log_bytes(struct mirror_log_info *info, unsigned int level, size_t n_byte
     }
 
     if (info != NULL && info->magic == MIRROR_LOG_INFO_MAGIC) {
-        stream    = info->stream;
+        stream = info->stream;
         verbosity = info->verbosity;
     }
 
     if (level <= verbosity) {
-        size_t               bytes_written = 0;
-        const unsigned char *b             = NULL;
+        size_t bytes_written = 0;
+        const unsigned char* b = NULL;
 
         /* print whole lines */
         while ((n_bytes - bytes_written) >= 32) {
@@ -103,9 +96,39 @@ mirror_log_bytes(struct mirror_log_info *info, unsigned int level, size_t n_byte
                     " %02X%02X%02X%02X %02X%02X%02X%02X"
                     " %02X%02X%02X%02X %02X%02X%02X%02X"
                     " %02X%02X%02X%02X %02X%02X%02X%02X\n",
-                    bytes_written, b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11],
-                    b[12], b[13], b[14], b[15], b[16], b[17], b[18], b[19], b[20], b[21], b[22], b[23], b[24],
-                    b[25], b[26], b[27], b[28], b[29], b[30], b[31]);
+                    bytes_written,
+                    b[0],
+                    b[1],
+                    b[2],
+                    b[3],
+                    b[4],
+                    b[5],
+                    b[6],
+                    b[7],
+                    b[8],
+                    b[9],
+                    b[10],
+                    b[11],
+                    b[12],
+                    b[13],
+                    b[14],
+                    b[15],
+                    b[16],
+                    b[17],
+                    b[18],
+                    b[19],
+                    b[20],
+                    b[21],
+                    b[22],
+                    b[23],
+                    b[24],
+                    b[25],
+                    b[26],
+                    b[27],
+                    b[28],
+                    b[29],
+                    b[30],
+                    b[31]);
             bytes_written += 32;
         }
 
@@ -116,8 +139,7 @@ mirror_log_bytes(struct mirror_log_info *info, unsigned int level, size_t n_byte
 
         /* partial line blocks */
         while ((n_bytes - bytes_written) >= 4) {
-            fprintf(stream, " %02X%02X%02X%02X", buf[bytes_written], buf[bytes_written + 1],
-                    buf[bytes_written + 2], buf[bytes_written + 3]);
+            fprintf(stream, " %02X%02X%02X%02X", buf[bytes_written], buf[bytes_written + 1], buf[bytes_written + 2], buf[bytes_written + 3]);
             bytes_written += 4;
         }
 
@@ -145,16 +167,15 @@ mirror_log_bytes(struct mirror_log_info *info, unsigned int level, size_t n_byte
  *              Failure: NULL. Either unable to allocate or cannot open file.
  * ----------------------------------------------------------------------------
  */
-loginfo_t *
-mirror_log_init(char *path, const char *prefix, unsigned int verbosity)
+loginfo_t* mirror_log_init(char* path, const char* prefix, unsigned int verbosity)
 {
-    loginfo_t *info = NULL;
+    loginfo_t* info = NULL;
 
-    info = (loginfo_t *)malloc(sizeof(loginfo_t));
+    info = (loginfo_t*)malloc(sizeof(loginfo_t));
     if (info != NULL) {
-        info->magic     = MIRROR_LOG_INFO_MAGIC;
+        info->magic = MIRROR_LOG_INFO_MAGIC;
         info->verbosity = verbosity;
-        info->stream    = MIRROR_LOG_DEFAULT_STREAM;
+        info->stream = MIRROR_LOG_DEFAULT_STREAM;
         info->prefix[0] = '\0';
 
         if (prefix && *prefix) {
@@ -162,11 +183,10 @@ mirror_log_init(char *path, const char *prefix, unsigned int verbosity)
         }
 
         if (path && *path) {
-            FILE *f = NULL;
-            f       = fopen(path, "w");
+            FILE* f = NULL;
+            f = fopen(path, "w");
             if (NULL == f) {
-                fprintf(MIRROR_LOG_DEFAULT_STREAM, "WARN custom logging path could not be opened: %s\n",
-                        path);
+                fprintf(MIRROR_LOG_DEFAULT_STREAM, "WARN custom logging path could not be opened: %s\n", path);
                 info->magic += 1;
                 free(info);
             }
@@ -189,8 +209,7 @@ mirror_log_init(char *path, const char *prefix, unsigned int verbosity)
  *              Failure: FAIL.    Indeterminite state.
  * ----------------------------------------------------------------------------
  */
-herr_t
-mirror_log_term(loginfo_t *info)
+herr_t mirror_log_term(loginfo_t* info)
 {
     if (info == NULL || info->magic != MIRROR_LOG_INFO_MAGIC) {
         return FAIL;

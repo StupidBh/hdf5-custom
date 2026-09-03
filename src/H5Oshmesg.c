@@ -15,23 +15,21 @@
  *              information in the superblock extension.
  */
 
-#include "H5Omodule.h" /* This source code file is part of the H5O module */
+#include "H5Omodule.h"   /* This source code file is part of the H5O module */
 
 #include "H5private.h"   /* Generic Functions			*/
 #include "H5Eprivate.h"  /* Error handling		  	*/
 #include "H5Opkg.h"      /* Object headers			*/
 #include "H5MMprivate.h" /* Memory management			*/
 
-static void  *H5O__shmesg_decode(H5F_t *f, H5O_t *open_oh, unsigned mesg_flags, unsigned *ioflags,
-                                 size_t p_size, const uint8_t *p);
-static herr_t H5O__shmesg_encode(H5F_t *f, bool disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t *p,
-                                 const void *_mesg);
-static void  *H5O__shmesg_copy(const void *_mesg, void *_dest);
-static size_t H5O__shmesg_size(const H5F_t *f, bool disable_shared, const void *_mesg);
-static herr_t H5O__shmesg_debug(H5F_t *f, const void *_mesg, FILE *stream, int indent, int fwidth);
+static void* H5O__shmesg_decode(H5F_t* f, H5O_t* open_oh, unsigned mesg_flags, unsigned* ioflags, size_t p_size, const uint8_t* p);
+static herr_t H5O__shmesg_encode(H5F_t* f, bool disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t* p, const void* _mesg);
+static void* H5O__shmesg_copy(const void* _mesg, void* _dest);
+static size_t H5O__shmesg_size(const H5F_t* f, bool disable_shared, const void* _mesg);
+static herr_t H5O__shmesg_debug(H5F_t* f, const void* _mesg, FILE* stream, int indent, int fwidth);
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_SHMESG[1] = {{
+const H5O_msg_class_t H5O_MSG_SHMESG[1] = { {
     H5O_SHMESG_ID,              /*message id number                     */
     "shared message table",     /*message name for debugging            */
     sizeof(H5O_shmesg_table_t), /*native message size                   */
@@ -52,7 +50,7 @@ const H5O_msg_class_t H5O_MSG_SHMESG[1] = {{
     NULL,                       /* get creation index		        */
     NULL,                       /* set creation index		        */
     H5O__shmesg_debug           /*debug the message			*/
-}};
+} };
 
 /*-------------------------------------------------------------------------
  * Function:    H5O__shmesg_decode
@@ -64,42 +62,49 @@ const H5O_msg_class_t H5O_MSG_SHMESG[1] = {{
  *              Failure:    NULL
  *-------------------------------------------------------------------------
  */
-static void *
-H5O__shmesg_decode(H5F_t *f, H5O_t H5_ATTR_UNUSED *open_oh, unsigned H5_ATTR_UNUSED mesg_flags,
-                   unsigned H5_ATTR_UNUSED *ioflags, size_t p_size, const uint8_t *p)
+static void* H5O__shmesg_decode(H5F_t* f,
+                                H5O_t H5_ATTR_UNUSED* open_oh,
+                                unsigned H5_ATTR_UNUSED mesg_flags,
+                                unsigned H5_ATTR_UNUSED* ioflags,
+                                size_t p_size,
+                                const uint8_t* p)
 {
-    H5O_shmesg_table_t *mesg;                       /* New shared message table */
-    const uint8_t      *p_end     = p + p_size - 1; /* End of the p buffer */
-    void               *ret_value = NULL;
+    H5O_shmesg_table_t* mesg;              /* New shared message table */
+    const uint8_t* p_end = p + p_size - 1; /* End of the p buffer */
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
     assert(f);
     assert(p);
 
-    if (NULL == (mesg = (H5O_shmesg_table_t *)H5MM_calloc(sizeof(H5O_shmesg_table_t))))
-        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL,
-                    "memory allocation failed for shared message table message");
+    if (NULL == (mesg = (H5O_shmesg_table_t*)H5MM_calloc(sizeof(H5O_shmesg_table_t)))) {
+        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed for shared message table message");
+    }
 
     /* Retrieve version, table address, and number of indexes */
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     mesg->version = *p++;
 
-    if (H5_IS_BUFFER_OVERFLOW(p, H5F_sizeof_addr(f), p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, H5F_sizeof_addr(f), p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     H5F_addr_decode(f, &p, &(mesg->addr));
 
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     mesg->nindexes = *p++;
 
     /* Set return value */
-    ret_value = (void *)mesg;
+    ret_value = (void*)mesg;
 
 done:
-    if (!ret_value && mesg)
+    if (!ret_value && mesg) {
         H5MM_xfree(mesg);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O__shmesg_decode() */
@@ -113,11 +118,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__shmesg_encode(H5F_t *f, bool H5_ATTR_UNUSED disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t *p,
-                   const void *_mesg)
+static herr_t H5O__shmesg_encode(H5F_t* f, bool H5_ATTR_UNUSED disable_shared, size_t H5_ATTR_UNUSED p_size, uint8_t* p, const void* _mesg)
 {
-    const H5O_shmesg_table_t *mesg = (const H5O_shmesg_table_t *)_mesg;
+    const H5O_shmesg_table_t* mesg = (const H5O_shmesg_table_t*)_mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -145,21 +148,20 @@ H5O__shmesg_encode(H5F_t *f, bool H5_ATTR_UNUSED disable_shared, size_t H5_ATTR_
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5O__shmesg_copy(const void *_mesg, void *_dest)
+static void* H5O__shmesg_copy(const void* _mesg, void* _dest)
 {
-    const H5O_shmesg_table_t *mesg      = (const H5O_shmesg_table_t *)_mesg;
-    H5O_shmesg_table_t       *dest      = (H5O_shmesg_table_t *)_dest;
-    void                     *ret_value = NULL; /* Return value */
+    const H5O_shmesg_table_t* mesg = (const H5O_shmesg_table_t*)_mesg;
+    H5O_shmesg_table_t* dest = (H5O_shmesg_table_t*)_dest;
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Sanity check */
     assert(mesg);
 
-    if (!dest && NULL == (dest = (H5O_shmesg_table_t *)H5MM_malloc(sizeof(H5O_shmesg_table_t))))
-        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL,
-                    "memory allocation failed for shared message table message");
+    if (!dest && NULL == (dest = (H5O_shmesg_table_t*)H5MM_malloc(sizeof(H5O_shmesg_table_t)))) {
+        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed for shared message table message");
+    }
 
     /* All this message requires is a shallow copy */
     *dest = *mesg;
@@ -182,8 +184,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-H5O__shmesg_size(const H5F_t *f, bool H5_ATTR_UNUSED disable_shared, const void H5_ATTR_UNUSED *_mesg)
+static size_t H5O__shmesg_size(const H5F_t* f, bool H5_ATTR_UNUSED disable_shared, const void H5_ATTR_UNUSED* _mesg)
 {
     size_t ret_value = 0; /* Return value */
 
@@ -208,10 +209,9 @@ H5O__shmesg_size(const H5F_t *f, bool H5_ATTR_UNUSED disable_shared, const void 
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__shmesg_debug(H5F_t H5_ATTR_UNUSED *f, const void *_mesg, FILE *stream, int indent, int fwidth)
+static herr_t H5O__shmesg_debug(H5F_t H5_ATTR_UNUSED* f, const void* _mesg, FILE* stream, int indent, int fwidth)
 {
-    const H5O_shmesg_table_t *mesg = (const H5O_shmesg_table_t *)_mesg;
+    const H5O_shmesg_table_t* mesg = (const H5O_shmesg_table_t*)_mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -223,8 +223,7 @@ H5O__shmesg_debug(H5F_t H5_ATTR_UNUSED *f, const void *_mesg, FILE *stream, int 
     assert(fwidth >= 0);
 
     fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Version:", mesg->version);
-    fprintf(stream, "%*s%-*s %" PRIuHADDR " (rel)\n", indent, "", fwidth,
-            "Shared message table address:", mesg->addr);
+    fprintf(stream, "%*s%-*s %" PRIuHADDR " (rel)\n", indent, "", fwidth, "Shared message table address:", mesg->addr);
     fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Number of indexes:", mesg->nindexes);
 
     FUNC_LEAVE_NOAPI(SUCCEED)

@@ -16,18 +16,18 @@
  *              H5HG package should include H5HGprivate.h instead.
  */
 #if !(defined H5HG_FRIEND || defined H5HG_MODULE)
-#error "Do not include this file outside the H5HG package!"
+    #error "Do not include this file outside the H5HG package!"
 #endif
 
 #ifndef H5HGpkg_H
-#define H5HGpkg_H
+    #define H5HGpkg_H
 
-/* Get package's private header */
-#include "H5HGprivate.h"
+    /* Get package's private header */
+    #include "H5HGprivate.h"
 
-/* Other private headers needed by this file */
-#include "H5ACprivate.h" /* Metadata cache			*/
-#include "H5FLprivate.h" /* Free lists                           */
+    /* Other private headers needed by this file */
+    #include "H5ACprivate.h" /* Metadata cache			*/
+    #include "H5FLprivate.h" /* Free lists                           */
 
 /*****************************/
 /* Package Private Variables */
@@ -42,82 +42,84 @@ H5FL_SEQ_EXTERN(H5HG_obj_t);
 /* Declare extern the PQ free list to manage heap chunks */
 H5FL_BLK_EXTERN(gheap_chunk);
 
-/**************************/
-/* Package Private Macros */
-/**************************/
+    /**************************/
+    /* Package Private Macros */
+    /**************************/
 
-/*
- * Global heap collection version.
- */
-#define H5HG_VERSION 1
+    /*
+     * Global heap collection version.
+     */
+    #define H5HG_VERSION 1
 
-/*
- * All global heap collections are at least this big.  This allows us to read
- * most collections with a single read() since we don't have to read a few
- * bytes of header to figure out the size.  If the heap is larger than this
- * then a second read gets the rest after we've decoded the header.
- */
-#define H5HG_MINSIZE 4096
+    /*
+     * All global heap collections are at least this big.  This allows us to read
+     * most collections with a single read() since we don't have to read a few
+     * bytes of header to figure out the size.  If the heap is larger than this
+     * then a second read gets the rest after we've decoded the header.
+     */
+    #define H5HG_MINSIZE 4096
 
-/*
- * Pad all global heap messages to a multiple of eight bytes so we can load
- * the entire collection into memory and operate on it there.  Eight should
- * be sufficient for machines that have alignment constraints because our
- * largest data type is eight bytes.
- */
-#define H5HG_ALIGNMENT    8
-#define H5HG_ALIGN(X)     (H5HG_ALIGNMENT * (((X) + H5HG_ALIGNMENT - 1) / H5HG_ALIGNMENT))
-#define H5HG_ISALIGNED(X) ((X) == H5HG_ALIGN(X))
+    /*
+     * Pad all global heap messages to a multiple of eight bytes so we can load
+     * the entire collection into memory and operate on it there.  Eight should
+     * be sufficient for machines that have alignment constraints because our
+     * largest data type is eight bytes.
+     */
+    #define H5HG_ALIGNMENT    8
+    #define H5HG_ALIGN(X)     (H5HG_ALIGNMENT * (((X) + H5HG_ALIGNMENT - 1) / H5HG_ALIGNMENT))
+    #define H5HG_ISALIGNED(X) ((X) == H5HG_ALIGN(X))
 
-/*
- * The size of the collection header, always a multiple of the alignment so
- * that the stuff that follows the header is aligned.
- */
-#define H5HG_SIZEOF_HDR(f)                                                                                   \
-    (size_t) H5HG_ALIGN(4 +                 /*magic number		*/                                               \
-                        1 +                 /*version number	*/                                              \
-                        3 +                 /*reserved		*/                                                   \
-                        H5F_SIZEOF_SIZE(f)) /*collection size	*/
+    /*
+     * The size of the collection header, always a multiple of the alignment so
+     * that the stuff that follows the header is aligned.
+     */
+    #define H5HG_SIZEOF_HDR(f)                                     \
+        (size_t)H5HG_ALIGN(4 +                 /*magic number		*/  \
+                           1 +                 /*version number	*/ \
+                           3 +                 /*reserved		*/      \
+                           H5F_SIZEOF_SIZE(f)) /*collection size	*/
 
-/*
- * The overhead associated with each object in the heap, always a multiple of
- * the alignment so that the stuff that follows the header is aligned.
- */
-#define H5HG_SIZEOF_OBJHDR(f)                                                                                \
-    (size_t) H5HG_ALIGN(2 +                 /*object id number	*/                                            \
-                        2 +                 /*reference count	*/                                             \
-                        4 +                 /*reserved		*/                                                   \
-                        H5F_SIZEOF_SIZE(f)) /*object data size	*/
+    /*
+     * The overhead associated with each object in the heap, always a multiple of
+     * the alignment so that the stuff that follows the header is aligned.
+     */
+    #define H5HG_SIZEOF_OBJHDR(f)                                    \
+        (size_t)H5HG_ALIGN(2 +                 /*object id number	*/ \
+                           2 +                 /*reference count	*/  \
+                           4 +                 /*reserved		*/        \
+                           H5F_SIZEOF_SIZE(f)) /*object data size	*/
 
-/*
- * The initial guess for the number of messages in a collection.  We assume
- * that all objects in that collection are zero length, giving the maximum
- * possible number of objects in the collection.  The collection itself has
- * some overhead and each message has some overhead.  The `+2' accounts for
- * rounding and for the free space object.
- */
-#define H5HG_NOBJS(f, z) ((((z)-H5HG_SIZEOF_HDR(f)) / H5HG_SIZEOF_OBJHDR(f) + 2))
+    /*
+     * The initial guess for the number of messages in a collection.  We assume
+     * that all objects in that collection are zero length, giving the maximum
+     * possible number of objects in the collection.  The collection itself has
+     * some overhead and each message has some overhead.  The `+2' accounts for
+     * rounding and for the free space object.
+     */
+    #define H5HG_NOBJS(f, z) ((((z) - H5HG_SIZEOF_HDR(f)) / H5HG_SIZEOF_OBJHDR(f) + 2))
 
 /****************************/
 /* Package Private Typedefs */
 /****************************/
 
-typedef struct H5HG_obj_t {
-    int      nrefs; /* Reference count */
-    size_t   size;  /* Total size of object */
-    uint8_t *begin; /* Pointer to object into heap->chunk (INCLUDES header) */
+typedef struct H5HG_obj_t
+{
+    int nrefs;      /* Reference count */
+    size_t size;    /* Total size of object */
+    uint8_t* begin; /* Pointer to object into heap->chunk (INCLUDES header) */
 } H5HG_obj_t;
 
 /* Forward declarations for fields */
 struct H5F_shared_t;
 
-struct H5HG_heap_t {
+struct H5HG_heap_t
+{
     H5AC_info_t cache_info;      /* Information for H5AC cache functions, MUST be
                                   * the first field in structure
                                   */
-    haddr_t  addr;               /* Collection address */
-    size_t   size;               /* Total size of collection */
-    uint8_t *chunk;              /* Collection of elements - note that this
+    haddr_t addr;                /* Collection address */
+    size_t size;                 /* Total size of collection */
+    uint8_t* chunk;              /* Collection of elements - note that this
                                   * INCLUDES the header, so it's not just
                                   * the objects!
                                   */
@@ -127,14 +129,14 @@ struct H5HG_heap_t {
                                   * have been used at some time and the
                                   * correct new index should be searched for
                                   */
-    struct H5F_shared_t *shared; /* Shared file */
-    H5HG_obj_t          *obj;    /* Array of object descriptions */
+    struct H5F_shared_t* shared; /* Shared file */
+    H5HG_obj_t* obj;             /* Array of object descriptions */
 };
 
 /******************************/
 /* Package Private Prototypes */
 /******************************/
-H5_DLL herr_t       H5HG__free(H5HG_heap_t *heap);
-H5_DLL H5HG_heap_t *H5HG__protect(H5F_t *f, haddr_t addr, unsigned flags);
+H5_DLL herr_t H5HG__free(H5HG_heap_t* heap);
+H5_DLL H5HG_heap_t* H5HG__protect(H5F_t* f, haddr_t addr, unsigned flags);
 
 #endif /* H5HGpkg_H */

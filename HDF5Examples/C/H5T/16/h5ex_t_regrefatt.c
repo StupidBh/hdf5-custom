@@ -24,20 +24,19 @@
 #define DS2DIM0   3
 #define DS2DIM1   16
 
-int
-main(void)
+int main(void)
 {
     hid_t file, space, memspace, dset, dset2, attr;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[1] = {DIM0}, dims2[2] = {DS2DIM0, DS2DIM1}, coords[4][2] = {{0, 1}, {2, 11}, {1, 0}, {2, 4}},
-            start[2] = {0, 0}, stride[2] = {2, 11}, count[2] = {2, 2}, block[2] = {1, 3};
-    hssize_t        npoints;
+    herr_t status;
+    hsize_t dims[1] = { DIM0 }, dims2[2] = { DS2DIM0, DS2DIM1 }, coords[4][2] = { { 0, 1 }, { 2, 11 }, { 1, 0 }, { 2, 4 } }, start[2] = { 0, 0 },
+            stride[2] = { 2, 11 }, count[2] = { 2, 2 }, block[2] = { 1, 3 };
+    hssize_t npoints;
     hdset_reg_ref_t wdata[DIM0], /* Write buffer */
         *rdata;                  /* Read buffer */
     ssize_t size;
-    char wdata2[DS2DIM0][DS2DIM1] = {"The quick brown", "fox jumps over ", "the 5 lazy dogs"}, *rdata2, *name;
-    int  ndims, i;
+    char wdata2[DS2DIM0][DS2DIM1] = { "The quick brown", "fox jumps over ", "the 5 lazy dogs" }, *rdata2, *name;
+    int ndims, i;
 
     /*
      * Create a new file using the default properties.
@@ -47,8 +46,8 @@ main(void)
     /*
      * Create a dataset with character data.
      */
-    space  = H5Screate_simple(2, dims2, NULL);
-    dset2  = H5Dcreate(file, DATASET2, H5T_STD_I8LE, space, H5P_DEFAULT);
+    space = H5Screate_simple(2, dims2, NULL);
+    dset2 = H5Dcreate(file, DATASET2, H5T_STD_I8LE, space, H5P_DEFAULT);
     status = H5Dwrite(dset2, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata2);
 
     /*
@@ -68,8 +67,8 @@ main(void)
      * Create dataset with a scalar dataspace to serve as the parent
      * for the attribute.
      */
-    space  = H5Screate(H5S_SCALAR);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
+    space = H5Screate(H5S_SCALAR);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -81,7 +80,7 @@ main(void)
     /*
      * Create the attribute and write the region references to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, H5T_STD_REF_DSETREG, space, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, H5T_STD_REF_DSETREG, space, H5P_DEFAULT);
     status = H5Awrite(attr, H5T_STD_REF_DSETREG, wdata);
 
     /*
@@ -110,9 +109,9 @@ main(void)
     /*
      * Get dataspace and allocate memory for read buffer.
      */
-    space  = H5Aget_space(attr);
-    ndims  = H5Sget_simple_extent_dims(space, dims, NULL);
-    rdata  = (hdset_reg_ref_t *)malloc(dims[0] * sizeof(hdset_reg_ref_t));
+    space = H5Aget_space(attr);
+    ndims = H5Sget_simple_extent_dims(space, dims, NULL);
+    rdata = (hdset_reg_ref_t*)malloc(dims[0] * sizeof(hdset_reg_ref_t));
     status = H5Sclose(space);
 
     /*
@@ -138,10 +137,11 @@ main(void)
          * retrieve the name.
          */
         size = 1 + H5Iget_name(dset2, NULL, 0);
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
         size = H5Iget_name(dset2, name, size);
-        if (size <= 1)
+        if (size <= 1) {
             name[0] = '\0';
+        }
 
         /*
          * Allocate space for the read buffer.  We will only allocate
@@ -149,14 +149,14 @@ main(void)
          * read buffer will be 1-dimensional.
          */
         npoints = H5Sget_select_npoints(space);
-        rdata2  = (char *)malloc(npoints + 1);
+        rdata2 = (char*)malloc(npoints + 1);
 
         /*
          * Read the dataset region, and add a null terminator so we can
          * print it as a string.
          */
-        memspace        = H5Screate_simple(1, (hsize_t *)&npoints, NULL);
-        status          = H5Dread(dset2, H5T_NATIVE_CHAR, memspace, space, H5P_DEFAULT, rdata2);
+        memspace = H5Screate_simple(1, (hsize_t*)&npoints, NULL);
+        status = H5Dread(dset2, H5T_NATIVE_CHAR, memspace, space, H5P_DEFAULT, rdata2);
         rdata2[npoints] = '\0';
 
         /*

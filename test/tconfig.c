@@ -24,26 +24,25 @@
 /* verify C int type: verify the size of signed and unsigned int type
  * with the macro size.
  */
-#define vrfy_cint_type(ctype, uctype, ctype_macro)                                                           \
-    do {                                                                                                     \
-        /* check signed type size */                                                                         \
-        vrfy_macrosize(ctype, ctype_macro, #ctype_macro);                                                    \
-        /* check unsigned type size */                                                                       \
-        vrfy_macrosize(uctype, ctype_macro, #ctype_macro);                                                   \
+#define vrfy_cint_type(ctype, uctype, ctype_macro)         \
+    do {                                                   \
+        /* check signed type size */                       \
+        vrfy_macrosize(ctype, ctype_macro, #ctype_macro);  \
+        /* check unsigned type size */                     \
+        vrfy_macrosize(uctype, ctype_macro, #ctype_macro); \
     } while (0)
 
 /* verify C type sizes: verify the sizeof type with the macro size. */
-#define vrfy_ctype(type, macro)                                                                              \
-    do {                                                                                                     \
-        vrfy_macrosize(type, macro, #macro);                                                                 \
+#define vrfy_ctype(type, macro)              \
+    do {                                     \
+        vrfy_macrosize(type, macro, #macro); \
     } while (0)
 
 /* verify if the sizeof(type) matches size defined in macro. */
 /* Needs this extra step so that we can print the macro name. */
-#define vrfy_macrosize(type, macro, macroname)                                                               \
-    if (sizeof(type) != (macro))                                                                             \
-        TestErrPrintf("Error: sizeof(%s) is %zu but %s is %d\n", #type, sizeof(type), macroname,             \
-                      (int)(macro));
+#define vrfy_macrosize(type, macro, macroname) \
+    if (sizeof(type) != (macro))               \
+        TestErrPrintf("Error: sizeof(%s) is %zu but %s is %d\n", #type, sizeof(type), macroname, (int)(macro));
 
 /* local routine prototypes */
 void test_config_ctypes(void);
@@ -58,8 +57,7 @@ void test_exit_definitions(void);
  *
  *-------------------------------------------------------------------------
  */
-void
-test_configure(void H5_ATTR_UNUSED *params)
+void test_configure(void H5_ATTR_UNUSED* params)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing configure definitions\n"));
@@ -76,8 +74,7 @@ test_configure(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_configure(void H5_ATTR_UNUSED *params)
+void cleanup_configure(void H5_ATTR_UNUSED* params)
 {
     /* no file to clean */
 }
@@ -91,8 +88,7 @@ cleanup_configure(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-test_config_ctypes(void)
+void test_config_ctypes(void)
 {
     /* standard C89 basic types */
     /* char, signed char,  unsigned char are three distinct types. */
@@ -172,13 +168,14 @@ test_config_ctypes(void)
  *
  *-------------------------------------------------------------------------
  */
-void
-test_exit_definitions(void)
+void test_exit_definitions(void)
 {
     /* Verify the EXIT_SUCCESS and EXIT_FAILURE are 0 and 1 respectively. */
     /* This should be true for POSIX compliant systems. */
-    if (EXIT_SUCCESS != 0)
+    if (EXIT_SUCCESS != 0) {
         TestErrPrintf("Error: EXIT_SUCCESS is %d, should be %d\n", EXIT_SUCCESS, 0);
-    if (EXIT_FAILURE != 1)
+    }
+    if (EXIT_FAILURE != 1) {
         TestErrPrintf("Error: EXIT_FAILURE is %d, should be %d\n", EXIT_FAILURE, 1);
+    }
 }

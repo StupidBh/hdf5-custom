@@ -36,17 +36,19 @@
 /******************/
 
 /* Callback info for readvv operation */
-typedef struct H5D_efl_readvv_ud_t {
-    const H5O_efl_t *efl;  /* Pointer to efl info */
-    const H5D_t     *dset; /* The dataset */
-    unsigned char   *rbuf; /* Read buffer */
+typedef struct H5D_efl_readvv_ud_t
+{
+    const H5O_efl_t* efl; /* Pointer to efl info */
+    const H5D_t* dset;    /* The dataset */
+    unsigned char* rbuf;  /* Read buffer */
 } H5D_efl_readvv_ud_t;
 
 /* Callback info for writevv operation */
-typedef struct H5D_efl_writevv_ud_t {
-    const H5O_efl_t     *efl;  /* Pointer to efl info */
-    const H5D_t         *dset; /* The dataset */
-    const unsigned char *wbuf; /* Write buffer */
+typedef struct H5D_efl_writevv_ud_t
+{
+    const H5O_efl_t* efl;      /* Pointer to efl info */
+    const H5D_t* dset;         /* The dataset */
+    const unsigned char* wbuf; /* Write buffer */
 } H5D_efl_writevv_ud_t;
 
 /********************/
@@ -54,29 +56,40 @@ typedef struct H5D_efl_writevv_ud_t {
 /********************/
 
 /* Layout operation callbacks */
-static herr_t  H5D__efl_construct(H5F_t *f, H5D_t *dset);
-static herr_t  H5D__efl_init(H5F_t *f, H5D_t *dset, hid_t dapl_id, bool open_op);
-static herr_t  H5D__efl_io_init(H5D_io_info_t *io_info, H5D_dset_io_info_t *dinfo);
-static ssize_t H5D__efl_readvv(const H5D_io_info_t *io_info, const H5D_dset_io_info_t *dset_info,
-                               size_t dset_max_nseq, size_t *dset_curr_seq, size_t dset_len_arr[],
-                               hsize_t dset_offset_arr[], size_t mem_max_nseq, size_t *mem_curr_seq,
-                               size_t mem_len_arr[], hsize_t mem_offset_arr[]);
-static ssize_t H5D__efl_writevv(const H5D_io_info_t *io_info, const H5D_dset_io_info_t *dset_info,
-                                size_t dset_max_nseq, size_t *dset_curr_seq, size_t dset_len_arr[],
-                                hsize_t dset_offset_arr[], size_t mem_max_nseq, size_t *mem_curr_seq,
-                                size_t mem_len_arr[], hsize_t mem_offset_arr[]);
+static herr_t H5D__efl_construct(H5F_t* f, H5D_t* dset);
+static herr_t H5D__efl_init(H5F_t* f, H5D_t* dset, hid_t dapl_id, bool open_op);
+static herr_t H5D__efl_io_init(H5D_io_info_t* io_info, H5D_dset_io_info_t* dinfo);
+static ssize_t H5D__efl_readvv(const H5D_io_info_t* io_info,
+                               const H5D_dset_io_info_t* dset_info,
+                               size_t dset_max_nseq,
+                               size_t* dset_curr_seq,
+                               size_t dset_len_arr[],
+                               hsize_t dset_offset_arr[],
+                               size_t mem_max_nseq,
+                               size_t* mem_curr_seq,
+                               size_t mem_len_arr[],
+                               hsize_t mem_offset_arr[]);
+static ssize_t H5D__efl_writevv(const H5D_io_info_t* io_info,
+                                const H5D_dset_io_info_t* dset_info,
+                                size_t dset_max_nseq,
+                                size_t* dset_curr_seq,
+                                size_t dset_len_arr[],
+                                hsize_t dset_offset_arr[],
+                                size_t mem_max_nseq,
+                                size_t* mem_curr_seq,
+                                size_t mem_len_arr[],
+                                hsize_t mem_offset_arr[]);
 
 /* Helper routines */
-static herr_t H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size, uint8_t *buf);
-static herr_t H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size,
-                             const uint8_t *buf);
+static herr_t H5D__efl_read(const H5O_efl_t* efl, const H5D_t* dset, haddr_t addr, size_t size, uint8_t* buf);
+static herr_t H5D__efl_write(const H5O_efl_t* efl, const H5D_t* dset, haddr_t addr, size_t size, const uint8_t* buf);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* External File List (EFL) storage layout I/O ops */
-const H5D_layout_ops_t H5D_LOPS_EFL[1] = {{
+const H5D_layout_ops_t H5D_LOPS_EFL[1] = { {
     H5D__efl_construct,      /* construct */
     H5D__efl_init,           /* init */
     H5D__efl_is_space_alloc, /* is_space_alloc */
@@ -90,7 +103,7 @@ const H5D_layout_ops_t H5D_LOPS_EFL[1] = {{
     NULL,                    /* flush */
     NULL,                    /* io_term */
     NULL                     /* dest */
-}};
+} };
 
 /*******************/
 /* Local Variables */
@@ -105,16 +118,15 @@ const H5D_layout_ops_t H5D_LOPS_EFL[1] = {{
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_construct(H5F_t *f, H5D_t *dset)
+static herr_t H5D__efl_construct(H5F_t* f, H5D_t* dset)
 {
-    size_t   dt_size;             /* Size of datatype */
-    hssize_t stmp_size;           /* Temporary holder for raw data size */
-    hsize_t  tmp_size;            /* Temporary holder for raw data size */
-    hsize_t  max_points;          /* Maximum elements */
-    hsize_t  max_storage;         /* Maximum storage size */
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    size_t dt_size;             /* Size of datatype */
+    hssize_t stmp_size;         /* Temporary holder for raw data size */
+    hsize_t tmp_size;           /* Temporary holder for raw data size */
+    hsize_t max_points;         /* Maximum elements */
+    hsize_t max_storage;        /* Maximum storage size */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -129,38 +141,45 @@ H5D__efl_construct(H5F_t *f, H5D_t *dset)
      */
 
     /* Check for invalid dataset dimensions */
-    for (u = 1; u < dset->shared->ndims; u++)
-        if (dset->shared->max_dims[u] > dset->shared->curr_dims[u])
+    for (u = 1; u < dset->shared->ndims; u++) {
+        if (dset->shared->max_dims[u] > dset->shared->curr_dims[u]) {
             HGOTO_ERROR(H5E_DATASET, H5E_UNSUPPORTED, FAIL, "only the first dimension can be extendible");
+        }
+    }
 
     /* Retrieve the size of the dataset's datatype */
-    if (0 == (dt_size = H5T_get_size(dset->shared->type)))
+    if (0 == (dt_size = H5T_get_size(dset->shared->type))) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unable to determine datatype size");
+    }
 
     /* Check for storage overflows */
     max_points = H5S_get_npoints_max(dset->shared->space);
-    if (H5O_efl_total_size(&dset->shared->dcpl_cache.efl, &max_storage) < 0)
+    if (H5O_efl_total_size(&dset->shared->dcpl_cache.efl, &max_storage) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "unable to retrieve size of external file");
+    }
     if (H5S_UNLIMITED == max_points) {
-        if (H5O_EFL_UNLIMITED != max_storage)
+        if (H5O_EFL_UNLIMITED != max_storage) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unlimited dataspace but finite storage");
+        }
     } /* end if */
-    else if ((max_points * dt_size) < max_points)
+    else if ((max_points * dt_size) < max_points) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "dataspace * type size overflowed");
-    else if ((max_points * dt_size) > max_storage)
+    }
+    else if ((max_points * dt_size) > max_storage) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "dataspace size exceeds external storage size");
+    }
 
     /* Compute the total size of dataset */
-    if ((stmp_size = H5S_GET_EXTENT_NPOINTS(dset->shared->space)) < 0)
+    if ((stmp_size = H5S_GET_EXTENT_NPOINTS(dset->shared->space)) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "unable to retrieve number of elements in dataspace");
+    }
     tmp_size = (hsize_t)stmp_size * dt_size;
     H5_CHECKED_ASSIGN(dset->shared->layout.storage.u.contig.size, hsize_t, tmp_size, hssize_t);
 
     /* Get the sieve buffer size for this dataset - the smaller of the dataset size and
      * the sieve buffer size from the FAPL is used
      */
-    dset->shared->cache.sieve.sieve_buf_size =
-        MIN(dset->shared->layout.storage.u.contig.size, H5F_SIEVE_BUF_SIZE(f));
+    dset->shared->cache.sieve.sieve_buf_size = MIN(dset->shared->layout.storage.u.contig.size, H5F_SIEVE_BUF_SIZE(f));
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -176,15 +195,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_init(H5F_t H5_ATTR_UNUSED *f, H5D_t *dset, hid_t H5_ATTR_UNUSED dapl_id, bool H5_ATTR_UNUSED open_op)
+static herr_t H5D__efl_init(H5F_t H5_ATTR_UNUSED* f, H5D_t* dset, hid_t H5_ATTR_UNUSED dapl_id, bool H5_ATTR_UNUSED open_op)
 {
-    size_t   dt_size;             /* Size of datatype */
-    hssize_t snelmts;             /* Temporary holder for number of elements in dataspace */
-    hsize_t  nelmts;              /* Number of elements in dataspace */
-    hsize_t  data_size;           /* Raw data size */
-    hsize_t  max_storage;         /* Maximum storage size */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    size_t dt_size;             /* Size of datatype */
+    hssize_t snelmts;           /* Temporary holder for number of elements in dataspace */
+    hsize_t nelmts;             /* Number of elements in dataspace */
+    hsize_t data_size;          /* Raw data size */
+    hsize_t max_storage;        /* Maximum storage size */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -192,26 +210,31 @@ H5D__efl_init(H5F_t H5_ATTR_UNUSED *f, H5D_t *dset, hid_t H5_ATTR_UNUSED dapl_id
     assert(dset);
 
     /* Retrieve the size of the dataset's datatype */
-    if (0 == (dt_size = H5T_get_size(dset->shared->type)))
+    if (0 == (dt_size = H5T_get_size(dset->shared->type))) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unable to determine datatype size");
+    }
 
     /* Retrieve the number of elements in the dataspace */
-    if ((snelmts = H5S_GET_EXTENT_NPOINTS(dset->shared->space)) < 0)
+    if ((snelmts = H5S_GET_EXTENT_NPOINTS(dset->shared->space)) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "unable to retrieve number of elements in dataspace");
+    }
     nelmts = (hsize_t)snelmts;
 
     /* Compute the size of the dataset's contiguous storage */
     data_size = nelmts * dt_size;
 
     /* Check for overflow during multiplication */
-    if (nelmts != (data_size / dt_size))
+    if (nelmts != (data_size / dt_size)) {
         HGOTO_ERROR(H5E_DATASET, H5E_OVERFLOW, FAIL, "size of dataset's storage overflowed");
+    }
 
     /* Check for storage overflows */
-    if (H5O_efl_total_size(&dset->shared->dcpl_cache.efl, &max_storage) < 0)
+    if (H5O_efl_total_size(&dset->shared->dcpl_cache.efl, &max_storage) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "unable to retrieve size of external file");
-    if (H5O_EFL_UNLIMITED != max_storage && data_size > max_storage)
+    }
+    if (H5O_EFL_UNLIMITED != max_storage && data_size > max_storage) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "dataspace size exceeds external storage size");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -226,8 +249,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5D__efl_is_space_alloc(const H5O_storage_t H5_ATTR_UNUSED *storage)
+bool H5D__efl_is_space_alloc(const H5O_storage_t H5_ATTR_UNUSED* storage)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -247,8 +269,7 @@ H5D__efl_is_space_alloc(const H5O_storage_t H5_ATTR_UNUSED *storage)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_io_init(H5D_io_info_t *io_info, H5D_dset_io_info_t *dinfo)
+static herr_t H5D__efl_io_init(H5D_io_info_t* io_info, H5D_dset_io_info_t* dinfo)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -276,10 +297,9 @@ H5D__efl_io_init(H5D_io_info_t *io_info, H5D_dset_io_info_t *dinfo)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size, uint8_t *buf)
+static herr_t H5D__efl_read(const H5O_efl_t* efl, const H5D_t* dset, haddr_t addr, size_t size, uint8_t* buf)
 {
-    int    fd = -1;
+    int fd = -1;
     size_t to_read;
     size_t left_to_read;
 #ifndef NDEBUG
@@ -287,9 +307,9 @@ H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size
 #endif /* NDEBUG */
     hsize_t skip = 0;
     haddr_t cur;
-    size_t  u;                   /* Local index variable */
-    char   *full_name = NULL;    /* File name with prefix */
-    herr_t  ret_value = SUCCEED; /* Return value */
+    size_t u;                   /* Local index variable */
+    char* full_name = NULL;     /* File name with prefix */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -311,16 +331,21 @@ H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size
     /* Read the data */
     while (size) {
         assert(buf);
-        if (u >= efl->nused)
+        if (u >= efl->nused) {
             HGOTO_ERROR(H5E_EFL, H5E_OVERFLOW, FAIL, "read past logical end of file");
-        if (H5F_OVERFLOW_HSIZET2OFFT((hsize_t)efl->slot[u].offset + skip))
+        }
+        if (H5F_OVERFLOW_HSIZET2OFFT((hsize_t)efl->slot[u].offset + skip)) {
             HGOTO_ERROR(H5E_EFL, H5E_OVERFLOW, FAIL, "external file address overflowed");
-        if (H5_combine_path(dset->shared->extfile_prefix, efl->slot[u].name, &full_name) < 0)
+        }
+        if (H5_combine_path(dset->shared->extfile_prefix, efl->slot[u].name, &full_name) < 0) {
             HGOTO_ERROR(H5E_EFL, H5E_NOSPACE, FAIL, "can't build external file name");
-        if ((fd = HDopen(full_name, O_RDONLY)) < 0)
+        }
+        if ((fd = HDopen(full_name, O_RDONLY)) < 0) {
             HGOTO_ERROR(H5E_EFL, H5E_CANTOPENFILE, FAIL, "unable to open external raw data file");
-        if (HDlseek(fd, (HDoff_t)(efl->slot[u].offset + (HDoff_t)skip), SEEK_SET) < 0)
+        }
+        if (HDlseek(fd, (HDoff_t)(efl->slot[u].offset + (HDoff_t)skip), SEEK_SET) < 0) {
             HGOTO_ERROR(H5E_EFL, H5E_SEEKERROR, FAIL, "unable to seek in external raw data file");
+        }
 #ifndef NDEBUG
         tempto_read = MIN((size_t)(efl->slot[u].size - skip), (hsize_t)size);
         H5_CHECK_OVERFLOW(tempto_read, hsize_t, size_t);
@@ -332,23 +357,26 @@ H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size
         /* Inner loop - read to_read bytes from a single external file */
         left_to_read = to_read;
         while (left_to_read > 0) {
-            h5_posix_io_t     bytes_in   = 0;  /* # of bytes to read       */
+            h5_posix_io_t bytes_in = 0;        /* # of bytes to read       */
             h5_posix_io_ret_t bytes_read = -1; /* # of bytes actually read */
 
             /* Trying to read more bytes than the return type can handle is
              * undefined behavior in POSIX.
              */
-            if (left_to_read > H5_POSIX_MAX_IO_BYTES)
+            if (left_to_read > H5_POSIX_MAX_IO_BYTES) {
                 bytes_in = H5_POSIX_MAX_IO_BYTES;
-            else
+            }
+            else {
                 bytes_in = (h5_posix_io_t)left_to_read;
+            }
 
             do {
                 bytes_read = HDread(fd, buf, bytes_in);
             } while (-1 == bytes_read && EINTR == errno);
 
-            if (bytes_read < 0)
+            if (bytes_read < 0) {
                 HGOTO_ERROR(H5E_EFL, H5E_READERROR, FAIL, "read error in external raw data file");
+            }
 
             if (0 == bytes_read) {
                 /* End of file on disk, fill the remaining sectors to be read from this file with 0 */
@@ -361,7 +389,7 @@ H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size
         }
 
         /* Prepare to advance to next external file */
-        full_name = (char *)H5MM_xfree(full_name);
+        full_name = (char*)H5MM_xfree(full_name);
         HDclose(fd);
         fd = -1;
         size -= to_read;
@@ -370,10 +398,12 @@ H5D__efl_read(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size
     } /* end while */
 
 done:
-    if (full_name)
-        full_name = (char *)H5MM_xfree(full_name);
-    if (fd >= 0)
+    if (full_name) {
+        full_name = (char*)H5MM_xfree(full_name);
+    }
+    if (fd >= 0) {
         HDclose(fd);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__efl_read() */
@@ -390,10 +420,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t size, const uint8_t *buf)
+static herr_t H5D__efl_write(const H5O_efl_t* efl, const H5D_t* dset, haddr_t addr, size_t size, const uint8_t* buf)
 {
-    int    fd = -1;
+    int fd = -1;
     size_t to_write;
     size_t left_to_write;
 #ifndef NDEBUG
@@ -401,9 +430,9 @@ H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t siz
 #endif /* NDEBUG */
     haddr_t cur;
     hsize_t skip = 0;
-    size_t  u;                   /* Local index variable */
-    char   *full_name = NULL;    /* File name with prefix */
-    herr_t  ret_value = SUCCEED; /* Return value */
+    size_t u;                   /* Local index variable */
+    char* full_name = NULL;     /* File name with prefix */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -425,20 +454,26 @@ H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t siz
     /* Write the data */
     while (size) {
         assert(buf);
-        if (u >= efl->nused)
+        if (u >= efl->nused) {
             HGOTO_ERROR(H5E_EFL, H5E_OVERFLOW, FAIL, "write past logical end of file");
-        if (H5F_OVERFLOW_HSIZET2OFFT((hsize_t)efl->slot[u].offset + skip))
+        }
+        if (H5F_OVERFLOW_HSIZET2OFFT((hsize_t)efl->slot[u].offset + skip)) {
             HGOTO_ERROR(H5E_EFL, H5E_OVERFLOW, FAIL, "external file address overflowed");
-        if (H5_combine_path(dset->shared->extfile_prefix, efl->slot[u].name, &full_name) < 0)
+        }
+        if (H5_combine_path(dset->shared->extfile_prefix, efl->slot[u].name, &full_name) < 0) {
             HGOTO_ERROR(H5E_EFL, H5E_NOSPACE, FAIL, "can't build external file name");
+        }
         if ((fd = HDopen(full_name, O_CREAT | O_RDWR, H5_POSIX_CREATE_MODE_RW)) < 0) {
-            if (HDaccess(full_name, F_OK) < 0)
+            if (HDaccess(full_name, F_OK) < 0) {
                 HGOTO_ERROR(H5E_EFL, H5E_CANTOPENFILE, FAIL, "external raw data file does not exist");
-            else
+            }
+            else {
                 HGOTO_ERROR(H5E_EFL, H5E_CANTOPENFILE, FAIL, "unable to open external raw data file");
+            }
         } /* end if */
-        if (HDlseek(fd, (HDoff_t)(efl->slot[u].offset + (HDoff_t)skip), SEEK_SET) < 0)
+        if (HDlseek(fd, (HDoff_t)(efl->slot[u].offset + (HDoff_t)skip), SEEK_SET) < 0) {
             HGOTO_ERROR(H5E_EFL, H5E_SEEKERROR, FAIL, "unable to seek in external raw data file");
+        }
 #ifndef NDEBUG
         tempto_write = MIN(efl->slot[u].size - skip, (hsize_t)size);
         H5_CHECK_OVERFLOW(tempto_write, hsize_t, size_t);
@@ -450,32 +485,36 @@ H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t siz
         /* Inner loop - write to_write bytes to a single external file */
         left_to_write = to_write;
         while (left_to_write > 0) {
-            h5_posix_io_t     bytes_in    = 0;  /* # of bytes to write         */
+            h5_posix_io_t bytes_in = 0;         /* # of bytes to write         */
             h5_posix_io_ret_t bytes_wrote = -1; /* # of bytes actually written */
 
             /* Trying to write more bytes than the return type can handle is
              * undefined behavior in POSIX.
              */
-            if (left_to_write > H5_POSIX_MAX_IO_BYTES)
+            if (left_to_write > H5_POSIX_MAX_IO_BYTES) {
                 bytes_in = H5_POSIX_MAX_IO_BYTES;
-            else
+            }
+            else {
                 bytes_in = (h5_posix_io_t)left_to_write;
+            }
 
             do {
                 bytes_wrote = HDwrite(fd, buf, bytes_in);
             } while (-1 == bytes_wrote && EINTR == errno);
 
-            if (bytes_wrote < 0)
+            if (bytes_wrote < 0) {
                 HGOTO_ERROR(H5E_EFL, H5E_WRITEERROR, FAIL, "write error in external raw data file");
-            if (bytes_wrote == 0)
+            }
+            if (bytes_wrote == 0) {
                 HGOTO_ERROR(H5E_EFL, H5E_WRITEERROR, FAIL, "wrote 0 bytes to external raw data file");
+            }
 
             left_to_write -= (size_t)bytes_wrote;
             buf += bytes_wrote;
         }
 
         /* Prepare to advance to next external file */
-        full_name = (char *)H5MM_xfree(full_name);
+        full_name = (char*)H5MM_xfree(full_name);
         HDclose(fd);
         fd = -1;
         size -= to_write;
@@ -484,10 +523,12 @@ H5D__efl_write(const H5O_efl_t *efl, const H5D_t *dset, haddr_t addr, size_t siz
     } /* end while */
 
 done:
-    if (full_name)
-        full_name = (char *)H5MM_xfree(full_name);
-    if (fd >= 0)
+    if (full_name) {
+        full_name = (char*)H5MM_xfree(full_name);
+    }
+    if (fd >= 0) {
         HDclose(fd);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__efl_write() */
@@ -501,17 +542,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_readvv_cb(hsize_t dst_off, hsize_t src_off, size_t len, void *_udata)
+static herr_t H5D__efl_readvv_cb(hsize_t dst_off, hsize_t src_off, size_t len, void* _udata)
 {
-    H5D_efl_readvv_ud_t *udata     = (H5D_efl_readvv_ud_t *)_udata; /* User data for H5VM_opvv() operator */
-    herr_t               ret_value = SUCCEED;                       /* Return value */
+    H5D_efl_readvv_ud_t* udata = (H5D_efl_readvv_ud_t*)_udata; /* User data for H5VM_opvv() operator */
+    herr_t ret_value = SUCCEED;                                /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Read data */
-    if (H5D__efl_read(udata->efl, udata->dset, dst_off, len, (udata->rbuf + src_off)) < 0)
+    if (H5D__efl_read(udata->efl, udata->dset, dst_off, len, (udata->rbuf + src_off)) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "EFL read failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -529,13 +570,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static ssize_t
-H5D__efl_readvv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED *io_info, const H5D_dset_io_info_t *dset_info,
-                size_t dset_max_nseq, size_t *dset_curr_seq, size_t dset_len_arr[], hsize_t dset_off_arr[],
-                size_t mem_max_nseq, size_t *mem_curr_seq, size_t mem_len_arr[], hsize_t mem_off_arr[])
+static ssize_t H5D__efl_readvv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED* io_info,
+                               const H5D_dset_io_info_t* dset_info,
+                               size_t dset_max_nseq,
+                               size_t* dset_curr_seq,
+                               size_t dset_len_arr[],
+                               hsize_t dset_off_arr[],
+                               size_t mem_max_nseq,
+                               size_t* mem_curr_seq,
+                               size_t mem_len_arr[],
+                               hsize_t mem_off_arr[])
 {
-    H5D_efl_readvv_ud_t udata;          /* User data for H5VM_opvv() operator */
-    ssize_t             ret_value = -1; /* Return value (Total size of sequence in bytes) */
+    H5D_efl_readvv_ud_t udata; /* User data for H5VM_opvv() operator */
+    ssize_t ret_value = -1;    /* Return value (Total size of sequence in bytes) */
 
     FUNC_ENTER_PACKAGE
 
@@ -554,14 +601,16 @@ H5D__efl_readvv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED *io_info, const H5D_ds
     assert(mem_off_arr);
 
     /* Set up user data for H5VM_opvv() */
-    udata.efl  = &(dset_info->store->efl);
+    udata.efl = &(dset_info->store->efl);
     udata.dset = dset_info->dset;
-    udata.rbuf = (unsigned char *)dset_info->buf.vp;
+    udata.rbuf = (unsigned char*)dset_info->buf.vp;
 
     /* Call generic sequence operation routine */
-    if ((ret_value = H5VM_opvv(dset_max_nseq, dset_curr_seq, dset_len_arr, dset_off_arr, mem_max_nseq,
-                               mem_curr_seq, mem_len_arr, mem_off_arr, H5D__efl_readvv_cb, &udata)) < 0)
+    if ((ret_value =
+             H5VM_opvv(dset_max_nseq, dset_curr_seq, dset_len_arr, dset_off_arr, mem_max_nseq, mem_curr_seq, mem_len_arr, mem_off_arr, H5D__efl_readvv_cb, &udata)) <
+        0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTOPERATE, FAIL, "can't perform vectorized EFL read");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -576,17 +625,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__efl_writevv_cb(hsize_t dst_off, hsize_t src_off, size_t len, void *_udata)
+static herr_t H5D__efl_writevv_cb(hsize_t dst_off, hsize_t src_off, size_t len, void* _udata)
 {
-    H5D_efl_writevv_ud_t *udata     = (H5D_efl_writevv_ud_t *)_udata; /* User data for H5VM_opvv() operator */
-    herr_t                ret_value = SUCCEED;                        /* Return value */
+    H5D_efl_writevv_ud_t* udata = (H5D_efl_writevv_ud_t*)_udata; /* User data for H5VM_opvv() operator */
+    herr_t ret_value = SUCCEED;                                  /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Write data */
-    if (H5D__efl_write(udata->efl, udata->dset, dst_off, len, (udata->wbuf + src_off)) < 0)
+    if (H5D__efl_write(udata->efl, udata->dset, dst_off, len, (udata->wbuf + src_off)) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "EFL write failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -604,13 +653,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static ssize_t
-H5D__efl_writevv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED *io_info, const H5D_dset_io_info_t *dset_info,
-                 size_t dset_max_nseq, size_t *dset_curr_seq, size_t dset_len_arr[], hsize_t dset_off_arr[],
-                 size_t mem_max_nseq, size_t *mem_curr_seq, size_t mem_len_arr[], hsize_t mem_off_arr[])
+static ssize_t H5D__efl_writevv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED* io_info,
+                                const H5D_dset_io_info_t* dset_info,
+                                size_t dset_max_nseq,
+                                size_t* dset_curr_seq,
+                                size_t dset_len_arr[],
+                                hsize_t dset_off_arr[],
+                                size_t mem_max_nseq,
+                                size_t* mem_curr_seq,
+                                size_t mem_len_arr[],
+                                hsize_t mem_off_arr[])
 {
-    H5D_efl_writevv_ud_t udata;          /* User data for H5VM_opvv() operator */
-    ssize_t              ret_value = -1; /* Return value (Total size of sequence in bytes) */
+    H5D_efl_writevv_ud_t udata; /* User data for H5VM_opvv() operator */
+    ssize_t ret_value = -1;     /* Return value (Total size of sequence in bytes) */
 
     FUNC_ENTER_PACKAGE
 
@@ -629,14 +684,23 @@ H5D__efl_writevv(const H5D_io_info_t H5_ATTR_NDEBUG_UNUSED *io_info, const H5D_d
     assert(mem_off_arr);
 
     /* Set up user data for H5VM_opvv() */
-    udata.efl  = &(dset_info->store->efl);
+    udata.efl = &(dset_info->store->efl);
     udata.dset = dset_info->dset;
-    udata.wbuf = (const unsigned char *)dset_info->buf.cvp;
+    udata.wbuf = (const unsigned char*)dset_info->buf.cvp;
 
     /* Call generic sequence operation routine */
-    if ((ret_value = H5VM_opvv(dset_max_nseq, dset_curr_seq, dset_len_arr, dset_off_arr, mem_max_nseq,
-                               mem_curr_seq, mem_len_arr, mem_off_arr, H5D__efl_writevv_cb, &udata)) < 0)
+    if ((ret_value = H5VM_opvv(dset_max_nseq,
+                               dset_curr_seq,
+                               dset_len_arr,
+                               dset_off_arr,
+                               mem_max_nseq,
+                               mem_curr_seq,
+                               mem_len_arr,
+                               mem_off_arr,
+                               H5D__efl_writevv_cb,
+                               &udata)) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTOPERATE, FAIL, "can't perform vectorized EFL write");
+    }
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__efl_writevv() */
@@ -652,8 +716,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__efl_bh_info(H5F_t *f, H5O_efl_t *efl, hsize_t *heap_size)
+herr_t H5D__efl_bh_info(H5F_t* f, H5O_efl_t* efl, hsize_t* heap_size)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -666,8 +729,9 @@ H5D__efl_bh_info(H5F_t *f, H5O_efl_t *efl, hsize_t *heap_size)
     assert(heap_size);
 
     /* Get the size of the local heap for EFL's file list */
-    if (H5HL_heapsize(f, efl->heap_addr, heap_size) < 0)
+    if (H5HL_heapsize(f, efl->heap_addr, heap_size) < 0) {
         HGOTO_ERROR(H5E_EFL, H5E_CANTINIT, FAIL, "unable to retrieve local heap info");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

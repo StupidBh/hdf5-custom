@@ -31,29 +31,33 @@
 /* Size of data buffer */
 #define TEST_BUF_SIZE 100
 
-static herr_t extend_dset_two(const char *file, char *dname, int action1, int action2);
-static herr_t extend_dset_one(const char *file, char *dname, int action);
+static herr_t extend_dset_two(const char* file, char* dname, int action1, int action2);
+static herr_t extend_dset_one(const char* file, char* dname, int action);
 
 /* Data structures for datasets with compound data type */
-typedef struct sub22_t {
+typedef struct sub22_t
+{
     int a;
     int b;
     int c;
 } sub22_t;
 
-typedef struct sub2_t {
-    int     a;
+typedef struct sub2_t
+{
+    int a;
     sub22_t b;
-    int     c;
+    int c;
 } sub2_t;
 
-typedef struct sub4_t {
+typedef struct sub4_t
+{
     int a;
     int b;
 } sub4_t;
 
-typedef struct set_t {
-    int    field1;
+typedef struct set_t
+{
+    int field1;
     sub2_t field2;
     double field3;
     sub4_t field4;
@@ -67,131 +71,153 @@ typedef struct set_t {
  *
  ***********************************************************************
  */
-static herr_t
-extend_dset_two(const char *file, char *dname, int action1, int action2)
+static herr_t extend_dset_two(const char* file, char* dname, int action1, int action2)
 {
-    hid_t    fid  = -1;   /* file id                                          */
-    hid_t    fapl = -1;   /* file access property list id                     */
-    hid_t    did  = -1;   /* dataset id                                       */
-    hid_t    sid  = -1;   /* dataspace id                                     */
-    hid_t    dtid = -1;   /* dataset's datatype id                            */
-    int      ndims;       /* # of dimension sizes                             */
-    unsigned i;           /* local index variable                             */
-    hsize_t  ext_dims[2]; /* new dimension sizes after extension              */
-    hsize_t  cur_dims[2]; /* current dimension sizes                          */
-    size_t   dtype_size;  /* size of the dataset's datatype                   */
-    unsigned num_elmts;   /* number of elements in the dataset                */
-    int     *ibuf = NULL; /* buffer for storing retrieved elements (integer)  */
-    set_t   *cbuf = NULL; /* buffer for storing retrieved elements (compound) */
+    hid_t fid = -1;      /* file id                                          */
+    hid_t fapl = -1;     /* file access property list id                     */
+    hid_t did = -1;      /* dataset id                                       */
+    hid_t sid = -1;      /* dataspace id                                     */
+    hid_t dtid = -1;     /* dataset's datatype id                            */
+    int ndims;           /* # of dimension sizes                             */
+    unsigned i;          /* local index variable                             */
+    hsize_t ext_dims[2]; /* new dimension sizes after extension              */
+    hsize_t cur_dims[2]; /* current dimension sizes                          */
+    size_t dtype_size;   /* size of the dataset's datatype                   */
+    unsigned num_elmts;  /* number of elements in the dataset                */
+    int* ibuf = NULL;    /* buffer for storing retrieved elements (integer)  */
+    set_t* cbuf = NULL;  /* buffer for storing retrieved elements (compound) */
 
     /* Allocate memory */
-    if (NULL == (ibuf = (int *)calloc(TEST_BUF_SIZE, sizeof(int))))
+    if (NULL == (ibuf = (int*)calloc(TEST_BUF_SIZE, sizeof(int)))) {
         goto error;
-    if (NULL == (cbuf = (set_t *)calloc(TEST_BUF_SIZE, sizeof(set_t))))
+    }
+    if (NULL == (cbuf = (set_t*)calloc(TEST_BUF_SIZE, sizeof(set_t)))) {
         goto error;
+    }
 
     /* Create a copy of file access property list */
-    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         goto error;
+    }
 
     /* Set to use the latest library format */
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         goto error;
+    }
 
     /* Open the file and dataset with SWMR write */
-    if ((fid = H5Fopen(file, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0)
+    if ((fid = H5Fopen(file, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0) {
         goto error;
+    }
 
-    if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Send message to the test script to start "h5watch" */
     h5_send_message(WRITER_MESSAGE, NULL, NULL);
 
-    if ((sid = H5Dget_space(did)) < 0)
+    if ((sid = H5Dget_space(did)) < 0) {
         goto error;
+    }
 
-    if ((ndims = H5Sget_simple_extent_ndims(sid)) < 0)
+    if ((ndims = H5Sget_simple_extent_ndims(sid)) < 0) {
         goto error;
+    }
 
     /* Get the size of the dataset's datatype */
-    if ((dtype_size = H5LDget_dset_type_size(did, NULL)) == 0)
+    if ((dtype_size = H5LDget_dset_type_size(did, NULL)) == 0) {
         goto error;
+    }
 
     /* Get the dataset's data type */
-    if ((dtid = H5Tget_native_type(H5Dget_type(did), H5T_DIR_DEFAULT)) < 0)
+    if ((dtid = H5Tget_native_type(H5Dget_type(did), H5T_DIR_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Wait for message from the test script to start extending dataset */
-    if (h5_wait_message(READER_MESSAGE) < 0)
+    if (h5_wait_message(READER_MESSAGE) < 0) {
         goto error;
+    }
 
     /* sleep to emulate about 2 seconds of application operation */
     HDsleep(2);
 
     /* Get current dimension sizes */
-    if (H5LDget_dset_dims(did, cur_dims) < 0)
+    if (H5LDget_dset_dims(did, cur_dims) < 0) {
         goto error;
+    }
 
     /* Set up the new extended dimension sizes  */
     ext_dims[0] = cur_dims[0] + (hsize_t)action1;
     ext_dims[1] = cur_dims[1] + (hsize_t)action2;
 
     /* Extend the dataset */
-    if (H5Dset_extent(did, ext_dims) < 0)
+    if (H5Dset_extent(did, ext_dims) < 0) {
         goto error;
+    }
 
     num_elmts = 1;
-    for (i = 0; i < (unsigned)ndims; i++)
+    for (i = 0; i < (unsigned)ndims; i++) {
         num_elmts *= (unsigned)ext_dims[i];
+    }
 
     /* Compound type */
     if (!strcmp(dname, DSET_CMPD_TWO)) {
-
         memset(cbuf, 0, TEST_BUF_SIZE * sizeof(set_t));
         for (i = 0; i < num_elmts; i++) {
-            cbuf[i].field1     = action1;
-            cbuf[i].field2.a   = action1;
-            cbuf[i].field2.c   = action1;
+            cbuf[i].field1 = action1;
+            cbuf[i].field2.a = action1;
+            cbuf[i].field2.c = action1;
             cbuf[i].field2.b.a = action1;
             cbuf[i].field2.b.b = action1;
             cbuf[i].field2.b.c = action1;
-            cbuf[i].field3     = action1;
-            cbuf[i].field4.a   = action1;
-            cbuf[i].field4.b   = action1;
+            cbuf[i].field3 = action1;
+            cbuf[i].field4.a = action1;
+            cbuf[i].field4.b = action1;
         } /* end for */
 
         /* Write to the dataset */
-        if (H5Dwrite(did, dtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, cbuf) < 0)
+        if (H5Dwrite(did, dtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, cbuf) < 0) {
             goto error;
+        }
     }
     else { /* Integer type */
         memset(ibuf, 0, TEST_BUF_SIZE * sizeof(int));
-        for (i = 0; i < num_elmts; i++)
+        for (i = 0; i < num_elmts; i++) {
             ibuf[i] = action1;
+        }
 
         /* Write to the dataset */
-        if (H5Dwrite(did, dtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, ibuf) < 0)
+        if (H5Dwrite(did, dtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, ibuf) < 0) {
             goto error;
+        }
     } /* end if-else */
 
-    if (H5Dflush(did) < 0)
+    if (H5Dflush(did) < 0) {
         goto error;
+    }
 
     /* Closing */
-    if (H5Tclose(dtid) < 0)
+    if (H5Tclose(dtid) < 0) {
         goto error;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto error;
-    if (H5Pclose(fapl) < 0)
+    }
+    if (H5Pclose(fapl) < 0) {
         goto error;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
-    if (ibuf)
+    if (ibuf) {
         free(ibuf);
-    if (cbuf)
+    }
+    if (cbuf) {
         free(cbuf);
+    }
 
     return SUCCEED;
 
@@ -203,10 +229,12 @@ error:
     H5Fclose(fid);
     H5E_END_TRY
 
-    if (ibuf)
+    if (ibuf) {
         free(ibuf);
-    if (cbuf)
+    }
+    if (cbuf) {
         free(cbuf);
+    }
 
     return FAIL;
 
@@ -220,101 +248,112 @@ error:
  *
  ***********************************************************************
  */
-static herr_t
-extend_dset_one(const char *file, char *dname, int action)
+static herr_t extend_dset_one(const char* file, char* dname, int action)
 {
-    hid_t   fid  = -1;   /* file id                                          */
-    hid_t   fapl = -1;   /* file access property list id                     */
-    hid_t   did  = -1;   /* dataset id                                       */
-    hid_t   dtid = -1;   /* dataset's datatype id                            */
-    hid_t   sid  = -1;   /* dataspace id                                     */
-    hid_t   mid  = -1;   /* memory space id                                  */
-    int     i;           /* local index variable                             */
+    hid_t fid = -1;      /* file id                                          */
+    hid_t fapl = -1;     /* file access property list id                     */
+    hid_t did = -1;      /* dataset id                                       */
+    hid_t dtid = -1;     /* dataset's datatype id                            */
+    hid_t sid = -1;      /* dataspace id                                     */
+    hid_t mid = -1;      /* memory space id                                  */
+    int i;               /* local index variable                             */
     hsize_t cur_dims[1]; /* current dimension sizes                          */
     hsize_t ext_dims[1]; /* new dimension sizes after extension              */
     hsize_t offset[1];   /* starting offsets of appended data                */
     hsize_t count[1];    /* dimension sizes of appended data                 */
-    size_t  dtype_size;  /* size of the dataset's datatype                   */
-    int    *ibuf = NULL; /* buffer for storing retrieved elements (integer)  */
-    set_t  *cbuf = NULL; /* buffer for storing retrieved elements (compound) */
+    size_t dtype_size;   /* size of the dataset's datatype                   */
+    int* ibuf = NULL;    /* buffer for storing retrieved elements (integer)  */
+    set_t* cbuf = NULL;  /* buffer for storing retrieved elements (compound) */
 
     /* Allocate memory */
-    if (NULL == (ibuf = (int *)calloc(TEST_BUF_SIZE, sizeof(int))))
+    if (NULL == (ibuf = (int*)calloc(TEST_BUF_SIZE, sizeof(int)))) {
         goto error;
-    if (NULL == (cbuf = (set_t *)calloc(TEST_BUF_SIZE, sizeof(set_t))))
+    }
+    if (NULL == (cbuf = (set_t*)calloc(TEST_BUF_SIZE, sizeof(set_t)))) {
         goto error;
+    }
 
     /* Create a copy of file access property list */
-    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         goto error;
+    }
 
     /* Set to use the latest library format */
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         goto error;
+    }
 
     /* Open the file and dataset with SWMR write */
-    if ((fid = H5Fopen(file, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0)
+    if ((fid = H5Fopen(file, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl)) < 0) {
         goto error;
+    }
 
     /* Send message to the test script to start "h5watch" */
     h5_send_message(WRITER_MESSAGE, NULL, NULL);
 
-    if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Get size of the dataset's datatype */
-    if ((dtype_size = H5LDget_dset_type_size(did, NULL)) == 0)
+    if ((dtype_size = H5LDget_dset_type_size(did, NULL)) == 0) {
         goto error;
+    }
 
     /* Get dataset's datatype */
-    if ((dtid = H5Tget_native_type(H5Dget_type(did), H5T_DIR_DEFAULT)) < 0)
+    if ((dtid = H5Tget_native_type(H5Dget_type(did), H5T_DIR_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Wait for message from the test script to start extending dataset */
-    if (h5_wait_message(READER_MESSAGE) < 0)
+    if (h5_wait_message(READER_MESSAGE) < 0) {
         goto error;
+    }
 
     /* sleep to emulate about 2 seconds of application operation */
     HDsleep(2);
 
     /* Get current dimension sizes */
-    if (H5LDget_dset_dims(did, cur_dims) < 0)
+    if (H5LDget_dset_dims(did, cur_dims) < 0) {
         goto error;
+    }
 
     /* Set up the new extended dimension sizes  */
     ext_dims[0] = cur_dims[0] + (hsize_t)action;
 
     /* Extend the dataset */
-    if (H5Dset_extent(did, ext_dims) < 0)
+    if (H5Dset_extent(did, ext_dims) < 0) {
         goto error;
+    }
 
     /* Write to the new appended region of the dataset */
     if (action > 0) {
-
         /* Select the extended region */
         offset[0] = cur_dims[0];
-        count[0]  = (hsize_t)action;
-        if ((sid = H5Dget_space(did)) < 0)
+        count[0] = (hsize_t)action;
+        if ((sid = H5Dget_space(did)) < 0) {
             goto error;
-        if (H5Sselect_hyperslab(sid, H5S_SELECT_SET, offset, NULL, count, NULL) < 0)
+        }
+        if (H5Sselect_hyperslab(sid, H5S_SELECT_SET, offset, NULL, count, NULL) < 0) {
             goto error;
+        }
 
         /* Set up memory space and get dataset's datatype */
-        if ((mid = H5Screate_simple(1, count, NULL)) < 0)
+        if ((mid = H5Screate_simple(1, count, NULL)) < 0) {
             goto error;
+        }
 
         /* Initialize data for the extended region of the dataset */
         /* Compound type */
         if (!strcmp(dname, DSET_CMPD) || !strcmp(dname, DSET_CMPD_ESC)) {
-
             memset(cbuf, 0, TEST_BUF_SIZE * sizeof(set_t));
             for (i = 0; i < action; i++) {
-                cbuf[i].field1     = i + 1;
-                cbuf[i].field2.a   = i + 2;
+                cbuf[i].field1 = i + 1;
+                cbuf[i].field2.a = i + 2;
                 cbuf[i].field2.b.a = i + 2;
                 cbuf[i].field2.b.b = i + 2;
                 cbuf[i].field2.b.c = i + 2;
-                cbuf[i].field2.c   = i + 2;
+                cbuf[i].field2.c = i + 2;
 
                 cbuf[i].field3 = i + 3;
 
@@ -323,44 +362,56 @@ extend_dset_one(const char *file, char *dname, int action)
             } /* end for */
 
             /* Write to the extended region of the dataset */
-            if (H5Dwrite(did, dtid, mid, sid, H5P_DEFAULT, cbuf) < 0)
+            if (H5Dwrite(did, dtid, mid, sid, H5P_DEFAULT, cbuf) < 0) {
                 goto error;
+            }
         }
         else { /* Integer type */
 
             memset(ibuf, 0, TEST_BUF_SIZE * sizeof(int));
-            for (i = 0; i < action; i++)
+            for (i = 0; i < action; i++) {
                 ibuf[i] = (int)i;
+            }
 
             /* Write to the extended region of the dataset */
-            if (H5Dwrite(did, dtid, mid, sid, H5P_DEFAULT, ibuf) < 0)
+            if (H5Dwrite(did, dtid, mid, sid, H5P_DEFAULT, ibuf) < 0) {
                 goto error;
+            }
         } /* end if-else */
 
         /* Closing */
-        if (H5Sclose(sid) < 0)
+        if (H5Sclose(sid) < 0) {
             goto error;
-        if (H5Sclose(mid) < 0)
+        }
+        if (H5Sclose(mid) < 0) {
             goto error;
+        }
     } /* end if */
 
-    if (H5Dflush(did) < 0)
+    if (H5Dflush(did) < 0) {
         goto error;
+    }
 
     /* Closing */
-    if (H5Tclose(dtid) < 0)
+    if (H5Tclose(dtid) < 0) {
         goto error;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto error;
-    if (H5Pclose(fapl) < 0)
+    }
+    if (H5Pclose(fapl) < 0) {
         goto error;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
-    if (ibuf)
+    if (ibuf) {
         free(ibuf);
-    if (cbuf)
+    }
+    if (cbuf) {
         free(cbuf);
+    }
 
     return SUCCEED;
 
@@ -374,10 +425,12 @@ error:
     H5Fclose(fid);
     H5E_END_TRY
 
-    if (ibuf)
+    if (ibuf) {
         free(ibuf);
-    if (cbuf)
+    }
+    if (cbuf) {
         free(cbuf);
+    }
 
     return FAIL;
 } /* end extend_dset_one() */
@@ -390,12 +443,11 @@ error:
  *
  ***********************************************************************
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    char *dname = NULL;
-    char *fname = NULL;
-    int   action1, action2;
+    char* dname = NULL;
+    char* fname = NULL;
+    int action1, action2;
 
     if (argc != 5) {
         fprintf(stderr, "Should have file name, dataset name, and the extended amount...\n");
@@ -403,23 +455,25 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Get the dataset name to be extended */
-    fname   = strdup(argv[1]);
-    dname   = strdup(argv[2]);
+    fname = strdup(argv[1]);
+    dname = strdup(argv[2]);
     action1 = atoi(argv[3]);
     action2 = atoi(argv[4]);
 
     if (!strcmp(dname, DSET_CMPD) || !strcmp(dname, DSET_CMPD_ESC)) {
-        if (extend_dset_one(fname, dname, action1) < 0)
+        if (extend_dset_one(fname, dname, action1) < 0) {
             goto error;
+        }
     }
-    else if (!strcmp(dname, DSET_ONE) || !strcmp(dname, DSET_ALLOC_LATE) ||
-             !strcmp(dname, DSET_ALLOC_EARLY)) {
-        if (extend_dset_one(fname, dname, action1) < 0)
+    else if (!strcmp(dname, DSET_ONE) || !strcmp(dname, DSET_ALLOC_LATE) || !strcmp(dname, DSET_ALLOC_EARLY)) {
+        if (extend_dset_one(fname, dname, action1) < 0) {
             goto error;
+        }
     }
     else if (!strcmp(dname, DSET_TWO) || !strcmp(dname, DSET_CMPD_TWO)) {
-        if (extend_dset_two(fname, dname, action1, action2) < 0)
+        if (extend_dset_two(fname, dname, action1, action2) < 0) {
             goto error;
+        }
     }
     else {
         fprintf(stdout, "Dataset cannot be extended...\n");
@@ -429,9 +483,11 @@ main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 
 error:
-    if (dname)
+    if (dname) {
         free(dname);
-    if (fname)
+    }
+    if (fname) {
         free(fname);
+    }
     exit(EXIT_FAILURE);
 } /* end main() */

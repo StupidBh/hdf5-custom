@@ -26,15 +26,14 @@ using namespace H5;
 
 const H5std_string FILE_NAME("SDS.h5");
 const H5std_string DATASET_NAME("IntArray");
-const int          NX_SUB   = 3; // hyperslab dimensions
-const int          NY_SUB   = 4;
-const int          NX       = 7; // output buffer dimensions
-const int          NY       = 7;
-const int          NZ       = 3;
-const int          RANK_OUT = 3;
+const int NX_SUB = 3; // hyperslab dimensions
+const int NY_SUB = 4;
+const int NX = 7;     // output buffer dimensions
+const int NY = 7;
+const int NZ = 3;
+const int RANK_OUT = 3;
 
-int
-main(void)
+int main(void)
 {
     /*
      * Output buffer initialization.
@@ -43,8 +42,9 @@ main(void)
     int data_out[NX][NY][NZ]; /* output buffer */
     for (j = 0; j < NX; j++) {
         for (i = 0; i < NY; i++) {
-            for (k = 0; k < NZ; k++)
+            for (k = 0; k < NZ; k++) {
                 data_out[j][i][k] = 0;
+            }
         }
     }
 
@@ -61,7 +61,7 @@ main(void)
         /*
          * Open the specified file and the specified dataset in the file.
          */
-        H5File  file(FILE_NAME, H5F_ACC_RDONLY);
+        H5File file(FILE_NAME, H5F_ACC_RDONLY);
         DataSet dataset = file.openDataSet(DATASET_NAME);
 
         /*
@@ -110,8 +110,7 @@ main(void)
          */
         hsize_t dims_out[2];
         (void)dataspace.getSimpleExtentDims(dims_out, NULL);
-        cout << "rank " << rank << ", dimensions " << (unsigned long)(dims_out[0]) << " x "
-             << (unsigned long)(dims_out[1]) << endl;
+        cout << "rank " << rank << ", dimensions " << (unsigned long)(dims_out[0]) << " x " << (unsigned long)(dims_out[1]) << endl;
 
         /*
          * Define hyperslab in the dataset; implicitly giving strike and
@@ -121,8 +120,8 @@ main(void)
         hsize_t count[2];  // size of the hyperslab in the file
         offset[0] = 1;
         offset[1] = 2;
-        count[0]  = NX_SUB;
-        count[1]  = NY_SUB;
+        count[0] = NX_SUB;
+        count[1] = NY_SUB;
         dataspace.selectHyperslab(H5S_SELECT_SET, count, offset);
 
         /*
@@ -142,9 +141,9 @@ main(void)
         offset_out[0] = 3;
         offset_out[1] = 0;
         offset_out[2] = 0;
-        count_out[0]  = NX_SUB;
-        count_out[1]  = NY_SUB;
-        count_out[2]  = 1;
+        count_out[0] = NX_SUB;
+        count_out[1] = NY_SUB;
+        count_out[2] = 1;
         memspace.selectHyperslab(H5S_SELECT_SET, count_out, offset_out);
 
         /*
@@ -154,8 +153,9 @@ main(void)
         dataset.read(data_out, PredType::NATIVE_INT, memspace, dataspace);
 
         for (j = 0; j < NX; j++) {
-            for (i = 0; i < NY; i++)
+            for (i = 0; i < NY; i++) {
                 cout << data_out[j][i][0] << " ";
+            }
             cout << endl;
         }
         /*

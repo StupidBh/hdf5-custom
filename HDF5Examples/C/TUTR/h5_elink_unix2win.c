@@ -35,29 +35,29 @@
  * Note that this may not be necessary on your system; many Windows systems can
  * understand Unix paths.
  */
-static hid_t
-elink_unix2win_trav(const char *link_name, hid_t cur_group, const void *udata, size_t udata_size,
-                    hid_t lapl_id, hid_t dxpl_id)
+static hid_t elink_unix2win_trav(const char* link_name, hid_t cur_group, const void* udata, size_t udata_size, hid_t lapl_id, hid_t dxpl_id)
 {
-    hid_t       fid;
-    const char *file_name;
-    const char *obj_name;
-    char       *new_fname = NULL; /* Buffer allocated to hold Unix file path */
-    ssize_t     prefix_len;       /* External link prefix length */
-    size_t      fname_len;
-    size_t      start_pos; /* Initial position in new_fname buffer */
-    size_t      x;         /* Counter variable */
-    hid_t       ret_value = -1;
+    hid_t fid;
+    const char* file_name;
+    const char* obj_name;
+    char* new_fname = NULL; /* Buffer allocated to hold Unix file path */
+    ssize_t prefix_len;     /* External link prefix length */
+    size_t fname_len;
+    size_t start_pos;       /* Initial position in new_fname buffer */
+    size_t x;               /* Counter variable */
+    hid_t ret_value = -1;
 
     printf("Converting Unix path to Windows path.\n");
 
-    if (H5Lunpack_elink_val(udata, udata_size, NULL, &file_name, &obj_name) < 0)
+    if (H5Lunpack_elink_val(udata, udata_size, NULL, &file_name, &obj_name) < 0) {
         goto error;
+    }
     fname_len = strlen(file_name);
 
     /* See if the external link prefix property is set */
-    if ((prefix_len = H5Pget_elink_prefix(lapl_id, NULL, 0)) < 0)
+    if ((prefix_len = H5Pget_elink_prefix(lapl_id, NULL, 0)) < 0) {
         goto error;
+    }
 
     /* If so, prepend it to the filename.  We assume that the prefix
      * is in the correct format for the current file system.
@@ -67,8 +67,9 @@ elink_unix2win_trav(const char *link_name, hid_t cur_group, const void *udata, s
         new_fname = malloc(prefix_len + fname_len + 1);
 
         /* Copy the prefix into the buffer */
-        if (H5Pget_elink_prefix(lapl_id, new_fname, (size_t)(prefix_len + 1)) < 0)
+        if (H5Pget_elink_prefix(lapl_id, new_fname, (size_t)(prefix_len + 1)) < 0) {
             goto error;
+        }
 
         start_pos = prefix_len;
     }
@@ -82,34 +83,40 @@ elink_unix2win_trav(const char *link_name, hid_t cur_group, const void *udata, s
      * We'll convert '/' characters into '\' characters as we go.
      */
     for (x = 0; file_name[x] != '\0'; x++) {
-        if (file_name[x] == '/')
+        if (file_name[x] == '/') {
             new_fname[x + start_pos] = '\\';
-        else
+        }
+        else {
             new_fname[x + start_pos] = file_name[x];
+        }
     }
     new_fname[x + start_pos] = '\0';
 
     /* Now open the file and object within it */
-    if ((fid = H5Fopen(new_fname, H5F_ACC_RDWR, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fopen(new_fname, H5F_ACC_RDWR, H5P_DEFAULT)) < 0) {
         goto error;
+    }
     ret_value = H5Oopen(fid, obj_name, lapl_id); /* If this fails, our return value will be negative. */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     /* Free file name if it's been allocated */
-    if (new_fname)
+    if (new_fname) {
         free(new_fname);
+    }
 
     return ret_value;
 
 error:
     /* Free file name if it's been allocated */
-    if (new_fname)
+    if (new_fname) {
         free(new_fname);
+    }
     return -1;
 }
 
-const H5L_class_t elink_unix2win_class[1] = {{
+const H5L_class_t elink_unix2win_class[1] = { {
     H5L_LINK_CLASS_T_VERS,    /* H5L_class_t version       */
     H5L_TYPE_EXTERNAL,        /* Link type id number            */
     "unix2win external link", /* Link class name for debugging  */
@@ -119,7 +126,7 @@ const H5L_class_t elink_unix2win_class[1] = {{
     elink_unix2win_trav,      /* The actual traversal function  */
     NULL,                     /* Deletion callback              */
     NULL                      /* Query callback                 */
-}};
+} };
 
 /* The example function.
  * Creates a file named "unix2win.h5" with an external link pointing to
@@ -128,55 +135,63 @@ const H5L_class_t elink_unix2win_class[1] = {{
  * Registers a new traversal function for external links and then
  * follows the external link to open the target file.
  */
-static int
-unix2win_example(void)
+static int unix2win_example(void)
 {
     hid_t fid = (-1); /* File ID */
     hid_t gid = (-1); /* Group ID */
 
     /* Create the target file. */
 #ifdef H5_HAVE_WIN32_API
-    if ((fid = H5Fcreate("u2w\\u2w_target.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("u2w\\u2w_target.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 #else
-    if ((fid = H5Fcreate("u2w/u2w_target.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("u2w/u2w_target.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 #endif
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     /* Create the source file with an external link in Windows format */
-    if ((fid = H5Fcreate("unix2win.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("unix2win.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Create the external link */
-    if (H5Lcreate_external("u2w/../u2w/u2w_target.h5", "/", fid, "ext_link", H5P_DEFAULT, H5P_DEFAULT) < 0)
+    if (H5Lcreate_external("u2w/../u2w/u2w_target.h5", "/", fid, "ext_link", H5P_DEFAULT, H5P_DEFAULT) < 0) {
         goto error;
+    }
 
-        /* If we are not on Windows, assume we are on a Unix-y filesystem and
-         * follow the external link normally.
-         * If we are on Windows, register the unix2win traversal function so
-         * that external links can be traversed.
-         */
+    /* If we are not on Windows, assume we are on a Unix-y filesystem and
+     * follow the external link normally.
+     * If we are on Windows, register the unix2win traversal function so
+     * that external links can be traversed.
+     */
 
 #ifdef H5_HAVE_WIN32_API
     /* Register the elink_unix2win class defined above to replace default
      * external links
      */
-    if (H5Lregister(elink_unix2win_class) < 0)
+    if (H5Lregister(elink_unix2win_class) < 0) {
         goto error;
+    }
 #endif
 
     /* Now follow the link */
-    if ((gid = H5Gopen2(fid, "ext_link", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "ext_link", H5P_DEFAULT)) < 0) {
         goto error;
+    }
     printf("Successfully followed external link.\n");
 
     /* Close the group and the file */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto error;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     return 0;
 
@@ -195,8 +210,7 @@ error:
  *
  * Invokes the example function.
  */
-int
-main(void)
+int main(void)
 {
     int ret;
 

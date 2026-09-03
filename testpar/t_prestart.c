@@ -26,32 +26,32 @@ typedef int DATATYPE;
 
 int nerrors = 0; /* errors count */
 
-static const char *FILENAME[] = {"shutdown", NULL};
+static const char* FILENAME[] = { "shutdown", NULL };
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    hid_t     file_id, dset_id, grp_id;
-    hid_t     fapl, sid, mem_dataspace;
-    herr_t    ret;
-    char      filename[1024];
-    int       mpi_size, mpi_rank, ndims;
-    MPI_Comm  comm = MPI_COMM_WORLD;
-    MPI_Info  info = MPI_INFO_NULL;
-    hsize_t   dims[RANK];
-    hsize_t   start[RANK];
-    hsize_t   count[RANK];
-    hsize_t   stride[RANK];
-    hsize_t   block[RANK];
-    hsize_t   i, j;
+    hid_t file_id, dset_id, grp_id;
+    hid_t fapl, sid, mem_dataspace;
+    herr_t ret;
+    char filename[1024];
+    int mpi_size, mpi_rank, ndims;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    hsize_t dims[RANK];
+    hsize_t start[RANK];
+    hsize_t count[RANK];
+    hsize_t stride[RANK];
+    hsize_t block[RANK];
+    hsize_t i, j;
     DATATYPE *data_array = NULL, *dataptr; /* data buffer */
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(comm, &mpi_size);
     MPI_Comm_rank(comm, &mpi_rank);
 
-    if (MAINPROCESS)
+    if (MAINPROCESS) {
         TESTING("proper shutdown of HDF5 library");
+    }
 
     /* Set up file access property list with parallel I/O access */
     fapl = H5Pcreate(H5P_FILE_ACCESS);
@@ -78,18 +78,18 @@ main(int argc, char **argv)
     VRFY(dims[1] == (hsize_t)(COL_FACTOR * mpi_size), "Wrong dataset dimensions");
 
     /* allocate memory for data buffer */
-    data_array = (DATATYPE *)malloc(dims[0] * dims[1] * sizeof(DATATYPE));
+    data_array = (DATATYPE*)malloc(dims[0] * dims[1] * sizeof(DATATYPE));
     VRFY((data_array != NULL), "data_array malloc succeeded");
 
     /* Each process takes a slabs of rows. */
-    block[0]  = dims[0] / (hsize_t)mpi_size;
-    block[1]  = dims[1];
+    block[0] = dims[0] / (hsize_t)mpi_size;
+    block[1] = dims[1];
     stride[0] = block[0];
     stride[1] = block[1];
-    count[0]  = 1;
-    count[1]  = 1;
-    start[0]  = (hsize_t)mpi_rank * block[0];
-    start[1]  = 0;
+    count[0] = 1;
+    count[1] = 1;
+    start[0] = (hsize_t)mpi_rank * block[0];
+    start[1] = 0;
 
     ret = H5Sselect_hyperslab(sid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "H5Sset_hyperslab succeeded");
@@ -108,8 +108,12 @@ main(int argc, char **argv)
         for (j = 0; j < block[1]; j++) {
             if (*dataptr != mpi_rank + 1) {
                 printf("Dataset Verify failed at [%lu][%lu](row %lu, col %lu): expect %d, got %d\n",
-                       (unsigned long)i, (unsigned long)j, (unsigned long)((hsize_t)i + start[0]),
-                       (unsigned long)((hsize_t)j + start[1]), mpi_rank + 1, *(dataptr));
+                       (unsigned long)i,
+                       (unsigned long)j,
+                       (unsigned long)((hsize_t)i + start[0]),
+                       (unsigned long)((hsize_t)j + start[1]),
+                       mpi_rank + 1,
+                       *(dataptr));
                 nerrors++;
             }
             dataptr++;
@@ -119,14 +123,17 @@ main(int argc, char **argv)
     HDremove(filename);
 
     /* release data buffers */
-    if (data_array)
+    if (data_array) {
         free(data_array);
+    }
 
     if (MAINPROCESS) {
-        if (0 == nerrors)
+        if (0 == nerrors) {
             PASSED();
-        else
+        }
+        else {
             H5_FAILED();
+        }
     }
 
     return (nerrors != 0);

@@ -18,7 +18,7 @@
 #include "h5test.h"
 #include "H5srcdir.h"
 
-static const char *FILENAME[] = {"vms_data", "le_data", "be_data", NULL};
+static const char* FILENAME[] = { "vms_data", "le_data", "be_data", NULL };
 
 #define DATASETNAME   "Array_le"
 #define DATASETNAME1  "Array_be"
@@ -38,12 +38,12 @@ static const char *FILENAME[] = {"vms_data", "le_data", "be_data", NULL};
 #define DATASETNAME14 "Fletcher_float_data_le"
 #define DATASETNAME15 "Fletcher_float_data_be"
 #ifdef H5_HAVE_FILTER_DEFLATE
-#define DATASETNAME16 "Deflate_float_data_le"
-#define DATASETNAME17 "Deflate_float_data_be"
+    #define DATASETNAME16 "Deflate_float_data_le"
+    #define DATASETNAME17 "Deflate_float_data_be"
 #endif
 #ifdef H5_HAVE_FILTER_SZIP
-#define DATASETNAME18 "Szip_float_data_le"
-#define DATASETNAME19 "Szip_float_data_be"
+    #define DATASETNAME18 "Szip_float_data_le"
+    #define DATASETNAME19 "Szip_float_data_be"
 #endif /* H5_HAVE_FILTER_SZIP */
 #define DATASETNAME20 "Shuffle_float_data_le"
 #define DATASETNAME21 "Shuffle_float_data_be"
@@ -63,48 +63,55 @@ static const char *FILENAME[] = {"vms_data", "le_data", "be_data", NULL};
  *
  *-------------------------------------------------------------------------
  */
-static int
-check_data_i(const char *dsetname, hid_t fid)
+static int check_data_i(const char* dsetname, hid_t fid)
 {
-    hid_t     did = H5I_INVALID_HID; /* dataset ID                       */
-    long long data_in[NX + 1][NY];   /* input buffer                     */
-    long long data_out[NX + 1][NY];  /* output buffer                    */
-    int       i, j;                  /* iterators                        */
-    int       nerrors = 0;           /* # errors in dataset values       */
+    hid_t did = H5I_INVALID_HID;    /* dataset ID                       */
+    long long data_in[NX + 1][NY];  /* input buffer                     */
+    long long data_out[NX + 1][NY]; /* output buffer                    */
+    int i, j;                       /* iterators                        */
+    int nerrors = 0;                /* # errors in dataset values       */
 
     /* Open the dataset. */
-    if ((did = H5Dopen2(fid, dsetname, H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, dsetname, H5P_DEFAULT)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Initialization. */
     /* Input (last row is different) */
-    for (i = 0; i < NX; i++)
-        for (j = 0; j < NY; j++)
+    for (i = 0; i < NX; i++) {
+        for (j = 0; j < NY; j++) {
             data_in[i][j] = i + j;
-    for (i = 0; i < NY; i++)
+        }
+    }
+    for (i = 0; i < NY; i++) {
         data_in[NX][i] = -2;
+    }
     /* Output */
     memset(data_out, 0, (NX + 1) * NY * sizeof(long long));
 
     /* Read data from hyperslab in the file into the hyperslab in
      * memory and display.
      */
-    if (H5Dread(did, H5T_NATIVE_LLONG, H5S_ALL, H5S_ALL, H5P_DEFAULT, data_out) < 0)
+    if (H5Dread(did, H5T_NATIVE_LLONG, H5S_ALL, H5S_ALL, H5P_DEFAULT, data_out) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Check results */
-    for (i = 0; i < (NX + 1); i++)
-        for (j = 0; j < NY; j++)
-            if (data_out[i][j] != data_in[i][j])
+    for (i = 0; i < (NX + 1); i++) {
+        for (j = 0; j < NY; j++) {
+            if (data_out[i][j] != data_in[i][j]) {
                 if (!nerrors++) {
                     H5_FAILED();
-                    printf("element [%d][%d] is %lld but should have been %lld\n", (int)i, (int)j,
-                           data_out[i][j], data_in[i][j]);
+                    printf("element [%d][%d] is %lld but should have been %lld\n", (int)i, (int)j, data_out[i][j], data_in[i][j]);
                 } /* end if */
+            }
+        }
+    }
 
     /* Close/release resources. */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Failure */
     if (nerrors) {
@@ -134,48 +141,55 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-check_data_f(const char *dsetname, hid_t fid)
+static int check_data_f(const char* dsetname, hid_t fid)
 {
-    hid_t  did = H5I_INVALID_HID; /* dataset ID                       */
-    double data_in[NX + 1][NY];   /* input buffer                     */
-    double data_out[NX + 1][NY];  /* output buffer                    */
-    int    i, j;                  /* iterators                        */
-    int    nerrors = 0;           /* # of errors in dataset values    */
+    hid_t did = H5I_INVALID_HID; /* dataset ID                       */
+    double data_in[NX + 1][NY];  /* input buffer                     */
+    double data_out[NX + 1][NY]; /* output buffer                    */
+    int i, j;                    /* iterators                        */
+    int nerrors = 0;             /* # of errors in dataset values    */
 
     /* Open the dataset. */
-    if ((did = H5Dopen2(fid, dsetname, H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, dsetname, H5P_DEFAULT)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Initialization. */
     /* Input (last row is different) */
-    for (i = 0; i < NX; i++)
-        for (j = 0; j < NY; j++)
+    for (i = 0; i < NX; i++) {
+        for (j = 0; j < NY; j++) {
             data_in[i][j] = ((double)(i + j + 1)) / 3.0;
-    for (i = 0; i < NY; i++)
+        }
+    }
+    for (i = 0; i < NY; i++) {
         data_in[NX][i] = -2.2;
+    }
     /* Output */
     memset(data_out, 0, (NX + 1) * NY * sizeof(double));
 
     /* Read data from hyperslab in the file into the hyperslab in
      * memory and display.
      */
-    if (H5Dread(did, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, data_out) < 0)
+    if (H5Dread(did, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, data_out) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Check results */
-    for (i = 0; i < (NX + 1); i++)
-        for (j = 0; j < NY; j++)
-            if (!H5_DBL_REL_EQUAL(data_out[i][j], data_in[i][j], 0.001))
+    for (i = 0; i < (NX + 1); i++) {
+        for (j = 0; j < NY; j++) {
+            if (!H5_DBL_REL_EQUAL(data_out[i][j], data_in[i][j], 0.001)) {
                 if (!nerrors++) {
                     H5_FAILED();
-                    printf("element [%d][%d] is %g but should have been %g\n", (int)i, (int)j, data_out[i][j],
-                           data_in[i][j]);
+                    printf("element [%d][%d] is %g but should have been %g\n", (int)i, (int)j, data_out[i][j], data_in[i][j]);
                 } /* end if */
+            }
+        }
+    }
 
     /* Close/release resources. */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Failure */
     if (nerrors) {
@@ -205,14 +219,13 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-check_file(char *filename)
+static int check_file(char* filename)
 {
-    const char *pathname = H5_get_srcdir_filename(filename); /* Corrected test file name     */
-    hid_t       fid      = H5I_INVALID_HID;                  /* file ID                      */
-    int         nerrors  = 0;                                /* # of datasets with errors    */
+    const char* pathname = H5_get_srcdir_filename(filename); /* Corrected test file name     */
+    hid_t fid = H5I_INVALID_HID;                             /* file ID                      */
+    int nerrors = 0;                                         /* # of datasets with errors    */
 #if !defined(H5_HAVE_FILTER_DEFLATE) || !defined(H5_HAVE_FILTER_SZIP)
-    const char *not_supported = "    filter is not enabled."; /* no filter message            */
+    const char* not_supported = "    filter is not enabled."; /* no filter message            */
 #endif
 
     /* Open the file. */
@@ -313,8 +326,9 @@ check_file(char *filename)
     TESTING("dataset of BE FLOAT with Nbit filter");
     nerrors += check_data_f(DATASETNAME23, fid);
 
-    if (H5Fclose(fid))
+    if (H5Fclose(fid)) {
         FAIL_STACK_ERROR;
+    }
     return nerrors;
 
 error:
@@ -335,12 +349,11 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     bool driver_is_default_compatible;
     char filename[1024];
-    int  nerrors = 0;
+    int nerrors = 0;
 
     h5_test_init();
 

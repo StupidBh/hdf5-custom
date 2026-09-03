@@ -28,57 +28,58 @@ Note: This example includes older cases from previous versions
 #define DS2DIM0   3
 #define DS2DIM1   16
 
-int
-main(void)
+int main(void)
 {
-    hid_t    file     = H5I_INVALID_HID; /* File Handle */
-    hid_t    space    = H5I_INVALID_HID; /* Dataspace Handle */
-    hid_t    dset     = H5I_INVALID_HID; /* Dataset Handle */
-    hid_t    dset2    = H5I_INVALID_HID; /* Dataset Handle */
-    hid_t    memspace = H5I_INVALID_HID; /* Mem dataspace */
-    hid_t    attr     = H5I_INVALID_HID; /* Attribute dataspace */
-    herr_t   status;
-    hsize_t  dims[1]      = {DIM0};
-    hsize_t  dims2[2]     = {DS2DIM0, DS2DIM1};
-    hsize_t  coords[4][2] = {{0, 1}, {2, 11}, {1, 0}, {2, 4}};
-    hsize_t  start[2]     = {0, 0};
-    hsize_t  stride[2]    = {2, 11};
-    hsize_t  count[2]     = {2, 2};
-    hsize_t  block[2]     = {1, 3};
+    hid_t file = H5I_INVALID_HID;     /* File Handle */
+    hid_t space = H5I_INVALID_HID;    /* Dataspace Handle */
+    hid_t dset = H5I_INVALID_HID;     /* Dataset Handle */
+    hid_t dset2 = H5I_INVALID_HID;    /* Dataset Handle */
+    hid_t memspace = H5I_INVALID_HID; /* Mem dataspace */
+    hid_t attr = H5I_INVALID_HID;     /* Attribute dataspace */
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    hsize_t dims2[2] = { DS2DIM0, DS2DIM1 };
+    hsize_t coords[4][2] = { { 0, 1 }, { 2, 11 }, { 1, 0 }, { 2, 4 } };
+    hsize_t start[2] = { 0, 0 };
+    hsize_t stride[2] = { 2, 11 };
+    hsize_t count[2] = { 2, 2 };
+    hsize_t block[2] = { 1, 3 };
     hssize_t npoints;
-    ssize_t  size;
-    char    *name = NULL;
-    int      ndims;
-    hsize_t  i;
-    char     wdata2[DS2DIM0][DS2DIM1] = {"The quick brown", "fox jumps over ", "the 5 lazy dogs"};
-    char    *rdata2                   = NULL;
+    ssize_t size;
+    char* name = NULL;
+    int ndims;
+    hsize_t i;
+    char wdata2[DS2DIM0][DS2DIM1] = { "The quick brown", "fox jumps over ", "the 5 lazy dogs" };
+    char* rdata2 = NULL;
 
 #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-    hid_t      ref_type = H5T_STD_REF; /* Reference datatype */
-    H5R_ref_t  wdata[DIM0];            /* buffer to write to disk */
-    H5R_ref_t *rdata = NULL;           /* buffer to read into*/
-    H5R_type_t objtype;                /* Reference type */
+    hid_t ref_type = H5T_STD_REF; /* Reference datatype */
+    H5R_ref_t wdata[DIM0];        /* buffer to write to disk */
+    H5R_ref_t* rdata = NULL;      /* buffer to read into*/
+    H5R_type_t objtype;           /* Reference type */
 #else
-    hid_t            ref_type = H5T_STD_REF_DSETREG; /* Reference datatype */
-    hdset_reg_ref_t  wdata[DIM0];                    /* Write buffer */
-    hdset_reg_ref_t *rdata = NULL;                   /* Read buffer */
-    H5O_type_t       objtype;
+    hid_t ref_type = H5T_STD_REF_DSETREG; /* Reference datatype */
+    hdset_reg_ref_t wdata[DIM0];          /* Write buffer */
+    hdset_reg_ref_t* rdata = NULL;        /* Read buffer */
+    H5O_type_t objtype;
 #endif
 
     /*
      * Create a new file using the default properties.
      */
     file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    if (file < 0)
+    if (file < 0) {
         goto done;
+    }
 
     /*
      * Create a dataset with character data.
      */
     space = H5Screate_simple(2, dims2, NULL);
     dset2 = H5Dcreate(file, DATASET2, H5T_STD_I8LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (dset2 < 0)
+    if (dset2 < 0) {
         goto done;
+    }
     status = H5Dwrite(dset2, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata2);
 
     /*
@@ -91,8 +92,9 @@ main(void)
 #else
     status = H5Rcreate(&wdata[0], file, DATASET2, H5R_DATASET_REGION, space);
 #endif
-    if (status < 0)
+    if (status < 0) {
         goto done;
+    }
 
     /*
      * Create reference to a hyperslab in dset2, close dataspace.
@@ -104,8 +106,9 @@ main(void)
 #else
     status = H5Rcreate(&wdata[1], file, DATASET2, H5R_DATASET_REGION, space);
 #endif
-    if (status < 0)
+    if (status < 0) {
         goto done;
+    }
 
     status = H5Sclose(space);
 
@@ -113,8 +116,8 @@ main(void)
      * Create dataset with a null dataspace to serve as the parent for
      * the attribute.
      */
-    space  = H5Screate(H5S_NULL);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -127,8 +130,9 @@ main(void)
      * Create the attribute and write the region references to it.
      */
     attr = H5Acreate(dset, ATTRIBUTE, ref_type, space, H5P_DEFAULT, H5P_DEFAULT);
-    if (attr < 0)
+    if (attr < 0) {
         goto done;
+    }
     status = H5Awrite(attr, ref_type, wdata);
 
     /*
@@ -155,16 +159,19 @@ main(void)
      * Open file, dataset, and attribute.
      */
     file = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
-    if (file < 0)
+    if (file < 0) {
         goto done;
+    }
 
     dset = H5Dopen(file, DATASET, H5P_DEFAULT);
-    if (dset < 0)
+    if (dset < 0) {
         goto done;
+    }
 
     attr = H5Aopen(dset, ATTRIBUTE, H5P_DEFAULT);
-    if (attr < 0)
+    if (attr < 0) {
         goto done;
+    }
 
     /*
      * Get dataspace and allocate memory for read buffer.
@@ -173,9 +180,9 @@ main(void)
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
 
 #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-    rdata = (H5R_ref_t *)malloc(dims[0] * sizeof(H5R_ref_t));
+    rdata = (H5R_ref_t*)malloc(dims[0] * sizeof(H5R_ref_t));
 #else
-    rdata = (hdset_reg_ref_t *)malloc(dims[0] * sizeof(hdset_reg_ref_t));
+    rdata = (hdset_reg_ref_t*)malloc(dims[0] * sizeof(hdset_reg_ref_t));
 #endif
 
     status = H5Sclose(space);
@@ -196,26 +203,27 @@ main(void)
          * dataspace selection.
          */
 #if H5_VERSION_GE(1, 10, 0) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-#if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
+    #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
         dset2 = H5Ropen_object(&rdata[i], H5P_DEFAULT, H5P_DEFAULT);
         space = H5Ropen_region(&rdata[i], H5P_DEFAULT, H5P_DEFAULT);
-#else
+    #else
         dset2 = H5Rdereference(dset, H5P_DEFAULT, H5R_DATASET_REGION, &rdata[i]);
         space = H5Rget_region(dset, H5R_DATASET_REGION, &rdata[i]);
-#endif
+    #endif
 #else
         dset2 = H5Rdereference(dset, H5R_DATASET_REGION, &rdata[i]);
         space = H5Rget_region(dset, H5R_DATASET_REGION, &rdata[i]);
 #endif
-        if (dset2 < 0)
+        if (dset2 < 0) {
             goto done;
+        }
 
         /*
          * Get the length of the object's name, allocate space, then
          * retrieve the name.
          */
         size = 1 + H5Iget_name(dset2, NULL, 0);
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
         size = H5Iget_name(dset2, name, size);
 
         /*
@@ -224,14 +232,14 @@ main(void)
          * read buffer will be 1-dimensional.
          */
         npoints = H5Sget_select_npoints(space);
-        rdata2  = (char *)malloc(npoints + 1);
+        rdata2 = (char*)malloc(npoints + 1);
 
         /*
          * Read the dataset region, and add a null terminator so we can
          * print it as a string.
          */
-        memspace        = H5Screate_simple(1, (hsize_t *)&npoints, NULL);
-        status          = H5Dread(dset2, H5T_NATIVE_CHAR, memspace, space, H5P_DEFAULT, rdata2);
+        memspace = H5Screate_simple(1, (hsize_t*)&npoints, NULL);
+        status = H5Dread(dset2, H5T_NATIVE_CHAR, memspace, space, H5P_DEFAULT, rdata2);
         rdata2[npoints] = '\0';
 
         /*

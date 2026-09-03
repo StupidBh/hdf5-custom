@@ -26,22 +26,21 @@ using namespace H5;
 const H5std_string FILE_NAME("h5tutr_extend.h5");
 const H5std_string DATASETNAME("ExtendibleArray");
 
-int
-main(void)
+int main(void)
 {
-    hsize_t dims[2]       = {3, 3}; // dataset dimensions at creation
-    hsize_t maxdims[2]    = {H5S_UNLIMITED, H5S_UNLIMITED};
-    hsize_t chunk_dims[2] = {2, 5};
-    int     data[3][3]    = {{1, 1, 1}, // data to write
-                             {1, 1, 1},
-                             {1, 1, 1}};
+    hsize_t dims[2] = { 3, 3 }; // dataset dimensions at creation
+    hsize_t maxdims[2] = { H5S_UNLIMITED, H5S_UNLIMITED };
+    hsize_t chunk_dims[2] = { 2, 5 };
+    int data[3][3] = { { 1, 1, 1 }, // data to write
+                       { 1, 1, 1 },
+                       { 1, 1, 1 } };
 
     // Variables used in extending and writing to the extended portion of dataset
 
     hsize_t size[2];
     hsize_t offset[2];
-    hsize_t dimsext[2]    = {7, 3}; // extend dimensions
-    int     dataext[7][3] = {{2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}};
+    hsize_t dimsext[2] = { 7, 3 }; // extend dimensions
+    int dataext[7][3] = { { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 } };
 
     // Try block to detect exceptions raised by any of the calls inside it
     try {
@@ -56,15 +55,14 @@ main(void)
         // for the instance 'dataspace'.  It can be deleted and used again
         // later for another dataspace.  An HDF5 identifier can be closed
         // by the destructor or the method 'close()'.
-        DataSpace *dataspace = new DataSpace(2, dims, maxdims);
+        DataSpace* dataspace = new DataSpace(2, dims, maxdims);
 
         // Modify dataset creation property to enable chunking
         DSetCreatPropList prop;
         prop.setChunk(2, chunk_dims);
 
         // Create the chunked dataset.  Note the use of pointer.
-        DataSet *dataset =
-            new DataSet(file.createDataSet(DATASETNAME, PredType::STD_I32BE, *dataspace, prop));
+        DataSet* dataset = new DataSet(file.createDataSet(DATASETNAME, PredType::STD_I32BE, *dataspace, prop));
 
         // Write data to dataset.
         dataset->write(data, PredType::NATIVE_INT);
@@ -75,13 +73,13 @@ main(void)
         dataset->extend(size);
 
         // Select a hyperslab in extended portion of the dataset.
-        DataSpace *filespace = new DataSpace(dataset->getSpace());
-        offset[0]            = 3;
-        offset[1]            = 0;
+        DataSpace* filespace = new DataSpace(dataset->getSpace());
+        offset[0] = 3;
+        offset[1] = 0;
         filespace->selectHyperslab(H5S_SELECT_SET, dimsext, offset);
 
         // Define memory space.
-        DataSpace *memspace = new DataSpace(2, dimsext, NULL);
+        DataSpace* memspace = new DataSpace(2, dimsext, NULL);
 
         // Write data to the extended portion of the dataset.
         dataset->write(dataext, PredType::NATIVE_INT, *memspace, *filespace);
@@ -98,8 +96,8 @@ main(void)
         // Re-open the file and read the data back
         // ---------------------------------------
 
-        int     rdata[10][3];
-        int     i, j, rank;
+        int rdata[10][3];
+        int i, j, rank;
         hsize_t chunk_dimsr[2], dimsr[2];
 
         // Open the file and dataset.
@@ -108,7 +106,7 @@ main(void)
 
         // Get the dataset's dataspace and creation property list.
         filespace = new DataSpace(dataset->getSpace());
-        prop      = dataset->getCreatePlist();
+        prop = dataset->getCreatePlist();
 
         // Get information to obtain memory dataspace.
         rank = filespace->getSimpleExtentNdims();
@@ -124,8 +122,9 @@ main(void)
 
         cout << endl;
         for (j = 0; j < dimsr[0]; j++) {
-            for (i = 0; i < dimsr[1]; i++)
+            for (i = 0; i < dimsr[1]; i++) {
                 cout << " " << rdata[j][i];
+            }
             cout << endl;
         }
 

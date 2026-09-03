@@ -20,13 +20,13 @@
 
 #ifdef H5_HAVE_THREADSAFE_API
 
-#define CYCLE_COUNT 2
-#define NTHREADS    5
+    #define CYCLE_COUNT 2
+    #define NTHREADS    5
 
 static H5TS_barrier_t barrier;
-static int            times;
-static bool           used[NTHREADS * CYCLE_COUNT];
-static H5TS_mutex_t   used_lock;
+static int times;
+static bool used[NTHREADS * CYCLE_COUNT];
+static H5TS_mutex_t used_lock;
 
 /* Each thread runs this routine.  The routine fetches the current
  * thread's ID, makes sure that it is in the expected range, makes
@@ -44,10 +44,9 @@ static H5TS_mutex_t   used_lock;
  * least ID has to be (times * NTHREADS) + 2 and the greatest,
  * (times * NTHREADS) + NTHREADS + 1.
  */
-static H5TS_THREAD_RETURN_TYPE
-thread_main(void H5_ATTR_UNUSED *arg)
+static H5TS_THREAD_RETURN_TYPE thread_main(void H5_ATTR_UNUSED* arg)
 {
-    int      min_id, max_id;
+    int min_id, max_id;
     uint64_t ntid, tid;
 
     H5TS_thread_id(&tid);
@@ -75,8 +74,9 @@ thread_main(void H5_ATTR_UNUSED *arg)
 
     /* Verify that the thread ID hasn't changed */
     H5TS_thread_id(&ntid);
-    if (ntid != tid)
+    if (ntid != tid) {
         TestErrPrintf("tid changed from %" PRIu64 " to %" PRIu64 " FAIL\n", tid, ntid);
+    }
 
     return (H5TS_thread_ret_t)0;
 
@@ -92,13 +92,12 @@ pre_barrier_error:
  *
  **********************************************************************
  */
-void
-tts_thread_id(void H5_ATTR_UNUSED *params)
+void tts_thread_id(void H5_ATTR_UNUSED* params)
 {
     H5TS_thread_t threads[NTHREADS];
-    uint64_t      tid;
-    int           i;
-    herr_t        result;
+    uint64_t tid;
+    int i;
+    herr_t result;
 
     result = H5TS_mutex_init(&used_lock, H5TS_MUTEX_TYPE_PLAIN);
     CHECK_I(result, "H5TS_mutex_lock");
@@ -116,18 +115,23 @@ tts_thread_id(void H5_ATTR_UNUSED *params)
      */
     memset(used, 0, sizeof(used));
     for (times = 0; times < CYCLE_COUNT; times++) {
-        for (i = 0; i < NTHREADS; i++)
-            if (H5TS_thread_create(&threads[i], thread_main, NULL) < 0)
+        for (i = 0; i < NTHREADS; i++) {
+            if (H5TS_thread_create(&threads[i], thread_main, NULL) < 0) {
                 TestErrPrintf("thread %d did not start", i);
+            }
+        }
 
-        for (i = 0; i < NTHREADS; i++)
-            if (H5TS_thread_join(threads[i], NULL) < 0)
+        for (i = 0; i < NTHREADS; i++) {
+            if (H5TS_thread_join(threads[i], NULL) < 0) {
                 TestErrPrintf("thread %d failed to join", i);
+            }
+        }
 
         /* Access synchronized by thread create/join */
         for (i = 0; i < NTHREADS; i++) {
-            if (!used[(times * NTHREADS) + i])
+            if (!used[(times * NTHREADS) + i]) {
                 TestErrPrintf("thread ID %d did not run.", i + 1);
+            }
         }
     }
     result = H5TS_barrier_destroy(&barrier);

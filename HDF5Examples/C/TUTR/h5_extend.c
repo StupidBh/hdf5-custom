@@ -23,35 +23,34 @@
 #define DATASETNAME "ExtendibleArray"
 #define RANK        2
 
-int
-main(void)
+int main(void)
 {
     hid_t file; /* handles */
     hid_t dataspace, dataset;
     hid_t filespace, memspace;
     hid_t prop;
 
-    hsize_t dims[2]    = {3, 3}; /* dataset dimensions at creation time */
-    hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
-    herr_t  status;
-    hsize_t chunk_dims[2] = {2, 5};
-    int     data[3][3]    = {{1, 1, 1}, /* data to write */
-                             {1, 1, 1},
-                             {1, 1, 1}};
+    hsize_t dims[2] = { 3, 3 }; /* dataset dimensions at creation time */
+    hsize_t maxdims[2] = { H5S_UNLIMITED, H5S_UNLIMITED };
+    herr_t status;
+    hsize_t chunk_dims[2] = { 2, 5 };
+    int data[3][3] = { { 1, 1, 1 }, /* data to write */
+                       { 1, 1, 1 },
+                       { 1, 1, 1 } };
 
     /* Variables used in extending and writing to the extended portion of dataset */
     hsize_t size[2];
     hsize_t offset[2];
-    hsize_t dimsext[2]    = {7, 3}; /* extend dimensions */
-    int     dataext[7][3] = {{2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}, {2, 3, 4}};
+    hsize_t dimsext[2] = { 7, 3 }; /* extend dimensions */
+    int dataext[7][3] = { { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 }, { 2, 3, 4 } };
 
     /* Variables used in reading data back */
     hsize_t chunk_dimsr[2];
     hsize_t dimsr[2];
     hsize_t i, j;
-    int     rdata[10][3];
-    herr_t  status_n;
-    int     rank, rank_chunk;
+    int rdata[10][3];
+    herr_t status_n;
+    int rank, rank_chunk;
 
     /* Create the data space with unlimited dimensions. */
     dataspace = H5Screate_simple(RANK, dims, maxdims);
@@ -60,7 +59,7 @@ main(void)
     file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Modify dataset creation properties, i.e. enable chunking  */
-    prop   = H5Pcreate(H5P_DATASET_CREATE);
+    prop = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(prop, RANK, chunk_dims);
 
     /* Create a new dataset within the file using chunk
@@ -73,13 +72,13 @@ main(void)
     /* Extend the dataset. Dataset becomes 10 x 3  */
     size[0] = dims[0] + dimsext[0];
     size[1] = dims[1];
-    status  = H5Dset_extent(dataset, size);
+    status = H5Dset_extent(dataset, size);
 
     /* Select a hyperslab in extended portion of dataset  */
     filespace = H5Dget_space(dataset);
     offset[0] = 3;
     offset[1] = 0;
-    status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, dimsext, NULL);
+    status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, dimsext, NULL);
 
     /* Define memory space */
     memspace = H5Screate_simple(RANK, dimsext, NULL);
@@ -99,26 +98,28 @@ main(void)
      * Re-open the file and read the data back. *
      ********************************************/
 
-    file    = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
+    file = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
     dataset = H5Dopen2(file, DATASETNAME, H5P_DEFAULT);
 
     filespace = H5Dget_space(dataset);
-    rank      = H5Sget_simple_extent_ndims(filespace);
-    status_n  = H5Sget_simple_extent_dims(filespace, dimsr, NULL);
+    rank = H5Sget_simple_extent_ndims(filespace);
+    status_n = H5Sget_simple_extent_dims(filespace, dimsr, NULL);
 
     prop = H5Dget_create_plist(dataset);
 
-    if (H5D_CHUNKED == H5Pget_layout(prop))
+    if (H5D_CHUNKED == H5Pget_layout(prop)) {
         rank_chunk = H5Pget_chunk(prop, rank, chunk_dimsr);
+    }
 
     memspace = H5Screate_simple(rank, dimsr, NULL);
-    status   = H5Dread(dataset, H5T_NATIVE_INT, memspace, filespace, H5P_DEFAULT, rdata);
+    status = H5Dread(dataset, H5T_NATIVE_INT, memspace, filespace, H5P_DEFAULT, rdata);
 
     printf("\n");
     printf("Dataset: \n");
     for (j = 0; j < dimsr[0]; j++) {
-        for (i = 0; i < dimsr[1]; i++)
+        for (i = 0; i < dimsr[1]; i++) {
             printf("%d ", rdata[j][i]);
+        }
         printf("\n");
     }
 

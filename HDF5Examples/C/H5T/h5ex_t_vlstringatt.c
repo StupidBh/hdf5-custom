@@ -26,14 +26,13 @@ Note: This example includes older cases from previous versions
 #define ATTRIBUTE "A1"
 #define DIM0      4
 
-int
-main(void)
+int main(void)
 {
     hid_t file, filetype, memtype, space, dset, attr;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[1]     = {DIM0};
-    char   *wdata[DIM0] = {"Parting", "is such", "sweet", "sorrow."},
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    char *wdata[DIM0] = { "Parting", "is such", "sweet", "sorrow." },
          /* Write buffer */
         **rdata; /* Read buffer */
     int ndims, i;
@@ -48,15 +47,15 @@ main(void)
      * space-padded string prototype for file storage.
      */
     filetype = H5Tcopy(H5T_FORTRAN_S1);
-    status   = H5Tset_size(filetype, H5T_VARIABLE);
-    memtype  = H5Tcopy(H5T_C_S1);
-    status   = H5Tset_size(memtype, H5T_VARIABLE);
+    status = H5Tset_size(filetype, H5T_VARIABLE);
+    memtype = H5Tcopy(H5T_C_S1);
+    status = H5Tset_size(memtype, H5T_VARIABLE);
 
     /*
      * Create dataset with a null dataspace.
      */
-    space  = H5Screate(H5S_NULL);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -69,7 +68,7 @@ main(void)
      * Create the attribute and write the variable-length string data
      * to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Awrite(attr, memtype, wdata);
 
     /*
@@ -106,13 +105,13 @@ main(void)
      */
     space = H5Aget_space(attr);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-    rdata = (char **)malloc(dims[0] * sizeof(char *));
+    rdata = (char**)malloc(dims[0] * sizeof(char*));
 
     /*
      * Create the memory datatype.
      */
     memtype = H5Tcopy(H5T_C_S1);
-    status  = H5Tset_size(memtype, H5T_VARIABLE);
+    status = H5Tset_size(memtype, H5T_VARIABLE);
 
     /*
      * Read the data.
@@ -122,15 +121,16 @@ main(void)
     /*
      * Output the data to the screen.
      */
-    for (i = 0; i < dims[0]; i++)
+    for (i = 0; i < dims[0]; i++) {
         printf("%s[%d]: %s\n", ATTRIBUTE, i, rdata[i]);
+    }
 
-        /*
-         * Close and release resources.  Note that H5Dvlen_reclaim works
-         * for variable-length strings as well as variable-length arrays.
-         * Also note that we must still free the array of pointers stored
-         * in rdata, as H5Tvlen_reclaim only frees the data these point to.
-         */
+    /*
+     * Close and release resources.  Note that H5Dvlen_reclaim works
+     * for variable-length strings as well as variable-length arrays.
+     * Also note that we must still free the array of pointers stored
+     * in rdata, as H5Tvlen_reclaim only frees the data these point to.
+     */
 #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
     status = H5Treclaim(memtype, space, H5P_DEFAULT, rdata);
 #else

@@ -77,10 +77,9 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5T__visit(H5T_t *dt, unsigned visit_flags, H5T_operator_t op, void *op_value)
+herr_t H5T__visit(H5T_t* dt, unsigned visit_flags, H5T_operator_t op, void* op_value)
 {
-    bool   is_composite;        /* Flag indicating current datatype is composite */
+    bool is_composite;          /* Flag indicating current datatype is composite */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
@@ -93,56 +92,66 @@ H5T__visit(H5T_t *dt, unsigned visit_flags, H5T_operator_t op, void *op_value)
     is_composite = H5T_IS_COMPOSITE(dt->shared->type);
 
     /* If the callback is to be made on the datatype first, do that */
-    if (is_composite && (visit_flags & H5T_VISIT_COMPOSITE_FIRST))
-        if (op(dt, op_value) < 0)
+    if (is_composite && (visit_flags & H5T_VISIT_COMPOSITE_FIRST)) {
+        if (op(dt, op_value) < 0) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "operator callback failed");
+        }
+    }
 
     /* Make callback for each member/child, if requested */
     switch (dt->shared->type) {
-        case H5T_COMPOUND: {
+    case H5T_COMPOUND:
+        {
             unsigned u; /* Local index variable */
 
             /* Visit each member of the compound datatype */
-            for (u = 0; u < dt->shared->u.compnd.nmembs; u++)
-                if (H5T__visit(dt->shared->u.compnd.memb[u].type, visit_flags, op, op_value) < 0)
+            for (u = 0; u < dt->shared->u.compnd.nmembs; u++) {
+                if (H5T__visit(dt->shared->u.compnd.memb[u].type, visit_flags, op, op_value) < 0) {
                     HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "can't visit member datatype");
+                }
+            }
         } /* end case */
         break;
 
-        case H5T_ARRAY:
-        case H5T_VLEN:
-        case H5T_ENUM:
-        case H5T_COMPLEX:
-            /* Visit parent type */
-            if (H5T__visit(dt->shared->parent, visit_flags, op, op_value) < 0)
-                HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "can't visit parent datatype");
-            break;
+    case H5T_ARRAY:
+    case H5T_VLEN:
+    case H5T_ENUM:
+    case H5T_COMPLEX:
+        /* Visit parent type */
+        if (H5T__visit(dt->shared->parent, visit_flags, op, op_value) < 0) {
+            HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "can't visit parent datatype");
+        }
+        break;
 
-        case H5T_NO_CLASS:
-        case H5T_NCLASSES:
-            /* Not real values */
-            HGOTO_ERROR(H5E_ARGS, H5E_UNSUPPORTED, FAIL, "operation not defined for datatype class");
-            break;
+    case H5T_NO_CLASS:
+    case H5T_NCLASSES:
+        /* Not real values */
+        HGOTO_ERROR(H5E_ARGS, H5E_UNSUPPORTED, FAIL, "operation not defined for datatype class");
+        break;
 
-        case H5T_INTEGER:
-        case H5T_FLOAT:
-        case H5T_TIME:
-        case H5T_STRING:
-        case H5T_BITFIELD:
-        case H5T_OPAQUE:
-        case H5T_REFERENCE:
-        default:
-            /* Visit "simple" datatypes here */
-            if (visit_flags & H5T_VISIT_SIMPLE)
-                if (op(dt, op_value) < 0)
-                    HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "operator callback failed");
-            break;
+    case H5T_INTEGER:
+    case H5T_FLOAT:
+    case H5T_TIME:
+    case H5T_STRING:
+    case H5T_BITFIELD:
+    case H5T_OPAQUE:
+    case H5T_REFERENCE:
+    default:
+        /* Visit "simple" datatypes here */
+        if (visit_flags & H5T_VISIT_SIMPLE) {
+            if (op(dt, op_value) < 0) {
+                HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "operator callback failed");
+            }
+        }
+        break;
     } /* end switch */
 
     /* If the callback is to be made on the datatype last, do that */
-    if (is_composite && (visit_flags & H5T_VISIT_COMPOSITE_LAST))
-        if (op(dt, op_value) < 0)
+    if (is_composite && (visit_flags & H5T_VISIT_COMPOSITE_LAST)) {
+        if (op(dt, op_value) < 0) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_BADITER, FAIL, "operator callback failed");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

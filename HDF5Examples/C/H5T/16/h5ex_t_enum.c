@@ -22,27 +22,34 @@
 #define M_BASET       H5T_NATIVE_INT /* Memory base type */
 #define NAME_BUF_SIZE 16
 
-typedef enum { SOLID, LIQUID, GAS, PLASMA } phase_t; /* Enumerated type */
+typedef enum
+{
+    SOLID,
+    LIQUID,
+    GAS,
+    PLASMA
+} phase_t; /* Enumerated type */
 
-int
-main(void)
+int main(void)
 {
     hid_t file, filetype, memtype, space, dset;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
     phase_t wdata[DIM0][DIM1], /* Write buffer */
         **rdata,               /* Read buffer */
         val;
-    char *names[4] = {"SOLID", "LIQUID", "GAS", "PLASMA"}, name[NAME_BUF_SIZE];
-    int   ndims, i, j;
+    char *names[4] = { "SOLID", "LIQUID", "GAS", "PLASMA" }, name[NAME_BUF_SIZE];
+    int ndims, i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = (phase_t)((i + 1) * j - j) % (int)(PLASMA + 1);
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -55,13 +62,13 @@ main(void)
      * as only one type must be defined.
      */
     filetype = H5Tenum_create(F_BASET);
-    memtype  = H5Tenum_create(M_BASET);
+    memtype = H5Tenum_create(M_BASET);
 
     for (i = (int)SOLID; i <= (int)PLASMA; i++) {
         /*
          * Insert enumerated value for memtype.
          */
-        val    = (phase_t)i;
+        val = (phase_t)i;
         status = H5Tenum_insert(memtype, names[i], &val);
         /*
          * Insert enumerated value for filetype.  We must first convert
@@ -80,7 +87,7 @@ main(void)
     /*
      * Create the dataset and write the enumerated data to it.
      */
-    dset   = H5Dcreate(file, DATASET, filetype, space, H5P_DEFAULT);
+    dset = H5Dcreate(file, DATASET, filetype, space, H5P_DEFAULT);
     status = H5Dwrite(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]);
 
     /*
@@ -115,18 +122,19 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (phase_t **)malloc(dims[0] * sizeof(phase_t *));
+    rdata = (phase_t**)malloc(dims[0] * sizeof(phase_t*));
 
     /*
      * Allocate space for enumerated data.
      */
-    rdata[0] = (phase_t *)malloc(dims[0] * dims[1] * sizeof(phase_t));
+    rdata[0] = (phase_t*)malloc(dims[0] * dims[1] * sizeof(phase_t));
 
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * dims[1];
+    }
 
     /*
      * Read the data.
@@ -140,7 +148,6 @@ main(void)
     for (i = 0; i < dims[0]; i++) {
         printf(" [");
         for (j = 0; j < dims[1]; j++) {
-
             /*
              * Get the name of the enumeration member.
              */

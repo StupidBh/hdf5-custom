@@ -34,16 +34,14 @@
  *        to have any effect.
  */
 #ifdef NDEBUG
-#undef H5M_DEBUG
+    #undef H5M_DEBUG
 #endif
 
 /* ========  Map creation property names ======== */
 
 /* ========  Map access property names ======== */
-#define H5M_ACS_KEY_PREFETCH_SIZE_NAME                                                                       \
-    "key_prefetch_size" /* Number of keys to prefetch during map iteration */
-#define H5M_ACS_KEY_ALLOC_SIZE_NAME                                                                          \
-    "key_alloc_size" /* Initial allocation size for keys prefetched during map iteration */
+#define H5M_ACS_KEY_PREFETCH_SIZE_NAME "key_prefetch_size" /* Number of keys to prefetch during map iteration */
+#define H5M_ACS_KEY_ALLOC_SIZE_NAME    "key_alloc_size"    /* Initial allocation size for keys prefetched during map iteration */
 
 /* Default temporary buffer size */
 #define H5D_TEMP_BUF_SIZE (1024 * 1024)

@@ -19,12 +19,11 @@ Note: This example includes older cases from previous versions
 /*
  * Operator function to be called by H5Literate.
  */
-herr_t op_func(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data);
+herr_t op_func(hid_t loc_id, const char* name, const H5L_info_t* info, void* operator_data);
 
-int
-main(void)
+int main(void)
 {
-    hid_t  file; /* Handle */
+    hid_t file; /* Handle */
     herr_t status;
 
     /*
@@ -52,10 +51,9 @@ main(void)
   being examined.
 
  ************************************************************/
-herr_t
-op_func(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_data)
+herr_t op_func(hid_t loc_id, const char* name, const H5L_info_t* info, void* operator_data)
 {
-    herr_t     status;
+    herr_t status;
     H5O_info_t infobuf;
 
     /*
@@ -69,17 +67,10 @@ op_func(hid_t loc_id, const char *name, const H5L_info_t *info, void *operator_d
     status = H5Oget_info_by_name(loc_id, name, &infobuf, H5P_DEFAULT);
 #endif
     switch (infobuf.type) {
-        case H5O_TYPE_GROUP:
-            printf("  Group: %s\n", name);
-            break;
-        case H5O_TYPE_DATASET:
-            printf("  Dataset: %s\n", name);
-            break;
-        case H5O_TYPE_NAMED_DATATYPE:
-            printf("  Datatype: %s\n", name);
-            break;
-        default:
-            printf("  Unknown: %s\n", name);
+    case H5O_TYPE_GROUP         : printf("  Group: %s\n", name); break;
+    case H5O_TYPE_DATASET       : printf("  Dataset: %s\n", name); break;
+    case H5O_TYPE_NAMED_DATATYPE: printf("  Datatype: %s\n", name); break;
+    default                     : printf("  Unknown: %s\n", name);
     }
 
     return 0;

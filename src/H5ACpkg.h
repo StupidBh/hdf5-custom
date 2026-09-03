@@ -23,18 +23,18 @@
  */
 
 #if !(defined H5AC_FRIEND || defined H5AC_MODULE)
-#error "Do not include this file outside the H5AC package!"
+    #error "Do not include this file outside the H5AC package!"
 #endif
 
 #ifndef H5ACpkg_H
-#define H5ACpkg_H
+    #define H5ACpkg_H
 
-/* Get package's private header */
-#include "H5ACprivate.h" /* Metadata cache			*/
+    /* Get package's private header */
+    #include "H5ACprivate.h" /* Metadata cache			*/
 
-/* Get needed headers */
-#include "H5Cprivate.h"  /* Cache                                */
-#include "H5FLprivate.h" /* Free Lists                           */
+    /* Get needed headers */
+    #include "H5Cprivate.h"  /* Cache                                */
+    #include "H5FLprivate.h" /* Free Lists                           */
 
 /*****************************/
 /* Package Private Variables */
@@ -49,27 +49,27 @@ H5FL_EXTERN(H5AC_aux_t);
 
 /* #define H5AC_DEBUG_DIRTY_BYTES_CREATION */
 
-#ifdef H5_HAVE_PARALLEL
+    #ifdef H5_HAVE_PARALLEL
 
-/* the following #defined are used to specify the operation required
- * at a sync point.
- */
+    /* the following #defined are used to specify the operation required
+     * at a sync point.
+     */
 
-#define H5AC_SYNC_POINT_OP__FLUSH_TO_MIN_CLEAN 0
-#define H5AC_SYNC_POINT_OP__FLUSH_CACHE        1
+        #define H5AC_SYNC_POINT_OP__FLUSH_TO_MIN_CLEAN 0
+        #define H5AC_SYNC_POINT_OP__FLUSH_CACHE        1
 
-#endif /* H5_HAVE_PARALLEL */
+    #endif /* H5_HAVE_PARALLEL */
 
-/*-------------------------------------------------------------------------
- *  It is a bit difficult to set ranges of allowable values on the
- *  dirty_bytes_threshold field of H5AC_aux_t.  The following are
- *  probably broader than they should be.
- *-------------------------------------------------------------------------
- */
+           /*-------------------------------------------------------------------------
+            *  It is a bit difficult to set ranges of allowable values on the
+            *  dirty_bytes_threshold field of H5AC_aux_t.  The following are
+            *  probably broader than they should be.
+            *-------------------------------------------------------------------------
+            */
 
-#define H5AC__MIN_DIRTY_BYTES_THRESHOLD     (size_t)(H5C__MIN_MAX_CACHE_SIZE / 2)
-#define H5AC__DEFAULT_DIRTY_BYTES_THRESHOLD (256 * 1024)
-#define H5AC__MAX_DIRTY_BYTES_THRESHOLD     (size_t)(H5C__MAX_MAX_CACHE_SIZE / 4)
+    #define H5AC__MIN_DIRTY_BYTES_THRESHOLD     (size_t)(H5C__MIN_MAX_CACHE_SIZE / 2)
+    #define H5AC__DEFAULT_DIRTY_BYTES_THRESHOLD (256 * 1024)
+    #define H5AC__MAX_DIRTY_BYTES_THRESHOLD     (size_t)(H5C__MAX_MAX_CACHE_SIZE / 4)
 
 /****************************************************************************
  *
@@ -344,60 +344,61 @@ H5FL_EXTERN(H5AC_aux_t);
  *
  ****************************************************************************/
 
-#ifdef H5_HAVE_PARALLEL
+    #ifdef H5_HAVE_PARALLEL
 
-typedef struct H5AC_aux_t {
+typedef struct H5AC_aux_t
+{
     MPI_Comm mpi_comm;
-    int      mpi_rank;
-    int      mpi_size;
+    int mpi_rank;
+    int mpi_size;
 
-    bool    write_permitted;
-    size_t  dirty_bytes_threshold;
-    size_t  dirty_bytes;
+    bool write_permitted;
+    size_t dirty_bytes_threshold;
+    size_t dirty_bytes;
     int32_t metadata_write_strategy;
 
-#ifdef H5AC_DEBUG_DIRTY_BYTES_CREATION
+        #ifdef H5AC_DEBUG_DIRTY_BYTES_CREATION
     unsigned dirty_bytes_propagations;
-    size_t   unprotect_dirty_bytes;
+    size_t unprotect_dirty_bytes;
     unsigned unprotect_dirty_bytes_updates;
-    size_t   insert_dirty_bytes;
+    size_t insert_dirty_bytes;
     unsigned insert_dirty_bytes_updates;
-    size_t   move_dirty_bytes;
+    size_t move_dirty_bytes;
     unsigned move_dirty_bytes_updates;
-#endif /* H5AC_DEBUG_DIRTY_BYTES_CREATION */
+        #endif /* H5AC_DEBUG_DIRTY_BYTES_CREATION */
 
-    H5SL_t *d_slist_ptr;
-    H5SL_t *c_slist_ptr;
-    H5SL_t *candidate_slist_ptr;
+    H5SL_t* d_slist_ptr;
+    H5SL_t* c_slist_ptr;
+    H5SL_t* candidate_slist_ptr;
 
     void (*write_done)(void);
-    void (*sync_point_done)(unsigned num_writes, haddr_t *written_entries_tbl);
+    void (*sync_point_done)(unsigned num_writes, haddr_t* written_entries_tbl);
 
     unsigned p0_image_len;
 } H5AC_aux_t; /* struct H5AC_aux_t */
 
 /* Typedefs for debugging function pointers */
-typedef void (*H5AC_sync_point_done_cb_t)(unsigned num_writes, haddr_t *written_entries_tbl);
+typedef void (*H5AC_sync_point_done_cb_t)(unsigned num_writes, haddr_t* written_entries_tbl);
 typedef void (*H5AC_write_done_cb_t)(void);
 
-#endif /* H5_HAVE_PARALLEL */
+    #endif /* H5_HAVE_PARALLEL */
 
-/******************************/
+           /******************************/
 /* Package Private Prototypes */
 /******************************/
 
-#ifdef H5_HAVE_PARALLEL
+    #ifdef H5_HAVE_PARALLEL
 /* Parallel I/O routines */
-H5_DLL herr_t H5AC__log_deleted_entry(const H5AC_info_t *entry_ptr);
-H5_DLL herr_t H5AC__log_dirtied_entry(const H5AC_info_t *entry_ptr);
-H5_DLL herr_t H5AC__log_cleaned_entry(const H5AC_info_t *entry_ptr);
-H5_DLL herr_t H5AC__log_flushed_entry(H5C_t *cache_ptr, haddr_t addr, bool was_dirty, unsigned flags);
-H5_DLL herr_t H5AC__log_inserted_entry(const H5AC_info_t *entry_ptr);
-H5_DLL herr_t H5AC__log_moved_entry(const H5F_t *f, haddr_t old_addr, haddr_t new_addr);
-H5_DLL herr_t H5AC__flush_entries(H5F_t *f);
-H5_DLL herr_t H5AC__run_sync_point(H5F_t *f, int sync_point_op);
-H5_DLL herr_t H5AC__set_sync_point_done_callback(H5C_t *cache_ptr, H5AC_sync_point_done_cb_t sync_point_done);
-H5_DLL herr_t H5AC__set_write_done_callback(H5C_t *cache_ptr, H5AC_write_done_cb_t write_done);
-#endif /* H5_HAVE_PARALLEL */
+H5_DLL herr_t H5AC__log_deleted_entry(const H5AC_info_t* entry_ptr);
+H5_DLL herr_t H5AC__log_dirtied_entry(const H5AC_info_t* entry_ptr);
+H5_DLL herr_t H5AC__log_cleaned_entry(const H5AC_info_t* entry_ptr);
+H5_DLL herr_t H5AC__log_flushed_entry(H5C_t* cache_ptr, haddr_t addr, bool was_dirty, unsigned flags);
+H5_DLL herr_t H5AC__log_inserted_entry(const H5AC_info_t* entry_ptr);
+H5_DLL herr_t H5AC__log_moved_entry(const H5F_t* f, haddr_t old_addr, haddr_t new_addr);
+H5_DLL herr_t H5AC__flush_entries(H5F_t* f);
+H5_DLL herr_t H5AC__run_sync_point(H5F_t* f, int sync_point_op);
+H5_DLL herr_t H5AC__set_sync_point_done_callback(H5C_t* cache_ptr, H5AC_sync_point_done_cb_t sync_point_done);
+H5_DLL herr_t H5AC__set_write_done_callback(H5C_t* cache_ptr, H5AC_write_done_cb_t write_done);
+    #endif /* H5_HAVE_PARALLEL */
 
-#endif /* H5ACpkg_H */
+#endif     /* H5ACpkg_H */

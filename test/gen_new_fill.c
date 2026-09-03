@@ -24,66 +24,82 @@
 
 #define FILENAME "fill_new.h5"
 
-int
-main(void)
+int main(void)
 {
-    hid_t file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID, space = H5I_INVALID_HID, dset1 = H5I_INVALID_HID,
-          dset2                    = H5I_INVALID_HID;
-    hsize_t            cur_size[2] = {8, 8};
+    hid_t file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID, space = H5I_INVALID_HID, dset1 = H5I_INVALID_HID, dset2 = H5I_INVALID_HID;
+    hsize_t cur_size[2] = { 8, 8 };
     H5D_space_status_t allocation;
-    int                fill_val1 = 4444, fill_val2 = 5555;
+    int fill_val1 = 4444, fill_val2 = 5555;
 
-    if ((file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((file = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
-    if ((space = H5Screate_simple(2, cur_size, cur_size)) < 0)
+    }
+    if ((space = H5Screate_simple(2, cur_size, cur_size)) < 0) {
         goto error;
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    }
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
+    }
 
     /* Create a dataset with space being allocated and fill value written */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0) {
         goto error;
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    }
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fill_val1) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fill_val1) < 0) {
         goto error;
-    if ((dset1 = H5Dcreate2(file, "dset1", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset1 = H5Dcreate2(file, "dset1", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Dget_space_status(dset1, &allocation) < 0)
+    }
+    if (H5Dget_space_status(dset1, &allocation) < 0) {
         goto error;
+    }
     if (allocation == H5D_SPACE_STATUS_NOT_ALLOCATED) {
         puts("    Got unallocated space instead of allocated.");
         printf("    Got %d\n", allocation);
         goto error;
     }
-    if (H5Dclose(dset1) < 0)
+    if (H5Dclose(dset1) < 0) {
         goto error;
+    }
 
     /* Create a dataset with space allocation being delayed */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0) {
         goto error;
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    }
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fill_val2) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fill_val2) < 0) {
         goto error;
-    if ((dset2 = H5Dcreate2(file, "dset2", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset2 = H5Dcreate2(file, "dset2", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Dget_space_status(dset2, &allocation) < 0)
+    }
+    if (H5Dget_space_status(dset2, &allocation) < 0) {
         goto error;
+    }
     if (allocation != H5D_SPACE_STATUS_NOT_ALLOCATED) {
         puts("    Got allocated space instead of unallocated.");
         printf("    Got %d\n", allocation);
         goto error;
     }
-    if (H5Dclose(dset2) < 0)
+    if (H5Dclose(dset2) < 0) {
         goto error;
+    }
 
-    if (H5Sclose(space) < 0)
+    if (H5Sclose(space) < 0) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     return 0;
 

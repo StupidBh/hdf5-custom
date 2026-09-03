@@ -59,10 +59,9 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Ddebug(hid_t dset_id)
+herr_t H5Ddebug(hid_t dset_id)
 {
-    H5D_t  *dset;                   /* Dataset to debug */
+    H5D_t* dset;                    /* Dataset to debug */
     haddr_t prev_tag = HADDR_UNDEF; /* Previous metadata tag (should always be undefined since this is an API
                                        function, but we'll include it anyways as it's proper form) */
     herr_t ret_value = SUCCEED;     /* Return value */
@@ -70,17 +69,20 @@ H5Ddebug(hid_t dset_id)
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dset = (H5D_t *)H5VL_object_verify(dset_id, H5I_DATASET)))
+    if (NULL == (dset = (H5D_t*)H5VL_object_verify(dset_id, H5I_DATASET))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a dataset");
+    }
 
     /* Set metadata tagging with dset oheader addr */
     H5AC_tag(dset->oloc.addr, &prev_tag);
 
     /* Print B-tree information */
-    if (H5D_CHUNKED == dset->shared->layout.type)
+    if (H5D_CHUNKED == dset->shared->layout.type) {
         (void)H5D__chunk_dump_index(dset, stdout);
-    else if (H5D_CONTIGUOUS == dset->shared->layout.type)
+    }
+    else if (H5D_CONTIGUOUS == dset->shared->layout.type) {
         fprintf(stdout, "    %-10s %" PRIuHADDR "\n", "Address:", dset->shared->layout.storage.u.contig.addr);
+    }
 
     /* Reset metadata tagging */
     H5AC_tag(prev_tag, NULL);

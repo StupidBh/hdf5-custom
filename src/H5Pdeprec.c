@@ -53,7 +53,7 @@
 /********************/
 /* Local Prototypes */
 /********************/
-static herr_t H5P__get_file_space(H5P_genplist_t *plist, H5F_file_space_type_t *strategy, hsize_t *threshold);
+static herr_t H5P__get_file_space(H5P_genplist_t* plist, H5F_file_space_type_t* strategy, hsize_t* threshold);
 
 /*********************/
 /* Package Variables */
@@ -208,44 +208,54 @@ static herr_t H5P__get_file_space(H5P_genplist_t *plist, H5F_file_space_type_t *
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5Pregister1(hid_t cls_id, const char *name, size_t size, void *def_value, H5P_prp_create_func_t prp_create,
-             H5P_prp_set_func_t prp_set, H5P_prp_get_func_t prp_get, H5P_prp_delete_func_t prp_delete,
-             H5P_prp_copy_func_t prp_copy, H5P_prp_close_func_t prp_close)
+herr_t H5Pregister1(hid_t cls_id,
+                    const char* name,
+                    size_t size,
+                    void* def_value,
+                    H5P_prp_create_func_t prp_create,
+                    H5P_prp_set_func_t prp_set,
+                    H5P_prp_get_func_t prp_get,
+                    H5P_prp_delete_func_t prp_delete,
+                    H5P_prp_copy_func_t prp_copy,
+                    H5P_prp_close_func_t prp_close)
 {
-    H5P_genclass_t *pclass;      /* Property list class to modify */
-    H5P_genclass_t *orig_pclass; /* Original property class */
-    herr_t          ret_value;   /* Return value */
+    H5P_genclass_t* pclass;      /* Property list class to modify */
+    H5P_genclass_t* orig_pclass; /* Original property class */
+    herr_t ret_value;            /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments. */
-    if (NULL == (pclass = (H5P_genclass_t *)H5I_object_verify(cls_id, H5I_GENPROP_CLS)))
+    if (NULL == (pclass = (H5P_genclass_t*)H5I_object_verify(cls_id, H5I_GENPROP_CLS))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a property list class");
-    if (!name || !*name)
+    }
+    if (!name || !*name) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid class name");
-    if (size > 0 && def_value == NULL)
+    }
+    if (size > 0 && def_value == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "properties >0 size must have default");
+    }
 
     /* Create the new property list class */
     orig_pclass = pclass;
-    if ((ret_value = H5P__register(&pclass, name, size, def_value, prp_create, prp_set, prp_get, NULL, NULL,
-                                   prp_delete, prp_copy, NULL, prp_close)) < 0)
+    if ((ret_value = H5P__register(&pclass, name, size, def_value, prp_create, prp_set, prp_get, NULL, NULL, prp_delete, prp_copy, NULL, prp_close)) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTREGISTER, FAIL, "unable to register property in class");
+    }
 
     /* Check if the property class changed and needs to be substituted in the ID */
     if (pclass != orig_pclass) {
-        H5P_genclass_t *old_pclass; /* Old property class */
+        H5P_genclass_t* old_pclass; /* Old property class */
 
         /* Substitute the new property class in the ID */
-        if (NULL == (old_pclass = (H5P_genclass_t *)H5I_subst(cls_id, pclass)))
+        if (NULL == (old_pclass = (H5P_genclass_t*)H5I_subst(cls_id, pclass))) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "unable to substitute property class in ID");
+        }
         assert(old_pclass == orig_pclass);
 
         /* Close the previous class */
-        if (H5P__close_class(orig_pclass) < 0)
-            HGOTO_ERROR(H5E_PLIST, H5E_CANTCLOSEOBJ, FAIL,
-                        "unable to close original property class after substitution");
+        if (H5P__close_class(orig_pclass) < 0) {
+            HGOTO_ERROR(H5E_PLIST, H5E_CANTCLOSEOBJ, FAIL, "unable to close original property class after substitution");
+        }
     } /* end if */
 
 done:
@@ -391,28 +401,36 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5Pinsert1(hid_t plist_id, const char *name, size_t size, void *value, H5P_prp_set_func_t prp_set,
-           H5P_prp_get_func_t prp_get, H5P_prp_delete_func_t prp_delete, H5P_prp_copy_func_t prp_copy,
-           H5P_prp_close_func_t prp_close)
+herr_t H5Pinsert1(hid_t plist_id,
+                  const char* name,
+                  size_t size,
+                  void* value,
+                  H5P_prp_set_func_t prp_set,
+                  H5P_prp_get_func_t prp_get,
+                  H5P_prp_delete_func_t prp_delete,
+                  H5P_prp_copy_func_t prp_copy,
+                  H5P_prp_close_func_t prp_close)
 {
-    H5P_genplist_t *plist;     /* Property list to modify */
-    herr_t          ret_value; /* return value */
+    H5P_genplist_t* plist; /* Property list to modify */
+    herr_t ret_value;      /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments. */
-    if (NULL == (plist = (H5P_genplist_t *)H5I_object_verify(plist_id, H5I_GENPROP_LST)))
+    if (NULL == (plist = (H5P_genplist_t*)H5I_object_verify(plist_id, H5I_GENPROP_LST))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a property list");
-    if (!name || !*name)
+    }
+    if (!name || !*name) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid property name");
-    if (size > 0 && value == NULL)
+    }
+    if (size > 0 && value == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "properties >0 size must have default");
+    }
 
     /* Create the new property list class */
-    if ((ret_value = H5P_insert(plist, name, size, value, prp_set, prp_get, NULL, NULL, prp_delete, prp_copy,
-                                NULL, prp_close)) < 0)
+    if ((ret_value = H5P_insert(plist, name, size, value, prp_set, prp_get, NULL, NULL, prp_delete, prp_copy, NULL, prp_close)) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTREGISTER, FAIL, "unable to register property in plist");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -438,29 +456,33 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pget_version(hid_t plist_id, unsigned *super /*out*/, unsigned *freelist /*out*/, unsigned *stab /*out*/,
-               unsigned *shhdr /*out*/)
+herr_t H5Pget_version(hid_t plist_id, unsigned* super /*out*/, unsigned* freelist /*out*/, unsigned* stab /*out*/, unsigned* shhdr /*out*/)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, true)))
+    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, true))) {
         HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Get values */
-    if (super)
-        if (H5P_get(plist, H5F_CRT_SUPER_VERS_NAME, super) < 0)
+    if (super) {
+        if (H5P_get(plist, H5F_CRT_SUPER_VERS_NAME, super) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get superblock version");
-    if (freelist)
+        }
+    }
+    if (freelist) {
         *freelist = HDF5_FREESPACE_VERSION; /* (hard-wired) */
-    if (stab)
+    }
+    if (stab) {
         *stab = HDF5_OBJECTDIR_VERSION; /* (hard-wired) */
-    if (shhdr)
+    }
+    if (shhdr) {
         *shhdr = HDF5_SHAREDHEADER_VERSION; /* (hard-wired) */
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -487,26 +509,28 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5Pencode1(hid_t plist_id, void *buf, size_t *nalloc)
+herr_t H5Pencode1(hid_t plist_id, void* buf, size_t* nalloc)
 {
-    H5P_genplist_t *plist; /* Property list to query */
-    hid_t           temp_fapl_id = H5P_DEFAULT;
-    herr_t          ret_value    = SUCCEED; /* return value */
+    H5P_genplist_t* plist;      /* Property list to query */
+    hid_t temp_fapl_id = H5P_DEFAULT;
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments. */
-    if (NULL == (plist = (H5P_genplist_t *)H5I_object_verify(plist_id, H5I_GENPROP_LST)))
+    if (NULL == (plist = (H5P_genplist_t*)H5I_object_verify(plist_id, H5I_GENPROP_LST))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a property list");
+    }
 
     /* Verify access property list and set up collective metadata if appropriate */
-    if (H5CX_set_apl(&temp_fapl_id, H5P_CLS_FACC, H5I_INVALID_HID, true) < 0)
+    if (H5CX_set_apl(&temp_fapl_id, H5P_CLS_FACC, H5I_INVALID_HID, true) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTSET, H5I_INVALID_HID, "can't set access property list info");
+    }
 
     /* Call the internal encode routine */
-    if ((ret_value = H5P__encode(plist, true, buf, nalloc)) < 0)
+    if ((ret_value = H5P__encode(plist, true, buf, nalloc)) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTENCODE, FAIL, "unable to encode property list");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -521,27 +545,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pset_file_space(hid_t plist_id, H5F_file_space_type_t strategy, hsize_t threshold)
+herr_t H5Pset_file_space(hid_t plist_id, H5F_file_space_type_t strategy, hsize_t threshold)
 {
-
-    H5P_genplist_t       *plist;                                        /* Property list pointer */
-    H5F_fspace_strategy_t new_strategy;                                 /* File space strategy type */
-    bool                  new_persist   = H5F_FREE_SPACE_PERSIST_DEF;   /* Persisting free-space or not */
-    hsize_t               new_threshold = H5F_FREE_SPACE_THRESHOLD_DEF; /* Free-space section threshold */
-    H5F_file_space_type_t in_strategy   = strategy;                     /* Input strategy */
-    hsize_t               in_threshold  = threshold;                    /* Input threshold */
-    herr_t                ret_value     = SUCCEED;                      /* Return value */
+    H5P_genplist_t* plist;                                /* Property list pointer */
+    H5F_fspace_strategy_t new_strategy;                   /* File space strategy type */
+    bool new_persist = H5F_FREE_SPACE_PERSIST_DEF;        /* Persisting free-space or not */
+    hsize_t new_threshold = H5F_FREE_SPACE_THRESHOLD_DEF; /* Free-space section threshold */
+    H5F_file_space_type_t in_strategy = strategy;         /* Input strategy */
+    hsize_t in_threshold = threshold;                     /* Input threshold */
+    herr_t ret_value = SUCCEED;                           /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if ((unsigned)in_strategy >= H5F_FILE_SPACE_NTYPES)
+    if ((unsigned)in_strategy >= H5F_FILE_SPACE_NTYPES) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid strategy");
+    }
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, false)))
+    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, false))) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /*
      *  For 1.10.0 H5Pset_file_space:
@@ -550,41 +574,41 @@ H5Pset_file_space(hid_t plist_id, H5F_file_space_type_t strategy, hsize_t thresh
      *      If threshold is zero, the property is not changed;
      *      the existing threshold is retained.
      */
-    if (!in_strategy)
-        if (H5P__get_file_space(plist, &in_strategy, NULL) < 0)
+    if (!in_strategy) {
+        if (H5P__get_file_space(plist, &in_strategy, NULL) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get file space strategy");
-    if (!in_threshold)
-        if (H5P__get_file_space(plist, NULL, &in_threshold) < 0)
+        }
+    }
+    if (!in_threshold) {
+        if (H5P__get_file_space(plist, NULL, &in_threshold) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get free-space threshold");
-
-    switch (in_strategy) {
-        case H5F_FILE_SPACE_ALL_PERSIST:
-            new_strategy  = H5F_FSPACE_STRATEGY_FSM_AGGR;
-            new_persist   = true;
-            new_threshold = in_threshold;
-            break;
-
-        case H5F_FILE_SPACE_ALL:
-            new_strategy  = H5F_FSPACE_STRATEGY_FSM_AGGR;
-            new_threshold = in_threshold;
-            break;
-
-        case H5F_FILE_SPACE_AGGR_VFD:
-            new_strategy = H5F_FSPACE_STRATEGY_AGGR;
-            break;
-
-        case H5F_FILE_SPACE_VFD:
-            new_strategy = H5F_FSPACE_STRATEGY_NONE;
-            break;
-
-        case H5F_FILE_SPACE_NTYPES:
-        case H5F_FILE_SPACE_DEFAULT:
-        default:
-            HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid file space strategy");
+        }
     }
 
-    if (H5P__set_file_space_strategy(plist, new_strategy, new_persist, new_threshold) < 0)
+    switch (in_strategy) {
+    case H5F_FILE_SPACE_ALL_PERSIST:
+        new_strategy = H5F_FSPACE_STRATEGY_FSM_AGGR;
+        new_persist = true;
+        new_threshold = in_threshold;
+        break;
+
+    case H5F_FILE_SPACE_ALL:
+        new_strategy = H5F_FSPACE_STRATEGY_FSM_AGGR;
+        new_threshold = in_threshold;
+        break;
+
+    case H5F_FILE_SPACE_AGGR_VFD: new_strategy = H5F_FSPACE_STRATEGY_AGGR; break;
+
+    case H5F_FILE_SPACE_VFD: new_strategy = H5F_FSPACE_STRATEGY_NONE; break;
+
+    case H5F_FILE_SPACE_NTYPES:
+    case H5F_FILE_SPACE_DEFAULT:
+    default                    : HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid file space strategy");
+    }
+
+    if (H5P__set_file_space_strategy(plist, new_strategy, new_persist, new_threshold) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "can't set file space strategy");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -599,48 +623,45 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__get_file_space(H5P_genplist_t *plist, H5F_file_space_type_t *strategy, hsize_t *threshold)
+static herr_t H5P__get_file_space(H5P_genplist_t* plist, H5F_file_space_type_t* strategy, hsize_t* threshold)
 {
-    H5F_fspace_strategy_t new_strategy;        /* File space strategy type */
-    bool                  new_persist;         /* Persisting free-space or not */
-    hsize_t               new_threshold;       /* Free-space section threshold */
-    herr_t                ret_value = SUCCEED; /* Return value */
+    H5F_fspace_strategy_t new_strategy; /* File space strategy type */
+    bool new_persist;                   /* Persisting free-space or not */
+    hsize_t new_threshold;              /* Free-space section threshold */
+    herr_t ret_value = SUCCEED;         /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Get current file space info */
-    if (H5P__get_file_space_strategy(plist, &new_strategy, &new_persist, &new_threshold) < 0)
+    if (H5P__get_file_space_strategy(plist, &new_strategy, &new_persist, &new_threshold) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get file space strategy values");
+    }
 
     /* Get value(s) */
     if (strategy) {
         switch (new_strategy) {
+        case H5F_FSPACE_STRATEGY_FSM_AGGR:
+            if (new_persist) {
+                *strategy = H5F_FILE_SPACE_ALL_PERSIST;
+            }
+            else {
+                *strategy = H5F_FILE_SPACE_ALL;
+            }
+            break;
 
-            case H5F_FSPACE_STRATEGY_FSM_AGGR:
-                if (new_persist)
-                    *strategy = H5F_FILE_SPACE_ALL_PERSIST;
-                else
-                    *strategy = H5F_FILE_SPACE_ALL;
-                break;
+        case H5F_FSPACE_STRATEGY_AGGR: *strategy = H5F_FILE_SPACE_AGGR_VFD; break;
 
-            case H5F_FSPACE_STRATEGY_AGGR:
-                *strategy = H5F_FILE_SPACE_AGGR_VFD;
-                break;
+        case H5F_FSPACE_STRATEGY_NONE: *strategy = H5F_FILE_SPACE_VFD; break;
 
-            case H5F_FSPACE_STRATEGY_NONE:
-                *strategy = H5F_FILE_SPACE_VFD;
-                break;
-
-            case H5F_FSPACE_STRATEGY_PAGE:
-            case H5F_FSPACE_STRATEGY_NTYPES:
-            default:
-                HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid file space strategy");
+        case H5F_FSPACE_STRATEGY_PAGE:
+        case H5F_FSPACE_STRATEGY_NTYPES:
+        default                        : HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid file space strategy");
         }
     }
 
-    if (threshold)
+    if (threshold) {
         *threshold = new_threshold;
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -655,21 +676,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pget_file_space(hid_t plist_id, H5F_file_space_type_t *strategy /*out*/, hsize_t *threshold /*out*/)
+herr_t H5Pget_file_space(hid_t plist_id, H5F_file_space_type_t* strategy /*out*/, hsize_t* threshold /*out*/)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, true)))
+    if (NULL == (plist = H5P_object_verify(plist_id, H5P_FILE_CREATE, true))) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Get current file space info */
-    if (H5P__get_file_space(plist, strategy, threshold) < 0)
+    if (H5P__get_file_space(plist, strategy, threshold) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get file space strategy");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)

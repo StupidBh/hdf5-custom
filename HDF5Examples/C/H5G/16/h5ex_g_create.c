@@ -10,10 +10,9 @@
 
 #define FILENAME "h5ex_g_create.h5"
 
-int
-main(void)
+int main(void)
 {
-    hid_t  file, group; /* Handles */
+    hid_t file, group; /* Handles */
     herr_t status;
 
     /*

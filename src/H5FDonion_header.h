@@ -30,9 +30,10 @@
 
 /* In-memory representation of the on-store onion history file header.
  */
-typedef struct H5FD_onion_header_t {
-    uint8_t  version;
-    uint32_t flags; /* At most three bytes used! */
+typedef struct H5FD_onion_header_t
+{
+    uint8_t version;
+    uint32_t flags;      /* At most three bytes used! */
     uint32_t page_size;
     uint64_t origin_eof; /* Size of the 'original' canonical file */
     uint64_t history_addr;
@@ -41,12 +42,13 @@ typedef struct H5FD_onion_header_t {
 } H5FD_onion_header_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-H5_DLL herr_t H5FD__onion_ingest_header(H5FD_onion_header_t *hdr_out, H5FD_t *raw_file, haddr_t addr);
-H5_DLL herr_t H5FD__onion_write_header(H5FD_onion_header_t *header, H5FD_t *file);
-H5_DLL size_t H5FD__onion_header_decode(unsigned char *buf, H5FD_onion_header_t *header);
-H5_DLL size_t H5FD__onion_header_encode(H5FD_onion_header_t *header, unsigned char *buf, uint32_t *checksum);
+    H5_DLL herr_t H5FD__onion_ingest_header(H5FD_onion_header_t* hdr_out, H5FD_t* raw_file, haddr_t addr);
+    H5_DLL herr_t H5FD__onion_write_header(H5FD_onion_header_t* header, H5FD_t* file);
+    H5_DLL size_t H5FD__onion_header_decode(unsigned char* buf, H5FD_onion_header_t* header);
+    H5_DLL size_t H5FD__onion_header_encode(H5FD_onion_header_t* header, unsigned char* buf, uint32_t* checksum);
 
 #ifdef __cplusplus
 }

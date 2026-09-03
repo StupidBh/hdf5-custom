@@ -12,15 +12,15 @@
 
 #include "H5FDmodule.h" /* This source code file is part of the H5FD module */
 
-#include "H5private.h" /* Generic Functions        */
+#include "H5private.h"  /* Generic Functions        */
 
 #ifdef H5_HAVE_WINDOWS
 
-#include "H5Eprivate.h"  /* Error handling           */
-#include "H5FDsec2.h"    /* Windows file driver      */
-#include "H5FDpkg.h"     /* File drivers             */
-#include "H5FDwindows.h" /* Windows file driver      */
-#include "H5Pprivate.h"  /* Property lists           */
+    #include "H5Eprivate.h"  /* Error handling           */
+    #include "H5FDsec2.h"    /* Windows file driver      */
+    #include "H5FDpkg.h"     /* File drivers             */
+    #include "H5FDwindows.h" /* Windows file driver      */
+    #include "H5Pprivate.h"  /* Property lists           */
 
 /*-------------------------------------------------------------------------
  * Function:    H5Pset_fapl_windows
@@ -39,16 +39,16 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pset_fapl_windows(hid_t fapl_id)
+herr_t H5Pset_fapl_windows(hid_t fapl_id)
 {
-    H5P_genplist_t *plist; /* Property list pointer */
-    herr_t          ret_value;
+    H5P_genplist_t* plist; /* Property list pointer */
+    herr_t ret_value;
 
     FUNC_ENTER_API(FAIL)
 
-    if (NULL == (plist = H5P_object_verify(fapl_id, H5P_FILE_ACCESS, false)))
+    if (NULL == (plist = H5P_object_verify(fapl_id, H5P_FILE_ACCESS, false))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a file access property list");
+    }
 
     ret_value = H5P_set_driver(plist, H5FD_WINDOWS, NULL, NULL);
 

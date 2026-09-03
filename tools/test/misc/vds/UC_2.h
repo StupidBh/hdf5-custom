@@ -56,9 +56,9 @@
 #define UC_2_C_HEIGHT    2
 #define UC_2_D_HEIGHT    5
 #define UC_2_E_HEIGHT    3
-#define UC_2_FULL_HEIGHT 8 /* A+B+C and D+E */
+#define UC_2_FULL_HEIGHT 8                    /* A+B+C and D+E */
 #define UC_2_WIDTH       7
-#define UC_2_FULL_WIDTH  14 /* 2*width */
+#define UC_2_FULL_WIDTH  14                   /* 2*width */
 
 #define UC_2_N_PLANES_IN_SERIES 3             /* number of planes in a series of sub-images */
 #define UC_2_N_MAX_PLANES       H5S_UNLIMITED /* max number of planes */
@@ -69,22 +69,21 @@
 #define UC_2_VDS_DATATYPE    H5T_STD_I32LE
 
 /* Starting size of datasets, both source and VDS */
-static hsize_t UC_2_DIMS[UC_2_N_SOURCES][RANK] = {{0, UC_2_A_HEIGHT, UC_2_WIDTH},
-                                                  {0, UC_2_B_HEIGHT, UC_2_WIDTH},
-                                                  {0, UC_2_C_HEIGHT, UC_2_WIDTH},
-                                                  {0, UC_2_D_HEIGHT, UC_2_WIDTH},
-                                                  {0, UC_2_E_HEIGHT, UC_2_WIDTH}};
+static hsize_t UC_2_DIMS[UC_2_N_SOURCES][RANK] = { { 0, UC_2_A_HEIGHT, UC_2_WIDTH },
+                                                   { 0, UC_2_B_HEIGHT, UC_2_WIDTH },
+                                                   { 0, UC_2_C_HEIGHT, UC_2_WIDTH },
+                                                   { 0, UC_2_D_HEIGHT, UC_2_WIDTH },
+                                                   { 0, UC_2_E_HEIGHT, UC_2_WIDTH } };
 
 /* Maximum size of datasets, both source and VDS */
-static hsize_t UC_2_MAX_DIMS[UC_2_N_SOURCES][RANK] = {{UC_2_N_MAX_PLANES, UC_2_A_HEIGHT, UC_2_WIDTH},
-                                                      {UC_2_N_MAX_PLANES, UC_2_B_HEIGHT, UC_2_WIDTH},
-                                                      {UC_2_N_MAX_PLANES, UC_2_C_HEIGHT, UC_2_WIDTH},
-                                                      {UC_2_N_MAX_PLANES, UC_2_D_HEIGHT, UC_2_WIDTH},
-                                                      {UC_2_N_MAX_PLANES, UC_2_E_HEIGHT, UC_2_WIDTH}};
+static hsize_t UC_2_MAX_DIMS[UC_2_N_SOURCES][RANK] = { { UC_2_N_MAX_PLANES, UC_2_A_HEIGHT, UC_2_WIDTH },
+                                                       { UC_2_N_MAX_PLANES, UC_2_B_HEIGHT, UC_2_WIDTH },
+                                                       { UC_2_N_MAX_PLANES, UC_2_C_HEIGHT, UC_2_WIDTH },
+                                                       { UC_2_N_MAX_PLANES, UC_2_D_HEIGHT, UC_2_WIDTH },
+                                                       { UC_2_N_MAX_PLANES, UC_2_E_HEIGHT, UC_2_WIDTH } };
 
 /* File names for source datasets */
-static char UC_2_FILE_NAMES[UC_2_N_SOURCES][NAME_LEN] = {
-    {"2_a.h5"}, {"2_b.h5"}, {"2_c.h5"}, {"2_d.h5"}, {"2_e.h5"}};
+static char UC_2_FILE_NAMES[UC_2_N_SOURCES][NAME_LEN] = { { "2_a.h5" }, { "2_b.h5" }, { "2_c.h5" }, { "2_d.h5" }, { "2_e.h5" } };
 
 /* VDS file name */
 #define UC_2_VDS_FILE_NAME "2_vds.h5"

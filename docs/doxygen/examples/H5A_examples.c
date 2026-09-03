@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -15,8 +14,8 @@ main(void)
         __label__ fail_acpl, fail_attr, fail_file;
         hid_t file, acpl, fspace, attr;
 
-        unsigned mode        = H5F_ACC_TRUNC;
-        char     file_name[] = "f1.h5";
+        unsigned mode = H5F_ACC_TRUNC;
+        char file_name[] = "f1.h5";
         // attribute names can be arbitrary Unicode strings
         char attr_name[] = "Χαρακτηριστικό";
 
@@ -39,8 +38,7 @@ main(void)
             goto fail_fspace;
         }
         // create an attribute on the root group
-        if ((attr = H5Acreate2(file, attr_name, H5T_STD_I32LE, fspace, acpl, H5P_DEFAULT)) ==
-            H5I_INVALID_HID) {
+        if ((attr = H5Acreate2(file, attr_name, H5T_STD_I32LE, fspace, acpl, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
             goto fail_attr;
         }
@@ -61,10 +59,10 @@ fail_file:;
         __label__ fail_attr, fail_file;
         hid_t file, attr;
 
-        unsigned mode        = H5F_ACC_RDONLY;
-        char     file_name[] = "f1.h5";
-        char     attr_name[] = "Χαρακτηριστικό";
-        int      value;
+        unsigned mode = H5F_ACC_RDONLY;
+        char file_name[] = "f1.h5";
+        char attr_name[] = "Χαρακτηριστικό";
+        int value;
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -75,8 +73,9 @@ fail_file:;
             goto fail_attr;
         }
         // read the attribute value
-        if (H5Aread(attr, H5T_NATIVE_INT, &value) < 0)
+        if (H5Aread(attr, H5T_NATIVE_INT, &value) < 0) {
             ret_val = EXIT_FAILURE;
+        }
 
         // do something w/ the attribute value
 
@@ -92,10 +91,10 @@ fail_file:;
         __label__ fail_attr, fail_file;
         hid_t file, attr;
 
-        unsigned mode        = H5F_ACC_RDWR;
-        char     file_name[] = "f1.h5";
-        char     attr_name[] = "Χαρακτηριστικό";
-        int      value       = 1234;
+        unsigned mode = H5F_ACC_RDWR;
+        char file_name[] = "f1.h5";
+        char attr_name[] = "Χαρακτηριστικό";
+        int value = 1234;
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -106,8 +105,9 @@ fail_file:;
             goto fail_attr;
         }
         // update the attribute value
-        if (H5Awrite(attr, H5T_NATIVE_INT, &value) < 0)
+        if (H5Awrite(attr, H5T_NATIVE_INT, &value) < 0) {
             ret_val = EXIT_FAILURE;
+        }
 
         H5Aclose(attr);
 fail_attr:
@@ -121,9 +121,9 @@ fail_file:;
         __label__ fail_attr, fail_file;
         hid_t file;
 
-        unsigned mode        = H5F_ACC_RDWR;
-        char     file_name[] = "f1.h5";
-        char     attr_name[] = "Χαρακτηριστικό";
+        unsigned mode = H5F_ACC_RDWR;
+        char file_name[] = "f1.h5";
+        char attr_name[] = "Χαρακτηριστικό";
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;

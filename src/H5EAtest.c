@@ -47,9 +47,10 @@
 /******************/
 
 /* Callback context */
-typedef struct H5EA__test_ctx_t {
-    uint32_t        bogus; /* Placeholder field to verify that context is working */
-    H5EA__ctx_cb_t *cb;    /* Pointer to context's callback action */
+typedef struct H5EA__test_ctx_t
+{
+    uint32_t bogus;     /* Placeholder field to verify that context is working */
+    H5EA__ctx_cb_t* cb; /* Pointer to context's callback action */
 } H5EA__test_ctx_t;
 
 /********************/
@@ -61,21 +62,21 @@ typedef struct H5EA__test_ctx_t {
 /********************/
 
 /* Extensible array class callbacks */
-static void  *H5EA__test_crt_context(void *udata);
-static herr_t H5EA__test_dst_context(void *ctx);
-static herr_t H5EA__test_fill(void *nat_blk, size_t nelmts);
-static herr_t H5EA__test_encode(void *raw, const void *elmt, size_t nelmts, void *ctx);
-static herr_t H5EA__test_decode(const void *raw, void *elmt, size_t nelmts, void *ctx);
-static herr_t H5EA__test_debug(FILE *stream, int indent, int fwidth, hsize_t idx, const void *elmt);
-static void  *H5EA__test_crt_dbg_context(H5F_t H5_ATTR_UNUSED *f, haddr_t H5_ATTR_UNUSED obj_addr);
-static herr_t H5EA__test_dst_dbg_context(void *_ctx);
+static void* H5EA__test_crt_context(void* udata);
+static herr_t H5EA__test_dst_context(void* ctx);
+static herr_t H5EA__test_fill(void* nat_blk, size_t nelmts);
+static herr_t H5EA__test_encode(void* raw, const void* elmt, size_t nelmts, void* ctx);
+static herr_t H5EA__test_decode(const void* raw, void* elmt, size_t nelmts, void* ctx);
+static herr_t H5EA__test_debug(FILE* stream, int indent, int fwidth, hsize_t idx, const void* elmt);
+static void* H5EA__test_crt_dbg_context(H5F_t H5_ATTR_UNUSED* f, haddr_t H5_ATTR_UNUSED obj_addr);
+static herr_t H5EA__test_dst_dbg_context(void* _ctx);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* Extensible array testing class information */
-const H5EA_class_t H5EA_CLS_TEST[1] = {{
+const H5EA_class_t H5EA_CLS_TEST[1] = { {
     H5EA_CLS_TEST_ID,           /* Type of Extensible array */
     "Testing",                  /* Name of Extensible Array class */
     sizeof(uint64_t),           /* Size of native element */
@@ -87,7 +88,7 @@ const H5EA_class_t H5EA_CLS_TEST[1] = {{
     H5EA__test_debug,           /* Element debugging callback */
     H5EA__test_crt_dbg_context, /* Create debugging context */
     H5EA__test_dst_dbg_context  /* Destroy debugging context */
-}};
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -113,23 +114,22 @@ H5FL_DEFINE_STATIC(H5EA__ctx_cb_t);
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5EA__test_crt_context(void *_udata)
+static void* H5EA__test_crt_context(void* _udata)
 {
-    H5EA__test_ctx_t *ctx;                                  /* Context for callbacks */
-    H5EA__ctx_cb_t   *udata     = (H5EA__ctx_cb_t *)_udata; /* User data for context */
-    void             *ret_value = NULL;
+    H5EA__test_ctx_t* ctx;                           /* Context for callbacks */
+    H5EA__ctx_cb_t* udata = (H5EA__ctx_cb_t*)_udata; /* User data for context */
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
     /* Allocate new context structure */
-    if (NULL == (ctx = H5FL_MALLOC(H5EA__test_ctx_t)))
-        HGOTO_ERROR(H5E_EARRAY, H5E_CANTALLOC, NULL,
-                    "can't allocate extensible array client callback context");
+    if (NULL == (ctx = H5FL_MALLOC(H5EA__test_ctx_t))) {
+        HGOTO_ERROR(H5E_EARRAY, H5E_CANTALLOC, NULL, "can't allocate extensible array client callback context");
+    }
 
     /* Initialize the context */
     ctx->bogus = H5EA__TEST_BOGUS_VAL;
-    ctx->cb    = udata;
+    ctx->cb = udata;
 
     /* Set return value */
     ret_value = ctx;
@@ -148,10 +148,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_dst_context(void *_ctx)
+static herr_t H5EA__test_dst_context(void* _ctx)
 {
-    H5EA__test_ctx_t *ctx = (H5EA__test_ctx_t *)_ctx; /* Callback context to destroy */
+    H5EA__test_ctx_t* ctx = (H5EA__test_ctx_t*)_ctx; /* Callback context to destroy */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -174,8 +173,7 @@ H5EA__test_dst_context(void *_ctx)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_fill(void *nat_blk, size_t nelmts)
+static herr_t H5EA__test_fill(void* nat_blk, size_t nelmts)
 {
     uint64_t fill_val = H5EA_TEST_FILL; /* Value to fill elements with */
 
@@ -200,12 +198,11 @@ H5EA__test_fill(void *nat_blk, size_t nelmts)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_encode(void *raw, const void *_elmt, size_t nelmts, void *_ctx)
+static herr_t H5EA__test_encode(void* raw, const void* _elmt, size_t nelmts, void* _ctx)
 {
-    H5EA__test_ctx_t *ctx       = (H5EA__test_ctx_t *)_ctx; /* Callback context to destroy */
-    const uint64_t   *elmt      = (const uint64_t *)_elmt;  /* Convenience pointer to native elements */
-    herr_t            ret_value = SUCCEED;
+    H5EA__test_ctx_t* ctx = (H5EA__test_ctx_t*)_ctx; /* Callback context to destroy */
+    const uint64_t* elmt = (const uint64_t*)_elmt;   /* Convenience pointer to native elements */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -217,8 +214,9 @@ H5EA__test_encode(void *raw, const void *_elmt, size_t nelmts, void *_ctx)
 
     /* Check for callback action */
     if (ctx->cb) {
-        if ((*ctx->cb->encode)(elmt, nelmts, ctx->cb->udata) < 0)
+        if ((*ctx->cb->encode)(elmt, nelmts, ctx->cb->udata) < 0) {
             HGOTO_ERROR(H5E_EARRAY, H5E_BADVALUE, FAIL, "extensible array testing callback action failed");
+        }
     }
 
     /* Encode native elements into raw elements */
@@ -247,14 +245,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_decode(const void *_raw, void *_elmt, size_t nelmts, void H5_ATTR_NDEBUG_UNUSED *_ctx)
+static herr_t H5EA__test_decode(const void* _raw, void* _elmt, size_t nelmts, void H5_ATTR_NDEBUG_UNUSED* _ctx)
 {
 #ifndef NDEBUG
-    H5EA__test_ctx_t *ctx = (H5EA__test_ctx_t *)_ctx; /* Callback context to destroy */
-#endif                                                /* NDEBUG */
-    uint64_t      *elmt = (uint64_t *)_elmt;          /* Convenience pointer to native elements */
-    const uint8_t *raw  = (const uint8_t *)_raw;      /* Convenience pointer to raw elements */
+    H5EA__test_ctx_t* ctx = (H5EA__test_ctx_t*)_ctx; /* Callback context to destroy */
+#endif /* NDEBUG */
+    uint64_t* elmt = (uint64_t*)_elmt;         /* Convenience pointer to native elements */
+    const uint8_t* raw = (const uint8_t*)_raw; /* Convenience pointer to raw elements */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -289,8 +286,7 @@ H5EA__test_decode(const void *_raw, void *_elmt, size_t nelmts, void H5_ATTR_NDE
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_debug(FILE *stream, int indent, int fwidth, hsize_t idx, const void *elmt)
+static herr_t H5EA__test_debug(FILE* stream, int indent, int fwidth, hsize_t idx, const void* elmt)
 {
     char temp_str[128]; /* Temporary string, for formatting */
 
@@ -302,8 +298,7 @@ H5EA__test_debug(FILE *stream, int indent, int fwidth, hsize_t idx, const void *
 
     /* Print element */
     snprintf(temp_str, sizeof(temp_str), "Element #%llu:", (unsigned long long)idx);
-    fprintf(stream, "%*s%-*s %llu\n", indent, "", fwidth, temp_str,
-            (unsigned long long)*(const uint64_t *)elmt);
+    fprintf(stream, "%*s%-*s %llu\n", indent, "", fwidth, temp_str, (unsigned long long)*(const uint64_t*)elmt);
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5EA__test_debug() */
@@ -318,18 +313,17 @@ H5EA__test_debug(FILE *stream, int indent, int fwidth, hsize_t idx, const void *
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5EA__test_crt_dbg_context(H5F_t H5_ATTR_UNUSED *f, haddr_t H5_ATTR_UNUSED obj_addr)
+static void* H5EA__test_crt_dbg_context(H5F_t H5_ATTR_UNUSED* f, haddr_t H5_ATTR_UNUSED obj_addr)
 {
-    H5EA__ctx_cb_t *ctx; /* Context for callbacks */
-    void           *ret_value = NULL;
+    H5EA__ctx_cb_t* ctx; /* Context for callbacks */
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
     /* Allocate new context structure */
-    if (NULL == (ctx = H5FL_MALLOC(H5EA__ctx_cb_t)))
-        HGOTO_ERROR(H5E_EARRAY, H5E_CANTALLOC, NULL,
-                    "can't allocate extensible array client callback context");
+    if (NULL == (ctx = H5FL_MALLOC(H5EA__ctx_cb_t))) {
+        HGOTO_ERROR(H5E_EARRAY, H5E_CANTALLOC, NULL, "can't allocate extensible array client callback context");
+    }
 
     /* Set return value */
     ret_value = ctx;
@@ -348,10 +342,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5EA__test_dst_dbg_context(void *_ctx)
+static herr_t H5EA__test_dst_dbg_context(void* _ctx)
 {
-    H5EA__ctx_cb_t *ctx = (H5EA__ctx_cb_t *)_ctx; /* Callback context to destroy */
+    H5EA__ctx_cb_t* ctx = (H5EA__ctx_cb_t*)_ctx; /* Callback context to destroy */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -373,8 +366,7 @@ H5EA__test_dst_dbg_context(void *_ctx)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5EA__get_cparam_test(const H5EA_t *ea, H5EA_create_t *cparam)
+herr_t H5EA__get_cparam_test(const H5EA_t* ea, H5EA_create_t* cparam)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -383,11 +375,11 @@ H5EA__get_cparam_test(const H5EA_t *ea, H5EA_create_t *cparam)
     assert(cparam);
 
     /* Get extensible array creation parameters */
-    cparam->raw_elmt_size             = ea->hdr->cparam.raw_elmt_size;
-    cparam->max_nelmts_bits           = ea->hdr->cparam.max_nelmts_bits;
-    cparam->idx_blk_elmts             = ea->hdr->cparam.idx_blk_elmts;
-    cparam->sup_blk_min_data_ptrs     = ea->hdr->cparam.sup_blk_min_data_ptrs;
-    cparam->data_blk_min_elmts        = ea->hdr->cparam.data_blk_min_elmts;
+    cparam->raw_elmt_size = ea->hdr->cparam.raw_elmt_size;
+    cparam->max_nelmts_bits = ea->hdr->cparam.max_nelmts_bits;
+    cparam->idx_blk_elmts = ea->hdr->cparam.idx_blk_elmts;
+    cparam->sup_blk_min_data_ptrs = ea->hdr->cparam.sup_blk_min_data_ptrs;
+    cparam->data_blk_min_elmts = ea->hdr->cparam.data_blk_min_elmts;
     cparam->max_dblk_page_nelmts_bits = ea->hdr->cparam.max_dblk_page_nelmts_bits;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -403,8 +395,7 @@ H5EA__get_cparam_test(const H5EA_t *ea, H5EA_create_t *cparam)
  *
  *-------------------------------------------------------------------------
  */
-int
-H5EA__cmp_cparam_test(const H5EA_create_t *cparam1, const H5EA_create_t *cparam2)
+int H5EA__cmp_cparam_test(const H5EA_create_t* cparam1, const H5EA_create_t* cparam2)
 {
     int ret_value = 0;
 
@@ -415,35 +406,47 @@ H5EA__cmp_cparam_test(const H5EA_create_t *cparam1, const H5EA_create_t *cparam2
     assert(cparam2);
 
     /* Compare creation parameters for array */
-    if (cparam1->raw_elmt_size < cparam2->raw_elmt_size)
+    if (cparam1->raw_elmt_size < cparam2->raw_elmt_size) {
         HGOTO_DONE(-1);
-    else if (cparam1->raw_elmt_size > cparam2->raw_elmt_size)
+    }
+    else if (cparam1->raw_elmt_size > cparam2->raw_elmt_size) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->max_nelmts_bits < cparam2->max_nelmts_bits)
+    if (cparam1->max_nelmts_bits < cparam2->max_nelmts_bits) {
         HGOTO_DONE(-1);
-    else if (cparam1->max_nelmts_bits > cparam2->max_nelmts_bits)
+    }
+    else if (cparam1->max_nelmts_bits > cparam2->max_nelmts_bits) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->idx_blk_elmts < cparam2->idx_blk_elmts)
+    if (cparam1->idx_blk_elmts < cparam2->idx_blk_elmts) {
         HGOTO_DONE(-1);
-    else if (cparam1->idx_blk_elmts > cparam2->idx_blk_elmts)
+    }
+    else if (cparam1->idx_blk_elmts > cparam2->idx_blk_elmts) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->sup_blk_min_data_ptrs < cparam2->sup_blk_min_data_ptrs)
+    if (cparam1->sup_blk_min_data_ptrs < cparam2->sup_blk_min_data_ptrs) {
         HGOTO_DONE(-1);
-    else if (cparam1->sup_blk_min_data_ptrs > cparam2->sup_blk_min_data_ptrs)
+    }
+    else if (cparam1->sup_blk_min_data_ptrs > cparam2->sup_blk_min_data_ptrs) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->data_blk_min_elmts < cparam2->data_blk_min_elmts)
+    if (cparam1->data_blk_min_elmts < cparam2->data_blk_min_elmts) {
         HGOTO_DONE(-1);
-    else if (cparam1->data_blk_min_elmts > cparam2->data_blk_min_elmts)
+    }
+    else if (cparam1->data_blk_min_elmts > cparam2->data_blk_min_elmts) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->max_dblk_page_nelmts_bits < cparam2->max_dblk_page_nelmts_bits)
+    if (cparam1->max_dblk_page_nelmts_bits < cparam2->max_dblk_page_nelmts_bits) {
         HGOTO_DONE(-1);
-    else if (cparam1->max_dblk_page_nelmts_bits > cparam2->max_dblk_page_nelmts_bits)
+    }
+    else if (cparam1->max_dblk_page_nelmts_bits > cparam2->max_dblk_page_nelmts_bits) {
         HGOTO_DONE(1);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

@@ -44,19 +44,19 @@
 #define UC_4_VDS_DATATYPE    H5T_STD_I32LE
 
 /* Starting size of datasets, both source and VDS */
-static hsize_t UC_4_SOURCE_DIMS[RANK] = {0, UC_4_HEIGHT, UC_4_WIDTH};
-static hsize_t UC_4_VDS_DIMS[RANK]    = {0, UC_4_HEIGHT, UC_4_WIDTH};
+static hsize_t UC_4_SOURCE_DIMS[RANK] = { 0, UC_4_HEIGHT, UC_4_WIDTH };
+static hsize_t UC_4_VDS_DIMS[RANK] = { 0, UC_4_HEIGHT, UC_4_WIDTH };
 
 /* Max size of datasets, both source and VDS */
-static hsize_t UC_4_SOURCE_MAX_DIMS[RANK] = {UC_4_SRC_PLANES, UC_4_HEIGHT, UC_4_WIDTH};
-static hsize_t UC_4_VDS_MAX_DIMS[RANK]    = {UC_4_VDS_MAX_PLANES, UC_4_HEIGHT, UC_4_WIDTH};
+static hsize_t UC_4_SOURCE_MAX_DIMS[RANK] = { UC_4_SRC_PLANES, UC_4_HEIGHT, UC_4_WIDTH };
+static hsize_t UC_4_VDS_MAX_DIMS[RANK] = { UC_4_VDS_MAX_PLANES, UC_4_HEIGHT, UC_4_WIDTH };
 
 /* Planes (both source and VDS) */
-static hsize_t UC_4_PLANE[RANK] = {1, UC_4_HEIGHT, UC_4_WIDTH};
+static hsize_t UC_4_PLANE[RANK] = { 1, UC_4_HEIGHT, UC_4_WIDTH };
 
 /* File names for source datasets */
-static char UC_4_FILE_NAMES[UC_4_N_SOURCES][NAME_LEN] = {{"4_0.h5"}, {"4_1.h5"}, {"4_2.h5"}};
-static char UC_4_MAPPING_FILE_NAME[NAME_LEN]          = "4_%b.h5";
+static char UC_4_FILE_NAMES[UC_4_N_SOURCES][NAME_LEN] = { { "4_0.h5" }, { "4_1.h5" }, { "4_2.h5" } };
+static char UC_4_MAPPING_FILE_NAME[NAME_LEN] = "4_%b.h5";
 
 /* VDS file name */
 static char UC_4_VDS_FILE_NAME[NAME_LEN] = "4_vds.h5";
@@ -64,10 +64,10 @@ static char UC_4_VDS_FILE_NAME[NAME_LEN] = "4_vds.h5";
 /* Dataset names */
 static char UC_4_SOURCE_DSET_NAME[NAME_LEN] = "source_dset";
 static char UC_4_SOURCE_DSET_PATH[NAME_LEN] = "/source_dset";
-static char UC_4_VDS_DSET_NAME[NAME_LEN]    = "vds_dset";
+static char UC_4_VDS_DSET_NAME[NAME_LEN] = "vds_dset";
 
 /* Fill values */
-static int UC_4_FILL_VALUES[UC_4_N_SOURCES] = {-1, -2, -3};
-static int UC_4_VDS_FILL_VALUE              = -9;
+static int UC_4_FILL_VALUES[UC_4_N_SOURCES] = { -1, -2, -3 };
+static int UC_4_VDS_FILL_VALUE = -9;
 
 #endif /* UC_4_H */

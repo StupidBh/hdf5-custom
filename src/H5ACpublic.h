@@ -478,7 +478,8 @@
  */
 
 //! <!-- [H5AC_cache_config_t_snip] -->
-typedef struct H5AC_cache_config_t {
+typedef struct H5AC_cache_config_t
+{
     /* general configuration fields: */
     //! <!-- [H5AC_cache_config_t_general_snip] -->
     int version;
@@ -734,6 +735,7 @@ typedef struct H5AC_cache_config_t {
      * library has detailed information on each strategy. */
     //! <!-- [H5AC_cache_config_t_parallel_snip] -->
 } H5AC_cache_config_t;
+
 //! <!-- [H5AC_cache_config_t_snip] -->
 
 /**
@@ -762,7 +764,8 @@ typedef struct H5AC_cache_config_t {
  * H5C_cache_image_ctl_t.
  */
 
-typedef struct H5AC_cache_image_config_t {
+typedef struct H5AC_cache_image_config_t
+{
     int version;
     /**< Integer field containing the version number of this version of the \c
      *  H5C_image_ctl_t structure.  Any instance of \c H5C_image_ctl_t passed

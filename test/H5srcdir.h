@@ -17,13 +17,14 @@
 #define H5SRCDIR_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-/* Just return the srcdir path */
-H5TEST_DLL const char *H5_get_srcdir(void);
+    /* Just return the srcdir path */
+    H5TEST_DLL const char* H5_get_srcdir(void);
 
-/* Append the test file name to the srcdir path and return the whole string */
-H5TEST_DLL const char *H5_get_srcdir_filename(const char *filename);
+    /* Append the test file name to the srcdir path and return the whole string */
+    H5TEST_DLL const char* H5_get_srcdir_filename(const char* filename);
 
 #ifdef __cplusplus
 }

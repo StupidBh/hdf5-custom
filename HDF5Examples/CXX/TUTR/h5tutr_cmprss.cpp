@@ -25,15 +25,14 @@ using namespace H5;
 
 const H5std_string FILE_NAME("h5tutr_cmprss.h5");
 const H5std_string DATASET_NAME("Compressed_Data");
-const int          DIM0 = 100;
-const int          DIM1 = 20;
+const int DIM0 = 100;
+const int DIM1 = 20;
 
-int
-main(void)
+int main(void)
 {
-    hsize_t dims[2]       = {DIM0, DIM1}; // dataset dimensions
-    hsize_t chunk_dims[2] = {20, 20};     // chunk dimensions
-    int     i, j, buf[DIM0][DIM1];
+    hsize_t dims[2] = { DIM0, DIM1 };   // dataset dimensions
+    hsize_t chunk_dims[2] = { 20, 20 }; // chunk dimensions
+    int i, j, buf[DIM0][DIM1];
 
     // Try block to detect exceptions raised by any of the calls inside it
     try {
@@ -45,10 +44,10 @@ main(void)
         H5File file(FILE_NAME, H5F_ACC_TRUNC);
 
         // Create the data space for the dataset.
-        DataSpace *dataspace = new DataSpace(2, dims);
+        DataSpace* dataspace = new DataSpace(2, dims);
 
         // Modify dataset creation property to enable chunking
-        DSetCreatPropList *plist = new DSetCreatPropList;
+        DSetCreatPropList* plist = new DSetCreatPropList;
         plist->setChunk(2, chunk_dims);
 
         // Set ZLIB (DEFLATE) Compression using level 6.
@@ -61,12 +60,13 @@ main(void)
         // plist->setSzip(szip_options_mask, szip_pixels_per_block);
 
         // Create the dataset.
-        DataSet *dataset =
-            new DataSet(file.createDataSet(DATASET_NAME, PredType::STD_I32BE, *dataspace, *plist));
+        DataSet* dataset = new DataSet(file.createDataSet(DATASET_NAME, PredType::STD_I32BE, *dataspace, *plist));
 
-        for (i = 0; i < DIM0; i++)
-            for (j = 0; j < DIM1; j++)
+        for (i = 0; i < DIM0; i++) {
+            for (j = 0; j < DIM1; j++) {
                 buf[i][j] = i + j;
+            }
+        }
 
         // Write data to dataset.
         dataset->write(buf, PredType::NATIVE_INT);
@@ -82,11 +82,11 @@ main(void)
         // information for dataset and read the data back.
         // -----------------------------------------------
 
-        int          rbuf[DIM0][DIM1];
-        int          numfilt;
-        size_t       nelmts = {1}, namelen = {1};
-        unsigned     flags, filter_info, cd_values[1], idx;
-        char         name[1];
+        int rbuf[DIM0][DIM1];
+        int numfilt;
+        size_t nelmts = { 1 }, namelen = { 1 };
+        unsigned flags, filter_info, cd_values[1], idx;
+        char name[1];
         H5Z_filter_t filter_type;
 
         // Open the file and the dataset in the file.
@@ -108,14 +108,9 @@ main(void)
             cout << "Filter Type: ";
 
             switch (filter_type) {
-                case H5Z_FILTER_DEFLATE:
-                    cout << "H5Z_FILTER_DEFLATE" << endl;
-                    break;
-                case H5Z_FILTER_SZIP:
-                    cout << "H5Z_FILTER_SZIP" << endl;
-                    break;
-                default:
-                    cout << "Other filter type included." << endl;
+            case H5Z_FILTER_DEFLATE: cout << "H5Z_FILTER_DEFLATE" << endl; break;
+            case H5Z_FILTER_SZIP   : cout << "H5Z_FILTER_SZIP" << endl; break;
+            default                : cout << "Other filter type included." << endl;
             }
         }
 

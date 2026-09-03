@@ -33,20 +33,20 @@
 
 #if defined(H5_HAVE_PARALLEL) && defined(H5_HAVE_PARALLEL_FILTERED_WRITES)
 
-#define EXAMPLE_FILE       "ph5_filtered_writes.h5"
-#define EXAMPLE_DSET1_NAME "DSET1"
-#define EXAMPLE_DSET2_NAME "DSET2"
+    #define EXAMPLE_FILE       "ph5_filtered_writes.h5"
+    #define EXAMPLE_DSET1_NAME "DSET1"
+    #define EXAMPLE_DSET2_NAME "DSET2"
 
-#define EXAMPLE_DSET_DIMS           2
-#define EXAMPLE_DSET_CHUNK_DIM_SIZE 10
+    #define EXAMPLE_DSET_DIMS           2
+    #define EXAMPLE_DSET_CHUNK_DIM_SIZE 10
 
-/* Dataset datatype */
-#define HDF5_DATATYPE H5T_NATIVE_INT
+    /* Dataset datatype */
+    #define HDF5_DATATYPE H5T_NATIVE_INT
 typedef int C_DATATYPE;
 
-#ifndef PATH_MAX
-#define PATH_MAX 512
-#endif
+    #ifndef PATH_MAX
+        #define PATH_MAX 512
+    #endif
 
 /* Global variables */
 int mpi_rank, mpi_size;
@@ -54,8 +54,7 @@ int mpi_rank, mpi_size;
 /*
  * Routine to set an HDF5 filter on the given DCPL
  */
-static void
-set_filter(hid_t dcpl_id)
+static void set_filter(hid_t dcpl_id)
 {
     htri_t filter_avail;
 
@@ -63,8 +62,9 @@ set_filter(hid_t dcpl_id)
      * Check if 'deflate' filter is available
      */
     filter_avail = H5Zfilter_avail(H5Z_FILTER_DEFLATE);
-    if (filter_avail < 0)
+    if (filter_avail < 0) {
         return;
+    }
     else if (filter_avail) {
         /*
          * Set 'deflate' filter with reasonable
@@ -85,11 +85,10 @@ set_filter(hid_t dcpl_id)
  * Routine to fill a data buffer with data. Assumes
  * dimension rank is 2 and data is stored contiguous.
  */
-void
-fill_databuf(hsize_t start[], hsize_t count[], hsize_t stride[], C_DATATYPE *data)
+void fill_databuf(hsize_t start[], hsize_t count[], hsize_t stride[], C_DATATYPE* data)
 {
-    C_DATATYPE *dataptr = data;
-    hsize_t     i, j;
+    C_DATATYPE* dataptr = data;
+    hsize_t i, j;
 
     /* Use MPI rank value for data */
     for (i = 0; i < count[0]; i++) {
@@ -100,13 +99,13 @@ fill_databuf(hsize_t start[], hsize_t count[], hsize_t stride[], C_DATATYPE *dat
 }
 
 /* Cleanup created file */
-static void
-cleanup(char *filename)
+static void cleanup(char* filename)
 {
     bool do_cleanup = getenv(HDF5_NOCLEANUP) ? false : true;
 
-    if (do_cleanup)
+    if (do_cleanup) {
         MPI_File_delete(filename, MPI_INFO_NULL);
+    }
 }
 
 /*
@@ -117,18 +116,17 @@ cleanup(char *filename)
  * MPI ranks will need the least amount of
  * inter-process communication.
  */
-static void
-write_dataset_no_overlap(hid_t file_id, hid_t dxpl_id)
+static void write_dataset_no_overlap(hid_t file_id, hid_t dxpl_id)
 {
     C_DATATYPE data[EXAMPLE_DSET_CHUNK_DIM_SIZE][4 * EXAMPLE_DSET_CHUNK_DIM_SIZE];
-    hsize_t    dataset_dims[EXAMPLE_DSET_DIMS];
-    hsize_t    chunk_dims[EXAMPLE_DSET_DIMS];
-    hsize_t    start[EXAMPLE_DSET_DIMS];
-    hsize_t    stride[EXAMPLE_DSET_DIMS];
-    hsize_t    count[EXAMPLE_DSET_DIMS];
-    hid_t      dset_id        = H5I_INVALID_HID;
-    hid_t      dcpl_id        = H5I_INVALID_HID;
-    hid_t      file_dataspace = H5I_INVALID_HID;
+    hsize_t dataset_dims[EXAMPLE_DSET_DIMS];
+    hsize_t chunk_dims[EXAMPLE_DSET_DIMS];
+    hsize_t start[EXAMPLE_DSET_DIMS];
+    hsize_t stride[EXAMPLE_DSET_DIMS];
+    hsize_t count[EXAMPLE_DSET_DIMS];
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    hid_t file_dataspace = H5I_INVALID_HID;
 
     /*
      * ------------------------------------
@@ -171,8 +169,7 @@ write_dataset_no_overlap(hid_t file_id, hid_t dxpl_id)
     file_dataspace = H5Screate_simple(EXAMPLE_DSET_DIMS, dataset_dims, NULL);
 
     /* Create the dataset */
-    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET1_NAME, HDF5_DATATYPE, file_dataspace, H5P_DEFAULT, dcpl_id,
-                         H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET1_NAME, HDF5_DATATYPE, file_dataspace, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
 
     /*
      * ------------------------------------
@@ -189,12 +186,12 @@ write_dataset_no_overlap(hid_t file_id, hid_t dxpl_id)
      * dimension. This leads to each MPI rank
      * writing to 4 chunks of the dataset.
      */
-    start[0]  = mpi_rank * EXAMPLE_DSET_CHUNK_DIM_SIZE;
-    start[1]  = 0;
+    start[0] = mpi_rank * EXAMPLE_DSET_CHUNK_DIM_SIZE;
+    start[1] = 0;
     stride[0] = 1;
     stride[1] = 1;
-    count[0]  = EXAMPLE_DSET_CHUNK_DIM_SIZE;
-    count[1]  = 4 * EXAMPLE_DSET_CHUNK_DIM_SIZE;
+    count[0] = EXAMPLE_DSET_CHUNK_DIM_SIZE;
+    count[1] = 4 * EXAMPLE_DSET_CHUNK_DIM_SIZE;
 
     H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, NULL);
 
@@ -235,18 +232,17 @@ write_dataset_no_overlap(hid_t file_id, hid_t dxpl_id)
  * will need the most amount of inter-process
  * communication.
  */
-static void
-write_dataset_overlap(hid_t file_id, hid_t dxpl_id)
+static void write_dataset_overlap(hid_t file_id, hid_t dxpl_id)
 {
-    C_DATATYPE *data = NULL;
-    hsize_t     dataset_dims[EXAMPLE_DSET_DIMS];
-    hsize_t     chunk_dims[EXAMPLE_DSET_DIMS];
-    hsize_t     start[EXAMPLE_DSET_DIMS];
-    hsize_t     stride[EXAMPLE_DSET_DIMS];
-    hsize_t     count[EXAMPLE_DSET_DIMS];
-    hid_t       dset_id        = H5I_INVALID_HID;
-    hid_t       dcpl_id        = H5I_INVALID_HID;
-    hid_t       file_dataspace = H5I_INVALID_HID;
+    C_DATATYPE* data = NULL;
+    hsize_t dataset_dims[EXAMPLE_DSET_DIMS];
+    hsize_t chunk_dims[EXAMPLE_DSET_DIMS];
+    hsize_t start[EXAMPLE_DSET_DIMS];
+    hsize_t stride[EXAMPLE_DSET_DIMS];
+    hsize_t count[EXAMPLE_DSET_DIMS];
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    hid_t file_dataspace = H5I_INVALID_HID;
 
     /*
      * ------------------------------------
@@ -290,8 +286,7 @@ write_dataset_overlap(hid_t file_id, hid_t dxpl_id)
     file_dataspace = H5Screate_simple(EXAMPLE_DSET_DIMS, dataset_dims, NULL);
 
     /* Create the dataset */
-    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET2_NAME, HDF5_DATATYPE, file_dataspace, H5P_DEFAULT, dcpl_id,
-                         H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET2_NAME, HDF5_DATATYPE, file_dataspace, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
 
     /*
      * ------------------------------------
@@ -310,12 +305,12 @@ write_dataset_overlap(hid_t file_id, hid_t dxpl_id)
      * amount of data to every chunk
      * in the dataset.
      */
-    start[0]  = mpi_rank;
-    start[1]  = 0;
+    start[0] = mpi_rank;
+    start[1] = 0;
     stride[0] = chunk_dims[0];
     stride[1] = 1;
-    count[0]  = mpi_size;
-    count[1]  = EXAMPLE_DSET_CHUNK_DIM_SIZE;
+    count[0] = mpi_size;
+    count[1] = EXAMPLE_DSET_CHUNK_DIM_SIZE;
 
     H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, NULL);
 
@@ -352,16 +347,15 @@ write_dataset_overlap(hid_t file_id, hid_t dxpl_id)
     H5Dclose(dset_id);
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    MPI_Comm comm       = MPI_COMM_WORLD;
-    MPI_Info info       = MPI_INFO_NULL;
-    hid_t    file_id    = H5I_INVALID_HID;
-    hid_t    fapl_id    = H5I_INVALID_HID;
-    hid_t    dxpl_id    = H5I_INVALID_HID;
-    char    *par_prefix = NULL;
-    char     filename[PATH_MAX];
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t dxpl_id = H5I_INVALID_HID;
+    char* par_prefix = NULL;
+    char filename[PATH_MAX];
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(comm, &mpi_size);
@@ -489,8 +483,7 @@ main(int argc, char **argv)
 
 #else
 
-int
-main(void)
+int main(void)
 {
     printf("HDF5 not configured with parallel support or parallel filtered writes are disabled!\n");
     return 0;

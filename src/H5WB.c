@@ -46,10 +46,11 @@
 /********************/
 
 /* Typedef for buffer wrapper */
-struct H5WB_t {
-    void  *wrapped_buf;  /* Pointer to wrapped buffer */
+struct H5WB_t
+{
+    void* wrapped_buf;   /* Pointer to wrapped buffer */
     size_t wrapped_size; /* Size of wrapped buffer */
-    void  *actual_buf;   /* Pointer to actual buffer */
+    void* actual_buf;    /* Pointer to actual buffer */
     size_t actual_size;  /* Size of actual buffer used */
     size_t alloc_size;   /* Size of actual buffer allocated */
 };
@@ -86,11 +87,10 @@ H5FL_BLK_DEFINE_STATIC(extra_buf);
  *
  *-------------------------------------------------------------------------
  */
-H5WB_t *
-H5WB_wrap(void *buf, size_t buf_size)
+H5WB_t* H5WB_wrap(void* buf, size_t buf_size)
 {
-    H5WB_t *wb = NULL; /* Wrapped buffer info */
-    H5WB_t *ret_value; /* Return value */
+    H5WB_t* wb = NULL; /* Wrapped buffer info */
+    H5WB_t* ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -101,25 +101,27 @@ H5WB_wrap(void *buf, size_t buf_size)
     assert(buf_size);
 
     /* Create wrapped buffer info */
-    if (NULL == (wb = H5FL_MALLOC(H5WB_t)))
+    if (NULL == (wb = H5FL_MALLOC(H5WB_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed for wrapped buffer info");
+    }
 
     /* Wrap buffer given */
-    wb->wrapped_buf  = buf;
+    wb->wrapped_buf = buf;
     wb->wrapped_size = buf_size;
 
     /* No actual buffer yet */
-    wb->actual_buf  = NULL;
+    wb->actual_buf = NULL;
     wb->actual_size = 0;
-    wb->alloc_size  = 0;
+    wb->alloc_size = 0;
 
     /* Set the return value */
     ret_value = wb;
 
 done:
     /* Release resources on error */
-    if (!ret_value && wb)
+    if (!ret_value && wb) {
         wb = H5FL_FREE(H5WB_t, wb);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5WB_wrap() */
@@ -135,10 +137,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5WB_actual(H5WB_t *wb, size_t need)
+void* H5WB_actual(H5WB_t* wb, size_t need)
 {
-    void *ret_value; /* Return value */
+    void* ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -154,18 +155,21 @@ H5WB_actual(H5WB_t *wb, size_t need)
         assert(wb->actual_size > wb->wrapped_size);
 
         /* Check if we can reuse existing buffer */
-        if (need <= wb->alloc_size)
+        if (need <= wb->alloc_size) {
             HGOTO_DONE(wb->actual_buf);
+        }
         /* Can't reuse existing buffer, free it and proceed */
-        else
+        else {
             wb->actual_buf = H5FL_BLK_FREE(extra_buf, wb->actual_buf);
+        }
     } /* end if */
 
     /* Check if size needed can be fulfilled with wrapped buffer */
     if (need > wb->wrapped_size) {
         /* Need to allocate new buffer */
-        if (NULL == (wb->actual_buf = H5FL_BLK_MALLOC(extra_buf, need)))
+        if (NULL == (wb->actual_buf = H5FL_BLK_MALLOC(extra_buf, need))) {
             HGOTO_ERROR(H5E_ATTR, H5E_NOSPACE, NULL, "memory allocation failed");
+        }
 
         /* Remember size of buffer allocated */
         wb->alloc_size = need;
@@ -181,8 +185,9 @@ H5WB_actual(H5WB_t *wb, size_t need)
 
 done:
     /* Remember size of buffer used, if we were successful */
-    if (ret_value)
+    if (ret_value) {
         wb->actual_size = need;
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5WB_actual() */
@@ -198,10 +203,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5WB_actual_clear(H5WB_t *wb, size_t need)
+void* H5WB_actual_clear(H5WB_t* wb, size_t need)
 {
-    void *ret_value; /* Return value */
+    void* ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -212,8 +216,9 @@ H5WB_actual_clear(H5WB_t *wb, size_t need)
     assert(wb->wrapped_buf);
 
     /* Get a pointer to an actual buffer */
-    if (NULL == (ret_value = H5WB_actual(wb, need)))
+    if (NULL == (ret_value = H5WB_actual(wb, need))) {
         HGOTO_ERROR(H5E_ATTR, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Clear the buffer */
     memset(ret_value, 0, need);
@@ -231,8 +236,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5WB_unwrap(H5WB_t *wb)
+herr_t H5WB_unwrap(H5WB_t* wb)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 

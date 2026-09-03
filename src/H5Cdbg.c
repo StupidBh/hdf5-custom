@@ -70,13 +70,12 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
+herr_t H5C_dump_cache(H5C_t* cache_ptr, const char* cache_name)
 {
-    H5C_cache_entry_t *entry_ptr;
-    H5SL_t            *slist_ptr = NULL;
-    int                i;                   /* Local index variable */
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5C_cache_entry_t* entry_ptr;
+    H5SL_t* slist_ptr = NULL;
+    int i;                      /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -85,8 +84,9 @@ H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
     assert(cache_name != NULL);
 
     /* First, create a skip list */
-    if (NULL == (slist_ptr = H5SL_create(H5SL_TYPE_HADDR, NULL)))
+    if (NULL == (slist_ptr = H5SL_create(H5SL_TYPE_HADDR, NULL))) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTCREATE, FAIL, "can't create skip list");
+    }
 
     /* Next, scan the index, and insert all entries in the skip list.
      * Do this, as we want to display cache entries in increasing address
@@ -96,12 +96,13 @@ H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
         entry_ptr = cache_ptr->index[i];
 
         while (entry_ptr != NULL) {
-            if (H5SL_insert(slist_ptr, entry_ptr, &(entry_ptr->addr)) < 0)
+            if (H5SL_insert(slist_ptr, entry_ptr, &(entry_ptr->addr)) < 0) {
                 HGOTO_ERROR(H5E_CACHE, H5E_BADVALUE, FAIL, "can't insert entry in skip list");
+            }
 
             entry_ptr = entry_ptr->ht_next;
         } /* end while */
-    }     /* end for */
+    } /* end for */
 
     /* If we get this far, all entries in the cache are listed in the
      * skip list -- scan the skip list generating the desired output.
@@ -119,19 +120,22 @@ H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
     fprintf(stdout, "| Prot/Pin/Dirty");
     fprintf(stdout, "\n");
 
-    fprintf(stdout, "--------------------------------------------------------------------------------------"
-                    "--------------------------\n");
+    fprintf(stdout,
+            "--------------------------------------------------------------------------------------"
+            "--------------------------\n");
 
-    i         = 0;
-    entry_ptr = (H5C_cache_entry_t *)H5SL_remove_first(slist_ptr);
+    i = 0;
+    entry_ptr = (H5C_cache_entry_t*)H5SL_remove_first(slist_ptr);
     while (entry_ptr != NULL) {
         /* Print entry */
         fprintf(stdout, "%s%5d ", cache_ptr->prefix, i);
         fprintf(stdout, "  0x%16llx ", (long long)(entry_ptr->addr));
-        if (NULL == entry_ptr->tag_info)
+        if (NULL == entry_ptr->tag_info) {
             fprintf(stdout, "    %16s ", "N/A");
-        else
+        }
+        else {
             fprintf(stdout, "  0x%16llx ", (long long)(entry_ptr->tag_info->tag));
+        }
         fprintf(stdout, "  %5lld ", (long long)(entry_ptr->size));
         fprintf(stdout, "    %d  ", (int)(entry_ptr->ring));
         fprintf(stdout, "  %2d %-32s ", (int)(entry_ptr->type->id), (entry_ptr->type->name));
@@ -141,7 +145,7 @@ H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
         fprintf(stdout, "\n");
 
         /* remove the next (first) item in the skip list */
-        entry_ptr = (H5C_cache_entry_t *)H5SL_remove_first(slist_ptr);
+        entry_ptr = (H5C_cache_entry_t*)H5SL_remove_first(slist_ptr);
 
         i++;
     } /* end while */
@@ -153,8 +157,9 @@ H5C_dump_cache(H5C_t *cache_ptr, const char *cache_name)
 
 done:
     /* Discard the skip list */
-    if (slist_ptr)
+    if (slist_ptr) {
         H5SL_close(slist_ptr);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5C_dump_cache() */
@@ -172,11 +177,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
+herr_t H5C_dump_cache_LRU(H5C_t* cache_ptr, const char* cache_name)
 {
-    H5C_cache_entry_t *entry_ptr;
-    int                i = 0;
+    H5C_cache_entry_t* entry_ptr;
+    int i = 0;
 
     FUNC_ENTER_NOAPI_NOERR
 
@@ -185,9 +189,10 @@ H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
     assert(cache_name != NULL);
 
     fprintf(stdout, "\n\nDump of metadata cache LRU \"%s\"\n", cache_name);
-    fprintf(stdout, "LRU len = %d, LRU size = %d\n", cache_ptr->LRU_list_len,
-            (int)(cache_ptr->LRU_list_size));
-    fprintf(stdout, "index_size = %d, max_cache_size = %d, delta = %d\n\n", (int)(cache_ptr->index_size),
+    fprintf(stdout, "LRU len = %d, LRU size = %d\n", cache_ptr->LRU_list_len, (int)(cache_ptr->LRU_list_size));
+    fprintf(stdout,
+            "index_size = %d, max_cache_size = %d, delta = %d\n\n",
+            (int)(cache_ptr->index_size),
             (int)(cache_ptr->max_cache_size),
             (int)(cache_ptr->max_cache_size) - (int)(cache_ptr->index_size));
 
@@ -201,8 +206,9 @@ H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
     fprintf(stdout, "| Dirty");
     fprintf(stdout, "\n");
 
-    fprintf(stdout, "--------------------------------------------------------------------------------------"
-                    "--------------------------\n");
+    fprintf(stdout,
+            "--------------------------------------------------------------------------------------"
+            "--------------------------\n");
 
     entry_ptr = cache_ptr->LRU_head_ptr;
     while (entry_ptr != NULL) {
@@ -210,10 +216,12 @@ H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
         fprintf(stdout, "%s%5d ", cache_ptr->prefix, i);
         fprintf(stdout, "  0x%16llx ", (long long)(entry_ptr->addr));
 
-        if (NULL == entry_ptr->tag_info)
+        if (NULL == entry_ptr->tag_info) {
             fprintf(stdout, "    %16s ", "N/A");
-        else
+        }
+        else {
             fprintf(stdout, "  0x%16llx ", (long long)(entry_ptr->tag_info->tag));
+        }
 
         fprintf(stdout, "  %5lld ", (long long)(entry_ptr->size));
         fprintf(stdout, "    %d  ", (int)(entry_ptr->ring));
@@ -225,8 +233,9 @@ H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
         entry_ptr = entry_ptr->next;
     } /* end while */
 
-    fprintf(stdout, "--------------------------------------------------------------------------------------"
-                    "--------------------------\n");
+    fprintf(stdout,
+            "--------------------------------------------------------------------------------------"
+            "--------------------------\n");
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* H5C_dump_cache_LRU() */
@@ -244,13 +253,12 @@ H5C_dump_cache_LRU(H5C_t *cache_ptr, const char *cache_name)
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5C_dump_cache_skip_list(H5C_t *cache_ptr, char *calling_fcn)
+herr_t H5C_dump_cache_skip_list(H5C_t* cache_ptr, char* calling_fcn)
 {
-    herr_t             ret_value = SUCCEED; /* Return value */
-    int                i;
-    H5C_cache_entry_t *entry_ptr = NULL;
-    H5SL_node_t       *node_ptr  = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
+    int i;
+    H5C_cache_entry_t* entry_ptr = NULL;
+    H5SL_node_t* node_ptr = NULL;
 
     FUNC_ENTER_NOAPI_NOERR
 
@@ -263,7 +271,6 @@ H5C_dump_cache_skip_list(H5C_t *cache_ptr, char *calling_fcn)
     fprintf(stdout, "	slist size = %zu.\n", cache_ptr->slist_size);
 
     if (cache_ptr->slist_len > 0) {
-
         /* If we get this far, all entries in the cache are listed in the
          * skip list -- scan the skip list generating the desired output.
          */
@@ -272,28 +279,38 @@ H5C_dump_cache_skip_list(H5C_t *cache_ptr, char *calling_fcn)
         i = 0;
 
         node_ptr = H5SL_first(cache_ptr->slist_ptr);
-        if (node_ptr != NULL)
-            entry_ptr = (H5C_cache_entry_t *)H5SL_item(node_ptr);
-        else
+        if (node_ptr != NULL) {
+            entry_ptr = (H5C_cache_entry_t*)H5SL_item(node_ptr);
+        }
+        else {
             entry_ptr = NULL;
+        }
 
         while (entry_ptr != NULL) {
-            fprintf(stdout, "%s%d       0x%016llx  %4lld    %d/%d       %d    %s\n", cache_ptr->prefix, i,
-                    (long long)(entry_ptr->addr), (long long)(entry_ptr->size),
-                    (int)(entry_ptr->is_protected), (int)(entry_ptr->is_pinned), (int)(entry_ptr->is_dirty),
+            fprintf(stdout,
+                    "%s%d       0x%016llx  %4lld    %d/%d       %d    %s\n",
+                    cache_ptr->prefix,
+                    i,
+                    (long long)(entry_ptr->addr),
+                    (long long)(entry_ptr->size),
+                    (int)(entry_ptr->is_protected),
+                    (int)(entry_ptr->is_pinned),
+                    (int)(entry_ptr->is_dirty),
                     entry_ptr->type->name);
-            fprintf(stdout, "		node_ptr = %p, item = %p\n", (void *)node_ptr, H5SL_item(node_ptr));
+            fprintf(stdout, "		node_ptr = %p, item = %p\n", (void*)node_ptr, H5SL_item(node_ptr));
 
             /* increment node_ptr before we delete its target */
             node_ptr = H5SL_next(node_ptr);
-            if (node_ptr != NULL)
-                entry_ptr = (H5C_cache_entry_t *)H5SL_item(node_ptr);
-            else
+            if (node_ptr != NULL) {
+                entry_ptr = (H5C_cache_entry_t*)H5SL_item(node_ptr);
+            }
+            else {
                 entry_ptr = NULL;
+            }
 
             i++;
         } /* end while */
-    }     /* end if */
+    } /* end if */
 
     fprintf(stdout, "\n\n");
 
@@ -311,15 +328,15 @@ H5C_dump_cache_skip_list(H5C_t *cache_ptr, char *calling_fcn)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_set_prefix(H5C_t *cache_ptr, char *prefix)
+herr_t H5C_set_prefix(H5C_t* cache_ptr, char* prefix)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
-    if (cache_ptr == NULL || prefix == NULL || strlen(prefix) >= H5C__PREFIX_LEN)
+    if (cache_ptr == NULL || prefix == NULL || strlen(prefix) >= H5C__PREFIX_LEN) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Bad param(s) on entry");
+    }
 
     strncpy(&(cache_ptr->prefix[0]), prefix, (size_t)(H5C__PREFIX_LEN));
 
@@ -338,59 +355,60 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_stats(H5C_t *cache_ptr, const char *cache_name,
-          bool
+herr_t H5C_stats(H5C_t* cache_ptr,
+                 const char* cache_name,
+                 bool
 #if !H5C_COLLECT_CACHE_STATS
-              H5_ATTR_UNUSED
+                     H5_ATTR_UNUSED
 #endif /* H5C_COLLECT_CACHE_STATS */
-                  display_detailed_stats)
+                         display_detailed_stats)
 {
 #if H5C_COLLECT_CACHE_STATS
-    int     i;
-    int64_t total_hits                     = 0;
-    int64_t total_misses                   = 0;
-    int64_t total_write_protects           = 0;
-    int64_t total_read_protects            = 0;
-    int64_t max_read_protects              = 0;
-    int64_t total_insertions               = 0;
-    int64_t total_pinned_insertions        = 0;
-    int64_t total_clears                   = 0;
-    int64_t total_flushes                  = 0;
-    int64_t total_evictions                = 0;
-    int64_t total_take_ownerships          = 0;
-    int64_t total_moves                    = 0;
-    int64_t total_entry_flush_moves        = 0;
-    int64_t total_cache_flush_moves        = 0;
-    int64_t total_size_increases           = 0;
-    int64_t total_size_decreases           = 0;
+    int i;
+    int64_t total_hits = 0;
+    int64_t total_misses = 0;
+    int64_t total_write_protects = 0;
+    int64_t total_read_protects = 0;
+    int64_t max_read_protects = 0;
+    int64_t total_insertions = 0;
+    int64_t total_pinned_insertions = 0;
+    int64_t total_clears = 0;
+    int64_t total_flushes = 0;
+    int64_t total_evictions = 0;
+    int64_t total_take_ownerships = 0;
+    int64_t total_moves = 0;
+    int64_t total_entry_flush_moves = 0;
+    int64_t total_cache_flush_moves = 0;
+    int64_t total_size_increases = 0;
+    int64_t total_size_decreases = 0;
     int64_t total_entry_flush_size_changes = 0;
     int64_t total_cache_flush_size_changes = 0;
-    int64_t total_pins                     = 0;
-    int64_t total_unpins                   = 0;
-    int64_t total_dirty_pins               = 0;
-    int64_t total_pinned_flushes           = 0;
-    int64_t total_pinned_clears            = 0;
-    int32_t aggregate_max_accesses         = 0;
-    int32_t aggregate_min_accesses         = 1000000;
-    int32_t aggregate_max_clears           = 0;
-    int32_t aggregate_max_flushes          = 0;
-    size_t  aggregate_max_size             = 0;
-    int32_t aggregate_max_pins             = 0;
-    double  hit_rate;
-    double  prefetch_use_rate;
-    double  average_successful_search_depth                   = 0.0;
-    double  average_failed_search_depth                       = 0.0;
-    double  average_entries_skipped_per_calls_to_msic         = 0.0;
-    double  average_dirty_pf_entries_skipped_per_call_to_msic = 0.0;
-    double  average_entries_scanned_per_calls_to_msic         = 0.0;
-#endif                          /* H5C_COLLECT_CACHE_STATS */
+    int64_t total_pins = 0;
+    int64_t total_unpins = 0;
+    int64_t total_dirty_pins = 0;
+    int64_t total_pinned_flushes = 0;
+    int64_t total_pinned_clears = 0;
+    int32_t aggregate_max_accesses = 0;
+    int32_t aggregate_min_accesses = 1'000'000;
+    int32_t aggregate_max_clears = 0;
+    int32_t aggregate_max_flushes = 0;
+    size_t aggregate_max_size = 0;
+    int32_t aggregate_max_pins = 0;
+    double hit_rate;
+    double prefetch_use_rate;
+    double average_successful_search_depth = 0.0;
+    double average_failed_search_depth = 0.0;
+    double average_entries_skipped_per_calls_to_msic = 0.0;
+    double average_dirty_pf_entries_skipped_per_call_to_msic = 0.0;
+    double average_entries_scanned_per_calls_to_msic = 0.0;
+#endif /* H5C_COLLECT_CACHE_STATS */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
-    if (NULL == cache_ptr || NULL == cache_name)
+    if (NULL == cache_ptr || NULL == cache_name) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Bad cache_ptr or cache_name");
+    }
 
 #if H5C_COLLECT_CACHE_STATS
     for (i = 0; i <= cache_ptr->max_type_id; i++) {
@@ -398,8 +416,9 @@ H5C_stats(H5C_t *cache_ptr, const char *cache_name,
         total_misses += cache_ptr->misses[i];
         total_write_protects += cache_ptr->write_protects[i];
         total_read_protects += cache_ptr->read_protects[i];
-        if (max_read_protects < cache_ptr->max_read_protects[i])
+        if (max_read_protects < cache_ptr->max_read_protects[i]) {
             max_read_protects = cache_ptr->max_read_protects[i];
+        }
         total_insertions += cache_ptr->insertions[i];
         total_pinned_insertions += cache_ptr->pinned_insertions[i];
         total_clears += cache_ptr->clears[i];
@@ -418,179 +437,243 @@ H5C_stats(H5C_t *cache_ptr, const char *cache_name,
         total_dirty_pins += cache_ptr->dirty_pins[i];
         total_pinned_flushes += cache_ptr->pinned_flushes[i];
         total_pinned_clears += cache_ptr->pinned_clears[i];
-#if H5C_COLLECT_CACHE_ENTRY_STATS
-        if (aggregate_max_accesses < cache_ptr->max_accesses[i])
+    #if H5C_COLLECT_CACHE_ENTRY_STATS
+        if (aggregate_max_accesses < cache_ptr->max_accesses[i]) {
             aggregate_max_accesses = cache_ptr->max_accesses[i];
-        if (aggregate_min_accesses > aggregate_max_accesses)
+        }
+        if (aggregate_min_accesses > aggregate_max_accesses) {
             aggregate_min_accesses = aggregate_max_accesses;
-        if (aggregate_min_accesses > cache_ptr->min_accesses[i])
+        }
+        if (aggregate_min_accesses > cache_ptr->min_accesses[i]) {
             aggregate_min_accesses = cache_ptr->min_accesses[i];
-        if (aggregate_max_clears < cache_ptr->max_clears[i])
+        }
+        if (aggregate_max_clears < cache_ptr->max_clears[i]) {
             aggregate_max_clears = cache_ptr->max_clears[i];
-        if (aggregate_max_flushes < cache_ptr->max_flushes[i])
+        }
+        if (aggregate_max_flushes < cache_ptr->max_flushes[i]) {
             aggregate_max_flushes = cache_ptr->max_flushes[i];
-        if (aggregate_max_size < cache_ptr->max_size[i])
+        }
+        if (aggregate_max_size < cache_ptr->max_size[i]) {
             aggregate_max_size = cache_ptr->max_size[i];
-        if (aggregate_max_pins < cache_ptr->max_pins[i])
+        }
+        if (aggregate_max_pins < cache_ptr->max_pins[i]) {
             aggregate_max_pins = cache_ptr->max_pins[i];
-#endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
-    }  /* end for */
+        }
+    #endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
+    } /* end for */
 
-    if ((total_hits > 0) || (total_misses > 0))
+    if ((total_hits > 0) || (total_misses > 0)) {
         hit_rate = 100.0 * ((double)(total_hits)) / ((double)(total_hits + total_misses));
-    else
+    }
+    else {
         hit_rate = 0.0;
+    }
 
-    if (cache_ptr->successful_ht_searches > 0)
-        average_successful_search_depth = ((double)(cache_ptr->total_successful_ht_search_depth)) /
-                                          ((double)(cache_ptr->successful_ht_searches));
+    if (cache_ptr->successful_ht_searches > 0) {
+        average_successful_search_depth = ((double)(cache_ptr->total_successful_ht_search_depth)) / ((double)(cache_ptr->successful_ht_searches));
+    }
 
-    if (cache_ptr->failed_ht_searches > 0)
-        average_failed_search_depth =
-            ((double)(cache_ptr->total_failed_ht_search_depth)) / ((double)(cache_ptr->failed_ht_searches));
+    if (cache_ptr->failed_ht_searches > 0) {
+        average_failed_search_depth = ((double)(cache_ptr->total_failed_ht_search_depth)) / ((double)(cache_ptr->failed_ht_searches));
+    }
 
     fprintf(stdout, "\n%sH5C: cache statistics for %s\n", cache_ptr->prefix, cache_name);
 
     fprintf(stdout, "\n");
 
-    fprintf(stdout, "%s  hash table insertion / deletions   = %ld / %ld\n", cache_ptr->prefix,
-            (long)(cache_ptr->total_ht_insertions), (long)(cache_ptr->total_ht_deletions));
+    fprintf(stdout,
+            "%s  hash table insertion / deletions   = %ld / %ld\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->total_ht_insertions),
+            (long)(cache_ptr->total_ht_deletions));
 
-    fprintf(stdout, "%s  HT successful / failed searches    = %ld / %ld\n", cache_ptr->prefix,
-            (long)(cache_ptr->successful_ht_searches), (long)(cache_ptr->failed_ht_searches));
+    fprintf(stdout,
+            "%s  HT successful / failed searches    = %ld / %ld\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->successful_ht_searches),
+            (long)(cache_ptr->failed_ht_searches));
 
-    fprintf(stdout, "%s  Av. HT suc / failed search depth   = %f / %f\n", cache_ptr->prefix,
-            average_successful_search_depth, average_failed_search_depth);
+    fprintf(stdout, "%s  Av. HT suc / failed search depth   = %f / %f\n", cache_ptr->prefix, average_successful_search_depth, average_failed_search_depth);
 
-    fprintf(stdout, "%s  current (max) index size / length  = %ld (%ld) / %lu (%lu)\n", cache_ptr->prefix,
-            (long)(cache_ptr->index_size), (long)(cache_ptr->max_index_size),
-            (unsigned long)(cache_ptr->index_len), (unsigned long)(cache_ptr->max_index_len));
+    fprintf(stdout,
+            "%s  current (max) index size / length  = %ld (%ld) / %lu (%lu)\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->index_size),
+            (long)(cache_ptr->max_index_size),
+            (unsigned long)(cache_ptr->index_len),
+            (unsigned long)(cache_ptr->max_index_len));
 
-    fprintf(stdout, "%s  current (max) clean/dirty idx size = %ld (%ld) / %ld (%ld)\n", cache_ptr->prefix,
-            (long)(cache_ptr->clean_index_size), (long)(cache_ptr->max_clean_index_size),
-            (long)(cache_ptr->dirty_index_size), (long)(cache_ptr->max_dirty_index_size));
+    fprintf(stdout,
+            "%s  current (max) clean/dirty idx size = %ld (%ld) / %ld (%ld)\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->clean_index_size),
+            (long)(cache_ptr->max_clean_index_size),
+            (long)(cache_ptr->dirty_index_size),
+            (long)(cache_ptr->max_dirty_index_size));
 
-    fprintf(stdout, "%s  current (max) slist size / length  = %ld (%ld) / %lu (%lu)\n", cache_ptr->prefix,
-            (long)(cache_ptr->slist_size), (long)(cache_ptr->max_slist_size),
-            (unsigned long)(cache_ptr->slist_len), (unsigned long)(cache_ptr->max_slist_len));
+    fprintf(stdout,
+            "%s  current (max) slist size / length  = %ld (%ld) / %lu (%lu)\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->slist_size),
+            (long)(cache_ptr->max_slist_size),
+            (unsigned long)(cache_ptr->slist_len),
+            (unsigned long)(cache_ptr->max_slist_len));
 
-    fprintf(stdout, "%s  current (max) PL size / length     = %ld (%ld) / %lu (%lu)\n", cache_ptr->prefix,
-            (long)(cache_ptr->pl_size), (long)(cache_ptr->max_pl_size), (unsigned long)(cache_ptr->pl_len),
+    fprintf(stdout,
+            "%s  current (max) PL size / length     = %ld (%ld) / %lu (%lu)\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->pl_size),
+            (long)(cache_ptr->max_pl_size),
+            (unsigned long)(cache_ptr->pl_len),
             (unsigned long)(cache_ptr->max_pl_len));
 
-    fprintf(stdout, "%s  current (max) PEL size / length    = %ld (%ld) / %lu (%lu)\n", cache_ptr->prefix,
-            (long)(cache_ptr->pel_size), (long)(cache_ptr->max_pel_size), (unsigned long)(cache_ptr->pel_len),
+    fprintf(stdout,
+            "%s  current (max) PEL size / length    = %ld (%ld) / %lu (%lu)\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->pel_size),
+            (long)(cache_ptr->max_pel_size),
+            (unsigned long)(cache_ptr->pel_len),
             (unsigned long)(cache_ptr->max_pel_len));
 
-    fprintf(stdout, "%s  current LRU list size / length     = %ld / %lu\n", cache_ptr->prefix,
-            (long)(cache_ptr->LRU_list_size), (unsigned long)(cache_ptr->LRU_list_len));
+    fprintf(stdout,
+            "%s  current LRU list size / length     = %ld / %lu\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->LRU_list_size),
+            (unsigned long)(cache_ptr->LRU_list_len));
 
-#if H5C_MAINTAIN_CLEAN_AND_DIRTY_LRU_LISTS
-    fprintf(stdout, "%s  current clean LRU size / length    = %ld / %lu\n", cache_ptr->prefix,
-            (long)(cache_ptr->cLRU_list_size), (unsigned long)(cache_ptr->cLRU_list_len));
+    #if H5C_MAINTAIN_CLEAN_AND_DIRTY_LRU_LISTS
+    fprintf(stdout,
+            "%s  current clean LRU size / length    = %ld / %lu\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->cLRU_list_size),
+            (unsigned long)(cache_ptr->cLRU_list_len));
 
-    fprintf(stdout, "%s  current dirty LRU size / length    = %ld / %lu\n", cache_ptr->prefix,
-            (long)(cache_ptr->dLRU_list_size), (unsigned long)(cache_ptr->dLRU_list_len));
-#endif /* H5C_MAINTAIN_CLEAN_AND_DIRTY_LRU_LISTS */
+    fprintf(stdout,
+            "%s  current dirty LRU size / length    = %ld / %lu\n",
+            cache_ptr->prefix,
+            (long)(cache_ptr->dLRU_list_size),
+            (unsigned long)(cache_ptr->dLRU_list_len));
+    #endif /* H5C_MAINTAIN_CLEAN_AND_DIRTY_LRU_LISTS */
 
-    fprintf(stdout, "%s  Total hits / misses / hit_rate     = %ld / %ld / %f\n", cache_ptr->prefix,
-            (long)total_hits, (long)total_misses, hit_rate);
+    fprintf(stdout, "%s  Total hits / misses / hit_rate     = %ld / %ld / %f\n", cache_ptr->prefix, (long)total_hits, (long)total_misses, hit_rate);
 
-    fprintf(stdout, "%s  Total write / read (max) protects  = %ld / %ld (%ld)\n", cache_ptr->prefix,
-            (long)total_write_protects, (long)total_read_protects, (long)max_read_protects);
+    fprintf(stdout,
+            "%s  Total write / read (max) protects  = %ld / %ld (%ld)\n",
+            cache_ptr->prefix,
+            (long)total_write_protects,
+            (long)total_read_protects,
+            (long)max_read_protects);
 
-    fprintf(stdout, "%s  Total clears / flushes             = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_clears, (long)total_flushes);
+    fprintf(stdout, "%s  Total clears / flushes             = %ld / %ld\n", cache_ptr->prefix, (long)total_clears, (long)total_flushes);
 
-    fprintf(stdout, "%s  Total evictions / take ownerships  = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_evictions, (long)total_take_ownerships);
+    fprintf(stdout, "%s  Total evictions / take ownerships  = %ld / %ld\n", cache_ptr->prefix, (long)total_evictions, (long)total_take_ownerships);
 
-    fprintf(stdout, "%s  Total insertions(pinned) / moves   = %ld(%ld) / %ld\n", cache_ptr->prefix,
-            (long)total_insertions, (long)total_pinned_insertions, (long)total_moves);
+    fprintf(stdout,
+            "%s  Total insertions(pinned) / moves   = %ld(%ld) / %ld\n",
+            cache_ptr->prefix,
+            (long)total_insertions,
+            (long)total_pinned_insertions,
+            (long)total_moves);
 
-    fprintf(stdout, "%s  Total entry / cache flush moves    = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_entry_flush_moves, (long)total_cache_flush_moves);
+    fprintf(stdout, "%s  Total entry / cache flush moves    = %ld / %ld\n", cache_ptr->prefix, (long)total_entry_flush_moves, (long)total_cache_flush_moves);
 
-    fprintf(stdout, "%s  Total entry size incrs / decrs     = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_size_increases, (long)total_size_decreases);
+    fprintf(stdout, "%s  Total entry size incrs / decrs     = %ld / %ld\n", cache_ptr->prefix, (long)total_size_increases, (long)total_size_decreases);
 
-    fprintf(stdout, "%s  Ttl entry/cache flush size changes = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_entry_flush_size_changes, (long)total_cache_flush_size_changes);
+    fprintf(stdout,
+            "%s  Ttl entry/cache flush size changes = %ld / %ld\n",
+            cache_ptr->prefix,
+            (long)total_entry_flush_size_changes,
+            (long)total_cache_flush_size_changes);
 
-    fprintf(stdout, "%s  Total entry pins (dirty) / unpins  = %ld (%ld) / %ld\n", cache_ptr->prefix,
-            (long)total_pins, (long)total_dirty_pins, (long)total_unpins);
+    fprintf(stdout, "%s  Total entry pins (dirty) / unpins  = %ld (%ld) / %ld\n", cache_ptr->prefix, (long)total_pins, (long)total_dirty_pins, (long)total_unpins);
 
-    fprintf(stdout, "%s  Total pinned flushes / clears      = %ld / %ld\n", cache_ptr->prefix,
-            (long)total_pinned_flushes, (long)total_pinned_clears);
+    fprintf(stdout, "%s  Total pinned flushes / clears      = %ld / %ld\n", cache_ptr->prefix, (long)total_pinned_flushes, (long)total_pinned_clears);
 
-    fprintf(stdout, "%s  MSIC: (make space in cache) calls  = %lld\n", cache_ptr->prefix,
-            (long long)(cache_ptr->calls_to_msic));
+    fprintf(stdout, "%s  MSIC: (make space in cache) calls  = %lld\n", cache_ptr->prefix, (long long)(cache_ptr->calls_to_msic));
 
-    if (cache_ptr->calls_to_msic > 0)
-        average_entries_skipped_per_calls_to_msic =
-            (((double)(cache_ptr->total_entries_skipped_in_msic)) / ((double)(cache_ptr->calls_to_msic)));
+    if (cache_ptr->calls_to_msic > 0) {
+        average_entries_skipped_per_calls_to_msic = (((double)(cache_ptr->total_entries_skipped_in_msic)) / ((double)(cache_ptr->calls_to_msic)));
+    }
 
-    fprintf(stdout, "%s  MSIC: Average/max entries skipped  = %lf / %ld\n", cache_ptr->prefix,
+    fprintf(stdout,
+            "%s  MSIC: Average/max entries skipped  = %lf / %ld\n",
+            cache_ptr->prefix,
             (double)average_entries_skipped_per_calls_to_msic,
             (long)(cache_ptr->max_entries_skipped_in_msic));
 
-    if (cache_ptr->calls_to_msic > 0)
-        average_dirty_pf_entries_skipped_per_call_to_msic =
-            (((double)(cache_ptr->total_dirty_pf_entries_skipped_in_msic)) /
-             ((double)(cache_ptr->calls_to_msic)));
+    if (cache_ptr->calls_to_msic > 0) {
+        average_dirty_pf_entries_skipped_per_call_to_msic = (((double)(cache_ptr->total_dirty_pf_entries_skipped_in_msic)) / ((double)(cache_ptr->calls_to_msic)));
+    }
 
-    fprintf(stdout, "%s  MSIC: Average/max dirty pf entries skipped  = %lf / %ld\n", cache_ptr->prefix,
+    fprintf(stdout,
+            "%s  MSIC: Average/max dirty pf entries skipped  = %lf / %ld\n",
+            cache_ptr->prefix,
             average_dirty_pf_entries_skipped_per_call_to_msic,
             (long)(cache_ptr->max_dirty_pf_entries_skipped_in_msic));
 
-    if (cache_ptr->calls_to_msic > 0)
-        average_entries_scanned_per_calls_to_msic =
-            (((double)(cache_ptr->total_entries_scanned_in_msic)) / ((double)(cache_ptr->calls_to_msic)));
+    if (cache_ptr->calls_to_msic > 0) {
+        average_entries_scanned_per_calls_to_msic = (((double)(cache_ptr->total_entries_scanned_in_msic)) / ((double)(cache_ptr->calls_to_msic)));
+    }
 
-    fprintf(stdout, "%s  MSIC: Average/max entries scanned  = %lf / %ld\n", cache_ptr->prefix,
+    fprintf(stdout,
+            "%s  MSIC: Average/max entries scanned  = %lf / %ld\n",
+            cache_ptr->prefix,
             (double)average_entries_scanned_per_calls_to_msic,
             (long)(cache_ptr->max_entries_scanned_in_msic));
 
-    fprintf(stdout, "%s  MSIC: Scanned to make space(evict) = %lld\n", cache_ptr->prefix,
-            (long long)(cache_ptr->entries_scanned_to_make_space));
+    fprintf(stdout, "%s  MSIC: Scanned to make space(evict) = %lld\n", cache_ptr->prefix, (long long)(cache_ptr->entries_scanned_to_make_space));
 
-    fprintf(stdout, "%s  MSIC: Scanned to satisfy min_clean = %lld\n", cache_ptr->prefix,
+    fprintf(stdout,
+            "%s  MSIC: Scanned to satisfy min_clean = %lld\n",
+            cache_ptr->prefix,
             (long long)(cache_ptr->total_entries_scanned_in_msic - cache_ptr->entries_scanned_to_make_space));
 
-    fprintf(stdout, "%s  slist/LRU/index scan restarts   = %lld / %lld / %lld.\n", cache_ptr->prefix,
-            (long long)(cache_ptr->slist_scan_restarts), (long long)(cache_ptr->LRU_scan_restarts),
+    fprintf(stdout,
+            "%s  slist/LRU/index scan restarts   = %lld / %lld / %lld.\n",
+            cache_ptr->prefix,
+            (long long)(cache_ptr->slist_scan_restarts),
+            (long long)(cache_ptr->LRU_scan_restarts),
             (long long)(cache_ptr->index_scan_restarts));
 
-    fprintf(stdout, "%s  cache image creations/reads/loads/size = %d / %d /%d / %" PRIuHSIZE "\n",
-            cache_ptr->prefix, cache_ptr->images_created, cache_ptr->images_read, cache_ptr->images_loaded,
+    fprintf(stdout,
+            "%s  cache image creations/reads/loads/size = %d / %d /%d / %" PRIuHSIZE "\n",
+            cache_ptr->prefix,
+            cache_ptr->images_created,
+            cache_ptr->images_read,
+            cache_ptr->images_loaded,
             cache_ptr->last_image_size);
 
-    fprintf(stdout, "%s  prefetches / dirty prefetches      = %lld / %lld\n", cache_ptr->prefix,
-            (long long)(cache_ptr->prefetches), (long long)(cache_ptr->dirty_prefetches));
+    fprintf(stdout,
+            "%s  prefetches / dirty prefetches      = %lld / %lld\n",
+            cache_ptr->prefix,
+            (long long)(cache_ptr->prefetches),
+            (long long)(cache_ptr->dirty_prefetches));
 
-    fprintf(stdout, "%s  prefetch hits/flushes/evictions    = %lld / %lld / %lld\n", cache_ptr->prefix,
-            (long long)(cache_ptr->prefetch_hits), (long long)(cache_ptr->flushes[H5AC_PREFETCHED_ENTRY_ID]),
+    fprintf(stdout,
+            "%s  prefetch hits/flushes/evictions    = %lld / %lld / %lld\n",
+            cache_ptr->prefix,
+            (long long)(cache_ptr->prefetch_hits),
+            (long long)(cache_ptr->flushes[H5AC_PREFETCHED_ENTRY_ID]),
             (long long)(cache_ptr->evictions[H5AC_PREFETCHED_ENTRY_ID]));
 
-    if (cache_ptr->prefetches > 0)
+    if (cache_ptr->prefetches > 0) {
         prefetch_use_rate = 100.0 * ((double)(cache_ptr->prefetch_hits)) / ((double)(cache_ptr->prefetches));
-    else
+    }
+    else {
         prefetch_use_rate = 0.0;
+    }
 
     fprintf(stdout, "%s  prefetched entry use rate          = %lf\n", cache_ptr->prefix, prefetch_use_rate);
 
-#if H5C_COLLECT_CACHE_ENTRY_STATS
+    #if H5C_COLLECT_CACHE_ENTRY_STATS
 
-    fprintf(stdout, "%s  aggregate max / min accesses       = %d / %d\n", cache_ptr->prefix,
-            (int)aggregate_max_accesses, (int)aggregate_min_accesses);
+    fprintf(stdout, "%s  aggregate max / min accesses       = %d / %d\n", cache_ptr->prefix, (int)aggregate_max_accesses, (int)aggregate_min_accesses);
 
-    fprintf(stdout, "%s  aggregate max_clears / max_flushes = %d / %d\n", cache_ptr->prefix,
-            (int)aggregate_max_clears, (int)aggregate_max_flushes);
+    fprintf(stdout, "%s  aggregate max_clears / max_flushes = %d / %d\n", cache_ptr->prefix, (int)aggregate_max_clears, (int)aggregate_max_flushes);
 
-    fprintf(stdout, "%s  aggregate max_size / max_pins      = %d / %d\n", cache_ptr->prefix,
-            (int)aggregate_max_size, (int)aggregate_max_pins);
+    fprintf(stdout, "%s  aggregate max_size / max_pins      = %d / %d\n", cache_ptr->prefix, (int)aggregate_max_size, (int)aggregate_max_pins);
 
-#endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
+    #endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
 
     if (display_detailed_stats) {
         for (i = 0; i <= cache_ptr->max_type_id; i++) {
@@ -598,60 +681,80 @@ H5C_stats(H5C_t *cache_ptr, const char *cache_name,
 
             fprintf(stdout, "%s  Stats on %s:\n", cache_ptr->prefix, ((cache_ptr->class_table_ptr))[i]->name);
 
-            if ((cache_ptr->hits[i] > 0) || (cache_ptr->misses[i] > 0))
-                hit_rate = 100.0 * ((double)(cache_ptr->hits[i])) /
-                           ((double)(cache_ptr->hits[i] + cache_ptr->misses[i]));
-            else
+            if ((cache_ptr->hits[i] > 0) || (cache_ptr->misses[i] > 0)) {
+                hit_rate = 100.0 * ((double)(cache_ptr->hits[i])) / ((double)(cache_ptr->hits[i] + cache_ptr->misses[i]));
+            }
+            else {
                 hit_rate = 0.0;
+            }
 
-            fprintf(stdout, "%s    hits / misses / hit_rate       = %ld / %ld / %f\n", cache_ptr->prefix,
-                    (long)(cache_ptr->hits[i]), (long)(cache_ptr->misses[i]), hit_rate);
+            fprintf(stdout,
+                    "%s    hits / misses / hit_rate       = %ld / %ld / %f\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->hits[i]),
+                    (long)(cache_ptr->misses[i]),
+                    hit_rate);
 
-            fprintf(stdout, "%s    write / read (max) protects    = %ld / %ld (%d)\n", cache_ptr->prefix,
-                    (long)(cache_ptr->write_protects[i]), (long)(cache_ptr->read_protects[i]),
+            fprintf(stdout,
+                    "%s    write / read (max) protects    = %ld / %ld (%d)\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->write_protects[i]),
+                    (long)(cache_ptr->read_protects[i]),
                     (int)(cache_ptr->max_read_protects[i]));
 
-            fprintf(stdout, "%s    clears / flushes               = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->clears[i]), (long)(cache_ptr->flushes[i]));
+            fprintf(stdout, "%s    clears / flushes               = %ld / %ld\n", cache_ptr->prefix, (long)(cache_ptr->clears[i]), (long)(cache_ptr->flushes[i]));
 
-            fprintf(stdout, "%s    evictions / take ownerships    = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->evictions[i]), (long)(cache_ptr->take_ownerships[i]));
+            fprintf(stdout,
+                    "%s    evictions / take ownerships    = %ld / %ld\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->evictions[i]),
+                    (long)(cache_ptr->take_ownerships[i]));
 
-            fprintf(stdout, "%s    insertions(pinned) / moves     = %ld(%ld) / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->insertions[i]), (long)(cache_ptr->pinned_insertions[i]),
+            fprintf(stdout,
+                    "%s    insertions(pinned) / moves     = %ld(%ld) / %ld\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->insertions[i]),
+                    (long)(cache_ptr->pinned_insertions[i]),
                     (long)(cache_ptr->moves[i]));
 
-            fprintf(stdout, "%s    entry / cache flush moves      = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->entry_flush_moves[i]), (long)(cache_ptr->cache_flush_moves[i]));
+            fprintf(stdout,
+                    "%s    entry / cache flush moves      = %ld / %ld\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->entry_flush_moves[i]),
+                    (long)(cache_ptr->cache_flush_moves[i]));
 
-            fprintf(stdout, "%s    size increases / decreases     = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->size_increases[i]), (long)(cache_ptr->size_decreases[i]));
+            fprintf(stdout,
+                    "%s    size increases / decreases     = %ld / %ld\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->size_increases[i]),
+                    (long)(cache_ptr->size_decreases[i]));
 
-            fprintf(stdout, "%s    entry/cache flush size changes = %ld / %ld\n", cache_ptr->prefix,
+            fprintf(stdout,
+                    "%s    entry/cache flush size changes = %ld / %ld\n",
+                    cache_ptr->prefix,
                     (long)(cache_ptr->entry_flush_size_changes[i]),
                     (long)(cache_ptr->cache_flush_size_changes[i]));
 
-            fprintf(stdout, "%s    entry pins / unpins            = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->pins[i]), (long)(cache_ptr->unpins[i]));
+            fprintf(stdout, "%s    entry pins / unpins            = %ld / %ld\n", cache_ptr->prefix, (long)(cache_ptr->pins[i]), (long)(cache_ptr->unpins[i]));
 
-            fprintf(stdout, "%s    entry dirty pins/pin'd flushes = %ld / %ld\n", cache_ptr->prefix,
-                    (long)(cache_ptr->dirty_pins[i]), (long)(cache_ptr->pinned_flushes[i]));
+            fprintf(stdout,
+                    "%s    entry dirty pins/pin'd flushes = %ld / %ld\n",
+                    cache_ptr->prefix,
+                    (long)(cache_ptr->dirty_pins[i]),
+                    (long)(cache_ptr->pinned_flushes[i]));
 
-#if H5C_COLLECT_CACHE_ENTRY_STATS
+    #if H5C_COLLECT_CACHE_ENTRY_STATS
 
-            fprintf(stdout, "%s    entry max / min accesses       = %d / %d\n", cache_ptr->prefix,
-                    cache_ptr->max_accesses[i], cache_ptr->min_accesses[i]);
+            fprintf(stdout, "%s    entry max / min accesses       = %d / %d\n", cache_ptr->prefix, cache_ptr->max_accesses[i], cache_ptr->min_accesses[i]);
 
-            fprintf(stdout, "%s    entry max_clears / max_flushes = %d / %d\n", cache_ptr->prefix,
-                    cache_ptr->max_clears[i], cache_ptr->max_flushes[i]);
+            fprintf(stdout, "%s    entry max_clears / max_flushes = %d / %d\n", cache_ptr->prefix, cache_ptr->max_clears[i], cache_ptr->max_flushes[i]);
 
-            fprintf(stdout, "%s    entry max_size / max_pins      = %d / %d\n", cache_ptr->prefix,
-                    (int)(cache_ptr->max_size[i]), (int)(cache_ptr->max_pins[i]));
+            fprintf(stdout, "%s    entry max_size / max_pins      = %d / %d\n", cache_ptr->prefix, (int)(cache_ptr->max_size[i]), (int)(cache_ptr->max_pins[i]));
 
-#endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
+    #endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
 
         } /* end for */
-    }     /* end if */
+    } /* end if */
 
     fprintf(stdout, "\n");
 
@@ -673,13 +776,13 @@ done:
 void
 #ifndef NDEBUG
 H5C_stats__reset(H5C_t *cache_ptr)
-#else /* NDEBUG */
-#if H5C_COLLECT_CACHE_STATS
+#else      /* NDEBUG */
+    #if H5C_COLLECT_CACHE_STATS
 H5C_stats__reset(H5C_t *cache_ptr)
-#else  /* H5C_COLLECT_CACHE_STATS */
+    #else  /* H5C_COLLECT_CACHE_STATS */
 H5C_stats__reset(H5C_t H5_ATTR_UNUSED *cache_ptr)
-#endif /* H5C_COLLECT_CACHE_STATS */
-#endif /* NDEBUG */
+    #endif /* H5C_COLLECT_CACHE_STATS */
+#endif     /* NDEBUG */
 {
 #if H5C_COLLECT_CACHE_STATS
     int i;
@@ -689,86 +792,86 @@ H5C_stats__reset(H5C_t H5_ATTR_UNUSED *cache_ptr)
 
 #if H5C_COLLECT_CACHE_STATS
     for (i = 0; i <= cache_ptr->max_type_id; i++) {
-        cache_ptr->hits[i]                     = 0;
-        cache_ptr->misses[i]                   = 0;
-        cache_ptr->write_protects[i]           = 0;
-        cache_ptr->read_protects[i]            = 0;
-        cache_ptr->max_read_protects[i]        = 0;
-        cache_ptr->insertions[i]               = 0;
-        cache_ptr->pinned_insertions[i]        = 0;
-        cache_ptr->clears[i]                   = 0;
-        cache_ptr->flushes[i]                  = 0;
-        cache_ptr->evictions[i]                = 0;
-        cache_ptr->take_ownerships[i]          = 0;
-        cache_ptr->moves[i]                    = 0;
-        cache_ptr->entry_flush_moves[i]        = 0;
-        cache_ptr->cache_flush_moves[i]        = 0;
-        cache_ptr->pins[i]                     = 0;
-        cache_ptr->unpins[i]                   = 0;
-        cache_ptr->dirty_pins[i]               = 0;
-        cache_ptr->pinned_flushes[i]           = 0;
-        cache_ptr->pinned_clears[i]            = 0;
-        cache_ptr->size_increases[i]           = 0;
-        cache_ptr->size_decreases[i]           = 0;
+        cache_ptr->hits[i] = 0;
+        cache_ptr->misses[i] = 0;
+        cache_ptr->write_protects[i] = 0;
+        cache_ptr->read_protects[i] = 0;
+        cache_ptr->max_read_protects[i] = 0;
+        cache_ptr->insertions[i] = 0;
+        cache_ptr->pinned_insertions[i] = 0;
+        cache_ptr->clears[i] = 0;
+        cache_ptr->flushes[i] = 0;
+        cache_ptr->evictions[i] = 0;
+        cache_ptr->take_ownerships[i] = 0;
+        cache_ptr->moves[i] = 0;
+        cache_ptr->entry_flush_moves[i] = 0;
+        cache_ptr->cache_flush_moves[i] = 0;
+        cache_ptr->pins[i] = 0;
+        cache_ptr->unpins[i] = 0;
+        cache_ptr->dirty_pins[i] = 0;
+        cache_ptr->pinned_flushes[i] = 0;
+        cache_ptr->pinned_clears[i] = 0;
+        cache_ptr->size_increases[i] = 0;
+        cache_ptr->size_decreases[i] = 0;
         cache_ptr->entry_flush_size_changes[i] = 0;
         cache_ptr->cache_flush_size_changes[i] = 0;
     } /* end for */
 
-    cache_ptr->total_ht_insertions              = 0;
-    cache_ptr->total_ht_deletions               = 0;
-    cache_ptr->successful_ht_searches           = 0;
+    cache_ptr->total_ht_insertions = 0;
+    cache_ptr->total_ht_deletions = 0;
+    cache_ptr->successful_ht_searches = 0;
     cache_ptr->total_successful_ht_search_depth = 0;
-    cache_ptr->failed_ht_searches               = 0;
-    cache_ptr->total_failed_ht_search_depth     = 0;
+    cache_ptr->failed_ht_searches = 0;
+    cache_ptr->total_failed_ht_search_depth = 0;
 
-    cache_ptr->max_index_len        = 0;
-    cache_ptr->max_index_size       = (size_t)0;
+    cache_ptr->max_index_len = 0;
+    cache_ptr->max_index_size = (size_t)0;
     cache_ptr->max_clean_index_size = (size_t)0;
     cache_ptr->max_dirty_index_size = (size_t)0;
 
-    cache_ptr->max_slist_len  = 0;
+    cache_ptr->max_slist_len = 0;
     cache_ptr->max_slist_size = (size_t)0;
 
-    cache_ptr->max_pl_len  = 0;
+    cache_ptr->max_pl_len = 0;
     cache_ptr->max_pl_size = (size_t)0;
 
-    cache_ptr->max_pel_len  = 0;
+    cache_ptr->max_pel_len = 0;
     cache_ptr->max_pel_size = (size_t)0;
 
-    cache_ptr->calls_to_msic                          = 0;
-    cache_ptr->total_entries_skipped_in_msic          = 0;
+    cache_ptr->calls_to_msic = 0;
+    cache_ptr->total_entries_skipped_in_msic = 0;
     cache_ptr->total_dirty_pf_entries_skipped_in_msic = 0;
-    cache_ptr->total_entries_scanned_in_msic          = 0;
-    cache_ptr->max_entries_skipped_in_msic            = 0;
-    cache_ptr->max_dirty_pf_entries_skipped_in_msic   = 0;
-    cache_ptr->max_entries_scanned_in_msic            = 0;
-    cache_ptr->entries_scanned_to_make_space          = 0;
+    cache_ptr->total_entries_scanned_in_msic = 0;
+    cache_ptr->max_entries_skipped_in_msic = 0;
+    cache_ptr->max_dirty_pf_entries_skipped_in_msic = 0;
+    cache_ptr->max_entries_scanned_in_msic = 0;
+    cache_ptr->entries_scanned_to_make_space = 0;
 
     cache_ptr->slist_scan_restarts = 0;
-    cache_ptr->LRU_scan_restarts   = 0;
+    cache_ptr->LRU_scan_restarts = 0;
     cache_ptr->index_scan_restarts = 0;
 
-    cache_ptr->images_created  = 0;
-    cache_ptr->images_read     = 0;
-    cache_ptr->images_loaded   = 0;
+    cache_ptr->images_created = 0;
+    cache_ptr->images_read = 0;
+    cache_ptr->images_loaded = 0;
     cache_ptr->last_image_size = (hsize_t)0;
 
-    cache_ptr->prefetches       = 0;
+    cache_ptr->prefetches = 0;
     cache_ptr->dirty_prefetches = 0;
-    cache_ptr->prefetch_hits    = 0;
+    cache_ptr->prefetch_hits = 0;
 
-#if H5C_COLLECT_CACHE_ENTRY_STATS
+    #if H5C_COLLECT_CACHE_ENTRY_STATS
     for (i = 0; i <= cache_ptr->max_type_id; i++) {
         cache_ptr->max_accesses[i] = 0;
-        cache_ptr->min_accesses[i] = 1000000;
-        cache_ptr->max_clears[i]   = 0;
-        cache_ptr->max_flushes[i]  = 0;
-        cache_ptr->max_size[i]     = (size_t)0;
-        cache_ptr->max_pins[i]     = 0;
+        cache_ptr->min_accesses[i] = 1'000'000;
+        cache_ptr->max_clears[i] = 0;
+        cache_ptr->max_flushes[i] = 0;
+        cache_ptr->max_size[i] = (size_t)0;
+        cache_ptr->max_pins[i] = 0;
     } /* end for */
 
-#endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
-#endif /* H5C_COLLECT_CACHE_STATS */
+    #endif /* H5C_COLLECT_CACHE_ENTRY_STATS */
+#endif     /* H5C_COLLECT_CACHE_STATS */
 } /* H5C_stats__reset() */
 
 /*-------------------------------------------------------------------------
@@ -794,13 +897,12 @@ H5C_stats__reset(H5C_t H5_ATTR_UNUSED *cache_ptr)
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5C_flush_dependency_exists(H5C_t *cache_ptr, haddr_t parent_addr, haddr_t child_addr, bool *fd_exists_ptr)
+herr_t H5C_flush_dependency_exists(H5C_t* cache_ptr, haddr_t parent_addr, haddr_t child_addr, bool* fd_exists_ptr)
 {
-    bool               fd_exists = false; /* whether flush dependency exists */
-    H5C_cache_entry_t *parent_ptr;        /* Ptr to parent entry */
-    H5C_cache_entry_t *child_ptr;         /* Ptr to child entry */
-    bool               ret_value = false; /* Return value */
+    bool fd_exists = false;        /* whether flush dependency exists */
+    H5C_cache_entry_t* parent_ptr; /* Ptr to parent entry */
+    H5C_cache_entry_t* child_ptr;  /* Ptr to child entry */
+    bool ret_value = false;        /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -826,9 +928,9 @@ H5C_flush_dependency_exists(H5C_t *cache_ptr, haddr_t parent_addr, haddr_t child
                     assert(parent_ptr->flush_dep_nchildren > 0);
                     break;
                 } /* end if */
-            }     /* end for */
-        }         /* end if */
-    }             /* end if */
+            } /* end for */
+        } /* end if */
+    } /* end if */
 
     *fd_exists_ptr = fd_exists;
 
@@ -851,20 +953,19 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5C_validate_index_list(H5C_t *cache_ptr)
+herr_t H5C_validate_index_list(H5C_t* cache_ptr)
 {
-    H5C_cache_entry_t *entry_ptr = NULL;
-    uint32_t           len       = 0;
-    int32_t            index_ring_len[H5C_RING_NTYPES];
-    size_t             size       = 0;
-    size_t             clean_size = 0;
-    size_t             dirty_size = 0;
-    size_t             index_ring_size[H5C_RING_NTYPES];
-    size_t             clean_index_ring_size[H5C_RING_NTYPES];
-    size_t             dirty_index_ring_size[H5C_RING_NTYPES];
-    int                i;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5C_cache_entry_t* entry_ptr = NULL;
+    uint32_t len = 0;
+    int32_t index_ring_len[H5C_RING_NTYPES];
+    size_t size = 0;
+    size_t clean_size = 0;
+    size_t dirty_size = 0;
+    size_t index_ring_size[H5C_RING_NTYPES];
+    size_t clean_index_ring_size[H5C_RING_NTYPES];
+    size_t dirty_index_ring_size[H5C_RING_NTYPES];
+    int i;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -872,35 +973,35 @@ H5C_validate_index_list(H5C_t *cache_ptr)
     assert(cache_ptr);
 
     for (i = 0; i < H5C_RING_NTYPES; i++) {
-        index_ring_len[i]        = 0;
-        index_ring_size[i]       = 0;
+        index_ring_len[i] = 0;
+        index_ring_size[i] = 0;
         clean_index_ring_size[i] = 0;
         dirty_index_ring_size[i] = 0;
     } /* end if */
 
-    if (((cache_ptr->il_head == NULL) || (cache_ptr->il_tail == NULL)) &&
-        (cache_ptr->il_head != cache_ptr->il_tail))
+    if (((cache_ptr->il_head == NULL) || (cache_ptr->il_tail == NULL)) && (cache_ptr->il_head != cache_ptr->il_tail)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index list pointer validation failed");
+    }
 
     if ((cache_ptr->index_len == 1) &&
-        ((cache_ptr->il_head != cache_ptr->il_tail) || (cache_ptr->il_head == NULL) ||
-         (cache_ptr->il_head->size != cache_ptr->index_size)))
+        ((cache_ptr->il_head != cache_ptr->il_tail) || (cache_ptr->il_head == NULL) || (cache_ptr->il_head->size != cache_ptr->index_size))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index list pointer sanity checks failed");
+    }
 
     if ((cache_ptr->index_len >= 1) &&
-        ((cache_ptr->il_head == NULL) || (cache_ptr->il_head->il_prev != NULL) ||
-         (cache_ptr->il_tail == NULL) || (cache_ptr->il_tail->il_next != NULL)))
+        ((cache_ptr->il_head == NULL) || (cache_ptr->il_head->il_prev != NULL) || (cache_ptr->il_tail == NULL) || (cache_ptr->il_tail->il_next != NULL))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index list length sanity checks failed");
+    }
 
     entry_ptr = cache_ptr->il_head;
     while (entry_ptr != NULL) {
-        if ((entry_ptr != cache_ptr->il_head) &&
-            ((entry_ptr->il_prev == NULL) || (entry_ptr->il_prev->il_next != entry_ptr)))
+        if ((entry_ptr != cache_ptr->il_head) && ((entry_ptr->il_prev == NULL) || (entry_ptr->il_prev->il_next != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index list pointers for entry are invalid");
+        }
 
-        if ((entry_ptr != cache_ptr->il_tail) &&
-            ((entry_ptr->il_next == NULL) || (entry_ptr->il_next->il_prev != entry_ptr)))
+        if ((entry_ptr != cache_ptr->il_tail) && ((entry_ptr->il_next == NULL) || (entry_ptr->il_next->il_prev != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index list pointers for entry are invalid");
+        }
 
         assert(entry_ptr->ring > 0);
         assert(entry_ptr->ring < H5C_RING_NTYPES);
@@ -923,12 +1024,12 @@ H5C_validate_index_list(H5C_t *cache_ptr)
         entry_ptr = entry_ptr->il_next;
     } /* end while */
 
-    if ((cache_ptr->index_len != len) || (cache_ptr->il_len != len) || (cache_ptr->index_size != size) ||
-        (cache_ptr->il_size != size) || (cache_ptr->clean_index_size != clean_size) ||
-        (cache_ptr->dirty_index_size != dirty_size) || (clean_size + dirty_size != size))
+    if ((cache_ptr->index_len != len) || (cache_ptr->il_len != len) || (cache_ptr->index_size != size) || (cache_ptr->il_size != size) ||
+        (cache_ptr->clean_index_size != clean_size) || (cache_ptr->dirty_index_size != dirty_size) || (clean_size + dirty_size != size)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index, clean and dirty sizes for cache are invalid");
+    }
 
-    size       = 0;
+    size = 0;
     clean_size = 0;
     dirty_size = 0;
     for (i = 0; i < H5C_RING_NTYPES; i++) {
@@ -937,13 +1038,14 @@ H5C_validate_index_list(H5C_t *cache_ptr)
         dirty_size += dirty_index_ring_size[i];
     } /* end for */
 
-    if ((cache_ptr->index_size != size) || (cache_ptr->clean_index_size != clean_size) ||
-        (cache_ptr->dirty_index_size != dirty_size))
+    if ((cache_ptr->index_size != size) || (cache_ptr->clean_index_size != clean_size) || (cache_ptr->dirty_index_size != dirty_size)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Index, clean and dirty sizes for cache are invalid");
+    }
 
 done:
-    if (ret_value != SUCCEED)
+    if (ret_value != SUCCEED) {
         assert(0);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5C_validate_index_list() */
@@ -983,11 +1085,10 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5C_get_entry_ptr_from_addr(H5C_t *cache_ptr, haddr_t addr, void **entry_ptr_ptr)
+herr_t H5C_get_entry_ptr_from_addr(H5C_t* cache_ptr, haddr_t addr, void** entry_ptr_ptr)
 {
-    H5C_cache_entry_t *entry_ptr = NULL;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5C_cache_entry_t* entry_ptr = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -998,11 +1099,12 @@ H5C_get_entry_ptr_from_addr(H5C_t *cache_ptr, haddr_t addr, void **entry_ptr_ptr
 
     H5C__SEARCH_INDEX(cache_ptr, addr, entry_ptr, FAIL);
 
-    if (entry_ptr == NULL)
+    if (entry_ptr == NULL) {
         /* the entry doesn't exist in the cache -- report this
          * and quit.
          */
         *entry_ptr_ptr = NULL;
+    }
     else {
         *entry_ptr_ptr = entry_ptr;
 
@@ -1026,8 +1128,7 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-bool
-H5C_get_serialization_in_progress(const H5C_t *cache_ptr)
+bool H5C_get_serialization_in_progress(const H5C_t* cache_ptr)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1053,11 +1154,10 @@ H5C_get_serialization_in_progress(const H5C_t *cache_ptr)
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-bool
-H5C_cache_is_clean(const H5C_t *cache_ptr, H5C_ring_t inner_ring)
+bool H5C_cache_is_clean(const H5C_t* cache_ptr, H5C_ring_t inner_ring)
 {
-    H5C_ring_t ring      = H5C_RING_USER;
-    bool       ret_value = true; /* Return value */
+    H5C_ring_t ring = H5C_RING_USER;
+    bool ret_value = true; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1067,8 +1167,9 @@ H5C_cache_is_clean(const H5C_t *cache_ptr, H5C_ring_t inner_ring)
     assert(inner_ring <= H5C_RING_SB);
 
     while (ring <= inner_ring) {
-        if (cache_ptr->dirty_index_ring_size[ring] > 0)
+        if (cache_ptr->dirty_index_ring_size[ring] > 0) {
             HGOTO_DONE(false);
+        }
 
         ring++;
     } /* end while */
@@ -1101,12 +1202,10 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5C_verify_entry_type(H5C_t *cache_ptr, haddr_t addr, const H5C_class_t *expected_type, bool *in_cache_ptr,
-                      bool *type_ok_ptr)
+herr_t H5C_verify_entry_type(H5C_t* cache_ptr, haddr_t addr, const H5C_class_t* expected_type, bool* in_cache_ptr, bool* type_ok_ptr)
 {
-    H5C_cache_entry_t *entry_ptr = NULL;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5C_cache_entry_t* entry_ptr = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1119,18 +1218,21 @@ H5C_verify_entry_type(H5C_t *cache_ptr, haddr_t addr, const H5C_class_t *expecte
 
     H5C__SEARCH_INDEX(cache_ptr, addr, entry_ptr, FAIL);
 
-    if (entry_ptr == NULL)
+    if (entry_ptr == NULL) {
         /* the entry doesn't exist in the cache -- report this
          * and quit.
          */
         *in_cache_ptr = false;
+    }
     else {
         *in_cache_ptr = true;
 
-        if (entry_ptr->prefetched)
+        if (entry_ptr->prefetched) {
             *type_ok_ptr = (expected_type->id == entry_ptr->prefetch_type_id);
-        else
+        }
+        else {
             *type_ok_ptr = (expected_type == entry_ptr->type);
+        }
     } /* end else */
 
 done:
@@ -1150,117 +1252,131 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5C_def_auto_resize_rpt_fcn(H5C_t *cache_ptr,
+void H5C_def_auto_resize_rpt_fcn(H5C_t* cache_ptr,
 #ifndef NDEBUG
-                            int32_t version,
+                                 int32_t version,
 #else
-                            int32_t H5_ATTR_UNUSED version,
+                                 int32_t H5_ATTR_UNUSED version,
 #endif
-                            double hit_rate, enum H5C_resize_status status, size_t old_max_cache_size,
-                            size_t new_max_cache_size, size_t old_min_clean_size, size_t new_min_clean_size)
+                                 double hit_rate,
+                                 enum H5C_resize_status status,
+                                 size_t old_max_cache_size,
+                                 size_t new_max_cache_size,
+                                 size_t old_min_clean_size,
+                                 size_t new_min_clean_size)
 {
     assert(cache_ptr != NULL);
     assert(version == H5C__CURR_AUTO_RESIZE_RPT_FCN_VER);
 
     switch (status) {
-        case in_spec:
-            fprintf(stdout, "%sAuto cache resize -- no change. (hit rate = %lf)\n", cache_ptr->prefix,
-                    hit_rate);
+    case in_spec: fprintf(stdout, "%sAuto cache resize -- no change. (hit rate = %lf)\n", cache_ptr->prefix, hit_rate); break;
+
+    case increase:
+        assert(hit_rate < cache_ptr->resize_ctl.lower_hr_threshold);
+        assert(old_max_cache_size < new_max_cache_size);
+
+        fprintf(stdout,
+                "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
+                cache_ptr->prefix,
+                hit_rate,
+                cache_ptr->resize_ctl.lower_hr_threshold);
+        fprintf(stdout,
+                "%scache size increased from (%zu/%zu) to (%zu/%zu).\n",
+                cache_ptr->prefix,
+                old_max_cache_size,
+                old_min_clean_size,
+                new_max_cache_size,
+                new_min_clean_size);
+        break;
+
+    case flash_increase:
+        assert(old_max_cache_size < new_max_cache_size);
+
+        fprintf(stdout,
+                "%sflash cache resize(%d) -- size threshold = %zu.\n",
+                cache_ptr->prefix,
+                (int)(cache_ptr->resize_ctl.flash_incr_mode),
+                cache_ptr->flash_size_increase_threshold);
+        fprintf(stdout,
+                "%s cache size increased from (%zu/%zu) to (%zu/%zu).\n",
+                cache_ptr->prefix,
+                old_max_cache_size,
+                old_min_clean_size,
+                new_max_cache_size,
+                new_min_clean_size);
+        break;
+
+    case decrease:
+        assert(old_max_cache_size > new_max_cache_size);
+
+        switch (cache_ptr->resize_ctl.decr_mode) {
+        case H5C_decr__off: fprintf(stdout, "%sAuto cache resize -- decrease off.  HR = %lf\n", cache_ptr->prefix, hit_rate); break;
+
+        case H5C_decr__threshold:
+            assert(hit_rate > cache_ptr->resize_ctl.upper_hr_threshold);
+
+            fprintf(stdout,
+                    "%sAuto cache resize -- decrease by threshold.  HR = %lf > %6.5lf\n",
+                    cache_ptr->prefix,
+                    hit_rate,
+                    cache_ptr->resize_ctl.upper_hr_threshold);
+            fprintf(stdout, "%sout of bounds high (%6.5lf).\n", cache_ptr->prefix, cache_ptr->resize_ctl.upper_hr_threshold);
             break;
 
-        case increase:
-            assert(hit_rate < cache_ptr->resize_ctl.lower_hr_threshold);
-            assert(old_max_cache_size < new_max_cache_size);
+        case H5C_decr__age_out: fprintf(stdout, "%sAuto cache resize -- decrease by ageout.  HR = %lf\n", cache_ptr->prefix, hit_rate); break;
 
-            fprintf(stdout, "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
-                    cache_ptr->prefix, hit_rate, cache_ptr->resize_ctl.lower_hr_threshold);
-            fprintf(stdout, "%scache size increased from (%zu/%zu) to (%zu/%zu).\n", cache_ptr->prefix,
-                    old_max_cache_size, old_min_clean_size, new_max_cache_size, new_min_clean_size);
+        case H5C_decr__age_out_with_threshold:
+            assert(hit_rate > cache_ptr->resize_ctl.upper_hr_threshold);
+
+            fprintf(stdout,
+                    "%sAuto cache resize -- decrease by ageout with threshold. HR = %lf > %6.5lf\n",
+                    cache_ptr->prefix,
+                    hit_rate,
+                    cache_ptr->resize_ctl.upper_hr_threshold);
             break;
 
-        case flash_increase:
-            assert(old_max_cache_size < new_max_cache_size);
+        default: fprintf(stdout, "%sAuto cache resize -- decrease by unknown mode.  HR = %lf\n", cache_ptr->prefix, hit_rate);
+        }
 
-            fprintf(stdout, "%sflash cache resize(%d) -- size threshold = %zu.\n", cache_ptr->prefix,
-                    (int)(cache_ptr->resize_ctl.flash_incr_mode), cache_ptr->flash_size_increase_threshold);
-            fprintf(stdout, "%s cache size increased from (%zu/%zu) to (%zu/%zu).\n", cache_ptr->prefix,
-                    old_max_cache_size, old_min_clean_size, new_max_cache_size, new_min_clean_size);
-            break;
+        fprintf(stdout,
+                "%s    cache size decreased from (%zu/%zu) to (%zu/%zu).\n",
+                cache_ptr->prefix,
+                old_max_cache_size,
+                old_min_clean_size,
+                new_max_cache_size,
+                new_min_clean_size);
+        break;
 
-        case decrease:
-            assert(old_max_cache_size > new_max_cache_size);
+    case at_max_size:
+        fprintf(stdout,
+                "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
+                cache_ptr->prefix,
+                hit_rate,
+                cache_ptr->resize_ctl.lower_hr_threshold);
+        fprintf(stdout, "%s    cache already at maximum size so no change.\n", cache_ptr->prefix);
+        break;
 
-            switch (cache_ptr->resize_ctl.decr_mode) {
-                case H5C_decr__off:
-                    fprintf(stdout, "%sAuto cache resize -- decrease off.  HR = %lf\n", cache_ptr->prefix,
-                            hit_rate);
-                    break;
+    case at_min_size:
+        fprintf(stdout, "%sAuto cache resize -- hit rate (%lf) -- can't decrease.\n", cache_ptr->prefix, hit_rate);
+        fprintf(stdout, "%s    cache already at minimum size.\n", cache_ptr->prefix);
+        break;
 
-                case H5C_decr__threshold:
-                    assert(hit_rate > cache_ptr->resize_ctl.upper_hr_threshold);
+    case increase_disabled: fprintf(stdout, "%sAuto cache resize -- increase disabled -- HR = %lf.", cache_ptr->prefix, hit_rate); break;
 
-                    fprintf(stdout, "%sAuto cache resize -- decrease by threshold.  HR = %lf > %6.5lf\n",
-                            cache_ptr->prefix, hit_rate, cache_ptr->resize_ctl.upper_hr_threshold);
-                    fprintf(stdout, "%sout of bounds high (%6.5lf).\n", cache_ptr->prefix,
-                            cache_ptr->resize_ctl.upper_hr_threshold);
-                    break;
+    case decrease_disabled: fprintf(stdout, "%sAuto cache resize -- decrease disabled -- HR = %lf.\n", cache_ptr->prefix, hit_rate); break;
 
-                case H5C_decr__age_out:
-                    fprintf(stdout, "%sAuto cache resize -- decrease by ageout.  HR = %lf\n",
-                            cache_ptr->prefix, hit_rate);
-                    break;
+    case not_full:
+        assert(hit_rate < cache_ptr->resize_ctl.lower_hr_threshold);
 
-                case H5C_decr__age_out_with_threshold:
-                    assert(hit_rate > cache_ptr->resize_ctl.upper_hr_threshold);
+        fprintf(stdout,
+                "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
+                cache_ptr->prefix,
+                hit_rate,
+                cache_ptr->resize_ctl.lower_hr_threshold);
+        fprintf(stdout, "%s    cache not full so no increase in size.\n", cache_ptr->prefix);
+        break;
 
-                    fprintf(stdout,
-                            "%sAuto cache resize -- decrease by ageout with threshold. HR = %lf > %6.5lf\n",
-                            cache_ptr->prefix, hit_rate, cache_ptr->resize_ctl.upper_hr_threshold);
-                    break;
-
-                default:
-                    fprintf(stdout, "%sAuto cache resize -- decrease by unknown mode.  HR = %lf\n",
-                            cache_ptr->prefix, hit_rate);
-            }
-
-            fprintf(stdout, "%s    cache size decreased from (%zu/%zu) to (%zu/%zu).\n", cache_ptr->prefix,
-                    old_max_cache_size, old_min_clean_size, new_max_cache_size, new_min_clean_size);
-            break;
-
-        case at_max_size:
-            fprintf(stdout, "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
-                    cache_ptr->prefix, hit_rate, cache_ptr->resize_ctl.lower_hr_threshold);
-            fprintf(stdout, "%s    cache already at maximum size so no change.\n", cache_ptr->prefix);
-            break;
-
-        case at_min_size:
-            fprintf(stdout, "%sAuto cache resize -- hit rate (%lf) -- can't decrease.\n", cache_ptr->prefix,
-                    hit_rate);
-            fprintf(stdout, "%s    cache already at minimum size.\n", cache_ptr->prefix);
-            break;
-
-        case increase_disabled:
-            fprintf(stdout, "%sAuto cache resize -- increase disabled -- HR = %lf.", cache_ptr->prefix,
-                    hit_rate);
-            break;
-
-        case decrease_disabled:
-            fprintf(stdout, "%sAuto cache resize -- decrease disabled -- HR = %lf.\n", cache_ptr->prefix,
-                    hit_rate);
-            break;
-
-        case not_full:
-            assert(hit_rate < cache_ptr->resize_ctl.lower_hr_threshold);
-
-            fprintf(stdout, "%sAuto cache resize -- hit rate (%lf) out of bounds low (%6.5lf).\n",
-                    cache_ptr->prefix, hit_rate, cache_ptr->resize_ctl.lower_hr_threshold);
-            fprintf(stdout, "%s    cache not full so no increase in size.\n", cache_ptr->prefix);
-            break;
-
-        default:
-            fprintf(stdout, "%sAuto cache resize -- unknown status code.\n", cache_ptr->prefix);
-            break;
+    default: fprintf(stdout, "%sAuto cache resize -- unknown status code.\n", cache_ptr->prefix); break;
     }
 } /* H5C_def_auto_resize_rpt_fcn() */
 
@@ -1278,56 +1394,58 @@ H5C_def_auto_resize_rpt_fcn(H5C_t *cache_ptr,
  *-------------------------------------------------------------------------
  */
 #ifdef H5C_DO_EXTREME_SANITY_CHECKS
-herr_t
-H5C__validate_lru_list(H5C_t *cache_ptr)
+herr_t H5C__validate_lru_list(H5C_t* cache_ptr)
 {
-    int32_t            len       = 0;
-    size_t             size      = 0;
-    H5C_cache_entry_t *entry_ptr = NULL;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    int32_t len = 0;
+    size_t size = 0;
+    H5C_cache_entry_t* entry_ptr = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     assert(cache_ptr);
 
-    if (((cache_ptr->LRU_head_ptr == NULL) || (cache_ptr->LRU_tail_ptr == NULL)) &&
-        (cache_ptr->LRU_head_ptr != cache_ptr->LRU_tail_ptr))
+    if (((cache_ptr->LRU_head_ptr == NULL) || (cache_ptr->LRU_tail_ptr == NULL)) && (cache_ptr->LRU_head_ptr != cache_ptr->LRU_tail_ptr)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "LRU list head/tail check failed");
+    }
 
     if ((cache_ptr->LRU_list_len == 1) &&
-        ((cache_ptr->LRU_head_ptr != cache_ptr->LRU_tail_ptr) || (cache_ptr->LRU_head_ptr == NULL) ||
-         (cache_ptr->LRU_head_ptr->size != cache_ptr->LRU_list_size)))
+        ((cache_ptr->LRU_head_ptr != cache_ptr->LRU_tail_ptr) || (cache_ptr->LRU_head_ptr == NULL) || (cache_ptr->LRU_head_ptr->size != cache_ptr->LRU_list_size))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "LRU list sanity check failed");
+    }
 
-    if ((cache_ptr->LRU_list_len >= 1) &&
-        ((cache_ptr->LRU_head_ptr == NULL) || (cache_ptr->LRU_head_ptr->prev != NULL) ||
-         (cache_ptr->LRU_tail_ptr == NULL) || (cache_ptr->LRU_tail_ptr->next != NULL)))
+    if ((cache_ptr->LRU_list_len >= 1) && ((cache_ptr->LRU_head_ptr == NULL) || (cache_ptr->LRU_head_ptr->prev != NULL) || (cache_ptr->LRU_tail_ptr == NULL) ||
+                                           (cache_ptr->LRU_tail_ptr->next != NULL))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "LRU list sanity check failed");
+    }
 
     entry_ptr = cache_ptr->LRU_head_ptr;
     while (entry_ptr != NULL) {
-        if ((entry_ptr != cache_ptr->LRU_head_ptr) &&
-            ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr)))
+        if ((entry_ptr != cache_ptr->LRU_head_ptr) && ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if ((entry_ptr != cache_ptr->LRU_tail_ptr) &&
-            ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr)))
+        if ((entry_ptr != cache_ptr->LRU_tail_ptr) && ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if (entry_ptr->is_pinned || entry_ptr->pinned_from_client || entry_ptr->pinned_from_cache)
+        if (entry_ptr->is_pinned || entry_ptr->pinned_from_client || entry_ptr->pinned_from_cache) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "invalid entry 'pin origin' fields");
+        }
 
         len++;
         size += entry_ptr->size;
         entry_ptr = entry_ptr->next;
     }
 
-    if ((cache_ptr->LRU_list_len != (uint32_t)len) || (cache_ptr->LRU_list_size != size))
+    if ((cache_ptr->LRU_list_len != (uint32_t)len) || (cache_ptr->LRU_list_size != size)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "LRU list length/size check failed");
+    }
 
 done:
-    if (ret_value != SUCCEED)
+    if (ret_value != SUCCEED) {
         assert(0);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5C__validate_lru_list() */
@@ -1348,59 +1466,62 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifdef H5C_DO_EXTREME_SANITY_CHECKS
-herr_t
-H5C__validate_pinned_entry_list(H5C_t *cache_ptr)
+herr_t H5C__validate_pinned_entry_list(H5C_t* cache_ptr)
 {
-    int32_t            len       = 0;
-    size_t             size      = 0;
-    H5C_cache_entry_t *entry_ptr = NULL;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    int32_t len = 0;
+    size_t size = 0;
+    H5C_cache_entry_t* entry_ptr = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     assert(cache_ptr);
 
-    if (((cache_ptr->pel_head_ptr == NULL) || (cache_ptr->pel_tail_ptr == NULL)) &&
-        (cache_ptr->pel_head_ptr != cache_ptr->pel_tail_ptr))
+    if (((cache_ptr->pel_head_ptr == NULL) || (cache_ptr->pel_tail_ptr == NULL)) && (cache_ptr->pel_head_ptr != cache_ptr->pel_tail_ptr)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "pinned list head/tail check failed");
+    }
 
     if ((cache_ptr->pel_len == 1) &&
-        ((cache_ptr->pel_head_ptr != cache_ptr->pel_tail_ptr) || (cache_ptr->pel_head_ptr == NULL) ||
-         (cache_ptr->pel_head_ptr->size != cache_ptr->pel_size)))
+        ((cache_ptr->pel_head_ptr != cache_ptr->pel_tail_ptr) || (cache_ptr->pel_head_ptr == NULL) || (cache_ptr->pel_head_ptr->size != cache_ptr->pel_size))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "pinned list sanity check failed");
+    }
 
-    if ((cache_ptr->pel_len >= 1) &&
-        ((cache_ptr->pel_head_ptr == NULL) || (cache_ptr->pel_head_ptr->prev != NULL) ||
-         (cache_ptr->pel_tail_ptr == NULL) || (cache_ptr->pel_tail_ptr->next != NULL)))
+    if ((cache_ptr->pel_len >= 1) && ((cache_ptr->pel_head_ptr == NULL) || (cache_ptr->pel_head_ptr->prev != NULL) || (cache_ptr->pel_tail_ptr == NULL) ||
+                                      (cache_ptr->pel_tail_ptr->next != NULL))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "pinned list sanity check failed");
+    }
 
     entry_ptr = cache_ptr->pel_head_ptr;
     while (entry_ptr != NULL) {
-        if ((entry_ptr != cache_ptr->pel_head_ptr) &&
-            ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr)))
+        if ((entry_ptr != cache_ptr->pel_head_ptr) && ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if ((entry_ptr != cache_ptr->pel_tail_ptr) &&
-            ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr)))
+        if ((entry_ptr != cache_ptr->pel_tail_ptr) && ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if (!entry_ptr->is_pinned)
+        if (!entry_ptr->is_pinned) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "pinned list contains unpinned entry");
+        }
 
-        if (!(entry_ptr->pinned_from_client || entry_ptr->pinned_from_cache))
+        if (!(entry_ptr->pinned_from_client || entry_ptr->pinned_from_cache)) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "invalid entry 'pin origin' fields");
+        }
 
         len++;
         size += entry_ptr->size;
         entry_ptr = entry_ptr->next;
     }
 
-    if ((cache_ptr->pel_len != (uint32_t)len) || (cache_ptr->pel_size != size))
+    if ((cache_ptr->pel_len != (uint32_t)len) || (cache_ptr->pel_size != size)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "pinned list length/size check failed");
+    }
 
 done:
-    if (ret_value != SUCCEED)
+    if (ret_value != SUCCEED) {
         assert(0);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5C__validate_pinned_entry_list() */
@@ -1421,59 +1542,62 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifdef H5C_DO_EXTREME_SANITY_CHECKS
-herr_t
-H5C__validate_protected_entry_list(H5C_t *cache_ptr)
+herr_t H5C__validate_protected_entry_list(H5C_t* cache_ptr)
 {
-    int32_t            len       = 0;
-    size_t             size      = 0;
-    H5C_cache_entry_t *entry_ptr = NULL;
-    herr_t             ret_value = SUCCEED; /* Return value */
+    int32_t len = 0;
+    size_t size = 0;
+    H5C_cache_entry_t* entry_ptr = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     assert(cache_ptr);
 
-    if (((cache_ptr->pl_head_ptr == NULL) || (cache_ptr->pl_tail_ptr == NULL)) &&
-        (cache_ptr->pl_head_ptr != cache_ptr->pl_tail_ptr))
+    if (((cache_ptr->pl_head_ptr == NULL) || (cache_ptr->pl_tail_ptr == NULL)) && (cache_ptr->pl_head_ptr != cache_ptr->pl_tail_ptr)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "protected list head/tail check failed");
+    }
 
     if ((cache_ptr->pl_len == 1) &&
-        ((cache_ptr->pl_head_ptr != cache_ptr->pl_tail_ptr) || (cache_ptr->pl_head_ptr == NULL) ||
-         (cache_ptr->pl_head_ptr->size != cache_ptr->pl_size)))
+        ((cache_ptr->pl_head_ptr != cache_ptr->pl_tail_ptr) || (cache_ptr->pl_head_ptr == NULL) || (cache_ptr->pl_head_ptr->size != cache_ptr->pl_size))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "protected list sanity check failed");
+    }
 
     if ((cache_ptr->pl_len >= 1) &&
-        ((cache_ptr->pl_head_ptr == NULL) || (cache_ptr->pl_head_ptr->prev != NULL) ||
-         (cache_ptr->pl_tail_ptr == NULL) || (cache_ptr->pl_tail_ptr->next != NULL)))
+        ((cache_ptr->pl_head_ptr == NULL) || (cache_ptr->pl_head_ptr->prev != NULL) || (cache_ptr->pl_tail_ptr == NULL) || (cache_ptr->pl_tail_ptr->next != NULL))) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "protected list sanity check failed");
+    }
 
     entry_ptr = cache_ptr->pl_head_ptr;
     while (entry_ptr != NULL) {
-        if ((entry_ptr != cache_ptr->pl_head_ptr) &&
-            ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr)))
+        if ((entry_ptr != cache_ptr->pl_head_ptr) && ((entry_ptr->prev == NULL) || (entry_ptr->prev->next != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if ((entry_ptr != cache_ptr->pl_tail_ptr) &&
-            ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr)))
+        if ((entry_ptr != cache_ptr->pl_tail_ptr) && ((entry_ptr->next == NULL) || (entry_ptr->next->prev != entry_ptr))) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "entry has bad prev/next pointers");
+        }
 
-        if (!entry_ptr->is_protected)
+        if (!entry_ptr->is_protected) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "protected list contains unprotected entry");
+        }
 
-        if (entry_ptr->is_read_only && (entry_ptr->ro_ref_count <= 0))
+        if (entry_ptr->is_read_only && (entry_ptr->ro_ref_count <= 0)) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "read-only entry has non-positive ref count");
+        }
 
         len++;
         size += entry_ptr->size;
         entry_ptr = entry_ptr->next;
     }
 
-    if ((cache_ptr->pl_len != (uint32_t)len) || (cache_ptr->pl_size != size))
+    if ((cache_ptr->pl_len != (uint32_t)len) || (cache_ptr->pl_size != size)) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "protected list length/size check failed");
+    }
 
 done:
-    if (ret_value != SUCCEED)
+    if (ret_value != SUCCEED) {
         assert(0);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5C__validate_protected_entry_list() */
@@ -1492,12 +1616,11 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifdef H5C_DO_SLIST_SANITY_CHECKS
-bool
-H5C__entry_in_skip_list(H5C_t *cache_ptr, H5C_cache_entry_t *target_ptr)
+bool H5C__entry_in_skip_list(H5C_t* cache_ptr, H5C_cache_entry_t* target_ptr)
 {
-    H5SL_node_t *node_ptr;
-    bool         in_slist;
-    bool         ret_value;
+    H5SL_node_t* node_ptr;
+    bool in_slist;
+    bool ret_value;
 
     FUNC_ENTER_PACKAGE
 
@@ -1508,18 +1631,20 @@ H5C__entry_in_skip_list(H5C_t *cache_ptr, H5C_cache_entry_t *target_ptr)
     node_ptr = H5SL_first(cache_ptr->slist_ptr);
     in_slist = false;
     while ((node_ptr != NULL) && (!in_slist)) {
-        H5C_cache_entry_t *entry_ptr;
+        H5C_cache_entry_t* entry_ptr;
 
-        entry_ptr = (H5C_cache_entry_t *)H5SL_item(node_ptr);
+        entry_ptr = (H5C_cache_entry_t*)H5SL_item(node_ptr);
 
         assert(entry_ptr);
         assert(entry_ptr->is_dirty);
         assert(entry_ptr->in_slist);
 
-        if (entry_ptr == target_ptr)
+        if (entry_ptr == target_ptr) {
             in_slist = true;
-        else
+        }
+        else {
             node_ptr = H5SL_next(node_ptr);
+        }
     }
 
     /* Set return value */
@@ -1541,24 +1666,25 @@ done:
  */
 herr_t
 #if H5C_COLLECT_CACHE_STATS
-H5C__image_stats(H5C_t *cache_ptr, bool print_header)
+    H5C__image_stats(H5C_t* cache_ptr, bool print_header)
 #else  /* H5C_COLLECT_CACHE_STATS */
-H5C__image_stats(H5C_t *cache_ptr, bool H5_ATTR_UNUSED print_header)
+    H5C__image_stats(H5C_t* cache_ptr, bool H5_ATTR_UNUSED print_header)
 #endif /* H5C_COLLECT_CACHE_STATS */
 {
 #if H5C_COLLECT_CACHE_STATS
-    int     i;
-    int64_t total_hits   = 0;
+    int i;
+    int64_t total_hits = 0;
     int64_t total_misses = 0;
-    double  hit_rate;
-    double  prefetch_use_rate;
-#endif                          /* H5C_COLLECT_CACHE_STATS */
+    double hit_rate;
+    double prefetch_use_rate;
+#endif /* H5C_COLLECT_CACHE_STATS */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
-    if (NULL == cache_ptr)
+    if (NULL == cache_ptr) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "Bad cache_ptr");
+    }
 
 #if H5C_COLLECT_CACHE_STATS
     for (i = 0; i <= cache_ptr->max_type_id; i++) {
@@ -1566,26 +1692,35 @@ H5C__image_stats(H5C_t *cache_ptr, bool H5_ATTR_UNUSED print_header)
         total_misses += cache_ptr->misses[i];
     } /* end for */
 
-    if ((total_hits > 0) || (total_misses > 0))
+    if ((total_hits > 0) || (total_misses > 0)) {
         hit_rate = 100.0 * ((double)(total_hits)) / ((double)(total_hits + total_misses));
-    else
+    }
+    else {
         hit_rate = 0.0;
+    }
 
-    if (cache_ptr->prefetches > 0)
+    if (cache_ptr->prefetches > 0) {
         prefetch_use_rate = 100.0 * ((double)(cache_ptr->prefetch_hits)) / ((double)(cache_ptr->prefetches));
-    else
+    }
+    else {
         prefetch_use_rate = 0.0;
+    }
 
     if (print_header) {
         fprintf(stdout, "\nhit     prefetches      prefetch              image  pf hit\n");
         fprintf(stdout, "rate:   total:  dirty:  hits:  flshs:  evct:  size:  rate:\n");
     } /* end if */
 
-    fprintf(stdout, "%3.1lf    %5lld   %5lld   %5lld  %5lld   %5lld   %5lld   %3.1lf\n", hit_rate,
-            (long long)(cache_ptr->prefetches), (long long)(cache_ptr->dirty_prefetches),
-            (long long)(cache_ptr->prefetch_hits), (long long)(cache_ptr->flushes[H5AC_PREFETCHED_ENTRY_ID]),
+    fprintf(stdout,
+            "%3.1lf    %5lld   %5lld   %5lld  %5lld   %5lld   %5lld   %3.1lf\n",
+            hit_rate,
+            (long long)(cache_ptr->prefetches),
+            (long long)(cache_ptr->dirty_prefetches),
+            (long long)(cache_ptr->prefetch_hits),
+            (long long)(cache_ptr->flushes[H5AC_PREFETCHED_ENTRY_ID]),
             (long long)(cache_ptr->evictions[H5AC_PREFETCHED_ENTRY_ID]),
-            (long long)(cache_ptr->last_image_size), prefetch_use_rate);
+            (long long)(cache_ptr->last_image_size),
+            prefetch_use_rate);
 #endif /* H5C_COLLECT_CACHE_STATS */
 
 done:

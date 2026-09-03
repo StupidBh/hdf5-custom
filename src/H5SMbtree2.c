@@ -39,16 +39,16 @@
 /********************/
 
 /* v2 B-tree callbacks */
-static void  *H5SM__bt2_crt_context(void *udata);
-static herr_t H5SM__bt2_dst_context(void *ctx);
-static herr_t H5SM__bt2_store(void *native, const void *udata);
-static herr_t H5SM__bt2_debug(FILE *stream, int indent, int fwidth, const void *record, const void *_udata);
+static void* H5SM__bt2_crt_context(void* udata);
+static herr_t H5SM__bt2_dst_context(void* ctx);
+static herr_t H5SM__bt2_store(void* native, const void* udata);
+static herr_t H5SM__bt2_debug(FILE* stream, int indent, int fwidth, const void* record, const void* _udata);
 
 /*****************************/
 /* Library Private Variables */
 /*****************************/
 /* v2 B-tree class for SOHM indexes*/
-const H5B2_class_t H5SM_INDEX[1] = {{
+const H5B2_class_t H5SM_INDEX[1] = { {
     /* B-tree class information */
     H5B2_SOHM_INDEX_ID,    /* Type of B-tree */
     "H5B2_SOHM_INDEX_ID",  /* Name of B-tree class */
@@ -60,7 +60,7 @@ const H5B2_class_t H5SM_INDEX[1] = {{
     H5SM__message_encode,  /* Record encoding callback */
     H5SM__message_decode,  /* Record decoding callback */
     H5SM__bt2_debug        /* Record debugging callback */
-}};
+} };
 
 /*******************/
 /* Local Variables */
@@ -79,12 +79,11 @@ H5FL_DEFINE_STATIC(H5SM_bt2_ctx_t);
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5SM__bt2_crt_context(void *_f)
+static void* H5SM__bt2_crt_context(void* _f)
 {
-    H5F_t          *f = (H5F_t *)_f;  /* User data for building callback context */
-    H5SM_bt2_ctx_t *ctx;              /* Callback context structure */
-    void           *ret_value = NULL; /* Return value */
+    H5F_t* f = (H5F_t*)_f;  /* User data for building callback context */
+    H5SM_bt2_ctx_t* ctx;    /* Callback context structure */
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -92,8 +91,9 @@ H5SM__bt2_crt_context(void *_f)
     assert(f);
 
     /* Allocate callback context */
-    if (NULL == (ctx = H5FL_MALLOC(H5SM_bt2_ctx_t)))
+    if (NULL == (ctx = H5FL_MALLOC(H5SM_bt2_ctx_t))) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTALLOC, NULL, "can't allocate callback context");
+    }
 
     /* Determine the size of addresses & lengths in the file */
     ctx->sizeof_addr = H5F_SIZEOF_ADDR(f);
@@ -115,10 +115,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5SM__bt2_dst_context(void *_ctx)
+static herr_t H5SM__bt2_dst_context(void* _ctx)
 {
-    H5SM_bt2_ctx_t *ctx = (H5SM_bt2_ctx_t *)_ctx; /* Callback context structure */
+    H5SM_bt2_ctx_t* ctx = (H5SM_bt2_ctx_t*)_ctx; /* Callback context structure */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -143,15 +142,14 @@ H5SM__bt2_dst_context(void *_ctx)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5SM__bt2_store(void *native, const void *udata)
+static herr_t H5SM__bt2_store(void* native, const void* udata)
 {
-    const H5SM_mesg_key_t *key = (const H5SM_mesg_key_t *)udata;
+    const H5SM_mesg_key_t* key = (const H5SM_mesg_key_t*)udata;
 
     FUNC_ENTER_PACKAGE_NOERR
 
     /* Copy the source message to the B-tree */
-    *(H5SM_sohm_t *)native = key->message;
+    *(H5SM_sohm_t*)native = key->message;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5SM__bt2_store */
@@ -166,21 +164,34 @@ H5SM__bt2_store(void *native, const void *udata)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5SM__bt2_debug(FILE *stream, int indent, int fwidth, const void *record, const void H5_ATTR_UNUSED *_udata)
+static herr_t H5SM__bt2_debug(FILE* stream, int indent, int fwidth, const void* record, const void H5_ATTR_UNUSED* _udata)
 {
-    const H5SM_sohm_t *sohm = (const H5SM_sohm_t *)record;
+    const H5SM_sohm_t* sohm = (const H5SM_sohm_t*)record;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    if (sohm->location == H5SM_IN_HEAP)
-        fprintf(stream, "%*s%-*s {%" PRIu64 ", %" PRIo32 ", %" PRIxHSIZE "}\n", indent, "", fwidth,
-                "Shared Message in heap:", sohm->u.heap_loc.fheap_id.val, sohm->hash,
+    if (sohm->location == H5SM_IN_HEAP) {
+        fprintf(stream,
+                "%*s%-*s {%" PRIu64 ", %" PRIo32 ", %" PRIxHSIZE "}\n",
+                indent,
+                "",
+                fwidth,
+                "Shared Message in heap:",
+                sohm->u.heap_loc.fheap_id.val,
+                sohm->hash,
                 sohm->u.heap_loc.ref_count);
+    }
     else {
         assert(sohm->location == H5SM_IN_OH);
-        fprintf(stream, "%*s%-*s {%" PRIuHADDR ", %" PRIo32 ", %x, %" PRIx32 "}\n", indent, "", fwidth,
-                "Shared Message in OH:", sohm->u.mesg_loc.oh_addr, sohm->hash, sohm->msg_type_id,
+        fprintf(stream,
+                "%*s%-*s {%" PRIuHADDR ", %" PRIo32 ", %x, %" PRIx32 "}\n",
+                indent,
+                "",
+                fwidth,
+                "Shared Message in OH:",
+                sohm->u.mesg_loc.oh_addr,
+                sohm->hash,
+                sohm->msg_type_id,
                 sohm->u.mesg_loc.index);
     } /* end else */
 

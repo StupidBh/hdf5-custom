@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -25,7 +24,7 @@ main(void)
 #elif H5_VERSION_GE(1, 8, 0)
         if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
 #else
-#error Only HDF5 1.8.x and later supported.
+    #error Only HDF5 1.8.x and later supported.
 #endif
             ret_val = EXIT_FAILURE;
             goto fail_file;
@@ -35,7 +34,7 @@ main(void)
             goto fail_file;
         }
 
-        if ((aspace = H5Screate_simple(1, (hsize_t[]){1024 * 1024}, NULL)) < 0) {
+        if ((aspace = H5Screate_simple(1, (hsize_t[]) { 1024 * 1024 }, NULL)) < 0) {
             ret_val = EXIT_FAILURE;
             goto fail_aspace;
         }
@@ -53,6 +52,7 @@ fail_file:
         H5Pclose(fapl);
 fail_fapl:;
     }
+
     //! <!-- [large_attribute] -->
 
     assert(ret_val == EXIT_SUCCESS);

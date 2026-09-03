@@ -27,32 +27,35 @@
 #define TABLE_NAME "table"
 #define FILENAME   "h5ex_table_06.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle;
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t dst_size            = sizeof(Particle);
-    size_t dst_offset[NFIELDS] = {HOFFSET(Particle, name), HOFFSET(Particle, lati), HOFFSET(Particle, longi),
-                                  HOFFSET(Particle, pressure), HOFFSET(Particle, temperature)};
+    size_t dst_size = sizeof(Particle);
+    size_t dst_offset[NFIELDS] = { HOFFSET(Particle, name),
+                                   HOFFSET(Particle, lati),
+                                   HOFFSET(Particle, longi),
+                                   HOFFSET(Particle, pressure),
+                                   HOFFSET(Particle, temperature) };
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type;
-    hid_t       file_id;
-    hsize_t     chunk_size   = 10;
-    Particle    fill_data[1] = {{"no data", -1, -2, -99.0F, -98.0}}; /* Fill value particle */
-    int         compress     = 0;
-    hsize_t     nfields_out;
-    hsize_t     nrecords_out;
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    Particle fill_data[1] = { { "no data", -1, -2, -99.0F, -98.0 } }; /* Fill value particle */
+    int compress = 0;
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
 
     /* Initialize field_type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -67,8 +70,7 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make a table */
-    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, compress, NULL);
+    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset, field_type, chunk_size, fill_data, compress, NULL);
 
     /* Get table info  */
     H5TBget_table_info(file_id, TABLE_NAME, &nfields_out, &nrecords_out);

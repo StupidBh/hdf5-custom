@@ -24,26 +24,26 @@
 int cleanup_g = -1; /* whether to clean.  Init to not set. */
 
 /* prototypes */
-void cleanup(const char *);
+void cleanup(const char*);
 void split_file(void);
 
 /*
  * Cleanup a file unless $HDF5_NOCLEANUP is set.
  */
-void
-cleanup(const char *filename)
+void cleanup(const char* filename)
 {
-    if (cleanup_g == -1)
+    if (cleanup_g == -1) {
         cleanup_g = getenv(HDF5_NOCLEANUP) ? 0 : 1;
-    if (cleanup_g)
+    }
+    if (cleanup_g) {
         remove(filename);
+    }
 }
 
 /*
  * This shows how to use the split file driver.
  */
-void
-split_file(void)
+void split_file(void)
 {
     hid_t fapl, fid;
 
@@ -88,10 +88,8 @@ split_file(void)
 }
 
 /* Main Body */
-int
-main(void)
+int main(void)
 {
-
     split_file();
 
     return (0);

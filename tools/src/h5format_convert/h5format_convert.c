@@ -23,21 +23,21 @@
 /* Name of tool */
 #define PROGRAMNAME "h5format_convert"
 
-static char *fname_g   = NULL;
-static char *dname_g   = NULL;
-static int   dset_g    = false;
-static int   noop_g    = false;
-static int   verbose_g = 0;
+static char* fname_g = NULL;
+static char* dname_g = NULL;
+static int dset_g = false;
+static int noop_g = false;
+static int verbose_g = 0;
 
 /*
  * Command-line options: The user can specify short or long-named
  * parameters.
  */
-static const char            *s_opts   = "hVvd:n";
-static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},    {"version", no_arg, 'V'},
-                                          {"verbose", no_arg, 'v'}, {"dname", require_arg, 'd'},
-                                          {"noop", no_arg, 'n'},    {"enable-error-stack", no_arg, 'E'},
-                                          {NULL, 0, '\0'}};
+static const char* s_opts = "hVvd:n";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },    { "version", no_arg, 'V' },
+                                           { "verbose", no_arg, 'v' }, { "dname", require_arg, 'd' },
+                                           { "noop", no_arg, 'n' },    { "enable-error-stack", no_arg, 'E' },
+                                           { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function: usage
@@ -48,8 +48,7 @@ static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},    {"version", 
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     fprintf(rawoutstream, "usage: %s [OPTIONS] file_name\n", prog);
     fprintf(rawoutstream, "  OPTIONS\n");
@@ -57,8 +56,7 @@ usage(const char *prog)
     fprintf(rawoutstream, "   -V, --version             Print version number and exit\n");
     fprintf(rawoutstream, "   -v, --verbose             Turn on verbose mode\n");
     fprintf(rawoutstream, "   -d dname, --dname=dataset_name    Pathname for the dataset\n");
-    fprintf(rawoutstream,
-            "   -n, --noop                Perform all the steps except the actual conversion\n");
+    fprintf(rawoutstream, "   -n, --noop                Perform all the steps except the actual conversion\n");
     fprintf(rawoutstream, "\n");
     fprintf(rawoutstream, "Examples of use:\n");
     fprintf(rawoutstream, "\n");
@@ -89,8 +87,7 @@ usage(const char *prog)
  *
  *-------------------------------------------------------------------------
  */
-static int
-parse_command_line(int argc, const char *const *argv)
+static int parse_command_line(int argc, const char* const* argv)
 {
     int opt;
 
@@ -104,47 +101,42 @@ parse_command_line(int argc, const char *const *argv)
     /* parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'h':
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto error;
+        case 'h':
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto error;
 
-            case 'V':
-                print_version(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto error;
+        case 'V':
+            print_version(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto error;
 
-            case 'v':
-                verbose_g = true;
-                break;
+        case 'v': verbose_g = true; break;
 
-            case 'd': /* -d dname */
-                if (H5_optarg != NULL && *H5_optarg)
-                    dname_g = strdup(H5_optarg);
-                if (dname_g == NULL) {
-                    h5tools_setstatus(EXIT_FAILURE);
-                    error_msg("No dataset name `%s`\n", H5_optarg);
-                    usage(h5tools_getprogname());
-                    goto error;
-                }
-                dset_g = true;
-                break;
-
-            case 'n': /* -n */
-                noop_g = true;
-                break;
-
-            case 'E':
-                enable_error_stack = 1;
-                break;
-
-            default:
+        case 'd': /* -d dname */
+            if (H5_optarg != NULL && *H5_optarg) {
+                dname_g = strdup(H5_optarg);
+            }
+            if (dname_g == NULL) {
                 h5tools_setstatus(EXIT_FAILURE);
+                error_msg("No dataset name `%s`\n", H5_optarg);
                 usage(h5tools_getprogname());
                 goto error;
-                break;
+            }
+            dset_g = true;
+            break;
+
+        case 'n': /* -n */ noop_g = true; break;
+
+        case 'E': enable_error_stack = 1; break;
+
+        default:
+            h5tools_setstatus(EXIT_FAILURE);
+            usage(h5tools_getprogname());
+            goto error;
+            break;
         } /* switch */
-    }     /* while */
+    } /* while */
 
     if (argc <= H5_optind) {
         error_msg("missing file name\n");
@@ -170,8 +162,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static void
-leave(int ret)
+static void leave(int ret)
 {
     h5tools_close();
 
@@ -196,12 +187,11 @@ leave(int ret)
  *
  *-------------------------------------------------------------------------
  */
-static int
-convert(hid_t fid, const char *dname)
+static int convert(hid_t fid, const char* dname)
 {
-    hid_t             dcpl = H5I_INVALID_HID;
-    hid_t             did  = H5I_INVALID_HID;
-    H5D_layout_t      layout_type;
+    hid_t dcpl = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    H5D_layout_t layout_type;
     H5D_chunk_index_t idx_type;
 
     /* Open the dataset */
@@ -210,8 +200,9 @@ convert(hid_t fid, const char *dname)
         h5tools_setstatus(EXIT_FAILURE);
         goto error;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         fprintf(rawoutstream, "Open the dataset\n");
+    }
 
     /* Get the dataset's creation property list */
     if ((dcpl = H5Dget_create_plist(did)) < 0) {
@@ -226,70 +217,78 @@ convert(hid_t fid, const char *dname)
         h5tools_setstatus(EXIT_FAILURE);
         goto error;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         fprintf(rawoutstream, "Retrieve the dataset's layout\n");
+    }
 
     switch (layout_type) {
-        case H5D_CHUNKED:
-            if (verbose_g)
-                fprintf(rawoutstream, "Dataset is a chunked dataset\n");
+    case H5D_CHUNKED:
+        if (verbose_g) {
+            fprintf(rawoutstream, "Dataset is a chunked dataset\n");
+        }
 
-            /* Get the dataset's chunk indexing type */
-            if (H5Dget_chunk_index_type(did, &idx_type) < 0) {
-                error_msg("unable to get the chunk indexing type for \"%s\"\n", dname);
-                h5tools_setstatus(EXIT_FAILURE);
-                goto error;
-            }
-            else if (verbose_g)
-                fprintf(rawoutstream, "Retrieve the dataset's chunk indexing type\n");
-
-            if (idx_type == H5D_CHUNK_IDX_BTREE) {
-                if (verbose_g)
-                    fprintf(rawoutstream,
-                            "Dataset's chunk indexing type is already version 1 B-tree: no further action\n");
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto done;
-            }
-            else if (verbose_g)
-                fprintf(rawoutstream, "Dataset's chunk indexing type is not version 1 B-tree\n");
-
-            break;
-
-        case H5D_CONTIGUOUS:
-            if (verbose_g)
-                fprintf(rawoutstream,
-                        "Dataset is a contiguous dataset: downgrade layout version as needed\n");
-            break;
-
-        case H5D_COMPACT:
-            if (verbose_g)
-                fprintf(rawoutstream, "Dataset is a compact dataset: downgrade layout version as needed\n");
-            break;
-
-        case H5D_VIRTUAL:
-            if (verbose_g)
-                fprintf(rawoutstream, "No further action for virtual dataset\n");
-            goto done;
-
-        case H5D_NLAYOUTS:
-        case H5D_LAYOUT_ERROR:
-        default:
-            error_msg("unknown layout type for \"%s\"\n", dname);
+        /* Get the dataset's chunk indexing type */
+        if (H5Dget_chunk_index_type(did, &idx_type) < 0) {
+            error_msg("unable to get the chunk indexing type for \"%s\"\n", dname);
             h5tools_setstatus(EXIT_FAILURE);
             goto error;
+        }
+        else if (verbose_g) {
+            fprintf(rawoutstream, "Retrieve the dataset's chunk indexing type\n");
+        }
+
+        if (idx_type == H5D_CHUNK_IDX_BTREE) {
+            if (verbose_g) {
+                fprintf(rawoutstream, "Dataset's chunk indexing type is already version 1 B-tree: no further action\n");
+            }
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto done;
+        }
+        else if (verbose_g) {
+            fprintf(rawoutstream, "Dataset's chunk indexing type is not version 1 B-tree\n");
+        }
+
+        break;
+
+    case H5D_CONTIGUOUS:
+        if (verbose_g) {
+            fprintf(rawoutstream, "Dataset is a contiguous dataset: downgrade layout version as needed\n");
+        }
+        break;
+
+    case H5D_COMPACT:
+        if (verbose_g) {
+            fprintf(rawoutstream, "Dataset is a compact dataset: downgrade layout version as needed\n");
+        }
+        break;
+
+    case H5D_VIRTUAL:
+        if (verbose_g) {
+            fprintf(rawoutstream, "No further action for virtual dataset\n");
+        }
+        goto done;
+
+    case H5D_NLAYOUTS:
+    case H5D_LAYOUT_ERROR:
+    default:
+        error_msg("unknown layout type for \"%s\"\n", dname);
+        h5tools_setstatus(EXIT_FAILURE);
+        goto error;
 
     } /* end switch */
 
     /* No further action if it is a noop */
     if (noop_g) {
-        if (verbose_g)
+        if (verbose_g) {
             fprintf(rawoutstream, "Not converting the dataset\n");
+        }
         h5tools_setstatus(EXIT_SUCCESS);
         goto done;
     }
 
-    if (verbose_g)
+    if (verbose_g) {
         fprintf(rawoutstream, "Converting the dataset...\n");
+    }
 
     /* Downgrade the dataset */
     if (H5Dformat_convert(did) < 0) {
@@ -297,8 +296,9 @@ convert(hid_t fid, const char *dname)
         h5tools_setstatus(EXIT_FAILURE);
         goto error;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         fprintf(rawoutstream, "Done\n");
+    }
 
 done:
     /* Close the dataset */
@@ -307,8 +307,9 @@ done:
         h5tools_setstatus(EXIT_FAILURE);
         goto error;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         fprintf(rawoutstream, "Close the dataset\n");
+    }
 
     /* Close the dataset creation property list */
     if (H5Pclose(dcpl) < 0) {
@@ -316,14 +317,16 @@ done:
         h5tools_setstatus(EXIT_FAILURE);
         goto error;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         printf("Close the dataset creation property list\n");
+    }
 
     return 0;
 
 error:
-    if (verbose_g)
+    if (verbose_g) {
         fprintf(rawoutstream, "Error encountered\n");
+    }
 
     H5E_BEGIN_TRY
     {
@@ -345,21 +348,21 @@ error:
  *              Failure:    -1
  *-------------------------------------------------------------------------
  */
-static int
-convert_dsets_cb(const char *path, const H5O_info2_t *oi, bool already_visited,
-                 const trav_seen_t H5_ATTR_UNUSED *visited_obj_info, void *_fid)
+static int convert_dsets_cb(const char* path, const H5O_info2_t* oi, bool already_visited, const trav_seen_t H5_ATTR_UNUSED* visited_obj_info, void* _fid)
 {
-    hid_t fid = *(hid_t *)_fid;
+    hid_t fid = *(hid_t*)_fid;
 
     /* If the object has already been seen then just return */
     if (!already_visited) {
         if (oi->type == H5O_TYPE_DATASET) {
-            if (verbose_g)
+            if (verbose_g) {
                 fprintf(rawoutstream, "Going to process dataset:%s...\n", path);
-            if (convert(fid, path) < 0)
+            }
+            if (convert(fid, path) < 0) {
                 goto error;
+            }
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     return 0;
 
@@ -378,8 +381,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     hid_t fid = H5I_INVALID_HID;
 
@@ -390,13 +392,16 @@ main(int argc, char *argv[])
     h5tools_init();
 
     /* Parse command line options */
-    if (parse_command_line(argc, (const char *const *)argv) < 0)
+    if (parse_command_line(argc, (const char* const*)argv) < 0) {
         goto done;
-    else if (verbose_g)
+    }
+    else if (verbose_g) {
         fprintf(rawoutstream, "Process command line options\n");
+    }
 
-    if (noop_g && verbose_g)
+    if (noop_g && verbose_g) {
         fprintf(rawoutstream, "It is noop...\n");
+    }
 
     /* enable error reporting if command line option */
     h5tools_error_report();
@@ -407,20 +412,25 @@ main(int argc, char *argv[])
         h5tools_setstatus(EXIT_FAILURE);
         goto done;
     }
-    else if (verbose_g)
+    else if (verbose_g) {
         fprintf(rawoutstream, "Open the file %s\n", fname_g);
+    }
 
     if (dset_g) { /* Convert a specified dataset in the file */
-        if (verbose_g)
+        if (verbose_g) {
             fprintf(rawoutstream, "Going to process dataset: %s...\n", dname_g);
-        if (convert(fid, dname_g) < 0)
+        }
+        if (convert(fid, dname_g) < 0) {
             goto done;
+        }
     }
     else { /* Convert all datasets in the file */
-        if (verbose_g)
+        if (verbose_g) {
             fprintf(rawoutstream, "Processing all datasets in the file...\n");
-        if (h5trav_visit(fid, "/", true, true, convert_dsets_cb, NULL, &fid, H5O_INFO_BASIC) < 0)
+        }
+        if (h5trav_visit(fid, "/", true, true, convert_dsets_cb, NULL, &fid, H5O_INFO_BASIC) < 0) {
             goto done;
+        }
     } /* end else */
 
     if (verbose_g) {
@@ -451,10 +461,12 @@ done:
         }
     } /* end if */
 
-    if (fname_g)
+    if (fname_g) {
         free(fname_g);
-    if (dname_g)
+    }
+    if (dname_g) {
         free(dname_g);
+    }
 
     leave(h5tools_getstatus());
 

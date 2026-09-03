@@ -34,23 +34,23 @@
 
 #ifdef H5_HAVE_WIN_THREADS
 
-/****************/
-/* Local Macros */
-/****************/
+    /****************/
+    /* Local Macros */
+    /****************/
 
-/******************/
-/* Local Typedefs */
-/******************/
+    /******************/
+    /* Local Typedefs */
+    /******************/
 
-/********************/
-/* Local Prototypes */
-/********************/
-#ifdef H5_HAVE_THREADSAFE
-#if defined(H5_BUILT_AS_DYNAMIC_LIB) && defined(H5_HAVE_WIN32_API)
+    /********************/
+    /* Local Prototypes */
+    /********************/
+    #ifdef H5_HAVE_THREADSAFE
+        #if defined(H5_BUILT_AS_DYNAMIC_LIB) && defined(H5_HAVE_WIN32_API)
 static herr_t H5TS__win32_thread_enter(void);
 static herr_t H5TS__win32_thread_exit(void);
-#endif
-#endif
+        #endif
+    #endif
 
 /*********************/
 /* Package Variables */
@@ -64,7 +64,7 @@ static herr_t H5TS__win32_thread_exit(void);
 /* Local Variables */
 /*******************/
 
-#ifdef H5_HAVE_THREADSAFE_API
+    #ifdef H5_HAVE_THREADSAFE_API
 /*--------------------------------------------------------------------------
  * Function:    H5TS__win32_process_enter
  *
@@ -74,22 +74,22 @@ static herr_t H5TS__win32_thread_exit(void);
  *
  *--------------------------------------------------------------------------
  */
-H5_DLL BOOL CALLBACK
-H5TS__win32_process_enter(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContex)
+H5_DLL BOOL CALLBACK H5TS__win32_process_enter(PINIT_ONCE InitOnce, PVOID Parameter, PVOID* lpContex)
 {
     BOOL ret_value = TRUE;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Initialize H5TS package */
-    if (H5_UNLIKELY(H5TS__init_package() < 0))
+    if (H5_UNLIKELY(H5TS__init_package() < 0)) {
         HGOTO_DONE(FALSE);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* H5TS__win32_process_enter() */
 
-#if defined(H5_BUILT_AS_DYNAMIC_LIB) && defined(H5_HAVE_WIN32_API)
+        #if defined(H5_BUILT_AS_DYNAMIC_LIB) && defined(H5_HAVE_WIN32_API)
 /*--------------------------------------------------------------------------
  * Function:    H5TS__win32_thread_enter
  *
@@ -99,8 +99,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__win32_thread_enter(void)
+static herr_t H5TS__win32_thread_enter(void)
 {
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
@@ -124,8 +123,7 @@ H5TS__win32_thread_enter(void)
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__win32_thread_exit(void)
+static herr_t H5TS__win32_thread_exit(void)
 {
     herr_t ret_value = SUCCEED;
 
@@ -143,10 +141,12 @@ H5TS__win32_thread_exit(void)
     if (H5TS_thrd_info_key_g != TLS_OUT_OF_INDEXES) {
         LPVOID lpvData;
 
-        if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, &lpvData) < 0))
+        if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, &lpvData) < 0)) {
             HGOTO_DONE(FAIL);
-        if (lpvData)
+        }
+        if (lpvData) {
             H5TS__tinfo_destroy(lpvData);
+        }
     }
 
 done:
@@ -168,8 +168,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-BOOL WINAPI
-DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID lpvReserved)
+BOOL WINAPI DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID lpvReserved)
 {
     /* Don't add our function enter/leave macros since this function will be
      * called before the library is initialized.
@@ -181,31 +180,31 @@ DllMain(_In_ HINSTANCE hinstDLL, _In_ DWORD fdwReason, _In_ LPVOID lpvReserved)
     BOOL fOkay = true;
 
     switch (fdwReason) {
-        case DLL_PROCESS_ATTACH:
-            break;
+    case DLL_PROCESS_ATTACH: break;
 
-        case DLL_PROCESS_DETACH:
-            break;
+    case DLL_PROCESS_DETACH: break;
 
-        case DLL_THREAD_ATTACH:
-            if (H5TS__win32_thread_enter() < 0)
-                fOkay = false;
-            break;
-
-        case DLL_THREAD_DETACH:
-            if (H5TS__win32_thread_exit() < 0)
-                fOkay = false;
-            break;
-
-        default:
-            /* Shouldn't get here */
+    case DLL_THREAD_ATTACH:
+        if (H5TS__win32_thread_enter() < 0) {
             fOkay = false;
-            break;
+        }
+        break;
+
+    case DLL_THREAD_DETACH:
+        if (H5TS__win32_thread_exit() < 0) {
+            fOkay = false;
+        }
+        break;
+
+    default:
+        /* Shouldn't get here */
+        fOkay = false;
+        break;
     }
 
     return fOkay;
 }
-#endif /* H5_HAVE_WIN32_API && H5_BUILT_AS_DYNAMIC_LIB */
-#endif /* H5_HAVE_THREADSAFE_API */
+        #endif /* H5_HAVE_WIN32_API && H5_BUILT_AS_DYNAMIC_LIB */
+    #endif     /* H5_HAVE_THREADSAFE_API */
 
-#endif /* H5_HAVE_WIN_THREADS */
+#endif         /* H5_HAVE_WIN_THREADS */

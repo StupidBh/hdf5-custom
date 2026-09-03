@@ -20,19 +20,31 @@
 /* Function Prototypes */
 /***********************/
 
-H5_DLL H5T_subset_info_t *H5T__conv_struct_subset(const H5T_cdata_t *cdata);
+H5_DLL H5T_subset_info_t* H5T__conv_struct_subset(const H5T_cdata_t* cdata);
 
 /****************************************/
 /* Soft (emulated) conversion functions */
 /****************************************/
 
 /* Conversion functions between compound datatypes */
-H5_DLL herr_t H5T__conv_struct(const H5T_t *src, const H5T_t *dst, H5T_cdata_t *cdata,
-                               const H5T_conv_ctx_t *conv_ctx, size_t nelmts, size_t buf_stride,
-                               size_t bkg_stride, void *_buf, void *bkg);
-H5_DLL herr_t H5T__conv_struct_opt(const H5T_t *src, const H5T_t *dst, H5T_cdata_t *cdata,
-                                   const H5T_conv_ctx_t *conv_ctx, size_t nelmts, size_t buf_stride,
-                                   size_t bkg_stride, void *_buf, void *bkg);
+H5_DLL herr_t H5T__conv_struct(const H5T_t* src,
+                               const H5T_t* dst,
+                               H5T_cdata_t* cdata,
+                               const H5T_conv_ctx_t* conv_ctx,
+                               size_t nelmts,
+                               size_t buf_stride,
+                               size_t bkg_stride,
+                               void* _buf,
+                               void* bkg);
+H5_DLL herr_t H5T__conv_struct_opt(const H5T_t* src,
+                                   const H5T_t* dst,
+                                   H5T_cdata_t* cdata,
+                                   const H5T_conv_ctx_t* conv_ctx,
+                                   size_t nelmts,
+                                   size_t buf_stride,
+                                   size_t bkg_stride,
+                                   void* _buf,
+                                   void* bkg);
 
 /*********************************************/
 /* Hard (compiler cast) conversion functions */

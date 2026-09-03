@@ -22,9 +22,10 @@
 /* PRIVATE TYPEDEFS */
 
 /* Struct for tracking "shared" file structs */
-typedef struct H5F_sfile_node_t {
-    H5F_shared_t            *shared; /* Pointer to "shared" file struct */
-    struct H5F_sfile_node_t *next;   /* Pointer to next node */
+typedef struct H5F_sfile_node_t
+{
+    H5F_shared_t* shared;          /* Pointer to "shared" file struct */
+    struct H5F_sfile_node_t* next; /* Pointer to next node */
 } H5F_sfile_node_t;
 
 /* PRIVATE PROTOTYPES */
@@ -35,7 +36,7 @@ typedef struct H5F_sfile_node_t {
 H5FL_DEFINE_STATIC(H5F_sfile_node_t);
 
 /* Declare a local variable to track the shared file information */
-static H5F_sfile_node_t *H5F_sfile_head_s = NULL;
+static H5F_sfile_node_t* H5F_sfile_head_s = NULL;
 
 /*-------------------------------------------------------------------------
  * Function:    H5F_sfile_assert_num
@@ -46,8 +47,7 @@ static H5F_sfile_node_t *H5F_sfile_head_s = NULL;
  *
  *-------------------------------------------------------------------------
  */
-void
-H5F_sfile_assert_num(unsigned H5_ATTR_NDEBUG_UNUSED n)
+void H5F_sfile_assert_num(unsigned H5_ATTR_NDEBUG_UNUSED n)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -59,11 +59,11 @@ H5F_sfile_assert_num(unsigned H5_ATTR_NDEBUG_UNUSED n)
         assert(H5F_sfile_head_s == NULL);
     }
     else {
-        unsigned          count; /* Number of open shared files */
-        H5F_sfile_node_t *curr;  /* Current shared file node */
+        unsigned count;         /* Number of open shared files */
+        H5F_sfile_node_t* curr; /* Current shared file node */
 
         /* Iterate through low-level files for matching low-level file info */
-        curr  = H5F_sfile_head_s;
+        curr = H5F_sfile_head_s;
         count = 0;
         while (curr) {
             /* Increment # of open shared file structs */
@@ -89,11 +89,10 @@ H5F_sfile_assert_num(unsigned H5_ATTR_NDEBUG_UNUSED n)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F__sfile_add(H5F_shared_t *shared)
+herr_t H5F__sfile_add(H5F_shared_t* shared)
 {
-    H5F_sfile_node_t *new_shared;          /* New shared file node */
-    herr_t            ret_value = SUCCEED; /* Return value */
+    H5F_sfile_node_t* new_shared; /* New shared file node */
+    herr_t ret_value = SUCCEED;   /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -101,8 +100,9 @@ H5F__sfile_add(H5F_shared_t *shared)
     assert(shared);
 
     /* Allocate new shared file node */
-    if (NULL == (new_shared = H5FL_CALLOC(H5F_sfile_node_t)))
+    if (NULL == (new_shared = H5FL_CALLOC(H5F_sfile_node_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+    }
 
     /* Set shared file value */
     new_shared->shared = shared;
@@ -125,11 +125,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5F_shared_t *
-H5F__sfile_search(H5FD_t *lf)
+H5F_shared_t* H5F__sfile_search(H5FD_t* lf)
 {
-    H5F_sfile_node_t *curr;             /* Current shared file node */
-    H5F_shared_t     *ret_value = NULL; /* Return value */
+    H5F_sfile_node_t* curr;         /* Current shared file node */
+    H5F_shared_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -140,8 +139,9 @@ H5F__sfile_search(H5FD_t *lf)
     curr = H5F_sfile_head_s;
     while (curr) {
         /* Check for match */
-        if (0 == H5FD_cmp(curr->shared->lf, lf))
+        if (0 == H5FD_cmp(curr->shared->lf, lf)) {
             HGOTO_DONE(curr->shared);
+        }
 
         /* Advance to next shared file node */
         curr = curr->next;
@@ -160,12 +160,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F__sfile_remove(H5F_shared_t *shared)
+herr_t H5F__sfile_remove(H5F_shared_t* shared)
 {
-    H5F_sfile_node_t *curr;                /* Current shared file node */
-    H5F_sfile_node_t *last;                /* Last shared file node */
-    herr_t            ret_value = SUCCEED; /* Return value */
+    H5F_sfile_node_t* curr;     /* Current shared file node */
+    H5F_sfile_node_t* last;     /* Last shared file node */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -182,16 +181,19 @@ H5F__sfile_remove(H5F_shared_t *shared)
     } /* end while */
 
     /* Indicate error if the node wasn't found */
-    if (curr == NULL)
+    if (curr == NULL) {
         HGOTO_ERROR(H5E_FILE, H5E_NOTFOUND, FAIL, "can't find shared file info");
+    }
 
     /* Remove node found from list */
-    if (last != NULL)
+    if (last != NULL) {
         /* Removing middle or tail node in list */
         last->next = curr->next;
-    else
+    }
+    else {
         /* Removing head node in list */
         H5F_sfile_head_s = curr->next;
+    }
 
     /* Release the shared file node struct */
     /* (the shared file info itself is freed elsewhere) */

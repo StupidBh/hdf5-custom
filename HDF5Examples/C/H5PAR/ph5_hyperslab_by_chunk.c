@@ -17,29 +17,28 @@
 #define CH_NY       2
 #define RANK        2
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     /*
      * HDF5 APIs definitions
      */
-    hid_t   file_id, dset_id;    /* file and dataset identifiers */
-    hid_t   filespace, memspace; /* file and memory dataspace identifiers */
-    hsize_t dimsf[2];            /* dataset dimensions */
-    hsize_t chunk_dims[2];       /* chunk dimensions */
-    int    *data;                /* pointer to data buffer to write */
-    hsize_t count[2];            /* hyperslab selection parameters */
+    hid_t file_id, dset_id;    /* file and dataset identifiers */
+    hid_t filespace, memspace; /* file and memory dataspace identifiers */
+    hsize_t dimsf[2];          /* dataset dimensions */
+    hsize_t chunk_dims[2];     /* chunk dimensions */
+    int* data;                 /* pointer to data buffer to write */
+    hsize_t count[2];          /* hyperslab selection parameters */
     hsize_t stride[2];
     hsize_t block[2];
     hsize_t offset[2];
-    hid_t   plist_id; /* property list identifier */
-    int     i;
-    herr_t  status;
+    hid_t plist_id; /* property list identifier */
+    int i;
+    herr_t status;
 
     /*
      * MPI variables
      */
-    int      mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
@@ -91,12 +90,12 @@ main(int argc, char **argv)
     /*
      * Create the dataspace for the dataset.
      */
-    dimsf[0]      = NX;
-    dimsf[1]      = NY;
+    dimsf[0] = NX;
+    dimsf[1] = NY;
     chunk_dims[0] = CH_NX;
     chunk_dims[1] = CH_NY;
-    filespace     = H5Screate_simple(RANK, dimsf, NULL);
-    memspace      = H5Screate_simple(RANK, chunk_dims, NULL);
+    filespace = H5Screate_simple(RANK, dimsf, NULL);
+    memspace = H5Screate_simple(RANK, chunk_dims, NULL);
 
     /*
      * Create chunked dataset.
@@ -111,12 +110,12 @@ main(int argc, char **argv)
      * Each process defines dataset in memory and writes it to the hyperslab
      * in the file.
      */
-    count[0]  = 1;
-    count[1]  = 1;
+    count[0] = 1;
+    count[1] = 1;
     stride[0] = 1;
     stride[1] = 1;
-    block[0]  = chunk_dims[0];
-    block[1]  = chunk_dims[1];
+    block[0] = chunk_dims[0];
+    block[1] = chunk_dims[1];
     if (mpi_rank == 0) {
         offset[0] = 0;
         offset[1] = 0;
@@ -138,12 +137,12 @@ main(int argc, char **argv)
      * Select hyperslab in the file.
      */
     filespace = H5Dget_space(dset_id);
-    status    = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);
+    status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);
 
     /*
      * Initialize data buffer
      */
-    data = (int *)malloc(sizeof(int) * chunk_dims[0] * chunk_dims[1]);
+    data = (int*)malloc(sizeof(int) * chunk_dims[0] * chunk_dims[1]);
     for (i = 0; i < (int)chunk_dims[0] * chunk_dims[1]; i++) {
         data[i] = mpi_rank + 1;
     }
@@ -166,8 +165,9 @@ main(int argc, char **argv)
     H5Pclose(plist_id);
     H5Fclose(file_id);
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         printf("PHDF5 example finished with no errors\n");
+    }
 
     MPI_Finalize();
 

@@ -16,7 +16,7 @@
 
 /* number of members in an array */
 #ifndef NELMTS
-#define NELMTS(X) (sizeof(X) / sizeof(X[0]))
+    #define NELMTS(X) (sizeof(X) / sizeof(X[0]))
 #endif
 
 /* minimum of two values */
@@ -31,44 +31,53 @@
  * Return: 0 success, -1 failure
  *-------------------------------------------------------------------------
  */
-static int
-aux_copy_obj(hid_t        dcpl_id,        /* dataset creation property list */
-             const char  *name,           /* object name from traverse list */
-             pack_info_t *objout /*OUT*/) /* info about object to filter */
+static int aux_copy_obj(hid_t dcpl_id,               /* dataset creation property list */
+                        const char* name,            /* object name from traverse list */
+                        pack_info_t* objout /*OUT*/) /* info about object to filter */
 {
-    int          nfilters;       /* number of filters in DCPL */
-    char         f_objname[256]; /* filter objname */
+    int nfilters;                                    /* number of filters in DCPL */
+    char f_objname[256];                             /* filter objname */
     H5D_layout_t layout;
-    int          rank;       /* rank of dataset */
-    hsize_t      chsize[64]; /* chunk size in elements */
-    int          i;
-    unsigned     u;
-    int          ret_value = 0;
+    int rank;                                        /* rank of dataset */
+    hsize_t chsize[64];                              /* chunk size in elements */
+    int i;
+    unsigned u;
+    int ret_value = 0;
 
     /* get information about input filters */
-    if ((nfilters = H5Pget_nfilters(dcpl_id)) < 0)
+    if ((nfilters = H5Pget_nfilters(dcpl_id)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Pget_nfilters failed");
+    }
     /* copy filter_info_t structure */
     for (i = 0; i < nfilters; i++) {
-        if ((objout->filter[i].filtn = H5Pget_filter2(
-                 dcpl_id, (unsigned)i, &objout->filter[i].filt_flag, &objout->filter[i].cd_nelmts,
-                 objout->filter[i].cd_values, sizeof(f_objname), f_objname, NULL)) < 0)
+        if ((objout->filter[i].filtn = H5Pget_filter2(dcpl_id,
+                                                      (unsigned)i,
+                                                      &objout->filter[i].filt_flag,
+                                                      &objout->filter[i].cd_nelmts,
+                                                      objout->filter[i].cd_values,
+                                                      sizeof(f_objname),
+                                                      f_objname,
+                                                      NULL)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Pget_filter2 failed");
+        }
     }
 
     objout->nfilters = nfilters;
     snprintf(objout->path, MAX_NC_NAME, "%s", name);
 
-    if ((layout = H5Pget_layout(dcpl_id)) < 0)
+    if ((layout = H5Pget_layout(dcpl_id)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Pget_layout failed");
+    }
     objout->layout = layout;
 
     if (layout == H5D_CHUNKED) {
-        if ((rank = H5Pget_chunk(dcpl_id, NELMTS(chsize), chsize /*out*/)) < 0)
+        if ((rank = H5Pget_chunk(dcpl_id, NELMTS(chsize), chsize /*out*/)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Pget_chunk failed");
+        }
         objout->chunk.rank = rank;
-        for (u = 0; u < (unsigned)rank; u++)
+        for (u = 0; u < (unsigned)rank; u++) {
             objout->chunk.chunk_lengths[u] = chsize[u];
+        }
     }
 
 done:
@@ -82,13 +91,12 @@ done:
  *  in the repack options list
  *-------------------------------------------------------------------------
  */
-static int
-aux_find_obj(const char  *name,        /* object name from traverse list */
-             pack_opt_t  *options,     /* repack options */
-             pack_info_t *obj /*OUT*/) /* info about object to filter */
+static int aux_find_obj(const char* name,         /* object name from traverse list */
+                        pack_opt_t* options,      /* repack options */
+                        pack_info_t* obj /*OUT*/) /* info about object to filter */
 {
-    char        *pdest = NULL;
-    const char  *pname = NULL;
+    char* pdest = NULL;
+    const char* pname = NULL;
     unsigned int i;
 
     for (i = 0; i < options->op_tbl->nelems; i++) {
@@ -98,11 +106,13 @@ aux_find_obj(const char  *name,        /* object name from traverse list */
         }
 
         pdest = options->op_tbl->objs[i].path;
-        if (pdest[0] == '/')
+        if (pdest[0] == '/') {
             pdest++;
+        }
         pname = name;
-        if (pname[0] == '/')
+        if (pname[0] == '/') {
             pname++;
+        }
 
         if (strcmp(pdest, pname) == 0) {
             *obj = options->op_tbl->objs[i];
@@ -125,10 +135,9 @@ aux_find_obj(const char  *name,        /* object name from traverse list */
  * Return: 0 not found, 1 found
  *-------------------------------------------------------------------------
  */
-static int
-aux_assign_obj(const char  *name,    /* object name from traverse list */
-               pack_opt_t  *options, /* repack options */
-               pack_info_t *obj)     /* info about object to filter */
+static int aux_assign_obj(const char* name,    /* object name from traverse list */
+                          pack_opt_t* options, /* repack options */
+                          pack_info_t* obj)    /* info about object to filter */
 {
     int idx;
 
@@ -141,44 +150,42 @@ aux_assign_obj(const char  *name,    /* object name from traverse list */
             /* assign the global layout info to the OBJ info */
             obj->layout = options->layout_g;
             switch (options->layout_g) {
-                case H5D_CHUNKED:
-                    obj->chunk.rank = options->chunk_g.rank;
-                    for (int i = 0; i < obj->chunk.rank; i++)
-                        obj->chunk.chunk_lengths[i] = options->chunk_g.chunk_lengths[i];
-                    break;
-                case H5D_LAYOUT_ERROR:
-                case H5D_COMPACT:
-                case H5D_CONTIGUOUS:
-                case H5D_VIRTUAL:
-                case H5D_NLAYOUTS:
-                    break;
-                default:
-                    break;
+            case H5D_CHUNKED:
+                obj->chunk.rank = options->chunk_g.rank;
+                for (int i = 0; i < obj->chunk.rank; i++) {
+                    obj->chunk.chunk_lengths[i] = options->chunk_g.chunk_lengths[i];
+                }
+                break;
+            case H5D_LAYOUT_ERROR:
+            case H5D_COMPACT:
+            case H5D_CONTIGUOUS:
+            case H5D_VIRTUAL:
+            case H5D_NLAYOUTS    : break;
+            default              : break;
             } /*switch*/
         }
         else {
             obj->layout = options->op_tbl->objs[idx].layout;
             switch (obj->layout) {
-                case H5D_CHUNKED:
-                    obj->chunk.rank = options->op_tbl->objs[idx].chunk.rank;
-                    for (int i = 0; i < obj->chunk.rank; i++)
-                        obj->chunk.chunk_lengths[i] = options->op_tbl->objs[idx].chunk.chunk_lengths[i];
-                    break;
-                case H5D_LAYOUT_ERROR:
-                case H5D_COMPACT:
-                case H5D_CONTIGUOUS:
-                case H5D_VIRTUAL:
-                case H5D_NLAYOUTS:
-                    break;
-                default:
-                    break;
+            case H5D_CHUNKED:
+                obj->chunk.rank = options->op_tbl->objs[idx].chunk.rank;
+                for (int i = 0; i < obj->chunk.rank; i++) {
+                    obj->chunk.chunk_lengths[i] = options->op_tbl->objs[idx].chunk.chunk_lengths[i];
+                }
+                break;
+            case H5D_LAYOUT_ERROR:
+            case H5D_COMPACT:
+            case H5D_CONTIGUOUS:
+            case H5D_VIRTUAL:
+            case H5D_NLAYOUTS    : break;
+            default              : break;
             } /*switch*/
         }
 
         /* applying to all objects */
         if (options->all_filter) {
             /* assign the global filter */
-            obj->nfilters  = 1;
+            obj->nfilters = 1;
             obj->filter[0] = options->filter_g[0];
         } /* if all */
         else {
@@ -193,26 +200,26 @@ aux_assign_obj(const char  *name,    /* object name from traverse list */
         if (options->all_filter) {
             /* assign the global filters */
             obj->nfilters = options->n_filter_g;
-            for (int k = 0; k < options->n_filter_g; k++)
+            for (int k = 0; k < options->n_filter_g; k++) {
                 obj->filter[k] = options->filter_g[k];
+            }
         }
         if (options->all_layout) {
             /* assign the global layout info to the OBJ info */
             obj->layout = options->layout_g;
             switch (options->layout_g) {
-                case H5D_CHUNKED:
-                    obj->chunk.rank = options->chunk_g.rank;
-                    for (int i = 0; i < obj->chunk.rank; i++)
-                        obj->chunk.chunk_lengths[i] = options->chunk_g.chunk_lengths[i];
-                    break;
-                case H5D_LAYOUT_ERROR:
-                case H5D_COMPACT:
-                case H5D_CONTIGUOUS:
-                case H5D_VIRTUAL:
-                case H5D_NLAYOUTS:
-                    break;
-                default:
-                    break;
+            case H5D_CHUNKED:
+                obj->chunk.rank = options->chunk_g.rank;
+                for (int i = 0; i < obj->chunk.rank; i++) {
+                    obj->chunk.chunk_lengths[i] = options->chunk_g.chunk_lengths[i];
+                }
+                break;
+            case H5D_LAYOUT_ERROR:
+            case H5D_COMPACT:
+            case H5D_CONTIGUOUS:
+            case H5D_VIRTUAL:
+            case H5D_NLAYOUTS    : break;
+            default              : break;
             } /*switch*/
         }
     }
@@ -231,32 +238,34 @@ aux_assign_obj(const char  *name,    /* object name from traverse list */
  *-------------------------------------------------------------------------
  */
 
-int
-apply_filters(const char    *name,    /* object name from traverse list */
-              int            rank,    /* rank of dataset */
-              const hsize_t *dims,    /* dimensions of dataset */
-              size_t         msize,   /* size of type */
-              hid_t          dcpl_id, /* dataset creation property list */
-              pack_opt_t    *options, /* repack options */
-              int           *has_filter)        /* (OUT) object NAME has a filter */
+int apply_filters(const char* name,    /* object name from traverse list */
+                  int rank,            /* rank of dataset */
+                  const hsize_t* dims, /* dimensions of dataset */
+                  size_t msize,        /* size of type */
+                  hid_t dcpl_id,       /* dataset creation property list */
+                  pack_opt_t* options, /* repack options */
+                  int* has_filter)     /* (OUT) object NAME has a filter */
 {
-    int          nfilters;   /* number of filters in DCPL */
-    hsize_t      chsize[64]; /* chunk size in elements */
+    int nfilters;                      /* number of filters in DCPL */
+    hsize_t chsize[64];                /* chunk size in elements */
     H5D_layout_t layout;
-    int          i;
-    pack_info_t *obj       = NULL;
-    pack_info_t *filtobj   = NULL;
-    int          ret_value = 0;
+    int i;
+    pack_info_t* obj = NULL;
+    pack_info_t* filtobj = NULL;
+    int ret_value = 0;
 
     *has_filter = 0;
 
-    if (rank == 0) /* scalar dataset, do not apply */
+    if (rank == 0) { /* scalar dataset, do not apply */
         H5TOOLS_GOTO_DONE(0);
+    }
 
-    if (NULL == (obj = (pack_info_t *)calloc(1, sizeof(pack_info_t))))
+    if (NULL == (obj = (pack_info_t*)calloc(1, sizeof(pack_info_t)))) {
         H5TOOLS_GOTO_ERROR((-1), "unable to allocate memory");
-    if (NULL == (filtobj = (pack_info_t *)calloc(1, sizeof(pack_info_t))))
+    }
+    if (NULL == (filtobj = (pack_info_t*)calloc(1, sizeof(pack_info_t)))) {
         H5TOOLS_GOTO_ERROR((-1), "unable to allocate memory");
+    }
 
     /*-------------------------------------------------------------------------
      * initialize the assignment object
@@ -269,12 +278,14 @@ apply_filters(const char    *name,    /* object name from traverse list */
      * find options
      *-------------------------------------------------------------------------
      */
-    if (aux_assign_obj(name, options, obj) == 0)
+    if (aux_assign_obj(name, options, obj) == 0) {
         H5TOOLS_GOTO_DONE(0);
+    }
 
     /* get information about input filters */
-    if ((nfilters = H5Pget_nfilters(dcpl_id)) < 0)
+    if ((nfilters = H5Pget_nfilters(dcpl_id)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Pget_nfilters failed");
+    }
 
     /*-------------------------------------------------------------------------
      * check if we have filters in the pipeline
@@ -284,13 +295,15 @@ apply_filters(const char    *name,    /* object name from traverse list */
      */
     if (nfilters && obj->nfilters) {
         *has_filter = 1;
-        if (H5Premove_filter(dcpl_id, H5Z_FILTER_ALL) < 0)
+        if (H5Premove_filter(dcpl_id, H5Z_FILTER_ALL) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Premove_filter failed");
+        }
     }
     else if (nfilters) {
         *has_filter = 1;
-        if (aux_copy_obj(dcpl_id, name, filtobj) < 0)
+        if (aux_copy_obj(dcpl_id, name, filtobj) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "aux_copy_obj failed");
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -299,16 +312,19 @@ apply_filters(const char    *name,    /* object name from traverse list */
      *-------------------------------------------------------------------------
      */
     if (obj->layout == -1) {
-        if ((layout = H5Pget_layout(dcpl_id)) < 0)
+        if ((layout = H5Pget_layout(dcpl_id)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Pget_layout failed");
+        }
 
         if (layout == H5D_CHUNKED) {
-            if ((rank = H5Pget_chunk(dcpl_id, NELMTS(chsize), chsize /*out*/)) < 0)
+            if ((rank = H5Pget_chunk(dcpl_id, NELMTS(chsize), chsize /*out*/)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pget_chunk failed");
-            obj->layout     = H5D_CHUNKED;
+            }
+            obj->layout = H5D_CHUNKED;
             obj->chunk.rank = rank;
-            for (i = 0; i < rank; i++)
+            for (i = 0; i < rank; i++) {
                 obj->chunk.chunk_lengths[i] = chsize[i];
+            }
         }
     }
 
@@ -345,11 +361,13 @@ apply_filters(const char    *name,    /* object name from traverse list */
             sm_nbytes = msize;
             for (i = rank; i > 0; --i) {
                 hsize_t size = 0;
-                if (sm_nbytes == 0)
+                if (sm_nbytes == 0) {
                     H5TOOLS_GOTO_ERROR((-1), "number of bytes per stripmine must be > 0");
+                }
                 size = H5TOOLS_BUFSIZE / sm_nbytes;
-                if (size == 0) /* datum size > H5TOOLS_BUFSIZE */
+                if (size == 0) { /* datum size > H5TOOLS_BUFSIZE */
                     size = 1;
+                }
                 sm_size[i - 1] = MIN(dims[i - 1], size);
                 sm_nbytes *= sm_size[i - 1];
             }
@@ -360,118 +378,141 @@ apply_filters(const char    *name,    /* object name from traverse list */
         }
 
         for (i = 0; i < obj->nfilters; i++) {
-            if (obj->filter[i].filtn < 0)
+            if (obj->filter[i].filtn < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "invalid filter");
+            }
 
             switch (obj->filter[i].filtn) {
-                /*-------------------------------------------------------------------------
-                 * H5Z_FILTER_NONE       0 , uncompress if compressed
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_NONE:
-                    break;
+            /*-------------------------------------------------------------------------
+             * H5Z_FILTER_NONE       0 , uncompress if compressed
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_NONE: break;
 
-                /*-------------------------------------------------------------------------
-                 * H5Z_FILTER_DEFLATE       1 , deflation like gzip
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_DEFLATE: {
+            /*-------------------------------------------------------------------------
+             * H5Z_FILTER_DEFLATE       1 , deflation like gzip
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_DEFLATE:
+                {
                     unsigned aggression; /* the deflate level */
 
                     aggression = obj->filter[i].cd_values[0];
                     /* set up for deflated data */
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
+                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_deflate(dcpl_id, aggression) < 0)
+                    }
+                    if (H5Pset_deflate(dcpl_id, aggression) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_deflate failed");
-                } break;
+                    }
+                }
+                break;
 
-                /*-------------------------------------------------------------------------
-                 * H5Z_FILTER_SZIP       4 , szip compression
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_SZIP: {
+            /*-------------------------------------------------------------------------
+             * H5Z_FILTER_SZIP       4 , szip compression
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_SZIP:
+                {
                     unsigned options_mask;
                     unsigned pixels_per_block;
 
-                    options_mask     = obj->filter[i].cd_values[H5Z_SZIP_PARM_MASK];
+                    options_mask = obj->filter[i].cd_values[H5Z_SZIP_PARM_MASK];
                     pixels_per_block = obj->filter[i].cd_values[H5Z_SZIP_PARM_PPB];
 
                     /* set up for szip data */
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
+                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_szip(dcpl_id, options_mask, pixels_per_block) < 0)
+                    }
+                    if (H5Pset_szip(dcpl_id, options_mask, pixels_per_block) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_szip failed");
-                } break;
+                    }
+                }
+                break;
 
-                /*-------------------------------------------------------------------------
-                 * H5Z_FILTER_SHUFFLE    2 , shuffle the data
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_SHUFFLE:
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_shuffle(dcpl_id) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_shuffle failed");
-                    break;
+            /*-------------------------------------------------------------------------
+             * H5Z_FILTER_SHUFFLE    2 , shuffle the data
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_SHUFFLE:
+                if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
+                }
+                if (H5Pset_shuffle(dcpl_id) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_shuffle failed");
+                }
+                break;
 
-                /*-------------------------------------------------------------------------
-                 * H5Z_FILTER_FLETCHER32 3 , fletcher32 checksum of EDC
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_FLETCHER32:
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_fletcher32(dcpl_id) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_fletcher32 failed");
-                    break;
-                /*----------- -------------------------------------------------------------
-                 * H5Z_FILTER_NBIT , NBIT compression
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_NBIT:
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_nbit(dcpl_id) < 0)
-                        H5TOOLS_GOTO_ERROR((-1), "H5Pset_nbit failed");
-                    break;
-                /*----------- -------------------------------------------------------------
-                 * H5Z_FILTER_SCALEOFFSET , scale+offset compression
-                 *-------------------------------------------------------------------------
-                 */
-                case H5Z_FILTER_SCALEOFFSET: {
+            /*-------------------------------------------------------------------------
+             * H5Z_FILTER_FLETCHER32 3 , fletcher32 checksum of EDC
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_FLETCHER32:
+                if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
+                }
+                if (H5Pset_fletcher32(dcpl_id) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_fletcher32 failed");
+                }
+                break;
+            /*----------- -------------------------------------------------------------
+             * H5Z_FILTER_NBIT , NBIT compression
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_NBIT:
+                if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
+                }
+                if (H5Pset_nbit(dcpl_id) < 0) {
+                    H5TOOLS_GOTO_ERROR((-1), "H5Pset_nbit failed");
+                }
+                break;
+            /*----------- -------------------------------------------------------------
+             * H5Z_FILTER_SCALEOFFSET , scale+offset compression
+             *-------------------------------------------------------------------------
+             */
+            case H5Z_FILTER_SCALEOFFSET:
+                {
                     H5Z_SO_scale_type_t scale_type;
-                    int                 scale_factor;
+                    int scale_factor;
 
-                    scale_type   = (H5Z_SO_scale_type_t)obj->filter[i].cd_values[0];
+                    scale_type = (H5Z_SO_scale_type_t)obj->filter[i].cd_values[0];
                     scale_factor = (int)obj->filter[i].cd_values[1];
 
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
+                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_scaleoffset(dcpl_id, scale_type, scale_factor) < 0)
+                    }
+                    if (H5Pset_scaleoffset(dcpl_id, scale_type, scale_factor) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_scaleoffset failed");
-                } break;
-                default: {
-                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
+                    }
+                }
+                break;
+            default:
+                {
+                    if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
-                    if (H5Pset_filter(dcpl_id, obj->filter[i].filtn, obj->filter[i].filt_flag,
-                                      obj->filter[i].cd_nelmts, obj->filter[i].cd_values) < 0)
+                    }
+                    if (H5Pset_filter(dcpl_id, obj->filter[i].filtn, obj->filter[i].filt_flag, obj->filter[i].cd_nelmts, obj->filter[i].cd_values) < 0) {
                         H5TOOLS_GOTO_ERROR((-1), "H5Pset_filter failed");
-                } break;
+                    }
+                }
+                break;
             } /* switch */
-        }     /*i*/
+        } /*i*/
     }
     /*obj->nfilters*/
 
     if (filtobj->nfilters) {
         for (i = 0; i < filtobj->nfilters; i++) {
-            if (filtobj->filter[i].filtn < 0)
+            if (filtobj->filter[i].filtn < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "invalid filter");
+            }
 
-            if (H5Zfilter_avail(filtobj->filter[i].filtn) <= 0)
+            if (H5Zfilter_avail(filtobj->filter[i].filtn) <= 0) {
                 H5TOOLS_GOTO_ERROR((-1), "%d filter unavailable", filtobj->filter[i].filtn);
+            }
         } /* for */
-    }     /* nfilters */
+    } /* nfilters */
 
     /*-------------------------------------------------------------------------
      * layout
@@ -480,21 +521,25 @@ apply_filters(const char    *name,    /* object name from traverse list */
 
     if (obj->layout >= 0) {
         /* a layout was defined */
-        if (H5Pset_layout(dcpl_id, obj->layout) < 0)
+        if (H5Pset_layout(dcpl_id, obj->layout) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Pset_layout failed");
+        }
 
         if (H5D_CHUNKED == obj->layout) {
-            if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0)
+            if (H5Pset_chunk(dcpl_id, obj->chunk.rank, obj->chunk.chunk_lengths) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pset_chunk failed");
+            }
         }
         else if (H5D_COMPACT == obj->layout) {
-            if (H5Pset_alloc_time(dcpl_id, H5D_ALLOC_TIME_EARLY) < 0)
+            if (H5Pset_alloc_time(dcpl_id, H5D_ALLOC_TIME_EARLY) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pset_alloc_time failed");
+            }
         }
         /* remove filters for the H5D_CONTIGUOUS case */
         else if (H5D_CONTIGUOUS == obj->layout) {
-            if (H5Premove_filter(dcpl_id, H5Z_FILTER_ALL) < 0)
+            if (H5Premove_filter(dcpl_id, H5Z_FILTER_ALL) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Premove_filter failed");
+            }
         }
     }
 

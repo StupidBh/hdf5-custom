@@ -18,15 +18,14 @@
 #define FILENAME "h5ex_t_commit.h5"
 #define DATATYPE "Sensor_Type"
 
-int
-main(void)
+int main(void)
 {
     hid_t file, filetype, strtype;
     /* Handles */
-    herr_t      status;
+    herr_t status;
     H5T_class_t typeclass;
-    char       *name;
-    int         nmembs, i;
+    char* name;
+    int nmembs, i;
 
     /*
      * Create a new file using the default properties.
@@ -37,18 +36,18 @@ main(void)
      * Create variable-length string datatype.
      */
     strtype = H5Tcopy(H5T_C_S1);
-    status  = H5Tset_size(strtype, H5T_VARIABLE);
+    status = H5Tset_size(strtype, H5T_VARIABLE);
 
     /*
      * Create the compound datatype.  Because the standard types we are
      * using may have different sizes than the corresponding native
      * types, we must manually calculate the offset of each member.
      */
-    filetype = H5Tcreate(H5T_COMPOUND, 8 + sizeof(char *) + 8 + 8);
-    status   = H5Tinsert(filetype, "Serial number", 0, H5T_STD_I64BE);
-    status   = H5Tinsert(filetype, "Location", 8, strtype);
-    status   = H5Tinsert(filetype, "Temperature (F)", 8 + sizeof(char *), H5T_IEEE_F64BE);
-    status   = H5Tinsert(filetype, "Pressure (inHg)", 8 + sizeof(char *) + 8, H5T_IEEE_F64BE);
+    filetype = H5Tcreate(H5T_COMPOUND, 8 + sizeof(char*) + 8 + 8);
+    status = H5Tinsert(filetype, "Serial number", 0, H5T_STD_I64BE);
+    status = H5Tinsert(filetype, "Location", 8, strtype);
+    status = H5Tinsert(filetype, "Temperature (F)", 8 + sizeof(char*), H5T_IEEE_F64BE);
+    status = H5Tinsert(filetype, "Pressure (inHg)", 8 + sizeof(char*) + 8, H5T_IEEE_F64BE);
 
     /*
      * Commit the compound datatype to the file, creating a named

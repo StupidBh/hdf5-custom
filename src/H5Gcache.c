@@ -53,11 +53,11 @@
 /********************/
 
 /* Metadata cache (H5AC) callbacks */
-static herr_t H5G__cache_node_get_initial_load_size(void *udata, size_t *image_len);
-static void  *H5G__cache_node_deserialize(const void *image, size_t len, void *udata, bool *dirty);
-static herr_t H5G__cache_node_image_len(const void *thing, size_t *image_len);
-static herr_t H5G__cache_node_serialize(const H5F_t *f, void *image, size_t len, void *thing);
-static herr_t H5G__cache_node_free_icr(void *thing);
+static herr_t H5G__cache_node_get_initial_load_size(void* udata, size_t* image_len);
+static void* H5G__cache_node_deserialize(const void* image, size_t len, void* udata, bool* dirty);
+static herr_t H5G__cache_node_image_len(const void* thing, size_t* image_len);
+static herr_t H5G__cache_node_serialize(const H5F_t* f, void* image, size_t len, void* thing);
+static herr_t H5G__cache_node_free_icr(void* thing);
 
 /*********************/
 /* Package Variables */
@@ -72,7 +72,7 @@ static herr_t H5G__cache_node_free_icr(void *thing);
 /*******************/
 
 /* Symbol table nodes inherit cache-like properties from H5AC */
-const H5AC_class_t H5AC_SNODE[1] = {{
+const H5AC_class_t H5AC_SNODE[1] = { {
     H5AC_SNODE_ID,                         /* Metadata client ID */
     "Symbol table node",                   /* Metadata client name (for debugging) */
     H5FD_MEM_BTREE,                        /* File space memory type for client */
@@ -87,7 +87,7 @@ const H5AC_class_t H5AC_SNODE[1] = {{
     NULL,                                  /* 'notify' callback */
     H5G__cache_node_free_icr,              /* 'free_icr' callback */
     NULL,                                  /* 'fsf_size' callback */
-}};
+} };
 
 /* Declare extern the free list to manage the H5G_node_t struct */
 H5FL_EXTERN(H5G_node_t);
@@ -104,10 +104,9 @@ H5FL_SEQ_EXTERN(H5G_entry_t);
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__cache_node_get_initial_load_size(void *_udata, size_t *image_len)
+static herr_t H5G__cache_node_get_initial_load_size(void* _udata, size_t* image_len)
 {
-    H5F_t *f = (H5F_t *)_udata; /* User data for callback */
+    H5F_t* f = (H5F_t*)_udata; /* User data for callback */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -137,14 +136,13 @@ H5G__cache_node_get_initial_load_size(void *_udata, size_t *image_len)
  *              Failure:        NULL
  *-------------------------------------------------------------------------
  */
-static void *
-H5G__cache_node_deserialize(const void *_image, size_t len, void *_udata, bool H5_ATTR_UNUSED *dirty)
+static void* H5G__cache_node_deserialize(const void* _image, size_t len, void* _udata, bool H5_ATTR_UNUSED* dirty)
 {
-    H5F_t         *f         = (H5F_t *)_udata;         /* User data for callback */
-    H5G_node_t    *sym       = NULL;                    /* Symbol table node created */
-    const uint8_t *image     = (const uint8_t *)_image; /* Pointer to image to deserialize */
-    const uint8_t *image_end = image + len - 1;         /* Pointer to end of image buffer */
-    void          *ret_value = NULL;
+    H5F_t* f = (H5F_t*)_udata;                     /* User data for callback */
+    H5G_node_t* sym = NULL;                        /* Symbol table node created */
+    const uint8_t* image = (const uint8_t*)_image; /* Pointer to image to deserialize */
+    const uint8_t* image_end = image + len - 1;    /* Pointer to end of image buffer */
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
@@ -154,46 +152,57 @@ H5G__cache_node_deserialize(const void *_image, size_t len, void *_udata, bool H
     assert(dirty);
 
     /* Allocate symbol table data structures */
-    if (NULL == (sym = H5FL_CALLOC(H5G_node_t)))
+    if (NULL == (sym = H5FL_CALLOC(H5G_node_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
     sym->node_size = (size_t)(H5G_NODE_SIZE(f));
-    if (NULL == (sym->entry = H5FL_SEQ_CALLOC(H5G_entry_t, (size_t)(2 * H5F_SYM_LEAF_K(f)))))
+    if (NULL == (sym->entry = H5FL_SEQ_CALLOC(H5G_entry_t, (size_t)(2 * H5F_SYM_LEAF_K(f))))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Magic */
-    if (H5_IS_BUFFER_OVERFLOW(image, H5_SIZEOF_MAGIC, image_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, H5_SIZEOF_MAGIC, image_end)) {
         HGOTO_ERROR(H5E_SYM, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
-    if (memcmp(image, H5G_NODE_MAGIC, (size_t)H5_SIZEOF_MAGIC) != 0)
+    }
+    if (memcmp(image, H5G_NODE_MAGIC, (size_t)H5_SIZEOF_MAGIC) != 0) {
         HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, NULL, "bad symbol table node signature");
+    }
     image += H5_SIZEOF_MAGIC;
 
     /* Version */
-    if (H5_IS_BUFFER_OVERFLOW(image, 1, image_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, 1, image_end)) {
         HGOTO_ERROR(H5E_SYM, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
-    if (H5G_NODE_VERS != *image++)
+    }
+    if (H5G_NODE_VERS != *image++) {
         HGOTO_ERROR(H5E_SYM, H5E_VERSION, NULL, "bad symbol table node version");
+    }
 
     /* Reserved */
-    if (H5_IS_BUFFER_OVERFLOW(image, 1, image_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, 1, image_end)) {
         HGOTO_ERROR(H5E_SYM, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     image++;
 
     /* Number of symbols */
-    if (H5_IS_BUFFER_OVERFLOW(image, 2, image_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, 2, image_end)) {
         HGOTO_ERROR(H5E_SYM, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     UINT16DECODE(image, sym->nsyms);
 
     /* Entries */
-    if (H5G__ent_decode_vec(f, &image, image_end, sym->entry, sym->nsyms) < 0)
+    if (H5G__ent_decode_vec(f, &image, image_end, sym->entry, sym->nsyms) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTLOAD, NULL, "unable to decode symbol table entries");
+    }
 
     /* Set return value */
     ret_value = sym;
 
 done:
-    if (!ret_value)
-        if (sym && H5G__node_free(sym) < 0)
+    if (!ret_value) {
+        if (sym && H5G__node_free(sym) < 0) {
             HDONE_ERROR(H5E_SYM, H5E_CANTFREE, NULL, "unable to destroy symbol table node");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__cache_node_deserialize() */
@@ -207,10 +216,9 @@ done:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__cache_node_image_len(const void *_thing, size_t *image_len)
+static herr_t H5G__cache_node_image_len(const void* _thing, size_t* image_len)
 {
-    const H5G_node_t *sym = (const H5G_node_t *)_thing; /* Pointer to object */
+    const H5G_node_t* sym = (const H5G_node_t*)_thing; /* Pointer to object */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -234,12 +242,11 @@ H5G__cache_node_image_len(const void *_thing, size_t *image_len)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__cache_node_serialize(const H5F_t *f, void *_image, size_t len, void *_thing)
+static herr_t H5G__cache_node_serialize(const H5F_t* f, void* _image, size_t len, void* _thing)
 {
-    H5G_node_t *sym       = (H5G_node_t *)_thing; /* Pointer to object */
-    uint8_t    *image     = (uint8_t *)_image;    /* Pointer into raw data buffer */
-    herr_t      ret_value = SUCCEED;
+    H5G_node_t* sym = (H5G_node_t*)_thing; /* Pointer to object */
+    uint8_t* image = (uint8_t*)_image;     /* Pointer into raw data buffer */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -263,11 +270,12 @@ H5G__cache_node_serialize(const H5F_t *f, void *_image, size_t len, void *_thing
     UINT16ENCODE(image, sym->nsyms);
 
     /* Entries */
-    if (H5G__ent_encode_vec(f, &image, sym->entry, sym->nsyms) < 0)
+    if (H5G__ent_encode_vec(f, &image, sym->entry, sym->nsyms) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTENCODE, FAIL, "can't serialize");
+    }
 
     /* Clear rest of symbol table node */
-    memset(image, 0, len - (size_t)(image - (uint8_t *)_image));
+    memset(image, 0, len - (size_t)(image - (uint8_t*)_image));
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -281,11 +289,10 @@ done:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__cache_node_free_icr(void *_thing)
+static herr_t H5G__cache_node_free_icr(void* _thing)
 {
-    H5G_node_t *sym       = (H5G_node_t *)_thing; /* Pointer to the object */
-    herr_t      ret_value = SUCCEED;
+    H5G_node_t* sym = (H5G_node_t*)_thing; /* Pointer to the object */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -293,8 +300,9 @@ H5G__cache_node_free_icr(void *_thing)
     assert(sym->cache_info.type == H5AC_SNODE);
 
     /* Destroy symbol table node */
-    if (H5G__node_free(sym) < 0)
+    if (H5G__node_free(sym) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTFREE, FAIL, "unable to destroy symbol table node");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

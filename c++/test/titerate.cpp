@@ -57,17 +57,24 @@ const H5std_string DSET_IN_GRP1_PATH("/Top Group/Dataset in Group 1");
 const H5std_string DSET_IN_GRP1_2("Dataset in Group 1.2");
 const H5std_string DSET_IN_GRP1_2_PATH("/Top Group/Sub-Group 1.2/Dataset in Group 1.2");
 
-typedef enum { RET_ZERO, RET_TWO, RET_CHANGE, RET_CHANGE2 } iter_enum;
+typedef enum
+{
+    RET_ZERO,
+    RET_TWO,
+    RET_CHANGE,
+    RET_CHANGE2
+} iter_enum;
 
 /* Custom group iteration callback data */
-typedef struct {
-    char       name[NAMELEN]; /* The name of the object */
-    H5O_type_t type;          /* The type of the object */
-    iter_enum  command;       /* The type of return value */
+typedef struct
+{
+    char name[NAMELEN]; /* The name of the object */
+    H5O_type_t type;    /* The type of the object */
+    iter_enum command;  /* The type of return value */
 } iter_info;
 
-static int  iter_strcmp(const void *s1, const void *s2);
-static void printelems(const Group &group, const H5std_string &dsname, const H5std_string &atname);
+static int iter_strcmp(const void* s1, const void* s2);
+static void printelems(const Group& group, const H5std_string& dsname, const H5std_string& atname);
 
 /*-------------------------------------------------------------------------
  * Function:    iter_strcmp
@@ -75,10 +82,9 @@ static void printelems(const Group &group, const H5std_string &dsname, const H5s
  * Purpose      String comparison routine for qsort
  *-------------------------------------------------------------------------
  */
-static int
-iter_strcmp(const void *s1, const void *s2)
+static int iter_strcmp(const void* s1, const void* s2)
 {
-    return (strcmp(*reinterpret_cast<const char *const *>(s1), *reinterpret_cast<const char *const *>(s2)));
+    return (strcmp(*reinterpret_cast<const char* const*>(s1), *reinterpret_cast<const char* const*>(s2)));
 }
 
 /*-------------------------------------------------------------------------
@@ -87,34 +93,24 @@ iter_strcmp(const void *s1, const void *s2)
  * Purpose      Custom link iteration callback routine
  *-------------------------------------------------------------------------
  */
-static herr_t
-liter_cb(hid_t H5_ATTR_UNUSED group, const char *name, const H5L_info2_t H5_ATTR_UNUSED *link_info,
-         void *op_data)
+static herr_t liter_cb(hid_t H5_ATTR_UNUSED group, const char* name, const H5L_info2_t H5_ATTR_UNUSED* link_info, void* op_data)
 {
-    iter_info *info   = static_cast<iter_info *>(op_data);
-    static int count  = 0;
+    iter_info* info = static_cast<iter_info*>(op_data);
+    static int count = 0;
     static int count2 = 0;
 
     strcpy(info->name, name);
 
     switch (info->command) {
-        case RET_ZERO:
-            return (0);
+    case RET_ZERO: return (0);
 
-        case RET_TWO:
-            return (2);
+    case RET_TWO: return (2);
 
-        case RET_CHANGE:
-            count++;
-            return (count > 10 ? 1 : 0);
+    case RET_CHANGE: count++; return (count > 10 ? 1 : 0);
 
-        case RET_CHANGE2:
-            count2++;
-            return (count2 > 10 ? 1 : 0);
+    case RET_CHANGE2: count2++; return (count2 > 10 ? 1 : 0);
 
-        default:
-            printf("invalid iteration command");
-            return (-1);
+    default: printf("invalid iteration command"); return (-1);
     } /* end switch */
 } /* end liter_cb() */
 
@@ -127,14 +123,13 @@ liter_cb(hid_t H5_ATTR_UNUSED group, const char *name, const H5L_info2_t H5_ATTR
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-static void
-test_iter_group(FileAccPropList &fapl)
+static void test_iter_group(FileAccPropList& fapl)
 {
-    hsize_t   idx;                   /* Index in the group */
-    char      name[NAMELEN];         /* temporary name buffer */
-    char     *lnames[NDATASETS + 2]; /* Names of the links created */
-    iter_info info;                  /* Custom iteration information */
-    herr_t    ret;                   /* Generic return value */
+    hsize_t idx;                 /* Index in the group */
+    char name[NAMELEN];          /* temporary name buffer */
+    char* lnames[NDATASETS + 2]; /* Names of the links created */
+    iter_info info;              /* Custom iteration information */
+    herr_t ret;                  /* Generic return value */
 
     /* Output message about test being performed */
     SUBTEST("Group Iteration");
@@ -146,8 +141,8 @@ test_iter_group(FileAccPropList &fapl)
 
         /* Test iterating over empty group */
         info.command = RET_ZERO;
-        idx          = 0;
-        ret          = H5Literate2(file.getId(), H5_INDEX_NAME, H5_ITER_INC, &idx, liter_cb, &info);
+        idx = 0;
+        ret = H5Literate2(file.getId(), H5_INDEX_NAME, H5_ITER_INC, &idx, liter_cb, &info);
         verify_val(ret, SUCCEED, "H5Literate", __LINE__, __FILE__);
 
         DataType datatype(PredType::NATIVE_INT);
@@ -176,7 +171,7 @@ test_iter_group(FileAccPropList &fapl)
         check_values(lnames[NDATASETS], "strdup returns NULL", __LINE__, __FILE__);
 
         /* Sort the dataset names */
-        qsort(lnames, NDATASETS + 2, sizeof(char *), iter_strcmp);
+        qsort(lnames, NDATASETS + 2, sizeof(char*), iter_strcmp);
 
         /* Iterate through the datasets in the root group in various ways */
 
@@ -210,61 +205,62 @@ test_iter_group(FileAccPropList &fapl)
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("Group::getObjnameByIdx", "Attempt to iterate with invalid index");
         }
-        catch (GroupIException &invalid_action) // invalid index
+        catch (GroupIException& invalid_action) // invalid index
         {
         } // do nothing, exception expected
 
         // Attempted to iterate with negative index, should fail
         try {
             info.command = RET_ZERO;
-            idx          = HSIZE_UNDEF;
-            obj_name     = root_group.getObjnameByIdx(idx);
+            idx = HSIZE_UNDEF;
+            obj_name = root_group.getObjnameByIdx(idx);
 
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("Group::getObjnameByIdx", "Attempt to iterate with negative index");
         }
-        catch (FileIException &invalid_action) // invalid index
+        catch (FileIException& invalid_action) // invalid index
         {
-        }                                       // do nothing, exception expected
-        catch (GroupIException &invalid_action) // invalid index
+        } // do nothing, exception expected
+        catch (GroupIException& invalid_action) // invalid index
         {
         } // do nothing, exception expected
 
         /* Test skipping exactly as many entries as in the group */
         try {
             info.command = RET_ZERO;
-            idx          = NDATASETS + 2;
-            obj_name     = root_group.getObjnameByIdx(idx);
+            idx = NDATASETS + 2;
+            obj_name = root_group.getObjnameByIdx(idx);
 
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("Group::getObjnameByIdx", "Attempt to iterate with negative index");
         }
-        catch (FileIException &invalid_action) // invalid index
+        catch (FileIException& invalid_action) // invalid index
         {
-        }                                       // do nothing, exception expected
-        catch (GroupIException &invalid_action) // invalid index
+        } // do nothing, exception expected
+        catch (GroupIException& invalid_action) // invalid index
         {
         } // do nothing, exception expected
 
         /* Test skipping more entries than are in the group */
         try {
             info.command = RET_ZERO;
-            idx          = NDATASETS + 3;
-            obj_name     = root_group.getObjnameByIdx(idx);
+            idx = NDATASETS + 3;
+            obj_name = root_group.getObjnameByIdx(idx);
 
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("Group::getObjnameByIdx", "Attempt to iterate with negative index");
         }
-        catch (FileIException &invalid_action) // invalid index
+        catch (FileIException& invalid_action) // invalid index
         {
-        }                                       // do nothing, exception expected
-        catch (GroupIException &invalid_action) // invalid index
+        } // do nothing, exception expected
+        catch (GroupIException& invalid_action) // invalid index
         {
         } // do nothing, exception expected
 
         /* Free the dataset names */
-        for (int i = 0; i < NDATASETS + 2; i++)
+        for (int i = 0; i < NDATASETS + 2; i++) {
             free(lnames[i]);
+        }
 
         // Everything will be closed as they go out of scope
 
@@ -272,7 +268,7 @@ test_iter_group(FileAccPropList &fapl)
     } // try block
 
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_iter_group", __LINE__, __FILE__);
     }
 
@@ -354,25 +350,25 @@ const H5std_string GDATASET_NAME("group dset");
 const H5std_string ATTR_NAME("Units");
 const H5std_string FATTR_NAME("F attr");
 const H5std_string GATTR_NAME("G attr");
-const int          DIM1 = 2;
-static void
-printelems(const Group &group, const H5std_string &dsname, const H5std_string &atname)
+const int DIM1 = 2;
+
+static void printelems(const Group& group, const H5std_string& dsname, const H5std_string& atname)
 {
     try {
-        DataSet   d1(group.openDataSet(dsname));
+        DataSet d1(group.openDataSet(dsname));
         DataSpace s1 = d1.getSpace();
         s1.close();
         d1.close();
 
-        unsigned     idx = 0;
-        Attribute    a1(group.openAttribute(idx));
+        unsigned idx = 0;
+        Attribute a1(group.openAttribute(idx));
         H5std_string aname = a1.getName();
         verify_val(aname, atname, "printelems", __LINE__, __FILE__);
 
         a1.close();
     }
     // Catch all exceptions and rethrow so caller can handle
-    catch (Exception &E) {
+    catch (Exception& E) {
         throw;
     }
 }
@@ -383,11 +379,10 @@ printelems(const Group &group, const H5std_string &dsname, const H5std_string &a
  * Purpose      Tests the fix for HDFFV-9920
  *-------------------------------------------------------------------------
  */
-static void
-test_HDFFV_9920()
+static void test_HDFFV_9920()
 {
-    int     attr_data[2] = {100, 200};
-    hsize_t dims[1]      = {DIM1};
+    int attr_data[2] = { 100, 200 };
+    hsize_t dims[1] = { DIM1 };
 
     /* Output message about test being performed */
     SUBTEST("Member access");
@@ -425,7 +420,7 @@ test_HDFFV_9920()
     } // end of try block
 
     // Catch all failures for handling in the same way
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_HDFFV_9920()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 }
@@ -439,8 +434,7 @@ test_HDFFV_9920()
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-extern "C" void
-test_iterate(void *params)
+extern "C" void test_iterate(void* params)
 {
     (void)params;
 
@@ -465,8 +459,7 @@ test_iterate(void *params)
  * Return       none
  *-------------------------------------------------------------------------
  */
-extern "C" void
-cleanup_iterate(void *params)
+extern "C" void cleanup_iterate(void* params)
 {
     (void)params;
 

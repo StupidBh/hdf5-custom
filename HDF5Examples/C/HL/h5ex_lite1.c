@@ -16,12 +16,11 @@
 #define FILENAME "h5ex_lite1.h5"
 #define RANK     2
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file_id;
-    hsize_t dims[RANK] = {2, 3};
-    int     data[6]    = {1, 2, 3, 4, 5, 6};
+    hid_t file_id;
+    hsize_t dims[RANK] = { 2, 3 };
+    int data[6] = { 1, 2, 3, 4, 5, 6 };
 
     /* create a HDF5 file */
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);

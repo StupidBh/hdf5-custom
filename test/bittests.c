@@ -33,11 +33,10 @@
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_find(void)
+static herr_t test_find(void)
 {
     uint8_t v1[8];
-    int     i;
+    int i;
     ssize_t n;
 
     TESTING("bit search operations");
@@ -76,7 +75,7 @@ test_find(void)
     for (i = 0; i < 8 * (int)sizeof(v1); i++) {
         memset(v1, 0, sizeof v1);
         v1[i / 8] = (uint8_t)(1 << (i % 8));
-        n         = H5T__bit_find(v1, (size_t)0, 8 * sizeof(v1), H5T_BIT_LSB, true);
+        n = H5T__bit_find(v1, (size_t)0, 8 * sizeof(v1), H5T_BIT_LSB, true);
         if ((ssize_t)i != n) {
             H5_FAILED();
             printf("    Test for set bit %d failed (lsb)!\n", i);
@@ -108,7 +107,7 @@ test_find(void)
     /* Try all combinations of one byte */
     for (i = 0; i < 8 * (int)sizeof(v1); i++) {
         memset(v1, 0xff, sizeof v1);
-        v1[i / 8] &= (uint8_t) ~(1 << (i % 8));
+        v1[i / 8] &= (uint8_t)~(1 << (i % 8));
         n = H5T__bit_find(v1, (size_t)0, 8 * sizeof(v1), H5T_BIT_LSB, false);
         if ((ssize_t)i != n) {
             H5_FAILED();
@@ -128,8 +127,9 @@ test_find(void)
 
 failed:
     printf("    v = 0x");
-    for (i = 0; i < (int)sizeof(v1); i++)
+    for (i = 0; i < (int)sizeof(v1); i++) {
         printf("%02x", v1[i]);
+    }
     printf("\n");
     return -1;
 }
@@ -145,12 +145,11 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_copy(void)
+static herr_t test_copy(void)
 {
     uint8_t v1[8], v2[8];
-    size_t  s_offset, d_offset, size;
-    int     i, j;
+    size_t s_offset, d_offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit copy operations");
@@ -158,16 +157,18 @@ test_copy(void)
     for (i = 0; i < NTESTS; i++) {
         s_offset = (size_t)rand() % (8 * sizeof v1);
         d_offset = (size_t)rand() % (8 * sizeof v2);
-        size     = (unsigned)rand() % MIN(8 * sizeof(v1), 8 * sizeof(v2));
-        size     = MIN3(size, 8 * sizeof(v1) - s_offset, 8 * sizeof(v2) - d_offset);
+        size = (unsigned)rand() % MIN(8 * sizeof(v1), 8 * sizeof(v2));
+        size = MIN3(size, 8 * sizeof(v1) - s_offset, 8 * sizeof(v2) - d_offset);
         memset(v1, 0xff, sizeof v1);
         memset(v2, 0x00, sizeof v2);
 
         /* Copy some bits to v2 and make sure something was copied */
         H5T__bit_copy(v2, d_offset, v1, s_offset, size);
-        for (j = 0; j < (int)sizeof(v2); j++)
-            if (v2[j])
+        for (j = 0; j < (int)sizeof(v2); j++) {
+            if (v2[j]) {
                 break;
+            }
+        }
         if (size > 0 && j >= (int)sizeof(v2)) {
             H5_FAILED();
             puts("    Unable to find copied region in destination");
@@ -183,9 +184,10 @@ test_copy(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_LSB, 1);
         if (size > 0 && n != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find first copied bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first copied bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -196,9 +198,10 @@ test_copy(void)
         n = H5T__bit_find(v2, d_offset, 8 * sizeof(v2) - d_offset, H5T_BIT_LSB, 0);
         if (d_offset + size < 8 * sizeof(v2) && n != (ssize_t)size) {
             H5_FAILED();
-            printf("    Unable to find last copied bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last copied bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (d_offset + size == 8 * sizeof(v2) && n >= 0) {
@@ -214,9 +217,10 @@ test_copy(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_MSB, 1);
         if (size > 0 && (size_t)(n + 1) != d_offset + size) {
             H5_FAILED();
-            printf("    Unable to find last copied bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last copied bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -227,9 +231,10 @@ test_copy(void)
         n = H5T__bit_find(v2, (size_t)0, d_offset + size, H5T_BIT_MSB, 0);
         if (d_offset > 0 && n + 1 != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find beginning of copied data "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find beginning of copied data "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == d_offset && n >= 0) {
@@ -243,14 +248,15 @@ test_copy(void)
     return 0;
 
 failed:
-    printf("    i=%d, s_offset=%lu, d_offset=%lu, size=%lu\n", i, (unsigned long)s_offset,
-           (unsigned long)d_offset, (unsigned long)size);
+    printf("    i=%d, s_offset=%lu, d_offset=%lu, size=%lu\n", i, (unsigned long)s_offset, (unsigned long)d_offset, (unsigned long)size);
     printf("    s = 0x");
-    for (j = sizeof(v1) - 1; j >= 0; --j)
+    for (j = sizeof(v1) - 1; j >= 0; --j) {
         printf("%02x", v1[j]);
+    }
     printf("\n    d = 0x");
-    for (j = sizeof(v2) - 1; j >= 0; --j)
+    for (j = sizeof(v2) - 1; j >= 0; --j) {
         printf("%02x", v2[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -266,22 +272,22 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_shift(void)
+static herr_t test_shift(void)
 {
     uint8_t vector[8];
-    size_t  offset, size;
-    int     i, j;
+    size_t offset, size;
+    int i, j;
     ssize_t shift_dist, n;
 
     TESTING("bit shift operations");
 
     for (i = 0; i < NTESTS; i++) {
         offset = (size_t)rand() % (8 * sizeof vector);
-        size   = (size_t)rand() % (8 * sizeof(vector) - offset);
+        size = (size_t)rand() % (8 * sizeof(vector) - offset);
         /* Don't want size to be 0 */
-        if (size == 0)
+        if (size == 0) {
             continue;
+        }
         shift_dist = (ssize_t)((size_t)rand() % size);
 
         /*-------- LEFT-shift some bits and make sure something was shifted --------*/
@@ -294,9 +300,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if (n != (ssize_t)offset + shift_dist) {
             H5_FAILED();
-            printf("    Unable to find first bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -307,9 +314,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n != (ssize_t)(offset + size - 1)) {
             H5_FAILED();
-            printf("    Unable to find last bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -323,9 +331,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if ((size_t)n != offset) {
             H5_FAILED();
-            printf("    Unable to find first bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -336,9 +345,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n != (ssize_t)(offset + size) - shift_dist - 1) {
             H5_FAILED();
-            printf("    Unable to find last bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -346,10 +356,12 @@ test_shift(void)
         /* A sequence 111111 will be 000000 if shift_dist=6 */
 
         /* Randomly decide shift direction */
-        if (size % 2 == 0)
+        if (size % 2 == 0) {
             shift_dist = (ssize_t)size;
-        else
+        }
+        else {
             shift_dist = -((ssize_t)size);
+        }
 
         memset(vector, 0x00, sizeof vector);
         H5T__bit_set(vector, offset, size, 1);
@@ -360,9 +372,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if (n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all bits are zero in destination(LSB) "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all bits are zero in destination(LSB) "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -370,9 +383,10 @@ test_shift(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all bits are zero in destination(MSB) "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all bits are zero in destination(MSB) "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
     }
@@ -381,10 +395,10 @@ test_shift(void)
     return 0;
 
 failed:
-    printf("    i=%d, offset=%lu, size=%lu, shift_dist=%lu\n", i, (unsigned long)offset, (unsigned long)size,
-           (unsigned long)shift_dist);
-    for (j = sizeof(vector) - 1; j >= 0; --j)
+    printf("    i=%d, offset=%lu, size=%lu, shift_dist=%lu\n", i, (unsigned long)offset, (unsigned long)size, (unsigned long)shift_dist);
+    for (j = sizeof(vector) - 1; j >= 0; --j) {
         printf("%02x", vector[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -400,28 +414,30 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_increment(void)
+static herr_t test_increment(void)
 {
     uint8_t vector[8];
-    size_t  offset, size;
-    int     i, j;
+    size_t offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit increment operations");
 
     for (i = 0; i < NTESTS; i++) {
         offset = (size_t)rand() % (8 * sizeof vector);
-        size   = (size_t)rand() % (8 * sizeof(vector) - offset);
+        size = (size_t)rand() % (8 * sizeof(vector) - offset);
         /* Don't want size to be 0 */
-        if (size == 0)
+        if (size == 0) {
             continue;
+        }
 
         memset(vector, 0x00, sizeof vector);
-        if (size > 1) /* if size=6, make a sequence like 011111 */
+        if (size > 1) { /* if size=6, make a sequence like 011111 */
             H5T__bit_set(vector, offset, size - 1, 1);
-        else /* if size=1, just set this one bit to 1 */
+        }
+        else { /* if size=1, just set this one bit to 1 */
             H5T__bit_set(vector, offset, size, 1);
+        }
 
         /* Increment the sequence by one */
         H5T__bit_inc(vector, offset, size);
@@ -430,16 +446,18 @@ test_increment(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if (size != 1 && (size_t)n != offset + size - 1) {
             H5_FAILED();
-            printf("    Unable to find first bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (size == 1 && n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all-zero bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all-zero bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -450,16 +468,18 @@ test_increment(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (size != 1 && n != (ssize_t)(offset + size - 1)) {
             H5_FAILED();
-            printf("    Unable to find last bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (size == 1 && n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all-zero bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all-zero bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
     }
@@ -469,8 +489,9 @@ test_increment(void)
 
 failed:
     printf("    i=%d, offset=%lu, size=%lu\n", i, (unsigned long)offset, (unsigned long)size);
-    for (j = sizeof(vector) - 1; j >= 0; --j)
+    for (j = sizeof(vector) - 1; j >= 0; --j) {
         printf("%02x", vector[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -486,22 +507,22 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_decrement(void)
+static herr_t test_decrement(void)
 {
     uint8_t vector[8];
-    size_t  offset, size;
-    int     i, j;
+    size_t offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit decrement operations");
 
     for (i = 0; i < NTESTS; i++) {
         offset = (size_t)rand() % (8 * sizeof vector);
-        size   = (size_t)rand() % (8 * sizeof(vector) - offset);
+        size = (size_t)rand() % (8 * sizeof(vector) - offset);
         /* Don't want size to be 0 */
-        if (size == 0)
+        if (size == 0) {
             continue;
+        }
 
         /* All-zero sequence will become 111111(size=6) after decrement */
         memset(vector, 0x00, sizeof vector);
@@ -513,9 +534,10 @@ test_decrement(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if ((size_t)n != offset) {
             H5_FAILED();
-            printf("    Unable to find first bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -526,9 +548,10 @@ test_decrement(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n != (ssize_t)(offset + size - 1)) {
             H5_FAILED();
-            printf("    Unable to find last bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
     }
@@ -538,8 +561,9 @@ test_decrement(void)
 
 failed:
     printf("    i=%d, offset=%lu, size=%lu\n", i, (unsigned long)offset, (unsigned long)size);
-    for (j = sizeof(vector) - 1; j >= 0; --j)
+    for (j = sizeof(vector) - 1; j >= 0; --j) {
         printf("%02x", vector[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -555,22 +579,22 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_negate(void)
+static herr_t test_negate(void)
 {
     uint8_t vector[8];
-    size_t  offset, size;
-    int     i, j;
+    size_t offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit negate operations");
 
     for (i = 0; i < NTESTS; i++) {
         offset = (size_t)rand() % (8 * sizeof vector);
-        size   = (size_t)rand() % (8 * sizeof(vector) - offset);
+        size = (size_t)rand() % (8 * sizeof(vector) - offset);
         /* Don't want size to be 0 */
-        if (size == 0)
+        if (size == 0) {
             continue;
+        }
 
         /* All-zero sequence will become 111111(size=6) after negating */
         memset(vector, 0x00, sizeof vector);
@@ -582,9 +606,10 @@ test_negate(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if ((size_t)n != offset) {
             H5_FAILED();
-            printf("    Unable to find first bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -595,9 +620,10 @@ test_negate(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n != (ssize_t)(offset + size - 1)) {
             H5_FAILED();
-            printf("    Unable to find last bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -612,9 +638,10 @@ test_negate(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_LSB, 1);
         if (n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all-zero bits in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all-zero bits in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
 
@@ -625,9 +652,10 @@ test_negate(void)
         n = H5T__bit_find(vector, (size_t)0, 8 * sizeof(vector), H5T_BIT_MSB, 1);
         if (n >= 0) {
             H5_FAILED();
-            printf("    Unable to verify all-zero bits in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to verify all-zero bits in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
     }
@@ -637,8 +665,9 @@ test_negate(void)
 
 failed:
     printf("    i=%d, offset=%lu, size=%lu\n", i, (unsigned long)offset, (unsigned long)size);
-    for (j = sizeof(vector) - 1; j >= 0; --j)
+    for (j = sizeof(vector) - 1; j >= 0; --j) {
         printf("%02x", vector[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -654,27 +683,28 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_set(void)
+static herr_t test_set(void)
 {
     uint8_t v2[8];
-    size_t  d_offset, size;
-    int     i, j;
+    size_t d_offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit set operations");
 
     for (i = 0; i < NTESTS; i++) {
         d_offset = (size_t)rand() % (8 * sizeof v2);
-        size     = (size_t)rand() % (8 * sizeof(v2));
-        size     = MIN(size, 8 * sizeof(v2) - d_offset);
+        size = (size_t)rand() % (8 * sizeof(v2));
+        size = MIN(size, 8 * sizeof(v2) - d_offset);
         memset(v2, 0x00, sizeof v2);
 
         /* Set some bits in v2 */
         H5T__bit_set(v2, d_offset, size, true);
-        for (j = 0; j < (int)sizeof(v2); j++)
-            if (v2[j])
+        for (j = 0; j < (int)sizeof(v2); j++) {
+            if (v2[j]) {
                 break;
+            }
+        }
         if (size > 0 && j >= (int)sizeof(v2)) {
             H5_FAILED();
             puts("    Unable to find set region in buffer");
@@ -690,9 +720,10 @@ test_set(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_LSB, 1);
         if (size > 0 && n != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find first set bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first set bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -703,9 +734,10 @@ test_set(void)
         n = H5T__bit_find(v2, d_offset, 8 * sizeof(v2) - d_offset, H5T_BIT_LSB, 0);
         if (d_offset + size < 8 * sizeof(v2) && n != (ssize_t)size) {
             H5_FAILED();
-            printf("    Unable to find last set bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last set bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (d_offset + size == 8 * sizeof(v2) && n >= 0) {
@@ -721,9 +753,10 @@ test_set(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_MSB, 1);
         if (size > 0 && (size_t)(n + 1) != d_offset + size) {
             H5_FAILED();
-            printf("    Unable to find last set bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last set bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -734,9 +767,10 @@ test_set(void)
         n = H5T__bit_find(v2, (size_t)0, d_offset + size, H5T_BIT_MSB, 0);
         if (d_offset > 0 && n + 1 != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find beginning of set bit region "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find beginning of set bit region "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == d_offset && n >= 0) {
@@ -752,8 +786,9 @@ test_set(void)
 failed:
     printf("    i=%d, d_offset=%lu, size=%lu\n", i, (unsigned long)d_offset, (unsigned long)size);
     printf("    d = 0x");
-    for (j = sizeof(v2) - 1; j >= 0; --j)
+    for (j = sizeof(v2) - 1; j >= 0; --j) {
         printf("%02x", v2[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -769,27 +804,28 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_clear(void)
+static herr_t test_clear(void)
 {
     uint8_t v2[8];
-    size_t  d_offset, size;
-    int     i, j;
+    size_t d_offset, size;
+    int i, j;
     ssize_t n;
 
     TESTING("bit clear operations");
 
     for (i = 0; i < NTESTS; i++) {
         d_offset = (size_t)rand() % (8 * sizeof v2);
-        size     = (size_t)rand() % (8 * sizeof(v2));
-        size     = MIN(size, 8 * sizeof(v2) - d_offset);
+        size = (size_t)rand() % (8 * sizeof(v2));
+        size = MIN(size, 8 * sizeof(v2) - d_offset);
         memset(v2, 0xff, sizeof v2);
 
         /* Clear some bits in v2 */
         H5T__bit_set(v2, d_offset, size, false);
-        for (j = 0; j < (int)sizeof(v2); j++)
-            if (0xff != v2[j])
+        for (j = 0; j < (int)sizeof(v2); j++) {
+            if (0xff != v2[j]) {
                 break;
+            }
+        }
         if (size > 0 && j >= (int)sizeof(v2)) {
             H5_FAILED();
             puts("    Unable to find cleared region in buffer");
@@ -805,9 +841,10 @@ test_clear(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_LSB, 0);
         if (size > 0 && n != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find first cleared bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find first cleared bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -818,9 +855,10 @@ test_clear(void)
         n = H5T__bit_find(v2, d_offset, 8 * sizeof(v2) - d_offset, H5T_BIT_LSB, 1);
         if (d_offset + size < 8 * sizeof(v2) && n != (ssize_t)size) {
             H5_FAILED();
-            printf("    Unable to find last cleared bit in destination "
-                   "(n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last cleared bit in destination "
+                "(n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (d_offset + size == 8 * sizeof(v2) && n >= 0) {
@@ -836,9 +874,10 @@ test_clear(void)
         n = H5T__bit_find(v2, (size_t)0, 8 * sizeof(v2), H5T_BIT_MSB, 0);
         if (size > 0 && (size_t)(n + 1) != d_offset + size) {
             H5_FAILED();
-            printf("    Unable to find last cleared bit in destination "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find last cleared bit in destination "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == size && n >= 0) {
@@ -849,9 +888,10 @@ test_clear(void)
         n = H5T__bit_find(v2, (size_t)0, d_offset + size, H5T_BIT_MSB, 1);
         if (d_offset > 0 && n + 1 != (ssize_t)d_offset) {
             H5_FAILED();
-            printf("    Unable to find beginning of cleared bit region "
-                   "(reverse, n=%d)\n",
-                   (int)n);
+            printf(
+                "    Unable to find beginning of cleared bit region "
+                "(reverse, n=%d)\n",
+                (int)n);
             goto failed;
         }
         if (0 == d_offset && n >= 0) {
@@ -867,8 +907,9 @@ test_clear(void)
 failed:
     printf("    i=%d, d_offset=%lu, size=%lu\n", i, (unsigned long)d_offset, (unsigned long)size);
     printf("    d = 0x");
-    for (j = sizeof(v2) - 1; j >= 0; --j)
+    for (j = sizeof(v2) - 1; j >= 0; --j) {
         printf("%02x", v2[j]);
+    }
     printf("\n");
     return -1;
 }
@@ -882,8 +923,7 @@ failed:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int nerrors = 0;
 

@@ -35,41 +35,42 @@
 #define SRC_FILE    "as.h5"
 #define SRC_DATASET "/A"
 
-int
-main(void)
+int main(void)
 {
-    hid_t        file      = H5I_INVALID_HID;
-    hid_t        space     = H5I_INVALID_HID;
-    hid_t        dset      = H5I_INVALID_HID;
-    hid_t        src_space = H5I_INVALID_HID;
-    hid_t        vspace    = H5I_INVALID_HID;
-    hid_t        dcpl      = H5I_INVALID_HID;
-    herr_t       status;
-    hsize_t      vdsdims[2] = {DIM0, DIM1}; /* Virtual dataset dimension */
-    hsize_t      dims[2]    = {DIM0, DIM1}; /* Source dataset dimensions */
-    int          wdata[DIM0][DIM1];         /* Write buffer for source dataset */
-    int          rdata[DIM0][DIM1];         /* Read buffer for virtual dataset */
-    int          i, j;
-    H5D_layout_t layout;  /* Storage layout */
-    size_t       num_map; /* Number of mappings */
-    ssize_t      len;     /* Length of the string; also a return value */
-    char        *filename = NULL;
-    char        *dsetname = NULL;
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t src_space = H5I_INVALID_HID;
+    hid_t vspace = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t vdsdims[2] = { DIM0, DIM1 }; /* Virtual dataset dimension */
+    hsize_t dims[2] = { DIM0, DIM1 };    /* Source dataset dimensions */
+    int wdata[DIM0][DIM1];               /* Write buffer for source dataset */
+    int rdata[DIM0][DIM1];               /* Read buffer for virtual dataset */
+    int i, j;
+    H5D_layout_t layout;                 /* Storage layout */
+    size_t num_map;                      /* Number of mappings */
+    ssize_t len;                         /* Length of the string; also a return value */
+    char* filename = NULL;
+    char* dsetname = NULL;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i + 1;
+        }
+    }
 
     /*
      * Create the source file and the dataset. Write data to the source dataset
      * and close all resources.
      */
-    file   = H5Fcreate(SRC_FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    space  = H5Screate_simple(RANK, dims, NULL);
-    dset   = H5Dcreate2(file, SRC_DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    file = H5Fcreate(SRC_FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate_simple(RANK, dims, NULL);
+    dset = H5Dcreate2(file, SRC_DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Dwrite(dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]);
     status = H5Sclose(space);
     status = H5Dclose(dset);
@@ -91,10 +92,10 @@ main(void)
      * and map each row to the data in the corresponding source dataset.
      */
     src_space = H5Screate_simple(RANK, dims, NULL);
-    status    = H5Pset_virtual(dcpl, vspace, SRC_FILE, SRC_DATASET, src_space);
+    status = H5Pset_virtual(dcpl, vspace, SRC_FILE, SRC_DATASET, src_space);
 
     /* Create a virtual dataset */
-    dset   = H5Dcreate2(file, DATASET, H5T_STD_I32LE, vspace, H5P_DEFAULT, dcpl, H5P_DEFAULT);
+    dset = H5Dcreate2(file, DATASET, H5T_STD_I32LE, vspace, H5P_DEFAULT, dcpl, H5P_DEFAULT);
     status = H5Sclose(vspace);
     status = H5Sclose(src_space);
     status = H5Dclose(dset);
@@ -119,10 +120,12 @@ main(void)
      * Get storage layout.
      */
     layout = H5Pget_layout(dcpl);
-    if (H5D_VIRTUAL == layout)
+    if (H5D_VIRTUAL == layout) {
         printf(" Dataset has a virtual layout \n");
-    else
+    }
+    else {
         printf("Wrong layout found \n");
+    }
 
     /*
      * Find the number of mappings.
@@ -144,14 +147,14 @@ main(void)
             printf("Selection is H5S_ALL \n");
         }
         /* Get source file name */
-        len      = H5Pget_virtual_filename(dcpl, (size_t)i, NULL, 0);
-        filename = (char *)malloc((size_t)len * sizeof(char) + 1);
+        len = H5Pget_virtual_filename(dcpl, (size_t)i, NULL, 0);
+        filename = (char*)malloc((size_t)len * sizeof(char) + 1);
         H5Pget_virtual_filename(dcpl, (size_t)i, filename, len + 1);
         printf("         Source filename %s\n", filename);
 
         /* Get source dataset name */
-        len      = H5Pget_virtual_dsetname(dcpl, (size_t)i, NULL, 0);
-        dsetname = (char *)malloc((size_t)len * sizeof(char) + 1);
+        len = H5Pget_virtual_dsetname(dcpl, (size_t)i, NULL, 0);
+        dsetname = (char*)malloc((size_t)len * sizeof(char) + 1);
         H5Pget_virtual_dsetname(dcpl, (size_t)i, dsetname, len + 1);
         printf("         Source dataset name %s\n", dsetname);
 
@@ -180,8 +183,9 @@ main(void)
     printf(" VDS Data:\n");
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

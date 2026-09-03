@@ -21,24 +21,24 @@
 int d_status = EXIT_SUCCESS;
 
 /* command-line options: short and long-named parameters */
-static const char            *s_opts   = "hlpvV";
-static struct h5_long_options l_opts[] = {
-    {"help", no_arg, 'h'},          {"latest", no_arg, 'l'},        {"parents", no_arg, 'p'},
-    {"verbose", no_arg, 'v'},       {"version", no_arg, 'V'},       {"vol-value", require_arg, '1'},
-    {"vol-name", require_arg, '2'}, {"vol-info", require_arg, '3'}, {"vfd-value", require_arg, '4'},
-    {"vfd-name", require_arg, '5'}, {"vfd-info", require_arg, '6'}, {NULL, 0, '\0'}};
+static const char* s_opts = "hlpvV";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },          { "latest", no_arg, 'l' },        { "parents", no_arg, 'p' },
+                                           { "verbose", no_arg, 'v' },       { "version", no_arg, 'V' },       { "vol-value", require_arg, '1' },
+                                           { "vol-name", require_arg, '2' }, { "vol-info", require_arg, '3' }, { "vfd-value", require_arg, '4' },
+                                           { "vfd-name", require_arg, '5' }, { "vfd-info", require_arg, '6' }, { NULL, 0, '\0' } };
 
 /* Command line parameter settings */
-typedef struct mkgrp_opt_t {
-    char  *fname;      /* File name to operate on */
-    bool   latest;     /* Whether file should use latest format versions */
-    bool   verbose;    /* Whether output should be verbose */
-    bool   parents;    /* Whether to create intermediate groups */
-    size_t ngroups;    /* Number of groups to create */
-    char **groups;     /* Pointer to array of group names */
-    hid_t  fapl_id;    /* fapl to use when opening the file */
-    bool   custom_vol; /* Whether fapl uses custom VOL */
-    bool   custom_vfd; /* Whether fapl uses custom VFD */
+typedef struct mkgrp_opt_t
+{
+    char* fname;     /* File name to operate on */
+    bool latest;     /* Whether file should use latest format versions */
+    bool verbose;    /* Whether output should be verbose */
+    bool parents;    /* Whether to create intermediate groups */
+    size_t ngroups;  /* Number of groups to create */
+    char** groups;   /* Pointer to array of group names */
+    hid_t fapl_id;   /* fapl to use when opening the file */
+    bool custom_vol; /* Whether fapl uses custom VOL */
+    bool custom_vfd; /* Whether fapl uses custom VFD */
 } mkgrp_opt_t;
 
 static mkgrp_opt_t params_g; /* Command line parameter settings */
@@ -52,21 +52,24 @@ static mkgrp_opt_t params_g; /* Command line parameter settings */
  *
  *-------------------------------------------------------------------------
  */
-static void
-leave(int ret)
+static void leave(int ret)
 {
     size_t curr_group;
 
-    if (params_g.fname)
+    if (params_g.fname) {
         free(params_g.fname);
+    }
     if (params_g.ngroups) {
-        for (curr_group = 0; curr_group < params_g.ngroups; curr_group++)
+        for (curr_group = 0; curr_group < params_g.ngroups; curr_group++) {
             free(params_g.groups[curr_group]);
+        }
         free(params_g.groups);
     }
-    if (H5I_INVALID_HID != params_g.fapl_id && H5P_DEFAULT != params_g.fapl_id)
-        if (H5Pclose(params_g.fapl_id) < 0)
+    if (H5I_INVALID_HID != params_g.fapl_id && H5P_DEFAULT != params_g.fapl_id) {
+        if (H5Pclose(params_g.fapl_id) < 0) {
             error_msg("Could not close file access property list\n");
+        }
+    }
 
     h5tools_close();
     exit(ret);
@@ -81,42 +84,30 @@ leave(int ret)
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     FLUSHSTREAM(rawoutstream);
     PRINTSTREAM(rawoutstream, "usage: %s [OPTIONS] FILE GROUP...\n", prog);
     PRINTVALSTREAM(rawoutstream, "   OPTIONS\n");
     PRINTVALSTREAM(rawoutstream, "      -h, --help         Print a usage message and exit\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      -l, --latest       Use latest version of file format to create groups\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      -p, --parents      No error if existing, make parent groups as needed\n");
+    PRINTVALSTREAM(rawoutstream, "      -l, --latest       Use latest version of file format to create groups\n");
+    PRINTVALSTREAM(rawoutstream, "      -p, --parents      No error if existing, make parent groups as needed\n");
     PRINTVALSTREAM(rawoutstream, "      -v, --verbose      Print information about OBJECTS and OPTIONS\n");
     PRINTVALSTREAM(rawoutstream, "      -V, --version      Print version number and exit\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      --vol-value        Value (ID) of the VOL connector to use for opening the\n");
+    PRINTVALSTREAM(rawoutstream, "      --vol-value        Value (ID) of the VOL connector to use for opening the\n");
     PRINTVALSTREAM(rawoutstream, "                         HDF5 file specified\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      --vol-name         Name of the VOL connector to use for opening the\n");
+    PRINTVALSTREAM(rawoutstream, "      --vol-name         Name of the VOL connector to use for opening the\n");
     PRINTVALSTREAM(rawoutstream, "                         HDF5 file specified\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      --vol-info         VOL-specific info to pass to the VOL connector used for\n");
+    PRINTVALSTREAM(rawoutstream, "      --vol-info         VOL-specific info to pass to the VOL connector used for\n");
     PRINTVALSTREAM(rawoutstream, "                         opening the HDF5 file specified\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "                         If none of the above options are used to specify a VOL, then\n");
-    PRINTVALSTREAM(
-        rawoutstream,
-        "                         the VOL named by HDF5_VOL_CONNECTOR (or the native VOL connector,\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "                         if that environment variable is unset) will be used\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      --vfd-value        Value (ID) of the VFL driver to use for opening the\n");
+    PRINTVALSTREAM(rawoutstream, "                         If none of the above options are used to specify a VOL, then\n");
+    PRINTVALSTREAM(rawoutstream, "                         the VOL named by HDF5_VOL_CONNECTOR (or the native VOL connector,\n");
+    PRINTVALSTREAM(rawoutstream, "                         if that environment variable is unset) will be used\n");
+    PRINTVALSTREAM(rawoutstream, "      --vfd-value        Value (ID) of the VFL driver to use for opening the\n");
     PRINTVALSTREAM(rawoutstream, "                         HDF5 file specified\n");
     PRINTVALSTREAM(rawoutstream, "      --vfd-name         Name of the VFL driver to use for opening the\n");
     PRINTVALSTREAM(rawoutstream, "                         HDF5 file specified\n");
-    PRINTVALSTREAM(rawoutstream,
-                   "      --vfd-info         VFD-specific info to pass to the VFL driver used for\n");
+    PRINTVALSTREAM(rawoutstream, "      --vfd-info         VFD-specific info to pass to the VFL driver used for\n");
     PRINTVALSTREAM(rawoutstream, "                         opening the HDF5 file specified\n");
     PRINTVALSTREAM(rawoutstream, "\n");
 } /* end usage() */
@@ -132,14 +123,13 @@ usage(const char *prog)
  *
  *-------------------------------------------------------------------------
  */
-static int
-parse_command_line(int argc, const char *const *argv, mkgrp_opt_t *options)
+static int parse_command_line(int argc, const char* const* argv, mkgrp_opt_t* options)
 {
-    int                opt;        /* Option from command line */
-    size_t             curr_group; /* Current group name to copy */
+    int opt;           /* Option from command line */
+    size_t curr_group; /* Current group name to copy */
     h5tools_vol_info_t vol_info;
     h5tools_vfd_info_t vfd_info;
-    hid_t              tmp_fapl_id = H5I_INVALID_HID;
+    hid_t tmp_fapl_id = H5I_INVALID_HID;
 
     /* Check for empty command line */
     if (argc == 1) {
@@ -154,71 +144,59 @@ parse_command_line(int argc, const char *const *argv, mkgrp_opt_t *options)
     /* Parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            /* Display 'help' */
-            case 'h':
-                usage(h5tools_getprogname());
-                leave(EXIT_SUCCESS);
-                break;
+        /* Display 'help' */
+        case 'h':
+            usage(h5tools_getprogname());
+            leave(EXIT_SUCCESS);
+            break;
 
-            /* Create objects with the latest version of the format */
-            case 'l':
-                options->latest = true;
-                break;
+        /* Create objects with the latest version of the format */
+        case 'l': options->latest = true; break;
 
-            /* Create parent groups */
-            case 'p':
-                options->parents = true;
-                break;
+        /* Create parent groups */
+        case 'p': options->parents = true; break;
 
-            /* Verbose output */
-            case 'v':
-                options->verbose = true;
-                break;
+        /* Verbose output */
+        case 'v': options->verbose = true; break;
 
-            /* Display version */
-            case 'V':
-                print_version(h5tools_getprogname());
-                leave(EXIT_SUCCESS);
-                break;
+        /* Display version */
+        case 'V':
+            print_version(h5tools_getprogname());
+            leave(EXIT_SUCCESS);
+            break;
 
-            case '1':
-                vol_info.type       = VOL_BY_VALUE;
-                vol_info.u.value    = (H5VL_class_value_t)atoi(H5_optarg);
-                options->custom_vol = true;
-                break;
+        case '1':
+            vol_info.type = VOL_BY_VALUE;
+            vol_info.u.value = (H5VL_class_value_t)atoi(H5_optarg);
+            options->custom_vol = true;
+            break;
 
-            case '2':
-                vol_info.type       = VOL_BY_NAME;
-                vol_info.u.name     = H5_optarg;
-                options->custom_vol = true;
-                break;
+        case '2':
+            vol_info.type = VOL_BY_NAME;
+            vol_info.u.name = H5_optarg;
+            options->custom_vol = true;
+            break;
 
-            case '3':
-                vol_info.info_string = H5_optarg;
-                break;
+        case '3': vol_info.info_string = H5_optarg; break;
 
-            case '4':
-                vfd_info.type       = VFD_BY_VALUE;
-                vfd_info.u.value    = (H5FD_class_value_t)atoi(H5_optarg);
-                options->custom_vfd = true;
-                break;
+        case '4':
+            vfd_info.type = VFD_BY_VALUE;
+            vfd_info.u.value = (H5FD_class_value_t)atoi(H5_optarg);
+            options->custom_vfd = true;
+            break;
 
-            case '5':
-                vfd_info.type       = VFD_BY_NAME;
-                vfd_info.u.name     = H5_optarg;
-                options->custom_vfd = true;
-                break;
+        case '5':
+            vfd_info.type = VFD_BY_NAME;
+            vfd_info.u.name = H5_optarg;
+            options->custom_vfd = true;
+            break;
 
-            case '6':
-                vfd_info.info = (const void *)H5_optarg;
-                break;
+        case '6': vfd_info.info = (const void*)H5_optarg; break;
 
-            /* Bad command line argument */
-            default:
-                usage(h5tools_getprogname());
-                leave(EXIT_FAILURE);
+        /* Bad command line argument */
+        default: usage(h5tools_getprogname()); leave(EXIT_FAILURE);
         } /* end switch */
-    }     /* end while */
+    } /* end while */
 
     /* Check for file name to be processed */
     if (argc <= H5_optind) {
@@ -240,7 +218,7 @@ parse_command_line(int argc, const char *const *argv, mkgrp_opt_t *options)
 
     /* Allocate space for the group name pointers */
     options->ngroups = (size_t)(argc - H5_optind);
-    options->groups  = (char **)malloc(options->ngroups * sizeof(char *));
+    options->groups = (char**)malloc(options->ngroups * sizeof(char*));
 
     /* Retrieve the group names */
     curr_group = 0;
@@ -284,12 +262,11 @@ parse_command_line(int argc, const char *const *argv, mkgrp_opt_t *options)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hid_t  fid     = H5I_INVALID_HID; /* HDF5 file ID */
-    hid_t  lcpl_id = H5I_INVALID_HID; /* Link creation property list ID */
-    size_t curr_group;                /* Current group to create */
+    hid_t fid = H5I_INVALID_HID;     /* HDF5 file ID */
+    hid_t lcpl_id = H5I_INVALID_HID; /* Link creation property list ID */
+    size_t curr_group;               /* Current group to create */
 
     h5tools_setprogname(PROGRAMNAME);
     h5tools_setstatus(EXIT_SUCCESS);
@@ -307,7 +284,7 @@ main(int argc, char *argv[])
     }
 
     /* Parse command line */
-    if (parse_command_line(argc, (const char *const *)argv, &params_g) < 0) {
+    if (parse_command_line(argc, (const char* const*)argv, &params_g) < 0) {
         error_msg("unable to parse command line arguments\n");
         leave(EXIT_FAILURE);
     }
@@ -324,18 +301,19 @@ main(int argc, char *argv[])
         }
 
         /* Display some output if requested */
-        if (params_g.verbose)
+        if (params_g.verbose) {
             printf("%s: Creating groups with latest version of the format\n", h5tools_getprogname());
+        }
     }
 
     /* Attempt to open an existing HDF5 file first */
-    fid = h5tools_fopen(params_g.fname, H5F_ACC_RDWR, params_g.fapl_id,
-                        (params_g.custom_vol || params_g.custom_vfd), NULL, 0);
+    fid = h5tools_fopen(params_g.fname, H5F_ACC_RDWR, params_g.fapl_id, (params_g.custom_vol || params_g.custom_vfd), NULL, 0);
 
     /* If we couldn't open an existing file, try creating file */
     /* (use "EXCL" instead of "TRUNC", so we don't blow away existing non-HDF5 file) */
-    if (fid < 0)
+    if (fid < 0) {
         fid = H5Fcreate(params_g.fname, H5F_ACC_EXCL, H5P_DEFAULT, params_g.fapl_id);
+    }
 
     /* Test for error in opening file */
     if (fid < 0) {
@@ -358,8 +336,9 @@ main(int argc, char *argv[])
         }
 
         /* Display some output if requested */
-        if (params_g.verbose)
+        if (params_g.verbose) {
             printf("%s: Creating parent groups\n", h5tools_getprogname());
+        }
     }
 
     /* Loop over creating requested groups */
@@ -379,8 +358,9 @@ main(int argc, char *argv[])
         }
 
         /* Display some output if requested */
-        if (params_g.verbose)
+        if (params_g.verbose) {
             printf("%s: created group '%s'\n", h5tools_getprogname(), params_g.groups[curr_group]);
+        }
     } /* end for */
 
     /* Close link creation property list */

@@ -17,71 +17,55 @@
 #include "H5IMpublic.h"
 
 /* operator functions */
-static herr_t verify_scale(hid_t dset, unsigned dim, hid_t scale, void *visitor_data);
-static herr_t read_scale(hid_t dset, unsigned dim, hid_t scale, void *visitor_data);
-static herr_t match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void *visitor_data);
-static herr_t op_continue(hid_t did, unsigned dim, hid_t dsid, void *visitor_data);
-static herr_t op_stop(hid_t did, unsigned dim, hid_t dsid, void *visitor_data);
+static herr_t verify_scale(hid_t dset, unsigned dim, hid_t scale, void* visitor_data);
+static herr_t read_scale(hid_t dset, unsigned dim, hid_t scale, void* visitor_data);
+static herr_t match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void* visitor_data);
+static herr_t op_continue(hid_t did, unsigned dim, hid_t dsid, void* visitor_data);
+static herr_t op_stop(hid_t did, unsigned dim, hid_t dsid, void* visitor_data);
 
 /* prototypes */
-static hid_t create_test_file(const char *fileext);
-static hid_t open_test_file(const char *fileext);
-herr_t       create_char_dataset(hid_t fid, const char *dsidx, int fulldims);
-herr_t       create_short_dataset(hid_t fid, const char *dsidx, int fulldims);
-herr_t       create_int_dataset(hid_t fid, const char *dsidx, int fulldims);
-herr_t       create_long_dataset(hid_t fid, const char *dsname, const char *dsidx, int fulldims);
-herr_t       create_float_dataset(hid_t fid, const char *dsidx, int fulldims);
-herr_t       create_DS1_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                                      char *s1_wbuf);
-herr_t       create_DS2_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                                      char *s1_wbuf, char *s2_wbuf);
-herr_t       create_DS3_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                                      char *s1_wbuf, char *s2_wbuf, char *s3_wbuf);
-herr_t create_DS1_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                                 short *s1_wbuf);
-herr_t create_DS2_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                                 short *s1_wbuf, short *s2_wbuf);
-herr_t create_DS3_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                                 short *s1_wbuf, short *s2_wbuf, short *s3_wbuf);
-herr_t create_DS1_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf,
-                               int *s1_wbuf);
-herr_t create_DS2_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf,
-                               int *s1_wbuf, int *s2_wbuf);
-herr_t create_DS3_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf,
-                               int *s1_wbuf, int *s2_wbuf, int *s3_wbuf);
-herr_t create_DS1_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                                long *s1_wbuf);
-herr_t create_DS2_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                                long *s1_wbuf, long *s2_wbuf);
-herr_t create_DS3_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                                long *s1_wbuf, long *s2_wbuf, long *s3_wbuf);
-herr_t create_DS4_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                                long *s1_wbuf, long *s2_wbuf, long *s3_wbuf, long *s4_wbuf);
-herr_t create_DS1_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                                 float *s1_wbuf);
-herr_t create_DS2_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                                 float *s1_wbuf, float *s2_wbuf);
-herr_t create_DS3_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                                 float *s1_wbuf, float *s2_wbuf, float *s3_wbuf);
-herr_t test_attach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx);
-herr_t test_detach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx);
-herr_t test_set_scalename(hid_t fid, hid_t did, const char *name, const char *scalename, unsigned int idx);
-herr_t test_cmp_scalename(hid_t fid, hid_t did, const char *name, const char *scalename, unsigned int idx);
+static hid_t create_test_file(const char* fileext);
+static hid_t open_test_file(const char* fileext);
+herr_t create_char_dataset(hid_t fid, const char* dsidx, int fulldims);
+herr_t create_short_dataset(hid_t fid, const char* dsidx, int fulldims);
+herr_t create_int_dataset(hid_t fid, const char* dsidx, int fulldims);
+herr_t create_long_dataset(hid_t fid, const char* dsname, const char* dsidx, int fulldims);
+herr_t create_float_dataset(hid_t fid, const char* dsidx, int fulldims);
+herr_t create_DS1_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf);
+herr_t create_DS2_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf, char* s2_wbuf);
+herr_t create_DS3_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf, char* s2_wbuf, char* s3_wbuf);
+herr_t create_DS1_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf);
+herr_t create_DS2_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf, short* s2_wbuf);
+herr_t create_DS3_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf, short* s2_wbuf, short* s3_wbuf);
+herr_t create_DS1_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf);
+herr_t create_DS2_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf, int* s2_wbuf);
+herr_t create_DS3_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf, int* s2_wbuf, int* s3_wbuf);
+herr_t create_DS1_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf);
+herr_t create_DS2_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf);
+herr_t create_DS3_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf, long* s3_wbuf);
+herr_t create_DS4_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf, long* s3_wbuf, long* s4_wbuf);
+herr_t create_DS1_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf);
+herr_t create_DS2_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf, float* s2_wbuf);
+herr_t create_DS3_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf, float* s2_wbuf, float* s3_wbuf);
+herr_t test_attach_scale(hid_t fid, hid_t did, const char* name, unsigned int idx);
+herr_t test_detach_scale(hid_t fid, hid_t did, const char* name, unsigned int idx);
+herr_t test_set_scalename(hid_t fid, hid_t did, const char* name, const char* scalename, unsigned int idx);
+herr_t test_cmp_scalename(hid_t fid, hid_t did, const char* name, const char* scalename, unsigned int idx);
 
-static int test_char_attachscales(const char *fileext);
-static int test_short_attachscales(const char *fileext);
-static int test_int_attachscales(const char *fileext);
-static int test_long_attachscales(const char *fileext);
-static int test_duplicatelong_attachscales(const char *fileext);
-static int test_float_attachscales(const char *fileext);
-static int test_numberofscales(const char *fileext);
-static int test_char_scalenames(const char *fileext);
-static int test_short_scalenames(const char *fileext);
-static int test_int_scalenames(const char *fileext);
-static int test_long_scalenames(const char *fileext);
-static int test_samelong_scalenames(const char *fileext);
-static int test_float_scalenames(const char *fileext);
-static int test_foreign_scaleattached(const char *fileforeign);
+static int test_char_attachscales(const char* fileext);
+static int test_short_attachscales(const char* fileext);
+static int test_int_attachscales(const char* fileext);
+static int test_long_attachscales(const char* fileext);
+static int test_duplicatelong_attachscales(const char* fileext);
+static int test_float_attachscales(const char* fileext);
+static int test_numberofscales(const char* fileext);
+static int test_char_scalenames(const char* fileext);
+static int test_short_scalenames(const char* fileext);
+static int test_int_scalenames(const char* fileext);
+static int test_long_scalenames(const char* fileext);
+static int test_samelong_scalenames(const char* fileext);
+static int test_float_scalenames(const char* fileext);
+static int test_foreign_scaleattached(const char* fileforeign);
 static int test_detachscales(void);
 
 static int test_simple(void);
@@ -91,7 +75,7 @@ static int test_rank(void);
 static int test_types(void);
 static int test_iterators(void);
 static int test_data(void);
-static int read_data(const char *fname, int ndims, hsize_t *dims, float **buf);
+static int read_data(const char* fname, int ndims, hsize_t* dims, float** buf);
 static int test_attach_detach(void);
 static int test_is_scale_class_prefix(void);
 static int test_is_reserved_class_prefix(void);
@@ -139,11 +123,11 @@ static int test_is_reserved_class_prefix(void);
 #define DIM1_LABEL "Longitude"
 
 #ifdef H5_DIMENSION_SCALES_WITH_NEW_REF
-#define FOREIGN_FILE1 "test_ds_le_new_ref.h5"
-#define FOREIGN_FILE2 "test_ds_be_new_ref.h5"
+    #define FOREIGN_FILE1 "test_ds_le_new_ref.h5"
+    #define FOREIGN_FILE2 "test_ds_be_new_ref.h5"
 #else
-#define FOREIGN_FILE1 "test_ds_le.h5"
-#define FOREIGN_FILE2 "test_ds_be.h5"
+    #define FOREIGN_FILE1 "test_ds_le.h5"
+    #define FOREIGN_FILE2 "test_ds_be.h5"
 #endif
 #define FILENAME "test_ds"
 #define FILEEXT  ".h5"
@@ -164,11 +148,10 @@ static int test_is_reserved_class_prefix(void);
  * the main program
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     hid_t file_id = H5I_INVALID_HID;
-    int   nerrors = 0;
+    int nerrors = 0;
 
     /* create file to be used in following tests */
     if ((file_id = create_test_file("1")) < 0) {
@@ -216,8 +199,9 @@ main(void)
     nerrors += test_is_scale_class_prefix() < 0 ? 1 : 0;
     nerrors += test_is_reserved_class_prefix() < 0 ? 1 : 0;
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
     printf("All dimension scales tests passed.\n");
     return 0;
 
@@ -244,8 +228,7 @@ error:
  *-------------------------------------------------------------------------
  */
 
-static hid_t
-create_test_file(const char *fileext)
+static hid_t create_test_file(const char* fileext)
 {
     char filename[65];
 
@@ -254,8 +237,7 @@ create_test_file(const char *fileext)
     return H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 }
 
-static hid_t
-open_test_file(const char *fileext)
+static hid_t open_test_file(const char* fileext)
 {
     char filename[65];
 
@@ -268,25 +250,24 @@ open_test_file(const char *fileext)
  * create "data" dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_char_dataset(hid_t fid, const char *dsidx, int fulldims)
+herr_t create_char_dataset(hid_t fid, const char* dsidx, int fulldims)
 {
-    int     rank                = 3;
-    int     rankds              = 1;
-    hsize_t dims[3]             = {DIM1_SIZE, DIM2_SIZE, DIM3_SIZE};
-    hsize_t s1_dim[1]           = {DIM1_SIZE};
-    hsize_t s2_dim[1]           = {DIM2_SIZE};
-    hsize_t s3_dim[1]           = {DIM3_SIZE};
-    char    s1_wbuf[DIM1_SIZE]  = {1, 2, 3};
-    char    s11_wbuf[DIM1_SIZE] = {10, 20, 30};
-    char    s2_wbuf[DIM2_SIZE]  = {10, 20, 30, 40};
-    char    s21_wbuf[DIM2_SIZE] = {1, 2, 3, 4};
-    char    s22_wbuf[DIM2_SIZE] = {5, 10, 50, 100};
-    char    s3_wbuf[DIM3_SIZE]  = {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40};
-    char    s31_wbuf[DIM3_SIZE] = {1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-    char    s32_wbuf[DIM3_SIZE] = {5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100};
-    char    s33_wbuf[DIM3_SIZE] = {6, 6, 6, 12, 12, 12, 53, 53, 53, 120, 120, 120};
-    char    name[64];
+    int rank = 3;
+    int rankds = 1;
+    hsize_t dims[3] = { DIM1_SIZE, DIM2_SIZE, DIM3_SIZE };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    hsize_t s3_dim[1] = { DIM3_SIZE };
+    char s1_wbuf[DIM1_SIZE] = { 1, 2, 3 };
+    char s11_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    char s2_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    char s21_wbuf[DIM2_SIZE] = { 1, 2, 3, 4 };
+    char s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 100 };
+    char s3_wbuf[DIM3_SIZE] = { 10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40 };
+    char s31_wbuf[DIM3_SIZE] = { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
+    char s32_wbuf[DIM3_SIZE] = { 5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100 };
+    char s33_wbuf[DIM3_SIZE] = { 6, 6, 6, 12, 12, 12, 53, 53, 53, 120, 120, 120 };
+    char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DATASET_NAME, dsidx);
 
@@ -294,53 +275,58 @@ create_char_dataset(hid_t fid, const char *dsidx, int fulldims)
     if (H5LTmake_dataset_char(fid, name, rank, dims, NULL) >= 0) {
         if (fulldims == 0) {
             /* make a DS dataset for the first dimension */
-            if (create_DS1_char_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0)
+            if (create_DS1_char_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the second dimension */
-            if (create_DS2_char_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0)
+            if (create_DS2_char_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the third dimension */
-            if (create_DS3_char_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0)
+            if (create_DS3_char_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0) {
                 return FAIL;
+            }
         }
         else {
-            if (create_DS1_char_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0)
+            if (create_DS1_char_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS2_char_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0)
+            if (create_DS2_char_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS3_char_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) <
-                0)
+            if (create_DS3_char_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) < 0) {
                 return FAIL;
+            }
         }
     }
-    else
+    else {
         return FAIL;
+    }
     return SUCCEED;
 }
 
-herr_t
-create_short_dataset(hid_t fid, const char *dsidx, int fulldims)
+herr_t create_short_dataset(hid_t fid, const char* dsidx, int fulldims)
 {
-    int     rank                = 3;
-    int     rankds              = 1;
-    hsize_t dims[3]             = {DIM1_SIZE, DIM2_SIZE, DIM3_SIZE};
-    hsize_t s1_dim[1]           = {DIM1_SIZE};
-    hsize_t s2_dim[1]           = {DIM2_SIZE};
-    hsize_t s3_dim[1]           = {DIM3_SIZE};
-    short   s1_wbuf[DIM1_SIZE]  = {10, 20, 30};
-    short   s11_wbuf[DIM1_SIZE] = {10, 100, 300};
-    short   s2_wbuf[DIM2_SIZE]  = {100, 200, 300, 400};
-    short   s21_wbuf[DIM2_SIZE] = {10, 20, 30, 40};
-    short   s22_wbuf[DIM2_SIZE] = {5, 10, 50, 300};
-    short   s3_wbuf[DIM3_SIZE]  = {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40};
-    short   s31_wbuf[DIM3_SIZE] = {1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-    short   s32_wbuf[DIM3_SIZE] = {5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100};
-    short   s33_wbuf[DIM3_SIZE] = {6, 6, 6, 12, 12, 12, 53, 53, 53, 140, 140, 140};
-    char    name[64];
+    int rank = 3;
+    int rankds = 1;
+    hsize_t dims[3] = { DIM1_SIZE, DIM2_SIZE, DIM3_SIZE };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    hsize_t s3_dim[1] = { DIM3_SIZE };
+    short s1_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    short s11_wbuf[DIM1_SIZE] = { 10, 100, 300 };
+    short s2_wbuf[DIM2_SIZE] = { 100, 200, 300, 400 };
+    short s21_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    short s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 300 };
+    short s3_wbuf[DIM3_SIZE] = { 10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40 };
+    short s31_wbuf[DIM3_SIZE] = { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
+    short s32_wbuf[DIM3_SIZE] = { 5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100 };
+    short s33_wbuf[DIM3_SIZE] = { 6, 6, 6, 12, 12, 12, 53, 53, 53, 140, 140, 140 };
+    char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DATASET_NAME, dsidx);
 
@@ -348,48 +334,53 @@ create_short_dataset(hid_t fid, const char *dsidx, int fulldims)
     if (H5LTmake_dataset_short(fid, name, rank, dims, NULL) >= 0) {
         if (fulldims == 0) {
             /* make a DS dataset for the first dimension */
-            if (create_DS1_short_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0)
+            if (create_DS1_short_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the second dimension */
-            if (create_DS2_short_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0)
+            if (create_DS2_short_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the third dimension */
-            if (create_DS3_short_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0)
+            if (create_DS3_short_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0) {
                 return FAIL;
+            }
         }
         else {
-            if (create_DS1_short_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0)
+            if (create_DS1_short_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS2_short_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0)
+            if (create_DS2_short_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS3_short_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) <
-                0)
+            if (create_DS3_short_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) < 0) {
                 return FAIL;
+            }
         }
     }
-    else
+    else {
         return FAIL;
+    }
     return SUCCEED;
 }
 
-herr_t
-create_int_dataset(hid_t fid, const char *dsidx, int fulldims)
+herr_t create_int_dataset(hid_t fid, const char* dsidx, int fulldims)
 {
-    int     rank                = RANK;
-    int     rankds              = 1;
-    hsize_t dims[RANK]          = {DIM1_SIZE, DIM2_SIZE};
-    hsize_t s1_dim[1]           = {DIM1_SIZE};
-    hsize_t s2_dim[1]           = {DIM2_SIZE};
-    int     s1_wbuf[DIM1_SIZE]  = {10, 20, 30};
-    int     s11_wbuf[DIM1_SIZE] = {10, 100, 300};
-    int     s2_wbuf[DIM2_SIZE]  = {100, 200, 300, 400};
-    int     s21_wbuf[DIM2_SIZE] = {10, 20, 30, 40};
-    int     s22_wbuf[DIM2_SIZE] = {5, 10, 50, 300};
-    char    name[64];
+    int rank = RANK;
+    int rankds = 1;
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    int s1_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    int s11_wbuf[DIM1_SIZE] = { 10, 100, 300 };
+    int s2_wbuf[DIM2_SIZE] = { 100, 200, 300, 400 };
+    int s21_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    int s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 300 };
+    char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DATASET_NAME, dsidx);
 
@@ -397,88 +388,99 @@ create_int_dataset(hid_t fid, const char *dsidx, int fulldims)
     if (H5LTmake_dataset_int(fid, name, rank, dims, NULL) >= 0) {
         if (fulldims == 0) {
             /* make a DS dataset for the first dimension */
-            if (create_DS1_int_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0)
+            if (create_DS1_int_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the second dimension */
-            if (create_DS2_int_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0)
+            if (create_DS2_int_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0) {
                 return FAIL;
+            }
         }
         else {
-            if (create_DS1_int_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0)
+            if (create_DS1_int_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS2_int_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0)
+            if (create_DS2_int_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0) {
                 return FAIL;
+            }
         }
     }
-    else
+    else {
         return FAIL;
+    }
     return SUCCEED;
 }
 
-herr_t
-create_long_dataset(hid_t fid, const char *dsname, const char *dsidx, int fulldims)
+herr_t create_long_dataset(hid_t fid, const char* dsname, const char* dsidx, int fulldims)
 {
-    int     rank                = 4;
-    int     rankds              = 1;
-    hsize_t dims[4]             = {DIM1_SIZE, DIM2_SIZE, DIM3_SIZE, DIM4_SIZE};
-    hsize_t s1_dim[1]           = {DIM1_SIZE};
-    hsize_t s2_dim[1]           = {DIM2_SIZE};
-    hsize_t s3_dim[1]           = {DIM3_SIZE};
-    hsize_t s4_dim[1]           = {DIM4_SIZE};
-    long    s1_wbuf[DIM1_SIZE]  = {10, 20, 30};
-    long    s11_wbuf[DIM1_SIZE] = {10, 100, 300};
-    long    s2_wbuf[DIM2_SIZE]  = {100, 200, 300, 400};
-    long    s21_wbuf[DIM2_SIZE] = {10, 20, 30, 40};
-    long    s22_wbuf[DIM2_SIZE] = {5, 10, 50, 300};
-    long    s3_wbuf[DIM3_SIZE]  = {10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40};
-    long    s31_wbuf[DIM3_SIZE] = {1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
-    long    s32_wbuf[DIM3_SIZE] = {5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100};
-    long    s33_wbuf[DIM3_SIZE] = {6, 6, 6, 12, 12, 12, 53, 53, 53, 140, 140, 140};
-    long    s4_wbuf[DIM4_SIZE]  = {18, 18};
-    long    s41_wbuf[DIM4_SIZE] = {8, 8};
-    long    s42_wbuf[DIM4_SIZE] = {80, 80};
-    long    s43_wbuf[DIM4_SIZE] = {180, 180};
-    long    s44_wbuf[DIM4_SIZE] = {280, 280};
+    int rank = 4;
+    int rankds = 1;
+    hsize_t dims[4] = { DIM1_SIZE, DIM2_SIZE, DIM3_SIZE, DIM4_SIZE };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    hsize_t s3_dim[1] = { DIM3_SIZE };
+    hsize_t s4_dim[1] = { DIM4_SIZE };
+    long s1_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    long s11_wbuf[DIM1_SIZE] = { 10, 100, 300 };
+    long s2_wbuf[DIM2_SIZE] = { 100, 200, 300, 400 };
+    long s21_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    long s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 300 };
+    long s3_wbuf[DIM3_SIZE] = { 10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40 };
+    long s31_wbuf[DIM3_SIZE] = { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
+    long s32_wbuf[DIM3_SIZE] = { 5, 5, 5, 10, 10, 10, 50, 50, 50, 100, 100, 100 };
+    long s33_wbuf[DIM3_SIZE] = { 6, 6, 6, 12, 12, 12, 53, 53, 53, 140, 140, 140 };
+    long s4_wbuf[DIM4_SIZE] = { 18, 18 };
+    long s41_wbuf[DIM4_SIZE] = { 8, 8 };
+    long s42_wbuf[DIM4_SIZE] = { 80, 80 };
+    long s43_wbuf[DIM4_SIZE] = { 180, 180 };
+    long s44_wbuf[DIM4_SIZE] = { 280, 280 };
 
     /* make a dataset */
     if (H5LTmake_dataset_long(fid, dsname, rank, dims, NULL) >= 0) {
         if (fulldims == 0) {
             /* make a DS dataset for the first dimension */
-            if (create_DS1_long_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0)
+            if (create_DS1_long_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0) {
                 goto error;
+            }
 
             /* make a DS dataset for the second dimension */
-            if (create_DS2_long_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0)
+            if (create_DS2_long_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0) {
                 goto error;
+            }
 
             /* make a DS dataset for the third dimension */
-            if (create_DS3_long_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0)
+            if (create_DS3_long_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, NULL, NULL, NULL) < 0) {
                 goto error;
+            }
 
             /* make a DS dataset for the fourth dimension */
-            if (create_DS4_long_datasets(fid, dsidx, rankds, s4_dim, s4_wbuf, NULL, NULL, NULL, NULL) < 0)
+            if (create_DS4_long_datasets(fid, dsidx, rankds, s4_dim, s4_wbuf, NULL, NULL, NULL, NULL) < 0) {
                 goto error;
+            }
         }
         else {
-            if (create_DS1_long_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0)
+            if (create_DS1_long_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0) {
                 goto error;
+            }
 
-            if (create_DS2_long_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0)
+            if (create_DS2_long_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0) {
                 goto error;
+            }
 
-            if (create_DS3_long_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) <
-                0)
+            if (create_DS3_long_datasets(fid, dsidx, rankds, s3_dim, s3_wbuf, s31_wbuf, s32_wbuf, s33_wbuf) < 0) {
                 goto error;
+            }
 
-            if (create_DS4_long_datasets(fid, dsidx, rankds, s4_dim, s4_wbuf, s41_wbuf, s42_wbuf, s43_wbuf,
-                                         s44_wbuf) < 0)
+            if (create_DS4_long_datasets(fid, dsidx, rankds, s4_dim, s4_wbuf, s41_wbuf, s42_wbuf, s43_wbuf, s44_wbuf) < 0) {
                 goto error;
+            }
         }
     }
-    else
+    else {
         goto error;
+    }
 
     return SUCCEED;
 
@@ -486,20 +488,19 @@ error:
     return FAIL;
 }
 
-herr_t
-create_float_dataset(hid_t fid, const char *dsidx, int fulldims)
+herr_t create_float_dataset(hid_t fid, const char* dsidx, int fulldims)
 {
-    int     rank                = RANK;
-    int     rankds              = 1;
-    hsize_t dims[RANK]          = {DIM1_SIZE, DIM2_SIZE};
-    hsize_t s1_dim[1]           = {DIM1_SIZE};
-    hsize_t s2_dim[1]           = {DIM2_SIZE};
-    float   s1_wbuf[DIM1_SIZE]  = {10, 20, 30};
-    float   s11_wbuf[DIM1_SIZE] = {10, 100, 300};
-    float   s2_wbuf[DIM2_SIZE]  = {100, 200, 300, 400};
-    float   s21_wbuf[DIM2_SIZE] = {10, 20, 30, 40};
-    float   s22_wbuf[DIM2_SIZE] = {5, 10, 50, 300};
-    char    name[64];
+    int rank = RANK;
+    int rankds = 1;
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    float s1_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    float s11_wbuf[DIM1_SIZE] = { 10, 100, 300 };
+    float s2_wbuf[DIM2_SIZE] = { 100, 200, 300, 400 };
+    float s21_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    float s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 300 };
+    char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DATASET_NAME, dsidx);
 
@@ -507,23 +508,28 @@ create_float_dataset(hid_t fid, const char *dsidx, int fulldims)
     if (H5LTmake_dataset_float(fid, name, rank, dims, NULL) >= 0) {
         if (fulldims == 0) {
             /* make a DS dataset for the first dimension */
-            if (create_DS1_float_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0)
+            if (create_DS1_float_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, NULL) < 0) {
                 return FAIL;
+            }
 
             /* make a DS dataset for the second dimension */
-            if (create_DS2_float_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0)
+            if (create_DS2_float_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, NULL, NULL) < 0) {
                 return FAIL;
+            }
         }
         else {
-            if (create_DS1_float_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0)
+            if (create_DS1_float_datasets(fid, dsidx, rankds, s1_dim, s1_wbuf, s11_wbuf) < 0) {
                 return FAIL;
+            }
 
-            if (create_DS2_float_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0)
+            if (create_DS2_float_datasets(fid, dsidx, rankds, s2_dim, s2_wbuf, s21_wbuf, s22_wbuf) < 0) {
                 return FAIL;
+            }
         }
     }
-    else
+    else {
         return FAIL;
+    }
     return SUCCEED;
 }
 
@@ -531,24 +537,24 @@ create_float_dataset(hid_t fid, const char *dsidx, int fulldims)
  * create 2 dimension scales datasets for first dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS1_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                         char *s1_wbuf)
+herr_t create_DS1_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_1_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_11_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -558,32 +564,33 @@ create_DS1_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 3 dimension scales datasets for second dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS2_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                         char *s1_wbuf, char *s2_wbuf)
+herr_t create_DS2_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf, char* s2_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_2_NAME, dsidx);
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_21_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_22_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -593,40 +600,42 @@ create_DS2_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 1 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS3_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, char *s_wbuf,
-                         char *s1_wbuf, char *s2_wbuf, char *s3_wbuf)
+herr_t create_DS3_char_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, char* s_wbuf, char* s1_wbuf, char* s2_wbuf, char* s3_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_3_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_31_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_32_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_33_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_char(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -636,24 +645,24 @@ create_DS3_char_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 2 dimension scales datasets for first dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS1_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                          short *s1_wbuf)
+herr_t create_DS1_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_1_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_11_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -663,32 +672,33 @@ create_DS1_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_d
  * create 3 dimension scales datasets for second dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS2_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                          short *s1_wbuf, short *s2_wbuf)
+herr_t create_DS2_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf, short* s2_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_2_NAME, dsidx);
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_21_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_22_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -698,40 +708,42 @@ create_DS2_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_d
  * create 1 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS3_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, short *s_wbuf,
-                          short *s1_wbuf, short *s2_wbuf, short *s3_wbuf)
+herr_t create_DS3_short_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, short* s_wbuf, short* s1_wbuf, short* s2_wbuf, short* s3_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_3_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_31_NAME, dsidx);
 
         /* make a DS dataset for the first dimension */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_32_NAME, dsidx);
 
         /* make a DS dataset for the first dimension */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_33_NAME, dsidx);
 
         /* make a DS dataset for the first dimension */
-        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_short(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -741,23 +753,24 @@ create_DS3_short_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_d
  * create 2 dimension scales datasets for first dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS1_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf, int *s1_wbuf)
+herr_t create_DS1_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_1_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_11_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -767,32 +780,33 @@ create_DS1_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim
  * create 3 dimension scales datasets for second dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS2_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf, int *s1_wbuf,
-                        int *s2_wbuf)
+herr_t create_DS2_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf, int* s2_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_2_NAME, dsidx);
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_21_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_22_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -802,40 +816,42 @@ create_DS2_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim
  * create 1 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS3_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, int *s_wbuf, int *s1_wbuf,
-                        int *s2_wbuf, int *s3_wbuf)
+herr_t create_DS3_int_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, int* s_wbuf, int* s1_wbuf, int* s2_wbuf, int* s3_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_3_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_31_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_32_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_33_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_int(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -845,24 +861,24 @@ create_DS3_int_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim
  * create 2 dimension scales datasets for first dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS1_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                         long *s1_wbuf)
+herr_t create_DS1_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_1_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_11_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -872,32 +888,33 @@ create_DS1_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 3 dimension scales datasets for second dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS2_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                         long *s1_wbuf, long *s2_wbuf)
+herr_t create_DS2_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_2_NAME, dsidx);
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_21_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_22_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -907,40 +924,42 @@ create_DS2_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 3 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS3_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                         long *s1_wbuf, long *s2_wbuf, long *s3_wbuf)
+herr_t create_DS3_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf, long* s3_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_3_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_31_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_32_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_33_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -950,48 +969,51 @@ create_DS3_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 4 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS4_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, long *s_wbuf,
-                         long *s1_wbuf, long *s2_wbuf, long *s3_wbuf, long *s4_wbuf)
+herr_t create_DS4_long_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, long* s_wbuf, long* s1_wbuf, long* s2_wbuf, long* s3_wbuf, long* s4_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_4_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_41_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_42_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_43_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s4_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_44_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s4_wbuf) < 0)
+        if (H5LTmake_dataset_long(fid, name, rankds, s_dim, s4_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -1001,24 +1023,24 @@ create_DS4_long_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_di
  * create 2 dimension scales datasets for first dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS1_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                          float *s1_wbuf)
+herr_t create_DS1_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_1_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_11_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the first dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -1028,32 +1050,33 @@ create_DS1_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_d
  * create 3 dimension scales datasets for second dimension
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS2_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                          float *s1_wbuf, float *s2_wbuf)
+herr_t create_DS2_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf, float* s2_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_2_NAME, dsidx);
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_21_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_22_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
@@ -1063,50 +1086,51 @@ create_DS2_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_d
  * create 3 dimension scales datasets for third dimension of dataset
  *-------------------------------------------------------------------------
  */
-herr_t
-create_DS3_float_datasets(hid_t fid, const char *dsidx, int rankds, hsize_t *s_dim, float *s_wbuf,
-                          float *s1_wbuf, float *s2_wbuf, float *s3_wbuf)
+herr_t create_DS3_float_datasets(hid_t fid, const char* dsidx, int rankds, hsize_t* s_dim, float* s_wbuf, float* s1_wbuf, float* s2_wbuf, float* s3_wbuf)
 {
     char name[64];
 
     snprintf(name, sizeof(name), "%s%s", DS_3_NAME, dsidx);
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0)
+    if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s_wbuf) < 0) {
         return FAIL;
+    }
 
     if (s1_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_31_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s1_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s2_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_32_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s2_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s2_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     if (s3_wbuf != NULL) {
         snprintf(name, sizeof(name), "%s%s", DS_33_NAME, dsidx);
 
         /* make a DS dataset with an alternate scale for the second dimension  */
-        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s3_wbuf) < 0)
+        if (H5LTmake_dataset_float(fid, name, rankds, s_dim, s3_wbuf) < 0) {
             return FAIL;
+        }
     }
 
     return SUCCEED;
 }
 
-herr_t
-test_attach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx)
+herr_t test_attach_scale(hid_t fid, hid_t did, const char* name, unsigned int idx)
 {
     herr_t ret_value = FAIL;
-    hid_t  dsid      = -1;
+    hid_t dsid = -1;
 
     if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) >= 0) {
         if (H5DSis_attached(did, dsid, idx) == 0) {
@@ -1119,18 +1143,18 @@ test_attach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx)
                 }
             }
         }
-        if (H5Dclose(dsid) < 0)
+        if (H5Dclose(dsid) < 0) {
             ret_value = FAIL;
+        }
     }
 
     return ret_value;
 }
 
-herr_t
-test_detach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx)
+herr_t test_detach_scale(hid_t fid, hid_t did, const char* name, unsigned int idx)
 {
     herr_t ret_value = FAIL;
-    hid_t  dsid      = -1;
+    hid_t dsid = -1;
 
     if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) >= 0) {
         if (H5DSis_attached(did, dsid, idx) == 1) {
@@ -1140,18 +1164,18 @@ test_detach_scale(hid_t fid, hid_t did, const char *name, unsigned int idx)
                 }
             }
         }
-        if (H5Dclose(dsid) < 0)
+        if (H5Dclose(dsid) < 0) {
             ret_value = FAIL;
+        }
     }
 
     return ret_value;
 }
 
-herr_t
-test_set_scalename(hid_t fid, hid_t did, const char *name, const char *scalename, unsigned int idx)
+herr_t test_set_scalename(hid_t fid, hid_t did, const char* name, const char* scalename, unsigned int idx)
 {
     herr_t ret_value = FAIL;
-    hid_t  dsid      = -1;
+    hid_t dsid = -1;
 
     if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) >= 0) {
         if (H5DSis_attached(did, dsid, idx) == 1) {
@@ -1161,25 +1185,25 @@ test_set_scalename(hid_t fid, hid_t did, const char *name, const char *scalename
                 }
             }
         }
-        if (H5Dclose(dsid) < 0)
+        if (H5Dclose(dsid) < 0) {
             ret_value = FAIL;
+        }
     }
 
     return ret_value;
 }
 
-herr_t
-test_cmp_scalename(hid_t fid, hid_t did, const char *name, const char *scalename, unsigned int idx)
+herr_t test_cmp_scalename(hid_t fid, hid_t did, const char* name, const char* scalename, unsigned int idx)
 {
-    herr_t  ret_value = FAIL;
-    hid_t   dsid      = -1;
+    herr_t ret_value = FAIL;
+    hid_t dsid = -1;
     ssize_t name_len;
-    char   *name_out = NULL;
+    char* name_out = NULL;
 
     if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) >= 0) {
         if (H5DSis_attached(did, dsid, idx) == 1) {
             if ((name_len = H5DSget_scale_name(dsid, NULL, (size_t)0)) > 0) {
-                name_out = (char *)malloc(((size_t)name_len + 1) * sizeof(char));
+                name_out = (char*)malloc(((size_t)name_len + 1) * sizeof(char));
                 if (name_out != NULL) {
                     if (H5DSget_scale_name(dsid, name_out, (size_t)name_len + 1) >= 0) {
                         if (strncmp(scalename, name_out, (size_t)name_len) == 0) {
@@ -1191,25 +1215,25 @@ test_cmp_scalename(hid_t fid, hid_t did, const char *name, const char *scalename
                 }
             }
         }
-        if (H5Dclose(dsid) < 0)
+        if (H5Dclose(dsid) < 0) {
             ret_value = FAIL;
+        }
     }
 
     return ret_value;
 }
 
-static int
-test_detachscales(void)
+static int test_detachscales(void)
 {
-    hid_t   fid    = -1;
-    hid_t   did    = -1;
-    hid_t   dsid   = -1;
-    int     rank1  = 1;
-    int     rank3  = 3;
-    hsize_t dims[] = {1, 2, 3}; /*some bogus numbers, not important for the test*/
-    int    *buf    = NULL;
-    char    dname[16];
-    int     i;
+    hid_t fid = -1;
+    hid_t did = -1;
+    hid_t dsid = -1;
+    int rank1 = 1;
+    int rank3 = 3;
+    hsize_t dims[] = { 1, 2, 3 }; /*some bogus numbers, not important for the test*/
+    int* buf = NULL;
+    char dname[16];
+    int i;
 
     /* This tests creates two three dimensional datasets; then it creates
        four integer datasets that are used as dim. scales; we will attach
@@ -1218,110 +1242,140 @@ test_detachscales(void)
 
     HL_TESTING2("test_detachscales");
 
-    if ((fid = H5Fcreate("test_detach.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("test_detach.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* make datasets; they are three dimensional*/
     for (i = 0; i < 2; i++) {
         snprintf(dname, sizeof(dname), "D%d", i);
-        if (H5LTmake_dataset_int(fid, dname, rank3, dims, buf) < 0)
+        if (H5LTmake_dataset_int(fid, dname, rank3, dims, buf) < 0) {
             goto out;
+        }
     }
     /* create datasets and make them dim. scales */
 
     for (i = 0; i < 4; i++) {
         snprintf(dname, sizeof(dname), "DS%d", i);
-        if (H5LTmake_dataset_int(fid, dname, rank1, dims, buf) < 0)
+        if (H5LTmake_dataset_int(fid, dname, rank1, dims, buf) < 0) {
             goto out;
+        }
     }
     /* attach scales to the first dataset; first dimension will have
        two scales attached  */
     if ((did = H5Dopen2(fid, "D0", H5P_DEFAULT)) >= 0) {
         for (i = 0; i < 4; i++) {
             snprintf(dname, sizeof(dname), "DS%d", i);
-            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSattach_scale(did, dsid, (unsigned int)i % 3) < 0)
+            }
+            if (H5DSattach_scale(did, dsid, (unsigned int)i % 3) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     /* attach scales to the second dataset */
     if ((did = H5Dopen2(fid, "D1", H5P_DEFAULT)) >= 0) {
         for (i = 0; i < 3; i++) {
             snprintf(dname, sizeof(dname), "DS%d", i);
-            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSattach_scale(did, dsid, (unsigned int)i) < 0)
+            }
+            if (H5DSattach_scale(did, dsid, (unsigned int)i) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     /* detach DS0 from first dimension of D0 and D1; then check
        that DS0 doesn't have attribute REFERENCE _LIST */
 
-    if ((dsid = H5Dopen2(fid, "DS0", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "DS0", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     for (i = 0; i < 2; i++) {
         snprintf(dname, sizeof(dname), "D%d", i);
-        if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+        if ((did = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
             goto out;
-        if (H5DSdetach_scale(did, dsid, (unsigned int)0) < 0)
+        }
+        if (H5DSdetach_scale(did, dsid, (unsigned int)0) < 0) {
             goto out;
-        if (H5Dclose(did) < 0)
+        }
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
     /* Check that attribute "REFERENCE_LIST" doesn't exist anymore */
-    if (H5Aexists(dsid, REFERENCE_LIST) != 0)
+    if (H5Aexists(dsid, REFERENCE_LIST) != 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* Check that DS3 is the only dim. scale attached to the first
        dimension of D0 */
-    if ((did = H5Dopen2(fid, "D0", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "D0", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "DS3", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "DS3", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSis_attached(did, dsid, (unsigned int)0) <= 0)
+    }
+    if (H5DSis_attached(did, dsid, (unsigned int)0) <= 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* Detach the rest of the scales DS3, DS1, DS2 from D0 and make
        sure that attribute "DIMENSION_LIST" doesn't exist anymore */
     if ((did = H5Dopen2(fid, "D0", H5P_DEFAULT)) >= 0) {
         for (i = 1; i < 4; i++) {
             snprintf(dname, sizeof(dname), "DS%d", i);
-            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSdetach_scale(did, dsid, (unsigned int)i % 3) < 0)
+            }
+            if (H5DSdetach_scale(did, dsid, (unsigned int)i % 3) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
         /* Check that attribute "DIMENSION_LIST" doesn't exist anymore */
-        if (H5Aexists(did, DIMENSION_LIST) != 0)
+        if (H5Aexists(did, DIMENSION_LIST) != 0) {
             goto out;
-        if (H5Dclose(did) < 0)
+        }
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1342,29 +1396,31 @@ out:
     return FAIL;
 }
 
-static int
-test_char_attachscales(const char *fileext)
+static int test_char_attachscales(const char* fileext)
 {
-    hid_t  fid = -1;
-    hid_t  did = -1;
-    char   dsname[32];
-    char   scalename[32];
+    hid_t fid = -1;
+    hid_t did = -1;
+    char dsname[32];
+    char scalename[32];
     herr_t ds_existed = 0;
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "ac");
 
     HL_TESTING2("test_char_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (create_char_dataset(fid, "ac", 0) < 0)
+    if (create_char_dataset(fid, "ac", 0) < 0) {
         goto out;
+    }
 
     /* test finding dataset dsname */
-    if ((ds_existed = H5LTfind_dataset(fid, dsname)) < 0)
+    if ((ds_existed = H5LTfind_dataset(fid, dsname)) < 0) {
         goto out;
+    }
     if (ds_existed == 0) {
         printf("Unexpected result: Dataset \"%s\" does exist\n", dsname);
         goto out;
@@ -1372,22 +1428,27 @@ test_char_attachscales(const char *fileext)
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "ac");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "ac");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "ac");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1407,67 +1468,79 @@ out:
     return FAIL;
 }
 
-static int
-test_short_attachscales(const char *fileext)
+static int test_short_attachscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "as");
 
     HL_TESTING2("test_short_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (create_short_dataset(fid, "as", 1) < 0)
+    if (create_short_dataset(fid, "as", 1) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_31_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_32_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_33_NAME, "as");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1487,51 +1560,59 @@ out:
     return FAIL;
 }
 
-static int
-test_int_attachscales(const char *fileext)
+static int test_int_attachscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "a");
 
     HL_TESTING2("test_int_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (create_int_dataset(fid, "a", 1) < 0)
+    if (create_int_dataset(fid, "a", 1) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "a");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "a");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "a");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "a");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "a");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1551,47 +1632,54 @@ out:
     return FAIL;
 }
 
-static int
-test_long_attachscales(const char *fileext)
+static int test_long_attachscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "al");
 
     HL_TESTING2("test_long_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (create_long_dataset(fid, dsname, "al", 0) < 0)
+    if (create_long_dataset(fid, dsname, "al", 0) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_4_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM3) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM3) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1611,47 +1699,54 @@ out:
     return FAIL;
 }
 
-static int
-test_duplicatelong_attachscales(const char *fileext)
+static int test_duplicatelong_attachscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "al2");
 
     HL_TESTING2("test_duplicatelong_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset 2 */
-    if (create_long_dataset(fid, dsname, "al2", 0) < 0)
+    if (create_long_dataset(fid, dsname, "al2", 0) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM2) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_4_NAME, "al");
-        if (test_attach_scale(fid, did, scalename, DIM3) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM3) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1671,51 +1766,59 @@ out:
     return FAIL;
 }
 
-static int
-test_float_attachscales(const char *fileext)
+static int test_float_attachscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "af");
 
     HL_TESTING2("test_float_attachscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (create_float_dataset(fid, "af", 1) < 0)
+    if (create_float_dataset(fid, "af", 1) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "af");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "af");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "af");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "af");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "af");
-        if (test_attach_scale(fid, did, scalename, DIM1) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM1) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1735,70 +1838,84 @@ out:
     return FAIL;
 }
 
-static int
-test_numberofscales(const char *fileext)
+static int test_numberofscales(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    int   nscales; /* number of scales in DIM */
-    char  dsname[32];
-    char  scalename[32];
+    int nscales; /* number of scales in DIM */
+    char dsname[32];
+    char scalename[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "a");
 
     HL_TESTING2("test_numberofscales");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
-        if ((nscales = H5DSget_num_scales(did, 0)) < 0)
+        if ((nscales = H5DSget_num_scales(did, 0)) < 0) {
             goto out;
+        }
 
-        if (nscales != 2)
+        if (nscales != 2) {
             goto out;
+        }
 
-        if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+        if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
             goto out;
+        }
 
-        if (nscales != 3)
+        if (nscales != 3) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "b");
 
     /* make a dataset */
-    if (create_int_dataset(fid, "b", 1) < 0)
+    if (create_int_dataset(fid, "b", 1) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "b");
-        if (test_attach_scale(fid, did, scalename, DIM0) < 0)
+        if (test_attach_scale(fid, did, scalename, DIM0) < 0) {
             goto out;
+        }
 
-        if ((nscales = H5DSget_num_scales(did, 0)) < 0)
+        if ((nscales = H5DSget_num_scales(did, 0)) < 0) {
             goto out;
+        }
 
-        if (nscales != 1)
+        if (nscales != 1) {
             goto out;
+        }
 
-        if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+        if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
             goto out;
+        }
 
-        if (nscales != 0)
+        if (nscales != 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1818,51 +1935,59 @@ out:
     return FAIL;
 }
 
-static int
-test_char_scalenames(const char *fileext)
+static int test_char_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "ac");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set char scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "ac");
         snprintf(name, sizeof(name), "%s%s", SCALE_1_NAME, "ac");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "ac");
         snprintf(name, sizeof(name), "%s%s", SCALE_2_NAME, "ac");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "ac");
         snprintf(name, sizeof(name), "%s%s", SCALE_3_NAME, "ac");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1882,99 +2007,119 @@ out:
     return FAIL;
 }
 
-static int
-test_short_scalenames(const char *fileext)
+static int test_short_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "as");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set short scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_1_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_11_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_2_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_21_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_22_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_3_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_31_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_31_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_32_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_32_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_33_NAME, "as");
         snprintf(name, sizeof(name), "%s%s", SCALE_33_NAME, "as");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -1994,67 +2139,79 @@ out:
     return FAIL;
 }
 
-static int
-test_int_scalenames(const char *fileext)
+static int test_int_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "a");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set int scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "a");
         snprintf(name, sizeof(name), "%s%s", SCALE_1_NAME, "a");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "a");
         snprintf(name, sizeof(name), "%s%s", SCALE_11_NAME, "a");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "a");
         snprintf(name, sizeof(name), "%s%s", SCALE_2_NAME, "a");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "a");
         snprintf(name, sizeof(name), "%s%s", SCALE_21_NAME, "a");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "a");
         snprintf(name, sizeof(name), "%s%s", SCALE_22_NAME, "a");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -2074,59 +2231,69 @@ out:
     return FAIL;
 }
 
-static int
-test_long_scalenames(const char *fileext)
+static int test_long_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "al");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set long scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", SCALE_1_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", SCALE_2_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", SCALE_3_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_4_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", SCALE_4_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM3) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM3) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM3) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM3) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -2146,59 +2313,69 @@ out:
     return FAIL;
 }
 
-static int
-test_samelong_scalenames(const char *fileext)
+static int test_samelong_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "al2");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set same long scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", DS_1_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", DS_2_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_3_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", DS_3_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM2) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_4_NAME, "al");
         snprintf(name, sizeof(name), "%s%s", DS_4_NAME, "al");
-        if (test_set_scalename(fid, did, scalename, name, DIM3) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM3) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM3) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM3) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -2218,67 +2395,79 @@ out:
     return FAIL;
 }
 
-static int
-test_float_scalenames(const char *fileext)
+static int test_float_scalenames(const char* fileext)
 {
     hid_t fid = -1;
     hid_t did = -1;
-    char  dsname[32];
-    char  scalename[32];
-    char  name[32];
+    char dsname[32];
+    char scalename[32];
+    char name[32];
 
     snprintf(dsname, sizeof(dsname), "%s%s", DATASET_NAME, "af");
 
-    if ((fid = open_test_file(fileext)) < 0)
+    if ((fid = open_test_file(fileext)) < 0) {
         goto out;
+    }
 
     HL_TESTING2("set float scale/cmp scale name");
     if ((did = H5Dopen2(fid, dsname, H5P_DEFAULT)) >= 0) {
         snprintf(scalename, sizeof(scalename), "%s%s", DS_1_NAME, "af");
         snprintf(name, sizeof(name), "%s%s", SCALE_1_NAME, "af");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_11_NAME, "af");
         snprintf(name, sizeof(name), "%s%s", SCALE_11_NAME, "af");
-        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM0) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_2_NAME, "af");
         snprintf(name, sizeof(name), "%s%s", SCALE_2_NAME, "af");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_21_NAME, "af");
         snprintf(name, sizeof(name), "%s%s", SCALE_21_NAME, "af");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
         snprintf(scalename, sizeof(scalename), "%s%s", DS_22_NAME, "af");
         snprintf(name, sizeof(name), "%s%s", SCALE_22_NAME, "af");
-        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_set_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0)
+        if (test_cmp_scalename(fid, did, scalename, name, DIM1) < 0) {
             goto out;
+        }
 
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
     PASSED();
 
@@ -2298,36 +2487,40 @@ out:
     return FAIL;
 }
 
-static int
-test_foreign_scaleattached(const char *fileforeign)
+static int test_foreign_scaleattached(const char* fileforeign)
 {
-    herr_t      ret_value = FAIL;
-    hid_t       fid       = -1;
-    hid_t       did       = -1;
-    hid_t       dsid      = -1;
-    const char *filename  = H5_get_srcdir_filename(fileforeign);
+    herr_t ret_value = FAIL;
+    hid_t fid = -1;
+    hid_t did = -1;
+    hid_t dsid = -1;
+    const char* filename = H5_get_srcdir_filename(fileforeign);
 
     HL_TESTING2("test_foreign_scaleattached");
 
-    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     if ((did = H5Dopen2(fid, "/dset_al", H5P_DEFAULT)) >= 0) {
         if ((dsid = H5Dopen2(fid, "/ds_4_al", H5P_DEFAULT)) >= 0) {
             if (H5DSis_attached(did, dsid, 3) == 1) {
                 ret_value = SUCCEED;
             }
-            if (H5Dclose(dsid) < 0)
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
-    else
+    else {
         goto out;
+    }
 
-    if (ret_value == FAIL)
+    if (ret_value == FAIL) {
         goto out;
+    }
 
     PASSED();
 
@@ -2347,42 +2540,41 @@ out:
     return FAIL;
 }
 
-static int
-test_simple(void)
+static int test_simple(void)
 {
-    hid_t        fid           = -1;
-    hid_t        did           = -1;
-    hid_t        dsid          = -1;
-    hid_t        sid           = -1;
-    hid_t        gid           = -1;
-    int          rank          = RANK;
-    int          rankds        = 1;
-    hsize_t      dims[RANK]    = {DIM1_SIZE, DIM2_SIZE};
-    int          buf[DIM_DATA] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    hsize_t      s1_dim[1]     = {DIM1_SIZE};
-    hsize_t      s2_dim[1]     = {DIM2_SIZE};
-    char         sname[30];
-    char         dname[30];
-    int          s1_wbuf[DIM1_SIZE]  = {10, 20, 30};
-    int          s11_wbuf[DIM1_SIZE] = {10, 100, 300};
-    int          s2_wbuf[DIM2_SIZE]  = {100, 200, 300, 400};
-    int          s21_wbuf[DIM2_SIZE] = {10, 20, 30, 40};
-    int          s22_wbuf[DIM2_SIZE] = {5, 10, 50, 300};
-    char         dim0_label[16];
-    char         dim1_label[16];
-    char        *dim0_labeld;
-    char        *dim1_labeld;
-    char         dim0_labels[3];
-    char         dim1_labels[3];
-    ssize_t      dim0_label_size;
-    ssize_t      dim1_label_size;
+    hid_t fid = -1;
+    hid_t did = -1;
+    hid_t dsid = -1;
+    hid_t sid = -1;
+    hid_t gid = -1;
+    int rank = RANK;
+    int rankds = 1;
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE };
+    int buf[DIM_DATA] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+    hsize_t s1_dim[1] = { DIM1_SIZE };
+    hsize_t s2_dim[1] = { DIM2_SIZE };
+    char sname[30];
+    char dname[30];
+    int s1_wbuf[DIM1_SIZE] = { 10, 20, 30 };
+    int s11_wbuf[DIM1_SIZE] = { 10, 100, 300 };
+    int s2_wbuf[DIM2_SIZE] = { 100, 200, 300, 400 };
+    int s21_wbuf[DIM2_SIZE] = { 10, 20, 30, 40 };
+    int s22_wbuf[DIM2_SIZE] = { 5, 10, 50, 300 };
+    char dim0_label[16];
+    char dim1_label[16];
+    char* dim0_labeld;
+    char* dim1_labeld;
+    char dim0_labels[3];
+    char dim1_labels[3];
+    ssize_t dim0_label_size;
+    ssize_t dim1_label_size;
     unsigned int dim;
-    int          scale_idx;
-    int          nscales;
-    ssize_t      name_len;
-    char        *name_out = NULL;
-    char         snames[3];
-    int          i, j;
+    int scale_idx;
+    int nscales;
+    ssize_t name_len;
+    char* name_out = NULL;
+    char snames[3];
+    int i, j;
 
     printf("Testing API functions\n");
 
@@ -2392,8 +2584,9 @@ test_simple(void)
      */
 
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE1, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE1, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create datasets: 1 "data" dataset and 4 dimension scales
@@ -2401,32 +2594,39 @@ test_simple(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, buf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_int(fid, "ds_a_1", rankds, s1_dim, s1_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_1", rankds, s1_dim, s1_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset with an alternate scale for the 2nd dimension  */
-    if (H5LTmake_dataset_int(fid, "ds_a_11", rankds, s1_dim, s11_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_11", rankds, s1_dim, s11_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_int(fid, "ds_a_2", rankds, s2_dim, s2_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_2", rankds, s2_dim, s2_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset with an alternate scale for the 2nd dimension  */
-    if (H5LTmake_dataset_int(fid, "ds_a_21", rankds, s2_dim, s21_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_21", rankds, s2_dim, s21_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset with an alternate scale for the 2nd dimension  */
-    if (H5LTmake_dataset_int(fid, "ds_a_22", rankds, s2_dim, s22_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_22", rankds, s2_dim, s22_wbuf) < 0) {
         goto out;
+    }
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach the DS_1_NAME dimension scale to "dset_a"
@@ -2434,16 +2634,19 @@ test_simple(void)
      */
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_a_1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_1", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach the DS_1_NAME dimension scale to "dset_a" at dimension 0 */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach the DS_11_NAME dimension scale to "dset_a"
@@ -2451,16 +2654,19 @@ test_simple(void)
      */
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_a_11", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_11", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach the DS_11_NAME dimension scale to "dset_a" at dimension 0 */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach the DS_2_NAME dimension scale to "dset_a"
@@ -2468,16 +2674,19 @@ test_simple(void)
      */
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_a_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_2", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach the "ds2" dimension scale to "dset_a" as the 2nd dimension  */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      *  attach the DS_21_NAME dimension scale to "dset_a"
@@ -2485,16 +2694,19 @@ test_simple(void)
      */
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_a_21", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_21", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach the DS_21_NAME dimension scale to "dset_a" as the 2nd dimension  */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      *  attach the DS_22_NAME dimension scale to "dset_a"
@@ -2502,20 +2714,24 @@ test_simple(void)
      */
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_a_22", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_22", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach the "ds22" dimension scale to "dset_a" as the 2nd dimension  */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_a" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create datasets: 1 "data" dataset and 1 dimension scale
@@ -2523,30 +2739,37 @@ test_simple(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_b", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_b", rank, dims, buf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_int(fid, "ds_b_1", rankds, s1_dim, s1_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_b_1", rankds, s1_dim, s1_wbuf) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      *  attach the scale to "dset_b"
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_b", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_b", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_b_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_b_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_b" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * H5DSdetach_scale
@@ -2561,89 +2784,114 @@ test_simple(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_c", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_c", rank, dims, buf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_int(fid, "ds_c_1", rankds, s1_dim, s1_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_c_1", rankds, s1_dim, s1_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_int(fid, "ds_c_2", rankds, s2_dim, s2_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_c_2", rankds, s2_dim, s2_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset with an alternate scale for the 2nd dimension  */
-    if (H5LTmake_dataset_int(fid, "ds_c_21", rankds, s2_dim, s2_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_c_21", rankds, s2_dim, s2_wbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset with an alternate scale for the 2nd dimension  */
-    if (H5LTmake_dataset_int(fid, "ds_c_22", rankds, s2_dim, s2_wbuf) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_c_22", rankds, s2_dim, s2_wbuf) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      *  attach the scales to "dset_c"
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_c_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_c_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_c_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_c_21", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_21", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_c_22", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_22", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * verify if "dset_c" has dimension scales
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* verify that "dset_c" has 1 dimension scale at DIM 0   */
-    if ((nscales = H5DSget_num_scales(did, 0)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 0)) < 0) {
         goto out;
+    }
 
-    if (nscales != 1)
+    if (nscales != 1) {
         goto out;
+    }
     /* verify that "dset_c" has 3 dimension scales at DIM 1   */
-    if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
         goto out;
+    }
 
-    if (nscales != 3)
+    if (nscales != 3) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * detach the "ds_c_21" dimension scale to "dset_c"
@@ -2651,41 +2899,50 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_c" */
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_c_21", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_21", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach the "ds_c_21" dimension scale to "dset_c" in DIM 1  */
-    if (H5DSdetach_scale(did, dsid, 1) < 0)
+    if (H5DSdetach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_c" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * "dset_c" must have now 2 dimension scales at DIM 1
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* verify that "dset_c" has 2 dimension scales at DIM 1  */
-    if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
         goto out;
+    }
 
-    if (nscales != 2)
+    if (nscales != 2) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * detach the "ds_c_22" dimension scale to "dset_c"
@@ -2693,41 +2950,50 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_c" */
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_c_22", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_22", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach the "ds_c_22" dimension scale to "dset_c" in DIM 1  */
-    if (H5DSdetach_scale(did, dsid, 1) < 0)
+    if (H5DSdetach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_c" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * "dset_c" must have now 1 dimension scale at DIM 1
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* verify that "dset_c" has 1 dimension scale at DIM 1  */
-    if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
         goto out;
+    }
 
-    if (nscales != 1)
+    if (nscales != 1) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * detach the "ds_c_2" dimension scale to "dset_c"
@@ -2735,101 +3001,129 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_c" */
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_c_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_c_2", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach the "ds_c_2" dimension scale to "dset_c" in DIM 1  */
-    if (H5DSdetach_scale(did, dsid, 1) < 0)
+    if (H5DSdetach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_c" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * "dset_c" must have now 0 dimension scales at DIM 1
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_c", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* verify that "dset_c" has 1 dimension scale at DIM 1  */
-    if ((nscales = H5DSget_num_scales(did, 1)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 1)) < 0) {
         goto out;
+    }
 
-    if (nscales != 0)
+    if (nscales != 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create 3 datasets: 1 "data" dataset and 2 dimension scales
      *-------------------------------------------------------------------------
      */
-    if (H5LTmake_dataset_int(fid, "dset_d", rank, dims, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_d", rank, dims, NULL) < 0) {
         goto out;
-    if (H5LTmake_dataset_int(fid, "ds_d_1", rankds, s1_dim, NULL) < 0)
+    }
+    if (H5LTmake_dataset_int(fid, "ds_d_1", rankds, s1_dim, NULL) < 0) {
         goto out;
-    if (H5LTmake_dataset_int(fid, "ds_d_2", rankds, s2_dim, NULL) < 0)
+    }
+    if (H5LTmake_dataset_int(fid, "ds_d_2", rankds, s2_dim, NULL) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach them
      *-------------------------------------------------------------------------
      */
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * verify
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSis_attached(did, dsid, DIM0) <= 0)
+    }
+    if (H5DSis_attached(did, dsid, DIM0) <= 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSis_attached(did, dsid, DIM1) <= 0)
+    }
+    if (H5DSis_attached(did, dsid, DIM1) <= 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * detach
@@ -2837,28 +3131,34 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_d" */
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach the dimension scale to "dset_d" in DIM 0  */
-    if (H5DSdetach_scale(did, dsid, DIM0) < 0)
+    if (H5DSdetach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
 
     /* verify attach, it must return 0 for no attach */
-    if (H5DSis_attached(did, dsid, DIM0) != 0)
+    if (H5DSis_attached(did, dsid, DIM0) != 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_d" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach again
@@ -2866,34 +3166,42 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_d" */
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_1", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach "ds_d_1" again in DIM 0  */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
 
     /* verify attach, it must return 1 for attach */
-    if (H5DSis_attached(did, dsid, DIM0) != 1)
+    if (H5DSis_attached(did, dsid, DIM0) != 1) {
         goto out;
+    }
 
     /* verify that "ds_d_1" has only 1 scale at DIM0  */
-    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0)
+    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0) {
         goto out;
-    if (nscales != 1)
+    }
+    if (nscales != 1) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_d" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * detach/detach
@@ -2901,38 +3209,47 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_d" */
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach the "ds_d_2" dimension scale to "dset_d" in DIM 1  */
-    if (H5DSdetach_scale(did, dsid, DIM1) < 0)
+    if (H5DSdetach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* detach again, it should fail */
-    if (H5DSdetach_scale(did, dsid, DIM1) == SUCCEED)
+    if (H5DSdetach_scale(did, dsid, DIM1) == SUCCEED) {
         goto out;
+    }
 
     /* verify attach, it must return 0 for no attach */
-    if (H5DSis_attached(did, dsid, DIM1) != 0)
+    if (H5DSis_attached(did, dsid, DIM1) != 0) {
         goto out;
+    }
 
     /* verify that "ds_d_1" has no scale at DIM1  */
-    if ((nscales = H5DSget_num_scales(did, DIM1)) < 0)
+    if ((nscales = H5DSget_num_scales(did, DIM1)) < 0) {
         goto out;
-    if (nscales != 0)
+    }
+    if (nscales != 0) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_d" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach twice
@@ -2940,48 +3257,60 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_d" */
-    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_d", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_d_2", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach "ds_d_2" in DIM 1  */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* verify attach, it must return 1 for attach */
-    if (H5DSis_attached(did, dsid, DIM1) != 1)
+    if (H5DSis_attached(did, dsid, DIM1) != 1) {
         goto out;
+    }
 
     /* verify that "ds_d_2" has only 1 scale at DIM1  */
-    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0)
+    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0) {
         goto out;
-    if (nscales != 1)
+    }
+    if (nscales != 1) {
         goto out;
+    }
 
     /* attach "ds_d_2" again in DIM 1  */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
 
     /* verify attach, it must return 1 for attach */
-    if (H5DSis_attached(did, dsid, DIM1) != 1)
+    if (H5DSis_attached(did, dsid, DIM1) != 1) {
         goto out;
+    }
 
     /* verify that "ds_d_2" has only 1 scale at DIM1  */
-    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0)
+    if ((nscales = H5DSget_num_scales(did, DIM0)) < 0) {
         goto out;
-    if (nscales != 1)
+    }
+    if (nscales != 1) {
         goto out;
+    }
 
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_d" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create 10 datasets: 5 "data" dataset and 5 dimension scales
@@ -2989,25 +3318,32 @@ test_simple(void)
      */
 
     /* create a group */
-    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* create the data space for the dataset */
-    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
+    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0) {
         goto out;
+    }
     for (i = 0; i < 5; i++) {
         snprintf(dname, sizeof(dname), "dset_%d", i);
-        if ((did = H5Dcreate2(gid, dname, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((did = H5Dcreate2(gid, dname, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto out;
+        }
         snprintf(sname, sizeof(sname), "ds_%d", i);
-        if ((dsid = H5Dcreate2(gid, sname, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((dsid = H5Dcreate2(gid, sname, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto out;
-        if (H5DSset_scale(dsid, "scale") < 0)
+        }
+        if (H5DSset_scale(dsid, "scale") < 0) {
             goto out;
-        if (H5Dclose(dsid) < 0)
+        }
+        if (H5Dclose(dsid) < 0) {
             goto out;
-        if (H5Dclose(did) < 0)
+        }
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -3017,19 +3353,24 @@ test_simple(void)
 
     for (i = 0; i < 5; i++) {
         snprintf(dname, sizeof(dname), "dset_%d", i);
-        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0)
+        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0) {
             goto out;
+        }
         for (j = 0; j < 5; j++) {
             snprintf(sname, sizeof(sname), "ds_%d", j);
-            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSattach_scale(did, dsid, DIM0) < 0)
+            }
+            if (H5DSattach_scale(did, dsid, DIM0) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -3039,19 +3380,24 @@ test_simple(void)
 
     for (i = 0; i < 5; i++) {
         snprintf(dname, sizeof(dname), "dset_%d", i);
-        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0)
+        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0) {
             goto out;
+        }
         for (j = 0; j < 5; j++) {
             snprintf(sname, sizeof(sname), "ds_%d", j);
-            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSdetach_scale(did, dsid, DIM0) < 0)
+            }
+            if (H5DSdetach_scale(did, dsid, DIM0) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -3061,27 +3407,34 @@ test_simple(void)
 
     for (i = 0; i < 5; i++) {
         snprintf(dname, sizeof(dname), "dset_%d", i);
-        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0)
+        if ((did = H5Dopen2(gid, dname, H5P_DEFAULT)) < 0) {
             goto out;
+        }
         for (j = 0; j < 5; j++) {
             snprintf(sname, sizeof(sname), "ds_%d", j);
-            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0)
+            if ((dsid = H5Dopen2(gid, sname, H5P_DEFAULT)) < 0) {
                 goto out;
-            if (H5DSattach_scale(did, dsid, DIM0) < 0)
+            }
+            if (H5DSattach_scale(did, dsid, DIM0) < 0) {
                 goto out;
-            if (H5Dclose(dsid) < 0)
+            }
+            if (H5Dclose(dsid) < 0) {
                 goto out;
+            }
         }
-        if (H5Dclose(did) < 0)
+        if (H5Dclose(did) < 0) {
             goto out;
+        }
     }
 
     /* close */
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create a dataset and attach only to 1 dimension
@@ -3089,39 +3442,49 @@ test_simple(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_e", rank, dims, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_e", rank, dims, NULL) < 0) {
         goto out;
+    }
 
     /* make a scale */
-    if (H5LTmake_dataset_int(fid, "ds_e_1", rankds, s1_dim, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_e_1", rankds, s1_dim, NULL) < 0) {
         goto out;
+    }
 
     /* attach the DS to dimension 1 */
-    if ((did = H5Dopen2(fid, "dset_e", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_e", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_e_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_e_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
-    if (H5DSis_attached(did, dsid, DIM1) <= 0)
+    }
+    if (H5DSis_attached(did, dsid, DIM1) <= 0) {
         goto out;
+    }
 
     /* try to detach all dimensions. for dimensions 0 and 2, it is an error */
     for (i = 0; i < rank; i++) {
         if (i == 1) {
-            if (H5DSdetach_scale(did, dsid, (unsigned)i) < 0)
+            if (H5DSdetach_scale(did, dsid, (unsigned)i) < 0) {
                 goto out;
+            }
         }
         else {
-            if (H5DSdetach_scale(did, dsid, (unsigned)i) != FAIL)
+            if (H5DSdetach_scale(did, dsid, (unsigned)i) != FAIL) {
                 goto out;
+            }
         }
     }
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -3131,61 +3494,76 @@ test_simple(void)
      */
 
     HL_TESTING2("set/get label");
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * set label
      *-------------------------------------------------------------------------
      */
 
-    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0)
+    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0) {
         goto out;
+    }
 
     /* check getting a label which does not exist */
-    if (H5DSget_label(did, DIM1, dim1_label, sizeof(dim1_label)) != 0)
+    if (H5DSget_label(did, DIM1, dim1_label, sizeof(dim1_label)) != 0) {
         goto out;
+    }
 
-    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0)
+    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * get the scale name using a static buffer
      *-------------------------------------------------------------------------
      */
 
-    if (H5DSget_label(did, DIM0, dim0_label, sizeof(dim0_label)) < 0)
+    if (H5DSget_label(did, DIM0, dim0_label, sizeof(dim0_label)) < 0) {
         goto out;
-    if (H5DSget_label(did, DIM1, dim1_label, sizeof(dim1_label)) < 0)
+    }
+    if (H5DSget_label(did, DIM1, dim1_label, sizeof(dim1_label)) < 0) {
         goto out;
-    if (strncmp(DIM0_LABEL, dim0_label, sizeof(dim0_label)) != 0)
+    }
+    if (strncmp(DIM0_LABEL, dim0_label, sizeof(dim0_label)) != 0) {
         goto out;
-    if (strncmp(DIM1_LABEL, dim1_label, sizeof(dim1_label)) != 0)
+    }
+    if (strncmp(DIM1_LABEL, dim1_label, sizeof(dim1_label)) != 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * get the scale name using a dynamic buffer
      *-------------------------------------------------------------------------
      */
 
-    if ((dim0_label_size = H5DSget_label(did, DIM0, NULL, (size_t)0)) < 0)
+    if ((dim0_label_size = H5DSget_label(did, DIM0, NULL, (size_t)0)) < 0) {
         goto out;
-    if ((dim1_label_size = H5DSget_label(did, DIM1, NULL, (size_t)0)) < 0)
+    }
+    if ((dim1_label_size = H5DSget_label(did, DIM1, NULL, (size_t)0)) < 0) {
         goto out;
+    }
 
     /* allocate */
-    dim0_labeld = (char *)malloc((size_t)dim0_label_size * sizeof(char));
-    dim1_labeld = (char *)malloc((size_t)dim1_label_size * sizeof(char));
-    if (dim0_labeld == NULL || dim1_labeld == NULL)
+    dim0_labeld = (char*)malloc((size_t)dim0_label_size * sizeof(char));
+    dim1_labeld = (char*)malloc((size_t)dim1_label_size * sizeof(char));
+    if (dim0_labeld == NULL || dim1_labeld == NULL) {
         goto out;
-    if (H5DSget_label(did, DIM0, dim0_labeld, (size_t)dim0_label_size) < 0)
+    }
+    if (H5DSget_label(did, DIM0, dim0_labeld, (size_t)dim0_label_size) < 0) {
         goto out;
-    if (H5DSget_label(did, DIM1, dim1_labeld, (size_t)dim1_label_size) < 0)
+    }
+    if (H5DSget_label(did, DIM1, dim1_labeld, (size_t)dim1_label_size) < 0) {
         goto out;
-    if (strncmp(DIM0_LABEL, dim0_labeld, (size_t)(dim0_label_size - 1)) != 0)
+    }
+    if (strncmp(DIM0_LABEL, dim0_labeld, (size_t)(dim0_label_size - 1)) != 0) {
         goto out;
-    if (strncmp(DIM1_LABEL, dim1_labeld, (size_t)(dim1_label_size - 1)) != 0)
+    }
+    if (strncmp(DIM1_LABEL, dim1_labeld, (size_t)(dim1_label_size - 1)) != 0) {
         goto out;
+    }
     if (dim0_labeld) {
         free(dim0_labeld);
         dim0_labeld = NULL;
@@ -3200,16 +3578,21 @@ test_simple(void)
      *-------------------------------------------------------------------------
      */
 
-    if (H5DSget_label(did, DIM0, dim0_labels, sizeof(dim0_labels)) < 0)
+    if (H5DSget_label(did, DIM0, dim0_labels, sizeof(dim0_labels)) < 0) {
         goto out;
-    if (H5DSget_label(did, DIM1, dim1_labels, sizeof(dim1_labels)) < 0)
+    }
+    if (H5DSget_label(did, DIM1, dim1_labels, sizeof(dim1_labels)) < 0) {
         goto out;
-    if (strncmp(DIM0_LABEL, dim0_labels, sizeof(dim0_labels) - 1) != 0)
+    }
+    if (strncmp(DIM0_LABEL, dim0_labels, sizeof(dim0_labels) - 1) != 0) {
         goto out;
-    if (strncmp(DIM1_LABEL, dim1_labels, sizeof(dim1_labels) - 1) != 0)
+    }
+    if (strncmp(DIM1_LABEL, dim1_labels, sizeof(dim1_labels) - 1) != 0) {
         goto out;
-    if (H5Dclose(did))
+    }
+    if (H5Dclose(did)) {
         goto out;
+    }
 
     PASSED();
 
@@ -3219,14 +3602,17 @@ test_simple(void)
      */
 
     HL_TESTING2("set scale/get scale name");
-    if ((dsid = H5Dopen2(fid, "ds_a_1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "Latitude set 0") < 0)
+    }
+    if (H5DSset_scale(dsid, "Latitude set 0") < 0) {
         goto out;
+    }
 
     /* verify that DS_1_NAME is a dimension scale dataset  */
-    if ((H5DSis_scale(dsid)) == 0)
+    if ((H5DSis_scale(dsid)) == 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * get the scale name using a dynamic buffer
@@ -3234,20 +3620,24 @@ test_simple(void)
      */
 
     /* get the length of the scale name (pass NULL in name) */
-    if ((name_len = H5DSget_scale_name(dsid, NULL, (size_t)0)) < 0)
+    if ((name_len = H5DSget_scale_name(dsid, NULL, (size_t)0)) < 0) {
         goto out;
+    }
 
     /* allocate a  buffer */
-    name_out = (char *)malloc(((size_t)name_len + 1) * sizeof(char));
-    if (name_out == NULL)
+    name_out = (char*)malloc(((size_t)name_len + 1) * sizeof(char));
+    if (name_out == NULL) {
         goto out;
+    }
 
     /* get the scale name using this buffer */
-    if (H5DSget_scale_name(dsid, name_out, (size_t)name_len + 1) < 0)
+    if (H5DSget_scale_name(dsid, name_out, (size_t)name_len + 1) < 0) {
         goto out;
+    }
 
-    if (strncmp("Latitude set 0", name_out, (size_t)name_len) != 0)
+    if (strncmp("Latitude set 0", name_out, (size_t)name_len) != 0) {
         goto out;
+    }
     if (name_out) {
         free(name_out);
         name_out = NULL;
@@ -3259,11 +3649,13 @@ test_simple(void)
      */
 
     /* get the scale name using this buffer */
-    if (H5DSget_scale_name(dsid, sname, sizeof(sname)) < 0)
+    if (H5DSget_scale_name(dsid, sname, sizeof(sname)) < 0) {
         goto out;
+    }
 
-    if (strncmp("Latitude set 0", sname, sizeof(sname)) != 0)
+    if (strncmp("Latitude set 0", sname, sizeof(sname)) != 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * get the scale name using a static buffer smaller than the string length
@@ -3271,46 +3663,61 @@ test_simple(void)
      */
 
     /* get the scale name using this buffer */
-    if (H5DSget_scale_name(dsid, snames, sizeof(snames)) < 0)
+    if (H5DSget_scale_name(dsid, snames, sizeof(snames)) < 0) {
         goto out;
+    }
 
-    if (strncmp("Latitude set 0", snames, sizeof(snames) - 1) != 0)
+    if (strncmp("Latitude set 0", snames, sizeof(snames) - 1) != 0) {
         goto out;
-    if (H5Dclose(dsid))
+    }
+    if (H5Dclose(dsid)) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * add scale names
      *-------------------------------------------------------------------------
      */
 
-    if ((dsid = H5Dopen2(fid, "ds_a_11", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_11", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "Latitude set 1") < 0)
+    }
+    if (H5DSset_scale(dsid, "Latitude set 1") < 0) {
         goto out;
-    if (H5Dclose(dsid))
+    }
+    if (H5Dclose(dsid)) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_a_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "Longitude set 0") < 0)
+    }
+    if (H5DSset_scale(dsid, "Longitude set 0") < 0) {
         goto out;
-    if (H5Dclose(dsid))
+    }
+    if (H5Dclose(dsid)) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_a_21", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_21", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "Longitude set 1") < 0)
+    }
+    if (H5DSset_scale(dsid, "Longitude set 1") < 0) {
         goto out;
-    if (H5Dclose(dsid))
+    }
+    if (H5Dclose(dsid)) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_a_22", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a_22", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "Longitude set 2") < 0)
+    }
+    if (H5DSset_scale(dsid, "Longitude set 2") < 0) {
         goto out;
-    if (H5Dclose(dsid))
+    }
+    if (H5Dclose(dsid)) {
         goto out;
+    }
 
     PASSED();
 
@@ -3327,24 +3734,28 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     dim = 0;
 
     /* iterate through the 1st dimension of "dset_a" and verify that its DS is valid  */
-    if (H5DSiterate_scales(did, dim, NULL, verify_scale, NULL) < 0)
+    if (H5DSiterate_scales(did, dim, NULL, verify_scale, NULL) < 0) {
         goto out;
+    }
 
     /* iterate through the 2nd dimension of "dset_a" and verify that its DS is valid
     start at DS index 2 */
-    dim       = 1;
+    dim = 1;
     scale_idx = 2;
-    if (H5DSiterate_scales(did, dim, &scale_idx, verify_scale, NULL) < 0)
+    if (H5DSiterate_scales(did, dim, &scale_idx, verify_scale, NULL) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_a" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * test iterate scales with a function read_scale
@@ -3352,24 +3763,28 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     dim = 0;
 
     /* iterate through the 1st dimension of "dset_a" and read the DS  */
-    if (H5DSiterate_scales(did, dim, NULL, read_scale, s1_wbuf) < 0)
+    if (H5DSiterate_scales(did, dim, NULL, read_scale, s1_wbuf) < 0) {
         goto out;
+    }
 
     /* iterate through the 2nd dimension of "dset_a" and read the DS
     start at DS index 2 */
-    dim       = 1;
+    dim = 1;
     scale_idx = 2;
-    if (H5DSiterate_scales(did, dim, &scale_idx, read_scale, s22_wbuf) < 0)
+    if (H5DSiterate_scales(did, dim, &scale_idx, read_scale, s22_wbuf) < 0) {
         goto out;
+    }
 
     /* close dataset ID of "dset_a" */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * test iterate scales with a function match_dim_scale
@@ -3377,44 +3792,53 @@ test_simple(void)
      */
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get dataset space */
-    if ((sid = H5Dget_space(did)) < 0)
+    if ((sid = H5Dget_space(did)) < 0) {
         goto out;
+    }
 
     /* get rank */
-    if ((rank = H5Sget_simple_extent_ndims(sid)) < 0)
+    if ((rank = H5Sget_simple_extent_ndims(sid)) < 0) {
         goto out;
+    }
 
     /* get dimensions of dataset */
-    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0)
+    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0) {
         goto out;
+    }
     {
         int match_size; /* does this scale size matches the dataset DIM size */
         int idx = 0;    /* scale index to start iterating, on return, index where iterator stopped */
 
         /* iterate through all the dimensions  */
         for (dim = 0; dim < (unsigned)rank; dim++) {
-            if ((match_size = H5DSiterate_scales(did, dim, &idx, match_dim_scale, NULL)) < 0)
+            if ((match_size = H5DSiterate_scales(did, dim, &idx, match_dim_scale, NULL)) < 0) {
                 goto out;
+            }
 
             /* "dset_a" was defined with all dimension scales size matching the size of its dimensions */
-            if (match_size == 0)
+            if (match_size == 0) {
                 goto out;
+            }
 
             /* both DS_1_NAME and DS_2_NAME are the on the first index */
-            if (idx != 0)
+            if (idx != 0) {
                 goto out;
+            }
         }
     }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * test iterate scales with a function match_dim_scale
@@ -3425,66 +3849,85 @@ test_simple(void)
      * create 3 datasets: 1 "data" dataset and dimension scales (some are empty)
      *-------------------------------------------------------------------------
      */
-    if (H5LTmake_dataset_int(fid, "dset_f", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_f", rank, dims, buf) < 0) {
         goto out;
+    }
 
-    if (H5LTmake_dataset_int(fid, "ds_f_1", rankds, s1_dim, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_f_1", rankds, s1_dim, NULL) < 0) {
         goto out;
-    if (H5LTmake_dataset_int(fid, "ds_f_11", rankds, s1_dim, s1_wbuf) < 0)
+    }
+    if (H5LTmake_dataset_int(fid, "ds_f_11", rankds, s1_dim, s1_wbuf) < 0) {
         goto out;
+    }
 
-    if (H5LTmake_dataset_int(fid, "ds_f_2", rankds, s2_dim, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_f_2", rankds, s2_dim, NULL) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach them
      *-------------------------------------------------------------------------
      */
-    if ((did = H5Dopen2(fid, "dset_f", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_f", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds_f_1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds_f_1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_f_11", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_f_11", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds_f_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_f_2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * verify match
      *-------------------------------------------------------------------------
      */
     /* get the dataset id for "dset_f" */
-    if ((did = H5Dopen2(fid, "dset_f", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_f", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get dataset space */
-    if ((sid = H5Dget_space(did)) < 0)
+    if ((sid = H5Dget_space(did)) < 0) {
         goto out;
+    }
 
     /* get rank */
-    if ((rank = H5Sget_simple_extent_ndims(sid)) < 0)
+    if ((rank = H5Sget_simple_extent_ndims(sid)) < 0) {
         goto out;
+    }
 
     /* get dimensions of dataset */
-    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0)
+    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0) {
         goto out;
+    }
     {
         int match_size; /* does this scale size matches the dataset DIM size */
         int idx;        /* scale index to start iterating, on return, index where iterator stopped */
@@ -3494,33 +3937,36 @@ test_simple(void)
             /* always start at 1st scale */
             idx = 0;
 
-            if ((match_size = H5DSiterate_scales(did, dim, &idx, match_dim_scale, NULL)) < 0)
+            if ((match_size = H5DSiterate_scales(did, dim, &idx, match_dim_scale, NULL)) < 0) {
                 goto out;
+            }
 
             /* "dset_e" was defined with :
             dim 0: 2 scales, first is empty
             dim 1: 1 scale, empty */
             switch (dim) {
-                case 0: /* for DIM 0, we get a valid scale at IDX 1 */
-                    if (match_size != 1 && idx != 1)
-                        goto out;
-                    break;
-                case 1: /* for DIM 1, we get no valid scales */
-                    if (match_size != 0 && idx != 0)
-                        goto out;
-                    break;
-                default:
-                    assert(0);
-                    break;
+            case 0: /* for DIM 0, we get a valid scale at IDX 1 */
+                if (match_size != 1 && idx != 1) {
+                    goto out;
+                }
+                break;
+            case 1: /* for DIM 1, we get no valid scales */
+                if (match_size != 0 && idx != 0) {
+                    goto out;
+                }
+                break;
+            default: assert(0); break;
             } /*switch*/
-        }     /*for*/
+        } /*for*/
     }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -3565,8 +4011,7 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static herr_t
-verify_scale(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
+static herr_t verify_scale(hid_t dset, unsigned dim, hid_t scale_id, void* visitor_data)
 {
     /* define a default zero value for return. This will cause the iterator to continue */
     int ret = 0;
@@ -3606,45 +4051,51 @@ verify_scale(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
  *-------------------------------------------------------------------------
  */
 
-static herr_t
-read_scale(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
+static herr_t read_scale(hid_t dset, unsigned dim, hid_t scale_id, void* visitor_data)
 {
-    int      ret  = 0;  /* define a default zero value for return. This will cause the iterator to continue */
-    hid_t    sid  = -1; /* space ID */
-    hid_t    tid  = -1; /* file type ID */
-    hid_t    mtid = -1; /* memory type ID */
-    hssize_t nelmts;    /* number of data elements */
-    char    *buf = NULL; /* data buffer */
-    size_t   size;
-    int      i;
-    char    *data = (char *)visitor_data;
+    int ret = 0;      /* define a default zero value for return. This will cause the iterator to continue */
+    hid_t sid = -1;   /* space ID */
+    hid_t tid = -1;   /* file type ID */
+    hid_t mtid = -1;  /* memory type ID */
+    hssize_t nelmts;  /* number of data elements */
+    char* buf = NULL; /* data buffer */
+    size_t size;
+    int i;
+    char* data = (char*)visitor_data;
 
     /* unused */
     (void)dset;
     (void)dim;
 
     /* get space */
-    if ((sid = H5Dget_space(scale_id)) < 0)
+    if ((sid = H5Dget_space(scale_id)) < 0) {
         goto out;
+    }
     /* get type */
-    if ((tid = H5Dget_type(scale_id)) < 0)
+    if ((tid = H5Dget_type(scale_id)) < 0) {
         goto out;
+    }
     /* get size of the DS array */
-    if ((nelmts = H5Sget_simple_extent_npoints(sid)) < 0)
+    if ((nelmts = H5Sget_simple_extent_npoints(sid)) < 0) {
         goto out;
+    }
     /* get type */
-    if ((mtid = H5Tget_native_type(tid, H5T_DIR_DEFAULT)) < 0)
+    if ((mtid = H5Tget_native_type(tid, H5T_DIR_DEFAULT)) < 0) {
         goto out;
+    }
     /* get type size */
-    if ((size = H5Tget_size(mtid)) == 0)
+    if ((size = H5Tget_size(mtid)) == 0) {
         goto out;
+    }
 
     if (nelmts) {
-        buf = (char *)malloc(((size_t)nelmts * size));
-        if (buf == NULL)
+        buf = (char*)malloc(((size_t)nelmts * size));
+        if (buf == NULL) {
             goto out;
-        if (H5Dread(scale_id, mtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) < 0)
+        }
+        if (H5Dread(scale_id, mtid, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) < 0) {
             goto out;
+        }
 
         for (i = 0; i < nelmts; i++) {
             if (buf[i] != data[i]) {
@@ -3655,14 +4106,18 @@ read_scale(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
 
     } /* if */
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Tclose(tid) < 0)
+    }
+    if (H5Tclose(tid) < 0) {
         goto out;
-    if (H5Tclose(mtid) < 0)
+    }
+    if (H5Tclose(mtid) < 0) {
         goto out;
-    if (buf)
+    }
+    if (buf) {
         free(buf);
+    }
 
     return ret;
 
@@ -3699,14 +4154,13 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static herr_t
-match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void *visitor_data)
+static herr_t match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void* visitor_data)
 {
-    int      ret = 0; /* define a default zero value for return. This will cause the iterator to continue */
-    hid_t    sid;     /* space ID */
-    hssize_t nelmts;  /* size of a dimension scale array */
-    hsize_t  dims[H5S_MAX_RANK]; /* dimensions of dataset */
-    hsize_t  storage_size;
+    int ret = 0;                /* define a default zero value for return. This will cause the iterator to continue */
+    hid_t sid;                  /* space ID */
+    hssize_t nelmts;            /* size of a dimension scale array */
+    hsize_t dims[H5S_MAX_RANK]; /* dimensions of dataset */
+    hsize_t storage_size;
 
     /* Stop compiler from whining about "unused parameters" */
     (void)visitor_data;
@@ -3717,16 +4171,19 @@ match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void *visitor_data)
      */
 
     /* get dataset space */
-    if ((sid = H5Dget_space(did)) < 0)
+    if ((sid = H5Dget_space(did)) < 0) {
         goto out;
+    }
 
     /* get dimensions of dataset */
-    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0)
+    if (H5Sget_simple_extent_dims(sid, dims, NULL) < 0) {
         goto out;
+    }
 
     /* close the dataspace id */
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * get DSID (scale) space info
@@ -3734,26 +4191,31 @@ match_dim_scale(hid_t did, unsigned dim, hid_t dsid, void *visitor_data)
      */
 
     /* get the space for the scale */
-    if ((sid = H5Dget_space(dsid)) < 0)
+    if ((sid = H5Dget_space(dsid)) < 0) {
         goto out;
+    }
 
     /* get size of the DS array */
-    if ((nelmts = H5Sget_simple_extent_npoints(sid)) < 0)
+    if ((nelmts = H5Sget_simple_extent_npoints(sid)) < 0) {
         goto out;
+    }
 
     /* close */
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /* the size of the DS array must match the dimension of the dataset */
-    if (nelmts == (hssize_t)dims[dim])
+    if (nelmts == (hssize_t)dims[dim]) {
         ret = 1;
+    }
 
     /* if the scale is empty assume it cannot be used */
     storage_size = H5Dget_storage_size(dsid);
 
-    if (storage_size == 0)
+    if (storage_size == 0) {
         ret = 0;
+    }
 
     return ret;
 
@@ -3783,8 +4245,7 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static herr_t
-op_continue(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
+static herr_t op_continue(hid_t dset, unsigned dim, hid_t scale_id, void* visitor_data)
 {
     /* Stop compiler from whining about "unused parameters" */
     (void)dset;
@@ -3792,7 +4253,7 @@ op_continue(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
     (void)scale_id;
 
     if (visitor_data != NULL) {
-        (*(int *)visitor_data)++;
+        (*(int*)visitor_data)++;
     }
 
     /* define a default zero value for return. This will cause the iterator to continue */
@@ -3816,8 +4277,7 @@ op_continue(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
  *-------------------------------------------------------------------------
  */
 
-static herr_t
-op_stop(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
+static herr_t op_stop(hid_t dset, unsigned dim, hid_t scale_id, void* visitor_data)
 {
     /* Stop compiler from whining about "unused parameters" */
     (void)dset;
@@ -3825,7 +4285,7 @@ op_stop(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
     (void)scale_id;
 
     if (visitor_data != NULL) {
-        (*(int *)visitor_data)++;
+        (*(int*)visitor_data)++;
     }
 
     /* define a default 1 value for return. This will cause the iterator to stop */
@@ -3837,20 +4297,19 @@ op_stop(hid_t dset, unsigned dim, hid_t scale_id, void *visitor_data)
  *-------------------------------------------------------------------------
  */
 
-static int
-test_errors(void)
+static int test_errors(void)
 {
-    hid_t   fid;                                 /* file ID */
-    int     rank       = RANK;                   /* rank of data dataset */
-    int     rankds     = 1;                      /* rank of DS dataset */
-    hsize_t dims[RANK] = {DIM1_SIZE, DIM2_SIZE}; /* size of data dataset */
-    hsize_t s1_dim[1]  = {DIM1_SIZE};            /* size of DS 1 dataset */
-    hid_t   did        = -1;                     /* dataset ID */
-    hid_t   dsid       = -1;                     /* scale ID */
-    hid_t   gid        = -1;                     /* group ID */
-    hid_t   sid        = -1;                     /* space ID */
-    hid_t   sidds      = -1;                     /* space ID */
-    hsize_t pal_dims[] = {9, 3};
+    hid_t fid;                                     /* file ID */
+    int rank = RANK;                               /* rank of data dataset */
+    int rankds = 1;                                /* rank of DS dataset */
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE }; /* size of data dataset */
+    hsize_t s1_dim[1] = { DIM1_SIZE };             /* size of DS 1 dataset */
+    hid_t did = -1;                                /* dataset ID */
+    hid_t dsid = -1;                               /* scale ID */
+    hid_t gid = -1;                                /* group ID */
+    hid_t sid = -1;                                /* space ID */
+    hid_t sidds = -1;                              /* space ID */
+    hsize_t pal_dims[] = { 9, 3 };
 
     printf("Testing error conditions\n");
 
@@ -3860,23 +4319,29 @@ test_errors(void)
      */
 
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* create a group */
-    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* create the data space for the dataset */
-    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0)
+    if ((sid = H5Screate_simple(rank, dims, NULL)) < 0) {
         goto out;
+    }
     /* create the data space for the scale */
-    if ((sidds = H5Screate_simple(rankds, s1_dim, NULL)) < 0)
+    if ((sidds = H5Screate_simple(rankds, s1_dim, NULL)) < 0) {
         goto out;
+    }
     /* create a dataset */
-    if ((did = H5Dcreate2(fid, "dset_a", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid, "dset_a", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* create a dataset for the scale */
-    if ((dsid = H5Dcreate2(fid, "ds_a", H5T_NATIVE_INT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dcreate2(fid, "ds_a", H5T_NATIVE_INT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attempt to attach a dataset to itself, it should fail
@@ -3885,8 +4350,9 @@ test_errors(void)
 
     HL_TESTING2("attach a dataset to itself");
 
-    if (H5DSattach_scale(did, did, 0) == SUCCEED)
+    if (H5DSattach_scale(did, did, 0) == SUCCEED) {
         goto out;
+    }
 
     PASSED();
 
@@ -3896,8 +4362,9 @@ test_errors(void)
      */
     HL_TESTING2("attach a group with a dataset");
 
-    if (H5DSattach_scale(gid, dsid, 0) == SUCCEED)
+    if (H5DSattach_scale(gid, dsid, 0) == SUCCEED) {
         goto out;
+    }
 
     PASSED();
 
@@ -3907,8 +4374,9 @@ test_errors(void)
      */
     HL_TESTING2("attach a dataset with a group");
 
-    if (H5DSattach_scale(did, gid, 0) == SUCCEED)
+    if (H5DSattach_scale(did, gid, 0) == SUCCEED) {
         goto out;
+    }
 
     PASSED();
 
@@ -3918,8 +4386,9 @@ test_errors(void)
      */
     HL_TESTING2("set scale for a group");
 
-    if (H5DSset_scale(gid, "scale 1") == SUCCEED)
+    if (H5DSset_scale(gid, "scale 1") == SUCCEED) {
         goto out;
+    }
 
     PASSED();
 
@@ -3929,16 +4398,21 @@ test_errors(void)
      */
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Sclose(sidds) < 0)
+    }
+    if (H5Sclose(sidds) < 0) {
         goto out;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * try to attach a scale that has scales
@@ -3948,64 +4422,81 @@ test_errors(void)
     HL_TESTING2("attach a scale that has scales");
 
     /* create the data space for the scale */
-    if ((sidds = H5Screate_simple(rankds, s1_dim, NULL)) < 0)
+    if ((sidds = H5Screate_simple(rankds, s1_dim, NULL)) < 0) {
         goto out;
+    }
 
     /* create a dataset "ds_b" for the scale */
-    if ((dsid = H5Dcreate2(fid, "ds_b", H5T_NATIVE_INT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dcreate2(fid, "ds_b", H5T_NATIVE_INT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_a" */
-    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* attach "ds_b" to "ds_a", valid */
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Sclose(sidds) < 0)
+    }
+    if (H5Sclose(sidds) < 0) {
         goto out;
+    }
 
     /* open the previous written "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_a" */
-    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to attach "ds_a" to "dset_a", not valid */
-    if (H5DSattach_scale(did, dsid, 0) == SUCCEED)
+    if (H5DSattach_scale(did, dsid, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_a" */
-    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_b" */
-    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* detach "ds_b" to "ds_a" */
-    if (H5DSdetach_scale(did, dsid, 0) < 0)
+    if (H5DSdetach_scale(did, dsid, 0) < 0) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4017,22 +4508,27 @@ test_errors(void)
     HL_TESTING2("attach to a dataset that is a scale");
 
     /* open the previous written "ds_b", that is a scale */
-    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_a" */
-    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to attach "ds_a" to "ds_b", not valid */
-    if (H5DSattach_scale(dsid, did, 0) == SUCCEED)
+    if (H5DSattach_scale(dsid, did, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4044,30 +4540,37 @@ test_errors(void)
     HL_TESTING2("attach to a dataset that is a reserved class dataset");
 
     /* make an image */
-    if (H5IMmake_image_8bit(fid, "image", (hsize_t)100, (hsize_t)50, NULL) < 0)
+    if (H5IMmake_image_8bit(fid, "image", (hsize_t)100, (hsize_t)50, NULL) < 0) {
         goto out;
+    }
 
     /* make a palette */
-    if (H5IMmake_palette(fid, "palette", pal_dims, NULL) < 0)
+    if (H5IMmake_palette(fid, "palette", pal_dims, NULL) < 0) {
         goto out;
+    }
 
     /* open the previous written "ds_b" */
-    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_b", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the image dataset */
-    if ((did = H5Dopen2(fid, "image", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "image", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to attach "ds_a" to the image, not valid */
-    if (H5DSattach_scale(did, dsid, 0) == SUCCEED)
+    if (H5DSattach_scale(did, dsid, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4079,28 +4582,34 @@ test_errors(void)
     HL_TESTING2("is scale");
 
     /* open a non scale dataset */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* verify that it is not a dimension scale dataset  */
-    if ((H5DSis_scale(did)) == 1)
+    if ((H5DSis_scale(did)) == 1) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /* open the group. */
-    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* verify that it is not a dimension scale dataset  */
-    if ((H5DSis_scale(gid)) == 1)
+    if ((H5DSis_scale(gid)) == 1) {
         goto out;
+    }
 
     /* close */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4112,22 +4621,27 @@ test_errors(void)
     HL_TESTING2("detach scale from dataset it is not attached to");
 
     /* open the previous written "ds_a" */
-    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the previous written "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to detach "ds_a" from "dset_a" */
-    if (H5DSdetach_scale(did, dsid, 0) == SUCCEED)
+    if (H5DSdetach_scale(did, dsid, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4139,22 +4653,27 @@ test_errors(void)
     HL_TESTING2("detach scale from group");
 
     /* open the previous written "ds_a" */
-    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the group. */
-    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to detach "ds_a" from "grp" */
-    if (H5DSdetach_scale(gid, dsid, 0) == SUCCEED)
+    if (H5DSdetach_scale(gid, dsid, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4166,28 +4685,34 @@ test_errors(void)
     HL_TESTING2("detach scale when scale is group");
 
     /* open the previous written "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* open the group. */
-    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to detach "grp" from "dset_a" */
-    if (H5DSdetach_scale(did, gid, 0) == SUCCEED)
+    if (H5DSdetach_scale(did, gid, 0) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     PASSED();
 
     /* close */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     return 0;
 
@@ -4212,19 +4737,18 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-test_iterators(void)
+static int test_iterators(void)
 {
-    hid_t   fid;                                 /* file ID */
-    int     rank       = RANK;                   /* rank of data dataset */
-    int     rankds     = 1;                      /* rank of DS dataset */
-    hsize_t dims[RANK] = {DIM1_SIZE, DIM2_SIZE}; /* size of data dataset */
-    hsize_t s1_dim[1]  = {DIM1_SIZE};            /* size of DS 1 dataset */
-    hid_t   gid        = -1;                     /* group ID */
-    hid_t   did        = -1;                     /* dataset ID */
-    hid_t   dsid       = -1;                     /* scale ID */
-    char    dname[30];                           /* dataset name */
-    int     i;
+    hid_t fid;                                     /* file ID */
+    int rank = RANK;                               /* rank of data dataset */
+    int rankds = 1;                                /* rank of DS dataset */
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE }; /* size of data dataset */
+    hsize_t s1_dim[1] = { DIM1_SIZE };             /* size of DS 1 dataset */
+    hid_t gid = -1;                                /* group ID */
+    hid_t did = -1;                                /* dataset ID */
+    hid_t dsid = -1;                               /* scale ID */
+    char dname[30];                                /* dataset name */
+    int i;
 
     printf("Testing iterators\n");
 
@@ -4234,20 +4758,25 @@ test_iterators(void)
      */
 
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE3, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE3, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* create a group */
-    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "grp", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* close */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, NULL) < 0) {
         goto out;
+    }
     /* make a DS dataset */
-    if (H5LTmake_dataset_int(fid, "ds_a", rankds, s1_dim, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a", rankds, s1_dim, NULL) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * iterate when the dataset has no scales
@@ -4257,16 +4786,19 @@ test_iterators(void)
     HL_TESTING2("iterate when the dataset has no scales ");
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to iterate through the 1st dimension of "dset_a", return error */
-    if (H5DSiterate_scales(did, 0, NULL, verify_scale, NULL) < 0)
+    if (H5DSiterate_scales(did, 0, NULL, verify_scale, NULL) < 0) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4278,16 +4810,19 @@ test_iterators(void)
     HL_TESTING2("iterate on dimension that is outside the rank ");
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to iterate through the 3rd dimension of "dset_a", return error */
-    if (H5DSiterate_scales(did, 3, NULL, verify_scale, NULL) == SUCCEED)
+    if (H5DSiterate_scales(did, 3, NULL, verify_scale, NULL) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4299,32 +4834,39 @@ test_iterators(void)
     HL_TESTING2("iterate for dimension with many scales ");
 
     /* open the previously written "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     for (i = 0; i < 100; i++) {
         /* make a DS */
         snprintf(dname, sizeof(dname), "ds_%d", i);
-        if (H5LTmake_dataset_int(fid, dname, rankds, s1_dim, NULL) < 0)
+        if (H5LTmake_dataset_int(fid, dname, rankds, s1_dim, NULL) < 0) {
             goto out;
+        }
         /* open */
-        if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0)
+        if ((dsid = H5Dopen2(fid, dname, H5P_DEFAULT)) < 0) {
             goto out;
+        }
         /* attach */
-        if (H5DSattach_scale(did, dsid, 0) < 0)
+        if (H5DSattach_scale(did, dsid, 0) < 0) {
             goto out;
+        }
         /* close */
-        if (H5Dclose(dsid) < 0)
+        if (H5Dclose(dsid) < 0) {
             goto out;
+        }
     }
 
     /* iterate through the 1st dimension of "dset_a" */
-    if (H5DSiterate_scales(did, 0, NULL, op_continue, NULL) < 0)
+    if (H5DSiterate_scales(did, 0, NULL, op_continue, NULL) < 0) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4336,16 +4878,19 @@ test_iterators(void)
     HL_TESTING2("iterate on group ");
 
     /* open */
-    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "grp", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* try to iterate, return error */
-    if (H5DSiterate_scales(gid, 0, NULL, verify_scale, NULL) == SUCCEED)
+    if (H5DSiterate_scales(gid, 0, NULL, verify_scale, NULL) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4356,26 +4901,31 @@ test_iterators(void)
 
     HL_TESTING2("iterate in deleted scales ");
 
-    if (H5Ldelete(fid, "ds_0", H5P_DEFAULT) < 0)
+    if (H5Ldelete(fid, "ds_0", H5P_DEFAULT) < 0) {
         goto out;
+    }
 
     /* open the previously written "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* iterate  */
-    if (H5DSiterate_scales(did, 0, NULL, op_continue, NULL) == SUCCEED)
+    if (H5DSiterate_scales(did, 0, NULL, op_continue, NULL) == SUCCEED) {
         goto out;
+    }
 
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
     /* close */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     return 0;
 
@@ -4397,24 +4947,23 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-test_rank(void)
+static int test_rank(void)
 {
-    hid_t   fid;                                          /* file ID */
-    hid_t   did      = -1;                                /* dataset ID */
-    hid_t   dsid     = -1;                                /* scale ID */
-    hid_t   sid      = -1;                                /* space ID */
-    hid_t   sidds    = -1;                                /* space ID */
-    hsize_t dims1[1] = {DIM1_SIZE};                       /* size of data dataset */
-    hsize_t dims2[2] = {DIM1_SIZE, DIM2_SIZE};            /* size of data dataset */
-    hsize_t dims3[3] = {DIM1_SIZE, DIM2_SIZE, DIM3_SIZE}; /* size of data dataset */
-    hsize_t dimss[2] = {1, 1};                            /* size of data dataset */
-    char    name[30];                                     /* dataset name buffer */
-    char    names[30];                                    /* dataset scale name buffer */
-    char    namel[30];                                    /* dataset label name buffer */
-    int     bufi[1] = {2};
-    float   buff[1] = {1};
-    int     i;
+    hid_t fid;                                              /* file ID */
+    hid_t did = -1;                                         /* dataset ID */
+    hid_t dsid = -1;                                        /* scale ID */
+    hid_t sid = -1;                                         /* space ID */
+    hid_t sidds = -1;                                       /* space ID */
+    hsize_t dims1[1] = { DIM1_SIZE };                       /* size of data dataset */
+    hsize_t dims2[2] = { DIM1_SIZE, DIM2_SIZE };            /* size of data dataset */
+    hsize_t dims3[3] = { DIM1_SIZE, DIM2_SIZE, DIM3_SIZE }; /* size of data dataset */
+    hsize_t dimss[2] = { 1, 1 };                            /* size of data dataset */
+    char name[30];                                          /* dataset name buffer */
+    char names[30];                                         /* dataset scale name buffer */
+    char namel[30];                                         /* dataset label name buffer */
+    int bufi[1] = { 2 };
+    float buff[1] = { 1 };
+    int i;
 
     printf("Testing ranks\n");
 
@@ -4424,24 +4973,29 @@ test_rank(void)
      */
 
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE4, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE4, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* make a dataset a 3D data dataset */
-    if (H5LTmake_dataset_int(fid, "dset_a", 3, dims3, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_a", 3, dims3, NULL) < 0) {
         goto out;
+    }
 
     /* make a 1D scale dataset  */
-    if (H5LTmake_dataset_int(fid, "ds_a_0", 1, dims1, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_0", 1, dims1, NULL) < 0) {
         goto out;
+    }
 
     /* make a 2D scale dataset  */
-    if (H5LTmake_dataset_int(fid, "ds_a_1", 2, dims2, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_1", 2, dims2, NULL) < 0) {
         goto out;
+    }
 
     /* make a 3D scale dataset  */
-    if (H5LTmake_dataset_int(fid, "ds_a_2", 3, dims3, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds_a_2", 3, dims3, NULL) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach
@@ -4450,23 +5004,29 @@ test_rank(void)
 
     HL_TESTING2("attach");
 
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     for (i = 0; i < 3; i++) {
         snprintf(name, sizeof(name), "ds_a_%d", i);
-        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0)
+        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0) {
             goto out;
-        if (H5DSattach_scale(did, dsid, (unsigned)i) < 0)
+        }
+        if (H5DSattach_scale(did, dsid, (unsigned)i) < 0) {
             goto out;
-        if (H5DSis_attached(did, dsid, (unsigned)i) <= 0)
+        }
+        if (H5DSis_attached(did, dsid, (unsigned)i) <= 0) {
             goto out;
-        if (H5Dclose(dsid) < 0)
+        }
+        if (H5Dclose(dsid) < 0) {
             goto out;
+        }
     }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4477,22 +5037,28 @@ test_rank(void)
 
     HL_TESTING2("detach");
 
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     for (i = 0; i < 3; i++) {
         snprintf(name, sizeof(name), "ds_a_%d", i);
-        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0)
+        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0) {
             goto out;
-        if (H5DSdetach_scale(did, dsid, (unsigned)i) < 0)
+        }
+        if (H5DSdetach_scale(did, dsid, (unsigned)i) < 0) {
             goto out;
-        if (H5DSis_attached(did, dsid, (unsigned)i) != 0)
+        }
+        if (H5DSis_attached(did, dsid, (unsigned)i) != 0) {
             goto out;
-        if (H5Dclose(dsid) < 0)
+        }
+        if (H5Dclose(dsid) < 0) {
             goto out;
+        }
     }
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4503,35 +5069,47 @@ test_rank(void)
 
     HL_TESTING2("attach, set, get names, labels");
 
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     for (i = 0; i < 3; i++) {
         snprintf(name, sizeof(name), "ds_a_%d", i);
-        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0)
+        if ((dsid = H5Dopen2(fid, name, H5P_DEFAULT)) < 0) {
             goto out;
-        if (H5DSset_scale(dsid, name) < 0)
+        }
+        if (H5DSset_scale(dsid, name) < 0) {
             goto out;
-        if (H5DSattach_scale(did, dsid, (unsigned)i) < 0)
+        }
+        if (H5DSattach_scale(did, dsid, (unsigned)i) < 0) {
             goto out;
-        if (H5DSis_attached(did, dsid, (unsigned)i) <= 0)
+        }
+        if (H5DSis_attached(did, dsid, (unsigned)i) <= 0) {
             goto out;
-        if (H5DSget_scale_name(dsid, names, sizeof(names)) < 0)
+        }
+        if (H5DSget_scale_name(dsid, names, sizeof(names)) < 0) {
             goto out;
-        if (H5Dclose(dsid) < 0)
+        }
+        if (H5Dclose(dsid) < 0) {
             goto out;
-        if (H5DSset_label(did, (unsigned)i, name) < 0)
+        }
+        if (H5DSset_label(did, (unsigned)i, name) < 0) {
             goto out;
-        if (H5DSget_label(did, (unsigned)i, namel, sizeof(namel)) < 0)
+        }
+        if (H5DSget_label(did, (unsigned)i, namel, sizeof(namel)) < 0) {
             goto out;
-        if (strncmp(name, names, sizeof(names)) != 0)
+        }
+        if (strncmp(name, names, sizeof(names)) != 0) {
             goto out;
-        if (strncmp(name, namel, sizeof(namel)) != 0)
+        }
+        if (strncmp(name, namel, sizeof(namel)) != 0) {
             goto out;
+        }
     }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4543,37 +5121,48 @@ test_rank(void)
     HL_TESTING2("attach a scalar scale");
 
     /* create the data space for the dataset */
-    if ((sid = H5Screate_simple(2, dimss, NULL)) < 0)
+    if ((sid = H5Screate_simple(2, dimss, NULL)) < 0) {
         goto out;
+    }
     /* create a dataset of rank 2 */
-    if ((did = H5Dcreate2(fid, "dset_b", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid, "dset_b", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* create a scalar space */
-    if ((sidds = H5Screate(H5S_SCALAR)) < 0)
+    if ((sidds = H5Screate(H5S_SCALAR)) < 0) {
         goto out;
+    }
     /* create a dataset of scalar rank for the scale */
-    if ((dsid = H5Dcreate2(fid, "ds_b_1", H5T_NATIVE_FLOAT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) <
-        0)
+    if ((dsid = H5Dcreate2(fid, "ds_b_1", H5T_NATIVE_FLOAT, sidds, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* write */
-    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, bufi) < 0)
+    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, bufi) < 0) {
         goto out;
-    if (H5Dwrite(dsid, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buff) < 0)
+    }
+    if (H5Dwrite(dsid, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buff) < 0) {
         goto out;
+    }
     /* attach */
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 1) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 1) < 0) {
         goto out;
+    }
     /* close */
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Sclose(sidds) < 0)
+    }
+    if (H5Sclose(sidds) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4581,8 +5170,9 @@ test_rank(void)
      * close
      *-------------------------------------------------------------------------
      */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     return 0;
 
@@ -4606,22 +5196,21 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-test_types(void)
+static int test_types(void)
 {
-    hid_t          fid;                                                            /* file ID */
-    hid_t          did                  = -1;                                      /* dataset ID */
-    hid_t          dsid                 = -1;                                      /* DS dataset ID */
-    int            rank                 = RANK;                                    /* rank of data dataset */
-    int            rankds               = 1;                                       /* rank of DS dataset */
-    hsize_t        dims[RANK]           = {DIM1_SIZE, DIM2_SIZE};                  /* size of data dataset */
-    int            buf[DIM_DATA]        = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}; /* data of data dataset */
-    hsize_t        s1_dim[1]            = {DIM1_SIZE};                             /* size of DS 1 dataset */
-    hsize_t        s2_dim[1]            = {DIM2_SIZE};                             /* size of DS 2 dataset */
-    float          s1_float[DIM1_SIZE]  = {10, 20, 30};                            /* data of DS 1 dataset */
-    unsigned short s2_ushort[DIM2_SIZE] = {10, 20, 30, 40};                        /* data of DS 2 dataset */
-    const char    *s1_str               = "ABC";
-    const char    *s2_str               = "ABCD";
+    hid_t fid;                                                     /* file ID */
+    hid_t did = -1;                                                /* dataset ID */
+    hid_t dsid = -1;                                               /* DS dataset ID */
+    int rank = RANK;                                               /* rank of data dataset */
+    int rankds = 1;                                                /* rank of DS dataset */
+    hsize_t dims[RANK] = { DIM1_SIZE, DIM2_SIZE };                 /* size of data dataset */
+    int buf[DIM_DATA] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }; /* data of data dataset */
+    hsize_t s1_dim[1] = { DIM1_SIZE };                             /* size of DS 1 dataset */
+    hsize_t s2_dim[1] = { DIM2_SIZE };                             /* size of DS 2 dataset */
+    float s1_float[DIM1_SIZE] = { 10, 20, 30 };                    /* data of DS 1 dataset */
+    unsigned short s2_ushort[DIM2_SIZE] = { 10, 20, 30, 40 };      /* data of DS 2 dataset */
+    const char* s1_str = "ABC";
+    const char* s2_str = "ABCD";
 
     printf("Testing scales with several datatypes\n");
 
@@ -4630,8 +5219,9 @@ test_types(void)
      *-------------------------------------------------------------------------
      */
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE5, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE5, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * create datasets: 1 "data" dataset and 2 dimension scales
@@ -4639,16 +5229,19 @@ test_types(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_a", rank, dims, buf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_float(fid, DS_1_NAME, rankds, s1_dim, s1_float) < 0)
+    if (H5LTmake_dataset_float(fid, DS_1_NAME, rankds, s1_dim, s1_float) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset(fid, DS_2_NAME, rankds, s2_dim, H5T_NATIVE_USHORT, s2_ushort) < 0)
+    if (H5LTmake_dataset(fid, DS_2_NAME, rankds, s2_dim, H5T_NATIVE_USHORT, s2_ushort) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * floating point and short scales
@@ -4658,41 +5251,53 @@ test_types(void)
     HL_TESTING2("floating point and short scales");
 
     /* get the dataset id for "dset_a" */
-    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_a", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, DS_1_NAME, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, DS_1_NAME, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_1_NAME dimension scale to "dset_a" at dimension 0 */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, DS_2_NAME, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, DS_2_NAME, H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_2_NAME dimension scale to "dset_a" at dimension 1 */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* set a label */
-    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0)
+    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0) {
         goto out;
-    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0)
+    }
+    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0) {
         goto out;
+    }
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4702,16 +5307,19 @@ test_types(void)
      */
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset_b", rank, dims, buf) < 0)
+    if (H5LTmake_dataset_int(fid, "dset_b", rank, dims, buf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_string(fid, "ds_b_1", s1_str) < 0)
+    if (H5LTmake_dataset_string(fid, "ds_b_1", s1_str) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_string(fid, "ds_b_2", s2_str) < 0)
+    if (H5LTmake_dataset_string(fid, "ds_b_2", s2_str) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * floating point and short scales
@@ -4721,40 +5329,52 @@ test_types(void)
     HL_TESTING2("string scales");
 
     /* get the dataset id for "dset_b" */
-    if ((did = H5Dopen2(fid, "dset_b", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset_b", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_b_1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_b_1", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_1_NAME dimension scale to "dset_b" at dimension 0 */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "ds_b_2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds_b_2", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_2_NAME dimension scale to "dset_b" at dimension 1 */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* set a label */
-    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0)
+    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0) {
         goto out;
-    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0)
+    }
+    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0) {
         goto out;
+    }
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4762,8 +5382,9 @@ test_types(void)
      * close
      *-------------------------------------------------------------------------
      */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     return 0;
 
@@ -4785,21 +5406,20 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-test_data(void)
+static int test_data(void)
 {
-    hid_t   fid;           /* file ID */
-    hid_t   did  = -1;     /* dataset ID */
-    hid_t   dsid = -1;     /* DS dataset ID */
-    hid_t   dcpl;          /* dataset creation property list */
-    hid_t   sid;           /* dataspace ID */
-    float  *vals   = NULL; /* array to hold data values */
-    float  *latbuf = NULL; /* array to hold the latitude values */
-    float  *lonbuf = NULL; /* array to hold the longitude values */
-    hsize_t dims[2];       /* array to hold dimensions */
-    hsize_t latdims[1];    /* array to hold dimensions */
-    hsize_t londims[1];    /* array to hold dimensions */
-    float   fill = -99;    /* fill value */
+    hid_t fid;            /* file ID */
+    hid_t did = -1;       /* dataset ID */
+    hid_t dsid = -1;      /* DS dataset ID */
+    hid_t dcpl;           /* dataset creation property list */
+    hid_t sid;            /* dataspace ID */
+    float* vals = NULL;   /* array to hold data values */
+    float* latbuf = NULL; /* array to hold the latitude values */
+    float* lonbuf = NULL; /* array to hold the longitude values */
+    hsize_t dims[2];      /* array to hold dimensions */
+    hsize_t latdims[1];   /* array to hold dimensions */
+    hsize_t londims[1];   /* array to hold dimensions */
+    float fill = -99;     /* fill value */
 
     printf("Testing reading ASCII data and generate HDF5 data with scales\n");
 
@@ -4808,8 +5428,9 @@ test_data(void)
      *-------------------------------------------------------------------------
      */
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE6, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE6, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * generating scales
@@ -4824,53 +5445,66 @@ test_data(void)
      */
 
     /* read the latitude */
-    if (read_data("dslat.txt", 1, latdims, &latbuf) < 0)
+    if (read_data("dslat.txt", 1, latdims, &latbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the first dimension */
-    if (H5LTmake_dataset_float(fid, "lat", 1, latdims, latbuf) < 0)
+    if (H5LTmake_dataset_float(fid, "lat", 1, latdims, latbuf) < 0) {
         goto out;
+    }
 
     free(latbuf);
     latbuf = NULL;
 
     /* read the longitude */
-    if (read_data("dslon.txt", 1, londims, &lonbuf) < 0)
+    if (read_data("dslon.txt", 1, londims, &lonbuf) < 0) {
         goto out;
+    }
 
     /* make a DS dataset for the second dimension */
-    if (H5LTmake_dataset_float(fid, "lon", 1, londims, lonbuf) < 0)
+    if (H5LTmake_dataset_float(fid, "lon", 1, londims, lonbuf) < 0) {
         goto out;
+    }
 
     free(lonbuf);
     lonbuf = NULL;
 
     /* make a dataset for the data. a fill value is set */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto out;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_FLOAT, &fill) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_FLOAT, &fill) < 0) {
         goto out;
+    }
 
     /* read ASCII bathymetry data and dimensions to create dataset */
-    if (read_data("dsdata.txt", 2, dims, &vals) < 0)
+    if (read_data("dsdata.txt", 2, dims, &vals) < 0) {
         goto out;
+    }
 
-    if ((sid = H5Screate_simple(2, dims, NULL)) < 0)
+    if ((sid = H5Screate_simple(2, dims, NULL)) < 0) {
         goto out;
-    if ((did = H5Dcreate2(fid, "data", H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((did = H5Dcreate2(fid, "data", H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5Dwrite(did, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, vals) < 0)
+    }
+    if (H5Dwrite(did, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, vals) < 0) {
         goto out;
+    }
 
     free(vals);
     vals = NULL;
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto out;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * attach
@@ -4878,41 +5512,53 @@ test_data(void)
      */
 
     /* get the dataset id for "data" */
-    if ((did = H5Dopen2(fid, "data", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "data", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "lat", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "lat", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_1_NAME dimension scale to "data" at dimension 0 */
-    if (H5DSattach_scale(did, dsid, DIM0) < 0)
+    if (H5DSattach_scale(did, dsid, DIM0) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_1_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* get the DS dataset id */
-    if ((dsid = H5Dopen2(fid, "lon", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "lon", H5P_DEFAULT)) < 0) {
         goto out;
+    }
     /* attach the DS_2_NAME dimension scale to "data" at dimension 1 */
-    if (H5DSattach_scale(did, dsid, DIM1) < 0)
+    if (H5DSattach_scale(did, dsid, DIM1) < 0) {
         goto out;
+    }
     /* set name */
-    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0)
+    if (H5DSset_scale(dsid, SCALE_2_NAME) < 0) {
         goto out;
+    }
     /* close DS id */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     /* set a label */
-    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0)
+    if (H5DSset_label(did, DIM0, DIM0_LABEL) < 0) {
         goto out;
-    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0)
+    }
+    if (H5DSset_label(did, DIM1, DIM1_LABEL) < 0) {
         goto out;
+    }
     /* close */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -4920,8 +5566,9 @@ test_data(void)
      * close
      *-------------------------------------------------------------------------
      */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     return 0;
 
@@ -4936,12 +5583,15 @@ out:
     H5E_END_TRY
     H5_FAILED();
 
-    if (latbuf)
+    if (latbuf) {
         free(latbuf);
-    if (lonbuf)
+    }
+    if (lonbuf) {
         free(lonbuf);
-    if (vals)
+    }
+    if (vals) {
         free(vals);
+    }
     return FAIL;
 }
 
@@ -4958,16 +5608,15 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-read_data(const char *fname, int ndims, hsize_t *dims, float **buf)
+static int read_data(const char* fname, int ndims, hsize_t* dims, float** buf)
 {
-    int         i, n;
-    unsigned    j;
-    char        str[20];
-    size_t      nelms;
-    FILE       *f;
-    float       val;
-    const char *data_file = H5_get_srcdir_filename(fname);
+    int i, n;
+    unsigned j;
+    char str[20];
+    size_t nelms;
+    FILE* f;
+    float val;
+    const char* data_file = H5_get_srcdir_filename(fname);
 
     /* read first data file */
     f = fopen(data_file, "r");
@@ -4991,7 +5640,7 @@ read_data(const char *fname, int ndims, hsize_t *dims, float **buf)
         nelms *= (size_t)n;
     }
 
-    *buf = (float *)malloc(nelms * sizeof(float));
+    *buf = (float*)malloc(nelms * sizeof(float));
 
     if (*buf == NULL) {
         printf("memory allocation failed\n");
@@ -5017,19 +5666,18 @@ read_data(const char *fname, int ndims, hsize_t *dims, float **buf)
  *-------------------------------------------------------------------------
  */
 
-static int
-test_errors2(void)
+static int test_errors2(void)
 {
-    hid_t   fid;              /* file ID */
-    hid_t   did     = -1;     /* dataset ID */
-    hid_t   dsid    = -1;     /* scale ID */
-    hsize_t dimd[2] = {3, 3}; /* size of data dataset */
-    hsize_t dims[1] = {3};    /* size of scale dataset */
-    char    lbuf[255];        /* label buffer */
-    ssize_t label_len;        /* label length */
-    int     scale_idx;        /* scale index */
-    int     nscales;          /* number of scales in DIM */
-    int     count;            /* visitor data */
+    hid_t fid;                  /* file ID */
+    hid_t did = -1;             /* dataset ID */
+    hid_t dsid = -1;            /* scale ID */
+    hsize_t dimd[2] = { 3, 3 }; /* size of data dataset */
+    hsize_t dims[1] = { 3 };    /* size of scale dataset */
+    char lbuf[255];             /* label buffer */
+    ssize_t label_len;          /* label length */
+    int scale_idx;              /* scale index */
+    int nscales;                /* number of scales in DIM */
+    int count;                  /* visitor data */
 
     printf("Testing parameter errors\n");
 
@@ -5039,20 +5687,24 @@ test_errors2(void)
      */
 
     /* create a file using default properties */
-    if ((fid = H5Fcreate(FILE7, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE7, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* make a dataset */
-    if (H5LTmake_dataset_int(fid, "dset", 2, dimd, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "dset", 2, dimd, NULL) < 0) {
         goto out;
+    }
 
     /* make a scale dataset  */
-    if (H5LTmake_dataset_int(fid, "ds1", 1, dims, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds1", 1, dims, NULL) < 0) {
         goto out;
+    }
 
     /* make a scale dataset  */
-    if (H5LTmake_dataset_int(fid, "ds2", 1, dims, NULL) < 0)
+    if (H5LTmake_dataset_int(fid, "ds2", 1, dims, NULL) < 0) {
         goto out;
+    }
 
     HL_TESTING2("attach scales");
 
@@ -5061,18 +5713,24 @@ test_errors2(void)
      *-------------------------------------------------------------------------
      */
 
-    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 2) == SUCCEED)
+    }
+    if (H5DSattach_scale(did, dsid, 2) == SUCCEED) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -5082,18 +5740,24 @@ test_errors2(void)
      * detach with invalid indices
      *-------------------------------------------------------------------------
      */
-    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0) {
         goto out;
-    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0)
+    }
+    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSdetach_scale(did, dsid, 2) == SUCCEED)
+    }
+    if (H5DSdetach_scale(did, dsid, 2) == SUCCEED) {
         goto out;
-    if (H5DSdetach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSdetach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -5103,22 +5767,30 @@ test_errors2(void)
      * set/get label invalid indices
      *-------------------------------------------------------------------------
      */
-    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_label(did, 2, "label") == SUCCEED)
+    }
+    if (H5DSset_label(did, 2, "label") == SUCCEED) {
         goto out;
-    if (H5DSset_label(did, 0, "label") < 0)
+    }
+    if (H5DSset_label(did, 0, "label") < 0) {
         goto out;
-    if (H5DSget_label(did, 2, lbuf, sizeof(lbuf)) == SUCCEED)
+    }
+    if (H5DSget_label(did, 2, lbuf, sizeof(lbuf)) == SUCCEED) {
         goto out;
-    if ((label_len = H5DSget_label(did, 0, NULL, 0)) < 0)
+    }
+    if ((label_len = H5DSget_label(did, 0, NULL, 0)) < 0) {
         goto out;
-    if (label_len != strlen("label"))
+    }
+    if (label_len != strlen("label")) {
         goto out;
-    if (H5DSget_label(did, 0, lbuf, sizeof(lbuf)) < 0)
+    }
+    if (H5DSget_label(did, 0, lbuf, sizeof(lbuf)) < 0) {
         goto out;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -5128,41 +5800,53 @@ test_errors2(void)
      * iterate_scales invalid indices and return DS_IDX and visitor data
      *-------------------------------------------------------------------------
      */
-    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0)
+    if ((did = H5Dopen2(fid, "dset", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds1", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dopen2(fid, "ds2", H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, "ds2", H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    }
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
 
-    if ((nscales = H5DSget_num_scales(did, 0)) < 0)
+    if ((nscales = H5DSget_num_scales(did, 0)) < 0) {
         goto out;
-    if (nscales != 2)
+    }
+    if (nscales != 2) {
         goto out;
+    }
 
     /* invalid DIM */
-    if (H5DSiterate_scales(did, 2, NULL, op_continue, NULL) == SUCCEED)
+    if (H5DSiterate_scales(did, 2, NULL, op_continue, NULL) == SUCCEED) {
         goto out;
+    }
     /* invalid DS_IDX */
     scale_idx = 2;
-    if (H5DSiterate_scales(did, 0, &scale_idx, op_continue, NULL) == SUCCEED)
+    if (H5DSiterate_scales(did, 0, &scale_idx, op_continue, NULL) == SUCCEED) {
         goto out;
+    }
 
     /* continue iteration */
     scale_idx = 0;
-    count     = 0;
-    if (H5DSiterate_scales(did, 0, &scale_idx, op_continue, (void *)&count) < 0)
+    count = 0;
+    if (H5DSiterate_scales(did, 0, &scale_idx, op_continue, (void*)&count) < 0) {
         goto out;
+    }
 
     if (scale_idx != 1 && count != nscales) {
         goto out;
@@ -5170,23 +5854,26 @@ test_errors2(void)
 
     /* stop iteration */
     scale_idx = 0;
-    count     = 0;
-    if (H5DSiterate_scales(did, 0, &scale_idx, op_stop, (void *)&count) < 0)
+    count = 0;
+    if (H5DSiterate_scales(did, 0, &scale_idx, op_stop, (void*)&count) < 0) {
         goto out;
+    }
 
     if (scale_idx != 0 && count != 1) {
         goto out;
     }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * close
      *-------------------------------------------------------------------------
      */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -5204,227 +5891,284 @@ out:
     H5_FAILED();
     return FAIL;
 }
+
 /*-------------------------------------------------------------------------
  * Test attaching and detaching in different order
  * Checks condition reported in Bug HDFFV-7605
  *-------------------------------------------------------------------------
  */
 
-static int
-test_attach_detach(void)
+static int test_attach_detach(void)
 {
-    hid_t   fid;                       /* file ID */
-    hid_t   gid;                       /* group ID */
-    hid_t   sid;                       /* dataspace ID */
-    hid_t   dcpl_id;                   /* dataset creation property */
-    hid_t   dsid = -1;                 /* DS dataset ID */
-    hid_t   var1_id, var2_id, var3_id; /* DS component name */
-    hsize_t dims[RANK1] = {DIM1};
+    hid_t fid;                       /* file ID */
+    hid_t gid;                       /* group ID */
+    hid_t sid;                       /* dataspace ID */
+    hid_t dcpl_id;                   /* dataset creation property */
+    hid_t dsid = -1;                 /* DS dataset ID */
+    hid_t var1_id, var2_id, var3_id; /* DS component name */
+    hsize_t dims[RANK1] = { DIM1 };
 
     HL_TESTING2("permutations of attaching and detaching");
 
     gid = var1_id = var2_id = var3_id = H5I_INVALID_HID;
 
-    if ((fid = H5Fcreate(FILE8, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILE8, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if ((gid = H5Gopen2(fid, "/", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "/", H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
     /* Create dimension scale. */
 
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto out;
+    }
 
-    if ((sid = H5Screate_simple(1, dims, dims)) < 0)
+    if ((sid = H5Screate_simple(1, dims, dims)) < 0) {
         goto out;
+    }
 
-    if ((dsid = H5Dcreate2(gid, DS_3_NAME, H5T_IEEE_F32BE, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dcreate2(gid, DS_3_NAME, H5T_IEEE_F32BE, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Pclose(dcpl_id) < 0)
+    }
+    if (H5Pclose(dcpl_id) < 0) {
         goto out;
+    }
 
-    if (H5DSset_scale(dsid, DS_3_NAME) < 0)
+    if (H5DSset_scale(dsid, DS_3_NAME) < 0) {
         goto out;
+    }
 
     /* Create a variable that uses this dimension scale. */
 
-    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0)
+    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0) {
         goto out;
+    }
 
-    if ((var1_id =
-             H5Dcreate2(gid, DS_31_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((var1_id = H5Dcreate2(gid, DS_31_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
-    if (H5DSattach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Create another variable that uses this dimension scale. */
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto out;
+    }
 
-    if (H5Pset_attr_creation_order(dcpl_id, H5P_CRT_ORDER_TRACKED | H5P_CRT_ORDER_INDEXED) < 0)
+    if (H5Pset_attr_creation_order(dcpl_id, H5P_CRT_ORDER_TRACKED | H5P_CRT_ORDER_INDEXED) < 0) {
         goto out;
+    }
 
-    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0)
+    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0) {
         goto out;
+    }
 
-    if ((var2_id =
-             H5Dcreate2(gid, DS_32_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((var2_id = H5Dcreate2(gid, DS_32_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if (H5Pclose(dcpl_id) < 0)
+    if (H5Pclose(dcpl_id) < 0) {
         goto out;
+    }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /* Create 3rd variable that uses this dimension scale. */
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto out;
+    }
 
-    if (H5Pset_attr_creation_order(dcpl_id, H5P_CRT_ORDER_TRACKED | H5P_CRT_ORDER_INDEXED) < 0)
+    if (H5Pset_attr_creation_order(dcpl_id, H5P_CRT_ORDER_TRACKED | H5P_CRT_ORDER_INDEXED) < 0) {
         goto out;
+    }
 
-    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0)
+    if ((sid = H5Screate_simple(DIM1, dims, dims)) < 0) {
         goto out;
+    }
 
-    if ((var3_id =
-             H5Dcreate2(gid, DS_33_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((var3_id = H5Dcreate2(gid, DS_33_NAME, H5T_NATIVE_FLOAT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if (H5Pclose(dcpl_id) < 0)
+    if (H5Pclose(dcpl_id) < 0) {
         goto out;
+    }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
+    }
 
     /* Attached var2 scale */
-    if (H5DSattach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Detach the var2 scale */
-    if (H5DSdetach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
-    if (H5DSis_attached(var1_id, dsid, 0) == 0) /* should still be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) == 0) { /* should still be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
+    }
 
     /* Detach the var1 scale */
-    if (H5DSdetach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
-    if (H5DSis_attached(var1_id, dsid, 0) != 0) /* should not be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
+    }
 
     /* Attach the DS again and remove them in the opposite order */
 
-    if (H5DSattach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5DSattach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Detach the var1 scale */
-    if (H5DSdetach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
 
-    if (H5DSis_attached(var1_id, dsid, 0) != 0) /* should not be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) == 0) /* should still be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) == 0) { /* should still be attached */
         goto out;
+    }
 
     /* Detach the var2 scale */
-    if (H5DSdetach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
-    if (H5DSis_attached(var1_id, dsid, 0) != 0) /* should not be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
+    }
 
     /***************************************************
      * Attach Three DS and remove the middle one first
      *****************************************************/
 
-    if (H5DSattach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5DSattach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5DSattach_scale(var3_id, dsid, 0) < 0)
+    if (H5DSattach_scale(var3_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Detach the var2 scale */
-    if (H5DSdetach_scale(var2_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var2_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
 
-    if (H5DSis_attached(var1_id, dsid, 0) == 0) /* should still be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) == 0) { /* should still be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var3_id, dsid, 0) == 0) /* should still be attached */
+    }
+    if (H5DSis_attached(var3_id, dsid, 0) == 0) { /* should still be attached */
         goto out;
+    }
 
     /* Detach the var3 scale */
-    if (H5DSdetach_scale(var3_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var3_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
-    if (H5DSis_attached(var1_id, dsid, 0) == 0) /* should still be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) == 0) { /* should still be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var3_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var3_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
+    }
 
     /* Detach the var1 scale */
-    if (H5DSdetach_scale(var1_id, dsid, 0) < 0)
+    if (H5DSdetach_scale(var1_id, dsid, 0) < 0) {
         goto out;
+    }
 
     /* Check if in correct state of detached and attached */
-    if (H5DSis_attached(var1_id, dsid, 0) != 0) /* should not be attached */
+    if (H5DSis_attached(var1_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var2_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var2_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
-    if (H5DSis_attached(var3_id, dsid, 0) != 0) /* should not be attached */
+    }
+    if (H5DSis_attached(var3_id, dsid, 0) != 0) { /* should not be attached */
         goto out;
+    }
 
     /*-------------------------------------------------------------------------
      * close
      *-------------------------------------------------------------------------
      */
 
-    if (H5Dclose(var1_id) < 0)
+    if (H5Dclose(var1_id) < 0) {
         goto out;
-    if (H5Dclose(var2_id) < 0)
+    }
+    if (H5Dclose(var2_id) < 0) {
         goto out;
-    if (H5Dclose(var3_id) < 0)
+    }
+    if (H5Dclose(var3_id) < 0) {
         goto out;
-    if (H5Dclose(dsid) < 0)
+    }
+    if (H5Dclose(dsid) < 0) {
         goto out;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         goto out;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     PASSED();
 
@@ -5452,25 +6196,29 @@ out:
  * dataspace before returning; the caller owns tid.
  *-------------------------------------------------------------------------
  */
-static herr_t
-write_class_attr(hid_t did, hid_t tid, const void *val)
+static herr_t write_class_attr(hid_t did, hid_t tid, const void* val)
 {
-    hid_t  aspace_id = H5I_INVALID_HID;
-    hid_t  aid       = H5I_INVALID_HID;
-    herr_t ret       = FAIL;
+    hid_t aspace_id = H5I_INVALID_HID;
+    hid_t aid = H5I_INVALID_HID;
+    herr_t ret = FAIL;
 
-    if ((aspace_id = H5Screate(H5S_SCALAR)) < 0)
+    if ((aspace_id = H5Screate(H5S_SCALAR)) < 0) {
         goto done;
-    if ((aid = H5Acreate2(did, "CLASS", tid, aspace_id, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    }
+    if ((aid = H5Acreate2(did, "CLASS", tid, aspace_id, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto done;
-    if (H5Awrite(aid, tid, val) < 0)
+    }
+    if (H5Awrite(aid, tid, val) < 0) {
         goto done;
+    }
     ret = SUCCEED;
 done:
-    if (aid != H5I_INVALID_HID)
+    if (aid != H5I_INVALID_HID) {
         H5Aclose(aid);
-    if (aspace_id != H5I_INVALID_HID)
+    }
+    if (aspace_id != H5I_INVALID_HID) {
         H5Sclose(aspace_id);
+    }
     return ret;
 }
 
@@ -5485,91 +6233,110 @@ done:
  * "DIMENSION_S" and null-padded to 16 bytes.
  *-------------------------------------------------------------------------
  */
-static int
-test_is_scale_class_prefix(void)
+static int test_is_scale_class_prefix(void)
 {
-    hid_t   fid     = H5I_INVALID_HID;
-    hid_t   sid     = H5I_INVALID_HID;
-    hid_t   did     = H5I_INVALID_HID;
-    hid_t   atid    = H5I_INVALID_HID;
-    hsize_t dims[1] = {1};
+    hid_t fid = H5I_INVALID_HID;
+    hid_t sid = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    hid_t atid = H5I_INVALID_HID;
+    hsize_t dims[1] = { 1 };
     /* DIMENSION_SCALE_CLASS is "DIMENSION_SCALE"; the spec stores the CLASS
      * attribute as a fixed-length string of exactly this many bytes. */
-    const size_t ds_class_len                             = sizeof(DIMENSION_SCALE_CLASS); /* includes null */
-    char         class_buf[sizeof(DIMENSION_SCALE_CLASS)] = {0};
+    const size_t ds_class_len = sizeof(DIMENSION_SCALE_CLASS); /* includes null */
+    char class_buf[sizeof(DIMENSION_SCALE_CLASS)] = { 0 };
 
     HL_TESTING2("H5DSis_scale rejects CLASS values that only share a prefix");
 
     memcpy(class_buf, "DIMENSION_S", sizeof("DIMENSION_S") - 1);
 
-    if ((fid = H5Fcreate("test_ds_class_prefix.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("test_ds_class_prefix.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
-    if ((sid = H5Screate_simple(1, dims, NULL)) < 0)
+    }
+    if ((sid = H5Screate_simple(1, dims, NULL)) < 0) {
         goto out;
-    if ((did = H5Dcreate2(fid, "dset", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    }
+    if ((did = H5Dcreate2(fid, "dset", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
+    }
 
-    if ((atid = H5Tcopy(H5T_C_S1)) < 0)
+    if ((atid = H5Tcopy(H5T_C_S1)) < 0) {
         goto out;
-    if (H5Tset_size(atid, ds_class_len) < 0)
+    }
+    if (H5Tset_size(atid, ds_class_len) < 0) {
         goto out;
-    if (H5Tset_strpad(atid, H5T_STR_NULLTERM) < 0)
+    }
+    if (H5Tset_strpad(atid, H5T_STR_NULLTERM) < 0) {
         goto out;
-    if (write_class_attr(did, atid, class_buf) < 0)
+    }
+    if (write_class_attr(did, atid, class_buf) < 0) {
         goto out;
-    if (H5Tclose(atid) < 0)
+    }
+    if (H5Tclose(atid) < 0) {
         goto out;
+    }
     atid = H5I_INVALID_HID;
 
     /* CLASS is "DIMENSION_S" (prefix of DIMENSION_SCALE), so H5DSis_scale() must return 0. */
-    if (H5DSis_scale(did) != 0)
+    if (H5DSis_scale(did) != 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
     did = H5I_INVALID_HID;
 
     /* VLEN-string CLASS attribute tests for H5DSis_scale: exact match → 1,
      * prefix/wrong value → 0. */
     {
-        static const struct {
-            const char *dset_name;
-            const char *class_val;
-            int         expected;
+        static const struct
+        {
+            const char* dset_name;
+            const char* class_val;
+            int expected;
         } vl_cases[] = {
-            {"dset_vlen_match", "DIMENSION_SCALE", 1},
-            {"dset_vlen_prefix", "DIMENSION_S", 0},
-            {"dset_vlen_nomatch", "NOT_A_SCALE", 0},
+            { "dset_vlen_match", "DIMENSION_SCALE", 1 },
+            { "dset_vlen_prefix", "DIMENSION_S", 0 },
+            { "dset_vlen_nomatch", "NOT_A_SCALE", 0 },
         };
+
         size_t k;
 
         for (k = 0; k < sizeof(vl_cases) / sizeof(vl_cases[0]); k++) {
-            const char *vl_val = vl_cases[k].class_val;
+            const char* vl_val = vl_cases[k].class_val;
 
-            if ((did = H5Dcreate2(fid, vl_cases[k].dset_name, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT,
-                                  H5P_DEFAULT)) < 0)
+            if ((did = H5Dcreate2(fid, vl_cases[k].dset_name, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                 goto out;
-            if ((atid = H5Tcopy(H5T_C_S1)) < 0)
+            }
+            if ((atid = H5Tcopy(H5T_C_S1)) < 0) {
                 goto out;
-            if (H5Tset_size(atid, H5T_VARIABLE) < 0)
+            }
+            if (H5Tset_size(atid, H5T_VARIABLE) < 0) {
                 goto out;
-            if (write_class_attr(did, atid, &vl_val) < 0)
+            }
+            if (write_class_attr(did, atid, &vl_val) < 0) {
                 goto out;
-            if (H5Tclose(atid) < 0)
+            }
+            if (H5Tclose(atid) < 0) {
                 goto out;
+            }
             atid = H5I_INVALID_HID;
-            if (H5DSis_scale(did) != vl_cases[k].expected)
+            if (H5DSis_scale(did) != vl_cases[k].expected) {
                 goto out;
-            if (H5Dclose(did) < 0)
+            }
+            if (H5Dclose(did) < 0) {
                 goto out;
+            }
             did = H5I_INVALID_HID;
         }
     }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     PASSED();
     return 0;
@@ -5595,76 +6362,89 @@ out:
  * prefix-only matches and variable-length CLASS strings are handled correctly.
  *-------------------------------------------------------------------------
  */
-static int
-test_is_reserved_class_prefix(void)
+static int test_is_reserved_class_prefix(void)
 {
-    hid_t   fid     = H5I_INVALID_HID;
-    hid_t   sid     = H5I_INVALID_HID;
-    hid_t   did     = H5I_INVALID_HID;
-    hid_t   dsid    = H5I_INVALID_HID;
-    hid_t   atid    = H5I_INVALID_HID;
-    hsize_t dims[1] = {4};
+    hid_t fid = H5I_INVALID_HID;
+    hid_t sid = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    hid_t dsid = H5I_INVALID_HID;
+    hid_t atid = H5I_INVALID_HID;
+    hsize_t dims[1] = { 4 };
 
     HL_TESTING2("H5DS_is_reserved rejects CLASS prefix; recognizes VL reserved CLASS");
 
-    if ((fid = H5Fcreate("test_ds_reserved_prefix.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate("test_ds_reserved_prefix.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
-    if ((sid = H5Screate_simple(1, dims, NULL)) < 0)
+    }
+    if ((sid = H5Screate_simple(1, dims, NULL)) < 0) {
         goto out;
+    }
 
     /* Dataset that will receive the scale, tagged with CLASS="IMAGE_EXTRA".
      * H5DS_is_reserved must return false: "IMAGE_EXTRA" is not a reserved
      * class name even though it shares a prefix with "IMAGE". */
-    if ((did = H5Dcreate2(fid, "data", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid, "data", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5LTset_attribute_string(fid, "data", "CLASS", "IMAGE_EXTRA") < 0)
+    }
+    if (H5LTset_attribute_string(fid, "data", "CLASS", "IMAGE_EXTRA") < 0) {
         goto out;
+    }
 
     /* Dimension-scale dataset */
-    if ((dsid = H5Dcreate2(fid, "ds", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dcreate2(fid, "ds", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto out;
-    if (H5DSset_scale(dsid, "xdim") < 0)
+    }
+    if (H5DSset_scale(dsid, "xdim") < 0) {
         goto out;
+    }
 
     /* Attaching a scale to a non-reserved dataset must succeed. */
-    if (H5DSattach_scale(did, dsid, 0) < 0)
+    if (H5DSattach_scale(did, dsid, 0) < 0) {
         goto out;
+    }
 
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto out;
+    }
     did = H5I_INVALID_HID;
 
     /* VLEN-string CLASS attribute tests for H5DS_is_reserved (via
      * H5DSattach_scale): all three reserved names must block attachment;
      * a non-reserved name must allow it. */
     {
-        static const struct {
-            const char *dset_name;
-            const char *class_val;
-            bool        attach_should_fail;
+        static const struct
+        {
+            const char* dset_name;
+            const char* class_val;
+            bool attach_should_fail;
         } vl_cases[] = {
-            {"data_vl_image", "IMAGE", true},
-            {"data_vl_palette", "PALETTE", true},
-            {"data_vl_table", "TABLE", true},
-            {"data_vl_unreserved", "NOT_RESERVED", false},
+            { "data_vl_image", "IMAGE", true },
+            { "data_vl_palette", "PALETTE", true },
+            { "data_vl_table", "TABLE", true },
+            { "data_vl_unreserved", "NOT_RESERVED", false },
         };
+
         size_t k;
 
         for (k = 0; k < sizeof(vl_cases) / sizeof(vl_cases[0]); k++) {
-            const char *vl_val = vl_cases[k].class_val;
-            herr_t      ret;
+            const char* vl_val = vl_cases[k].class_val;
+            herr_t ret;
 
-            if ((did = H5Dcreate2(fid, vl_cases[k].dset_name, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT,
-                                  H5P_DEFAULT)) < 0)
+            if ((did = H5Dcreate2(fid, vl_cases[k].dset_name, H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                 goto out;
-            if ((atid = H5Tcopy(H5T_C_S1)) < 0)
+            }
+            if ((atid = H5Tcopy(H5T_C_S1)) < 0) {
                 goto out;
-            if (H5Tset_size(atid, H5T_VARIABLE) < 0)
+            }
+            if (H5Tset_size(atid, H5T_VARIABLE) < 0) {
                 goto out;
-            if (write_class_attr(did, atid, &vl_val) < 0)
+            }
+            if (write_class_attr(did, atid, &vl_val) < 0) {
                 goto out;
-            if (H5Tclose(atid) < 0)
+            }
+            if (H5Tclose(atid) < 0) {
                 goto out;
+            }
             atid = H5I_INVALID_HID;
 
             H5E_BEGIN_TRY
@@ -5673,24 +6453,30 @@ test_is_reserved_class_prefix(void)
             }
             H5E_END_TRY
 
-            if (vl_cases[k].attach_should_fail && ret >= 0)
+            if (vl_cases[k].attach_should_fail && ret >= 0) {
                 goto out;
-            if (!vl_cases[k].attach_should_fail && ret < 0)
+            }
+            if (!vl_cases[k].attach_should_fail && ret < 0) {
                 goto out;
+            }
 
-            if (H5Dclose(did) < 0)
+            if (H5Dclose(did) < 0) {
                 goto out;
+            }
             did = H5I_INVALID_HID;
         }
     }
 
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         goto out;
+    }
     dsid = H5I_INVALID_HID;
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         goto out;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto out;
+    }
 
     PASSED();
     return 0;

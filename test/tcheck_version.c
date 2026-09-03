@@ -24,23 +24,22 @@
 #include "h5test.h"
 
 #ifdef H5_HAVE_WIN32_API
-#include <crtdbg.h>
+    #include <crtdbg.h>
 #endif
 
 #define progname "tcheck_version"
 
 /* prototypes */
 void showhelp(void);
-void parse(int ac, char **av);
+void parse(int ac, char** av);
 void abort_intercept(int H5_ATTR_UNUSED sig);
 
 /* global variables */
-static unsigned major   = H5_VERS_MAJOR;
-static unsigned minor   = H5_VERS_MINOR;
+static unsigned major = H5_VERS_MAJOR;
+static unsigned minor = H5_VERS_MINOR;
 static unsigned release = H5_VERS_RELEASE;
 
-void
-showhelp(void)
+void showhelp(void)
 {
     printf("Usage: " progname " [-h] [-t<vers>]\n");
     printf("\t-h\tShow this page and version information\n");
@@ -51,10 +50,9 @@ showhelp(void)
     printf("\t\t\tr for Release number (%d)\n", H5_VERS_RELEASE);
 }
 
-void
-parse(int ac, char **av)
+void parse(int ac, char** av)
 {
-    char *pt;
+    char* pt;
 
     while (--ac > 0) {
         pt = *(++av);
@@ -64,28 +62,16 @@ parse(int ac, char **av)
         }
         else {
             switch (*(++pt)) {
-                case 't': /* option -t */
-                    switch (*(++pt)) {
-                        case 'M':
-                            major++;
-                            break;
-                        case 'm':
-                            minor = 999;
-                            break;
-                        case 'r':
-                            release++;
-                            break;
-                        default:
-                            fprintf(stderr, "Unknown -v parameter (%s). Aborted.\n", *av);
-                            exit(EXIT_FAILURE);
-                    }
-                    break;
-                case 'h': /* help page */
-                    showhelp();
-                    exit(EXIT_SUCCESS);
-                default:
-                    fprintf(stderr, "Unknown option(%s). Aborted.\n", *av);
-                    exit(EXIT_FAILURE);
+            case 't': /* option -t */
+                switch (*(++pt)) {
+                case 'M': major++; break;
+                case 'm': minor = 999; break;
+                case 'r': release++; break;
+                default : fprintf(stderr, "Unknown -v parameter (%s). Aborted.\n", *av); exit(EXIT_FAILURE);
+                }
+                break;
+            case 'h': /* help page */ showhelp(); exit(EXIT_SUCCESS);
+            default : fprintf(stderr, "Unknown option(%s). Aborted.\n", *av); exit(EXIT_FAILURE);
             }
         }
     }
@@ -100,8 +86,7 @@ parse(int ac, char **av)
  * some systems may produce extra messages and/or produce core dump.
  * This tries to eliminate those side effects.
  */
-H5_ATTR_NORETURN void
-abort_intercept(int H5_ATTR_UNUSED sig)
+H5_ATTR_NORETURN void abort_intercept(int H5_ATTR_UNUSED sig)
 {
     exit(6);
 }
@@ -112,15 +97,13 @@ abort_intercept(int H5_ATTR_UNUSED sig)
  * Returning true here lets Windows know that we've handled the abort() and that there
  * is no need to alert the user with a modal dialog box.
  */
-int
-handle_crt_abort(int reportType, char *message, int *returnValue)
+int handle_crt_abort(int reportType, char* message, int* returnValue)
 {
     return true;
 }
 #endif
 
-int
-main(int ac, char **av)
+int main(int ac, char** av)
 {
 #ifdef H5_HAVE_WIN32_API
     (void)_CrtSetReportHook2(_CRT_RPTHOOK_INSTALL, handle_crt_abort);

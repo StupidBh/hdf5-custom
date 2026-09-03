@@ -35,25 +35,27 @@
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     hid_t file, space, dset;
 
     /* Create the file */
     file = H5Fcreate(TESTFILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    if (file < 0)
+    if (file < 0) {
         printf("file<0!\n");
+    }
 
     /* Create the dataspace (for dataset) */
     space = H5Screate(H5S_SCALAR);
-    if (space < 0)
+    if (space < 0) {
         printf("space<0!\n");
+    }
 
     /* Create the dataset with compound array fields */
     dset = H5Dcreate2(file, "Dataset1", H5T_NATIVE_INT, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (dset < 0)
+    if (dset < 0) {
         printf("dset<0!\n");
+    }
 
     H5Dclose(dset);
     H5Sclose(space);

@@ -25,9 +25,9 @@
 #define H5RT_FRIEND  /*suppress error about including H5RTpkg */
 #include "H5RTpkg.h" /* R-tree package         */
 
-#define H5D_FRIEND /*suppress error about including H5Dpkg */
+#define H5D_FRIEND   /*suppress error about including H5Dpkg */
 #define H5D_TESTING
-#include "H5Dpkg.h" /* Datasets */
+#include "H5Dpkg.h"  /* Datasets */
 
 #define RTREE_TEST_BASE_COORD 10000
 #define RTREE_TEST_BASE_SIZE  1000
@@ -35,12 +35,12 @@
 #define RTREE_TEST_CREATE_RANK       8
 #define RTREE_TEST_CREATE_NUM_COUNTS 4
 
-static const char *FILENAME[] = {"vds_rtree_src",       /* 0: Source file for VDS mappings */
-                                 "vds_rtree_dapl",      /* 1: DAPL test file */
-                                 "vds_rtree_threshold", /* 2: Threshold test file */
-                                 "vds_rtree_rw",        /* 3: Read/write test file */
-                                 "vds_rtree_empty",     /* 4: Empty slice test file */
-                                 NULL};
+static const char* FILENAME[] = { "vds_rtree_src",       /* 0: Source file for VDS mappings */
+                                  "vds_rtree_dapl",      /* 1: DAPL test file */
+                                  "vds_rtree_threshold", /* 2: Threshold test file */
+                                  "vds_rtree_rw",        /* 3: Read/write test file */
+                                  "vds_rtree_empty",     /* 4: Empty slice test file */
+                                  NULL };
 
 #define FILENAME_BUF_SIZE 1024
 
@@ -51,33 +51,28 @@ static const char *FILENAME[] = {"vds_rtree_src",       /* 0: Source file for VD
 
 #define RTREE_MAX_TEST_MAPPINGS (H5D_VIRTUAL_TREE_THRESHOLD + 100)
 
-static const size_t test_counts[RTREE_TEST_CREATE_NUM_COUNTS] = {H5D_VIRTUAL_TREE_THRESHOLD, 100, 1000,
-                                                                 10000};
+static const size_t test_counts[RTREE_TEST_CREATE_NUM_COUNTS] = { H5D_VIRTUAL_TREE_THRESHOLD, 100, 1000, 10000 };
 
 /* Helper function to generate leaf data */
-static H5RT_leaf_t *generate_leaves(int rank, size_t leaf_count);
+static H5RT_leaf_t* generate_leaves(int rank, size_t leaf_count);
 
 /* Helper function to free leaf data */
-static void free_leaves(H5RT_leaf_t *leaves, size_t leaf_count);
+static void free_leaves(H5RT_leaf_t* leaves, size_t leaf_count);
 
 /* For manual verification of r-tree results */
-static H5RT_leaf_t **manual_search(H5RT_leaf_t *leaves, size_t leaf_count, int rank, hsize_t min[],
-                                   hsize_t max[], size_t *results_count);
+static H5RT_leaf_t** manual_search(H5RT_leaf_t* leaves, size_t leaf_count, int rank, hsize_t min[], hsize_t max[], size_t* results_count);
 
 /* Helper function to compare r-tree search results to linear search */
-static herr_t verify_rtree_search(H5RT_result_set_t *result_set, H5RT_leaf_t *leaves, size_t leaf_count,
-                                  hsize_t min[], hsize_t max[], int rank);
+static herr_t verify_rtree_search(H5RT_result_set_t* result_set, H5RT_leaf_t* leaves, size_t leaf_count, hsize_t min[], hsize_t max[], int rank);
 
 /* Helper to create and initialize virtual dset in a file */
 static hid_t create_virtual_dataset(hid_t file_id, hid_t dapl_id, int num_mappings, hid_t src_fapl);
 
-static herr_t
-verify_rtree_search(H5RT_result_set_t *result_set, H5RT_leaf_t *leaves, size_t leaf_count, hsize_t min[],
-                    hsize_t max[], int rank)
+static herr_t verify_rtree_search(H5RT_result_set_t* result_set, H5RT_leaf_t* leaves, size_t leaf_count, hsize_t min[], hsize_t max[], int rank)
 {
-    H5RT_leaf_t **manual_results     = NULL;
-    size_t        num_manual_results = 0;
-    herr_t        ret_value          = SUCCEED;
+    H5RT_leaf_t** manual_results = NULL;
+    size_t num_manual_results = 0;
+    herr_t ret_value = SUCCEED;
 
     assert(result_set);
 
@@ -94,8 +89,8 @@ verify_rtree_search(H5RT_result_set_t *result_set, H5RT_leaf_t *leaves, size_t l
     if (num_manual_results > 0) {
         /* Order of results in each list may differ, so we need to check each result individually */
         for (size_t i = 0; i < num_manual_results; i++) {
-            H5RT_leaf_t *manual_leaf = manual_results[i];
-            bool         found       = false;
+            H5RT_leaf_t* manual_leaf = manual_results[i];
+            bool found = false;
 
             /* Check if this manual result is in the r-tree results */
             for (size_t j = 0; j < result_set->count; j++) {
@@ -114,27 +109,28 @@ verify_rtree_search(H5RT_result_set_t *result_set, H5RT_leaf_t *leaves, size_t l
     }
 
 done:
-    if (manual_results)
+    if (manual_results) {
         free(manual_results);
+    }
 
     return ret_value;
 }
 
 /* Helper function to generate leaf data */
-static H5RT_leaf_t *
-generate_leaves(int rank, size_t leaf_count)
+static H5RT_leaf_t* generate_leaves(int rank, size_t leaf_count)
 {
-    H5RT_leaf_t *ret_value = NULL;
+    H5RT_leaf_t* ret_value = NULL;
 
     assert(rank > 0);
     assert(leaf_count > 0);
 
-    if ((ret_value = calloc(leaf_count, sizeof(H5RT_leaf_t))) == NULL)
+    if ((ret_value = calloc(leaf_count, sizeof(H5RT_leaf_t))) == NULL) {
         goto done;
+    }
 
     for (size_t i = 0; i < leaf_count; i++) {
         /* Initialize leaf with dynamic coordinate allocation */
-        if (H5RT_leaf_init(&ret_value[i], rank, (void *)1) < 0) {
+        if (H5RT_leaf_init(&ret_value[i], rank, (void*)1) < 0) {
             /* Clean up already initialized leaves */
             for (size_t j = 0; j < i; j++) {
                 H5RT_leaf_cleanup(&ret_value[j]);
@@ -146,8 +142,8 @@ generate_leaves(int rank, size_t leaf_count)
 
         /* Set coordinates */
         for (int d = 0; d < rank; d++) {
-            hsize_t min_coord   = (hsize_t)rand() % RTREE_TEST_BASE_COORD;
-            hsize_t size        = 1 + (hsize_t)rand() % RTREE_TEST_BASE_SIZE;
+            hsize_t min_coord = (hsize_t)rand() % RTREE_TEST_BASE_COORD;
+            hsize_t size = 1 + (hsize_t)rand() % RTREE_TEST_BASE_SIZE;
             ret_value[i].min[d] = min_coord;
             ret_value[i].max[d] = min_coord + size;
             ret_value[i].mid[d] = (ret_value[i].max[d] + ret_value[i].min[d]) / 2;
@@ -159,11 +155,11 @@ done:
 }
 
 /* Helper function to free leaf data */
-static void
-free_leaves(H5RT_leaf_t *leaves, size_t leaf_count)
+static void free_leaves(H5RT_leaf_t* leaves, size_t leaf_count)
 {
-    if (!leaves)
+    if (!leaves) {
         return;
+    }
 
     for (size_t i = 0; i < leaf_count; i++) {
         H5RT_leaf_cleanup(&leaves[i]);
@@ -171,20 +167,19 @@ free_leaves(H5RT_leaf_t *leaves, size_t leaf_count)
     free(leaves);
 }
 
-static H5RT_leaf_t **
-manual_search(H5RT_leaf_t *leaves, size_t leaf_count, int rank, hsize_t min[], hsize_t max[],
-              size_t *results_count)
+static H5RT_leaf_t** manual_search(H5RT_leaf_t* leaves, size_t leaf_count, int rank, hsize_t min[], hsize_t max[], size_t* results_count)
 {
-    H5RT_leaf_t **ret_value = NULL;
-    H5RT_leaf_t **results   = NULL;
+    H5RT_leaf_t** ret_value = NULL;
+    H5RT_leaf_t** results = NULL;
 
     assert(leaves);
     assert(results_count);
 
     /* Allocate maximum possible results size
      * May need to optimize if this makes testing times impractical */
-    if ((results = calloc(leaf_count, sizeof(H5RT_leaf_t *))) == NULL)
+    if ((results = calloc(leaf_count, sizeof(H5RT_leaf_t*))) == NULL) {
         goto done;
+    }
 
     for (size_t i = 0; i < leaf_count; i++) {
         if (H5RT__leaves_intersect(rank, min, max, leaves[i].min, leaves[i].max)) {
@@ -194,8 +189,9 @@ manual_search(H5RT_leaf_t *leaves, size_t leaf_count, int rank, hsize_t min[], h
 
     ret_value = results;
 done:
-    if (!ret_value && results)
+    if (!ret_value && results) {
         free(results);
+    }
 
     return results;
 }
@@ -210,12 +206,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_create(void)
+static herr_t test_rtree_create(void)
 {
-    H5RT_t      *tree       = NULL;
-    size_t       leaf_count = 0;
-    H5RT_leaf_t *leaves     = NULL;
+    H5RT_t* tree = NULL;
+    size_t leaf_count = 0;
+    H5RT_leaf_t* leaves = NULL;
 
     TESTING("R-tree creation");
     srand(0);
@@ -225,17 +220,20 @@ test_rtree_create(void)
 
         for (int rank = 1; rank < RTREE_TEST_CREATE_RANK; rank++) {
             /* Create the data to populate the r-tree */
-            if ((leaves = generate_leaves(rank, leaf_count)) == NULL)
+            if ((leaves = generate_leaves(rank, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
-            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL)
+            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Ownership of memory has transferred */
             /* leaves is now NULL */
 
-            if (H5RT_free(tree) < 0)
+            if (H5RT_free(tree) < 0) {
                 FAIL_STACK_ERROR;
+            }
         }
     }
 
@@ -243,8 +241,9 @@ test_rtree_create(void)
     return SUCCEED;
 
 error:
-    if (leaves)
+    if (leaves) {
         free_leaves(leaves, leaf_count);
+    }
 
     return FAIL;
 }
@@ -259,18 +258,17 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_search(void)
+static herr_t test_rtree_search(void)
 {
-    H5RT_t      *tree        = NULL;
-    size_t       leaf_count  = 0;
-    H5RT_leaf_t *leaves      = NULL;
-    H5RT_leaf_t *leaves_temp = NULL;
+    H5RT_t* tree = NULL;
+    size_t leaf_count = 0;
+    H5RT_leaf_t* leaves = NULL;
+    H5RT_leaf_t* leaves_temp = NULL;
 
-    H5RT_result_set_t *result_set = NULL;
-    hsize_t            min[H5S_MAX_RANK];
-    hsize_t            max[H5S_MAX_RANK];
-    hsize_t            size = 0;
+    H5RT_result_set_t* result_set = NULL;
+    hsize_t min[H5S_MAX_RANK];
+    hsize_t max[H5S_MAX_RANK];
+    hsize_t size = 0;
 
     TESTING("R-tree spatial queries");
     srand(0);
@@ -283,26 +281,29 @@ test_rtree_search(void)
             memset(max, 0, H5S_MAX_RANK * sizeof(hsize_t));
 
             /* Create data */
-            if ((leaves = generate_leaves(rank, leaf_count)) == NULL)
+            if ((leaves = generate_leaves(rank, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Create tree */
             leaves_temp = leaves;
-            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL)
+            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Ownership is transferred - leaves is now NULL */
 
             /* Setup search criteria */
             for (int r = 0; r < rank; r++) {
                 min[r] = (hsize_t)(rand() % RTREE_TEST_BASE_COORD);
-                size   = 1 + (hsize_t)(rand() % RTREE_TEST_BASE_SIZE);
+                size = 1 + (hsize_t)(rand() % RTREE_TEST_BASE_SIZE);
                 max[r] = min[r] + size;
             }
 
             /* Perform r-tree search */
-            if (H5RT_search(tree, min, max, &result_set) < 0)
+            if (H5RT_search(tree, min, max, &result_set) < 0) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Verify that results are equivalent to a manual search */
             if (verify_rtree_search(result_set, leaves_temp, leaf_count, min, max, rank) < 0) {
@@ -310,12 +311,14 @@ test_rtree_search(void)
             }
 
             /* Free search results */
-            if (H5RT_free_results(result_set) < 0)
+            if (H5RT_free_results(result_set) < 0) {
                 FAIL_STACK_ERROR;
+            }
             result_set = NULL;
 
-            if (H5RT_free(tree) < 0)
+            if (H5RT_free(tree) < 0) {
                 FAIL_STACK_ERROR;
+            }
         }
     }
 
@@ -323,14 +326,17 @@ test_rtree_search(void)
     return SUCCEED;
 
 error:
-    if (result_set)
+    if (result_set) {
         H5RT_free_results(result_set);
+    }
 
-    if (leaves)
+    if (leaves) {
         free_leaves(leaves, leaf_count);
+    }
 
-    if (tree)
+    if (tree) {
         H5RT_free(tree);
+    }
 
     return FAIL;
 }
@@ -345,18 +351,17 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_copy(void)
+static herr_t test_rtree_copy(void)
 {
-    H5RT_t      *tree       = NULL;
-    H5RT_t      *tree_copy  = NULL;
-    size_t       leaf_count = 0;
-    H5RT_leaf_t *leaves     = NULL;
+    H5RT_t* tree = NULL;
+    H5RT_t* tree_copy = NULL;
+    size_t leaf_count = 0;
+    H5RT_leaf_t* leaves = NULL;
 
-    H5RT_result_set_t *result_set = NULL;
-    hsize_t            min[H5S_MAX_RANK];
-    hsize_t            max[H5S_MAX_RANK];
-    hsize_t            size = 0;
+    H5RT_result_set_t* result_set = NULL;
+    hsize_t min[H5S_MAX_RANK];
+    hsize_t max[H5S_MAX_RANK];
+    hsize_t size = 0;
 
     TESTING("R-tree copy");
     srand(0);
@@ -369,35 +374,40 @@ test_rtree_copy(void)
             memset(max, 0, H5S_MAX_RANK * sizeof(hsize_t));
 
             /* Create data */
-            if ((leaves = generate_leaves(rank, leaf_count)) == NULL)
+            if ((leaves = generate_leaves(rank, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Create original tree */
-            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL)
+            if ((tree = H5RT_create(rank, leaves, leaf_count)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Ownership is transferred */
             /* leaves is now NULL */
 
             /* Deep copy the tree */
-            if ((tree_copy = H5RT_copy(tree)) == NULL)
+            if ((tree_copy = H5RT_copy(tree)) == NULL) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Delete the original tree */
-            if (H5RT_free(tree) < 0)
+            if (H5RT_free(tree) < 0) {
                 FAIL_STACK_ERROR;
+            }
             tree = NULL;
 
             /* Setup search criteria */
             for (int r = 0; r < rank; r++) {
                 min[r] = (hsize_t)(rand() % RTREE_TEST_BASE_COORD);
-                size   = 1 + (hsize_t)(rand() % RTREE_TEST_BASE_SIZE);
+                size = 1 + (hsize_t)(rand() % RTREE_TEST_BASE_SIZE);
                 max[r] = min[r] + size;
             }
 
             /* Perform search on copied tree */
-            if (H5RT_search(tree_copy, min, max, &result_set) < 0)
+            if (H5RT_search(tree_copy, min, max, &result_set) < 0) {
                 FAIL_STACK_ERROR;
+            }
 
             /* Verify that results are equivalent to a manual search */
             if (verify_rtree_search(result_set, tree_copy->leaves, leaf_count, min, max, rank) < 0) {
@@ -406,12 +416,14 @@ test_rtree_copy(void)
             }
 
             /* Free search results */
-            if (H5RT_free_results(result_set) < 0)
+            if (H5RT_free_results(result_set) < 0) {
                 FAIL_STACK_ERROR;
+            }
             result_set = NULL;
 
-            if (H5RT_free(tree_copy) < 0)
+            if (H5RT_free(tree_copy) < 0) {
                 FAIL_STACK_ERROR;
+            }
             tree_copy = NULL;
         }
     }
@@ -419,17 +431,21 @@ test_rtree_copy(void)
     PASSED();
     return SUCCEED;
 error:
-    if (result_set)
+    if (result_set) {
         H5RT_free_results(result_set);
+    }
 
-    if (leaves)
+    if (leaves) {
         free_leaves(leaves, leaf_count);
+    }
 
-    if (tree)
+    if (tree) {
         H5RT_free(tree);
+    }
 
-    if (tree_copy)
+    if (tree_copy) {
         H5RT_free(tree_copy);
+    }
 
     return FAIL;
 }
@@ -444,96 +460,109 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static hid_t
-create_virtual_dataset(hid_t file_id, hid_t dapl_id, int num_mappings, hid_t src_fapl)
+static hid_t create_virtual_dataset(hid_t file_id, hid_t dapl_id, int num_mappings, hid_t src_fapl)
 {
-    hid_t   vspace_id   = H5I_INVALID_HID;
-    hid_t   srcspace_id = H5I_INVALID_HID;
-    hid_t   vsel_id     = H5I_INVALID_HID;
-    hid_t   srcfile_id  = H5I_INVALID_HID;
-    hid_t   srcdset_id  = H5I_INVALID_HID;
-    hid_t   vdset_id    = H5I_INVALID_HID;
-    hid_t   dcpl_id     = H5I_INVALID_HID;
-    hsize_t vdims[1]    = {(hsize_t)num_mappings};
-    hsize_t srcdims[1]  = {1};
+    hid_t vspace_id = H5I_INVALID_HID;
+    hid_t srcspace_id = H5I_INVALID_HID;
+    hid_t vsel_id = H5I_INVALID_HID;
+    hid_t srcfile_id = H5I_INVALID_HID;
+    hid_t srcdset_id = H5I_INVALID_HID;
+    hid_t vdset_id = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    hsize_t vdims[1] = { (hsize_t)num_mappings };
+    hsize_t srcdims[1] = { 1 };
     hsize_t start[1], count[1];
-    char    srcdset_name[256];
-    char    srcfilename[FILENAME_BUF_SIZE];
-    char    srcfilename_map[FILENAME_BUF_SIZE];
-    int     wdata;
-    int     i;
+    char srcdset_name[256];
+    char srcfilename[FILENAME_BUF_SIZE];
+    char srcfilename_map[FILENAME_BUF_SIZE];
+    int wdata;
+    int i;
 
     /* Generate VFD-specific source filenames */
     h5_fixname(FILENAME[0], src_fapl, srcfilename, sizeof(srcfilename));
     h5_fixname_printf(FILENAME[0], src_fapl, srcfilename_map, sizeof(srcfilename_map));
 
     /* Create 1D virtual dataset space */
-    if ((vspace_id = H5Screate_simple(1, vdims, NULL)) < 0)
+    if ((vspace_id = H5Screate_simple(1, vdims, NULL)) < 0) {
         goto error;
+    }
 
     /* Create 1D source dataset space (single element) */
-    if ((srcspace_id = H5Screate_simple(1, srcdims, NULL)) < 0)
+    if ((srcspace_id = H5Screate_simple(1, srcdims, NULL)) < 0) {
         goto error;
+    }
 
     /* Create dataset creation property list */
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
+    }
 
     /* Create source file - use actual filename, not the mapping version */
-    if ((srcfile_id = H5Fcreate(srcfilename, H5F_ACC_TRUNC, H5P_DEFAULT, src_fapl)) < 0)
+    if ((srcfile_id = H5Fcreate(srcfilename, H5F_ACC_TRUNC, H5P_DEFAULT, src_fapl)) < 0) {
         goto error;
+    }
 
     /* Create multiple source dsets and add virtual mappings */
     for (i = 0; i < num_mappings; i++) {
         sprintf(srcdset_name, "%d_src_dset", i);
 
         /* Create source dataset */
-        if ((srcdset_id = H5Dcreate2(srcfile_id, srcdset_name, H5T_NATIVE_INT, srcspace_id, H5P_DEFAULT,
-                                     H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((srcdset_id = H5Dcreate2(srcfile_id, srcdset_name, H5T_NATIVE_INT, srcspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
         /* Write data to source dataset (value equals index) */
         wdata = i;
-        if (H5Dwrite(srcdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata) < 0)
+        if (H5Dwrite(srcdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata) < 0) {
             goto error;
+        }
 
         /* Create hyperslab selection for virtual dataset (one element at position i) */
-        if ((vsel_id = H5Scopy(vspace_id)) < 0)
+        if ((vsel_id = H5Scopy(vspace_id)) < 0) {
             goto error;
+        }
 
         start[0] = (hsize_t)i;
         count[0] = 1;
-        if (H5Sselect_hyperslab(vsel_id, H5S_SELECT_SET, start, NULL, count, NULL) < 0)
+        if (H5Sselect_hyperslab(vsel_id, H5S_SELECT_SET, start, NULL, count, NULL) < 0) {
             goto error;
+        }
 
         /* Add virtual mapping - use the printf-escaped version for VDS mapping */
-        if (H5Pset_virtual(dcpl_id, vsel_id, srcfilename_map, srcdset_name, srcspace_id) < 0)
+        if (H5Pset_virtual(dcpl_id, vsel_id, srcfilename_map, srcdset_name, srcspace_id) < 0) {
             goto error;
+        }
 
         /* Close source dataset and selection */
-        if (H5Dclose(srcdset_id) < 0)
+        if (H5Dclose(srcdset_id) < 0) {
             goto error;
-        if (H5Sclose(vsel_id) < 0)
+        }
+        if (H5Sclose(vsel_id) < 0) {
             goto error;
+        }
 
         srcdset_id = H5I_INVALID_HID;
-        vsel_id    = H5I_INVALID_HID;
+        vsel_id = H5I_INVALID_HID;
     }
 
     /* Create virtual dataset */
-    if ((vdset_id = H5Dcreate2(file_id, RTREE_DAPL_VDS_NAME, H5T_NATIVE_INT, vspace_id, H5P_DEFAULT, dcpl_id,
-                               dapl_id)) < 0)
+    if ((vdset_id = H5Dcreate2(file_id, RTREE_DAPL_VDS_NAME, H5T_NATIVE_INT, vspace_id, H5P_DEFAULT, dcpl_id, dapl_id)) < 0) {
         goto error;
+    }
 
     /* Cleanup */
-    if (H5Sclose(vspace_id) < 0)
+    if (H5Sclose(vspace_id) < 0) {
         goto error;
-    if (H5Sclose(srcspace_id) < 0)
+    }
+    if (H5Sclose(srcspace_id) < 0) {
         goto error;
-    if (H5Fclose(srcfile_id) < 0)
+    }
+    if (H5Fclose(srcfile_id) < 0) {
         goto error;
-    if (H5Pclose(dcpl_id) < 0)
+    }
+    if (H5Pclose(dcpl_id) < 0) {
         goto error;
+    }
 
     return vdset_id;
 error:
@@ -564,18 +593,17 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_existence_helper(hid_t vdset_id, bool expect_tree, bool *correct_out)
+static herr_t test_rtree_existence_helper(hid_t vdset_id, bool expect_tree, bool* correct_out)
 {
-    herr_t                 ret_value = SUCCEED;
-    H5D_t                 *dset      = NULL;
-    H5O_storage_virtual_t *storage   = NULL;
+    herr_t ret_value = SUCCEED;
+    H5D_t* dset = NULL;
+    H5O_storage_virtual_t* storage = NULL;
 
     assert(correct_out);
     *correct_out = false;
 
     /* Get the dataset object - this is using internal API for testing */
-    if (NULL == (dset = (H5D_t *)H5VL_object(vdset_id))) {
+    if (NULL == (dset = (H5D_t*)H5VL_object(vdset_id))) {
         ret_value = FAIL;
         goto done;
     }
@@ -630,15 +658,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_dapl(bool use_tree, bool read_init, hid_t vds_fapl, hid_t src_fapl)
+static herr_t test_rtree_dapl(bool use_tree, bool read_init, hid_t vds_fapl, hid_t src_fapl)
 {
-    hid_t file_id  = H5I_INVALID_HID;
-    hid_t dapl_id  = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t dapl_id = H5I_INVALID_HID;
     hid_t vdset_id = H5I_INVALID_HID;
 
-    int  rbuf[RTREE_MAX_TEST_MAPPINGS];
-    int  wbuf[RTREE_MAX_TEST_MAPPINGS];
+    int rbuf[RTREE_MAX_TEST_MAPPINGS];
+    int wbuf[RTREE_MAX_TEST_MAPPINGS];
     bool tree_correct = false;
     char test_str[256];
     char vfilename[FILENAME_BUF_SIZE];
@@ -648,8 +675,9 @@ test_rtree_dapl(bool use_tree, bool read_init, hid_t vds_fapl, hid_t src_fapl)
 
     memset(test_str, 0, sizeof(test_str));
 
-    if (snprintf(test_str, sizeof(test_str), "spatial tree option %s", use_tree ? "enabled" : "disabled") < 0)
+    if (snprintf(test_str, sizeof(test_str), "spatial tree option %s", use_tree ? "enabled" : "disabled") < 0) {
         FAIL_STACK_ERROR;
+    }
 
     if (read_init) {
         strncat(test_str, " with read initialization", sizeof(test_str) - strlen(test_str) - 1);
@@ -667,97 +695,121 @@ test_rtree_dapl(bool use_tree, bool read_init, hid_t vds_fapl, hid_t src_fapl)
     h5_fixname(FILENAME[1], vds_fapl, vfilename, sizeof(vfilename));
 
     /* One-time setup */
-    if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0)
+    if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0)
+    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Create virtual dataset with enough mappings to use tree */
-    if ((vdset_id = create_virtual_dataset(file_id, dapl_id, RTREE_MAX_TEST_MAPPINGS, src_fapl)) < 0)
+    if ((vdset_id = create_virtual_dataset(file_id, dapl_id, RTREE_MAX_TEST_MAPPINGS, src_fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (H5Dclose(vdset_id) < 0)
+    if (H5Dclose(vdset_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Set the spatial tree property */
-    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0)
+    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((vdset_id = H5Dopen2(file_id, RTREE_DAPL_VDS_NAME, dapl_id)) < 0)
+    if ((vdset_id = H5Dopen2(file_id, RTREE_DAPL_VDS_NAME, dapl_id)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Read/write the entire virtual dataset to force tree initialization */
     if (read_init) {
-        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
             FAIL_STACK_ERROR;
+        }
     }
     else {
-        if (H5Dwrite(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf) < 0)
+        if (H5Dwrite(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf) < 0) {
             FAIL_STACK_ERROR;
+        }
     }
 
     /* Verify tree existence matches expectation */
-    if (test_rtree_existence_helper(vdset_id, use_tree, &tree_correct) < 0)
+    if (test_rtree_existence_helper(vdset_id, use_tree, &tree_correct) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (!tree_correct)
+    if (!tree_correct) {
         FAIL_STACK_ERROR;
+    }
 
     /* Close the dataset and re-open it with the opposite value set in DAPL */
-    if (H5Dclose(vdset_id) < 0)
+    if (H5Dclose(vdset_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     vdset_id = H5I_INVALID_HID;
 
-    if (H5Fclose(file_id) < 0)
+    if (H5Fclose(file_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     file_id = H5I_INVALID_HID;
 
-    if (H5Pclose(dapl_id) < 0)
+    if (H5Pclose(dapl_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    dapl_id      = H5I_INVALID_HID;
+    dapl_id = H5I_INVALID_HID;
     tree_correct = false;
     memset(rbuf, 0, sizeof(int) * RTREE_MAX_TEST_MAPPINGS);
 
-    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0)
+    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree_inverse) < 0)
+    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree_inverse) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((file_id = H5Fopen(vfilename, H5F_ACC_RDWR, vds_fapl)) < 0)
+    if ((file_id = H5Fopen(vfilename, H5F_ACC_RDWR, vds_fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((vdset_id = H5Dopen2(file_id, RTREE_DAPL_VDS_NAME, dapl_id)) < 0)
+    if ((vdset_id = H5Dopen2(file_id, RTREE_DAPL_VDS_NAME, dapl_id)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Read/write the entire virtual dataset to force tree initialization */
     if (read_init) {
-        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
             FAIL_STACK_ERROR;
+        }
     }
     else {
-        if (H5Dwrite(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf) < 0)
+        if (H5Dwrite(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf) < 0) {
             FAIL_STACK_ERROR;
+        }
     }
 
     /* Verify tree existence matches expectation after re-open */
-    if (test_rtree_existence_helper(vdset_id, use_tree_inverse, &tree_correct) < 0)
+    if (test_rtree_existence_helper(vdset_id, use_tree_inverse, &tree_correct) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (!tree_correct)
+    if (!tree_correct) {
         FAIL_STACK_ERROR;
+    }
 
     /* Cleanup */
-    if (H5Dclose(vdset_id) < 0)
+    if (H5Dclose(vdset_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Pclose(dapl_id) < 0)
+    }
+    if (H5Pclose(dapl_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Fclose(file_id) < 0)
+    }
+    if (H5Fclose(file_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     PASSED();
     return SUCCEED;
@@ -784,21 +836,19 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_threshold(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
+static herr_t test_rtree_threshold(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
 {
-    hid_t file_id  = H5I_INVALID_HID;
-    hid_t dapl_id  = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t dapl_id = H5I_INVALID_HID;
     hid_t vdset_id = H5I_INVALID_HID;
-    int   rbuf[RTREE_MAX_TEST_MAPPINGS];
-    char  vfilename[FILENAME_BUF_SIZE];
+    int rbuf[RTREE_MAX_TEST_MAPPINGS];
+    char vfilename[FILENAME_BUF_SIZE];
 
     /* Internal values for introspection */
-    H5D_t                 *dset    = NULL;
-    H5O_storage_virtual_t *storage = NULL;
+    H5D_t* dset = NULL;
+    H5O_storage_virtual_t* storage = NULL;
 
-    const char *test_str =
-        use_tree ? "threshold behavior with tree enabled" : "threshold behavior with tree disabled";
+    const char* test_str = use_tree ? "threshold behavior with tree enabled" : "threshold behavior with tree disabled";
 
     TESTING(test_str);
 
@@ -806,49 +856,55 @@ test_rtree_threshold(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
     h5_fixname(FILENAME[2], vds_fapl, vfilename, sizeof(vfilename));
 
     /* Test cases: below threshold, at threshold, above threshold */
-    int test_cases[3] = {H5D_VIRTUAL_TREE_THRESHOLD - 1, H5D_VIRTUAL_TREE_THRESHOLD, RTREE_MAX_TEST_MAPPINGS};
+    int test_cases[3] = { H5D_VIRTUAL_TREE_THRESHOLD - 1, H5D_VIRTUAL_TREE_THRESHOLD, RTREE_MAX_TEST_MAPPINGS };
 
     for (int test_idx = 0; test_idx < 3; test_idx++) {
-        int  num_mappings = test_cases[test_idx];
+        int num_mappings = test_cases[test_idx];
         bool expect_tree;
 
         /* Determine expected tree behavior based on threshold and use_tree setting */
         /* Tree is created only when: tree_enabled AND num_mappings >= threshold */
         expect_tree = (use_tree && (num_mappings >= H5D_VIRTUAL_TREE_THRESHOLD));
 
-        if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0)
+        if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0) {
             FAIL_STACK_ERROR;
+        }
 
-        if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0)
+        if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0) {
             FAIL_STACK_ERROR;
+        }
 
         /* Set the spatial tree property */
-        if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0)
+        if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0) {
             FAIL_STACK_ERROR;
+        }
 
         /* Create virtual dataset with specified number of mappings */
-        if ((vdset_id = create_virtual_dataset(file_id, dapl_id, num_mappings, src_fapl)) < 0)
+        if ((vdset_id = create_virtual_dataset(file_id, dapl_id, num_mappings, src_fapl)) < 0) {
             FAIL_STACK_ERROR;
+        }
 
         /* Read the virtual dataset to force initialization */
-        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+        if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
             FAIL_STACK_ERROR;
+        }
 
         /* Verify data pattern (each element should equal its index) */
         for (int i = 0; i < num_mappings; i++) {
             if (rbuf[i] != i) {
-                printf("%d mappings: Data mismatch at [%d]: expected %d, got %d\n", num_mappings, i, i,
-                       rbuf[i]);
+                printf("%d mappings: Data mismatch at [%d]: expected %d, got %d\n", num_mappings, i, i, rbuf[i]);
                 FAIL_STACK_ERROR;
             }
         }
 
         /* Get the dataset object for introspection */
-        if (NULL == (dset = (H5D_t *)H5VL_object(vdset_id)))
+        if (NULL == (dset = (H5D_t*)H5VL_object(vdset_id))) {
             FAIL_STACK_ERROR;
+        }
 
-        if (dset->shared->layout.type != H5D_VIRTUAL)
+        if (dset->shared->layout.type != H5D_VIRTUAL) {
             FAIL_STACK_ERROR;
+        }
 
         /* Get the virtual storage structure */
         storage = &(dset->shared->layout.storage.u.virt);
@@ -862,8 +918,7 @@ test_rtree_threshold(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
             /* not_in_tree_list can be NULL if all mappings fit in tree - this is OK */
             /* Just verify consistency: if nused > 0, then list should exist */
             if (storage->not_in_tree_nused > 0 && storage->not_in_tree_list == NULL) {
-                printf("%d mappings: Expected not_in_tree_list array to exist but it was NULL\n",
-                       num_mappings);
+                printf("%d mappings: Expected not_in_tree_list array to exist but it was NULL\n", num_mappings);
                 FAIL_STACK_ERROR;
             }
         }
@@ -873,23 +928,25 @@ test_rtree_threshold(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
                 FAIL_STACK_ERROR;
             }
             if (storage->not_in_tree_list != NULL) {
-                printf("%d mappings: Expected not_in_tree_list array to be NULL but it exists\n",
-                       num_mappings);
+                printf("%d mappings: Expected not_in_tree_list array to be NULL but it exists\n", num_mappings);
                 FAIL_STACK_ERROR;
             }
         }
 
         /* Cleanup */
-        if (H5Dclose(vdset_id) < 0)
+        if (H5Dclose(vdset_id) < 0) {
             FAIL_STACK_ERROR;
-        if (H5Pclose(dapl_id) < 0)
+        }
+        if (H5Pclose(dapl_id) < 0) {
             FAIL_STACK_ERROR;
-        if (H5Fclose(file_id) < 0)
+        }
+        if (H5Fclose(file_id) < 0) {
             FAIL_STACK_ERROR;
+        }
 
         vdset_id = H5I_INVALID_HID;
-        dapl_id  = H5I_INVALID_HID;
-        file_id  = H5I_INVALID_HID;
+        dapl_id = H5I_INVALID_HID;
+        file_id = H5I_INVALID_HID;
     }
 
     PASSED();
@@ -918,20 +975,19 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rtree_rw(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
+static herr_t test_rtree_rw(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
 {
-    hid_t   file_id  = H5I_INVALID_HID;
-    hid_t   dapl_id  = H5I_INVALID_HID;
-    hid_t   vdset_id = H5I_INVALID_HID;
-    hid_t   space_id = H5I_INVALID_HID;
-    hsize_t wdims    = RTREE_MAX_TEST_MAPPINGS / 2;
-    int     rbuf[RTREE_MAX_TEST_MAPPINGS];
-    int     wbuf[RTREE_MAX_TEST_MAPPINGS];
-    int     num_mappings = RTREE_MAX_TEST_MAPPINGS;
-    char    vfilename[FILENAME_BUF_SIZE];
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t dapl_id = H5I_INVALID_HID;
+    hid_t vdset_id = H5I_INVALID_HID;
+    hid_t space_id = H5I_INVALID_HID;
+    hsize_t wdims = RTREE_MAX_TEST_MAPPINGS / 2;
+    int rbuf[RTREE_MAX_TEST_MAPPINGS];
+    int wbuf[RTREE_MAX_TEST_MAPPINGS];
+    int num_mappings = RTREE_MAX_TEST_MAPPINGS;
+    char vfilename[FILENAME_BUF_SIZE];
 
-    const char *test_str = use_tree ? "R/W behavior with tree enabled" : "R/W behavior with tree disabled";
+    const char* test_str = use_tree ? "R/W behavior with tree enabled" : "R/W behavior with tree disabled";
 
     TESTING(test_str);
 
@@ -941,23 +997,28 @@ test_rtree_rw(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
     /* Generate VFD-specific filename for VDS file */
     h5_fixname(FILENAME[3], vds_fapl, vfilename, sizeof(vfilename));
 
-    if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0)
+    if ((file_id = H5Fcreate(vfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0)
+    if ((dapl_id = H5Pcreate(H5P_DATASET_ACCESS)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Set the spatial tree property */
-    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0)
+    if (H5Pset_virtual_spatial_tree(dapl_id, use_tree) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Create virtual dataset with specified number of mappings */
-    if ((vdset_id = create_virtual_dataset(file_id, dapl_id, num_mappings, src_fapl)) < 0)
+    if ((vdset_id = create_virtual_dataset(file_id, dapl_id, num_mappings, src_fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Verify initial read values (each element should equal its index) */
-    if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+    if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     for (int i = 0; i < num_mappings; i++) {
         if (rbuf[i] != i) {
@@ -967,41 +1028,48 @@ test_rtree_rw(bool use_tree, hid_t vds_fapl, hid_t src_fapl)
     }
 
     /* Write to first half of dataset with 2*index */
-    for (int i = 0; i < num_mappings / 2; i++)
+    for (int i = 0; i < num_mappings / 2; i++) {
         wbuf[i] = 2 * i;
+    }
 
-    if ((space_id = H5Screate_simple(1, (const hsize_t *)&wdims, NULL)) < 0)
+    if ((space_id = H5Screate_simple(1, (const hsize_t*)&wdims, NULL)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (H5Sselect_hyperslab(space_id, H5S_SELECT_SET, (const hsize_t *)&(hsize_t){0}, NULL,
-                            (const hsize_t *)&wdims, NULL) < 0)
+    if (H5Sselect_hyperslab(space_id, H5S_SELECT_SET, (const hsize_t*)&(hsize_t) { 0 }, NULL, (const hsize_t*)&wdims, NULL) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if (H5Dwrite(vdset_id, H5T_NATIVE_INT, space_id, space_id, H5P_DEFAULT, wbuf) < 0)
+    if (H5Dwrite(vdset_id, H5T_NATIVE_INT, space_id, space_id, H5P_DEFAULT, wbuf) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Read back entire dataset and verify values */
-    if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+    if (H5Dread(vdset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     for (int i = 0; i < num_mappings; i++) {
         int expected = (i < num_mappings / 2) ? (2 * i) : i;
         if (rbuf[i] != expected) {
-            printf("%d mappings: Post-write data mismatch at [%d]: expected %d, got %d\n", num_mappings, i,
-                   expected, rbuf[i]);
+            printf("%d mappings: Post-write data mismatch at [%d]: expected %d, got %d\n", num_mappings, i, expected, rbuf[i]);
             FAIL_STACK_ERROR;
         }
     }
 
     /* Cleanup */
-    if (H5Dclose(vdset_id) < 0)
+    if (H5Dclose(vdset_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Pclose(dapl_id) < 0)
+    }
+    if (H5Pclose(dapl_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Fclose(file_id) < 0)
+    }
+    if (H5Fclose(file_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(space_id) < 0)
+    }
+    if (H5Sclose(space_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     PASSED();
     return SUCCEED;
@@ -1029,29 +1097,28 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_vds_empty_slice(hid_t vds_fapl, hid_t src_fapl)
+static herr_t test_vds_empty_slice(hid_t vds_fapl, hid_t src_fapl)
 {
-    hid_t   srcfile_id  = H5I_INVALID_HID;
-    hid_t   vdsfile_id  = H5I_INVALID_HID;
-    hid_t   raw_dset_id = H5I_INVALID_HID;
-    hid_t   vds_dset_id = H5I_INVALID_HID;
-    hid_t   src_space   = H5I_INVALID_HID;
-    hid_t   vds_space   = H5I_INVALID_HID;
-    hid_t   vds_sel     = H5I_INVALID_HID;
-    hid_t   mem_space   = H5I_INVALID_HID;
-    hid_t   file_space  = H5I_INVALID_HID;
-    hid_t   dcpl        = H5I_INVALID_HID;
-    hsize_t src_dim     = 1;
-    hsize_t vds_dim     = 100;
-    hsize_t start       = 0;
-    hsize_t count       = 0;
-    int     wdata       = 42;
-    int     read_buf    = -1;
-    char    srcfilename[FILENAME_BUF_SIZE];
-    char    srcfilename_map[FILENAME_BUF_SIZE];
-    char    vdsfilename[FILENAME_BUF_SIZE];
-    size_t  i;
+    hid_t srcfile_id = H5I_INVALID_HID;
+    hid_t vdsfile_id = H5I_INVALID_HID;
+    hid_t raw_dset_id = H5I_INVALID_HID;
+    hid_t vds_dset_id = H5I_INVALID_HID;
+    hid_t src_space = H5I_INVALID_HID;
+    hid_t vds_space = H5I_INVALID_HID;
+    hid_t vds_sel = H5I_INVALID_HID;
+    hid_t mem_space = H5I_INVALID_HID;
+    hid_t file_space = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    hsize_t src_dim = 1;
+    hsize_t vds_dim = 100;
+    hsize_t start = 0;
+    hsize_t count = 0;
+    int wdata = 42;
+    int read_buf = -1;
+    char srcfilename[FILENAME_BUF_SIZE];
+    char srcfilename_map[FILENAME_BUF_SIZE];
+    char vdsfilename[FILENAME_BUF_SIZE];
+    size_t i;
 
     TESTING("zero-element read from virtual dataset with r-tree");
 
@@ -1061,90 +1128,119 @@ test_vds_empty_slice(hid_t vds_fapl, hid_t src_fapl)
     h5_fixname(FILENAME[4], vds_fapl, vdsfilename, sizeof(vdsfilename));
 
     /* Create source file with single dataset */
-    if ((srcfile_id = H5Fcreate(srcfilename, H5F_ACC_TRUNC, H5P_DEFAULT, src_fapl)) < 0)
+    if ((srcfile_id = H5Fcreate(srcfilename, H5F_ACC_TRUNC, H5P_DEFAULT, src_fapl)) < 0) {
         FAIL_STACK_ERROR;
-    if ((src_space = H5Screate_simple(1, &src_dim, NULL)) < 0)
+    }
+    if ((src_space = H5Screate_simple(1, &src_dim, NULL)) < 0) {
         FAIL_STACK_ERROR;
-    if ((raw_dset_id = H5Dcreate2(srcfile_id, "src", H5T_NATIVE_INT, src_space, H5P_DEFAULT, H5P_DEFAULT,
-                                  H5P_DEFAULT)) < 0)
+    }
+    if ((raw_dset_id = H5Dcreate2(srcfile_id, "src", H5T_NATIVE_INT, src_space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Dwrite(raw_dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata) < 0)
+    }
+    if (H5Dwrite(raw_dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &wdata) < 0) {
         FAIL_STACK_ERROR;
+    }
 
-    if ((vdsfile_id = H5Fcreate(vdsfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0)
+    if ((vdsfile_id = H5Fcreate(vdsfilename, H5F_ACC_TRUNC, H5P_DEFAULT, vds_fapl)) < 0) {
         FAIL_STACK_ERROR;
-    if ((vds_space = H5Screate_simple(1, &vds_dim, NULL)) < 0)
+    }
+    if ((vds_space = H5Screate_simple(1, &vds_dim, NULL)) < 0) {
         FAIL_STACK_ERROR;
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    }
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Add mappings and create VDS */
     for (i = 0; i < vds_dim; i++) {
-        if ((vds_sel = H5Scopy(vds_space)) < 0)
+        if ((vds_sel = H5Scopy(vds_space)) < 0) {
             FAIL_STACK_ERROR;
+        }
         start = i;
         count = 1;
-        if (H5Sselect_hyperslab(vds_sel, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0)
+        if (H5Sselect_hyperslab(vds_sel, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0) {
             FAIL_STACK_ERROR;
-        if (H5Pset_virtual(dcpl, vds_sel, srcfilename_map, "src", src_space) < 0)
+        }
+        if (H5Pset_virtual(dcpl, vds_sel, srcfilename_map, "src", src_space) < 0) {
             FAIL_STACK_ERROR;
-        if (H5Sclose(vds_sel) < 0)
+        }
+        if (H5Sclose(vds_sel) < 0) {
             FAIL_STACK_ERROR;
+        }
         vds_sel = H5I_INVALID_HID;
     }
 
-    if ((vds_dset_id =
-             H5Dcreate2(vdsfile_id, "vds", H5T_NATIVE_INT, vds_space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((vds_dset_id = H5Dcreate2(vdsfile_id, "vds", H5T_NATIVE_INT, vds_space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Trigger tree initialization by reading a single element */
     start = 0;
     count = 1;
-    if ((mem_space = H5Screate_simple(1, &count, NULL)) < 0)
+    if ((mem_space = H5Screate_simple(1, &count, NULL)) < 0) {
         FAIL_STACK_ERROR;
-    if ((file_space = H5Dget_space(vds_dset_id)) < 0)
+    }
+    if ((file_space = H5Dget_space(vds_dset_id)) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sselect_hyperslab(file_space, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0)
+    }
+    if (H5Sselect_hyperslab(file_space, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Dread(vds_dset_id, H5T_NATIVE_INT, mem_space, file_space, H5P_DEFAULT, &read_buf) < 0)
+    }
+    if (H5Dread(vds_dset_id, H5T_NATIVE_INT, mem_space, file_space, H5P_DEFAULT, &read_buf) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(mem_space) < 0)
+    }
+    if (H5Sclose(mem_space) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(file_space) < 0)
+    }
+    if (H5Sclose(file_space) < 0) {
         FAIL_STACK_ERROR;
-    mem_space  = H5I_INVALID_HID;
+    }
+    mem_space = H5I_INVALID_HID;
     file_space = H5I_INVALID_HID;
 
     /* Attempt zero-element read */
     count = 0;
-    if ((mem_space = H5Screate_simple(1, &count, NULL)) < 0)
+    if ((mem_space = H5Screate_simple(1, &count, NULL)) < 0) {
         FAIL_STACK_ERROR;
-    if ((file_space = H5Dget_space(vds_dset_id)) < 0)
+    }
+    if ((file_space = H5Dget_space(vds_dset_id)) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sselect_hyperslab(file_space, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0)
+    }
+    if (H5Sselect_hyperslab(file_space, H5S_SELECT_SET, &start, NULL, &count, NULL) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Dread(vds_dset_id, H5T_NATIVE_INT, mem_space, file_space, H5P_DEFAULT, &read_buf) < 0)
+    }
+    if (H5Dread(vds_dset_id, H5T_NATIVE_INT, mem_space, file_space, H5P_DEFAULT, &read_buf) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Cleanup */
-    if (H5Sclose(mem_space) < 0)
+    if (H5Sclose(mem_space) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(file_space) < 0)
+    }
+    if (H5Sclose(file_space) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(src_space) < 0)
+    }
+    if (H5Sclose(src_space) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Sclose(vds_space) < 0)
+    }
+    if (H5Sclose(vds_space) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Dclose(raw_dset_id) < 0)
+    }
+    if (H5Dclose(raw_dset_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Dclose(vds_dset_id) < 0)
+    }
+    if (H5Dclose(vds_dset_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Fclose(srcfile_id) < 0)
+    }
+    if (H5Fclose(srcfile_id) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Fclose(vdsfile_id) < 0)
+    }
+    if (H5Fclose(vdsfile_id) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     PASSED();
     return SUCCEED;
@@ -1178,26 +1274,27 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    int   nerrors  = 0;
+    int nerrors = 0;
     hid_t vds_fapl = H5I_INVALID_HID;
     hid_t src_fapl = H5I_INVALID_HID;
-    char  srcfilename[FILENAME_BUF_SIZE];
-    char  vfilename[FILENAME_BUF_SIZE];
-    char  threshfilename[FILENAME_BUF_SIZE];
-    char  rwfilename[FILENAME_BUF_SIZE];
+    char srcfilename[FILENAME_BUF_SIZE];
+    char vfilename[FILENAME_BUF_SIZE];
+    char threshfilename[FILENAME_BUF_SIZE];
+    char rwfilename[FILENAME_BUF_SIZE];
 
     printf("Testing R-tree spatial indexing...\n");
 
     H5open();
 
     /* Create file access property lists for VDS and source files */
-    if ((vds_fapl = h5_fileaccess()) < 0)
+    if ((vds_fapl = h5_fileaccess()) < 0) {
         TEST_ERROR;
-    if ((src_fapl = h5_fileaccess()) < 0)
+    }
+    if ((src_fapl = h5_fileaccess()) < 0) {
         TEST_ERROR;
+    }
 
     /* Run core R-tree tests */
     nerrors += test_rtree_create() < 0 ? 1 : 0;
@@ -1218,8 +1315,9 @@ main(void)
 
     nerrors += test_vds_empty_slice(vds_fapl, src_fapl) < 0 ? 1 : 0;
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
 
     /* Generate VFD-specific filenames for cleanup */
     h5_fixname(FILENAME[0], src_fapl, srcfilename, sizeof(srcfilename));
@@ -1240,10 +1338,12 @@ main(void)
     }
     H5E_END_TRY;
 
-    if (H5Pclose(vds_fapl) < 0)
+    if (H5Pclose(vds_fapl) < 0) {
         TEST_ERROR;
-    if (H5Pclose(src_fapl) < 0)
+    }
+    if (H5Pclose(src_fapl) < 0) {
         TEST_ERROR;
+    }
 
     printf("All R-tree tests passed.\n");
     return EXIT_SUCCESS;

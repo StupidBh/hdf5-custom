@@ -14,17 +14,16 @@
 #define EXT_FILE2 "h5efc2.h5"
 #define EXT_FILE3 "h5efc3.h5"
 
-int
-main(void)
+int main(void)
 {
-    hid_t  file1, file2, group, fapl; /* Handles */
+    hid_t file1, file2, group, fapl; /* Handles */
     herr_t status;
 
     /*
      * Create file access property list and set it to allow caching of open
      * files visited through external links.
      */
-    fapl   = H5Pcreate(H5P_FILE_ACCESS);
+    fapl = H5Pcreate(H5P_FILE_ACCESS);
     status = H5Pset_elink_file_cache_size(fapl, 8);
 
     /*
@@ -35,11 +34,11 @@ main(void)
     /*
      * Create files to serve as targets for external links.
      */
-    file2  = H5Fcreate(EXT_FILE1, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file2 = H5Fcreate(EXT_FILE1, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Fclose(file2);
-    file2  = H5Fcreate(EXT_FILE2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file2 = H5Fcreate(EXT_FILE2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Fclose(file2);
-    file2  = H5Fcreate(EXT_FILE3, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    file2 = H5Fcreate(EXT_FILE3, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Fclose(file2);
 
     /*
@@ -54,11 +53,11 @@ main(void)
      * root groups of the target files).  The target files should be held open
      * by the root file's external file cache after traversal.
      */
-    group  = H5Gopen(file1, "/link_to_1", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_1", H5P_DEFAULT);
     status = H5Gclose(group);
-    group  = H5Gopen(file1, "/link_to_2", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_2", H5P_DEFAULT);
     status = H5Gclose(group);
-    group  = H5Gopen(file1, "/link_to_3", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_3", H5P_DEFAULT);
     status = H5Gclose(group);
 
     /*
@@ -66,11 +65,11 @@ main(void)
      * files should already be held open by the root file's external file cache,
      * so the library will not actually have to issue an "open" system call.
      */
-    group  = H5Gopen(file1, "/link_to_1", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_1", H5P_DEFAULT);
     status = H5Gclose(group);
-    group  = H5Gopen(file1, "/link_to_2", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_2", H5P_DEFAULT);
     status = H5Gclose(group);
-    group  = H5Gopen(file1, "/link_to_3", H5P_DEFAULT);
+    group = H5Gopen(file1, "/link_to_3", H5P_DEFAULT);
     status = H5Gclose(group);
 
     /*

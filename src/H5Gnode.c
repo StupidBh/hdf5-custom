@@ -54,7 +54,8 @@
  * Each key field of the B-link tree that points to symbol table
  * nodes consists of this structure...
  */
-typedef struct H5G_node_key_t {
+typedef struct H5G_node_key_t
+{
     size_t offset; /*offset into heap for name          */
 } H5G_node_key_t;
 
@@ -67,27 +68,31 @@ typedef struct H5G_node_key_t {
 /********************/
 
 /* B-tree callbacks */
-static H5UC_t   *H5G__node_get_shared(const H5F_t *f, const void *_udata);
-static herr_t    H5G__node_create(H5F_t *f, H5B_ins_t op, void *_lt_key, void *_udata, void *_rt_key,
-                                  haddr_t *addr_p /*out*/);
-static int       H5G__node_cmp2(void *_lt_key, void *_udata, void *_rt_key);
-static int       H5G__node_cmp3(void *_lt_key, void *_udata, void *_rt_key);
-static herr_t    H5G__node_found(H5F_t *f, haddr_t addr, const void *_lt_key, bool *found, void *_udata);
-static H5B_ins_t H5G__node_insert(H5F_t *f, haddr_t addr, void *_lt_key, bool *lt_key_changed, void *_md_key,
-                                  void *_udata, void *_rt_key, bool *rt_key_changed,
-                                  haddr_t *new_node_p /*out*/);
-static H5B_ins_t H5G__node_remove(H5F_t *f, haddr_t addr, void *lt_key, bool *lt_key_changed, void *udata,
-                                  void *rt_key, bool *rt_key_changed);
-static herr_t    H5G__node_decode_key(const H5B_shared_t *shared, const uint8_t *raw, void *_key);
-static herr_t    H5G__node_encode_key(const H5B_shared_t *shared, uint8_t *raw, const void *_key);
-static herr_t H5G__node_debug_key(FILE *stream, int indent, int fwidth, const void *key, const void *udata);
+static H5UC_t* H5G__node_get_shared(const H5F_t* f, const void* _udata);
+static herr_t H5G__node_create(H5F_t* f, H5B_ins_t op, void* _lt_key, void* _udata, void* _rt_key, haddr_t* addr_p /*out*/);
+static int H5G__node_cmp2(void* _lt_key, void* _udata, void* _rt_key);
+static int H5G__node_cmp3(void* _lt_key, void* _udata, void* _rt_key);
+static herr_t H5G__node_found(H5F_t* f, haddr_t addr, const void* _lt_key, bool* found, void* _udata);
+static H5B_ins_t H5G__node_insert(H5F_t* f,
+                                  haddr_t addr,
+                                  void* _lt_key,
+                                  bool* lt_key_changed,
+                                  void* _md_key,
+                                  void* _udata,
+                                  void* _rt_key,
+                                  bool* rt_key_changed,
+                                  haddr_t* new_node_p /*out*/);
+static H5B_ins_t H5G__node_remove(H5F_t* f, haddr_t addr, void* lt_key, bool* lt_key_changed, void* udata, void* rt_key, bool* rt_key_changed);
+static herr_t H5G__node_decode_key(const H5B_shared_t* shared, const uint8_t* raw, void* _key);
+static herr_t H5G__node_encode_key(const H5B_shared_t* shared, uint8_t* raw, const void* _key);
+static herr_t H5G__node_debug_key(FILE* stream, int indent, int fwidth, const void* key, const void* udata);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* H5G inherits B-tree like properties from H5B */
-H5B_class_t H5B_SNODE[1] = {{
+H5B_class_t H5B_SNODE[1] = { {
     H5B_SNODE_ID,           /*id            */
     sizeof(H5G_node_key_t), /*sizeof_nkey   */
     H5G__node_get_shared,   /*get_shared    */
@@ -103,7 +108,7 @@ H5B_class_t H5B_SNODE[1] = {{
     H5G__node_decode_key,   /*decode        */
     H5G__node_encode_key,   /*encode        */
     H5G__node_debug_key     /*debug         */
-}};
+} };
 
 /* Declare a free list to manage the H5G_node_t struct */
 H5FL_DEFINE(H5G_node_t);
@@ -130,8 +135,7 @@ H5FL_SEQ_DEFINE(H5G_entry_t);
  *
  *-------------------------------------------------------------------------
  */
-static H5UC_t *
-H5G__node_get_shared(const H5F_t *f, const void H5_ATTR_UNUSED *_udata)
+static H5UC_t* H5G__node_get_shared(const H5F_t* f, const void H5_ATTR_UNUSED* _udata)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -150,10 +154,9 @@ H5G__node_get_shared(const H5F_t *f, const void H5_ATTR_UNUSED *_udata)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_decode_key(const H5B_shared_t *shared, const uint8_t *raw, void *_key)
+static herr_t H5G__node_decode_key(const H5B_shared_t* shared, const uint8_t* raw, void* _key)
 {
-    H5G_node_key_t *key = (H5G_node_key_t *)_key;
+    H5G_node_key_t* key = (H5G_node_key_t*)_key;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -175,10 +178,9 @@ H5G__node_decode_key(const H5B_shared_t *shared, const uint8_t *raw, void *_key)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_encode_key(const H5B_shared_t *shared, uint8_t *raw, const void *_key)
+static herr_t H5G__node_encode_key(const H5B_shared_t* shared, uint8_t* raw, const void* _key)
 {
-    const H5G_node_key_t *key = (const H5G_node_key_t *)_key;
+    const H5G_node_key_t* key = (const H5G_node_key_t*)_key;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -200,11 +202,10 @@ H5G__node_encode_key(const H5B_shared_t *shared, uint8_t *raw, const void *_key)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_debug_key(FILE *stream, int indent, int fwidth, const void *_key, const void *_udata)
+static herr_t H5G__node_debug_key(FILE* stream, int indent, int fwidth, const void* _key, const void* _udata)
 {
-    const H5G_node_key_t  *key   = (const H5G_node_key_t *)_key;
-    const H5G_bt_common_t *udata = (const H5G_bt_common_t *)_udata;
+    const H5G_node_key_t* key = (const H5G_node_key_t*)_key;
+    const H5G_bt_common_t* udata = (const H5G_bt_common_t*)_udata;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -213,15 +214,17 @@ H5G__node_debug_key(FILE *stream, int indent, int fwidth, const void *_key, cons
     fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Heap offset:", (unsigned)key->offset);
 
     if (udata->heap) {
-        const char *s;
+        const char* s;
 
         fprintf(stream, "%*s%-*s ", indent, "", fwidth, "Name:");
 
-        if ((s = (const char *)H5HL_offset_into(udata->heap, key->offset)) != NULL)
+        if ((s = (const char*)H5HL_offset_into(udata->heap, key->offset)) != NULL) {
             fprintf(stream, "%s\n", s);
+        }
     } /* end if */
-    else
+    else {
         fprintf(stream, "%*s%-*s ", indent, "", fwidth, "Cannot get name; heap address not specified\n");
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5G__node_debug_key() */
@@ -235,8 +238,7 @@ H5G__node_debug_key(FILE *stream, int indent, int fwidth, const void *_key, cons
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G__node_free(H5G_node_t *sym)
+herr_t H5G__node_free(H5G_node_t* sym)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -248,8 +250,9 @@ H5G__node_free(H5G_node_t *sym)
     /* Verify that node is clean */
     assert(sym->cache_info.is_dirty == false);
 
-    if (sym->entry)
+    if (sym->entry) {
         sym->entry = H5FL_SEQ_FREE(H5G_entry_t, sym->entry);
+    }
     sym = H5FL_FREE(H5G_node_t, sym);
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -270,14 +273,12 @@ H5G__node_free(H5G_node_t *sym)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_create(H5F_t *f, H5B_ins_t H5_ATTR_UNUSED op, void *_lt_key, void H5_ATTR_UNUSED *_udata,
-                 void *_rt_key, haddr_t *addr_p /*out*/)
+static herr_t H5G__node_create(H5F_t* f, H5B_ins_t H5_ATTR_UNUSED op, void* _lt_key, void H5_ATTR_UNUSED* _udata, void* _rt_key, haddr_t* addr_p /*out*/)
 {
-    H5G_node_key_t *lt_key    = (H5G_node_key_t *)_lt_key;
-    H5G_node_key_t *rt_key    = (H5G_node_key_t *)_rt_key;
-    H5G_node_t     *sym       = NULL;
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5G_node_key_t* lt_key = (H5G_node_key_t*)_lt_key;
+    H5G_node_key_t* rt_key = (H5G_node_key_t*)_rt_key;
+    H5G_node_t* sym = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -287,34 +288,42 @@ H5G__node_create(H5F_t *f, H5B_ins_t H5_ATTR_UNUSED op, void *_lt_key, void H5_A
     assert(f);
     assert(H5B_INS_FIRST == op);
 
-    if (NULL == (sym = H5FL_CALLOC(H5G_node_t)))
+    if (NULL == (sym = H5FL_CALLOC(H5G_node_t))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, FAIL, "memory allocation failed");
+    }
     sym->node_size = H5G_NODE_SIZE(f);
-    if (HADDR_UNDEF == (*addr_p = H5MF_alloc(f, H5FD_MEM_BTREE, (hsize_t)sym->node_size)))
+    if (HADDR_UNDEF == (*addr_p = H5MF_alloc(f, H5FD_MEM_BTREE, (hsize_t)sym->node_size))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, FAIL, "unable to allocate file space");
-    if (NULL == (sym->entry = H5FL_SEQ_CALLOC(H5G_entry_t, (size_t)(2 * H5F_SYM_LEAF_K(f)))))
+    }
+    if (NULL == (sym->entry = H5FL_SEQ_CALLOC(H5G_entry_t, (size_t)(2 * H5F_SYM_LEAF_K(f))))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, FAIL, "memory allocation failed");
+    }
 
-    if (H5AC_insert_entry(f, H5AC_SNODE, *addr_p, sym, H5AC__NO_FLAGS_SET) < 0)
+    if (H5AC_insert_entry(f, H5AC_SNODE, *addr_p, sym, H5AC__NO_FLAGS_SET) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, FAIL, "unable to cache symbol table leaf node");
+    }
     /*
      * The left and right symbols in an empty tree are both the
      * empty string stored at offset zero by the H5G functions. This
      * allows the comparison functions to work correctly without knowing
      * that there are no symbols.
      */
-    if (lt_key)
+    if (lt_key) {
         lt_key->offset = 0;
-    if (rt_key)
+    }
+    if (rt_key) {
         rt_key->offset = 0;
+    }
 
 done:
-    if (ret_value < 0)
+    if (ret_value < 0) {
         if (sym != NULL) {
-            if (sym->entry != NULL)
+            if (sym->entry != NULL) {
                 sym->entry = H5FL_SEQ_FREE(H5G_entry_t, sym->entry);
+            }
             sym = H5FL_FREE(H5G_node_t, sym);
         } /* end if */
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_create() */
@@ -336,15 +345,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_cmp2(void *_lt_key, void *_udata, void *_rt_key)
+static herr_t H5G__node_cmp2(void* _lt_key, void* _udata, void* _rt_key)
 {
-    H5G_bt_common_t *udata  = (H5G_bt_common_t *)_udata;
-    H5G_node_key_t  *lt_key = (H5G_node_key_t *)_lt_key;
-    H5G_node_key_t  *rt_key = (H5G_node_key_t *)_rt_key;
-    const char      *s1, *s2;
-    size_t           max_len;
-    int              ret_value = SUCCEED; /* Return value */
+    H5G_bt_common_t* udata = (H5G_bt_common_t*)_udata;
+    H5G_node_key_t* lt_key = (H5G_node_key_t*)_lt_key;
+    H5G_node_key_t* rt_key = (H5G_node_key_t*)_rt_key;
+    const char *s1, *s2;
+    size_t max_len;
+    int ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -354,16 +362,20 @@ H5G__node_cmp2(void *_lt_key, void *_udata, void *_rt_key)
     assert(rt_key);
 
     /* Get pointers to string names */
-    if ((s1 = (const char *)H5HL_offset_into(udata->heap, lt_key->offset)) == NULL)
+    if ((s1 = (const char*)H5HL_offset_into(udata->heap, lt_key->offset)) == NULL) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "unable to get key name");
-    if ((s2 = (const char *)H5HL_offset_into(udata->heap, rt_key->offset)) == NULL)
+    }
+    if ((s2 = (const char*)H5HL_offset_into(udata->heap, rt_key->offset)) == NULL) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "unable to get key name");
+    }
 
     /* Compute maximum length of string to compare */
-    if (rt_key->offset > lt_key->offset)
+    if (rt_key->offset > lt_key->offset) {
         max_len = udata->block_size - rt_key->offset;
-    else
+    }
+    else {
         max_len = udata->block_size - lt_key->offset;
+    }
 
     /* Set return value */
     ret_value = strncmp(s1, s2, max_len);
@@ -393,14 +405,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_cmp3(void *_lt_key, void *_udata, void *_rt_key)
+static herr_t H5G__node_cmp3(void* _lt_key, void* _udata, void* _rt_key)
 {
-    H5G_bt_common_t *udata  = (H5G_bt_common_t *)_udata;
-    H5G_node_key_t  *lt_key = (H5G_node_key_t *)_lt_key;
-    H5G_node_key_t  *rt_key = (H5G_node_key_t *)_rt_key;
-    const char      *s;
-    herr_t           ret_value = SUCCEED; /* Return value */
+    H5G_bt_common_t* udata = (H5G_bt_common_t*)_udata;
+    H5G_node_key_t* lt_key = (H5G_node_key_t*)_lt_key;
+    H5G_node_key_t* rt_key = (H5G_node_key_t*)_rt_key;
+    const char* s;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -410,16 +421,20 @@ H5G__node_cmp3(void *_lt_key, void *_udata, void *_rt_key)
     assert(rt_key);
 
     /* left side */
-    if ((s = (const char *)H5HL_offset_into(udata->heap, lt_key->offset)) == NULL)
+    if ((s = (const char*)H5HL_offset_into(udata->heap, lt_key->offset)) == NULL) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "unable to get key name");
-    if (strncmp(udata->name, s, (udata->block_size - lt_key->offset)) <= 0)
+    }
+    if (strncmp(udata->name, s, (udata->block_size - lt_key->offset)) <= 0) {
         ret_value = (-1);
+    }
     else {
         /* right side */
-        if ((s = (const char *)H5HL_offset_into(udata->heap, rt_key->offset)) == NULL)
+        if ((s = (const char*)H5HL_offset_into(udata->heap, rt_key->offset)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "unable to get key name");
-        if (strncmp(udata->name, s, (udata->block_size - rt_key->offset)) > 0)
+        }
+        if (strncmp(udata->name, s, (udata->block_size - rt_key->offset)) > 0) {
             ret_value = 1;
+        }
     } /* end else */
 
 done:
@@ -447,15 +462,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__node_found(H5F_t *f, haddr_t addr, const void H5_ATTR_UNUSED *_lt_key, bool *found, void *_udata)
+static herr_t H5G__node_found(H5F_t* f, haddr_t addr, const void H5_ATTR_UNUSED* _lt_key, bool* found, void* _udata)
 {
-    H5G_bt_lkp_t *udata = (H5G_bt_lkp_t *)_udata;
-    H5G_node_t   *sn    = NULL;
-    unsigned      lt = 0, idx = 0, rt;
-    int           cmp = 1;
-    const char   *s;
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5G_bt_lkp_t* udata = (H5G_bt_lkp_t*)_udata;
+    H5G_node_t* sn = NULL;
+    unsigned lt = 0, idx = 0, rt;
+    int cmp = 1;
+    const char* s;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -470,8 +484,9 @@ H5G__node_found(H5F_t *f, haddr_t addr, const void H5_ATTR_UNUSED *_lt_key, bool
     /*
      * Load the symbol table node for exclusive access.
      */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, FAIL, "unable to protect symbol table node");
+    }
 
     /*
      * Binary search.
@@ -480,30 +495,36 @@ H5G__node_found(H5F_t *f, haddr_t addr, const void H5_ATTR_UNUSED *_lt_key, bool
     while (lt < rt && cmp) {
         idx = (lt + rt) / 2;
 
-        if ((s = (const char *)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL)
+        if ((s = (const char*)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "unable to get symbol table name");
+        }
         cmp = strncmp(udata->common.name, s, (udata->common.block_size - sn->entry[idx].name_off));
 
-        if (cmp < 0)
+        if (cmp < 0) {
             rt = idx;
-        else
+        }
+        else {
             lt = idx + 1;
+        }
     } /* end while */
 
-    if (cmp)
+    if (cmp) {
         *found = false;
+    }
     else {
         /* Set the 'found it' flag */
         *found = true;
 
         /* Call user's callback operator */
-        if ((udata->op)(&sn->entry[idx], udata->op_data) < 0)
+        if ((udata->op)(&sn->entry[idx], udata->op_data) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_BADITER, FAIL, "iterator callback failed");
+        }
     } /* end else */
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, FAIL, "unable to release symbol table node");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_found() */
@@ -536,21 +557,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static H5B_ins_t
-H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_ATTR_UNUSED *lt_key_changed,
-                 void *_md_key, void *_udata, void *_rt_key, bool *rt_key_changed, haddr_t *new_node_p)
+static H5B_ins_t H5G__node_insert(H5F_t* f,
+                                  haddr_t addr,
+                                  void H5_ATTR_UNUSED* _lt_key,
+                                  bool H5_ATTR_UNUSED* lt_key_changed,
+                                  void* _md_key,
+                                  void* _udata,
+                                  void* _rt_key,
+                                  bool* rt_key_changed,
+                                  haddr_t* new_node_p)
 {
-    H5G_node_key_t *md_key = (H5G_node_key_t *)_md_key;
-    H5G_node_key_t *rt_key = (H5G_node_key_t *)_rt_key;
-    H5G_bt_ins_t   *udata  = (H5G_bt_ins_t *)_udata;
-    H5G_node_t     *sn = NULL, *snrt = NULL;
-    unsigned        sn_flags = H5AC__NO_FLAGS_SET, snrt_flags = H5AC__NO_FLAGS_SET;
-    const char     *s;
-    unsigned        lt  = 0, rt; /* Binary search cntrs	*/
-    int             cmp = 1, idx = -1;
-    H5G_node_t     *insert_into = NULL; /*node that gets new entry*/
-    H5G_entry_t     ent;                /* Entry to insert in node */
-    H5B_ins_t       ret_value = H5B_INS_ERROR;
+    H5G_node_key_t* md_key = (H5G_node_key_t*)_md_key;
+    H5G_node_key_t* rt_key = (H5G_node_key_t*)_rt_key;
+    H5G_bt_ins_t* udata = (H5G_bt_ins_t*)_udata;
+    H5G_node_t *sn = NULL, *snrt = NULL;
+    unsigned sn_flags = H5AC__NO_FLAGS_SET, snrt_flags = H5AC__NO_FLAGS_SET;
+    const char* s;
+    unsigned lt = 0, rt;            /* Binary search cntrs	*/
+    int cmp = 1, idx = -1;
+    H5G_node_t* insert_into = NULL; /*node that gets new entry*/
+    H5G_entry_t ent;                /* Entry to insert in node */
+    H5B_ins_t ret_value = H5B_INS_ERROR;
 
     FUNC_ENTER_PACKAGE
 
@@ -567,8 +594,9 @@ H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_A
     /*
      * Load the symbol node.
      */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__NO_FLAGS_SET)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__NO_FLAGS_SET))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5B_INS_ERROR, "unable to protect symbol table node");
+    }
 
     /*
      * Where does the new symbol get inserted?	We use a binary search.
@@ -576,23 +604,28 @@ H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_A
     rt = sn->nsyms;
     while (lt < rt) {
         idx = (int)((lt + rt) / 2);
-        if ((s = (const char *)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL)
+        if ((s = (const char*)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "unable to get symbol table name");
+        }
 
         /* Check if symbol is already present */
-        if (0 == (cmp = strncmp(udata->common.name, s, (udata->common.block_size - sn->entry[idx].name_off))))
+        if (0 == (cmp = strncmp(udata->common.name, s, (udata->common.block_size - sn->entry[idx].name_off)))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTINSERT, H5B_INS_ERROR, "symbol is already present in symbol table");
+        }
 
-        if (cmp < 0)
+        if (cmp < 0) {
             rt = (unsigned)idx;
-        else
+        }
+        else {
             lt = (unsigned)(idx + 1);
+        }
     } /* end while */
     idx += cmp > 0 ? 1 : 0;
 
     /* Convert link information & name to symbol table entry */
-    if (H5G__link_to_ent(f, udata->common.heap, udata->lnk, udata->obj_type, udata->crt_info, &ent) < 0)
+    if (H5G__link_to_ent(f, udata->common.heap, udata->lnk, udata->obj_type, udata->crt_info, &ent) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTCONVERT, H5B_INS_ERROR, "unable to convert link");
+    }
 
     /* Determine where to place entry in node */
     if (sn->nsyms >= 2 * H5F_SYM_LEAF_K(f)) {
@@ -604,11 +637,13 @@ H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_A
         ret_value = H5B_INS_RIGHT;
 
         /* The right node */
-        if (H5G__node_create(f, H5B_INS_FIRST, NULL, NULL, NULL, new_node_p /*out*/) < 0)
+        if (H5G__node_create(f, H5B_INS_FIRST, NULL, NULL, NULL, new_node_p /*out*/) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, H5B_INS_ERROR, "unable to split symbol table node");
+        }
 
-        if (NULL == (snrt = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, *new_node_p, f, H5AC__NO_FLAGS_SET)))
+        if (NULL == (snrt = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, *new_node_p, f, H5AC__NO_FLAGS_SET))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5B_INS_ERROR, "unable to split symbol table node");
+        }
 
         H5MM_memcpy(snrt->entry, sn->entry + H5F_SYM_LEAF_K(f), H5F_SYM_LEAF_K(f) * sizeof(H5G_entry_t));
         snrt->nsyms = H5F_SYM_LEAF_K(f);
@@ -625,33 +660,33 @@ H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_A
         /* Where to insert the new entry? */
         if (idx <= (int)H5F_SYM_LEAF_K(f)) {
             insert_into = sn;
-            if (idx == (int)H5F_SYM_LEAF_K(f))
+            if (idx == (int)H5F_SYM_LEAF_K(f)) {
                 md_key->offset = ent.name_off;
+            }
         } /* end if */
         else {
             idx -= (int)H5F_SYM_LEAF_K(f);
             insert_into = snrt;
             if (idx == (int)H5F_SYM_LEAF_K(f)) {
-                rt_key->offset  = ent.name_off;
+                rt_key->offset = ent.name_off;
                 *rt_key_changed = true;
             } /* end if */
-        }     /* end else */
-    }         /* end if */
+        } /* end else */
+    } /* end if */
     else {
         /* Where to insert the new entry? */
         ret_value = H5B_INS_NOOP;
         sn_flags |= H5AC__DIRTIED_FLAG;
         insert_into = sn;
         if (idx == (int)sn->nsyms) {
-            rt_key->offset  = ent.name_off;
+            rt_key->offset = ent.name_off;
             *rt_key_changed = true;
         } /* end if */
-    }     /* end else */
+    } /* end else */
 
     /* Move entries down to make room for new entry */
     assert(idx >= 0);
-    memmove(insert_into->entry + idx + 1, insert_into->entry + idx,
-            (insert_into->nsyms - (unsigned)idx) * sizeof(H5G_entry_t));
+    memmove(insert_into->entry + idx + 1, insert_into->entry + idx, (insert_into->nsyms - (unsigned)idx) * sizeof(H5G_entry_t));
 
     /* Copy new entry into table */
     H5G__ent_copy(&(insert_into->entry[idx]), &ent, H5_COPY_SHALLOW);
@@ -660,10 +695,12 @@ H5G__node_insert(H5F_t *f, haddr_t addr, void H5_ATTR_UNUSED *_lt_key, bool H5_A
     insert_into->nsyms += 1;
 
 done:
-    if (snrt && H5AC_unprotect(f, H5AC_SNODE, *new_node_p, snrt, snrt_flags) < 0)
+    if (snrt && H5AC_unprotect(f, H5AC_SNODE, *new_node_p, snrt, snrt_flags) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5B_INS_ERROR, "unable to release symbol table node");
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, sn_flags) < 0)
+    }
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, sn_flags) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5B_INS_ERROR, "unable to release symbol table node");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_insert() */
@@ -693,73 +730,83 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static H5B_ins_t
-H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*in,out*/,
-                 bool H5_ATTR_UNUSED *lt_key_changed /*out*/, void *_udata /*in,out*/,
-                 void *_rt_key /*in,out*/, bool *rt_key_changed /*out*/)
+static H5B_ins_t H5G__node_remove(H5F_t* f,
+                                  haddr_t addr,
+                                  void H5_ATTR_NDEBUG_UNUSED* _lt_key /*in,out*/,
+                                  bool H5_ATTR_UNUSED* lt_key_changed /*out*/,
+                                  void* _udata /*in,out*/,
+                                  void* _rt_key /*in,out*/,
+                                  bool* rt_key_changed /*out*/)
 {
-    H5G_node_key_t *rt_key   = (H5G_node_key_t *)_rt_key;
-    H5G_bt_rm_t    *udata    = (H5G_bt_rm_t *)_udata;
-    H5G_node_t     *sn       = NULL;
-    unsigned        sn_flags = H5AC__NO_FLAGS_SET;
-    unsigned        lt = 0, rt, idx = 0;
-    int             cmp       = 1;
-    H5B_ins_t       ret_value = H5B_INS_ERROR;
+    H5G_node_key_t* rt_key = (H5G_node_key_t*)_rt_key;
+    H5G_bt_rm_t* udata = (H5G_bt_rm_t*)_udata;
+    H5G_node_t* sn = NULL;
+    unsigned sn_flags = H5AC__NO_FLAGS_SET;
+    unsigned lt = 0, rt, idx = 0;
+    int cmp = 1;
+    H5B_ins_t ret_value = H5B_INS_ERROR;
 
     FUNC_ENTER_PACKAGE
 
     /* Check arguments */
     assert(f);
     assert(H5_addr_defined(addr));
-    assert((H5G_node_key_t *)_lt_key);
+    assert((H5G_node_key_t*)_lt_key);
     assert(rt_key);
     assert(udata && udata->common.heap);
 
     /* Load the symbol table */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__NO_FLAGS_SET)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__NO_FLAGS_SET))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5B_INS_ERROR, "unable to protect symbol table node");
+    }
 
     /* "Normal" removal of a single entry from the symbol table node */
     if (udata->common.name != NULL) {
-        H5O_link_t lnk;           /* Constructed link for replacement */
-        size_t     link_name_len; /* Length of string in local heap */
+        H5O_link_t lnk;       /* Constructed link for replacement */
+        size_t link_name_len; /* Length of string in local heap */
 
         /* Find the name with a binary search */
         rt = sn->nsyms;
         while (lt < rt && cmp) {
-            const char *s; /* Pointer to string in local heap */
+            const char* s; /* Pointer to string in local heap */
 
             idx = (lt + rt) / 2;
-            if ((s = (const char *)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL)
+            if ((s = (const char*)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)) == NULL) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "unable to get symbol table name");
+            }
             cmp = strncmp(udata->common.name, s, (udata->common.block_size - sn->entry[idx].name_off));
-            if (cmp < 0)
+            if (cmp < 0) {
                 rt = idx;
-            else
+            }
+            else {
                 lt = idx + 1;
+            }
         } /* end while */
 
-        if (cmp)
+        if (cmp) {
             HGOTO_ERROR(H5E_SYM, H5E_NOTFOUND, H5B_INS_ERROR, "name not found");
+        }
 
         /* Get a pointer to the name of the link */
-        if (NULL == (lnk.name = (char *)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off)))
+        if (NULL == (lnk.name = (char*)H5HL_offset_into(udata->common.heap, sn->entry[idx].name_off))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "unable to get link name");
+        }
 
         /* Compute the size of the link name in the heap, being defensive about corrupted data */
         link_name_len = strnlen(lnk.name, (udata->common.block_size - sn->entry[idx].name_off)) + 1;
-        if (link_name_len > (udata->common.block_size - sn->entry[idx].name_off))
+        if (link_name_len > (udata->common.block_size - sn->entry[idx].name_off)) {
             link_name_len = (udata->common.block_size - sn->entry[idx].name_off);
+        }
 
         /* Set up rest of link structure */
         lnk.corder_valid = false;
-        lnk.corder       = 0;
-        lnk.cset         = H5T_CSET_ASCII;
+        lnk.corder = 0;
+        lnk.cset = H5T_CSET_ASCII;
         if (sn->entry[idx].type == H5G_CACHED_SLINK) {
             lnk.type = H5L_TYPE_SOFT;
-            if (NULL == (lnk.u.soft.name = (char *)H5HL_offset_into(udata->common.heap,
-                                                                    sn->entry[idx].cache.slink.lval_offset)))
+            if (NULL == (lnk.u.soft.name = (char*)H5HL_offset_into(udata->common.heap, sn->entry[idx].cache.slink.lval_offset))) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "unable to get link name");
+            }
         } /* end if */
         else {
             lnk.type = H5L_TYPE_HARD;
@@ -768,8 +815,9 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
         } /* end else */
 
         /* Replace any object names */
-        if (H5G__link_name_replace(f, udata->grp_full_path_r, &lnk) < 0)
+        if (H5G__link_name_replace(f, udata->grp_full_path_r, &lnk) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "unable to get object type");
+        }
 
         /* Decrement the ref. count for hard links */
         if (lnk.type == H5L_TYPE_HARD) {
@@ -779,8 +827,9 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
             tmp_oloc.file = f;
             tmp_oloc.addr = lnk.u.hard.addr;
 
-            if (H5O_link(&tmp_oloc, -1) < 0)
+            if (H5O_link(&tmp_oloc, -1) < 0) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, H5B_INS_ERROR, "unable to decrement object link count");
+            }
         } /* end if */
         else {
             /* Remove the soft link's value from the local heap */
@@ -788,22 +837,21 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
                 size_t soft_link_len; /* Length of string in local heap */
 
                 /* Compute the size of the soft link name in the heap, being defensive about corrupted data */
-                soft_link_len = strnlen(lnk.u.soft.name,
-                                        (udata->common.block_size - sn->entry[idx].cache.slink.lval_offset)) +
-                                1;
-                if (soft_link_len > (udata->common.block_size - sn->entry[idx].cache.slink.lval_offset))
+                soft_link_len = strnlen(lnk.u.soft.name, (udata->common.block_size - sn->entry[idx].cache.slink.lval_offset)) + 1;
+                if (soft_link_len > (udata->common.block_size - sn->entry[idx].cache.slink.lval_offset)) {
                     soft_link_len = (udata->common.block_size - sn->entry[idx].cache.slink.lval_offset);
+                }
 
-                if (H5HL_remove(f, udata->common.heap, sn->entry[idx].cache.slink.lval_offset,
-                                soft_link_len) < 0)
-                    HGOTO_ERROR(H5E_SYM, H5E_CANTDELETE, H5B_INS_ERROR,
-                                "unable to remove soft link from local heap");
+                if (H5HL_remove(f, udata->common.heap, sn->entry[idx].cache.slink.lval_offset, soft_link_len) < 0) {
+                    HGOTO_ERROR(H5E_SYM, H5E_CANTDELETE, H5B_INS_ERROR, "unable to remove soft link from local heap");
+                }
             } /* end if */
-        }     /* end else */
+        } /* end else */
 
         /* Remove the link's name from the local heap */
-        if (H5HL_remove(f, udata->common.heap, sn->entry[idx].name_off, link_name_len) < 0)
+        if (H5HL_remove(f, udata->common.heap, sn->entry[idx].name_off, link_name_len) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTDELETE, H5B_INS_ERROR, "unable to remove link name from local heap");
+        }
 
         /* Remove the entry from the symbol table node */
         if (1 == sn->nsyms) {
@@ -836,9 +884,9 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
              */
             sn->nsyms -= 1;
             sn_flags |= H5AC__DIRTIED_FLAG;
-            rt_key->offset  = sn->entry[sn->nsyms - 1].name_off;
+            rt_key->offset = sn->entry[sn->nsyms - 1].name_off;
             *rt_key_changed = true;
-            ret_value       = H5B_INS_NOOP;
+            ret_value = H5B_INS_NOOP;
         }
         else {
             /*
@@ -850,7 +898,7 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
             memmove(sn->entry + idx, sn->entry + idx + 1, (sn->nsyms - idx) * sizeof(H5G_entry_t));
             ret_value = H5B_INS_NOOP;
         } /* end else */
-    }     /* end if */
+    } /* end if */
     /* Remove all entries from node, during B-tree deletion */
     else {
         H5O_loc_t tmp_oloc; /* Temporary object location */
@@ -859,16 +907,17 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
         tmp_oloc.file = f;
 
         /* Reduce the link count for all entries in this node */
-        for (idx = 0; idx < sn->nsyms; idx++)
+        for (idx = 0; idx < sn->nsyms; idx++) {
             if (!(H5G_CACHED_SLINK == sn->entry[idx].type)) {
                 /* Decrement the reference count */
                 assert(H5_addr_defined(sn->entry[idx].header));
                 tmp_oloc.addr = sn->entry[idx].header;
 
-                if (H5O_link(&tmp_oloc, -1) < 0)
-                    HGOTO_ERROR(H5E_SYM, H5E_CANTDELETE, H5B_INS_ERROR,
-                                "unable to decrement object link count");
+                if (H5O_link(&tmp_oloc, -1) < 0) {
+                    HGOTO_ERROR(H5E_SYM, H5E_CANTDELETE, H5B_INS_ERROR, "unable to decrement object link count");
+                }
             } /* end if */
+        }
 
         /*
          * We are about to remove all the symbols in this node.  Free this
@@ -881,8 +930,9 @@ H5G__node_remove(H5F_t *f, haddr_t addr, void H5_ATTR_NDEBUG_UNUSED *_lt_key /*i
     } /* end else */
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, sn_flags) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, sn_flags) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5B_INS_ERROR, "unable to release symbol table node");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_remove() */
@@ -896,15 +946,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5G__node_iterate(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
-                  const void H5_ATTR_UNUSED *_rt_key, void *_udata)
+int H5G__node_iterate(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    H5G_bt_it_it_t *udata = (H5G_bt_it_it_t *)_udata;
-    H5G_node_t     *sn    = NULL;
-    H5G_entry_t    *ents; /* Pointer to entries in this node */
-    unsigned        u;    /* Local index variable */
-    int             ret_value = H5_ITER_CONT;
+    H5G_bt_it_it_t* udata = (H5G_bt_it_it_t*)_udata;
+    H5G_node_t* sn = NULL;
+    H5G_entry_t* ents; /* Pointer to entries in this node */
+    unsigned u;        /* Local index variable */
+    int ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -916,43 +964,49 @@ H5G__node_iterate(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
     assert(udata && udata->heap);
 
     /* Protect the symbol table node & local heap while we iterate over entries */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5_ITER_ERROR, "unable to load symbol table node");
+    }
 
     /*
      * Iterate over the symbol table node entries.
      */
     for (u = 0, ents = sn->entry; u < sn->nsyms && ret_value == H5_ITER_CONT; u++) {
-        if (udata->skip > 0)
+        if (udata->skip > 0) {
             --udata->skip;
+        }
         else {
             H5O_link_t lnk; /* Link for entry */
 
             /* Convert the entry to a link */
-            if (H5G__ent_to_link(&ents[u], udata->heap, &lnk) < 0)
-                HGOTO_ERROR(H5E_SYM, H5E_CANTCONVERT, H5_ITER_ERROR,
-                            "unable to convert symbol table entry to link");
+            if (H5G__ent_to_link(&ents[u], udata->heap, &lnk) < 0) {
+                HGOTO_ERROR(H5E_SYM, H5E_CANTCONVERT, H5_ITER_ERROR, "unable to convert symbol table entry to link");
+            }
 
             /* Make the callback */
             ret_value = (udata->op)(&lnk, udata->op_data);
 
             /* Release memory for link object */
-            if (H5O_msg_reset(H5O_LINK_ID, &lnk) < 0)
+            if (H5O_msg_reset(H5O_LINK_ID, &lnk) < 0) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTFREE, H5_ITER_ERROR, "unable to release link message");
+            }
         } /* end else */
 
         /* Increment the number of entries passed through */
         /* (whether we skipped them or not) */
-        if (udata->final_ent)
+        if (udata->final_ent) {
             (*udata->final_ent)++;
+        }
     } /* end for */
-    if (ret_value < 0)
+    if (ret_value < 0) {
         HERROR(H5E_SYM, H5E_CANTNEXT, "iteration operator failed");
+    }
 
 done:
     /* Release resources */
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5_ITER_ERROR, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_iterate() */
@@ -967,13 +1021,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5G__node_sumup(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
-                const void H5_ATTR_UNUSED *_rt_key, void *_udata)
+int H5G__node_sumup(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    hsize_t    *num_objs  = (hsize_t *)_udata;
-    H5G_node_t *sn        = NULL;
-    int         ret_value = H5_ITER_CONT;
+    hsize_t* num_objs = (hsize_t*)_udata;
+    H5G_node_t* sn = NULL;
+    int ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -985,14 +1037,16 @@ H5G__node_sumup(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
     assert(num_objs);
 
     /* Find the object node and add the number of symbol entries. */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5_ITER_ERROR, "unable to load symbol table node");
+    }
 
     *num_objs += sn->nsyms;
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5_ITER_ERROR, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_sumup() */
@@ -1008,13 +1062,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5G__node_by_idx(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
-                 const void H5_ATTR_UNUSED *_rt_key, void *_udata)
+int H5G__node_by_idx(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    H5G_bt_it_idx_common_t *udata     = (H5G_bt_it_idx_common_t *)_udata;
-    H5G_node_t             *sn        = NULL;
-    int                     ret_value = H5_ITER_CONT;
+    H5G_bt_it_idx_common_t* udata = (H5G_bt_it_idx_common_t*)_udata;
+    H5G_node_t* sn = NULL;
+    int ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -1026,8 +1078,9 @@ H5G__node_by_idx(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
     assert(udata);
 
     /* Get a pointer to the symbol table node */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5_ITER_ERROR, "unable to load symbol table node");
+    }
 
     /* Find the node, locate the object symbol table entry and retrieve the name */
     if (udata->idx >= udata->num_objs && udata->idx < (udata->num_objs + sn->nsyms)) {
@@ -1038,18 +1091,21 @@ H5G__node_by_idx(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
 
         /* Call 'by index' callback */
         assert(udata->op);
-        if ((udata->op)(&sn->entry[ent_idx], udata) < 0)
+        if ((udata->op)(&sn->entry[ent_idx], udata) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5B_INS_ERROR, "'by index' callback failed");
+        }
 
         /* Indicate that we found the entry we are interested in */
         ret_value = H5_ITER_STOP;
     } /* end if */
-    else
+    else {
         udata->num_objs += sn->nsyms;
+    }
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5_ITER_ERROR, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_by_idx() */
@@ -1065,12 +1121,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G__node_init(H5F_t *f)
+herr_t H5G__node_init(H5F_t* f)
 {
-    H5B_shared_t *shared;              /* Shared B-tree node info  */
-    size_t        sizeof_rkey;         /* Size of raw (disk) key   */
-    herr_t        ret_value = SUCCEED; /* Return value             */
+    H5B_shared_t* shared;       /* Shared B-tree node info  */
+    size_t sizeof_rkey;         /* Size of raw (disk) key   */
+    herr_t ret_value = SUCCEED; /* Return value             */
 
     FUNC_ENTER_PACKAGE
 
@@ -1081,15 +1136,17 @@ H5G__node_init(H5F_t *f)
     sizeof_rkey = H5F_SIZEOF_SIZE(f); /*name offset */
 
     /* Allocate & initialize global info for the shared structure */
-    if (NULL == (shared = H5B_shared_new(f, H5B_SNODE, sizeof_rkey)))
+    if (NULL == (shared = H5B_shared_new(f, H5B_SNODE, sizeof_rkey))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, FAIL, "memory allocation failed for shared B-tree info");
+    }
 
     /* Set up the "local" information for this file's groups */
     /* <none> */
 
     /* Make shared B-tree info reference counted */
-    if (H5F_SET_GRP_BTREE_SHARED(f, H5UC_create(shared, H5B_shared_free)) < 0)
+    if (H5F_SET_GRP_BTREE_SHARED(f, H5UC_create(shared, H5B_shared_free)) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTINIT, FAIL, "can't create ref-count wrapper for shared B-tree info");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1107,8 +1164,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_node_close(const H5F_t *f)
+herr_t H5G_node_close(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1116,8 +1172,9 @@ H5G_node_close(const H5F_t *f)
     assert(f);
 
     /* Free the raw B-tree node buffer */
-    if (H5F_GRP_BTREE_SHARED(f))
+    if (H5F_GRP_BTREE_SHARED(f)) {
         H5UC_DEC(H5F_GRP_BTREE_SHARED(f));
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5G_node_close */
@@ -1132,16 +1189,14 @@ H5G_node_close(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-int
-H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const void H5_ATTR_UNUSED *_rt_key,
-               void *_udata)
+int H5G__node_copy(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    H5G_bt_it_cpy_t *udata    = (H5G_bt_it_cpy_t *)_udata;
-    const H5O_loc_t *src_oloc = udata->src_oloc;
-    H5O_copy_t      *cpy_info = udata->cpy_info;
-    H5G_node_t      *sn       = NULL;
-    unsigned int     i; /* Local index variable */
-    int              ret_value = H5_ITER_CONT;
+    H5G_bt_it_cpy_t* udata = (H5G_bt_it_cpy_t*)_udata;
+    const H5O_loc_t* src_oloc = udata->src_oloc;
+    H5O_copy_t* cpy_info = udata->cpy_info;
+    H5G_node_t* sn = NULL;
+    unsigned int i; /* Local index variable */
+    int ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -1152,27 +1207,27 @@ H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const
     assert(udata->src_heap);
 
     /* load the symbol table into memory from the source file */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5_ITER_ERROR, "unable to load symbol table node");
+    }
 
     /* copy object in this node one by one */
     for (i = 0; i < sn->nsyms; i++) {
-        H5G_entry_t *src_ent =
-            &(sn->entry[i]);             /* Convenience variable to refer to current source group entry */
-        H5O_link_t          lnk;         /* Link to insert */
-        char               *name;        /* Name of source object */
-        H5G_entry_t         tmp_src_ent; /* Temporary copy. Change will not affect the cache */
-        H5O_type_t          obj_type = H5O_TYPE_UNKNOWN; /* Target object type */
-        H5G_copy_file_ud_t *cpy_udata;                   /* Copy file udata */
-        H5G_obj_create_t    gcrt_info;                   /* Group creation info */
-        size_t              max_link_len;                /* Max. length of string in local heap */
+        H5G_entry_t* src_ent = &(sn->entry[i]); /* Convenience variable to refer to current source group entry */
+        H5O_link_t lnk;                         /* Link to insert */
+        char* name;                             /* Name of source object */
+        H5G_entry_t tmp_src_ent;                /* Temporary copy. Change will not affect the cache */
+        H5O_type_t obj_type = H5O_TYPE_UNKNOWN; /* Target object type */
+        H5G_copy_file_ud_t* cpy_udata;          /* Copy file udata */
+        H5G_obj_create_t gcrt_info;             /* Group creation info */
+        size_t max_link_len;                    /* Max. length of string in local heap */
 
         /* expand soft link */
         if (H5G_CACHED_SLINK == src_ent->type && cpy_info->expand_soft_link) {
-            haddr_t    obj_addr = HADDR_UNDEF; /* Address of object pointed to by soft link */
-            H5G_loc_t  grp_loc;                /* Group location holding soft link */
-            H5G_name_t grp_path;               /* Path for group holding soft link */
-            char      *link_name;              /* Pointer to value of soft link */
+            haddr_t obj_addr = HADDR_UNDEF; /* Address of object pointed to by soft link */
+            H5G_loc_t grp_loc;              /* Group location holding soft link */
+            H5G_name_t grp_path;            /* Path for group holding soft link */
+            char* link_name;                /* Pointer to value of soft link */
 
             /* Make a temporary copy, so that it will not change the info in the cache */
             H5MM_memcpy(&tmp_src_ent, src_ent, sizeof(H5G_entry_t));
@@ -1181,28 +1236,29 @@ H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const
             H5G_name_reset(&grp_path);
             grp_loc.path = &grp_path;
             H5_WARN_CAST_AWAY_CONST_OFF
-            grp_loc.oloc = (H5O_loc_t *)src_oloc;
+            grp_loc.oloc = (H5O_loc_t*)src_oloc;
             H5_WARN_CAST_AWAY_CONST_ON
 
             /* Get pointer to link value in local heap */
-            if ((link_name =
-                     (char *)H5HL_offset_into(udata->src_heap, tmp_src_ent.cache.slink.lval_offset)) == NULL)
+            if ((link_name = (char*)H5HL_offset_into(udata->src_heap, tmp_src_ent.cache.slink.lval_offset)) == NULL) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5_ITER_ERROR, "unable to get link name");
+            }
 
             /* Sanity check soft link name, to detect running off the end of the heap block */
             max_link_len = udata->src_block_size - tmp_src_ent.cache.slink.lval_offset;
-            if (strnlen(link_name, max_link_len) == max_link_len)
+            if (strnlen(link_name, max_link_len) == max_link_len) {
                 HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, H5_ITER_ERROR, "invalid link name offset");
+            }
 
             /* Check if the object pointed by the soft link exists in the source file */
-            if (H5G__loc_addr(&grp_loc, link_name, &obj_addr) < 0)
-                HGOTO_ERROR(H5E_SYM, H5E_CANTFIND, H5_ITER_ERROR,
-                            "unable to check if soft link resolves to an object");
+            if (H5G__loc_addr(&grp_loc, link_name, &obj_addr) < 0) {
+                HGOTO_ERROR(H5E_SYM, H5E_CANTFIND, H5_ITER_ERROR, "unable to check if soft link resolves to an object");
+            }
             if (H5_addr_defined(obj_addr)) {
                 tmp_src_ent.header = obj_addr;
-                src_ent            = &tmp_src_ent;
+                src_ent = &tmp_src_ent;
             } /* end if */
-        }     /* if ((H5G_CACHED_SLINK == src_ent->type)... */
+        } /* if ((H5G_CACHED_SLINK == src_ent->type)... */
 
         /* Check if object in source group is a hard link */
         if (H5_addr_defined(src_ent->header)) {
@@ -1219,21 +1275,21 @@ H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const
             tmp_src_oloc.addr = src_ent->header;
 
             /* Copy the shared object from source to destination */
-            if (H5O_copy_header_map(&tmp_src_oloc, &new_dst_oloc, cpy_info, true, &obj_type,
-                                    (void **)&cpy_udata) < 0)
+            if (H5O_copy_header_map(&tmp_src_oloc, &new_dst_oloc, cpy_info, true, &obj_type, (void**)&cpy_udata) < 0) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTCOPY, H5_ITER_ERROR, "unable to copy object");
+            }
 
             /* Set up object creation info for symbol table insertion.  Only
              * case so far is for inserting old-style groups (for caching stab
              * info). */
             if (obj_type == H5O_TYPE_GROUP) {
-                gcrt_info.gcpl_id    = H5P_DEFAULT;
+                gcrt_info.gcpl_id = H5P_DEFAULT;
                 gcrt_info.cache_type = cpy_udata->cache_type;
-                gcrt_info.cache      = cpy_udata->cache;
+                gcrt_info.cache = cpy_udata->cache;
             } /* end if */
 
             /* Construct link information for eventual insertion */
-            lnk.type        = H5L_TYPE_HARD;
+            lnk.type = H5L_TYPE_HARD;
             lnk.u.hard.addr = new_dst_oloc.addr;
         } /* ( H5_addr_defined(src_ent->header)) */
         else if (H5G_CACHED_SLINK == src_ent->type) {
@@ -1243,41 +1299,45 @@ H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const
 
             /* Construct link information for eventual insertion */
             lnk.type = H5L_TYPE_SOFT;
-            if ((lnk.u.soft.name =
-                     (char *)H5HL_offset_into(udata->src_heap, src_ent->cache.slink.lval_offset)) == NULL)
+            if ((lnk.u.soft.name = (char*)H5HL_offset_into(udata->src_heap, src_ent->cache.slink.lval_offset)) == NULL) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5_ITER_ERROR, "unable to get link name");
+            }
 
             /* Sanity check soft link name, to detect running off the end of the heap block */
             max_link_len = udata->src_block_size - src_ent->cache.slink.lval_offset;
-            if (strnlen(lnk.u.soft.name, max_link_len) == max_link_len)
+            if (strnlen(lnk.u.soft.name, max_link_len) == max_link_len) {
                 HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, H5_ITER_ERROR, "invalid link name offset");
+            }
         } /* else if */
-        else
+        else {
             assert(0 && "Unknown entry type");
+        }
 
         /* Determine name of source object */
-        if ((name = (char *)H5HL_offset_into(udata->src_heap, src_ent->name_off)) == NULL)
+        if ((name = (char*)H5HL_offset_into(udata->src_heap, src_ent->name_off)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, H5_ITER_ERROR, "unable to get source object name");
+        }
 
         /* Sanity check soft link name, to detect running off the end of the heap block */
         max_link_len = udata->src_block_size - src_ent->name_off;
-        if (strnlen(name, max_link_len) == max_link_len)
+        if (strnlen(name, max_link_len) == max_link_len) {
             HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, H5_ITER_ERROR, "invalid link name offset");
+        }
 
         /* Set up common link data */
-        lnk.cset         = H5F_DEFAULT_CSET; /* XXX: Allow user to set this */
-        lnk.corder       = 0;                /* Creation order is not tracked for old-style links */
-        lnk.corder_valid = false;            /* Creation order is not valid */
-        lnk.name         = name;             /* Name of link */
+        lnk.cset = H5F_DEFAULT_CSET; /* XXX: Allow user to set this */
+        lnk.corder = 0;              /* Creation order is not tracked for old-style links */
+        lnk.corder_valid = false;    /* Creation order is not valid */
+        lnk.name = name;             /* Name of link */
 
         /* Set copied metadata tag */
         H5_BEGIN_TAG(H5AC__COPIED_TAG)
 
         /* Insert the new object in the destination file's group */
         /* (Don't increment the link count - that's already done above for hard links) */
-        if (H5G__stab_insert_real(udata->dst_file, udata->dst_stab, &lnk, obj_type,
-                                  (obj_type == H5O_TYPE_GROUP ? &gcrt_info : NULL)) < 0)
+        if (H5G__stab_insert_real(udata->dst_file, udata->dst_stab, &lnk, obj_type, (obj_type == H5O_TYPE_GROUP ? &gcrt_info : NULL)) < 0) {
             HGOTO_ERROR_TAG(H5E_DATATYPE, H5E_CANTINIT, H5_ITER_ERROR, "unable to insert the name");
+        }
 
         /* Reset metadata tag */
         H5_END_TAG
@@ -1285,8 +1345,9 @@ H5G__node_copy(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr, const
     } /* end of for (i=0; i<sn->nsyms; i++) */
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5_ITER_ERROR, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_copy() */
@@ -1300,14 +1361,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5G__node_build_table(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr,
-                      const void H5_ATTR_UNUSED *_rt_key, void *_udata)
+int H5G__node_build_table(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    H5G_bt_it_bt_t *udata = (H5G_bt_it_bt_t *)_udata;
-    H5G_node_t     *sn    = NULL; /* Symbol table node */
-    unsigned        u;            /* Local index variable */
-    int             ret_value = H5_ITER_CONT;
+    H5G_bt_it_bt_t* udata = (H5G_bt_it_bt_t*)_udata;
+    H5G_node_t* sn = NULL; /* Symbol table node */
+    unsigned u;            /* Local index variable */
+    int ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -1322,18 +1381,19 @@ H5G__node_build_table(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr
      * Save information about the symbol table node since we can't lock it
      * because we're about to call an application function.
      */
-    if (NULL == (sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG)))
+    if (NULL == (sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, H5_ITER_ERROR, "unable to load symbol table node");
+    }
 
     /* Check if the link table needs to be extended */
     if ((udata->ltable->nlinks + sn->nsyms) >= udata->alloc_nlinks) {
-        size_t      na = MAX((udata->ltable->nlinks + sn->nsyms),
-                             (udata->alloc_nlinks * 2)); /* Double # of links allocated */
-        H5O_link_t *x;                                   /* Pointer to larger array of links */
+        size_t na = MAX((udata->ltable->nlinks + sn->nsyms), (udata->alloc_nlinks * 2)); /* Double # of links allocated */
+        H5O_link_t* x;                                                                   /* Pointer to larger array of links */
 
         /* Re-allocate the link table */
-        if (NULL == (x = (H5O_link_t *)H5MM_realloc(udata->ltable->lnks, sizeof(H5O_link_t) * na)))
+        if (NULL == (x = (H5O_link_t*)H5MM_realloc(udata->ltable->lnks, sizeof(H5O_link_t) * na))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, H5_ITER_ERROR, "memory allocation failed");
+        }
         udata->ltable->lnks = x;
     } /* end if */
 
@@ -1345,15 +1405,16 @@ H5G__node_build_table(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t addr
         linkno = udata->ltable->nlinks++;
 
         /* Convert the entry to a link */
-        if (H5G__ent_to_link(&sn->entry[u], udata->heap, &udata->ltable->lnks[linkno]) < 0)
-            HGOTO_ERROR(H5E_SYM, H5E_CANTCONVERT, H5_ITER_ERROR,
-                        "unable to convert symbol table entry to link");
+        if (H5G__ent_to_link(&sn->entry[u], udata->heap, &udata->ltable->lnks[linkno]) < 0) {
+            HGOTO_ERROR(H5E_SYM, H5E_CANTCONVERT, H5_ITER_ERROR, "unable to convert symbol table entry to link");
+        }
     } /* end for */
 
 done:
     /* Release the locked items */
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, H5_ITER_ERROR, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G__node_build_table() */
@@ -1368,11 +1429,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G__node_iterate_size(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t H5_ATTR_UNUSED addr,
-                       const void H5_ATTR_UNUSED *_rt_key, void *_udata)
+herr_t H5G__node_iterate_size(H5F_t* f, const void H5_ATTR_UNUSED* _lt_key, haddr_t H5_ATTR_UNUSED addr, const void H5_ATTR_UNUSED* _rt_key, void* _udata)
 {
-    hsize_t *stab_size = (hsize_t *)_udata; /* User data */
+    hsize_t* stab_size = (hsize_t*)_udata; /* User data */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -1395,12 +1454,11 @@ H5G__node_iterate_size(H5F_t *f, const void H5_ATTR_UNUSED *_lt_key, haddr_t H5_
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_node_debug(H5F_t *f, haddr_t addr, FILE *stream, int indent, int fwidth, haddr_t heap_addr)
+herr_t H5G_node_debug(H5F_t* f, haddr_t addr, FILE* stream, int indent, int fwidth, haddr_t heap_addr)
 {
-    H5G_node_t *sn        = NULL;
-    H5HL_t     *heap      = NULL;
-    herr_t      ret_value = SUCCEED; /* Return value */
+    H5G_node_t* sn = NULL;
+    H5HL_t* heap = NULL;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1414,25 +1472,25 @@ H5G_node_debug(H5F_t *f, haddr_t addr, FILE *stream, int indent, int fwidth, had
     assert(fwidth >= 0);
 
     /* Pin the heap down in memory */
-    if (heap_addr > 0 && H5_addr_defined(heap_addr))
-        if (NULL == (heap = H5HL_protect(f, heap_addr, H5AC__READ_ONLY_FLAG)))
+    if (heap_addr > 0 && H5_addr_defined(heap_addr)) {
+        if (NULL == (heap = H5HL_protect(f, heap_addr, H5AC__READ_ONLY_FLAG))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTPROTECT, FAIL, "unable to protect symbol table heap");
+        }
+    }
 
     /* Try loading symbol table node */
     H5E_PAUSE_ERRORS
-        {
-            sn = (H5G_node_t *)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG);
-        }
+    {
+        sn = (H5G_node_t*)H5AC_protect(f, H5AC_SNODE, addr, f, H5AC__READ_ONLY_FLAG);
+    }
     H5E_RESUME_ERRORS
     if (sn) {
         unsigned u; /* Local index variable */
 
         fprintf(stream, "%*sSymbol Table Node...\n", indent, "");
         fprintf(stream, "%*s%-*s %s\n", indent, "", fwidth, "Dirty:", sn->cache_info.is_dirty ? "Yes" : "No");
-        fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth,
-                "Size of Node (in bytes):", (unsigned)sn->node_size);
-        fprintf(stream, "%*s%-*s %u of %u\n", indent, "", fwidth, "Number of Symbols:", sn->nsyms,
-                (unsigned)(2 * H5F_SYM_LEAF_K(f)));
+        fprintf(stream, "%*s%-*s %u\n", indent, "", fwidth, "Size of Node (in bytes):", (unsigned)sn->node_size);
+        fprintf(stream, "%*s%-*s %u of %u\n", indent, "", fwidth, "Number of Symbols:", sn->nsyms, (unsigned)(2 * H5F_SYM_LEAF_K(f)));
 
         indent += 3;
         fwidth = MAX(0, fwidth - 3);
@@ -1440,18 +1498,19 @@ H5G_node_debug(H5F_t *f, haddr_t addr, FILE *stream, int indent, int fwidth, had
             fprintf(stream, "%*sSymbol %u:\n", indent - 3, "", u);
 
             if (heap) {
-                const char *s = (const char *)H5HL_offset_into(heap, sn->entry[u].name_off);
+                const char* s = (const char*)H5HL_offset_into(heap, sn->entry[u].name_off);
 
-                if (s)
+                if (s) {
                     fprintf(stream, "%*s%-*s `%s'\n", indent, "", fwidth, "Name:", s);
+                }
             } /* end if */
-            else
-                fprintf(stream, "%*s%-*s\n", indent, "", fwidth,
-                        "Warning: Invalid heap address given, name not displayed!");
+            else {
+                fprintf(stream, "%*s%-*s\n", indent, "", fwidth, "Warning: Invalid heap address given, name not displayed!");
+            }
 
             H5G__ent_debug(sn->entry + u, stream, indent, fwidth, heap);
         } /* end for */
-    }     /* end if */
+    } /* end if */
     /*
      * If we couldn't load the symbol table node, then try loading the
      * B-tree node.
@@ -1459,17 +1518,20 @@ H5G_node_debug(H5F_t *f, haddr_t addr, FILE *stream, int indent, int fwidth, had
     else {
         H5G_bt_common_t udata; /*data to pass through B-tree	*/
 
-        udata.heap       = heap;
+        udata.heap = heap;
         udata.block_size = H5HL_heap_get_size(heap);
-        if (H5B_debug(f, addr, stream, indent, fwidth, H5B_SNODE, &udata) < 0)
+        if (H5B_debug(f, addr, stream, indent, fwidth, H5B_SNODE, &udata) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, FAIL, "unable to debug B-tree node");
+        }
     } /* end else */
 
 done:
-    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0)
+    if (sn && H5AC_unprotect(f, H5AC_SNODE, addr, sn, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, FAIL, "unable to release symbol table node");
-    if (heap && H5HL_unprotect(heap) < 0)
+    }
+    if (heap && H5HL_unprotect(heap) < 0) {
         HDONE_ERROR(H5E_SYM, H5E_CANTUNPROTECT, FAIL, "unable to unprotect symbol table heap");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5G_node_debug() */

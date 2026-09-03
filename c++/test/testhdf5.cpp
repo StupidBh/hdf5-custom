@@ -46,8 +46,7 @@ using namespace H5;
 #include "h5test.h"
 #include "h5cpputil.h" // C++ utilility header file
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     try {
         // Turn of the auto-printing when failure occurs so that we can
@@ -93,7 +92,7 @@ main(int argc, char *argv[])
                 AddTest("enum", test_enum, NULL, cleanup_enum, NULL, 0, "Enum Data Types");
         */
     }
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("Tests failed", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
@@ -107,8 +106,9 @@ main(int argc, char *argv[])
     PerformTests();
 
     /* Display test summary, if requested */
-    if (GetTestSummary())
+    if (GetTestSummary()) {
         TestSummary(stdout);
+    }
 
     /* Release test infrastructure */
     TestShutdown();

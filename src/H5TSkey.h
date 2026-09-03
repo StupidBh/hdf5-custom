@@ -53,11 +53,11 @@
 /*******************/
 
 #ifdef H5_HAVE_C11_THREADS
-#define H5TS_key_set_value(key, value) (H5_UNLIKELY(tss_set((key), (value)) != thrd_success) ? FAIL : SUCCEED)
-#define H5TS_key_get_value(key, value) (*(value) = tss_get(key), SUCCEED)
+    #define H5TS_key_set_value(key, value) (H5_UNLIKELY(tss_set((key), (value)) != thrd_success) ? FAIL : SUCCEED)
+    #define H5TS_key_get_value(key, value) (*(value) = tss_get(key), SUCCEED)
 
 #else
-#ifdef H5_HAVE_WIN_THREADS
+    #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_key_set_value
  *
@@ -67,12 +67,12 @@
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_key_set_value(H5TS_key_t key, void *value)
+static inline herr_t H5TS_key_set_value(H5TS_key_t key, void* value)
 {
     /* Set the value for this thread */
-    if (H5_UNLIKELY(0 == TlsSetValue(key, (LPVOID)value)))
+    if (H5_UNLIKELY(0 == TlsSetValue(key, (LPVOID)value))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_key_set_value() */
@@ -86,22 +86,23 @@ H5TS_key_set_value(H5TS_key_t key, void *value)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_key_get_value(H5TS_key_t key, void **value)
+static inline herr_t H5TS_key_get_value(H5TS_key_t key, void** value)
 {
     /* Get the value for this thread */
-    if (H5_UNLIKELY(NULL == (*value = TlsGetValue(key))))
+    if (H5_UNLIKELY(NULL == (*value = TlsGetValue(key)))) {
         /* Check for possible error, when NULL value is returned */
-        if (H5_UNLIKELY(ERROR_SUCCESS != GetLastError()))
+        if (H5_UNLIKELY(ERROR_SUCCESS != GetLastError())) {
             return FAIL;
+        }
+    }
 
     return SUCCEED;
 } /* end H5TS_key_get_value() */
 
-#else
+    #else
 
-#define H5TS_key_set_value(key, value) (H5_UNLIKELY(pthread_setspecific((key), (value))) ? FAIL : SUCCEED)
-#define H5TS_key_get_value(key, value) (*(value) = pthread_getspecific(key), SUCCEED)
+        #define H5TS_key_set_value(key, value) (H5_UNLIKELY(pthread_setspecific((key), (value))) ? FAIL : SUCCEED)
+        #define H5TS_key_get_value(key, value) (*(value) = pthread_getspecific(key), SUCCEED)
 
-#endif
+    #endif
 #endif

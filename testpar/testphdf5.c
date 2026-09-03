@@ -17,7 +17,7 @@
 #include "testphdf5.h"
 
 #ifndef PATH_MAX
-#define PATH_MAX 512
+    #define PATH_MAX 512
 #endif /* !PATH_MAX */
 
 /* global variables */
@@ -25,11 +25,11 @@ int dim0;
 int dim1;
 int chunkdim0;
 int chunkdim1;
-int nerrors   = 0;               /* errors count */
-int ndatasets = 300;             /* number of datasets to create*/
-int ngroups   = 512;             /* number of groups to create in root
-                                  * group. */
-int facc_type       = FACC_MPIO; /*Test file access type */
+int nerrors = 0;           /* errors count */
+int ndatasets = 300;       /* number of datasets to create*/
+int ngroups = 512;         /* number of groups to create in root
+                            * group. */
+int facc_type = FACC_MPIO; /*Test file access type */
 int dxfer_coll_type = DXFER_COLLECTIVE_IO;
 
 /* other option flags */
@@ -41,31 +41,29 @@ int dxfer_coll_type = DXFER_COLLECTIVE_IO;
  */
 #define NFILENAME    2
 #define PARATESTFILE filenames[0]
-const char *FILENAME[NFILENAME] = {"ParaTest", NULL};
-char       *filenames[NFILENAME];
-hid_t       fapl; /* file access property list */
+const char* FILENAME[NFILENAME] = { "ParaTest", NULL };
+char* filenames[NFILENAME];
+hid_t fapl; /* file access property list */
 
 #ifdef USE_PAUSE
-/* pause the process for a moment to allow debugger to attach if desired. */
-/* Will pause more if greenlight file is not present but will eventually */
-/* continue. */
-#include <sys/types.h>
-#include <sys/stat.h>
+    /* pause the process for a moment to allow debugger to attach if desired. */
+    /* Will pause more if greenlight file is not present but will eventually */
+    /* continue. */
+    #include <sys/types.h>
+    #include <sys/stat.h>
 
-void
-pause_proc(void)
+void pause_proc(void)
 {
-
-    int       pid;
+    int pid;
     h5_stat_t statbuf;
-    char      greenlight[] = "go";
-    int       maxloop      = 10;
-    int       loops        = 0;
-    int       time_int     = 10;
+    char greenlight[] = "go";
+    int maxloop = 10;
+    int loops = 0;
+    int time_int = 10;
 
     /* mpi variables */
-    int  mpi_size, mpi_rank;
-    int  mpi_namelen;
+    int mpi_size, mpi_rank;
+    int mpi_namelen;
     char mpi_name[MPI_MAX_PROCESSOR_NAME];
 
     pid = getpid();
@@ -90,8 +88,7 @@ pause_proc(void)
 }
 
 /* Use the Profile feature of MPI to call the pause_proc() */
-int
-MPI_Init(int *argc, char ***argv)
+int MPI_Init(int* argc, char*** argv)
 {
     int ret_code;
     ret_code = PMPI_Init(argc, argv);
@@ -103,19 +100,20 @@ MPI_Init(int *argc, char ***argv)
 /*
  * Show command usage
  */
-static void
-usage(FILE *stream)
+static void usage(FILE* stream)
 {
-    fprintf(stream, "    [-r] [-w] [-m<n_datasets>] [-n<n_groups>] "
-                    "[-o] [-f <prefix>] [-d <dim0> <dim1>]\n");
-    fprintf(stream, "\t-m<n_datasets>"
-                    "\tset number of datasets for the multiple dataset test\n");
-    fprintf(stream, "\t-n<n_groups>"
-                    "\tset number of groups for the multiple group test\n");
+    fprintf(stream,
+            "    [-r] [-w] [-m<n_datasets>] [-n<n_groups>] "
+            "[-o] [-f <prefix>] [-d <dim0> <dim1>]\n");
+    fprintf(stream,
+            "\t-m<n_datasets>"
+            "\tset number of datasets for the multiple dataset test\n");
+    fprintf(stream,
+            "\t-n<n_groups>"
+            "\tset number of groups for the multiple group test\n");
     fprintf(stream, "\t-f <prefix>\tfilename prefix\n");
     fprintf(stream, "\t-2\t\tuse Split-file together with MPIO\n");
-    fprintf(stream, "\t-d <factor0> <factor1>\tdataset dimensions factors. Defaults (%d,%d)\n", ROW_FACTOR,
-            COL_FACTOR);
+    fprintf(stream, "\t-d <factor0> <factor1>\tdataset dimensions factors. Defaults (%d,%d)\n", ROW_FACTOR, COL_FACTOR);
     fprintf(stream, "\t-c <dim0> <dim1>\tdataset chunk dimensions. Defaults (dim0/10,dim1/10)\n");
     fprintf(stream, "\n");
 }
@@ -123,8 +121,7 @@ usage(FILE *stream)
 /*
  * parse the command line options
  */
-static int
-parse_options(int argc, char **argv)
+static int parse_options(int argc, char** argv)
 {
     int mpi_size, mpi_rank; /* mpi variables */
 
@@ -142,66 +139,63 @@ parse_options(int argc, char **argv)
         }
         else {
             switch (*(*argv + 1)) {
-                case 'm':
-                    ndatasets = atoi((*argv + 1) + 1);
-                    if (ndatasets < 0) {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-                case 'n':
-                    ngroups = atoi((*argv + 1) + 1);
-                    if (ngroups < 0) {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-                case 'f':
-                    if (--argc < 1) {
-                        nerrors++;
-                        return (1);
-                    }
-                    if (**(++argv) == '-') {
-                        nerrors++;
-                        return (1);
-                    }
-                    paraprefix = *argv;
-                    break;
-                case 'i': /* Collective MPI-IO access with independent IO  */
-                    dxfer_coll_type = DXFER_INDEPENDENT_IO;
-                    break;
-                case '2': /* Use the split-file driver with MPIO access */
-                    /* Can use $HDF5_METAPREFIX to define the */
-                    /* meta-file-prefix. */
-                    facc_type = FACC_MPIO | FACC_SPLIT;
-                    break;
-                case 'd': /* dimensizes */
-                    if (--argc < 2) {
-                        nerrors++;
-                        return (1);
-                    }
-                    dim0 = atoi(*(++argv)) * mpi_size;
-                    argc--;
-                    dim1 = atoi(*(++argv)) * mpi_size;
-                    /* set default chunkdim sizes too */
-                    chunkdim0 = (dim0 + 9) / 10;
-                    chunkdim1 = (dim1 + 9) / 10;
-                    break;
-                case 'c': /* chunk dimensions */
-                    if (--argc < 2) {
-                        nerrors++;
-                        return (1);
-                    }
-                    chunkdim0 = atoi(*(++argv));
-                    argc--;
-                    chunkdim1 = atoi(*(++argv));
-                    break;
-                case 'h': /* print help message--return with nerrors set */
-                    return (1);
-                default:
-                    printf("Illegal option(%s)\n", *argv);
+            case 'm':
+                ndatasets = atoi((*argv + 1) + 1);
+                if (ndatasets < 0) {
                     nerrors++;
                     return (1);
+                }
+                break;
+            case 'n':
+                ngroups = atoi((*argv + 1) + 1);
+                if (ngroups < 0) {
+                    nerrors++;
+                    return (1);
+                }
+                break;
+            case 'f':
+                if (--argc < 1) {
+                    nerrors++;
+                    return (1);
+                }
+                if (**(++argv) == '-') {
+                    nerrors++;
+                    return (1);
+                }
+                paraprefix = *argv;
+                break;
+            case 'i': /* Collective MPI-IO access with independent IO  */ dxfer_coll_type = DXFER_INDEPENDENT_IO; break;
+            case '2': /* Use the split-file driver with MPIO access */
+                /* Can use $HDF5_METAPREFIX to define the */
+                /* meta-file-prefix. */
+                facc_type = FACC_MPIO | FACC_SPLIT;
+                break;
+            case 'd': /* dimensizes */
+                if (--argc < 2) {
+                    nerrors++;
+                    return (1);
+                }
+                dim0 = atoi(*(++argv)) * mpi_size;
+                argc--;
+                dim1 = atoi(*(++argv)) * mpi_size;
+                /* set default chunkdim sizes too */
+                chunkdim0 = (dim0 + 9) / 10;
+                chunkdim1 = (dim1 + 9) / 10;
+                break;
+            case 'c': /* chunk dimensions */
+                if (--argc < 2) {
+                    nerrors++;
+                    return (1);
+                }
+                chunkdim0 = atoi(*(++argv));
+                argc--;
+                chunkdim1 = atoi(*(++argv));
+                break;
+            case 'h': /* print help message--return with nerrors set */ return (1);
+            default:
+                printf("Illegal option(%s)\n", *argv);
+                nerrors++;
+                return (1);
             }
         }
     } /*while*/
@@ -220,8 +214,9 @@ parse_options(int argc, char **argv)
 
     /* Make sure datasets can be divided into equal portions by the processes */
     if ((dim0 % mpi_size) || (dim1 % mpi_size)) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             printf("dim0(%d) and dim1(%d) must be multiples of processes(%d)\n", dim0, dim1, mpi_size);
+        }
         nerrors++;
         return (1);
     }
@@ -232,28 +227,29 @@ parse_options(int argc, char **argv)
 
         n = sizeof(FILENAME) / sizeof(FILENAME[0]) - 1; /* exclude the NULL */
 
-        for (i = 0; i < n; i++)
+        for (i = 0; i < n; i++) {
             if (h5_fixname(FILENAME[i], fapl, filenames[i], PATH_MAX) == NULL) {
                 printf("h5_fixname failed\n");
                 nerrors++;
                 return (1);
             }
+        }
         if (MAINPROCESS) {
             printf("Test filenames are:\n");
-            for (i = 0; i < n; i++)
+            for (i = 0; i < n; i++) {
                 printf("    %s\n", filenames[i]);
+            }
         }
     }
 
     return (0);
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     H5Ptest_param_t test_params;
-    int             mpi_size, mpi_rank; /* mpi variables */
-    int             mpi_code;
+    int mpi_size, mpi_rank; /* mpi variables */
+    int mpi_code;
 #ifdef H5_HAVE_TEST_API
     int required = MPI_THREAD_MULTIPLE;
     int provided;
@@ -286,13 +282,15 @@ main(int argc, char **argv)
 
 #ifdef H5_HAVE_TEST_API
     /* Warn about missing MPI_THREAD_MULTIPLE support */
-    if ((provided < required) && MAINPROCESS)
+    if ((provided < required) && MAINPROCESS) {
         printf("** MPI doesn't support MPI_Init_thread with MPI_THREAD_MULTIPLE **\n");
+    }
 #endif
 
     if (MPI_SUCCESS != (mpi_code = MPI_Comm_size(MPI_COMM_WORLD, &mpi_size))) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             printf("MPI_Comm_size failed with error code %d\n", mpi_code);
+        }
         MPI_Finalize();
         return -1;
     }
@@ -336,13 +334,14 @@ main(int argc, char **argv)
 
     /* Initialize testing framework */
     if (TestInit(argv[0], usage, parse_options, NULL, NULL, mpi_rank) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "couldn't initialize testing framework\n");
+        }
         MPI_Finalize();
         return -1;
     }
 
-    test_params.name  = PARATESTFILE;
+    test_params.name = PARATESTFILE;
     test_params.count = 0;
 
     /* Tests are generally arranged from least to most complexity... */
@@ -351,113 +350,100 @@ main(int argc, char **argv)
      * introduced in that release which causes this test to fail.
      * The issue was fixed for the 5.0.6 release.
      */
-#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) &&                         \
-    defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && defined(OMPI_RELEASE_VERSION) &&             \
-    (OMPI_RELEASE_VERSION == 5)
+#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) && defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && \
+    defined(OMPI_RELEASE_VERSION) && (OMPI_RELEASE_VERSION == 5)
     AddTest("-mpiodup", test_fapl_mpio_dup, NULL, NULL, NULL, 0, "fapl_mpio duplicate");
 #else
     AddTest("mpiodup", test_fapl_mpio_dup, NULL, NULL, NULL, 0, "fapl_mpio duplicate");
 #endif
 
-    AddTest("getdxplmpio", test_get_dxpl_mpio, NULL, NULL, &test_params, sizeof(test_params),
-            "dxpl_mpio get");
+    AddTest("getdxplmpio", test_get_dxpl_mpio, NULL, NULL, &test_params, sizeof(test_params), "dxpl_mpio get");
 
-    AddTest("split", test_split_comm_access, NULL, NULL, &test_params, sizeof(test_params),
-            "dataset using split communicators");
+    AddTest("split", test_split_comm_access, NULL, NULL, &test_params, sizeof(test_params), "dataset using split communicators");
     AddTest("h5oflusherror", test_oflush, NULL, NULL, &test_params, sizeof(test_params), "H5Oflush failure");
 
-    AddTest("page_buffer", test_page_buffer_access, NULL, NULL, &test_params, sizeof(test_params),
-            "page buffer usage in parallel");
+    AddTest("page_buffer", test_page_buffer_access, NULL, NULL, &test_params, sizeof(test_params), "page buffer usage in parallel");
 
     /* Skip this test for OpenMPI version 5.0.5 since an issue was
      * introduced in that release which causes this test to fail.
      * The issue was fixed for the 5.0.6 release.
      */
-#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) &&                         \
-    defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && defined(OMPI_RELEASE_VERSION) &&             \
-    (OMPI_RELEASE_VERSION == 5)
-    AddTest("-props", test_file_properties, NULL, NULL, &test_params, sizeof(test_params),
-            "Coll Metadata file property settings");
+#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) && defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && \
+    defined(OMPI_RELEASE_VERSION) && (OMPI_RELEASE_VERSION == 5)
+    AddTest("-props", test_file_properties, NULL, NULL, &test_params, sizeof(test_params), "Coll Metadata file property settings");
 #else
-    AddTest("props", test_file_properties, NULL, NULL, &test_params, sizeof(test_params),
-            "Coll Metadata file property settings");
+    AddTest("props", test_file_properties, NULL, NULL, &test_params, sizeof(test_params), "Coll Metadata file property settings");
 #endif
 
     AddTest("delete", test_delete, NULL, NULL, &test_params, sizeof(test_params), "MPI-IO VFD file delete");
 
-    AddTest("invlibverassert", test_invalid_libver_bounds_file_close_assert, NULL, NULL, &test_params,
-            sizeof(test_params), "Invalid libver bounds assertion failure");
+    AddTest("invlibverassert",
+            test_invalid_libver_bounds_file_close_assert,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "Invalid libver bounds assertion failure");
 
-    AddTest("evictparassert", test_evict_on_close_parallel_unsupp, NULL, NULL, &test_params,
-            sizeof(test_params), "Evict on close in parallel failure");
+    AddTest("evictparassert", test_evict_on_close_parallel_unsupp, NULL, NULL, &test_params, sizeof(test_params), "Evict on close in parallel failure");
 
     /* Skip this test for OpenMPI version 5.0.5 since an issue was
      * introduced in that release which causes this test to fail.
      * The issue was fixed for the 5.0.6 release.
      */
-#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) &&                         \
-    defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && defined(OMPI_RELEASE_VERSION) &&             \
-    (OMPI_RELEASE_VERSION == 5)
-    AddTest("-fapl_preserve", test_fapl_preserve_hints, NULL, NULL, &test_params, sizeof(test_params),
-            "preserve MPI I/O hints after fapl closed");
+#if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION == 5) && defined(OMPI_MINOR_VERSION) && (OMPI_MINOR_VERSION == 0) && \
+    defined(OMPI_RELEASE_VERSION) && (OMPI_RELEASE_VERSION == 5)
+    AddTest("-fapl_preserve", test_fapl_preserve_hints, NULL, NULL, &test_params, sizeof(test_params), "preserve MPI I/O hints after fapl closed");
 #else
-    AddTest("fapl_preserve", test_fapl_preserve_hints, NULL, NULL, &test_params, sizeof(test_params),
-            "preserve MPI I/O hints after fapl closed");
+    AddTest("fapl_preserve", test_fapl_preserve_hints, NULL, NULL, &test_params, sizeof(test_params), "preserve MPI I/O hints after fapl closed");
 #endif
 
-    AddTest("idsetw", dataset_writeInd, NULL, NULL, &test_params, sizeof(test_params),
-            "dataset independent write");
-    AddTest("idsetr", dataset_readInd, NULL, NULL, &test_params, sizeof(test_params),
-            "dataset independent read");
+    AddTest("idsetw", dataset_writeInd, NULL, NULL, &test_params, sizeof(test_params), "dataset independent write");
+    AddTest("idsetr", dataset_readInd, NULL, NULL, &test_params, sizeof(test_params), "dataset independent read");
 
-    AddTest("cdsetw", dataset_writeAll, NULL, NULL, &test_params, sizeof(test_params),
-            "dataset collective write");
-    AddTest("cdsetr", dataset_readAll, NULL, NULL, &test_params, sizeof(test_params),
-            "dataset collective read");
+    AddTest("cdsetw", dataset_writeAll, NULL, NULL, &test_params, sizeof(test_params), "dataset collective write");
+    AddTest("cdsetr", dataset_readAll, NULL, NULL, &test_params, sizeof(test_params), "dataset collective read");
 
-    AddTest("eidsetw", extend_writeInd, NULL, NULL, &test_params, sizeof(test_params),
-            "extendible dataset independent write");
-    AddTest("eidsetr", extend_readInd, NULL, NULL, &test_params, sizeof(test_params),
-            "extendible dataset independent read");
-    AddTest("ecdsetw", extend_writeAll, NULL, NULL, &test_params, sizeof(test_params),
-            "extendible dataset collective write");
-    AddTest("ecdsetr", extend_readAll, NULL, NULL, &test_params, sizeof(test_params),
-            "extendible dataset collective read");
-    AddTest("eidsetw2", extend_writeInd2, NULL, NULL, &test_params, sizeof(test_params),
-            "extendible dataset independent write #2");
-    AddTest("selnone", none_selection_chunk, NULL, NULL, &test_params, sizeof(test_params),
-            "chunked dataset with none-selection");
-    AddTest("calloc", test_chunk_alloc, NULL, NULL, &test_params, sizeof(test_params),
-            "parallel extend Chunked allocation on serial file");
-    AddTest("chkallocser2par", test_chunk_alloc_incr_ser_to_par, NULL, NULL, &test_params,
-            sizeof(test_params), "chunk allocation from serial to parallel file access");
-    AddTest("fltread", test_filter_read, NULL, NULL, &test_params, sizeof(test_params),
-            "parallel read of dataset written serially with filters");
+    AddTest("eidsetw", extend_writeInd, NULL, NULL, &test_params, sizeof(test_params), "extendible dataset independent write");
+    AddTest("eidsetr", extend_readInd, NULL, NULL, &test_params, sizeof(test_params), "extendible dataset independent read");
+    AddTest("ecdsetw", extend_writeAll, NULL, NULL, &test_params, sizeof(test_params), "extendible dataset collective write");
+    AddTest("ecdsetr", extend_readAll, NULL, NULL, &test_params, sizeof(test_params), "extendible dataset collective read");
+    AddTest("eidsetw2", extend_writeInd2, NULL, NULL, &test_params, sizeof(test_params), "extendible dataset independent write #2");
+    AddTest("selnone", none_selection_chunk, NULL, NULL, &test_params, sizeof(test_params), "chunked dataset with none-selection");
+    AddTest("calloc", test_chunk_alloc, NULL, NULL, &test_params, sizeof(test_params), "parallel extend Chunked allocation on serial file");
+    AddTest("chkallocser2par",
+            test_chunk_alloc_incr_ser_to_par,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "chunk allocation from serial to parallel file access");
+    AddTest("fltread", test_filter_read, NULL, NULL, &test_params, sizeof(test_params), "parallel read of dataset written serially with filters");
 
 #ifdef H5_HAVE_FILTER_DEFLATE
-    AddTest("cmpdsetr", compress_readAll, NULL, NULL, &test_params, sizeof(test_params),
-            "compressed dataset collective read");
+    AddTest("cmpdsetr", compress_readAll, NULL, NULL, &test_params, sizeof(test_params), "compressed dataset collective read");
 #endif /* H5_HAVE_FILTER_DEFLATE */
 
     AddTest("zerodsetr", zero_dim_dset, NULL, NULL, &test_params, sizeof(test_params), "zero dim dset");
 
     test_params.count = ndatasets;
-    AddTest("ndsetw", multiple_dset_write, NULL, NULL, &test_params, sizeof(test_params),
-            "multiple datasets write");
+    AddTest("ndsetw", multiple_dset_write, NULL, NULL, &test_params, sizeof(test_params), "multiple datasets write");
 
     test_params.count = ngroups;
-    AddTest("ngrpw", multiple_group_write, NULL, NULL, &test_params, sizeof(test_params),
-            "multiple groups write");
-    AddTest("ngrpr", multiple_group_read, NULL, NULL, &test_params, sizeof(test_params),
-            "multiple groups read");
+    AddTest("ngrpw", multiple_group_write, NULL, NULL, &test_params, sizeof(test_params), "multiple groups write");
+    AddTest("ngrpr", multiple_group_read, NULL, NULL, &test_params, sizeof(test_params), "multiple groups read");
 
-    AddTest("compact", compact_dataset, NULL, NULL, &test_params, sizeof(test_params),
-            "compact dataset test");
+    AddTest("compact", compact_dataset, NULL, NULL, &test_params, sizeof(test_params), "compact dataset test");
 
     test_params.count = ngroups;
     /* combined cngrpw and ingrpr tests because ingrpr reads file created by cngrpw. */
-    AddTest("cngrpw-ingrpr", collective_group_write_independent_group_read, NULL, NULL, &test_params,
-            sizeof(test_params), "collective grp/dset write - independent grp/dset read");
+    AddTest("cngrpw-ingrpr",
+            collective_group_write_independent_group_read,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "collective grp/dset write - independent grp/dset read");
 #ifndef H5_HAVE_WIN32_API
     AddTest("bigdset", big_dataset, NULL, NULL, &test_params, sizeof(test_params), "big dataset test");
 #else
@@ -465,52 +451,47 @@ main(int argc, char **argv)
 #endif
     AddTest("fill", dataset_fillvalue, NULL, NULL, &test_params, sizeof(test_params), "dataset fill value");
 
-    AddTest("cchunk1", coll_chunk1, NULL, NULL, &test_params, sizeof(test_params),
-            "simple collective chunk io");
-    AddTest("cchunk2", coll_chunk2, NULL, NULL, &test_params, sizeof(test_params),
-            "noncontiguous collective chunk io");
-    AddTest("cchunk3", coll_chunk3, NULL, NULL, &test_params, sizeof(test_params),
-            "multi-chunk collective chunk io");
-    AddTest("cchunk4", coll_chunk4, NULL, NULL, &test_params, sizeof(test_params),
-            "collective chunk io with partial non-selection");
+    AddTest("cchunk1", coll_chunk1, NULL, NULL, &test_params, sizeof(test_params), "simple collective chunk io");
+    AddTest("cchunk2", coll_chunk2, NULL, NULL, &test_params, sizeof(test_params), "noncontiguous collective chunk io");
+    AddTest("cchunk3", coll_chunk3, NULL, NULL, &test_params, sizeof(test_params), "multi-chunk collective chunk io");
+    AddTest("cchunk4", coll_chunk4, NULL, NULL, &test_params, sizeof(test_params), "collective chunk io with partial non-selection");
 
     if ((mpi_size < 3) && MAINPROCESS) {
         printf("Collective chunk IO optimization APIs ");
         printf("needs at least 3 processes to participate\n");
         printf("Collective chunk IO API tests will be skipped \n");
     }
-    AddTest((mpi_size < 3) ? "-cchunk5" : "cchunk5", coll_chunk5, NULL, NULL, &test_params,
-            sizeof(test_params), "linked chunk collective IO without optimization");
-    AddTest((mpi_size < 3) ? "-cchunk6" : "cchunk6", coll_chunk6, NULL, NULL, &test_params,
-            sizeof(test_params), "multi-chunk collective IO with direct request");
-    AddTest((mpi_size < 3) ? "-cchunk7" : "cchunk7", coll_chunk7, NULL, NULL, &test_params,
-            sizeof(test_params), "linked chunk collective IO with optimization");
-    AddTest((mpi_size < 3) ? "-cchunk8" : "cchunk8", coll_chunk8, NULL, NULL, &test_params,
-            sizeof(test_params), "linked chunk collective IO transferring to multi-chunk");
-    AddTest((mpi_size < 3) ? "-cchunk9" : "cchunk9", coll_chunk9, NULL, NULL, &test_params,
-            sizeof(test_params), "multiple chunk collective IO with optimization");
-    AddTest((mpi_size < 3) ? "-cchunk10" : "cchunk10", coll_chunk10, NULL, NULL, &test_params,
-            sizeof(test_params), "multiple chunk collective IO transferring to independent IO");
+    AddTest((mpi_size < 3) ? "-cchunk5" : "cchunk5", coll_chunk5, NULL, NULL, &test_params, sizeof(test_params), "linked chunk collective IO without optimization");
+    AddTest((mpi_size < 3) ? "-cchunk6" : "cchunk6", coll_chunk6, NULL, NULL, &test_params, sizeof(test_params), "multi-chunk collective IO with direct request");
+    AddTest((mpi_size < 3) ? "-cchunk7" : "cchunk7", coll_chunk7, NULL, NULL, &test_params, sizeof(test_params), "linked chunk collective IO with optimization");
+    AddTest((mpi_size < 3) ? "-cchunk8" : "cchunk8",
+            coll_chunk8,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "linked chunk collective IO transferring to multi-chunk");
+    AddTest((mpi_size < 3) ? "-cchunk9" : "cchunk9", coll_chunk9, NULL, NULL, &test_params, sizeof(test_params), "multiple chunk collective IO with optimization");
+    AddTest((mpi_size < 3) ? "-cchunk10" : "cchunk10",
+            coll_chunk10,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "multiple chunk collective IO transferring to independent IO");
 
     /* irregular collective IO tests*/
-    AddTest("ccontw", coll_irregular_cont_write, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular contiguous write");
-    AddTest("ccontr", coll_irregular_cont_read, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular contiguous read");
-    AddTest("cschunkw", coll_irregular_simple_chunk_write, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular simple chunk write");
-    AddTest("cschunkr", coll_irregular_simple_chunk_read, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular simple chunk read");
-    AddTest("ccchunkw", coll_irregular_complex_chunk_write, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular complex chunk write");
-    AddTest("ccchunkr", coll_irregular_complex_chunk_read, NULL, NULL, &test_params, sizeof(test_params),
-            "collective irregular complex chunk read");
+    AddTest("ccontw", coll_irregular_cont_write, NULL, NULL, &test_params, sizeof(test_params), "collective irregular contiguous write");
+    AddTest("ccontr", coll_irregular_cont_read, NULL, NULL, &test_params, sizeof(test_params), "collective irregular contiguous read");
+    AddTest("cschunkw", coll_irregular_simple_chunk_write, NULL, NULL, &test_params, sizeof(test_params), "collective irregular simple chunk write");
+    AddTest("cschunkr", coll_irregular_simple_chunk_read, NULL, NULL, &test_params, sizeof(test_params), "collective irregular simple chunk read");
+    AddTest("ccchunkw", coll_irregular_complex_chunk_write, NULL, NULL, &test_params, sizeof(test_params), "collective irregular complex chunk write");
+    AddTest("ccchunkr", coll_irregular_complex_chunk_read, NULL, NULL, &test_params, sizeof(test_params), "collective irregular complex chunk read");
 
     AddTest("null", null_dataset, NULL, NULL, &test_params, sizeof(test_params), "null dataset test");
 
     test_params.count = 0;
-    AddTest("I/Omodeconf", io_mode_confusion, NULL, NULL, &test_params, sizeof(test_params),
-            "I/O mode confusion test -- hangs quickly on failure");
+    AddTest("I/Omodeconf", io_mode_confusion, NULL, NULL, &test_params, sizeof(test_params), "I/O mode confusion test -- hangs quickly on failure");
 
     if ((mpi_size < 3) && MAINPROCESS) {
         printf("rr_obj_hdr_flush_confusion test needs at least 3 processes.\n");
@@ -518,24 +499,18 @@ main(int argc, char **argv)
     }
     if (mpi_size > 2) {
         test_params.count = 0;
-        AddTest("rrobjflushconf", rr_obj_hdr_flush_confusion, NULL, NULL, &test_params, sizeof(test_params),
-                "round robin object header flush confusion test");
+        AddTest("rrobjflushconf", rr_obj_hdr_flush_confusion, NULL, NULL, &test_params, sizeof(test_params), "round robin object header flush confusion test");
     }
 
-    AddTest("alnbg1", chunk_align_bug_1, NULL, NULL, &test_params, sizeof(test_params),
-            "Chunk allocation with alignment bug.");
+    AddTest("alnbg1", chunk_align_bug_1, NULL, NULL, &test_params, sizeof(test_params), "Chunk allocation with alignment bug.");
 
-    AddTest("tldsc", lower_dim_size_comp_test, NULL, NULL, &test_params, sizeof(test_params),
-            "test lower dim size comp in span tree to mpi derived type");
+    AddTest("tldsc", lower_dim_size_comp_test, NULL, NULL, &test_params, sizeof(test_params), "test lower dim size comp in span tree to mpi derived type");
 
-    AddTest("lccio", link_chunk_collective_io_test, NULL, NULL, &test_params, sizeof(test_params),
-            "test mpi derived type management");
+    AddTest("lccio", link_chunk_collective_io_test, NULL, NULL, &test_params, sizeof(test_params), "test mpi derived type management");
 
-    AddTest("actualio", actual_io_mode_tests, NULL, NULL, &test_params, sizeof(test_params),
-            "test actual io mode proprerty");
+    AddTest("actualio", actual_io_mode_tests, NULL, NULL, &test_params, sizeof(test_params), "test actual io mode proprerty");
 
-    AddTest("nocolcause", no_collective_cause_tests, NULL, NULL, &test_params, sizeof(test_params),
-            "test cause for broken collective io");
+    AddTest("nocolcause", no_collective_cause_tests, NULL, NULL, &test_params, sizeof(test_params), "test cause for broken collective io");
 
     AddTest("edpl", test_plist_ed, NULL, NULL, NULL, 0, "encode/decode Property Lists");
 
@@ -545,16 +520,17 @@ main(int argc, char **argv)
         printf("File Image Ops daisy chain test needs at least 2 processes.\n");
         printf("File Image Ops daisy chain test will be skipped \n");
     }
-    AddTest((mpi_size < 2) ? "-fiodc" : "fiodc", file_image_daisy_chain_test, NULL, NULL, NULL, 0,
-            "file image ops daisy chain");
+    AddTest((mpi_size < 2) ? "-fiodc" : "fiodc", file_image_daisy_chain_test, NULL, NULL, NULL, 0, "file image ops daisy chain");
 
     /* Atomicity operations are not supported for OpenMPI versions < major
      * version 5 and will sporadically fail.
      */
 #if defined(OPEN_MPI) && defined(OMPI_MAJOR_VERSION) && (OMPI_MAJOR_VERSION < 5)
-    if (MAINPROCESS)
-        printf("OpenMPI major version is < 5. Atomicity tests will be skipped due to support for atomicity "
-               "operations not being implemented.\n");
+    if (MAINPROCESS) {
+        printf(
+            "OpenMPI major version is < 5. Atomicity tests will be skipped due to support for atomicity "
+            "operations not being implemented.\n");
+    }
 #else
     if ((mpi_size < 2) && MAINPROCESS) {
         printf("Atomicity tests need at least 2 processes to participate\n");
@@ -564,24 +540,35 @@ main(int argc, char **argv)
         printf("Atomicity tests will not work with a non MPIO VFD\n");
     }
     else if (mpi_size >= 2 && facc_type == FACC_MPIO) {
-        AddTest("atomicity", dataset_atomicity, NULL, NULL, &test_params, sizeof(test_params),
-                "dataset atomic updates");
+        AddTest("atomicity", dataset_atomicity, NULL, NULL, &test_params, sizeof(test_params), "dataset atomic updates");
     }
 #endif
 
-    AddTest("denseattr", test_dense_attr, NULL, NULL, &test_params, sizeof(test_params),
-            "Store Dense Attributes");
+    AddTest("denseattr", test_dense_attr, NULL, NULL, &test_params, sizeof(test_params), "Store Dense Attributes");
 
-    AddTest("noselcollmdread", test_partial_no_selection_coll_md_read, NULL, NULL, &test_params,
-            sizeof(test_params), "Collective Metadata read with some ranks having no selection");
-    AddTest("MC_coll_MD_read", test_multi_chunk_io_addrmap_issue, NULL, NULL, &test_params,
-            sizeof(test_params), "Collective MD read with multi chunk I/O (H5D__chunk_addrmap)");
-    AddTest("LC_coll_MD_read", test_link_chunk_io_sort_chunk_issue, NULL, NULL, &test_params,
-            sizeof(test_params), "Collective MD read with link chunk I/O (H5D__sort_chunk)");
-    AddTest("GH_coll_MD_wr", test_collective_global_heap_write, NULL, NULL, &test_params, sizeof(test_params),
-            "Collective MD write of global heap data");
-    AddTest("COLLIO_INDMDWR", test_coll_io_ind_md_write, NULL, NULL, &test_params, sizeof(test_params),
-            "Collective I/O with Independent metadata writes");
+    AddTest("noselcollmdread",
+            test_partial_no_selection_coll_md_read,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "Collective Metadata read with some ranks having no selection");
+    AddTest("MC_coll_MD_read",
+            test_multi_chunk_io_addrmap_issue,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "Collective MD read with multi chunk I/O (H5D__chunk_addrmap)");
+    AddTest("LC_coll_MD_read",
+            test_link_chunk_io_sort_chunk_issue,
+            NULL,
+            NULL,
+            &test_params,
+            sizeof(test_params),
+            "Collective MD read with link chunk I/O (H5D__sort_chunk)");
+    AddTest("GH_coll_MD_wr", test_collective_global_heap_write, NULL, NULL, &test_params, sizeof(test_params), "Collective MD write of global heap data");
+    AddTest("COLLIO_INDMDWR", test_coll_io_ind_md_write, NULL, NULL, &test_params, sizeof(test_params), "Collective I/O with Independent metadata writes");
 
     /* Display testing information */
     TestInfo(stdout);
@@ -591,22 +578,25 @@ main(int argc, char **argv)
 
     /* Parse command line arguments */
     if (TestParseCmdLine(argc, argv) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "couldn't parse command-line arguments\n");
+        }
         TestShutdown();
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     if (dxfer_coll_type == DXFER_INDEPENDENT_IO && MAINPROCESS) {
-        printf("===================================\n"
-               "   Using Independent I/O with file set view to replace collective I/O \n"
-               "===================================\n");
+        printf(
+            "===================================\n"
+            "   Using Independent I/O with file set view to replace collective I/O \n"
+            "===================================\n");
     }
 
     /* Perform requested testing */
     if (PerformTests() < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "couldn't run tests\n");
+        }
         TestShutdown();
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
@@ -617,8 +607,9 @@ main(int argc, char **argv)
     MPI_Barrier(MPI_COMM_WORLD);
 
     /* Display test summary, if requested */
-    if (MAINPROCESS && GetTestSummary())
+    if (MAINPROCESS && GetTestSummary()) {
         TestSummary(stdout);
+    }
 
     /* Clean up test files */
     h5_delete_all_test_files(FILENAME, fapl);
@@ -635,10 +626,12 @@ main(int argc, char **argv)
 
     if (MAINPROCESS) { /* only process 0 reports */
         printf("===================================\n");
-        if (nerrors)
+        if (nerrors) {
             printf("***PHDF5 tests detected %d errors***\n", nerrors);
-        else
+        }
+        else {
             printf("PHDF5 tests finished with no errors\n");
+        }
         printf("===================================\n");
     }
 
@@ -652,8 +645,9 @@ main(int argc, char **argv)
 
     /* Release test infrastructure */
     if (TestShutdown() < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "couldn't shut down testing framework\n");
+        }
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 

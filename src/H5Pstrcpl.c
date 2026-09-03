@@ -57,20 +57,20 @@
 /********************/
 
 /* Property class callbacks */
-static herr_t H5P__strcrt_reg_prop(H5P_genclass_t *pclass);
+static herr_t H5P__strcrt_reg_prop(H5P_genclass_t* pclass);
 
 /* encode & decode callbacks */
-static herr_t H5P__strcrt_char_encoding_enc(const void *value, void **_pp, size_t *size);
-static herr_t H5P__strcrt_char_encoding_dec(const void **_pp, void *value);
+static herr_t H5P__strcrt_char_encoding_enc(const void* value, void** _pp, size_t* size);
+static herr_t H5P__strcrt_char_encoding_dec(const void** _pp, void* value);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* String creation property list class library initialization object */
-const H5P_libclass_t H5P_CLS_STRCRT[1] = {{
-    "string create",        /* Class name for debugging     */
-    H5P_TYPE_STRING_CREATE, /* Class type                   */
+const H5P_libclass_t H5P_CLS_STRCRT[1] = { {
+    "string create",             /* Class name for debugging     */
+    H5P_TYPE_STRING_CREATE,      /* Class type                   */
 
     &H5P_CLS_ROOT_g,             /* Parent class                 */
     &H5P_CLS_STRING_CREATE_g,    /* Pointer to class             */
@@ -78,13 +78,13 @@ const H5P_libclass_t H5P_CLS_STRCRT[1] = {{
     NULL,                        /* Pointer to default property list ID */
     H5P__strcrt_reg_prop,        /* Default property registration routine */
 
-    NULL, /* Class creation callback      */
-    NULL, /* Class creation callback info */
-    NULL, /* Class copy callback          */
-    NULL, /* Class copy callback info     */
-    NULL, /* Class close callback         */
-    NULL  /* Class close callback info    */
-}};
+    NULL,                        /* Class creation callback      */
+    NULL,                        /* Class creation callback info */
+    NULL,                        /* Class copy callback          */
+    NULL,                        /* Class copy callback info     */
+    NULL,                        /* Class close callback         */
+    NULL                         /* Class close callback info    */
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -95,8 +95,7 @@ const H5P_libclass_t H5P_CLS_STRCRT[1] = {{
 /*******************/
 
 /* Property value defaults */
-static const H5T_cset_t H5P_def_char_encoding_g =
-    H5P_STRCRT_CHAR_ENCODING_DEF; /* Default character set encoding */
+static const H5T_cset_t H5P_def_char_encoding_g = H5P_STRCRT_CHAR_ENCODING_DEF; /* Default character set encoding */
 
 /*-------------------------------------------------------------------------
  * Function:    H5P__strcrt_reg_prop
@@ -107,18 +106,28 @@ static const H5T_cset_t H5P_def_char_encoding_g =
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__strcrt_reg_prop(H5P_genclass_t *pclass)
+static herr_t H5P__strcrt_reg_prop(H5P_genclass_t* pclass)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Register character encoding */
-    if (H5P__register_real(pclass, H5P_STRCRT_CHAR_ENCODING_NAME, H5P_STRCRT_CHAR_ENCODING_SIZE,
-                           &H5P_def_char_encoding_g, NULL, NULL, NULL, H5P_STRCRT_CHAR_ENCODING_ENC,
-                           H5P_STRCRT_CHAR_ENCODING_DEC, NULL, NULL, NULL, NULL) < 0)
+    if (H5P__register_real(pclass,
+                           H5P_STRCRT_CHAR_ENCODING_NAME,
+                           H5P_STRCRT_CHAR_ENCODING_SIZE,
+                           &H5P_def_char_encoding_g,
+                           NULL,
+                           NULL,
+                           NULL,
+                           H5P_STRCRT_CHAR_ENCODING_ENC,
+                           H5P_STRCRT_CHAR_ENCODING_DEC,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTINSERT, FAIL, "can't insert property into class");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -133,25 +142,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pset_char_encoding(hid_t plist_id, H5T_cset_t encoding)
+herr_t H5Pset_char_encoding(hid_t plist_id, H5T_cset_t encoding)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments */
-    if (encoding <= H5T_CSET_ERROR || encoding >= H5T_NCSET)
+    if (encoding <= H5T_CSET_ERROR || encoding >= H5T_NCSET) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADRANGE, FAIL, "character encoding is not valid");
+    }
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(plist_id, H5P_STRING_CREATE, false)))
+    if (NULL == (plist = H5P_object_verify(plist_id, H5P_STRING_CREATE, false))) {
         HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Set the character encoding */
-    if (H5P_set(plist, H5P_STRCRT_CHAR_ENCODING_NAME, &encoding) < 0)
+    if (H5P_set(plist, H5P_STRCRT_CHAR_ENCODING_NAME, &encoding) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "can't set character encoding");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -166,22 +177,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pget_char_encoding(hid_t plist_id, H5T_cset_t *encoding /*out*/)
+herr_t H5Pget_char_encoding(hid_t plist_id, H5T_cset_t* encoding /*out*/)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(plist_id, H5P_STRING_CREATE, true)))
+    if (NULL == (plist = H5P_object_verify(plist_id, H5P_STRING_CREATE, true))) {
         HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Get value */
-    if (encoding)
-        if (H5P_get(plist, H5P_STRCRT_CHAR_ENCODING_NAME, encoding) < 0)
+    if (encoding) {
+        if (H5P_get(plist, H5P_STRCRT_CHAR_ENCODING_NAME, encoding) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get character encoding flag");
+        }
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -199,11 +212,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__strcrt_char_encoding_enc(const void *value, void **_pp, size_t *size)
+static herr_t H5P__strcrt_char_encoding_enc(const void* value, void** _pp, size_t* size)
 {
-    const H5T_cset_t *encoding = (const H5T_cset_t *)value; /* Create local alias for values */
-    uint8_t         **pp       = (uint8_t **)_pp;
+    const H5T_cset_t* encoding = (const H5T_cset_t*)value; /* Create local alias for values */
+    uint8_t** pp = (uint8_t**)_pp;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -211,9 +223,10 @@ H5P__strcrt_char_encoding_enc(const void *value, void **_pp, size_t *size)
     assert(encoding);
     assert(size);
 
-    if (NULL != *pp)
+    if (NULL != *pp) {
         /* Encode character set encoding */
         *(*pp)++ = (uint8_t)*encoding;
+    }
 
     /* Size of character set encoding */
     (*size)++;
@@ -233,11 +246,10 @@ H5P__strcrt_char_encoding_enc(const void *value, void **_pp, size_t *size)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__strcrt_char_encoding_dec(const void **_pp, void *_value)
+static herr_t H5P__strcrt_char_encoding_dec(const void** _pp, void* _value)
 {
-    H5T_cset_t     *encoding = (H5T_cset_t *)_value; /* Character set encoding */
-    const uint8_t **pp       = (const uint8_t **)_pp;
+    H5T_cset_t* encoding = (H5T_cset_t*)_value; /* Character set encoding */
+    const uint8_t** pp = (const uint8_t**)_pp;
 
     FUNC_ENTER_PACKAGE_NOERR
 

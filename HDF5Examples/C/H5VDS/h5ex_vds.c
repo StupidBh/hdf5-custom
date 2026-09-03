@@ -40,35 +40,34 @@
 #define RANK1    1
 #define RANK2    2
 
-const char *SRC_FILE[] = {"h5ex_vds_a.h5", "h5ex_vds_b.h5", "h5ex_vds_c.h5"};
+const char* SRC_FILE[] = { "h5ex_vds_a.h5", "h5ex_vds_b.h5", "h5ex_vds_c.h5" };
 
-const char *SRC_DATASET[] = {"A", "B", "C"};
+const char* SRC_DATASET[] = { "A", "B", "C" };
 
-int
-main(void)
+int main(void)
 {
-    hid_t        file      = H5I_INVALID_HID;
-    hid_t        space     = H5I_INVALID_HID;
-    hid_t        dset      = H5I_INVALID_HID;
-    hid_t        src_space = H5I_INVALID_HID;
-    hid_t        vspace    = H5I_INVALID_HID;
-    hid_t        dcpl      = H5I_INVALID_HID;
-    herr_t       status;
-    hsize_t      vdsdims[2] = {VDSDIM0, VDSDIM1}; /* Virtual datasets dimension */
-    hsize_t      dims[1]    = {DIM0};             /* Source datasets dimensions */
-    hsize_t      start[2], count[2], block[2];    /* Hyperslab parameters */
-    hsize_t      start_out[2], stride_out[2], count_out[2], block_out[2];
-    int          wdata[DIM0];             /* Write buffer for source dataset */
-    int          rdata[VDSDIM0][VDSDIM1]; /* Read buffer for virtual dataset */
-    int          i, j, k, l, block_inc;
-    int          fill_value = -1; /* Fill value for VDS */
-    H5D_layout_t layout;          /* Storage layout */
-    size_t       num_map;         /* Number of mappings */
-    ssize_t      len;             /* Length of the string; also a return value */
-    hsize_t     *buf      = NULL; /* Buffer to hold hyperslab coordinates */
-    char        *filename = NULL;
-    char        *dsetname = NULL;
-    hsize_t      nblocks;
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t src_space = H5I_INVALID_HID;
+    hid_t vspace = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t vdsdims[2] = { VDSDIM0, VDSDIM1 }; /* Virtual datasets dimension */
+    hsize_t dims[1] = { DIM0 };                /* Source datasets dimensions */
+    hsize_t start[2], count[2], block[2];      /* Hyperslab parameters */
+    hsize_t start_out[2], stride_out[2], count_out[2], block_out[2];
+    int wdata[DIM0];                           /* Write buffer for source dataset */
+    int rdata[VDSDIM0][VDSDIM1];               /* Read buffer for virtual dataset */
+    int i, j, k, l, block_inc;
+    int fill_value = -1;                       /* Fill value for VDS */
+    H5D_layout_t layout;                       /* Storage layout */
+    size_t num_map;                            /* Number of mappings */
+    ssize_t len;                               /* Length of the string; also a return value */
+    hsize_t* buf = NULL;                       /* Buffer to hold hyperslab coordinates */
+    char* filename = NULL;
+    char* dsetname = NULL;
+    hsize_t nblocks;
 
     /*
      * Create source files and datasets. This step is optional.
@@ -77,17 +76,18 @@ main(void)
         /*
          * Initialize data for i-th source dataset.
          */
-        for (j = 0; j < DIM0; j++)
+        for (j = 0; j < DIM0; j++) {
             wdata[j] = i + 1;
+        }
 
         /*
          * Create the source files and  datasets. Write data to each dataset and
          * close all resources.
          */
 
-        file  = H5Fcreate(SRC_FILE[i], H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+        file = H5Fcreate(SRC_FILE[i], H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
         space = H5Screate_simple(RANK1, dims, NULL);
-        dset  = H5Dcreate2(file, SRC_DATASET[i], H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        dset = H5Dcreate2(file, SRC_DATASET[i], H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         status = H5Dwrite(dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
         status = H5Sclose(space);
         status = H5Dclose(dset);
@@ -101,7 +101,7 @@ main(void)
     space = H5Screate_simple(RANK2, vdsdims, NULL);
 
     /* Set VDS creation property. */
-    dcpl   = H5Pcreate(H5P_DATASET_CREATE);
+    dcpl = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fill_value);
 
     /* Initialize hyperslab values. */
@@ -127,7 +127,7 @@ main(void)
     }
 
     /* Create a virtual dataset. */
-    dset   = H5Dcreate2(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT);
+    dset = H5Dcreate2(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT);
     status = H5Sclose(space);
     status = H5Sclose(src_space);
     status = H5Dclose(dset);
@@ -152,10 +152,12 @@ main(void)
      * Get storage layout.
      */
     layout = H5Pget_layout(dcpl);
-    if (H5D_VIRTUAL == layout)
+    if (H5D_VIRTUAL == layout) {
         printf(" Dataset has a virtual layout \n");
-    else
+    }
+    else {
         printf("Wrong layout found \n");
+    }
 
     /*
      * Find the number of mappings.
@@ -175,40 +177,38 @@ main(void)
         /* Make sure that this is a hyperslab selection and then print information. */
         if (H5Sget_select_type(vspace) == H5S_SEL_HYPERSLABS) {
             nblocks = H5Sget_select_hyper_nblocks(vspace);
-            buf     = (hsize_t *)malloc(sizeof(hsize_t) * 2 * RANK2 * nblocks);
-            status  = H5Sget_select_hyper_blocklist(vspace, (hsize_t)0, nblocks, buf);
+            buf = (hsize_t*)malloc(sizeof(hsize_t) * 2 * RANK2 * nblocks);
+            status = H5Sget_select_hyper_blocklist(vspace, (hsize_t)0, nblocks, buf);
             for (l = 0; l < nblocks; l++) {
                 block_inc = 2 * RANK2 * l;
                 printf("(");
-                for (k = 0; k < RANK2 - 1; k++)
+                for (k = 0; k < RANK2 - 1; k++) {
                     printf("%d,", (int)buf[block_inc + k]);
+                }
                 printf("%d) - (", (int)buf[block_inc + k]);
-                for (k = 0; k < RANK2 - 1; k++)
+                for (k = 0; k < RANK2 - 1; k++) {
                     printf("%d,", (int)buf[block_inc + RANK2 + k]);
+                }
                 printf("%d)\n", (int)buf[block_inc + RANK2 + k]);
             }
             /* We also can use new APIs to get start, stride, count and block */
             if (H5Sis_regular_hyperslab(vspace)) {
                 status = H5Sget_regular_hyperslab(vspace, start_out, stride_out, count_out, block_out);
-                printf("         start  = [%llu, %llu] \n", (unsigned long long)start_out[0],
-                       (unsigned long long)start_out[1]);
-                printf("         stride = [%llu, %llu] \n", (unsigned long long)stride_out[0],
-                       (unsigned long long)stride_out[1]);
-                printf("         count  = [%llu, %llu] \n", (unsigned long long)count_out[0],
-                       (unsigned long long)count_out[1]);
-                printf("         block  = [%llu, %llu] \n", (unsigned long long)block_out[0],
-                       (unsigned long long)block_out[1]);
+                printf("         start  = [%llu, %llu] \n", (unsigned long long)start_out[0], (unsigned long long)start_out[1]);
+                printf("         stride = [%llu, %llu] \n", (unsigned long long)stride_out[0], (unsigned long long)stride_out[1]);
+                printf("         count  = [%llu, %llu] \n", (unsigned long long)count_out[0], (unsigned long long)count_out[1]);
+                printf("         block  = [%llu, %llu] \n", (unsigned long long)block_out[0], (unsigned long long)block_out[1]);
             }
         }
         /* Get source file name */
-        len      = H5Pget_virtual_filename(dcpl, (size_t)i, NULL, 0);
-        filename = (char *)malloc((size_t)len * sizeof(char) + 1);
+        len = H5Pget_virtual_filename(dcpl, (size_t)i, NULL, 0);
+        filename = (char*)malloc((size_t)len * sizeof(char) + 1);
         H5Pget_virtual_filename(dcpl, (size_t)i, filename, len + 1);
         printf("         Source filename %s\n", filename);
 
         /* Get source dataset name */
-        len      = H5Pget_virtual_dsetname(dcpl, (size_t)i, NULL, 0);
-        dsetname = (char *)malloc((size_t)len * sizeof(char) + 1);
+        len = H5Pget_virtual_dsetname(dcpl, (size_t)i, NULL, 0);
+        dsetname = (char*)malloc((size_t)len * sizeof(char) + 1);
         H5Pget_virtual_dsetname(dcpl, (size_t)i, dsetname, len + 1);
         printf("         Source dataset name %s\n", dsetname);
 
@@ -238,8 +238,9 @@ main(void)
     printf(" VDS Data:\n");
     for (i = 0; i < VDSDIM0; i++) {
         printf(" [");
-        for (j = 0; j < VDSDIM1; j++)
+        for (j = 0; j < VDSDIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

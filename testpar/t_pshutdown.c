@@ -30,25 +30,24 @@ typedef int DATATYPE;
 
 int nerrors = 0; /* errors count */
 
-static const char *FILENAME[] = {"shutdown", NULL};
+static const char* FILENAME[] = { "shutdown", NULL };
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    hid_t     file_id, dset_id, grp_id;
-    hid_t     fapl, sid, mem_dataspace;
-    hsize_t   dims[RANK], i;
-    herr_t    ret;
-    char      filename[1024];
-    int       mpi_size, mpi_rank;
-    MPI_Comm  comm = MPI_COMM_WORLD;
-    MPI_Info  info = MPI_INFO_NULL;
-    hsize_t   start[RANK];
-    hsize_t   count[RANK];
-    hsize_t   stride[RANK];
-    hsize_t   block[RANK];
-    DATATYPE *data_array = NULL; /* data buffer */
-    int       mpi_code;
+    hid_t file_id, dset_id, grp_id;
+    hid_t fapl, sid, mem_dataspace;
+    hsize_t dims[RANK], i;
+    herr_t ret;
+    char filename[1024];
+    int mpi_size, mpi_rank;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    hsize_t start[RANK];
+    hsize_t count[RANK];
+    hsize_t stride[RANK];
+    hsize_t block[RANK];
+    DATATYPE* data_array = NULL; /* data buffer */
+    int mpi_code;
 #ifdef H5_HAVE_TEST_API
     int required = MPI_THREAD_MULTIPLE;
     int provided;
@@ -75,19 +74,22 @@ main(int argc, char **argv)
 
 #ifdef H5_HAVE_TEST_API
     /* Warn about missing MPI_THREAD_MULTIPLE support */
-    if ((provided < required) && MAINPROCESS)
+    if ((provided < required) && MAINPROCESS) {
         printf("** MPI doesn't support MPI_Init_thread with MPI_THREAD_MULTIPLE **\n");
+    }
 #endif
 
     if (MPI_SUCCESS != (mpi_code = MPI_Comm_size(comm, &mpi_size))) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             printf("MPI_Comm_size failed with error code %d\n", mpi_code);
+        }
         MPI_Finalize();
         return -1;
     }
 
-    if (MAINPROCESS)
+    if (MAINPROCESS) {
         TESTING("proper shutdown of HDF5 library");
+    }
 
     /* Set up file access property list with parallel I/O access */
     fapl = H5Pcreate(H5P_FILE_ACCESS);
@@ -98,12 +100,10 @@ main(int argc, char **argv)
     VRFY((ret >= 0), "H5Pget_vol_cap_flags succeeded");
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_GROUP_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_GROUP_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf(
-                "    API functions for basic file, group, or dataset aren't supported with this connector\n");
+            printf("    API functions for basic file, group, or dataset aren't supported with this connector\n");
             fflush(stdout);
         }
 
@@ -122,29 +122,30 @@ main(int argc, char **argv)
 
     dims[0] = (hsize_t)ROW_FACTOR * (hsize_t)mpi_size;
     dims[1] = (hsize_t)COL_FACTOR * (hsize_t)mpi_size;
-    sid     = H5Screate_simple(RANK, dims, NULL);
+    sid = H5Screate_simple(RANK, dims, NULL);
     VRFY((sid >= 0), "H5Screate_simple succeeded");
 
     dset_id = H5Dcreate2(grp_id, "Dataset", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     VRFY((dset_id >= 0), "H5Dcreate succeeded");
 
     /* allocate memory for data buffer */
-    data_array = (DATATYPE *)malloc(dims[0] * dims[1] * sizeof(DATATYPE));
+    data_array = (DATATYPE*)malloc(dims[0] * dims[1] * sizeof(DATATYPE));
     VRFY((data_array != NULL), "data_array malloc succeeded");
 
     /* Each process takes a slabs of rows. */
-    block[0]  = dims[0] / (hsize_t)mpi_size;
-    block[1]  = dims[1];
+    block[0] = dims[0] / (hsize_t)mpi_size;
+    block[1] = dims[1];
     stride[0] = block[0];
     stride[1] = block[1];
-    count[0]  = 1;
-    count[1]  = 1;
-    start[0]  = (hsize_t)mpi_rank * block[0];
-    start[1]  = 0;
+    count[0] = 1;
+    count[1] = 1;
+    start[0] = (hsize_t)mpi_rank * block[0];
+    start[1] = 0;
 
     /* put some trivial data in the data_array */
-    for (i = 0; i < dims[0] * dims[1]; i++)
+    for (i = 0; i < dims[0] * dims[1]; i++) {
         data_array[i] = mpi_rank + 1;
+    }
 
     ret = H5Sselect_hyperslab(sid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "H5Sset_hyperslab succeeded");
@@ -158,16 +159,19 @@ main(int argc, char **argv)
     VRFY((ret >= 0), "H5Dwrite succeeded");
 
     /* release data buffers */
-    if (data_array)
+    if (data_array) {
         free(data_array);
+    }
 
     MPI_Finalize();
 
     if (MAINPROCESS) {
-        if (0 == nerrors)
+        if (0 == nerrors) {
             PASSED();
-        else
+        }
+        else {
             H5_FAILED();
+        }
     }
 
     return (nerrors != 0);

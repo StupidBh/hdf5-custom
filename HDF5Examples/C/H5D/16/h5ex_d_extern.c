@@ -22,26 +22,27 @@
 #define DIM1          7
 #define NAME_BUF_SIZE 32
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file  = H5I_INVALID_HID;
-    hid_t   space = H5I_INVALID_HID;
-    hid_t   dset  = H5I_INVALID_HID;
-    hid_t   dcpl  = H5I_INVALID_HID;
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
-    char    name[NAME_BUF_SIZE];
-    int     wdata[DIM0][DIM1]; /* Write buffer */
-    int     rdata[DIM0][DIM1]; /* Read buffer */
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    char name[NAME_BUF_SIZE];
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    int rdata[DIM0][DIM1]; /* Read buffer */
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -58,7 +59,7 @@ main(void)
      * Create the dataset creation property list, set the external
      * file.
      */
-    dcpl   = H5Pcreate(H5P_DATASET_CREATE);
+    dcpl = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_external(dcpl, EXTERNAL, 0, H5F_UNLIMITED);
 
     /*
@@ -99,7 +100,7 @@ main(void)
      * manually set the last field in name to null, in case the name of
      * the file is longer than the buffer.
      */
-    status                  = H5Pget_external(dcpl, 0, NAME_BUF_SIZE, name, NULL, NULL);
+    status = H5Pget_external(dcpl, 0, NAME_BUF_SIZE, name, NULL, NULL);
     name[NAME_BUF_SIZE - 1] = '\0';
     printf("%s is stored in file: %s\n", DATASET, name);
 
@@ -114,8 +115,9 @@ main(void)
     printf("%s:\n", DATASET);
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

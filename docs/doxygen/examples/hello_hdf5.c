@@ -1,9 +1,8 @@
 #include "hdf5.h"
 
-int
-main(void)
+int main(void)
 {
-    herr_t   retval;
+    herr_t retval;
     unsigned majnum, minnum, relnum;
 
     if ((retval = H5get_libversion(&majnum, &minnum, &relnum)) >= 0) {

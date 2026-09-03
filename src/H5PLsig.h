@@ -38,7 +38,7 @@
  * Contains non-ASCII bytes to detect transport corruption and reduce
  * the chance of a false positive in arbitrary binary data. */
 #define H5PL_SIG_MAGIC_LEN 8
-static const uint8_t H5PL_SIG_MAGIC[H5PL_SIG_MAGIC_LEN] = {0x89, 'H', 'P', 'S', '\r', '\n', 0x1A, '\n'};
+static const uint8_t H5PL_SIG_MAGIC[H5PL_SIG_MAGIC_LEN] = { 0x89, 'H', 'P', 'S', '\r', '\n', 0x1A, '\n' };
 
 /* Current signature format version.
  * If future versions change the footer layout, the decoder should be
@@ -47,15 +47,16 @@ static const uint8_t H5PL_SIG_MAGIC[H5PL_SIG_MAGIC_LEN] = {0x89, 'H', 'P', 'S', 
 #define H5PL_SIG_FORMAT_VERSION_CURRENT 1
 
 /* Hash Algorithm Identifiers (on-disk values, stored as uint8_t) */
-typedef enum {
-    H5PL_SIG_ALGO_SHA256     = 0x01, /* SHA-256 with RSA-PKCS1 */
-    H5PL_SIG_ALGO_SHA384     = 0x02, /* SHA-384 with RSA-PKCS1 */
-    H5PL_SIG_ALGO_SHA512     = 0x03, /* SHA-512 with RSA-PKCS1 (default) */
+typedef enum
+{
+    H5PL_SIG_ALGO_SHA256 = 0x01,     /* SHA-256 with RSA-PKCS1 */
+    H5PL_SIG_ALGO_SHA384 = 0x02,     /* SHA-384 with RSA-PKCS1 */
+    H5PL_SIG_ALGO_SHA512 = 0x03,     /* SHA-512 with RSA-PKCS1 (default) */
     H5PL_SIG_ALGO_SHA256_PSS = 0x11, /* SHA-256 with RSA-PSS */
     H5PL_SIG_ALGO_SHA384_PSS = 0x12, /* SHA-384 with RSA-PSS */
     H5PL_SIG_ALGO_SHA512_PSS = 0x13, /* SHA-512 with RSA-PSS */
-    H5PL_SIG_ALGO_SHA3_256   = 0x20, /* SHA3-256 (future) */
-    H5PL_SIG_ALGO_BLAKE3     = 0x30  /* BLAKE3 (future) */
+    H5PL_SIG_ALGO_SHA3_256 = 0x20,   /* SHA3-256 (future) */
+    H5PL_SIG_ALGO_BLAKE3 = 0x30      /* BLAKE3 (future) */
 } H5PL_sig_algo_t;
 
 /* Signature footer on-disk size (14 bytes) */
@@ -94,10 +95,11 @@ typedef enum {
  * (the on-disk format is always little-endian, but host byte order
  * varies).
  */
-typedef struct H5PL_sig_footer_t {
-    uint32_t        signature_length; /* Length of RSA signature in bytes */
-    H5PL_sig_algo_t algorithm_id;     /* Hash algorithm identifier */
-    uint8_t         format_version;   /* Footer format version */
+typedef struct H5PL_sig_footer_t
+{
+    uint32_t signature_length;    /* Length of RSA signature in bytes */
+    H5PL_sig_algo_t algorithm_id; /* Hash algorithm identifier */
+    uint8_t format_version;       /* Footer format version */
 } H5PL_sig_footer_t;
 
 /*-------------------------------------------------------------------------
@@ -110,19 +112,18 @@ typedef struct H5PL_sig_footer_t {
  *              buf_size must be >= H5PL_SIG_FOOTER_SIZE (14).
  *-------------------------------------------------------------------------
  */
-static inline void
-H5PL_sig_encode_footer(uint8_t *buf, size_t buf_size, const H5PL_sig_footer_t *footer)
+static inline void H5PL_sig_encode_footer(uint8_t* buf, size_t buf_size, const H5PL_sig_footer_t* footer)
 {
-    uint8_t *p = buf;
+    uint8_t* p = buf;
 
     assert(buf_size >= H5PL_SIG_FOOTER_SIZE);
-    (void)buf_size; /* used only by assert */
+    (void)buf_size;                                /* used only by assert */
 
     *p++ = (uint8_t)footer->algorithm_id;          /* byte  0      */
     UINT32ENCODE(p, footer->signature_length);     /* bytes 1-4    */
     memcpy(p, H5PL_SIG_MAGIC, H5PL_SIG_MAGIC_LEN); /* bytes 5-12 */
     p += H5PL_SIG_MAGIC_LEN;
-    *p++ = footer->format_version; /* byte  13     */
+    *p++ = footer->format_version;                 /* byte  13     */
 } /* end H5PL_sig_encode_footer() */
 
 /*-------------------------------------------------------------------------
@@ -142,20 +143,21 @@ H5PL_sig_encode_footer(uint8_t *buf, size_t buf_size, const H5PL_sig_footer_t *f
  *              interpreting untrusted fields from an unsigned file.
  *-------------------------------------------------------------------------
  */
-static inline bool
-H5PL_sig_decode_footer(const uint8_t *buf, size_t buf_size, H5PL_sig_footer_t *footer)
+static inline bool H5PL_sig_decode_footer(const uint8_t* buf, size_t buf_size, H5PL_sig_footer_t* footer)
 {
-    const uint8_t *p;
+    const uint8_t* p;
 
-    if (buf_size < H5PL_SIG_FOOTER_SIZE)
+    if (buf_size < H5PL_SIG_FOOTER_SIZE) {
         return false;
+    }
 
     /* Decode and verify magic first (at offset 5) */
-    if (memcmp(buf + 5, H5PL_SIG_MAGIC, H5PL_SIG_MAGIC_LEN) != 0)
+    if (memcmp(buf + 5, H5PL_SIG_MAGIC, H5PL_SIG_MAGIC_LEN) != 0) {
         return false;
+    }
 
     /* Magic valid — now decode remaining fields from the beginning */
-    p                    = buf;
+    p = buf;
     footer->algorithm_id = (H5PL_sig_algo_t)*p++; /* byte  0      */
     UINT32DECODE(p, footer->signature_length);    /* bytes 1-4    */
     /* skip magic (already verified above) */
@@ -166,8 +168,9 @@ H5PL_sig_decode_footer(const uint8_t *buf, size_t buf_size, H5PL_sig_footer_t *f
      * Currently only version 1 exists.  When a new version is introduced,
      * add backward-compatible decoding here (e.g. accept versions 1..N)
      * so that plugins signed with an older format remain loadable. */
-    if (footer->format_version < 1 || footer->format_version > H5PL_SIG_FORMAT_VERSION_CURRENT)
+    if (footer->format_version < 1 || footer->format_version > H5PL_SIG_FORMAT_VERSION_CURRENT) {
         return false;
+    }
 
     return true;
 } /* end H5PL_sig_decode_footer() */

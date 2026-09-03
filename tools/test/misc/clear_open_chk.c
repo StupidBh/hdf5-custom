@@ -15,8 +15,7 @@
 
 static void usage(void);
 
-static void
-usage(void)
+static void usage(void)
 {
     fprintf(stdout, "\n");
     fprintf(stdout, "Usage error!\n");
@@ -34,10 +33,9 @@ usage(void)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    char *fname; /* The HDF5 file name */
+    char* fname; /* The HDF5 file name */
     hid_t fid;   /* File ID */
 
     /* Check the # of arguments */

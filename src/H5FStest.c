@@ -67,8 +67,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5FS__get_cparam_test(const H5FS_t *frsp, H5FS_create_t *cparam)
+herr_t H5FS__get_cparam_test(const H5FS_t* frsp, H5FS_create_t* cparam)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -76,11 +75,11 @@ H5FS__get_cparam_test(const H5FS_t *frsp, H5FS_create_t *cparam)
     assert(frsp);
     assert(cparam);
 
-    cparam->client         = frsp->client;
+    cparam->client = frsp->client;
     cparam->shrink_percent = frsp->shrink_percent;
     cparam->expand_percent = frsp->expand_percent;
-    cparam->max_sect_addr  = frsp->max_sect_addr;
-    cparam->max_sect_size  = frsp->max_sect_size;
+    cparam->max_sect_addr = frsp->max_sect_addr;
+    cparam->max_sect_size = frsp->max_sect_size;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* H5FS__get_cparam_test() */
@@ -95,8 +94,7 @@ H5FS__get_cparam_test(const H5FS_t *frsp, H5FS_create_t *cparam)
  *
  *-------------------------------------------------------------------------
  */
-int
-H5FS__cmp_cparam_test(const H5FS_create_t *cparam1, const H5FS_create_t *cparam2)
+int H5FS__cmp_cparam_test(const H5FS_create_t* cparam1, const H5FS_create_t* cparam2)
 {
     int ret_value = 0; /* Return value */
 
@@ -106,30 +104,40 @@ H5FS__cmp_cparam_test(const H5FS_create_t *cparam1, const H5FS_create_t *cparam2
     assert(cparam1);
     assert(cparam2);
 
-    if (cparam1->client < cparam2->client)
+    if (cparam1->client < cparam2->client) {
         HGOTO_DONE(-1);
-    else if (cparam1->client > cparam2->client)
+    }
+    else if (cparam1->client > cparam2->client) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->shrink_percent < cparam2->shrink_percent)
+    if (cparam1->shrink_percent < cparam2->shrink_percent) {
         HGOTO_DONE(-1);
-    else if (cparam1->shrink_percent > cparam2->shrink_percent)
+    }
+    else if (cparam1->shrink_percent > cparam2->shrink_percent) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->expand_percent < cparam2->expand_percent)
+    if (cparam1->expand_percent < cparam2->expand_percent) {
         HGOTO_DONE(-1);
-    else if (cparam1->expand_percent > cparam2->expand_percent)
+    }
+    else if (cparam1->expand_percent > cparam2->expand_percent) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->max_sect_size < cparam2->max_sect_size)
+    if (cparam1->max_sect_size < cparam2->max_sect_size) {
         HGOTO_DONE(-1);
-    else if (cparam1->max_sect_size > cparam2->max_sect_size)
+    }
+    else if (cparam1->max_sect_size > cparam2->max_sect_size) {
         HGOTO_DONE(1);
+    }
 
-    if (cparam1->max_sect_addr < cparam2->max_sect_addr)
+    if (cparam1->max_sect_addr < cparam2->max_sect_addr) {
         HGOTO_DONE(-1);
-    else if (cparam1->max_sect_addr > cparam2->max_sect_addr)
+    }
+    else if (cparam1->max_sect_addr > cparam2->max_sect_addr) {
         HGOTO_DONE(1);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

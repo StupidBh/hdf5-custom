@@ -27,48 +27,52 @@
 #define TABLE_NAME   "table"
 #define FILENAME     "h5ex_table_08.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle;
 
     Particle dst_buf[NRECORDS + NRECORDS_INS];
 
     /* Define an array of Particles */
-    Particle p_data[NRECORDS] = {{"zero", 0, 1, 0.2F, 3.0},    {"one", 10, 11, 1.2F, 13.0},
-                                 {"two", 20, 21, 2.2F, 23.0},  {"three", 30, 31, 3.2F, 33.0},
-                                 {"four", 40, 41, 4.2F, 43.0}, {"five", 50, 51, 5.2F, 53.0},
-                                 {"six", 60, 61, 6.2F, 63.0},  {"seven", 70, 71, 7.2F, 73.0}};
+    Particle p_data[NRECORDS] = { { "zero", 0, 1, 0.2F, 3.0 },    { "one", 10, 11, 1.2F, 13.0 },  { "two", 20, 21, 2.2F, 23.0 }, { "three", 30, 31, 3.2F, 33.0 },
+                                  { "four", 40, 41, 4.2F, 43.0 }, { "five", 50, 51, 5.2F, 53.0 }, { "six", 60, 61, 6.2F, 63.0 }, { "seven", 70, 71, 7.2F, 73.0 } };
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t dst_size            = sizeof(Particle);
-    size_t dst_offset[NFIELDS] = {HOFFSET(Particle, name), HOFFSET(Particle, lati), HOFFSET(Particle, longi),
-                                  HOFFSET(Particle, pressure), HOFFSET(Particle, temperature)};
-    size_t dst_sizes[NFIELDS]  = {sizeof(p_data[0].name), sizeof(p_data[0].lati), sizeof(p_data[0].longi),
-                                  sizeof(p_data[0].pressure), sizeof(p_data[0].temperature)};
+    size_t dst_size = sizeof(Particle);
+    size_t dst_offset[NFIELDS] = { HOFFSET(Particle, name),
+                                   HOFFSET(Particle, lati),
+                                   HOFFSET(Particle, longi),
+                                   HOFFSET(Particle, pressure),
+                                   HOFFSET(Particle, temperature) };
+    size_t dst_sizes[NFIELDS] = { sizeof(p_data[0].name),
+                                  sizeof(p_data[0].lati),
+                                  sizeof(p_data[0].longi),
+                                  sizeof(p_data[0].pressure),
+                                  sizeof(p_data[0].temperature) };
 
     /* Define an array of Particles to insert */
-    Particle p_data_insert[NRECORDS_INS] = {{"new", 80, 81, 8.2F, 83.0}, {"new", 90, 91, 9.2F, 93.0}};
+    Particle p_data_insert[NRECORDS_INS] = { { "new", 80, 81, 8.2F, 83.0 }, { "new", 90, 91, 9.2F, 93.0 } };
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type;
-    hid_t       file_id;
-    hsize_t     chunk_size = 10;
-    int         compress   = 0;
-    int        *fill_data  = NULL;
-    hsize_t     start;    /* Record to start reading */
-    hsize_t     nrecords; /* Number of records to insert/delete */
-    hsize_t     nfields_out;
-    hsize_t     nrecords_out;
-    int         i;
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    int compress = 0;
+    int* fill_data = NULL;
+    hsize_t start;    /* Record to start reading */
+    hsize_t nrecords; /* Number of records to insert/delete */
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
+    int i;
 
     /* Initialize the field field_type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -83,11 +87,10 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make the table */
-    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, compress, p_data);
+    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset, field_type, chunk_size, fill_data, compress, p_data);
 
     /* Insert records */
-    start    = 3;
+    start = 3;
     nrecords = NRECORDS_INS;
     H5TBinsert_record(file_id, TABLE_NAME, start, nrecords, dst_size, dst_offset, dst_sizes, p_data_insert);
 
@@ -102,8 +105,7 @@ main(void)
 
     /* print it by rows */
     for (i = 0; i < nrecords_out; i++) {
-        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi,
-               dst_buf[i].pressure, dst_buf[i].temperature);
+        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi, dst_buf[i].pressure, dst_buf[i].temperature);
         printf("\n");
     }
 

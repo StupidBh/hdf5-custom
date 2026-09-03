@@ -19,7 +19,7 @@
  *-------------------------------------------------------------------------
  */
 
-#include "H5Omodule.h" /* This source code file is part of the H5O module */
+#include "H5Omodule.h"   /* This source code file is part of the H5O module */
 
 #include "H5private.h"   /* Generic Functions			*/
 #include "H5Eprivate.h"  /* Error handling		  	*/
@@ -27,10 +27,10 @@
 #include "H5Opkg.h"      /* Object headers			*/
 
 /* PRIVATE PROTOTYPES */
-static herr_t H5O__unknown_free(void *_mesg);
+static herr_t H5O__unknown_free(void* _mesg);
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_UNKNOWN[1] = {{
+const H5O_msg_class_t H5O_MSG_UNKNOWN[1] = { {
     H5O_UNKNOWN_ID,    /*message id number             */
     "unknown",         /*message name for debugging    */
     0,                 /*native message size           */
@@ -51,7 +51,7 @@ const H5O_msg_class_t H5O_MSG_UNKNOWN[1] = {{
     NULL,              /* get creation index		*/
     NULL,              /* set creation index		*/
     NULL               /*debug the message             */
-}};
+} };
 
 /* Declare a free list to manage the H5O_unknown_t struct */
 H5FL_DEFINE(H5O_unknown_t);
@@ -65,8 +65,7 @@ H5FL_DEFINE(H5O_unknown_t);
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__unknown_free(void *mesg)
+static herr_t H5O__unknown_free(void* mesg)
 {
     FUNC_ENTER_PACKAGE_NOERR
 

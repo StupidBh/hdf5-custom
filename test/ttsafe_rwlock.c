@@ -20,23 +20,23 @@
 
 #ifdef H5_HAVE_THREADS
 
-#define NUM_THREADS 16
-#define NUM_WRITERS 4
+    #define NUM_THREADS 16
+    #define NUM_WRITERS 4
 
-#define NUM_ITERS 12
-#define COUNT_MAX 512
+    #define NUM_ITERS 12
+    #define COUNT_MAX 512
 
-typedef struct {
-    H5TS_rwlock_t  lock;
-    int            val;
+typedef struct
+{
+    H5TS_rwlock_t lock;
+    int val;
     H5TS_barrier_t barrier;
 } atomic_counter_t;
 
-static H5TS_THREAD_RETURN_TYPE
-incr_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE incr_task(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     result = H5TS_rwlock_wrlock(&counter->lock);
@@ -51,11 +51,10 @@ incr_task(void *_counter)
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-many_read(void *_counter)
+static H5TS_THREAD_RETURN_TYPE many_read(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     result = H5TS_rwlock_rdlock(&counter->lock);
@@ -71,11 +70,10 @@ many_read(void *_counter)
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-count_up_and_down(void *_counter)
+static H5TS_THREAD_RETURN_TYPE count_up_and_down(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     /* Count up & down a number of times */
@@ -116,12 +114,11 @@ count_up_and_down(void *_counter)
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-verify_counting(void *_counter)
+static H5TS_THREAD_RETURN_TYPE verify_counting(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
-    int               last_val  = 0;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
+    int last_val = 0;
     H5TS_thread_ret_t ret_value = 0;
 
     /* Count up & down a number of times */
@@ -136,8 +133,9 @@ verify_counting(void *_counter)
             CHECK_I(result, "H5TS_rwlock_rdlock");
 
             /* Check counter value */
-            if (counter->val < last_val)
+            if (counter->val < last_val) {
                 ERROR("incorrect counter value");
+            }
 
             /* Save value */
             last_val = counter->val;
@@ -159,8 +157,9 @@ verify_counting(void *_counter)
             CHECK_I(result, "H5TS_rwlock_rdlock");
 
             /* Check counter value */
-            if (counter->val > last_val)
+            if (counter->val > last_val) {
                 ERROR("incorrect counter value");
+            }
 
             /* Save value */
             last_val = counter->val;
@@ -181,14 +180,13 @@ verify_counting(void *_counter)
  * tts_rwlock
  **********************************************************************
  */
-void
-tts_rwlock(void H5_ATTR_UNUSED *params)
+void tts_rwlock(void H5_ATTR_UNUSED* params)
 {
-    H5TS_thread_t    threads[NUM_THREADS];
-    H5TS_pool_t     *pool = NULL;
-    H5TS_rwlock_t    lock;
+    H5TS_thread_t threads[NUM_THREADS];
+    H5TS_pool_t* pool = NULL;
+    H5TS_rwlock_t lock;
     atomic_counter_t counter;
-    herr_t           result;
+    herr_t result;
 
     /* Sanity checks on bad input */
     result = H5TS_rwlock_init(NULL);

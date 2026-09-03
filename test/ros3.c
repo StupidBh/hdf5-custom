@@ -29,41 +29,41 @@
 
 #ifdef H5_HAVE_ROS3_VFD
 
-#define MAXADDR (((haddr_t)1 << (8 * sizeof(HDoff_t) - 1)) - 1)
+    #define MAXADDR (((haddr_t)1 << (8 * sizeof(HDoff_t) - 1)) - 1)
 
-#define S3_TEST_PROFILE_NAME "ros3_vfd_test"
+    #define S3_TEST_PROFILE_NAME "ros3_vfd_test"
 
-/* Default region where the test files are located */
-#define S3_TEST_DEFAULT_REGION "us-east-2"
+    /* Default region where the test files are located */
+    #define S3_TEST_DEFAULT_REGION "us-east-2"
 
-#define S3_TEST_MAX_URL_SIZE 256
+    #define S3_TEST_MAX_URL_SIZE 256
 
-/* Size of buffer to allocate for session token */
-#define S3_TEST_SESSION_TOKEN_SIZE 4097
+    /* Size of buffer to allocate for session token */
+    #define S3_TEST_SESSION_TOKEN_SIZE 4097
 
-#define S3_TEST_RESOURCE_TEXT_RESTRICTED "t8.shakespeare.txt"
-#define S3_TEST_RESOURCE_TEXT_PUBLIC     "Poe_Raven.txt"
-#define S3_TEST_RESOURCE_H5_PUBLIC       "charsets.h5"
-#define S3_TEST_RESOURCE_MISSING         "missing.csv"
+    #define S3_TEST_RESOURCE_TEXT_RESTRICTED "t8.shakespeare.txt"
+    #define S3_TEST_RESOURCE_TEXT_PUBLIC     "Poe_Raven.txt"
+    #define S3_TEST_RESOURCE_H5_PUBLIC       "charsets.h5"
+    #define S3_TEST_RESOURCE_MISSING         "missing.csv"
 
-/* Object key containing characters ('=', '+') that must be URI-encoded
- * when request paths are built and signed; mimics Hive-style "key=value"
- * partition naming
- */
-#define S3_TEST_RESOURCE_H5_HIVE_KEY "src=h5test/fmt=hive+style@cloud/charsets.h5"
+    /* Object key containing characters ('=', '+') that must be URI-encoded
+     * when request paths are built and signed; mimics Hive-style "key=value"
+     * partition naming
+     */
+    #define S3_TEST_RESOURCE_H5_HIVE_KEY "src=h5test/fmt=hive+style@cloud/charsets.h5"
 
-#define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5458199
-#define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE     6464
-#define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEOVER 6400
-#define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEQUOT 5691
+    #define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5'458'199
+    #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE     6464
+    #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEOVER 6400
+    #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEQUOT 5691
 
 static char url_text_restricted[S3_TEST_MAX_URL_SIZE] = "";
-static char url_text_public[S3_TEST_MAX_URL_SIZE]     = "";
-static char url_h5_public[S3_TEST_MAX_URL_SIZE]       = "";
-static char url_h5_hive_key[S3_TEST_MAX_URL_SIZE]     = "";
-static char url_missing[S3_TEST_MAX_URL_SIZE]         = "";
-static char s3_test_bucket_url[S3_TEST_MAX_URL_SIZE]  = "";
-static bool s3_test_bucket_defined                    = false;
+static char url_text_public[S3_TEST_MAX_URL_SIZE] = "";
+static char url_h5_public[S3_TEST_MAX_URL_SIZE] = "";
+static char url_h5_hive_key[S3_TEST_MAX_URL_SIZE] = "";
+static char url_missing[S3_TEST_MAX_URL_SIZE] = "";
+static char s3_test_bucket_url[S3_TEST_MAX_URL_SIZE] = "";
+static bool s3_test_bucket_defined = false;
 
 /* Global variables for aws test profile.
  * An attempt is made to read from environment variables and/or
@@ -71,23 +71,23 @@ static bool s3_test_bucket_defined                    = false;
  * if unable to open either file or cannot load id and key,
  * tests connecting with S3 will not be run
  */
-static int   s3_test_credentials_loaded = 0;
-static char  s3_test_aws_region[16];
-static char  s3_test_aws_access_key_id[64];
-static char  s3_test_aws_secret_access_key[128];
-static char *s3_test_aws_session_token = NULL;
+static int s3_test_credentials_loaded = 0;
+static char s3_test_aws_region[16];
+static char s3_test_aws_access_key_id[64];
+static char s3_test_aws_secret_access_key[128];
+static char* s3_test_aws_session_token = NULL;
 
-H5FD_ros3_fapl_t restricted_access_fa = {H5FD_CURR_ROS3_FAPL_T_VERSION, /* fapl version      */
-                                         true,                          /* authenticate      */
-                                         S3_TEST_DEFAULT_REGION,        /* aws region        */
-                                         "",                            /* access key id     */
-                                         ""};                           /* secret access key */
+H5FD_ros3_fapl_t restricted_access_fa = { H5FD_CURR_ROS3_FAPL_T_VERSION, /* fapl version      */
+                                          true,                          /* authenticate      */
+                                          S3_TEST_DEFAULT_REGION,        /* aws region        */
+                                          "",                            /* access key id     */
+                                          "" };                          /* secret access key */
 
-H5FD_ros3_fapl_t anonymous_fa = {H5FD_CURR_ROS3_FAPL_T_VERSION, false, S3_TEST_DEFAULT_REGION, "", ""};
+H5FD_ros3_fapl_t anonymous_fa = { H5FD_CURR_ROS3_FAPL_T_VERSION, false, S3_TEST_DEFAULT_REGION, "", "" };
 
-H5FD_ros3_fapl_t empty_auth_fa   = {H5FD_CURR_ROS3_FAPL_T_VERSION, true, S3_TEST_DEFAULT_REGION, "", ""};
-H5FD_ros3_fapl_t empty_id_fa     = {H5FD_CURR_ROS3_FAPL_T_VERSION, true, S3_TEST_DEFAULT_REGION, "", ""};
-H5FD_ros3_fapl_t empty_region_fa = {H5FD_CURR_ROS3_FAPL_T_VERSION, true, "", "me", ""};
+H5FD_ros3_fapl_t empty_auth_fa = { H5FD_CURR_ROS3_FAPL_T_VERSION, true, S3_TEST_DEFAULT_REGION, "", "" };
+H5FD_ros3_fapl_t empty_id_fa = { H5FD_CURR_ROS3_FAPL_T_VERSION, true, S3_TEST_DEFAULT_REGION, "", "" };
+H5FD_ros3_fapl_t empty_region_fa = { H5FD_CURR_ROS3_FAPL_T_VERSION, true, "", "me", "" };
 
 /*---------------------------------------------------------------------------
  * Function:    test_fapl_config_validation
@@ -98,17 +98,17 @@ H5FD_ros3_fapl_t empty_region_fa = {H5FD_CURR_ROS3_FAPL_T_VERSION, true, "", "me
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_fapl_config_validation(void)
+static int test_fapl_config_validation(void)
 {
-    struct testcase {
-        const char      *msg;
-        herr_t           expected;
+    struct testcase
+    {
+        const char* msg;
+        herr_t expected;
         H5FD_ros3_fapl_t config;
     };
 
-    hid_t           fapl_id     = H5I_INVALID_HID;
-    const int       NCASES      = 5; /* Should equal number of cases */
+    hid_t fapl_id = H5I_INVALID_HID;
+    const int NCASES = 5; /* Should equal number of cases */
     struct testcase cases_arr[] = {
         {
             "non-authenticating config allows empties.\n",
@@ -178,12 +178,12 @@ test_fapl_config_validation(void)
     }
 
     for (int i = 0; i < NCASES; i++) {
+        struct testcase* case_ptr = &cases_arr[i]; /* Alias */
+        herr_t ret;
 
-        struct testcase *case_ptr = &cases_arr[i]; /* Alias */
-        herr_t           ret;
-
-        if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+        if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
             TEST_ERROR;
+        }
 
         H5E_BEGIN_TRY
         {
@@ -191,8 +191,9 @@ test_fapl_config_validation(void)
         }
         H5E_END_TRY
 
-        if (ret != case_ptr->expected)
+        if (ret != case_ptr->expected) {
             FAIL_PUTS_ERROR(case_ptr->msg);
+        }
 
         /* If H5Pset_fapl_ros3() succeeded, make sure H5Pget_fapl_ros3()
          * returns what we put in.
@@ -202,26 +203,34 @@ test_fapl_config_validation(void)
             H5FD_ros3_fapl_t conf_out;                  /* Config from fapl */
 
             /* Get the config from the fapl */
-            if (H5Pget_fapl_ros3(fapl_id, &conf_out) < 0)
+            if (H5Pget_fapl_ros3(fapl_id, &conf_out) < 0) {
                 TEST_ERROR;
+            }
 
             /* Make sure all fields match */
-            if (H5FD_CURR_ROS3_FAPL_T_VERSION != conf_out.version)
+            if (H5FD_CURR_ROS3_FAPL_T_VERSION != conf_out.version) {
                 FAIL_PUTS_ERROR("invalid version number");
-            if (config.version != conf_out.version)
+            }
+            if (config.version != conf_out.version) {
                 FAIL_PUTS_ERROR("version number mismatch");
-            if (config.authenticate != conf_out.authenticate)
+            }
+            if (config.authenticate != conf_out.authenticate) {
                 FAIL_PUTS_ERROR("authentication flag mismatch");
-            if (strncmp(config.aws_region, conf_out.aws_region, H5FD_ROS3_MAX_REGION_LEN + 1))
+            }
+            if (strncmp(config.aws_region, conf_out.aws_region, H5FD_ROS3_MAX_REGION_LEN + 1)) {
                 FAIL_PUTS_ERROR("AWS region mismatch");
-            if (strncmp(config.secret_id, conf_out.secret_id, H5FD_ROS3_MAX_SECRET_ID_LEN + 1))
+            }
+            if (strncmp(config.secret_id, conf_out.secret_id, H5FD_ROS3_MAX_SECRET_ID_LEN + 1)) {
                 FAIL_PUTS_ERROR("secret ID mismatch");
-            if (strncmp(config.secret_key, conf_out.secret_key, H5FD_ROS3_MAX_SECRET_KEY_LEN + 1))
+            }
+            if (strncmp(config.secret_key, conf_out.secret_key, H5FD_ROS3_MAX_SECRET_KEY_LEN + 1)) {
                 FAIL_PUTS_ERROR("secret key mismatch");
+            }
         }
 
-        if (H5Pclose(fapl_id) < 0)
+        if (H5Pclose(fapl_id) < 0) {
             TEST_ERROR;
+        }
     }
 
     PASSED();
@@ -252,13 +261,12 @@ error:
  *              FAIL : 1
  *-------------------------------------------------------------------------
  */
-static int
-test_ros3_fapl_driver_flags(void)
+static int test_ros3_fapl_driver_flags(void)
 {
-    hid_t            fapl_id      = H5I_INVALID_HID; /* file access property list ID */
-    hid_t            driver_id    = H5I_INVALID_HID; /* ID for this VFD              */
-    unsigned long    driver_flags = 0;               /* VFD feature flags            */
-    H5FD_ros3_fapl_t ros3_fa_0    = {
+    hid_t fapl_id = H5I_INVALID_HID;   /* file access property list ID */
+    hid_t driver_id = H5I_INVALID_HID; /* ID for this VFD              */
+    unsigned long driver_flags = 0;    /* VFD feature flags            */
+    H5FD_ros3_fapl_t ros3_fa_0 = {
         H5FD_CURR_ROS3_FAPL_T_VERSION, /* version       */
         false,                         /* authenticate  */
         "",                            /* aws_region    */
@@ -268,22 +276,28 @@ test_ros3_fapl_driver_flags(void)
 
     TESTING("ros3 driver flags");
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &ros3_fa_0) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &ros3_fa_0) < 0) {
         TEST_ERROR;
-    if ((driver_id = H5Pget_driver(fapl_id)) < 0)
+    }
+    if ((driver_id = H5Pget_driver(fapl_id)) < 0) {
         TEST_ERROR;
+    }
 
     /* Get VFD flags */
-    if (H5FDdriver_query(driver_id, &driver_flags) < 0)
+    if (H5FDdriver_query(driver_id, &driver_flags) < 0) {
         TEST_ERROR;
+    }
 
     /* Validate flags */
-    if (0 == (driver_flags & H5FD_FEAT_DATA_SIEVE))
+    if (0 == (driver_flags & H5FD_FEAT_DATA_SIEVE)) {
         FAIL_PUTS_ERROR("ros3 VFD should support H5FD_FEAT_DATA_SIEVE");
-    if (H5FD_FEAT_DATA_SIEVE != driver_flags)
+    }
+    if (H5FD_FEAT_DATA_SIEVE != driver_flags) {
         FAIL_PUTS_ERROR("H5FD_FEAT_DATA_SIEVE should be the only supported flag");
+    }
 
     PASSED();
     return 0;
@@ -299,33 +313,34 @@ error:
 
 } /* end test_ros3_fapl() */
 
-/*---------------------------------------------------------------------------
- * Function:    test_vfl_open
- *
- * Purpose:     Test the VFL "open" callback
- *
- * Return:      PASS : 0
- *              FAIL : 1
- *---------------------------------------------------------------------------
- */
-#define TESTS_COUNT 13
-static int
-test_vfl_open(void)
+    /*---------------------------------------------------------------------------
+     * Function:    test_vfl_open
+     *
+     * Purpose:     Test the VFL "open" callback
+     *
+     * Return:      PASS : 0
+     *              FAIL : 1
+     *---------------------------------------------------------------------------
+     */
+    #define TESTS_COUNT 13
+
+static int test_vfl_open(void)
 {
-    struct test_condition {
-        const char *message;
-        const char *url;
-        unsigned    flags;
-        hid_t       fapl;
-        haddr_t     maxaddr;
+    struct test_condition
+    {
+        const char* message;
+        const char* url;
+        unsigned flags;
+        hid_t fapl;
+        haddr_t maxaddr;
     };
 
-    H5FD_t *fd                   = NULL;
-    hid_t   ros3_fapl_id         = H5I_INVALID_HID;
-    hid_t   default_fapl_id      = H5I_INVALID_HID;
-    hid_t   empty_auth_fapl_id   = H5I_INVALID_HID;
-    hid_t   empty_id_fapl_id     = H5I_INVALID_HID;
-    hid_t   empty_region_fapl_id = H5I_INVALID_HID;
+    H5FD_t* fd = NULL;
+    hid_t ros3_fapl_id = H5I_INVALID_HID;
+    hid_t default_fapl_id = H5I_INVALID_HID;
+    hid_t empty_auth_fapl_id = H5I_INVALID_HID;
+    hid_t empty_id_fapl_id = H5I_INVALID_HID;
+    hid_t empty_region_fapl_id = H5I_INVALID_HID;
 
     struct test_condition tests[TESTS_COUNT] = {
         {
@@ -431,62 +446,79 @@ test_vfl_open(void)
     }
 
     /* Set up fapls */
-    if ((default_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((default_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if ((ros3_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    }
+    if ((ros3_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if ((empty_auth_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    }
+    if ((empty_auth_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if ((empty_id_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    }
+    if ((empty_id_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if ((empty_region_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    }
+    if ((empty_region_fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(ros3_fapl_id, &anonymous_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(ros3_fapl_id, &anonymous_fa) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(empty_auth_fapl_id, &empty_auth_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(empty_auth_fapl_id, &empty_auth_fa) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(empty_id_fapl_id, &empty_id_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(empty_id_fapl_id, &empty_id_fa) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(empty_region_fapl_id, &empty_region_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(empty_region_fapl_id, &empty_region_fa) < 0) {
         TEST_ERROR;
+    }
 
     /* Set up test cases */
     tests[1].fapl = default_fapl_id;
     tests[2].fapl = empty_auth_fapl_id;
     tests[3].fapl = empty_id_fapl_id;
     tests[4].fapl = empty_region_fapl_id;
-    for (int i = 5; i < TESTS_COUNT; i++)
+    for (int i = 5; i < TESTS_COUNT; i++) {
         tests[i].fapl = ros3_fapl_id;
+    }
 
     /* Test a variety of cases that are expected to fail */
     for (int i = 0; i < TESTS_COUNT; i++) {
-
         H5E_BEGIN_TRY
         {
             fd = H5FDopen(tests[i].url, tests[i].flags, tests[i].fapl, tests[i].maxaddr);
         }
         H5E_END_TRY
 
-        if (NULL != fd)
+        if (NULL != fd) {
             FAIL_PUTS_ERROR(tests[i].message);
+        }
     }
 
     /* Finally, show that a file can be opened */
-    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, ros3_fapl_id, MAXADDR)))
+    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, ros3_fapl_id, MAXADDR))) {
         TEST_ERROR;
-    if (H5FDclose(fd) < 0)
+    }
+    if (H5FDclose(fd) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Pclose(empty_auth_fapl_id) < 0)
+    if (H5Pclose(empty_auth_fapl_id) < 0) {
         TEST_ERROR;
-    if (H5Pclose(empty_id_fapl_id) < 0)
+    }
+    if (H5Pclose(empty_id_fapl_id) < 0) {
         TEST_ERROR;
-    if (H5Pclose(empty_region_fapl_id) < 0)
+    }
+    if (H5Pclose(empty_region_fapl_id) < 0) {
         TEST_ERROR;
-    if (H5Pclose(default_fapl_id) < 0)
+    }
+    if (H5Pclose(default_fapl_id) < 0) {
         TEST_ERROR;
-    if (H5Pclose(ros3_fapl_id) < 0)
+    }
+    if (H5Pclose(ros3_fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -506,7 +538,8 @@ error:
     return 1;
 
 } /* end test_vfd_open() */
-#undef TESTS_COUNT
+
+    #undef TESTS_COUNT
 
 /*---------------------------------------------------------------------------
  * Function:    test_eof_eoa
@@ -517,14 +550,13 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_eof_eoa(void)
+static int test_eof_eoa(void)
 {
     const haddr_t INITIAL_ADDR = S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE;
-    const haddr_t LOWER_ADDR   = INITIAL_ADDR - (1024 * 1024);
-    const haddr_t HIGHER_ADDR  = INITIAL_ADDR + (1024 * 1024);
-    H5FD_t       *fd           = NULL;
-    hid_t         fapl_id      = H5I_INVALID_HID;
+    const haddr_t LOWER_ADDR = INITIAL_ADDR - (1024 * 1024);
+    const haddr_t HIGHER_ADDR = INITIAL_ADDR + (1024 * 1024);
+    H5FD_t* fd = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("ros3 eof/eoa gets and sets");
 
@@ -542,44 +574,60 @@ test_eof_eoa(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* Open and verify EOA and EOF in a sample file */
-    if (NULL == (fd = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+    if (NULL == (fd = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
-    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT))
+    }
+    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("incorrect EOF (fragile - make sure the file size didn't change)");
-    if (H5FDget_eof(fd, H5FD_MEM_DEFAULT) != H5FDget_eof(fd, H5FD_MEM_DRAW))
+    }
+    if (H5FDget_eof(fd, H5FD_MEM_DEFAULT) != H5FDget_eof(fd, H5FD_MEM_DRAW)) {
         FAIL_PUTS_ERROR("mismatch between DEFAULT and RAW memory types");
-    if (0 != H5FDget_eoa(fd, H5FD_MEM_DEFAULT))
+    }
+    if (0 != H5FDget_eoa(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOA should be unset by H5FDopen");
+    }
 
     /* Set EOA below EOF - should succeed w/ EOF changed and EOA unchanged */
-    if (H5FDset_eoa(fd, H5FD_MEM_DEFAULT, LOWER_ADDR) < 0)
+    if (H5FDset_eoa(fd, H5FD_MEM_DEFAULT, LOWER_ADDR) < 0) {
         TEST_ERROR;
-    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT))
+    }
+    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOF changed when setting (lower) EOA");
-    if (LOWER_ADDR != H5FDget_eoa(fd, H5FD_MEM_DEFAULT))
+    }
+    if (LOWER_ADDR != H5FDget_eoa(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOA unchanged when setting (lower) EOA");
+    }
 
     /* Set EOA above EOF - should succeed w/ EOF changed and EOA unchanged */
-    if (H5FDset_eoa(fd, H5FD_MEM_DEFAULT, HIGHER_ADDR) < 0)
+    if (H5FDset_eoa(fd, H5FD_MEM_DEFAULT, HIGHER_ADDR) < 0) {
         TEST_ERROR;
-    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT))
+    }
+    if (INITIAL_ADDR != H5FDget_eof(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOF changed when setting (higher) EOA");
-    if (HIGHER_ADDR != H5FDget_eoa(fd, H5FD_MEM_DEFAULT))
+    }
+    if (HIGHER_ADDR != H5FDget_eoa(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOA unchanged when setting (higher) EOA");
+    }
 
-    if (H5FDclose(fd) < 0)
+    if (H5FDclose(fd) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -605,16 +653,16 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_vfl_read(void)
+static int test_vfl_read(void)
 {
-    struct testcase {
-        const char *message;  /* purpose of test case */
-        haddr_t     eoa_set;  /* set file EOA to this prior to read */
-        size_t      addr;     /* offset of read in file */
-        size_t      len;      /* length of read in file */
-        herr_t      success;  /* expected return value of read function */
-        const char *expected; /* expected contents of buffer; failure ignores */
+    struct testcase
+    {
+        const char* message;  /* purpose of test case */
+        haddr_t eoa_set;      /* set file EOA to this prior to read */
+        size_t addr;          /* offset of read in file */
+        size_t len;           /* length of read in file */
+        herr_t success;       /* expected return value of read function */
+        const char* expected; /* expected contents of buffer; failure ignores */
     };
 
     struct testcase tests[] = {
@@ -668,9 +716,9 @@ test_vfl_read(void)
         },
     };
     const int TESTCASE_COUNT = 6;
-    char      buffer[S3_TEST_MAX_URL_SIZE];
-    H5FD_t   *fd      = NULL;
-    hid_t     fapl_id = H5I_INVALID_HID;
+    char buffer[S3_TEST_MAX_URL_SIZE];
+    H5FD_t* fd = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("ros3 VFD read/range-gets");
 
@@ -688,29 +736,36 @@ test_vfl_read(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
-    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
-    if (S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE != H5FDget_eof(fd, H5FD_MEM_DEFAULT))
+    }
+    if (S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE != H5FDget_eof(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("incorrect EOF (fragile - make sure the file size didn't change)");
+    }
 
     for (int i = 0; i < TESTCASE_COUNT; i++) {
-
         herr_t ret = FAIL;
 
         /* Per-test setup */
 
-        if (S3_TEST_MAX_URL_SIZE < tests[i].len)
+        if (S3_TEST_MAX_URL_SIZE < tests[i].len) {
             FAIL_PUTS_ERROR("buffer too small!");
-        if (H5FD_set_eoa(fd, H5FD_MEM_DEFAULT, tests[i].eoa_set) < 0)
+        }
+        if (H5FD_set_eoa(fd, H5FD_MEM_DEFAULT, tests[i].eoa_set) < 0) {
             TEST_ERROR;
+        }
         memset(buffer, 0, S3_TEST_MAX_URL_SIZE);
 
         /* Check test config */
@@ -720,17 +775,22 @@ test_vfl_read(void)
             ret = H5FDread(fd, H5FD_MEM_DRAW, H5P_DEFAULT, tests[i].addr, tests[i].len, buffer);
         }
         H5E_END_TRY
-        if (tests[i].success != ret)
+        if (tests[i].success != ret) {
             FAIL_PUTS_ERROR(tests[i].message);
-        if (ret == SUCCEED)
-            if (strncmp(tests[i].expected, buffer, S3_TEST_MAX_URL_SIZE))
+        }
+        if (ret == SUCCEED) {
+            if (strncmp(tests[i].expected, buffer, S3_TEST_MAX_URL_SIZE)) {
                 FAIL_PUTS_ERROR("expected output is not the same");
+            }
+        }
     }
 
-    if (H5FDclose(fd) < 0)
+    if (H5FDclose(fd) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -757,13 +817,12 @@ error:
  *              FAIL : 1
  *-----------------------------------------------------------------------------
  */
-static int
-test_vfl_read_without_eoa_set_fails(void)
+static int test_vfl_read_without_eoa_set_fails(void)
 {
-    char    buffer[256];
-    H5FD_t *fd      = NULL;
-    hid_t   fapl_id = H5I_INVALID_HID;
-    herr_t  ret;
+    char buffer[256];
+    H5FD_t* fd = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
+    herr_t ret;
 
     TESTING("ros3 VFD read-eoa temporal coupling library limitation");
 
@@ -782,38 +841,48 @@ test_vfl_read_without_eoa_set_fails(void)
     }
 
     /* Set up fapl */
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* Open w/ VFL call */
-    if (NULL == (fd = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, MAXADDR)))
+    if (NULL == (fd = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, MAXADDR))) {
         TEST_ERROR;
-    if (0 != H5FDget_eoa(fd, H5FD_MEM_DEFAULT))
+    }
+    if (0 != H5FDget_eoa(fd, H5FD_MEM_DEFAULT)) {
         FAIL_PUTS_ERROR("EOA should remain unset by H5FDopen");
+    }
 
     /* Try reading without EOA set (should fail) */
     memset(buffer, 0, 256);
     H5E_BEGIN_TRY
     {
-        ret = H5FDread(fd, H5FD_MEM_DRAW, H5P_DEFAULT, 1200699, 102, buffer);
+        ret = H5FDread(fd, H5FD_MEM_DRAW, H5P_DEFAULT, 1'200'699, 102, buffer);
     }
     H5E_END_TRY
-    if (ret != FAIL)
+    if (ret != FAIL) {
         FAIL_PUTS_ERROR("should not be able to read before eoa is set");
+    }
     for (int i = 0; i < 256; i++) {
-        if (buffer[i] != 0)
+        if (buffer[i] != 0) {
             FAIL_PUTS_ERROR("buffer should remain untouched");
+        }
     }
 
-    if (H5FDclose(fd) < 0)
+    if (H5FDclose(fd) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -840,13 +909,12 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_noops_and_autofails(void)
+static int test_noops_and_autofails(void)
 {
-    hid_t      fapl_id  = H5I_INVALID_HID;
-    H5FD_t    *fd       = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
+    H5FD_t* fd = NULL;
     const char data[36] = "The Force shall be with you, always";
-    herr_t     ret;
+    herr_t ret;
 
     TESTING("ros3 VFD always-fail and no-op routines");
 
@@ -857,15 +925,20 @@ test_noops_and_autofails(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &anonymous_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &anonymous_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
-    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+        }
+    }
+    if (NULL == (fd = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
+    }
 
     /* Calls to write and truncate must fail */
     H5E_BEGIN_TRY
@@ -873,29 +946,34 @@ test_noops_and_autofails(void)
         ret = H5FDwrite(fd, H5FD_MEM_DRAW, H5P_DEFAULT, 1000, 35, data);
     }
     H5E_END_TRY
-    if (ret == SUCCEED)
+    if (ret == SUCCEED) {
         FAIL_PUTS_ERROR("write calls must fail");
+    }
 
     H5E_BEGIN_TRY
     {
         ret = H5FDtruncate(fd, H5P_DEFAULT, false);
     }
     H5E_END_TRY
-    if (ret == SUCCEED)
+    if (ret == SUCCEED) {
         FAIL_PUTS_ERROR("truncate calls must fail");
+    }
 
     H5E_BEGIN_TRY
     {
         ret = H5FDtruncate(fd, H5P_DEFAULT, true);
     }
     H5E_END_TRY
-    if (ret == SUCCEED)
+    if (ret == SUCCEED) {
         FAIL_PUTS_ERROR("truncate calls must fail (closing flag set)");
+    }
 
-    if (H5FDclose(fd) < 0)
+    if (H5FDclose(fd) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -921,13 +999,12 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_cmp(void)
+static int test_cmp(void)
 {
-    H5FD_t *fd_raven   = NULL;
-    H5FD_t *fd_shakes  = NULL;
-    H5FD_t *fd_raven_2 = NULL;
-    hid_t   fapl_id    = H5I_INVALID_HID;
+    H5FD_t* fd_raven = NULL;
+    H5FD_t* fd_shakes = NULL;
+    H5FD_t* fd_raven_2 = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("ros3 cmp (comparison)");
 
@@ -945,38 +1022,52 @@ test_cmp(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* Open files */
-    if (NULL == (fd_raven = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+    if (NULL == (fd_raven = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
-    if (NULL == (fd_shakes = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+    }
+    if (NULL == (fd_shakes = H5FDopen(url_text_restricted, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
-    if (NULL == (fd_raven_2 = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF)))
+    }
+    if (NULL == (fd_raven_2 = H5FDopen(url_text_public, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF))) {
         TEST_ERROR;
+    }
 
     /* Compare files */
-    if (0 != H5FDcmp(fd_raven, fd_raven_2))
+    if (0 != H5FDcmp(fd_raven, fd_raven_2)) {
         FAIL_PUTS_ERROR("bad comparison (case 1)");
-    if (-1 != H5FDcmp(fd_raven, fd_shakes))
+    }
+    if (-1 != H5FDcmp(fd_raven, fd_shakes)) {
         FAIL_PUTS_ERROR("bad comparison (case 2)");
-    if (-1 != H5FDcmp(fd_shakes, fd_raven_2))
+    }
+    if (-1 != H5FDcmp(fd_shakes, fd_raven_2)) {
         FAIL_PUTS_ERROR("bad comparison (case 3)");
+    }
 
-    if (H5FDclose(fd_raven) < 0)
+    if (H5FDclose(fd_raven) < 0) {
         TEST_ERROR;
-    if (H5FDclose(fd_shakes) < 0)
+    }
+    if (H5FDclose(fd_shakes) < 0) {
         TEST_ERROR;
-    if (H5FDclose(fd_raven_2) < 0)
+    }
+    if (H5FDclose(fd_raven_2) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -1004,10 +1095,9 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_ros3_access_modes(void)
+static int test_ros3_access_modes(void)
 {
-    hid_t fid     = H5I_INVALID_HID;
+    hid_t fid = H5I_INVALID_HID;
     hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("ros3 access modes");
@@ -1026,13 +1116,17 @@ test_ros3_access_modes(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* Read-Write Open access is not allowed with this file driver */
     H5E_BEGIN_TRY
@@ -1040,8 +1134,9 @@ test_ros3_access_modes(void)
         fid = H5Fopen(url_h5_public, H5F_ACC_RDWR, fapl_id);
     }
     H5E_END_TRY
-    if (fid != H5I_INVALID_HID)
+    if (fid != H5I_INVALID_HID) {
         FAIL_PUTS_ERROR("should not be allowed to open a file read-write with the ros3 VFD");
+    }
 
     /* H5Fcreate() is not allowed with this file driver */
     H5E_BEGIN_TRY
@@ -1049,17 +1144,21 @@ test_ros3_access_modes(void)
         fid = H5Fcreate(url_missing, H5F_ACC_RDONLY, H5P_DEFAULT, fapl_id);
     }
     H5E_END_TRY
-    if (fid != H5I_INVALID_HID)
+    if (fid != H5I_INVALID_HID) {
         FAIL_PUTS_ERROR("should not be allowed to create a file with the ros3 VFD");
+    }
 
     /* Read-only access should succeed */
-    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -1089,10 +1188,9 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_hive_style_object_key(void)
+static int test_hive_style_object_key(void)
 {
-    hid_t fid     = H5I_INVALID_HID;
+    hid_t fid = H5I_INVALID_HID;
     hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("ros3 object keys with characters requiring URI encoding");
@@ -1111,24 +1209,31 @@ test_hive_style_object_key(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &restricted_access_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* The object is not public, so all of the requests made when opening
      * and reading the file must be signed
      */
-    if ((fid = H5Fopen(url_h5_hive_key, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_hive_key, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
-    if (H5Pclose(fapl_id) < 0)
+    }
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -1155,14 +1260,13 @@ error:
  *              FAIL : 1
  *---------------------------------------------------------------------------
  */
-static int
-test_ros3_block_caching_apis(void)
+static int test_ros3_block_caching_apis(void)
 {
     size_t block_size;
     size_t block_cache_size;
-    hid_t  fid     = H5I_INVALID_HID;
-    hid_t  fapl_id = H5I_INVALID_HID;
-    bool   lock_superblock;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    bool lock_superblock;
 
     TESTING("ros3 I/O block caching parameter APIs");
 
@@ -1180,98 +1284,135 @@ test_ros3_block_caching_apis(void)
         return 0;
     }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fapl_ros3(fapl_id, &anonymous_fa) < 0)
+    }
+    if (H5Pset_fapl_ros3(fapl_id, &anonymous_fa) < 0) {
         TEST_ERROR;
-    if (*s3_test_aws_session_token != '\0')
-        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0)
+    }
+    if (*s3_test_aws_session_token != '\0') {
+        if (H5Pset_fapl_ros3_token(fapl_id, s3_test_aws_session_token) < 0) {
             TEST_ERROR;
+        }
+    }
 
     /* Test settings on FAPL without ROS3 VFD block caching set yet */
-    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0)
+    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
-    if (block_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_SIZE)
+    }
+    if (block_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_SIZE) {
         TEST_ERROR;
-    if (block_cache_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE)
+    }
+    if (block_cache_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE) {
         TEST_ERROR;
-    if (!lock_superblock)
+    }
+    if (!lock_superblock) {
         TEST_ERROR;
+    }
 
     /* Set block size to 0 - should disable block caching */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 0, HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE, true) < 0)
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 0, HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE, true) < 0) {
         TEST_ERROR;
-    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0)
+    }
+    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
-    if (block_size != 0)
+    }
+    if (block_size != 0) {
         TEST_ERROR;
-    if (block_cache_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE)
+    }
+    if (block_cache_size != HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE) {
         TEST_ERROR;
-    if (!lock_superblock)
+    }
+    if (!lock_superblock) {
         TEST_ERROR;
+    }
 
     /* Check that parameters are accepted - no validation performed since H5FD_ros3_t fields are internal */
-    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Set block cache size to 0 - should disable block caching */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048576, 0, true) < 0)
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'576, 0, true) < 0) {
         TEST_ERROR;
-    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0)
+    }
+    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
-    if (block_size != 1048576)
+    }
+    if (block_size != 1'048'576) {
         TEST_ERROR;
-    if (block_cache_size != 0)
+    }
+    if (block_cache_size != 0) {
         TEST_ERROR;
-    if (!lock_superblock)
+    }
+    if (!lock_superblock) {
         TEST_ERROR;
+    }
 
     /* Check that parameters are accepted - no validation performed since H5FD_ros3_t fields are internal */
-    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Set block size to slightly larger than block cache size - should round block size down */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048580, 1048576, true) < 0)
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'580, 1'048'576, true) < 0) {
         TEST_ERROR;
-    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0)
+    }
+    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
-    if (block_size != 1048576)
+    }
+    if (block_size != 1'048'576) {
         TEST_ERROR;
-    if (block_cache_size != 1048576)
+    }
+    if (block_cache_size != 1'048'576) {
         TEST_ERROR;
-    if (!lock_superblock)
+    }
+    if (!lock_superblock) {
         TEST_ERROR;
+    }
 
     /* Check that parameters are accepted - no validation performed since H5FD_ros3_t fields are internal */
-    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Disable locking of the superblock block into the block cache */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048576, 4194304, false) < 0)
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'576, 4'194'304, false) < 0) {
         TEST_ERROR;
-    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0)
+    }
+    if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
-    if (block_size != 1048576)
+    }
+    if (block_size != 1'048'576) {
         TEST_ERROR;
-    if (block_cache_size != 4194304)
+    }
+    if (block_cache_size != 4'194'304) {
         TEST_ERROR;
-    if (lock_superblock)
+    }
+    if (lock_superblock) {
         TEST_ERROR;
+    }
 
     /* Check that parameters are accepted - no validation performed since H5FD_ros3_t fields are internal */
-    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0)
+    if ((fid = H5Fopen(url_h5_public, H5F_ACC_RDONLY, fapl_id)) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Pclose(fapl_id) < 0)
+    if (H5Pclose(fapl_id) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -1298,15 +1439,14 @@ error:
  *              Failure:    EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int ret_value = EXIT_SUCCESS;
 
 #ifdef H5_HAVE_ROS3_VFD
-    int         nerrors           = 0;
-    const char *bucket_url_env    = NULL;
-    bool        credentials_found = false;
+    int nerrors = 0;
+    const char* bucket_url_env = NULL;
+    bool credentials_found = false;
 #endif /* H5_HAVE_ROS3_VFD */
 
     printf("Testing ros3 VFD functionality.\n");
@@ -1319,46 +1459,41 @@ main(void)
 
     bucket_url_env = getenv("HDF5_ROS3_TEST_BUCKET_URL");
     if (bucket_url_env == NULL || bucket_url_env[0] == '\0') {
-        printf("WARNING: S3 bucket url is not defined in environment "
-               "variable 'HDF5_ROS3_TEST_BUCKET_URL'!\n");
+        printf(
+            "WARNING: S3 bucket url is not defined in environment "
+            "variable 'HDF5_ROS3_TEST_BUCKET_URL'!\n");
     }
     else {
         strncpy(s3_test_bucket_url, bucket_url_env, S3_TEST_MAX_URL_SIZE);
         s3_test_bucket_url[S3_TEST_MAX_URL_SIZE - 1] = '\0';
-        s3_test_bucket_defined                       = true;
+        s3_test_bucket_defined = true;
     }
 
-    if (S3_TEST_MAX_URL_SIZE < snprintf(url_text_restricted, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s",
-                                        (const char *)s3_test_bucket_url,
-                                        (const char *)S3_TEST_RESOURCE_TEXT_RESTRICTED)) {
+    if (S3_TEST_MAX_URL_SIZE <
+        snprintf(url_text_restricted, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s", (const char*)s3_test_bucket_url, (const char*)S3_TEST_RESOURCE_TEXT_RESTRICTED)) {
         printf("* ros3 setup failed (text_restricted) ! *\n");
         ret_value = EXIT_FAILURE;
         goto done;
     }
-    if (S3_TEST_MAX_URL_SIZE < snprintf(url_text_public, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s",
-                                        (const char *)s3_test_bucket_url,
-                                        (const char *)S3_TEST_RESOURCE_TEXT_PUBLIC)) {
+    if (S3_TEST_MAX_URL_SIZE <
+        snprintf(url_text_public, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s", (const char*)s3_test_bucket_url, (const char*)S3_TEST_RESOURCE_TEXT_PUBLIC)) {
         printf("* ros3 setup failed (text_public) ! *\n");
         ret_value = EXIT_FAILURE;
         goto done;
     }
-    if (S3_TEST_MAX_URL_SIZE < snprintf(url_h5_public, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s",
-                                        (const char *)s3_test_bucket_url,
-                                        (const char *)S3_TEST_RESOURCE_H5_PUBLIC)) {
+    if (S3_TEST_MAX_URL_SIZE <
+        snprintf(url_h5_public, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s", (const char*)s3_test_bucket_url, (const char*)S3_TEST_RESOURCE_H5_PUBLIC)) {
         printf("* ros3 setup failed (h5_public) ! *\n");
         ret_value = EXIT_FAILURE;
         goto done;
     }
-    if (S3_TEST_MAX_URL_SIZE < snprintf(url_h5_hive_key, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s",
-                                        (const char *)s3_test_bucket_url,
-                                        (const char *)S3_TEST_RESOURCE_H5_HIVE_KEY)) {
+    if (S3_TEST_MAX_URL_SIZE <
+        snprintf(url_h5_hive_key, (size_t)S3_TEST_MAX_URL_SIZE, "%s/%s", (const char*)s3_test_bucket_url, (const char*)S3_TEST_RESOURCE_H5_HIVE_KEY)) {
         printf("* ros3 setup failed (h5_hive_key) ! *\n");
         ret_value = EXIT_FAILURE;
         goto done;
     }
-    if (S3_TEST_MAX_URL_SIZE < snprintf(url_missing, S3_TEST_MAX_URL_SIZE, "%s/%s",
-                                        (const char *)s3_test_bucket_url,
-                                        (const char *)S3_TEST_RESOURCE_MISSING)) {
+    if (S3_TEST_MAX_URL_SIZE < snprintf(url_missing, S3_TEST_MAX_URL_SIZE, "%s/%s", (const char*)s3_test_bucket_url, (const char*)S3_TEST_RESOURCE_MISSING)) {
         printf("* ros3 setup failed (missing) ! *\n");
         ret_value = EXIT_FAILURE;
         goto done;
@@ -1369,9 +1504,9 @@ main(void)
      **************************************/
 
     /* Clear profile data strings */
-    s3_test_aws_access_key_id[0]     = '\0';
+    s3_test_aws_access_key_id[0] = '\0';
     s3_test_aws_secret_access_key[0] = '\0';
-    s3_test_aws_region[0]            = '\0';
+    s3_test_aws_region[0] = '\0';
 
     if (NULL == (s3_test_aws_session_token = calloc(1, S3_TEST_SESSION_TOKEN_SIZE))) {
         fprintf(stderr, "couldn't allocate buffer for session token\n");
@@ -1380,10 +1515,15 @@ main(void)
     }
 
     /* Attempt to load test credentials - if unable, certain tests will be skipped */
-    if (h5_load_aws_environment(
-            &credentials_found, s3_test_aws_access_key_id, sizeof(s3_test_aws_access_key_id),
-            s3_test_aws_secret_access_key, sizeof(s3_test_aws_secret_access_key), s3_test_aws_region,
-            sizeof(s3_test_aws_region), s3_test_aws_session_token, S3_TEST_SESSION_TOKEN_SIZE) < 0) {
+    if (h5_load_aws_environment(&credentials_found,
+                                s3_test_aws_access_key_id,
+                                sizeof(s3_test_aws_access_key_id),
+                                s3_test_aws_secret_access_key,
+                                sizeof(s3_test_aws_secret_access_key),
+                                s3_test_aws_region,
+                                sizeof(s3_test_aws_region),
+                                s3_test_aws_session_token,
+                                S3_TEST_SESSION_TOKEN_SIZE) < 0) {
         fprintf(stderr, "error occurred while trying to load AWS credentials\n");
         ret_value = EXIT_FAILURE;
         goto done;
@@ -1393,8 +1533,7 @@ main(void)
         if (s3_test_aws_access_key_id[0] != '\0' && s3_test_aws_secret_access_key[0] != '\0') {
             s3_test_credentials_loaded = 1;
             strncpy(restricted_access_fa.secret_id, s3_test_aws_access_key_id, H5FD_ROS3_MAX_SECRET_ID_LEN);
-            strncpy(restricted_access_fa.secret_key, s3_test_aws_secret_access_key,
-                    H5FD_ROS3_MAX_SECRET_KEY_LEN);
+            strncpy(restricted_access_fa.secret_key, s3_test_aws_secret_access_key, H5FD_ROS3_MAX_SECRET_KEY_LEN);
             if (s3_test_aws_region[0] != '\0') {
                 strncpy(restricted_access_fa.aws_region, s3_test_aws_region, H5FD_ROS3_MAX_REGION_LEN);
                 strncpy(anonymous_fa.aws_region, s3_test_aws_region, H5FD_ROS3_MAX_REGION_LEN);
@@ -1402,18 +1541,22 @@ main(void)
         }
         else {
             /* Clear profile data strings */
-            s3_test_aws_access_key_id[0]     = '\0';
+            s3_test_aws_access_key_id[0] = '\0';
             s3_test_aws_secret_access_key[0] = '\0';
-            s3_test_aws_region[0]            = '\0';
-            s3_test_aws_session_token[0]     = '\0';
-            credentials_found                = false;
+            s3_test_aws_region[0] = '\0';
+            s3_test_aws_session_token[0] = '\0';
+            credentials_found = false;
         }
     }
 
     if (!credentials_found) {
-        if (h5_load_aws_profile(S3_TEST_PROFILE_NAME, &credentials_found, s3_test_aws_access_key_id,
-                                sizeof(s3_test_aws_access_key_id), s3_test_aws_secret_access_key,
-                                sizeof(s3_test_aws_secret_access_key), s3_test_aws_region,
+        if (h5_load_aws_profile(S3_TEST_PROFILE_NAME,
+                                &credentials_found,
+                                s3_test_aws_access_key_id,
+                                sizeof(s3_test_aws_access_key_id),
+                                s3_test_aws_secret_access_key,
+                                sizeof(s3_test_aws_secret_access_key),
+                                s3_test_aws_region,
                                 sizeof(s3_test_aws_region)) < 0) {
             fprintf(stderr, "error occurred while trying to load AWS credentials\n");
             ret_value = EXIT_FAILURE;
@@ -1423,10 +1566,8 @@ main(void)
         if (credentials_found) {
             if (s3_test_aws_access_key_id[0] != '\0' && s3_test_aws_secret_access_key[0] != '\0') {
                 s3_test_credentials_loaded = 1;
-                strncpy(restricted_access_fa.secret_id, s3_test_aws_access_key_id,
-                        H5FD_ROS3_MAX_SECRET_ID_LEN);
-                strncpy(restricted_access_fa.secret_key, s3_test_aws_secret_access_key,
-                        H5FD_ROS3_MAX_SECRET_KEY_LEN);
+                strncpy(restricted_access_fa.secret_id, s3_test_aws_access_key_id, H5FD_ROS3_MAX_SECRET_ID_LEN);
+                strncpy(restricted_access_fa.secret_key, s3_test_aws_secret_access_key, H5FD_ROS3_MAX_SECRET_KEY_LEN);
                 if (s3_test_aws_region[0] != '\0') {
                     strncpy(restricted_access_fa.aws_region, s3_test_aws_region, H5FD_ROS3_MAX_REGION_LEN);
                     strncpy(anonymous_fa.aws_region, s3_test_aws_region, H5FD_ROS3_MAX_REGION_LEN);

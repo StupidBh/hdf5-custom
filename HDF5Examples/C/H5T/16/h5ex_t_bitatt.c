@@ -20,12 +20,11 @@
 #define DIM0      4
 #define DIM1      7
 
-int
-main(void)
+int main(void)
 {
-    hid_t         file, space, dset, attr; /* Handles */
-    herr_t        status;
-    hsize_t       dims[2] = {DIM0, DIM1};
+    hid_t file, space, dset, attr; /* Handles */
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
     unsigned char wdata[DIM0][DIM1], /* Write buffer */
         **rdata;                     /* Read buffer */
     int ndims, A, B, C, D, i, j;
@@ -34,7 +33,7 @@ main(void)
      * Initialize data.  We will manually pack 4 2-bit integers into
      * each unsigned char data element.
      */
-    for (i = 0; i < DIM0; i++)
+    for (i = 0; i < DIM0; i++) {
         for (j = 0; j < DIM1; j++) {
             wdata[i][j] = 0;
             wdata[i][j] |= (i * j - j) & 0x03;    /* Field "A" */
@@ -42,6 +41,7 @@ main(void)
             wdata[i][j] |= (j & 0x03) << 4;       /* Field "C" */
             wdata[i][j] |= ((i + j) & 0x03) << 6; /* Field "D" */
         }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -51,8 +51,8 @@ main(void)
     /*
      * Create dataset with a scalar dataspace.
      */
-    space  = H5Screate(H5S_SCALAR);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
+    space = H5Screate(H5S_SCALAR);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -64,7 +64,7 @@ main(void)
     /*
      * Create the attribute and write the bitfield data to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, H5T_STD_B8BE, space, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, H5T_STD_B8BE, space, H5P_DEFAULT);
     status = H5Awrite(attr, H5T_NATIVE_B8, wdata[0]);
 
     /*
@@ -100,18 +100,19 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (unsigned char **)malloc(dims[0] * sizeof(unsigned char *));
+    rdata = (unsigned char**)malloc(dims[0] * sizeof(unsigned char*));
 
     /*
      * Allocate space for bitfield data.
      */
-    rdata[0] = (unsigned char *)malloc(dims[0] * dims[1] * sizeof(unsigned char));
+    rdata[0] = (unsigned char*)malloc(dims[0] * dims[1] * sizeof(unsigned char));
 
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * dims[1];
+    }
 
     /*
      * Read the data.

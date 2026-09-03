@@ -65,8 +65,7 @@
  *
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5HG_get_addr(const H5HG_heap_t *heap)
+haddr_t H5HG_get_addr(const H5HG_heap_t* heap)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -85,8 +84,7 @@ H5HG_get_addr(const H5HG_heap_t *heap)
  *
  *-------------------------------------------------------------------------
  */
-size_t
-H5HG_get_size(const H5HG_heap_t *heap)
+size_t H5HG_get_size(const H5HG_heap_t* heap)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -105,8 +103,7 @@ H5HG_get_size(const H5HG_heap_t *heap)
  *
  *-------------------------------------------------------------------------
  */
-size_t
-H5HG_get_free_size(const H5HG_heap_t *heap)
+size_t H5HG_get_free_size(const H5HG_heap_t* heap)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR

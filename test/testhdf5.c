@@ -34,8 +34,7 @@
 /* ANY new test needs to have a prototype in testhdf5.h */
 #include "testhdf5.h"
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     hid_t fapl_id = H5I_INVALID_HID;
 
@@ -67,8 +66,7 @@ main(int argc, char *argv[])
     AddTest("attr", test_attr, NULL, cleanup_attr, NULL, 0, "Attributes");
     AddTest("select", test_select, NULL, cleanup_select, NULL, 0, "Selections");
     AddTest("time", test_time, NULL, cleanup_time, NULL, 0, "Time Datatypes");
-    AddTest("ref_deprec", test_reference_deprec, NULL, cleanup_reference_deprec, NULL, 0,
-            "Deprecated References");
+    AddTest("ref_deprec", test_reference_deprec, NULL, cleanup_reference_deprec, NULL, 0, "Deprecated References");
     AddTest("ref", test_reference, NULL, cleanup_reference, NULL, 0, "References");
     AddTest("vltypes", test_vltypes, NULL, cleanup_vltypes, NULL, 0, "Variable-Length Datatypes");
     AddTest("vlstrings", test_vlstrings, NULL, cleanup_vlstrings, NULL, 0, "Variable-Length Strings");
@@ -97,8 +95,9 @@ main(int argc, char *argv[])
     }
 
     /* Display test summary, if requested */
-    if (GetTestSummary())
+    if (GetTestSummary()) {
         TestSummary(stdout);
+    }
 
     /* Release test infrastructure */
     if (TestShutdown() < 0) {
@@ -108,8 +107,10 @@ main(int argc, char *argv[])
 
     /* Exit failure if errors encountered; else exit success. */
     /* No need to print anything since PerformTests() already does. */
-    if (GetTestNumErrs() > 0)
+    if (GetTestNumErrs() > 0) {
         exit(EXIT_FAILURE);
-    else
+    }
+    else {
         exit(EXIT_SUCCESS);
+    }
 } /* end main() */

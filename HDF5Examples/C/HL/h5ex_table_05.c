@@ -28,60 +28,67 @@
 #define TABLE_NAME   "table"
 #define FILENAME     "h5ex_table_05.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle;
 
     /* Define a subset of Particle, with latitude and longitude fields */
-    typedef struct Position {
+    typedef struct Position
+    {
         int lati;
         int longi;
     } Position;
 
     /* Calculate the type_size and the offsets of our struct members */
     Particle dst_buf[NRECORDS];
-    size_t   dst_size          = sizeof(Particle);
-    size_t dst_offset[NFIELDS] = {HOFFSET(Particle, name), HOFFSET(Particle, lati), HOFFSET(Particle, longi),
-                                  HOFFSET(Particle, pressure), HOFFSET(Particle, temperature)};
-    size_t dst_sizes[NFIELDS]  = {sizeof(dst_buf[0].name), sizeof(dst_buf[0].lati), sizeof(dst_buf[0].longi),
-                                  sizeof(dst_buf[0].pressure), sizeof(dst_buf[0].temperature)};
+    size_t dst_size = sizeof(Particle);
+    size_t dst_offset[NFIELDS] = { HOFFSET(Particle, name),
+                                   HOFFSET(Particle, lati),
+                                   HOFFSET(Particle, longi),
+                                   HOFFSET(Particle, pressure),
+                                   HOFFSET(Particle, temperature) };
+    size_t dst_sizes[NFIELDS] = { sizeof(dst_buf[0].name),
+                                  sizeof(dst_buf[0].lati),
+                                  sizeof(dst_buf[0].longi),
+                                  sizeof(dst_buf[0].pressure),
+                                  sizeof(dst_buf[0].temperature) };
 
-    size_t field_offset_pos[2] = {HOFFSET(Position, lati), HOFFSET(Position, longi)};
+    size_t field_offset_pos[2] = { HOFFSET(Position, lati), HOFFSET(Position, longi) };
 
     /* Initially no data */
-    Particle *p_data = NULL;
+    Particle* p_data = NULL;
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type;
-    hid_t       file_id;
-    hsize_t     chunk_size   = 10;
-    Particle    fill_data[1] = {{"no data", -1, -2, -99.0F, -98.0}}; /* Fill value particle */
-    int         compress     = 0;
-    hsize_t     nfields;
-    hsize_t     start;    /* Record to start reading/writing */
-    hsize_t     nrecords; /* Number of records to read/write */
-    int         i;
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    Particle fill_data[1] = { { "no data", -1, -2, -99.0F, -98.0 } }; /* Fill value particle */
+    int compress = 0;
+    hsize_t nfields;
+    hsize_t start;    /* Record to start reading/writing */
+    hsize_t nrecords; /* Number of records to read/write */
+    int i;
 
     /* Define new values for the field "Pressure"  */
-    float pressure_in[NRECORDS_ADD] = {0.0F, 1.0F, 2.0F};
-    int   field_index_pre[1]        = {3};
-    int   field_index_pos[2]        = {1, 2};
+    float pressure_in[NRECORDS_ADD] = { 0.0F, 1.0F, 2.0F };
+    int field_index_pre[1] = { 3 };
+    int field_index_pos[2] = { 1, 2 };
 
     /* Define new values for the fields "Latitude,Longitude"  */
-    Position position_in[NRECORDS_ADD] = {{0, 1}, {10, 11}, {20, 21}};
+    Position position_in[NRECORDS_ADD] = { { 0, 1 }, { 10, 11 }, { 20, 21 } };
 
-    size_t field_sizes_pos[2] = {sizeof(position_in[0].longi), sizeof(position_in[0].lati)};
+    size_t field_sizes_pos[2] = { sizeof(position_in[0].longi), sizeof(position_in[0].lati) };
 
-    size_t field_sizes_pre[1] = {sizeof(float)};
+    size_t field_sizes_pre[1] = { sizeof(float) };
 
     /* Initialize the field field_type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -96,30 +103,26 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make the table */
-    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, compress, p_data);
+    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset, field_type, chunk_size, fill_data, compress, p_data);
 
     /* Write the pressure field starting at record 2 */
-    nfields  = 1;
-    start    = 2;
+    nfields = 1;
+    start = 2;
     nrecords = NRECORDS_ADD;
-    H5TBwrite_fields_index(file_id, TABLE_NAME, nfields, field_index_pre, start, nrecords, sizeof(float), 0,
-                           field_sizes_pre, pressure_in);
+    H5TBwrite_fields_index(file_id, TABLE_NAME, nfields, field_index_pre, start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in);
 
     /* Write the new longitude and latitude information starting at record 2  */
-    nfields  = 2;
-    start    = 2;
+    nfields = 2;
+    start = 2;
     nrecords = NRECORDS_ADD;
-    H5TBwrite_fields_index(file_id, TABLE_NAME, nfields, field_index_pos, start, nrecords, sizeof(Position),
-                           field_offset_pos, field_sizes_pos, position_in);
+    H5TBwrite_fields_index(file_id, TABLE_NAME, nfields, field_index_pos, start, nrecords, sizeof(Position), field_offset_pos, field_sizes_pos, position_in);
 
     /* read the table */
     H5TBread_table(file_id, TABLE_NAME, dst_size, dst_offset, dst_sizes, dst_buf);
 
     /* print it by rows */
     for (i = 0; i < NRECORDS; i++) {
-        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi,
-               dst_buf[i].pressure, dst_buf[i].temperature);
+        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi, dst_buf[i].pressure, dst_buf[i].temperature);
         printf("\n");
     }
 

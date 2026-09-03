@@ -17,22 +17,20 @@
  */
 #ifdef H5_HAVE_UNISTD_H
 
-#include "use.h"
+    #include "use.h"
 
 /* ----------------------------------------------------------------------------
  * Print a common/shared usage message.
  * Receives program name to show default test file name (<program_name>.h5).
  * ----------------------------------------------------------------------------
  */
-void
-usage(const char *prog)
+void usage(const char* prog)
 {
     fprintf(stderr, "usage: %s [OPTIONS]\n", prog);
     fprintf(stderr, "  OPTIONS\n");
     fprintf(stderr, "     -h, --help            Print a usage message and exit\n");
     fprintf(stderr, "     -f FN                 Test file name [default: %s.h5]\n", prog);
-    fprintf(stderr,
-            "     -i N, --iteration=N   Number of iterations to repeat the whole thing. [default: 1]\n");
+    fprintf(stderr, "     -i N, --iteration=N   Number of iterations to repeat the whole thing. [default: 1]\n");
     fprintf(stderr, "     -l w|r                launch writer or reader only. [default: launch both]\n");
     fprintf(stderr, "     -n N, --nplanes=N     Number of planes to write/read. [default: 1000]\n");
     fprintf(stderr, "     -s N, --swmr=N        Use SWMR mode (0: no, non-0: yes) default is yes\n");
@@ -46,98 +44,89 @@ usage(const char *prog)
  * Includes default values for unspecified options.
  * ----------------------------------------------------------------------------
  */
-int
-parse_option(int argc, char *const argv[], options_t *opts)
+int parse_option(int argc, char* const argv[], options_t* opts)
 {
     int ret_value = 0;
     int c;
     int use_swmr; /* Need an int to detect errors */
 
     /* command line options: See function usage for a description */
-    const char *nagg_options = "f:hi:l:n:s:y:z:";
+    const char* nagg_options = "f:hi:l:n:s:y:z:";
 
     /* suppress getopt from printing error */
     opterr = 0;
 
     while (1) {
         c = getopt(argc, argv, nagg_options);
-        if (-1 == c)
+        if (-1 == c) {
             break;
+        }
         switch (c) {
-            case 'h':
+        case 'h':
+            usage(opts->progname);
+            exit(EXIT_SUCCESS);
+            break;
+        case 'f': /* usecase data file name */ opts->filename = strdup(optarg); break;
+        case 'i': /* iterations */
+            if ((opts->iterations = atoi(optarg)) <= 0) {
+                fprintf(stderr, "bad iterations number %s, must be a positive integer\n", optarg);
                 usage(opts->progname);
-                exit(EXIT_SUCCESS);
-                break;
-            case 'f': /* usecase data file name */
-                opts->filename = strdup(optarg);
-                break;
-            case 'i': /* iterations */
-                if ((opts->iterations = atoi(optarg)) <= 0) {
-                    fprintf(stderr, "bad iterations number %s, must be a positive integer\n", optarg);
-                    usage(opts->progname);
-                    Hgoto_error(-1);
-                }
-                break;
-            case 'l': /* launch reader or writer only */
-                switch (*optarg) {
-                    case 'r': /* reader only */
-                        opts->launch = UC_READER;
-                        break;
-                    case 'w': /* writer only */
-                        opts->launch = UC_WRITER;
-                        break;
-                    default:
-                        fprintf(stderr, "launch value(%c) should be w or r only.\n", *optarg);
-                        usage(opts->progname);
-                        Hgoto_error(-1);
-                        break;
-                } /* end switch (reader/writer-only mode toggle) */
-                break;
-            case 'n': /* number of planes to write/read */
-                if ((opts->nplanes = strtoul(optarg, NULL, 0)) <= 0) {
-                    fprintf(stderr, "bad number of planes %s, must be a positive integer\n", optarg);
-                    usage(opts->progname);
-                    Hgoto_error(-1);
-                }
-                break;
-            case 's': /* use swmr file open mode */
-                use_swmr = atoi(optarg);
-                if (use_swmr != 0 && use_swmr != 1) {
-                    fprintf(stderr, "swmr value should be 0(no) or 1(yes)\n");
-                    usage(opts->progname);
-                    Hgoto_error(-1);
-                }
-                opts->use_swmr = (bool)use_swmr;
-                break;
-            case 'y': /* Number of planes per chunk */
-                if ((opts->chunkplanes = strtoul(optarg, NULL, 0)) <= 0) {
-                    fprintf(stderr, "bad number of planes per chunk %s, must be a positive integer\n",
-                            optarg);
-                    usage(opts->progname);
-                    Hgoto_error(-1);
-                }
-                break;
-            case 'z': /* size of chunk=(z,z) */
-                if ((opts->chunksize = strtoull(optarg, NULL, 0)) <= 0) {
-                    fprintf(stderr, "bad chunksize %s, must be a positive integer\n", optarg);
-                    usage(opts->progname);
-                    Hgoto_error(-1);
-                }
-                break;
-            case '?':
-                fprintf(stderr, "getopt returned '%c'.\n", c);
                 Hgoto_error(-1);
+            }
+            break;
+        case 'l': /* launch reader or writer only */
+            switch (*optarg) {
+            case 'r': /* reader only */ opts->launch = UC_READER; break;
+            case 'w': /* writer only */ opts->launch = UC_WRITER; break;
             default:
-                fprintf(stderr, "getopt returned unexpected value.\n");
-                fprintf(stderr, "Unexpected value is %d\n", c);
+                fprintf(stderr, "launch value(%c) should be w or r only.\n", *optarg);
+                usage(opts->progname);
                 Hgoto_error(-1);
+                break;
+            } /* end switch (reader/writer-only mode toggle) */
+            break;
+        case 'n': /* number of planes to write/read */
+            if ((opts->nplanes = strtoul(optarg, NULL, 0)) <= 0) {
+                fprintf(stderr, "bad number of planes %s, must be a positive integer\n", optarg);
+                usage(opts->progname);
+                Hgoto_error(-1);
+            }
+            break;
+        case 's': /* use swmr file open mode */
+            use_swmr = atoi(optarg);
+            if (use_swmr != 0 && use_swmr != 1) {
+                fprintf(stderr, "swmr value should be 0(no) or 1(yes)\n");
+                usage(opts->progname);
+                Hgoto_error(-1);
+            }
+            opts->use_swmr = (bool)use_swmr;
+            break;
+        case 'y': /* Number of planes per chunk */
+            if ((opts->chunkplanes = strtoul(optarg, NULL, 0)) <= 0) {
+                fprintf(stderr, "bad number of planes per chunk %s, must be a positive integer\n", optarg);
+                usage(opts->progname);
+                Hgoto_error(-1);
+            }
+            break;
+        case 'z': /* size of chunk=(z,z) */
+            if ((opts->chunksize = strtoull(optarg, NULL, 0)) <= 0) {
+                fprintf(stderr, "bad chunksize %s, must be a positive integer\n", optarg);
+                usage(opts->progname);
+                Hgoto_error(-1);
+            }
+            break;
+        case '?': fprintf(stderr, "getopt returned '%c'.\n", c); Hgoto_error(-1);
+        default:
+            fprintf(stderr, "getopt returned unexpected value.\n");
+            fprintf(stderr, "Unexpected value is %d\n", c);
+            Hgoto_error(-1);
         } /* end switch (argument symbol) */
-    }     /* end while (there are still arguments) */
+    } /* end while (there are still arguments) */
 
     /* set test file name if not given */
     if (!opts->filename) {
         /* default data file name is <progname>.h5 */
-        if ((opts->filename = (char *)malloc(strlen(opts->progname) + 4)) == NULL) {
+        if ((opts->filename = (char*)malloc(strlen(opts->progname) + 4)) == NULL) {
             fprintf(stderr, "malloc: failed\n");
             Hgoto_error(-1);
         }
@@ -153,31 +142,28 @@ done:
  * Show parameters used for this use case.
  * ----------------------------------------------------------------------------
  */
-void
-show_parameters(options_t *opts)
+void show_parameters(options_t* opts)
 {
     printf("===Parameters used:===\n");
-    printf("chunk dims=(%llu, %llu, %llu)\n", (unsigned long long)opts->chunkdims[0],
-           (unsigned long long)opts->chunkdims[1], (unsigned long long)opts->chunkdims[2]);
-    printf("dataset max dims=(%llu, %llu, %llu)\n", (unsigned long long)opts->max_dims[0],
-           (unsigned long long)opts->max_dims[1], (unsigned long long)opts->max_dims[2]);
+    printf("chunk dims=(%llu, %llu, %llu)\n",
+           (unsigned long long)opts->chunkdims[0],
+           (unsigned long long)opts->chunkdims[1],
+           (unsigned long long)opts->chunkdims[2]);
+    printf("dataset max dims=(%llu, %llu, %llu)\n",
+           (unsigned long long)opts->max_dims[0],
+           (unsigned long long)opts->max_dims[1],
+           (unsigned long long)opts->max_dims[2]);
     printf("number of planes to write=%llu\n", (unsigned long long)opts->nplanes);
     printf("using SWMR mode=%s\n", opts->use_swmr ? "yes(1)" : "no(0)");
     printf("data filename=%s\n", opts->filename);
     printf("launch part=");
     switch (opts->launch) {
-        case UC_READWRITE:
-            printf("Reader/Writer\n");
-            break;
-        case UC_WRITER:
-            printf("Writer\n");
-            break;
-        case UC_READER:
-            printf("Reader\n");
-            break;
-        default:
-            /* should not happen */
-            printf("Illegal part(%d)\n", opts->launch);
+    case UC_READWRITE: printf("Reader/Writer\n"); break;
+    case UC_WRITER   : printf("Writer\n"); break;
+    case UC_READER   : printf("Reader\n"); break;
+    default:
+        /* should not happen */
+        printf("Illegal part(%d)\n", opts->launch);
     }
     printf("number of iterations=%d (not used yet)\n", opts->iterations);
     printf("===Parameters shown===\n");
@@ -193,56 +179,65 @@ show_parameters(options_t *opts)
  * Return: 0 succeed; -1 fail.
  * ----------------------------------------------------------------------------
  */
-int
-create_uc_file(options_t *opts)
+int create_uc_file(options_t* opts)
 {
-    hsize_t           dims[3];  /* Dataset starting dimensions */
-    hid_t             fid;      /* File ID for new HDF5 file */
-    hid_t             dcpl;     /* Dataset creation property list */
-    hid_t             sid;      /* Dataspace ID */
-    hid_t             dsid;     /* Dataset ID */
+    hsize_t dims[3];            /* Dataset starting dimensions */
+    hid_t fid;                  /* File ID for new HDF5 file */
+    hid_t dcpl;                 /* Dataset creation property list */
+    hid_t sid;                  /* Dataspace ID */
+    hid_t dsid;                 /* Dataset ID */
     H5D_chunk_index_t idx_type; /* Chunk index type */
 
-    if ((fid = H5Fcreate(opts->filename, H5F_ACC_TRUNC, H5P_DEFAULT, opts->fapl_id)) < 0)
+    if ((fid = H5Fcreate(opts->filename, H5F_ACC_TRUNC, H5P_DEFAULT, opts->fapl_id)) < 0) {
         return -1;
+    }
 
     /* Set up dimension sizes */
     dims[0] = 0;
     dims[1] = dims[2] = opts->max_dims[1];
 
     /* Create dataspace for creating datasets */
-    if ((sid = H5Screate_simple(3, dims, opts->max_dims)) < 0)
+    if ((sid = H5Screate_simple(3, dims, opts->max_dims)) < 0) {
         return -1;
+    }
 
     /* Create dataset creation property list */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         return -1;
-    if (H5Pset_chunk(dcpl, 3, opts->chunkdims) < 0)
+    }
+    if (H5Pset_chunk(dcpl, 3, opts->chunkdims) < 0) {
         return -1;
+    }
 
     /* create dataset of progname */
-    if ((dsid = H5Dcreate2(fid, opts->progname, UC_DATATYPE, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dcreate2(fid, opts->progname, UC_DATATYPE, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         return -1;
+    }
 
     /* Check that the chunk index type is not version 1 B-tree.
      * Version 1 B-trees are not supported under SWMR.
      */
-    if (H5Dget_chunk_index_type(dsid, &idx_type) < 0)
+    if (H5Dget_chunk_index_type(dsid, &idx_type) < 0) {
         return -1;
+    }
     if (idx_type == H5D_CHUNK_IDX_BTREE) {
         fprintf(stderr, "ERROR: Chunk index is version 1 B-tree: aborting.\n");
         return -1;
     }
 
     /* Close everything */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         return -1;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         return -1;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         return -1;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         return -1;
+    }
 
     return 0;
 } /* end create_uc_file() */
@@ -257,21 +252,20 @@ create_uc_file(options_t *opts)
  * Return: 0 succeed; -1 fail.
  * ----------------------------------------------------------------------------
  */
-int
-write_uc_file(bool tosend, hid_t file_id, options_t *opts)
+int write_uc_file(bool tosend, hid_t file_id, options_t* opts)
 {
-    hid_t     dsid;                           /* dataset ID */
-    hid_t     dcpl;                           /* Dataset creation property list */
+    hid_t dsid;                               /* dataset ID */
+    hid_t dcpl;                               /* Dataset creation property list */
     UC_CTYPE *buffer, *bufptr;                /* data buffer */
-    hsize_t   cz = opts->chunksize;           /* Chunk size */
-    hid_t     f_sid;                          /* dataset file space id */
-    hid_t     m_sid;                          /* memory space id */
-    int       rank;                           /* rank */
-    hsize_t   chunk_dims[3];                  /* Chunk dimensions */
-    hsize_t   dims[3];                        /* Dataspace dimensions */
-    hsize_t   memdims[3];                     /* Memory space dimensions */
-    hsize_t   start[3] = {0, 0, 0}, count[3]; /* Hyperslab selection values */
-    hsize_t   i, j, k;
+    hsize_t cz = opts->chunksize;             /* Chunk size */
+    hid_t f_sid;                              /* dataset file space id */
+    hid_t m_sid;                              /* memory space id */
+    int rank;                                 /* rank */
+    hsize_t chunk_dims[3];                    /* Chunk dimensions */
+    hsize_t dims[3];                          /* Dataspace dimensions */
+    hsize_t memdims[3];                       /* Memory space dimensions */
+    hsize_t start[3] = { 0, 0, 0 }, count[3]; /* Hyperslab selection values */
+    hsize_t i, j, k;
 
     if (true == tosend) {
         /* Send a message that H5Fopen is complete--releasing the file lock */
@@ -300,8 +294,10 @@ write_uc_file(bool tosend, hid_t file_id, options_t *opts)
 
     /* verify chunk_dims against set parameters */
     if (chunk_dims[0] != opts->chunkdims[0] || chunk_dims[1] != cz || chunk_dims[2] != cz) {
-        fprintf(stderr, "chunk size is not as expected. Got dims=(%llu,%llu,%llu)\n",
-                (unsigned long long)chunk_dims[0], (unsigned long long)chunk_dims[1],
+        fprintf(stderr,
+                "chunk size is not as expected. Got dims=(%llu,%llu,%llu)\n",
+                (unsigned long long)chunk_dims[0],
+                (unsigned long long)chunk_dims[1],
                 (unsigned long long)chunk_dims[2]);
         return -1;
     }
@@ -310,7 +306,7 @@ write_uc_file(bool tosend, hid_t file_id, options_t *opts)
     memdims[0] = 1;
     memdims[1] = opts->dims[1];
     memdims[2] = opts->dims[2];
-    if ((buffer = (UC_CTYPE *)malloc((size_t)memdims[1] * (size_t)memdims[2] * sizeof(UC_CTYPE))) == NULL) {
+    if ((buffer = (UC_CTYPE*)malloc((size_t)memdims[1] * (size_t)memdims[2] * sizeof(UC_CTYPE))) == NULL) {
         fprintf(stderr, "malloc: failed\n");
         return -1;
     }
@@ -319,7 +315,7 @@ write_uc_file(bool tosend, hid_t file_id, options_t *opts)
      * Get dataset rank and dimension.
      */
     f_sid = H5Dget_space(dsid); /* Get filespace handle first. */
-    rank  = H5Sget_simple_extent_ndims(f_sid);
+    rank = H5Sget_simple_extent_ndims(f_sid);
     if (rank != UC_RANK) {
         fprintf(stderr, "rank(%d) of dataset does not match\n", rank);
         free(buffer);
@@ -330,12 +326,10 @@ write_uc_file(bool tosend, hid_t file_id, options_t *opts)
         free(buffer);
         return -1;
     }
-    printf("dataset rank %d, dimensions %llu x %llu x %llu\n", rank, (unsigned long long)(dims[0]),
-           (unsigned long long)(dims[1]), (unsigned long long)(dims[2]));
+    printf("dataset rank %d, dimensions %llu x %llu x %llu\n", rank, (unsigned long long)(dims[0]), (unsigned long long)(dims[1]), (unsigned long long)(dims[2]));
     /* verify that file space dims are as expected and are consistent with memory space dims */
     if (dims[0] != 0 || dims[1] != memdims[1] || dims[2] != memdims[2]) {
-        fprintf(stderr, "dataset is not empty. Got dims=(%llu,%llu,%llu)\n", (unsigned long long)dims[0],
-                (unsigned long long)dims[1], (unsigned long long)dims[2]);
+        fprintf(stderr, "dataset is not empty. Got dims=(%llu,%llu,%llu)\n", (unsigned long long)dims[0], (unsigned long long)dims[1], (unsigned long long)dims[2]);
         free(buffer);
         return -1;
     }
@@ -446,23 +440,22 @@ write_uc_file(bool tosend, hid_t file_id, options_t *opts)
  * Return: 0 succeed; -1 fail.
  * ----------------------------------------------------------------------------
  */
-int
-read_uc_file(bool towait, options_t *opts)
+int read_uc_file(bool towait, options_t* opts)
 {
-    hid_t     fid;                            /* File ID for new HDF5 file */
-    hid_t     dsid;                           /* dataset ID */
+    hid_t fid;                                /* File ID for new HDF5 file */
+    hid_t dsid;                               /* dataset ID */
     UC_CTYPE *buffer = NULL, *bufptr = NULL;  /* read data buffer */
-    hid_t     f_sid;                          /* dataset file space id */
-    hid_t     m_sid;                          /* memory space id */
-    int       rank;                           /* rank */
-    hsize_t   dims[3];                        /* Dataspace dimensions */
-    hsize_t   memdims[3];                     /* Memory space dimensions */
-    hsize_t   nplane = 0, nplanes_seen = 0;   /* nth plane, last nth plane */
-    hsize_t   start[3] = {0, 0, 0}, count[3]; /* Hyperslab selection values */
-    hsize_t   j, k;
-    int       nreadererr = 0;
-    int       nerrs;
-    int       loops_waiting_for_plane;
+    hid_t f_sid;                              /* dataset file space id */
+    hid_t m_sid;                              /* memory space id */
+    int rank;                                 /* rank */
+    hsize_t dims[3];                          /* Dataspace dimensions */
+    hsize_t memdims[3];                       /* Memory space dimensions */
+    hsize_t nplane = 0, nplanes_seen = 0;     /* nth plane, last nth plane */
+    hsize_t start[3] = { 0, 0, 0 }, count[3]; /* Hyperslab selection values */
+    hsize_t j, k;
+    int nreadererr = 0;
+    int nerrs;
+    int loops_waiting_for_plane;
 
     /* Before reading, wait for the message that H5Fopen is complete--file lock is released */
     if (towait && h5_wait_message(WRITER_MESSAGE) < 0) {
@@ -471,8 +464,7 @@ read_uc_file(bool towait, options_t *opts)
     }
 
     fprintf(stderr, "Opening to read %s\n", opts->filename);
-    if ((fid = H5Fopen(opts->filename, H5F_ACC_RDONLY | (opts->use_swmr ? H5F_ACC_SWMR_READ : 0),
-                       opts->fapl_id)) < 0) {
+    if ((fid = H5Fopen(opts->filename, H5F_ACC_RDONLY | (opts->use_swmr ? H5F_ACC_SWMR_READ : 0), opts->fapl_id)) < 0) {
         fprintf(stderr, "H5Fopen failed\n");
         return -1;
     }
@@ -486,7 +478,7 @@ read_uc_file(bool towait, options_t *opts)
     memdims[0] = 1;
     memdims[1] = opts->dims[1];
     memdims[2] = opts->dims[2];
-    if ((buffer = (UC_CTYPE *)malloc((size_t)memdims[1] * (size_t)memdims[2] * sizeof(UC_CTYPE))) == NULL) {
+    if ((buffer = (UC_CTYPE*)malloc((size_t)memdims[1] * (size_t)memdims[2] * sizeof(UC_CTYPE))) == NULL) {
         fprintf(stderr, "malloc: failed\n");
         return -1;
     }
@@ -496,7 +488,7 @@ read_uc_file(bool towait, options_t *opts)
      * Verify dimension is as expected (unlimited,2*chunksize,2*chunksize).
      */
     f_sid = H5Dget_space(dsid); /* Get filespace handle first. */
-    rank  = H5Sget_simple_extent_ndims(f_sid);
+    rank = H5Sget_simple_extent_ndims(f_sid);
     if (rank != UC_RANK) {
         fprintf(stderr, "rank(%d) of dataset does not match\n", rank);
         free(buffer);
@@ -507,14 +499,15 @@ read_uc_file(bool towait, options_t *opts)
         free(buffer);
         return -1;
     }
-    printf("dataset rank %d, dimensions %llu x %llu x %llu\n", rank, (unsigned long long)(dims[0]),
-           (unsigned long long)(dims[1]), (unsigned long long)(dims[2]));
+    printf("dataset rank %d, dimensions %llu x %llu x %llu\n", rank, (unsigned long long)(dims[0]), (unsigned long long)(dims[1]), (unsigned long long)(dims[2]));
     /* verify that file space dims are as expected and are consistent with memory space dims */
     if (dims[1] != memdims[1] || dims[2] != memdims[2]) {
-        fprintf(stderr, "dataset dimension is not as expected. Got dims=(%llu,%llu,%llu)\n",
-                (unsigned long long)dims[0], (unsigned long long)dims[1], (unsigned long long)dims[2]);
-        fprintf(stderr, "But memdims=(%llu,%llu,%llu)\n", (unsigned long long)memdims[0],
-                (unsigned long long)memdims[1], (unsigned long long)memdims[2]);
+        fprintf(stderr,
+                "dataset dimension is not as expected. Got dims=(%llu,%llu,%llu)\n",
+                (unsigned long long)dims[0],
+                (unsigned long long)dims[1],
+                (unsigned long long)dims[2]);
+        fprintf(stderr, "But memdims=(%llu,%llu,%llu)\n", (unsigned long long)memdims[0], (unsigned long long)memdims[1], (unsigned long long)memdims[2]);
         free(buffer);
         return -1;
     }
@@ -540,8 +533,7 @@ read_uc_file(bool towait, options_t *opts)
                 printf("\n");
                 loops_waiting_for_plane = 0;
             }
-            printf("reading planes %llu to %llu\n", (unsigned long long)nplanes_seen,
-                   (unsigned long long)dims[0]);
+            printf("reading planes %llu to %llu\n", (unsigned long long)nplanes_seen, (unsigned long long)dims[0]);
         }
         else {
             if (loops_waiting_for_plane) {
@@ -587,22 +579,25 @@ read_uc_file(bool towait, options_t *opts)
 
             /* compare read data with expected data value which is nplane */
             bufptr = buffer;
-            nerrs  = 0;
+            nerrs = 0;
             for (j = 0; j < dims[1]; j++) {
                 for (k = 0; k < dims[2]; k++) {
                     if ((hsize_t)*bufptr++ != nplane) {
                         if (++nerrs < ErrorReportMax) {
-                            fprintf(stderr, "found error %llu plane(%llu,%llu), expected %llu, got %d\n",
-                                    (unsigned long long)nplane, (unsigned long long)j, (unsigned long long)k,
-                                    (unsigned long long)nplane, (int)*(bufptr - 1));
+                            fprintf(stderr,
+                                    "found error %llu plane(%llu,%llu), expected %llu, got %d\n",
+                                    (unsigned long long)nplane,
+                                    (unsigned long long)j,
+                                    (unsigned long long)k,
+                                    (unsigned long long)nplane,
+                                    (int)*(bufptr - 1));
                         } /* end if should print error */
-                    }     /* end if value mismatch */
-                }         /* end for plane second dimension */
-            }             /* end for plane first dimension */
+                    } /* end if value mismatch */
+                } /* end for plane second dimension */
+            } /* end for plane first dimension */
             if (nerrs) {
                 nreadererr++;
-                fprintf(stderr, "found %d unexpected values in plane %llu\n", nerrs,
-                        (unsigned long long)nplane);
+                fprintf(stderr, "found %d unexpected values in plane %llu\n", nerrs, (unsigned long long)nplane);
             }
         } /* end for each plane added since last read */
 
@@ -626,10 +621,12 @@ read_uc_file(bool towait, options_t *opts)
 
     free(buffer);
 
-    if (nreadererr)
+    if (nreadererr) {
         return -1;
-    else
+    }
+    else {
         return 0;
+    }
 } /* end read_uc_file() */
 
 #endif /* H5_HAVE_UNISTD_H */

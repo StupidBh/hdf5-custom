@@ -20,37 +20,34 @@
 
 #if defined(H5_HAVE_THREADS) && !defined(H5_HAVE_STDATOMIC_H)
 
-#define NUM_THREADS 16
+    #define NUM_THREADS 16
 
 static H5TS_atomic_int_t counter_g;
 
-static H5TS_THREAD_RETURN_TYPE
-noop_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE noop_task(void* _counter)
 {
-    H5TS_atomic_int_t *counter   = (H5TS_atomic_int_t *)_counter;
-    H5TS_thread_ret_t  ret_value = 0;
+    H5TS_atomic_int_t* counter = (H5TS_atomic_int_t*)_counter;
+    H5TS_thread_ret_t ret_value = 0;
 
     VERIFY(H5TS_atomic_load_int(counter), 0, "noop_task");
 
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-incr_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE incr_task(void* _counter)
 {
-    H5TS_atomic_int_t *counter   = (H5TS_atomic_int_t *)_counter;
-    H5TS_thread_ret_t  ret_value = 0;
+    H5TS_atomic_int_t* counter = (H5TS_atomic_int_t*)_counter;
+    H5TS_thread_ret_t ret_value = 0;
 
     H5TS_atomic_fetch_add_int(counter, 1);
 
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-decr_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE decr_task(void* _counter)
 {
-    H5TS_atomic_int_t *counter   = (H5TS_atomic_int_t *)_counter;
-    H5TS_thread_ret_t  ret_value = 0;
+    H5TS_atomic_int_t* counter = (H5TS_atomic_int_t*)_counter;
+    H5TS_thread_ret_t ret_value = 0;
 
     H5TS_atomic_fetch_sub_int(counter, 1);
 
@@ -63,11 +60,10 @@ decr_task(void *_counter)
  *
  **********************************************************************
  */
-void
-tts_atomics(void H5_ATTR_UNUSED *params)
+void tts_atomics(void H5_ATTR_UNUSED* params)
 {
-    H5TS_pool_t *pool = NULL;
-    herr_t       result;
+    H5TS_pool_t* pool = NULL;
+    herr_t result;
 
     /* Initialize the counter */
     H5TS_atomic_init_int(&counter_g, 0);

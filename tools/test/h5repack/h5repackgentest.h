@@ -21,7 +21,7 @@ int generate_int32le_3d(bool external);
 int generate_uint8be(bool external);
 int generate_f32le(bool external);
 int make_h5repack_testfiles(void);
-int verify_userblock(const char *filename);
+int verify_userblock(const char* filename);
 int gen_filespaces(void);
 
 /* fill value test */
@@ -44,9 +44,9 @@ int gen_filespaces(void);
 #define H5REPACK_FNAME5OUT "h5repack_early_out.h5"
 #define H5REPACK_FNAME6    "h5repack_early2.h5"
 #ifdef H5_HAVE_FILTER_SZIP
-/* SZIP filter  */
-#define H5REPACK_FNAME7    "h5repack_szip.h5"
-#define H5REPACK_FNAME7OUT "h5repack_szip_out.h5"
+    /* SZIP filter  */
+    #define H5REPACK_FNAME7    "h5repack_szip.h5"
+    #define H5REPACK_FNAME7OUT "h5repack_szip_out.h5"
 #endif
 /* GZIP filter  */
 #define H5REPACK_FNAME8    "h5repack_deflate.h5"
@@ -60,7 +60,7 @@ int gen_filespaces(void);
 /* All filters  */
 #define H5REPACK_FNAME11 "h5repack_filters.h5"
 #if defined(H5_HAVE_FILTER_DEFLATE)
-#define H5REPACK_FNAME11OUT "h5repack_filters_out.h5"
+    #define H5REPACK_FNAME11OUT "h5repack_filters_out.h5"
 #endif
 /* NBit filter  */
 #define H5REPACK_FNAME12    "h5repack_nbit.h5"
@@ -97,7 +97,7 @@ int gen_filespaces(void);
 
 #define H5REPACK_EXTFILE "h5repack_ext.bin"
 
-static const char *H5REPACK_FSPACE_FNAMES[] = {
+static const char* H5REPACK_FSPACE_FNAMES[] = {
     "h5repack_latest.h5",             /* 0 */
     "h5repack_default.h5",            /* 1 */
     "h5repack_page_persist.h5",       /* 2 */
@@ -109,29 +109,28 @@ static const char *H5REPACK_FSPACE_FNAMES[] = {
 };
 
 /* Filenames for generated h5repack test HDF5 files */
-static const char *H5REPACK_TEST_H5_FILES[] = {
-    H5REPACK_FNAME0,     H5REPACK_FNAME0OUT,      H5REPACK_FNAME1,  H5REPACK_FNAME1OUT,
-    H5REPACK_FNAME2,     H5REPACK_FNAME2OUT,      H5REPACK_FNAME3,  H5REPACK_FNAME3OUT,
-    H5REPACK_FNAME4,     H5REPACK_FNAME4OUT,      H5REPACK_FNAME5,  H5REPACK_FNAME5OUT,
-    H5REPACK_FNAME6,
+static const char* H5REPACK_TEST_H5_FILES[] = { H5REPACK_FNAME0,     H5REPACK_FNAME0OUT,      H5REPACK_FNAME1,  H5REPACK_FNAME1OUT,
+                                                H5REPACK_FNAME2,     H5REPACK_FNAME2OUT,      H5REPACK_FNAME3,  H5REPACK_FNAME3OUT,
+                                                H5REPACK_FNAME4,     H5REPACK_FNAME4OUT,      H5REPACK_FNAME5,  H5REPACK_FNAME5OUT,
+                                                H5REPACK_FNAME6,
 #ifdef H5_HAVE_FILTER_SZIP
-    H5REPACK_FNAME7,     H5REPACK_FNAME7OUT,
+                                                H5REPACK_FNAME7,     H5REPACK_FNAME7OUT,
 #endif
-    H5REPACK_FNAME8,     H5REPACK_FNAME8OUT,      H5REPACK_FNAME9,  H5REPACK_FNAME9OUT,
-    H5REPACK_FNAME10,    H5REPACK_FNAME10OUT,     H5REPACK_FNAME11,
+                                                H5REPACK_FNAME8,     H5REPACK_FNAME8OUT,      H5REPACK_FNAME9,  H5REPACK_FNAME9OUT,
+                                                H5REPACK_FNAME10,    H5REPACK_FNAME10OUT,     H5REPACK_FNAME11,
 #if defined(H5_HAVE_FILTER_SZIP) && defined(H5_HAVE_FILTER_DEFLATE)
-    H5REPACK_FNAME11OUT,
+                                                H5REPACK_FNAME11OUT,
 #endif
-    H5REPACK_FNAME12,    H5REPACK_FNAME12OUT,     H5REPACK_FNAME13, H5REPACK_FNAME13OUT,
-    H5REPACK_FNAME14,    H5REPACK_FNAME14OUT,     H5REPACK_FNAME15, H5REPACK_FNAME15OUT,
-    H5REPACK_FNAME17,    H5REPACK_FNAME17OUT,     H5REPACK_FNAME18, H5REPACK_FNAME19,
-    H5REPACK_FNAME_REF,  H5REPACK_FNAME_ATTR_REF, FSPACE_OUT,       NULL};
+                                                H5REPACK_FNAME12,    H5REPACK_FNAME12OUT,     H5REPACK_FNAME13, H5REPACK_FNAME13OUT,
+                                                H5REPACK_FNAME14,    H5REPACK_FNAME14OUT,     H5REPACK_FNAME15, H5REPACK_FNAME15OUT,
+                                                H5REPACK_FNAME17,    H5REPACK_FNAME17OUT,     H5REPACK_FNAME18, H5REPACK_FNAME19,
+                                                H5REPACK_FNAME_REF,  H5REPACK_FNAME_ATTR_REF, FSPACE_OUT,       NULL };
 
-static const char *H5REPACK_TEST_MISC_FILES[] = {H5REPACK_EXTFILE};
+static const char* H5REPACK_TEST_MISC_FILES[] = { H5REPACK_EXTFILE };
 
-static const char *H5REPACK_DEFAULT_DRIVER_MISC_FILES[] = {H5REPACK_FNAME_UB};
+static const char* H5REPACK_DEFAULT_DRIVER_MISC_FILES[] = { H5REPACK_FNAME_UB };
 
-static const char *H5REPACK_DEFAULT_DRIVER_FILES[] = {H5REPACK_FNAME16, H5REPACK_FNAME16OUT, NULL};
+static const char* H5REPACK_DEFAULT_DRIVER_FILES[] = { H5REPACK_FNAME16, H5REPACK_FNAME16OUT, NULL };
 
 #define USERBLOCK_SIZE 2048
 

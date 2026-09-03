@@ -37,43 +37,43 @@
 #define ANAME  "Float attribute"     /* Name of the array attribute */
 #define ANAMES "Character attribute" /* Name of the string attribute */
 
-static herr_t attr_info(hid_t loc_id, const char *name, const H5A_info_t *ainfo, void *opdata);
+static herr_t attr_info(hid_t loc_id, const char* name, const H5A_info_t* ainfo, void* opdata);
+
 /* Operator function */
 
-int
-main(void)
+int main(void)
 {
+    hid_t file, dataset;       /* File and dataset identifiers */
 
-    hid_t file, dataset; /* File and dataset identifiers */
-
-    hid_t       fid;                 /* Dataspace identifier */
-    hid_t       attr1, attr2, attr3; /* Attribute identifiers */
-    hid_t       attr;
-    hid_t       aid1, aid2, aid3; /* Attribute dataspace identifiers */
-    hid_t       atype, atype_mem; /* Attribute type */
+    hid_t fid;                 /* Dataspace identifier */
+    hid_t attr1, attr2, attr3; /* Attribute identifiers */
+    hid_t attr;
+    hid_t aid1, aid2, aid3;    /* Attribute dataspace identifiers */
+    hid_t atype, atype_mem;    /* Attribute type */
     H5T_class_t type_class;
 
-    hsize_t fdim[] = {SIZE};
-    hsize_t adim[] = {ADIM1, ADIM2}; /* Dimensions of the first attribute  */
+    hsize_t fdim[] = { SIZE };
+    hsize_t adim[] = { ADIM1, ADIM2 }; /* Dimensions of the first attribute  */
 
-    float matrix[ADIM1][ADIM2]; /* Attribute data */
+    float matrix[ADIM1][ADIM2];        /* Attribute data */
 
-    herr_t      ret;            /* Return value */
-    H5O_info2_t oinfo;          /* Object info */
-    unsigned    i, j;           /* Counters */
-    char        string_out[80]; /* Buffer to read string attribute back */
-    int         point_out;      /* Buffer to read scalar attribute back */
+    herr_t ret;                        /* Return value */
+    H5O_info2_t oinfo;                 /* Object info */
+    unsigned i, j;                     /* Counters */
+    char string_out[80];               /* Buffer to read string attribute back */
+    int point_out;                     /* Buffer to read scalar attribute back */
 
     /*
      * Data initialization.
      */
-    int  vector[] = {1, 2, 3, 4, 5, 6, 7}; /* Dataset data */
-    int  point    = 1;                     /* Value of the scalar attribute */
-    char string[] = "ABCD";                /* Value of the string attribute */
+    int vector[] = { 1, 2, 3, 4, 5, 6, 7 }; /* Dataset data */
+    int point = 1;                          /* Value of the scalar attribute */
+    char string[] = "ABCD";                 /* Value of the string attribute */
 
-    for (i = 0; i < ADIM1; i++) { /* Values of the array attribute */
-        for (j = 0; j < ADIM2; j++)
+    for (i = 0; i < ADIM1; i++) {           /* Values of the array attribute */
+        for (j = 0; j < ADIM2; j++) {
             matrix[i][j] = -1.;
+        }
     }
 
     /*
@@ -101,7 +101,7 @@ main(void)
      * Create dataspace for the first attribute.
      */
     aid1 = H5Screate(H5S_SIMPLE);
-    ret  = H5Sset_extent_simple(aid1, ARANK, adim, NULL);
+    ret = H5Sset_extent_simple(aid1, ARANK, adim, NULL);
 
     /*
      * Create array attribute.
@@ -116,7 +116,7 @@ main(void)
     /*
      * Create scalar attribute.
      */
-    aid2  = H5Screate(H5S_SCALAR);
+    aid2 = H5Screate(H5S_SCALAR);
     attr2 = H5Acreate2(dataset, "Integer attribute", H5T_NATIVE_INT, aid2, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
@@ -127,7 +127,7 @@ main(void)
     /*
      * Create string attribute.
      */
-    aid3  = H5Screate(H5S_SCALAR);
+    aid3 = H5Screate(H5S_SCALAR);
     atype = H5Tcopy(H5T_C_S1);
     H5Tset_size(atype, 5);
     H5Tset_strpad(atype, H5T_STR_NULLTERM);
@@ -179,7 +179,7 @@ main(void)
      * display its value.
      */
     attr = H5Aopen(dataset, "Integer attribute", H5P_DEFAULT);
-    ret  = H5Aread(attr, H5T_NATIVE_INT, &point_out);
+    ret = H5Aread(attr, H5T_NATIVE_INT, &point_out);
     printf("The value of the attribute \"Integer attribute\" is %d \n", point_out);
     ret = H5Aclose(attr);
 
@@ -190,13 +190,12 @@ main(void)
      */
     ret = H5Oget_info3(dataset, &oinfo, H5O_INFO_NUM_ATTRS);
     for (i = 0; i < (unsigned)oinfo.num_attrs; i++) {
-        attr       = H5Aopen_by_idx(dataset, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, (hsize_t)i, H5P_DEFAULT,
-                                    H5P_DEFAULT);
-        atype      = H5Aget_type(attr);
+        attr = H5Aopen_by_idx(dataset, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, (hsize_t)i, H5P_DEFAULT, H5P_DEFAULT);
+        atype = H5Aget_type(attr);
         type_class = H5Tget_class(atype);
         if (type_class == H5T_STRING) {
             atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
-            ret       = H5Aread(attr, atype_mem, string_out);
+            ret = H5Aread(attr, atype_mem, string_out);
             printf("Found string attribute; its index is %d , value =   %s \n", i, string_out);
             ret = H5Tclose(atype_mem);
         }
@@ -222,16 +221,15 @@ main(void)
 /*
  * Operator function.
  */
-static herr_t
-attr_info(hid_t loc_id, const char *name, const H5A_info_t *ainfo, void *opdata)
+static herr_t attr_info(hid_t loc_id, const char* name, const H5A_info_t* ainfo, void* opdata)
 {
-    hid_t   attr, atype, aspace; /* Attribute, datatype and dataspace identifiers */
-    int     rank;
+    hid_t attr, atype, aspace; /* Attribute, datatype and dataspace identifiers */
+    int rank;
     hsize_t sdim[64];
-    herr_t  ret;
-    int     i;
-    size_t  npoints;     /* Number of elements in the array attribute. */
-    float  *float_array; /* Pointer to the array attribute. */
+    herr_t ret;
+    int i;
+    size_t npoints;     /* Number of elements in the array attribute. */
+    float* float_array; /* Pointer to the array attribute. */
 
     /* avoid warnings */
     (void)opdata;
@@ -249,10 +247,10 @@ attr_info(hid_t loc_id, const char *name, const H5A_info_t *ainfo, void *opdata)
     /*
      * Get attribute datatype, dataspace, rank, and dimensions.
      */
-    atype  = H5Aget_type(attr);
+    atype = H5Aget_type(attr);
     aspace = H5Aget_space(attr);
-    rank   = H5Sget_simple_extent_ndims(aspace);
-    ret    = H5Sget_simple_extent_dims(aspace, sdim, NULL);
+    rank = H5Sget_simple_extent_ndims(aspace);
+    ret = H5Sget_simple_extent_dims(aspace, sdim, NULL);
 
     /*
      *  Display rank and dimension sizes for the array attribute.
@@ -261,8 +259,9 @@ attr_info(hid_t loc_id, const char *name, const H5A_info_t *ainfo, void *opdata)
     if (rank > 0) {
         printf("Rank : %d \n", rank);
         printf("Dimension sizes : ");
-        for (i = 0; i < rank; i++)
+        for (i = 0; i < rank; i++) {
             printf("%d ", (int)sdim[i]);
+        }
         printf("\n");
     }
 
@@ -272,12 +271,13 @@ attr_info(hid_t loc_id, const char *name, const H5A_info_t *ainfo, void *opdata)
 
     if (H5T_FLOAT == H5Tget_class(atype)) {
         printf("Type : FLOAT \n");
-        npoints     = H5Sget_simple_extent_npoints(aspace);
-        float_array = (float *)malloc(sizeof(float) * (int)npoints);
-        ret         = H5Aread(attr, atype, float_array);
+        npoints = H5Sget_simple_extent_npoints(aspace);
+        float_array = (float*)malloc(sizeof(float) * (int)npoints);
+        ret = H5Aread(attr, atype, float_array);
         printf("Values : ");
-        for (i = 0; i < (int)npoints; i++)
+        for (i = 0; i < (int)npoints; i++) {
             printf("%f ", float_array[i]);
+        }
         printf("\n");
         free(float_array);
     }

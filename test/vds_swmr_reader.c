@@ -13,83 +13,99 @@
 #include "h5test.h"
 #include "vds_swmr.h"
 
-static hsize_t VDS_PLANE[RANK] = {1, FULL_HEIGHT, WIDTH};
+static hsize_t VDS_PLANE[RANK] = { 1, FULL_HEIGHT, WIDTH };
 
-int
-main(void)
+int main(void)
 {
-    hid_t fid    = H5I_INVALID_HID; /* HDF5 file ID                     */
+    hid_t fid = H5I_INVALID_HID;    /* HDF5 file ID                     */
     hid_t faplid = H5I_INVALID_HID; /* file access property list ID                */
-    hid_t did    = H5I_INVALID_HID; /* dataset ID                       */
-    hid_t msid   = H5I_INVALID_HID; /* memory dataspace ID              */
-    hid_t fsid   = H5I_INVALID_HID; /* file dataspace ID                */
+    hid_t did = H5I_INVALID_HID;    /* dataset ID                       */
+    hid_t msid = H5I_INVALID_HID;   /* memory dataspace ID              */
+    hid_t fsid = H5I_INVALID_HID;   /* file dataspace ID                */
 
-    hsize_t start[RANK]; /* hyperslab start point            */
+    hsize_t start[RANK];            /* hyperslab start point            */
 
-    int    n_elements = 0;    /* size of buffer (elements)        */
-    size_t size       = 0;    /* size of buffer (bytes)           */
-    int   *buffer     = NULL; /* data buffer                      */
+    int n_elements = 0;             /* size of buffer (elements)        */
+    size_t size = 0;                /* size of buffer (bytes)           */
+    int* buffer = NULL;             /* data buffer                      */
 
-    int     n_dims = -1;    /* # dimensions in dataset          */
-    hsize_t dims[RANK];     /* current size of dataset          */
-    hsize_t max_dims[RANK]; /* max size of dataset              */
+    int n_dims = -1;                /* # dimensions in dataset          */
+    hsize_t dims[RANK];             /* current size of dataset          */
+    hsize_t max_dims[RANK];         /* max size of dataset              */
 
     /* Open the VDS file and dataset */
-    if ((faplid = h5_fileaccess()) < 0)
+    if ((faplid = h5_fileaccess()) < 0) {
         TEST_ERROR;
-    if ((fid = H5Fopen(VDS_FILE_NAME, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, faplid)) < 0)
+    }
+    if ((fid = H5Fopen(VDS_FILE_NAME, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, faplid)) < 0) {
         TEST_ERROR;
-    if ((did = H5Dopen2(fid, VDS_DSET_NAME, H5P_DEFAULT)) < 0)
+    }
+    if ((did = H5Dopen2(fid, VDS_DSET_NAME, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the read buffer */
-    if (VDS_PLANE[1] * VDS_PLANE[2] > INT_MAX)
+    if (VDS_PLANE[1] * VDS_PLANE[2] > INT_MAX) {
         TEST_ERROR;
+    }
     n_elements = (int)(VDS_PLANE[1] * VDS_PLANE[2]);
-    size       = (size_t)n_elements * sizeof(int);
-    if (NULL == (buffer = (int *)malloc(size)))
+    size = (size_t)n_elements * sizeof(int);
+    if (NULL == (buffer = (int*)malloc(size))) {
         TEST_ERROR;
+    }
 
     /* Create memory dataspace */
-    if ((msid = H5Screate_simple(RANK, VDS_PLANE, NULL)) < 0)
+    if ((msid = H5Screate_simple(RANK, VDS_PLANE, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     /* Read data until the dataset is full (via the writer) */
     do {
-
         /* Refresh metadata */
-        if (H5Drefresh(did) < 0)
+        if (H5Drefresh(did) < 0) {
             TEST_ERROR;
+        }
 
         /* Get the dataset dimensions */
-        if ((fsid = H5Dget_space(did)) < 0)
+        if ((fsid = H5Dget_space(did)) < 0) {
             TEST_ERROR;
-        if (H5Sget_simple_extent_dims(fsid, dims, max_dims) < 0)
+        }
+        if (H5Sget_simple_extent_dims(fsid, dims, max_dims) < 0) {
             TEST_ERROR;
+        }
 
         /* Check the reported size of the VDS */
-        if ((n_dims = H5Sget_simple_extent_ndims(fsid)) < 0)
+        if ((n_dims = H5Sget_simple_extent_ndims(fsid)) < 0) {
             TEST_ERROR;
-        if (n_dims != RANK)
+        }
+        if (n_dims != RANK) {
             TEST_ERROR;
-        if (H5Sget_simple_extent_dims(fsid, dims, max_dims) < 0)
+        }
+        if (H5Sget_simple_extent_dims(fsid, dims, max_dims) < 0) {
             TEST_ERROR;
+        }
         /* NOTE: Don't care what dims[0] is. */
-        if (dims[1] != FULL_HEIGHT)
+        if (dims[1] != FULL_HEIGHT) {
             TEST_ERROR;
-        if (dims[2] != WIDTH)
+        }
+        if (dims[2] != WIDTH) {
             TEST_ERROR;
-        if (max_dims[0] != H5S_UNLIMITED)
+        }
+        if (max_dims[0] != H5S_UNLIMITED) {
             TEST_ERROR;
-        if (max_dims[1] != FULL_HEIGHT)
+        }
+        if (max_dims[1] != FULL_HEIGHT) {
             TEST_ERROR;
-        if (max_dims[2] != WIDTH)
+        }
+        if (max_dims[2] != WIDTH) {
             TEST_ERROR;
+        }
 
         /* Continue if there's nothing to read */
         if (0 == dims[0]) {
-            if (H5Sclose(fsid) < 0)
+            if (H5Sclose(fsid) < 0) {
                 TEST_ERROR;
+            }
             continue;
         }
 
@@ -98,24 +114,31 @@ main(void)
         start[0] = dims[0] - 1;
         start[1] = 0;
         start[2] = 0;
-        if (H5Sselect_hyperslab(fsid, H5S_SELECT_SET, start, NULL, VDS_PLANE, NULL) < 0)
+        if (H5Sselect_hyperslab(fsid, H5S_SELECT_SET, start, NULL, VDS_PLANE, NULL) < 0) {
             TEST_ERROR;
-        if (H5Dread(did, H5T_NATIVE_INT, msid, fsid, H5P_DEFAULT, buffer) < 0)
+        }
+        if (H5Dread(did, H5T_NATIVE_INT, msid, fsid, H5P_DEFAULT, buffer) < 0) {
             TEST_ERROR;
-        if (H5Sclose(fsid) < 0)
+        }
+        if (H5Sclose(fsid) < 0) {
             TEST_ERROR;
+        }
 
     } while (dims[0] < N_PLANES_TO_WRITE);
 
     /* Close file and dataset */
-    if (H5Pclose(faplid) < 0)
+    if (H5Pclose(faplid) < 0) {
         TEST_ERROR;
-    if (H5Sclose(msid) < 0)
+    }
+    if (H5Sclose(msid) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     free(buffer);
 
@@ -126,16 +149,21 @@ error:
 
     H5E_BEGIN_TRY
     {
-        if (fid >= 0)
+        if (fid >= 0) {
             (void)H5Fclose(fid);
-        if (faplid >= 0)
+        }
+        if (faplid >= 0) {
             (void)H5Pclose(faplid);
-        if (did >= 0)
+        }
+        if (did >= 0) {
             (void)H5Dclose(did);
-        if (msid >= 0)
+        }
+        if (msid >= 0) {
             (void)H5Sclose(msid);
-        if (fsid >= 0)
+        }
+        if (fsid >= 0) {
             (void)H5Sclose(fsid);
+        }
     }
     H5E_END_TRY
 

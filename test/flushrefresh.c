@@ -63,25 +63,25 @@
    For errors occurring in the spawned process (from the test script), use
    the PROCESS_ERROR macro, which will send a signal to the main process so the
    main process can propagate errors correctly. */
-static FILE *errorfile;
+static FILE* errorfile;
 #define ERRFILE "flushrefresh_ERROR"
-#define PROCESS_ERROR                                                                                        \
-    do {                                                                                                     \
-        errorfile = fopen(ERRFILE, "w+");                                                                    \
-        fprintf(errorfile, "Error occurred in flushrefresh.\n");                                             \
-        fflush(errorfile);                                                                                   \
-        fclose(errorfile);                                                                                   \
-        TEST_ERROR;                                                                                          \
+#define PROCESS_ERROR                                            \
+    do {                                                         \
+        errorfile = fopen(ERRFILE, "w+");                        \
+        fprintf(errorfile, "Error occurred in flushrefresh.\n"); \
+        fflush(errorfile);                                       \
+        fclose(errorfile);                                       \
+        TEST_ERROR;                                              \
     } while (0)
 
-#define CLEANUP_FILES                                                                                        \
-    do {                                                                                                     \
-        HDremove(ERRFILE);                                                                                   \
-        HDremove(FILENAME);                                                                                  \
-        HDremove(SIGNAL_TO_SCRIPT);                                                                          \
-        HDremove(SIGNAL_BETWEEN_PROCESSES_1);                                                                \
-        HDremove(SIGNAL_BETWEEN_PROCESSES_2);                                                                \
-        HDremove(SIGNAL_FROM_SCRIPT);                                                                        \
+#define CLEANUP_FILES                         \
+    do {                                      \
+        HDremove(ERRFILE);                    \
+        HDremove(FILENAME);                   \
+        HDremove(SIGNAL_TO_SCRIPT);           \
+        HDremove(SIGNAL_BETWEEN_PROCESSES_1); \
+        HDremove(SIGNAL_BETWEEN_PROCESSES_2); \
+        HDremove(SIGNAL_FROM_SCRIPT);         \
     } while (0)
 
 /* ===================== */
@@ -89,17 +89,17 @@ static FILE *errorfile;
 /* ===================== */
 
 /* Main */
-int main(int argc, char *argv[]);
+int main(int argc, char* argv[]);
 
 /* Flush Test Framework */
 herr_t test_flush(void);
-herr_t flush_verification(const char *obj_pathname, const char *expected);
-herr_t run_flush_verification_process(const char *obj_pathname, const char *expected);
+herr_t flush_verification(const char* obj_pathname, const char* expected);
+herr_t run_flush_verification_process(const char* obj_pathname, const char* expected);
 
 /* Refresh Test Framework */
 herr_t test_refresh(void);
-herr_t refresh_verification(const char *obj_pathname);
-herr_t start_refresh_verification_process(const char *obj_pathname);
+herr_t refresh_verification(const char* obj_pathname);
+herr_t start_refresh_verification_process(const char* obj_pathname);
 herr_t end_refresh_verification_process(void);
 
 /* Other Helper Functions */
@@ -129,15 +129,15 @@ herr_t end_verification(void);
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     /* Variables */
-    const char *driver_name = NULL;
+    const char* driver_name = NULL;
 
     /* Initialize library */
-    if (H5open() < 0)
+    if (H5open() < 0) {
         TEST_ERROR;
+    }
 
     /* Parse command line options */
     if (argc == 1) {
@@ -149,30 +149,36 @@ main(int argc, char *argv[])
         driver_name = h5_get_test_driver_name();
 
         if (driver_name == NULL || H5FD__supports_swmr_test(driver_name)) {
-            if (test_flush() != SUCCEED)
+            if (test_flush() != SUCCEED) {
                 TEST_ERROR;
-            if (test_refresh() != SUCCEED)
+            }
+            if (test_refresh() != SUCCEED) {
                 TEST_ERROR;
+            }
         } /* end if */
         else {
             fprintf(stdout, "Skipping all flush/refresh tests (only run with SWMR-enabled file drivers).\n");
 
             /* Test script is expecting some signals, so send them out to end it. */
-            if (end_verification() < 0)
+            if (end_verification() < 0) {
                 TEST_ERROR;
-            if (end_verification() < 0)
+            }
+            if (end_verification() < 0) {
                 TEST_ERROR;
+            }
         } /* end else */
     }
     else if (argc == 3) {
         /* Two arguments supplied. Pass them to flush verification routine. */
-        if (flush_verification(argv[1], argv[2]) != 0)
+        if (flush_verification(argv[1], argv[2]) != 0) {
             PROCESS_ERROR;
+        }
     }
     else if (argc == 2) {
         /* One argument supplied. Pass it to refresh verification routine. */
-        if (refresh_verification(argv[1]) != 0)
+        if (refresh_verification(argv[1]) != 0) {
             PROCESS_ERROR;
+        }
     }
     else {
         /* Illegal number of arguments supplied. Error. */
@@ -197,8 +203,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-test_flush(void)
+herr_t test_flush(void)
 {
     /**************************************************************************
      *
@@ -253,8 +258,8 @@ test_flush(void)
      **************************************************************************/
 
     /* Variables */
-    hid_t   fid, gid, gid2, gid3, sid, tid1, tid2, tid3, did, did2, did3, rid, fapl, status = 0;
-    hsize_t dims[2] = {3, 5};
+    hid_t fid, gid, gid2, gid3, sid, tid1, tid2, tid3, did, did2, did3, rid, fapl, status = 0;
+    hsize_t dims[2] = { 3, 5 };
 
     /* Testing Message */
     fprintf(stdout, "Testing individual object flush behavior:\n");
@@ -267,60 +272,77 @@ test_flush(void)
     /* ================ */
 
     /* Create file, open root group - have to use latest file format for SWMR */
-    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    }
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         TEST_ERROR;
-    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl)) < 0)
+    }
+    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
-    if ((rid = H5Gopen2(fid, "/", H5P_DEFAULT)) < 0)
+    }
+    if ((rid = H5Gopen2(fid, "/", H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create data space and types */
-    if ((sid = H5Screate_simple(2, dims, dims)) < 0)
+    if ((sid = H5Screate_simple(2, dims, dims)) < 0) {
         TEST_ERROR;
-    if ((tid1 = H5Tcopy(H5T_NATIVE_INT)) < 0)
+    }
+    if ((tid1 = H5Tcopy(H5T_NATIVE_INT)) < 0) {
         TEST_ERROR;
-    if ((tid2 = H5Tcopy(H5T_NATIVE_CHAR)) < 0)
+    }
+    if ((tid2 = H5Tcopy(H5T_NATIVE_CHAR)) < 0) {
         TEST_ERROR;
-    if ((tid3 = H5Tcopy(H5T_NATIVE_LONG)) < 0)
+    }
+    if ((tid3 = H5Tcopy(H5T_NATIVE_LONG)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group1 */
-    if ((gid = H5Gcreate2(fid, "Group1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "Group1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group2 */
-    if ((gid2 = H5Gcreate2(gid, "Group2", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid2 = H5Gcreate2(gid, "Group2", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group3 */
-    if ((gid3 = H5Gcreate2(fid, "Group3", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid3 = H5Gcreate2(fid, "Group3", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset1 */
-    if ((did = H5Dcreate2(fid, "Dataset1", tid1, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid, "Dataset1", tid1, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset2 */
-    if ((did2 = H5Dcreate2(gid, "Dataset2", tid3, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did2 = H5Dcreate2(gid, "Dataset2", tid3, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset3 */
-    if ((did3 = H5Dcreate2(gid3, "Dataset3", tid2, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did3 = H5Dcreate2(gid3, "Dataset3", tid2, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype1 */
-    if ((status = H5Tcommit2(fid, "CommittedDatatype1", tid1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(fid, "CommittedDatatype1", tid1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype2 */
-    if ((status = H5Tcommit2(gid2, "CommittedDatatype2", tid2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(gid2, "CommittedDatatype2", tid2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype3 */
-    if ((status = H5Tcommit2(gid3, "CommittedDatatype3", tid3, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(gid3, "CommittedDatatype3", tid3, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* ============ */
     /* FLUSH GROUPS */
@@ -330,100 +352,143 @@ test_flush(void)
     TESTING("to ensure H5Gflush correctly flushes single groups");
 
     /* First, let's verify that nothing is currently flushed. */
-    if (run_flush_verification_process(RG, NOT_FLUSHED) != 0)
+    if (run_flush_verification_process(RG, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Then, flush the root group and verify it's the only thing on disk */
-    if ((status = H5Gflush(rid)) < 0)
+    if ((status = H5Gflush(rid)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush Group1 and Verify it is recently flushed, and nothing
      * else has changed. */
-    if ((status = H5Gflush(gid)) < 0)
+    if ((status = H5Gflush(gid)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush Group2 and Verify it is recently flushed, and nothing
      * else has changed. */
-    if ((status = H5Gflush(gid2)) < 0)
+    if ((status = H5Gflush(gid2)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -435,52 +500,74 @@ test_flush(void)
     TESTING("to ensure H5Dflush correctly flushes single datasets");
 
     /* Flush Dataset1 and verify it's the only thing that hits disk. */
-    if ((status = H5Dflush(did)) < 0)
+    if ((status = H5Dflush(did)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush Dataset2 and verify it's the only thing that hits disk. */
-    if ((status = H5Dflush(did2)) < 0)
+    if ((status = H5Dflush(did2)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -492,52 +579,74 @@ test_flush(void)
     TESTING("to ensure H5Tflush correctly flushes single datatypes");
 
     /* Flush Datatype 1 and verify it's the only thing that hits disk. */
-    if ((status = H5Tflush(tid1)) < 0)
+    if ((status = H5Tflush(tid1)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush Datatype 2 and verify it's the only thing that hits disk. */
-    if ((status = H5Tflush(tid2)) < 0)
+    if ((status = H5Tflush(tid2)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -549,102 +658,143 @@ test_flush(void)
     TESTING("to ensure H5Oflush correctly flushes single objects");
 
     /* Flush Group3 and verify it's the only thing that hits disk. */
-    if ((status = H5Oflush(gid3)) < 0)
+    if ((status = H5Oflush(gid3)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush Dataset3 and verify it's the only thing that hits disk. */
-    if ((status = H5Oflush(did3)) < 0)
+    if ((status = H5Oflush(did3)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, NOT_FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     /* Flush CommittedDatatype3 and verify it's the only thing that hits disk. */
-    if ((status = H5Oflush(tid3)) < 0)
+    if ((status = H5Oflush(tid3)) < 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(RG, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(RG, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(G3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(G3, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(D3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(D3, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T1, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T1, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T2, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T2, FLUSHED) != 0) {
         TEST_ERROR;
-    if (run_flush_verification_process(T3, FLUSHED) != 0)
+    }
+    if (run_flush_verification_process(T3, FLUSHED) != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
     /* ================== */
     /* Cleanup and Return */
     /* ================== */
-    if (H5Pclose(fapl) < 0)
+    if (H5Pclose(fapl) < 0) {
         TEST_ERROR;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         TEST_ERROR;
-    if (H5Gclose(gid2) < 0)
+    }
+    if (H5Gclose(gid2) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did2) < 0)
+    }
+    if (H5Dclose(did2) < 0) {
         TEST_ERROR;
-    if (H5Gclose(rid) < 0)
+    }
+    if (H5Gclose(rid) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Delete test file */
     HDremove(FILENAME);
 
-    if (end_verification() < 0)
+    if (end_verification() < 0) {
         TEST_ERROR;
+    }
 
     return SUCCEED;
 
@@ -662,8 +812,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-test_refresh(void)
+herr_t test_refresh(void)
 {
     /**************************************************************************
      *
@@ -718,12 +867,12 @@ test_refresh(void)
      **************************************************************************/
 
     /* Variables */
-    hid_t   aid, fid, sid, tid1, did, dcpl, fapl = 0;
-    hid_t   gid, gid2, gid3, tid2, tid3, did2, did3;
-    herr_t  status   = 0;
-    hsize_t dims[2]  = {50, 50};
-    hsize_t cdims[2] = {1, 1};
-    int     fillval  = 2;
+    hid_t aid, fid, sid, tid1, did, dcpl, fapl = 0;
+    hid_t gid, gid2, gid3, tid2, tid3, did2, did3;
+    herr_t status = 0;
+    hsize_t dims[2] = { 50, 50 };
+    hsize_t cdims[2] = { 1, 1 };
+    int fillval = 2;
 
     /* Testing Message */
     fprintf(stdout, "Testing individual object refresh behavior:\n");
@@ -736,68 +885,88 @@ test_refresh(void)
     /* ================ */
 
     /* Create File */
-    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         TEST_ERROR;
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    }
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         TEST_ERROR;
-    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl)) < 0)
+    }
+    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create data space and types */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         TEST_ERROR;
-    if (H5Pset_chunk(dcpl, 2, cdims) < 0)
+    }
+    if (H5Pset_chunk(dcpl, 2, cdims) < 0) {
         TEST_ERROR;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0) {
         TEST_ERROR;
-    if ((sid = H5Screate_simple(2, dims, dims)) < 0)
+    }
+    if ((sid = H5Screate_simple(2, dims, dims)) < 0) {
         TEST_ERROR;
-    if ((tid1 = H5Tcopy(H5T_NATIVE_INT)) < 0)
+    }
+    if ((tid1 = H5Tcopy(H5T_NATIVE_INT)) < 0) {
         TEST_ERROR;
-    if ((tid2 = H5Tcopy(H5T_NATIVE_CHAR)) < 0)
+    }
+    if ((tid2 = H5Tcopy(H5T_NATIVE_CHAR)) < 0) {
         TEST_ERROR;
-    if ((tid3 = H5Tcopy(H5T_NATIVE_LONG)) < 0)
+    }
+    if ((tid3 = H5Tcopy(H5T_NATIVE_LONG)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group1 */
-    if ((gid = H5Gcreate2(fid, "Group1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "Group1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group2 */
-    if ((gid2 = H5Gcreate2(gid, "Group2", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid2 = H5Gcreate2(gid, "Group2", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Group3 */
-    if ((gid3 = H5Gcreate2(fid, "Group3", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid3 = H5Gcreate2(fid, "Group3", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset1 */
-    if ((did = H5Dcreate2(fid, "Dataset1", tid1, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid, "Dataset1", tid1, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset2 */
-    if ((did2 = H5Dcreate2(gid, "Dataset2", tid3, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did2 = H5Dcreate2(gid, "Dataset2", tid3, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create Dataset3 */
-    if ((did3 = H5Dcreate2(gid3, "Dataset3", tid2, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((did3 = H5Dcreate2(gid3, "Dataset3", tid2, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype1 */
-    if ((status = H5Tcommit2(fid, "CommittedDatatype1", tid1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(fid, "CommittedDatatype1", tid1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype2 */
-    if ((status = H5Tcommit2(gid2, "CommittedDatatype2", tid2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(gid2, "CommittedDatatype2", tid2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create CommittedDatatype3 */
-    if ((status = H5Tcommit2(gid3, "CommittedDatatype3", tid3, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((status = H5Tcommit2(gid3, "CommittedDatatype3", tid3, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Flush File to Disk */
-    if (H5Fflush(fid, H5F_SCOPE_GLOBAL) < 0)
+    if (H5Fflush(fid, H5F_SCOPE_GLOBAL) < 0) {
         TEST_ERROR;
+    }
 
     /* ================ */
     /* Refresh Datasets */
@@ -808,32 +977,42 @@ test_refresh(void)
     /* Create an attribute on each object before flush. */
 
     /* Verify First Dataset can be refreshed with H5Drefresh */
-    if (start_refresh_verification_process(D1) != 0)
+    if (start_refresh_verification_process(D1) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(did, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(did, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(did) < 0)
+    }
+    if (H5Oflush(did) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     /* Verify Second Dataset can be refreshed with H5Drefresh */
-    if (start_refresh_verification_process(D2) != 0)
+    if (start_refresh_verification_process(D2) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(did2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(did2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(did2) < 0)
+    }
+    if (H5Oflush(did2) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -844,32 +1023,42 @@ test_refresh(void)
     TESTING("to ensure that H5Grefresh correctly refreshes single groups");
 
     /* Verify First Group can be refreshed with H5Grefresh */
-    if (start_refresh_verification_process(G1) != 0)
+    if (start_refresh_verification_process(G1) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(gid, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(gid, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(gid) < 0)
+    }
+    if (H5Oflush(gid) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     /* Verify Second Group can be refreshed with H5Grefresh */
-    if (start_refresh_verification_process(G2) != 0)
+    if (start_refresh_verification_process(G2) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(gid2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(gid2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(gid2) < 0)
+    }
+    if (H5Oflush(gid2) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -879,32 +1068,42 @@ test_refresh(void)
     TESTING("to ensure that H5Trefresh correctly refreshes single datatypes");
 
     /* Verify First Committed Datatype can be refreshed with H5Trefresh */
-    if (start_refresh_verification_process(T1) != 0)
+    if (start_refresh_verification_process(T1) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(tid1, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(tid1, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(tid1) < 0)
+    }
+    if (H5Oflush(tid1) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     /* Verify Second Committed Datatype can be refreshed with H5Trefresh */
-    if (start_refresh_verification_process(T2) != 0)
+    if (start_refresh_verification_process(T2) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(tid2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(tid2, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(tid2) < 0)
+    }
+    if (H5Oflush(tid2) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
     PASSED();
 
     /* =============== */
@@ -914,46 +1113,61 @@ test_refresh(void)
     TESTING("to ensure that H5Orefresh correctly refreshes single objects");
 
     /* Verify Third Dataset can be refreshed with H5Orefresh */
-    if (start_refresh_verification_process(D3) != 0)
+    if (start_refresh_verification_process(D3) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(did3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(did3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(did3) < 0)
+    }
+    if (H5Oflush(did3) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     /* Verify Third Group can be refreshed with H5Orefresh */
-    if (start_refresh_verification_process(G3) != 0)
+    if (start_refresh_verification_process(G3) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(gid3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(gid3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(gid3) < 0)
+    }
+    if (H5Oflush(gid3) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     /* Verify Third Committed Datatype can be refreshed with H5Orefresh */
-    if (start_refresh_verification_process(T3) != 0)
+    if (start_refresh_verification_process(T3) != 0) {
         TEST_ERROR;
+    }
 
-    if ((aid = H5Acreate2(tid3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((aid = H5Acreate2(tid3, "Attribute", tid1, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         TEST_ERROR;
-    if (H5Oflush(tid3) < 0)
+    }
+    if (H5Oflush(tid3) < 0) {
         TEST_ERROR;
+    }
 
-    if (end_refresh_verification_process() != 0)
+    if (end_refresh_verification_process() != 0) {
         TEST_ERROR;
+    }
 
     PASSED();
 
@@ -962,38 +1176,52 @@ test_refresh(void)
     /* ================== */
 
     /* Close Stuff */
-    if (H5Pclose(fapl) < 0)
+    if (H5Pclose(fapl) < 0) {
         TEST_ERROR;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         TEST_ERROR;
-    if (H5Tclose(tid1) < 0)
+    }
+    if (H5Tclose(tid1) < 0) {
         TEST_ERROR;
-    if (H5Tclose(tid2) < 0)
+    }
+    if (H5Tclose(tid2) < 0) {
         TEST_ERROR;
-    if (H5Tclose(tid3) < 0)
+    }
+    if (H5Tclose(tid3) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did) < 0)
+    }
+    if (H5Dclose(did) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did2) < 0)
+    }
+    if (H5Dclose(did2) < 0) {
         TEST_ERROR;
-    if (H5Dclose(did3) < 0)
+    }
+    if (H5Dclose(did3) < 0) {
         TEST_ERROR;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         TEST_ERROR;
-    if (H5Gclose(gid2) < 0)
+    }
+    if (H5Gclose(gid2) < 0) {
         TEST_ERROR;
-    if (H5Gclose(gid3) < 0)
+    }
+    if (H5Gclose(gid3) < 0) {
         TEST_ERROR;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Delete Test File */
     HDremove(FILENAME);
 
-    if (end_verification() < 0)
+    if (end_verification() < 0) {
         TEST_ERROR;
+    }
 
     return SUCCEED;
 
@@ -1013,8 +1241,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-run_flush_verification_process(const char *obj_pathname, const char *expected)
+herr_t run_flush_verification_process(const char* obj_pathname, const char* expected)
 {
     HDremove(SIGNAL_FROM_SCRIPT);
 
@@ -1022,12 +1249,14 @@ run_flush_verification_process(const char *obj_pathname, const char *expected)
     h5_send_message(SIGNAL_TO_SCRIPT, obj_pathname, expected);
 
     /* Wait for Signal from SCRIPT indicating that verification process has completed. */
-    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0)
+    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0) {
         TEST_ERROR;
+    }
 
     /* Check to see if any errors occurred */
-    if (check_for_errors() < 0)
+    if (check_for_errors() < 0) {
         TEST_ERROR;
+    }
 
     /* Return */
     return SUCCEED;
@@ -1050,19 +1279,18 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-flush_verification(const char *obj_pathname, const char *expected)
+herr_t flush_verification(const char* obj_pathname, const char* expected)
 {
     /* Variables */
-    hid_t       oid = H5I_INVALID_HID, fid = H5I_INVALID_HID;
-    herr_t      status = 0;
+    hid_t oid = H5I_INVALID_HID, fid = H5I_INVALID_HID;
+    herr_t status = 0;
     H5O_info2_t oinfo;
 
     /* Try to open the testfile and then obj_pathname within the file */
     H5E_BEGIN_TRY
     {
-        fid    = H5Fopen(FILENAME, H5F_ACC_SWMR_READ, H5P_DEFAULT);
-        oid    = H5Oopen(fid, obj_pathname, H5P_DEFAULT);
+        fid = H5Fopen(FILENAME, H5F_ACC_SWMR_READ, H5P_DEFAULT);
+        oid = H5Oopen(fid, obj_pathname, H5P_DEFAULT);
         status = H5Oget_info3(oid, &oinfo, H5O_INFO_BASIC);
     }
     H5E_END_TRY
@@ -1076,8 +1304,7 @@ flush_verification(const char *obj_pathname, const char *expected)
     }
     else if (strcmp(expected, NOT_FLUSHED) == 0) {
         if ((oid > 0) || (status > 0)) {
-            fprintf(stderr, "Error! %s not expected to be flushed, but it was found on disk!\n",
-                    obj_pathname);
+            fprintf(stderr, "Error! %s not expected to be flushed, but it was found on disk!\n", obj_pathname);
             PROCESS_ERROR;
         } /* end if */
     }
@@ -1111,8 +1338,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-start_refresh_verification_process(const char *obj_pathname)
+herr_t start_refresh_verification_process(const char* obj_pathname)
 {
     HDremove(SIGNAL_BETWEEN_PROCESSES_1);
 
@@ -1122,12 +1348,14 @@ start_refresh_verification_process(const char *obj_pathname)
 
     /* Wait for Signal from VERIFICATION PROCESS indicating that it's opened the
        target object and ready for MAIN PROCESS to modify it */
-    if (h5_wait_message(SIGNAL_BETWEEN_PROCESSES_1) < 0)
+    if (h5_wait_message(SIGNAL_BETWEEN_PROCESSES_1) < 0) {
         TEST_ERROR;
+    }
 
     /* Check to see if any errors occurred */
-    if (check_for_errors() < 0)
+    if (check_for_errors() < 0) {
         TEST_ERROR;
+    }
 
     /* Return */
     return SUCCEED;
@@ -1148,8 +1376,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-end_refresh_verification_process(void)
+herr_t end_refresh_verification_process(void)
 {
     HDremove(SIGNAL_FROM_SCRIPT);
 
@@ -1160,12 +1387,14 @@ end_refresh_verification_process(void)
 
     /* Wait for Signal from SCRIPT indicating that the refresh verification
         process has completed. */
-    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0)
+    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0) {
         TEST_ERROR;
+    }
 
     /* Check to see if any errors occurred */
-    if (check_for_errors() < 0)
+    if (check_for_errors() < 0) {
         TEST_ERROR;
+    }
 
     /* Return */
     return SUCCEED;
@@ -1188,38 +1417,42 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-refresh_verification(const char *obj_pathname)
+herr_t refresh_verification(const char* obj_pathname)
 {
     /* Variables */
-    hid_t             oid, fid, status = 0;
-    H5O_info2_t       flushed_oinfo;
-    H5O_info2_t       refreshed_oinfo;
+    hid_t oid, fid, status = 0;
+    H5O_info2_t flushed_oinfo;
+    H5O_info2_t refreshed_oinfo;
     H5O_native_info_t flushed_ninfo;
     H5O_native_info_t refreshed_ninfo;
-    int               tries = 800, sleep_tries = 400;
-    int               token_cmp;
-    bool              ok = false;
+    int tries = 800, sleep_tries = 400;
+    int token_cmp;
+    bool ok = false;
 
     HDremove(SIGNAL_BETWEEN_PROCESSES_2);
 
     /* Open Object */
-    if ((fid = H5Fopen(FILENAME, H5F_ACC_SWMR_READ, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fopen(FILENAME, H5F_ACC_SWMR_READ, H5P_DEFAULT)) < 0) {
         PROCESS_ERROR;
-    if ((oid = H5Oopen(fid, obj_pathname, H5P_DEFAULT)) < 0)
+    }
+    if ((oid = H5Oopen(fid, obj_pathname, H5P_DEFAULT)) < 0) {
         PROCESS_ERROR;
+    }
 
     /* Get Object info */
-    if ((status = H5Oget_info3(oid, &flushed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0)
+    if ((status = H5Oget_info3(oid, &flushed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0) {
         PROCESS_ERROR;
-    if ((status = H5Oget_native_info(oid, &flushed_ninfo, H5O_NATIVE_INFO_HDR)) < 0)
+    }
+    if ((status = H5Oget_native_info(oid, &flushed_ninfo, H5O_NATIVE_INFO_HDR)) < 0) {
         PROCESS_ERROR;
+    }
 
     /* Make sure there are no attributes on the object. This is just a sanity
         check to ensure we didn't erroneously flush the attribute before
         starting the verification. */
-    if (flushed_oinfo.num_attrs != 0)
+    if (flushed_oinfo.num_attrs != 0) {
         PROCESS_ERROR;
+    }
 
     /* Send Signal to MAIN PROCESS indicating that it can go ahead and modify the
         object. */
@@ -1227,60 +1460,74 @@ refresh_verification(const char *obj_pathname)
 
     /* Wait for Signal from MAIN PROCESS indicating that it's modified the
         object and we can run verification now. */
-    if (h5_wait_message(SIGNAL_BETWEEN_PROCESSES_2) < 0)
+    if (h5_wait_message(SIGNAL_BETWEEN_PROCESSES_2) < 0) {
         PROCESS_ERROR;
+    }
 
     /* Get object info again. This will NOT reflect what's on disk, only what's
        in the cache. Thus, all values will be unchanged from above, despite
        newer information being on disk. */
-    if ((status = H5Oget_info3(oid, &refreshed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0)
+    if ((status = H5Oget_info3(oid, &refreshed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0) {
         PROCESS_ERROR;
-    if ((status = H5Oget_native_info(oid, &refreshed_ninfo, H5O_NATIVE_INFO_HDR)) < 0)
+    }
+    if ((status = H5Oget_native_info(oid, &refreshed_ninfo, H5O_NATIVE_INFO_HDR)) < 0) {
         PROCESS_ERROR;
+    }
 
     /* Verify that before doing a refresh, getting the object info returns stale
        information. (i.e., unchanged from above, despite new info on disk). */
-    if (H5Otoken_cmp(oid, &flushed_oinfo.token, &refreshed_oinfo.token, &token_cmp) < 0)
+    if (H5Otoken_cmp(oid, &flushed_oinfo.token, &refreshed_oinfo.token, &token_cmp) < 0) {
         PROCESS_ERROR;
-    if (token_cmp)
+    }
+    if (token_cmp) {
         PROCESS_ERROR;
-    if (flushed_oinfo.type != refreshed_oinfo.type)
+    }
+    if (flushed_oinfo.type != refreshed_oinfo.type) {
         PROCESS_ERROR;
-    if (flushed_oinfo.num_attrs != refreshed_oinfo.num_attrs)
+    }
+    if (flushed_oinfo.num_attrs != refreshed_oinfo.num_attrs) {
         PROCESS_ERROR;
-    if (flushed_ninfo.hdr.version != refreshed_ninfo.hdr.version)
+    }
+    if (flushed_ninfo.hdr.version != refreshed_ninfo.hdr.version) {
         PROCESS_ERROR;
-    if (flushed_ninfo.hdr.flags != refreshed_ninfo.hdr.flags)
+    }
+    if (flushed_ninfo.hdr.flags != refreshed_ninfo.hdr.flags) {
         PROCESS_ERROR;
-    if (flushed_ninfo.hdr.nmesgs != refreshed_ninfo.hdr.nmesgs)
+    }
+    if (flushed_ninfo.hdr.nmesgs != refreshed_ninfo.hdr.nmesgs) {
         PROCESS_ERROR;
-    if (flushed_ninfo.hdr.nchunks != refreshed_ninfo.hdr.nchunks)
+    }
+    if (flushed_ninfo.hdr.nchunks != refreshed_ninfo.hdr.nchunks) {
         PROCESS_ERROR;
-    if (flushed_ninfo.hdr.space.total != refreshed_ninfo.hdr.space.total)
+    }
+    if (flushed_ninfo.hdr.space.total != refreshed_ninfo.hdr.space.total) {
         PROCESS_ERROR;
+    }
 
     /* Refresh object */
     /* The H5*refresh function called depends on which object we are trying
      * to refresh. (MIKE: add desired refresh call as parameter so adding new
      * test cases is easy). */
     do {
-
         if ((strcmp(obj_pathname, D1) == 0) || (strcmp(obj_pathname, D2) == 0)) {
-            if (H5Drefresh(oid) < 0)
+            if (H5Drefresh(oid) < 0) {
                 PROCESS_ERROR;
+            }
         } /* end if */
         else if ((strcmp(obj_pathname, G1) == 0) || (strcmp(obj_pathname, G2) == 0)) {
-            if (H5Grefresh(oid) < 0)
+            if (H5Grefresh(oid) < 0) {
                 PROCESS_ERROR;
+            }
         } /* end if */
         else if ((strcmp(obj_pathname, T1) == 0) || (strcmp(obj_pathname, T2) == 0)) {
-            if (H5Trefresh(oid) < 0)
+            if (H5Trefresh(oid) < 0) {
                 PROCESS_ERROR;
+            }
         } /* end if */
-        else if ((strcmp(obj_pathname, D3) == 0) || (strcmp(obj_pathname, G3) == 0) ||
-                 (strcmp(obj_pathname, T3) == 0)) {
-            if (H5Orefresh(oid) < 0)
+        else if ((strcmp(obj_pathname, D3) == 0) || (strcmp(obj_pathname, G3) == 0) || (strcmp(obj_pathname, T3) == 0)) {
+            if (H5Orefresh(oid) < 0) {
                 PROCESS_ERROR;
+            }
         } /* end if */
         else {
             fprintf(stdout, "Error. %s is an unrecognized object.\n", obj_pathname);
@@ -1288,46 +1535,53 @@ refresh_verification(const char *obj_pathname)
         } /* end else */
 
         /* Get object info. This should now accurately reflect the refreshed object on disk. */
-        if ((status = H5Oget_info3(oid, &refreshed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0)
+        if ((status = H5Oget_info3(oid, &refreshed_oinfo, H5O_INFO_BASIC | H5O_INFO_NUM_ATTRS)) < 0) {
             PROCESS_ERROR;
-        if ((status = H5Oget_native_info(oid, &refreshed_ninfo, H5O_NATIVE_INFO_HDR)) < 0)
+        }
+        if ((status = H5Oget_native_info(oid, &refreshed_ninfo, H5O_NATIVE_INFO_HDR)) < 0) {
             PROCESS_ERROR;
-        if (H5Otoken_cmp(oid, &flushed_oinfo.token, &refreshed_oinfo.token, &token_cmp) < 0)
+        }
+        if (H5Otoken_cmp(oid, &flushed_oinfo.token, &refreshed_oinfo.token, &token_cmp) < 0) {
             PROCESS_ERROR;
+        }
 
         /* Confirm following (first 4) attributes are the same: */
         /* Confirm following (last 4) attributes are different */
-        if ((!token_cmp) && (flushed_oinfo.type == refreshed_oinfo.type) &&
-            (flushed_oinfo.num_attrs != refreshed_oinfo.num_attrs) &&
-            (flushed_ninfo.hdr.version == refreshed_ninfo.hdr.version) &&
-            (flushed_ninfo.hdr.flags == refreshed_ninfo.hdr.flags) &&
-            (flushed_ninfo.hdr.nmesgs != refreshed_ninfo.hdr.nmesgs) &&
-            (flushed_ninfo.hdr.nchunks != refreshed_ninfo.hdr.nchunks) &&
+        if ((!token_cmp) && (flushed_oinfo.type == refreshed_oinfo.type) && (flushed_oinfo.num_attrs != refreshed_oinfo.num_attrs) &&
+            (flushed_ninfo.hdr.version == refreshed_ninfo.hdr.version) && (flushed_ninfo.hdr.flags == refreshed_ninfo.hdr.flags) &&
+            (flushed_ninfo.hdr.nmesgs != refreshed_ninfo.hdr.nmesgs) && (flushed_ninfo.hdr.nchunks != refreshed_ninfo.hdr.nchunks) &&
             (flushed_ninfo.hdr.space.total != refreshed_ninfo.hdr.space.total)) {
             ok = true;
             break;
         }
 
-        if (tries == sleep_tries)
+        if (tries == sleep_tries) {
             HDsleep(1);
+        }
 
     } while (--tries);
 
     if (!ok) {
-        printf("FLUSHED: num_attrs=%d, nmesgs=%d, nchunks=%d, total=%d\n", (int)flushed_oinfo.num_attrs,
-               (int)flushed_ninfo.hdr.nmesgs, (int)flushed_ninfo.hdr.nchunks,
+        printf("FLUSHED: num_attrs=%d, nmesgs=%d, nchunks=%d, total=%d\n",
+               (int)flushed_oinfo.num_attrs,
+               (int)flushed_ninfo.hdr.nmesgs,
+               (int)flushed_ninfo.hdr.nchunks,
                (int)flushed_ninfo.hdr.space.total);
-        printf("REFRESHED: num_attrs=%d, nmesgs=%d, nchunks=%d, total=%d\n", (int)refreshed_oinfo.num_attrs,
-               (int)refreshed_ninfo.hdr.nmesgs, (int)refreshed_ninfo.hdr.nchunks,
+        printf("REFRESHED: num_attrs=%d, nmesgs=%d, nchunks=%d, total=%d\n",
+               (int)refreshed_oinfo.num_attrs,
+               (int)refreshed_ninfo.hdr.nmesgs,
+               (int)refreshed_ninfo.hdr.nchunks,
                (int)refreshed_ninfo.hdr.space.total);
         PROCESS_ERROR;
     }
 
     /* Close objects */
-    if (H5Oclose(oid) < 0)
+    if (H5Oclose(oid) < 0) {
         PROCESS_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         PROCESS_ERROR;
+    }
 
     /* Return */
     return SUCCEED;
@@ -1350,10 +1604,9 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-check_for_errors(void)
+herr_t check_for_errors(void)
 {
-    FILE *file;
+    FILE* file;
 
     if ((file = fopen(ERRFILE, "r"))) {
         fclose(file);
@@ -1374,8 +1627,7 @@ check_for_errors(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-end_verification(void)
+herr_t end_verification(void)
 {
     HDremove(SIGNAL_FROM_SCRIPT);
 
@@ -1383,8 +1635,9 @@ end_verification(void)
     h5_send_message(SIGNAL_TO_SCRIPT, "VERIFICATION_DONE", "VERIFICATION_DONE");
 
     /* Wait for Signal from SCRIPT indicating that we can continue. */
-    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0)
+    if (h5_wait_message(SIGNAL_FROM_SCRIPT) < 0) {
         TEST_ERROR;
+    }
 
     return SUCCEED;
 

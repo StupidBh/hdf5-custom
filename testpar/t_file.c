@@ -25,24 +25,23 @@
  */
 #define H5AC_FRIEND /*suppress error about including H5ACpkg      */
 #include "H5ACpkg.h"
-#define H5C_FRIEND /*suppress error about including H5Cpkg      */
+#define H5C_FRIEND  /*suppress error about including H5Cpkg      */
 #include "H5Cpkg.h"
-#define H5F_FRIEND /*suppress error about including H5Fpkg      */
+#define H5F_FRIEND  /*suppress error about including H5Fpkg      */
 #define H5F_TESTING
 #include "H5Fpkg.h"
 #define H5MF_FRIEND /*suppress error about including H5MFpkg      */
 #include "H5MFpkg.h"
 
 #ifdef PB_OUT
-#define NUM_DSETS 5
+    #define NUM_DSETS 5
 #endif
 
 int mpi_size, mpi_rank;
 
 #ifdef PB_OUT
-static int create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_strategy);
-static int open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t page_size,
-                     size_t page_buffer_size);
+static int create_file(const char* filename, hid_t fcpl, hid_t fapl, int metadata_write_strategy);
+static int open_file(const char* filename, hid_t fapl, int metadata_write_strategy, hsize_t page_size, size_t page_buffer_size);
 #endif
 
 /*
@@ -56,21 +55,21 @@ static int open_file(const char *filename, hid_t fapl, int metadata_write_strate
  * according to the communicator argument, the processes will freeze up
  * sooner or later due to barrier mixed up.
  */
-void
-test_split_comm_access(void *params)
+void test_split_comm_access(void* params)
 {
-    MPI_Comm    comm;
-    MPI_Info    info = MPI_INFO_NULL;
-    int         is_old, mrc;
-    int         newrank, newprocs;
-    hid_t       fid;     /* file IDs */
-    hid_t       acc_tpl; /* File access properties */
-    herr_t      ret;     /* generic return value */
-    const char *filename;
+    MPI_Comm comm;
+    MPI_Info info = MPI_INFO_NULL;
+    int is_old, mrc;
+    int newrank, newprocs;
+    hid_t fid;     /* file IDs */
+    hid_t acc_tpl; /* File access properties */
+    herr_t ret;    /* generic return value */
+    const char* filename;
 
-    filename = ((const H5Ptest_param_t *)params)->name;
-    if (VERBOSE_MED)
+    filename = ((const H5Ptest_param_t*)params)->name;
+    if (VERBOSE_MED) {
         printf("Split Communicator access test on file %s\n", filename);
+    }
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -88,7 +87,7 @@ test_split_comm_access(void *params)
     }
 
     is_old = mpi_rank % 2;
-    mrc    = MPI_Comm_split(MPI_COMM_WORLD, is_old, mpi_rank, &comm);
+    mrc = MPI_Comm_split(MPI_COMM_WORLD, is_old, mpi_rank, &comm);
     VRFY((mrc == MPI_SUCCESS), "");
     MPI_Comm_size(comm, &newprocs);
     MPI_Comm_rank(comm, &newrank);
@@ -133,35 +132,35 @@ test_split_comm_access(void *params)
     VRFY((mrc == MPI_SUCCESS), "final MPI_Barrier succeeded");
 }
 
-void
-test_page_buffer_access(void *params)
+void test_page_buffer_access(void* params)
 {
-    const char *filename;
-    hid_t       file_id = H5I_INVALID_HID; /* File ID */
-    hid_t       fcpl, fapl;
-    herr_t      ret; /* generic return value */
+    const char* filename;
+    hid_t file_id = H5I_INVALID_HID; /* File ID */
+    hid_t fcpl, fapl;
+    herr_t ret;                      /* generic return value */
 #ifdef PB_OUT
-    size_t      page_count = 0;
-    int         i, num_elements = 200;
-    haddr_t     raw_addr, meta_addr;
-    int        *data;
-    H5F_t      *f              = NULL;
-    H5CX_node_t api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool        api_ctx_pushed = false;       /* Whether API context pushed */
+    size_t page_count = 0;
+    int i, num_elements = 200;
+    haddr_t raw_addr, meta_addr;
+    int* data;
+    H5F_t* f = NULL;
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
 #endif
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /* Until page buffering is supported in parallel in some form (even if
      * just for a single MPI process), this test just will just check to
      * make sure that an error is thrown when page buffering is enabled
      * with parallel access.
      */
-    if (VERBOSE_MED)
+    if (VERBOSE_MED) {
         printf("Page Buffer Usage in Parallel %s\n", filename);
+    }
 
     fapl = create_faccess_plist(MPI_COMM_WORLD, MPI_INFO_NULL, facc_type);
     VRFY((fapl >= 0), "create_faccess_plist succeeded");
@@ -198,27 +197,26 @@ test_page_buffer_access(void *params)
 #ifdef PB_OUT
     ret = create_file(filename, fcpl, fapl, H5AC_METADATA_WRITE_STRATEGY__DISTRIBUTED);
     VRFY((ret == 0), "");
-    ret = open_file(filename, fapl, H5AC_METADATA_WRITE_STRATEGY__DISTRIBUTED, sizeof(int) * 100,
-                    sizeof(int) * 100000);
+    ret = open_file(filename, fapl, H5AC_METADATA_WRITE_STRATEGY__DISTRIBUTED, sizeof(int) * 100, sizeof(int) * 100000);
     VRFY((ret == 0), "");
 
     ret = create_file(filename, fcpl, fapl, H5AC_METADATA_WRITE_STRATEGY__PROCESS_0_ONLY);
     VRFY((ret == 0), "");
-    ret = open_file(filename, fapl, H5AC_METADATA_WRITE_STRATEGY__PROCESS_0_ONLY, sizeof(int) * 100,
-                    sizeof(int) * 100000);
+    ret = open_file(filename, fapl, H5AC_METADATA_WRITE_STRATEGY__PROCESS_0_ONLY, sizeof(int) * 100, sizeof(int) * 100000);
     VRFY((ret == 0), "");
 
     ret = H5Pset_file_space_page_size(fcpl, sizeof(int) * 100);
     VRFY((ret == 0), "");
 
-    data = (int *)malloc(sizeof(int) * (size_t)num_elements);
+    data = (int*)malloc(sizeof(int) * (size_t)num_elements);
 
     /* initialize all the elements to have a value of -1 */
-    for (i = 0; i < num_elements; i++)
+    for (i = 0; i < num_elements; i++) {
         data[i] = -1;
+    }
     if (MAINPROCESS) {
         hid_t fapl_self = H5I_INVALID_HID;
-        fapl_self       = create_faccess_plist(MPI_COMM_SELF, MPI_INFO_NULL, facc_type);
+        fapl_self = create_faccess_plist(MPI_COMM_SELF, MPI_INFO_NULL, facc_type);
 
         ret = H5Pset_page_buffer_size(fapl_self, sizeof(int) * 1000, 0, 0);
         VRFY((ret == 0), "");
@@ -235,7 +233,7 @@ test_page_buffer_access(void *params)
         api_ctx_pushed = true;
 
         /* Get a pointer to the internal file object */
-        f = (H5F_t *)H5I_object(file_id);
+        f = (H5F_t*)H5I_object(file_id);
 
         VRFY((f->shared->page_buf != NULL), "Page Buffer created with 1 process");
 
@@ -258,8 +256,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update the first 50 elements */
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             data[i] = i;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         H5Eprint2(H5E_DEFAULT, stderr);
         VRFY((ret == 0), "");
@@ -269,8 +268,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update the second 50 elements */
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             data[i] = i + 50;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr + (sizeof(int) * 50), sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         ret = H5F_block_write(f, H5FD_MEM_SUPER, meta_addr + (sizeof(int) * 50), sizeof(int) * 50, data);
@@ -278,8 +278,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update 100 - 200 */
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 100; i++) {
             data[i] = i + 100;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr + (sizeof(int) * 100), sizeof(int) * 100, data);
         VRFY((ret == 0), "");
         ret = H5F_block_write(f, H5FD_MEM_SUPER, meta_addr + (sizeof(int) * 100), sizeof(int) * 100, data);
@@ -293,25 +294,29 @@ test_page_buffer_access(void *params)
         ret = H5F_block_read(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 200, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 200; i++)
+        for (i = 0; i < 200; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
         ret = H5F_block_read(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 200, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 200; i++)
+        for (i = 0; i < 200; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
 
         /* read elements 0 - 50 */
         ret = H5F_block_read(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
         ret = H5F_block_read(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
 
         /* close the file */
         ret = H5Fclose(file_id);
@@ -345,7 +350,7 @@ test_page_buffer_access(void *params)
         api_ctx_pushed = true;
 
         /* Get a pointer to the internal file object */
-        f = (H5F_t *)H5I_object(file_id);
+        f = (H5F_t*)H5I_object(file_id);
 
         VRFY((f->shared->page_buf != NULL), "Page Buffer created with 1 process");
 
@@ -366,8 +371,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update the first 50 elements */
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             data[i] = i;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         ret = H5F_block_write(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 50, data);
@@ -375,8 +381,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update the second 50 elements */
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             data[i] = i + 50;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr + (sizeof(int) * 50), sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         ret = H5F_block_write(f, H5FD_MEM_SUPER, meta_addr + (sizeof(int) * 50), sizeof(int) * 50, data);
@@ -384,8 +391,9 @@ test_page_buffer_access(void *params)
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
 
         /* update 100 - 200 */
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 100; i++) {
             data[i] = i + 100;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr + (sizeof(int) * 100), sizeof(int) * 100, data);
         VRFY((ret == 0), "");
         ret = H5F_block_write(f, H5FD_MEM_SUPER, meta_addr + (sizeof(int) * 100), sizeof(int) * 100, data);
@@ -399,31 +407,36 @@ test_page_buffer_access(void *params)
         ret = H5F_block_read(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 200, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 200; i++)
+        for (i = 0; i < 200; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
         ret = H5F_block_read(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 200, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 200; i++)
+        for (i = 0; i < 200; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
 
         /* read elements 0 - 50 */
         ret = H5F_block_read(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
         ret = H5F_block_read(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         page_count += 1;
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == i), "Read different values than written");
+        }
 
         MPI_Barrier(MPI_COMM_WORLD);
         /* reset the first 50 elements to -1*/
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             data[i] = -1;
+        }
         ret = H5F_block_write(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
@@ -435,13 +448,15 @@ test_page_buffer_access(void *params)
         ret = H5F_block_read(f, H5FD_MEM_DRAW, raw_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == -1), "Read different values than written");
+        }
         ret = H5F_block_read(f, H5FD_MEM_SUPER, meta_addr, sizeof(int) * 50, data);
         VRFY((ret == 0), "");
         VRFY((H5SL_count(f->shared->page_buf->slist_ptr) == page_count), "Wrong number of pages in PB");
-        for (i = 0; i < 50; i++)
+        for (i = 0; i < 50; i++) {
             VRFY((data[i] == -1), "Read different values than written");
+        }
 
         /* close the file */
         ret = H5Fclose(file_id);
@@ -467,26 +482,25 @@ test_page_buffer_access(void *params)
 }
 
 #ifdef PB_OUT
-static int
-create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_strategy)
+static int create_file(const char* filename, hid_t fcpl, hid_t fapl, int metadata_write_strategy)
 {
-    hid_t               file_id, dset_id, grp_id;
-    hid_t               sid, mem_dataspace;
-    hsize_t             start[RANK];
-    hsize_t             count[RANK];
-    hsize_t             stride[RANK];
-    hsize_t             block[RANK];
-    DATATYPE           *data_array = NULL;
-    hsize_t             dims[RANK], i;
-    hsize_t             num_elements;
-    int                 k;
-    char                dset_name[20];
-    H5F_t              *f         = NULL;
-    H5C_t              *cache_ptr = NULL;
+    hid_t file_id, dset_id, grp_id;
+    hid_t sid, mem_dataspace;
+    hsize_t start[RANK];
+    hsize_t count[RANK];
+    hsize_t stride[RANK];
+    hsize_t block[RANK];
+    DATATYPE* data_array = NULL;
+    hsize_t dims[RANK], i;
+    hsize_t num_elements;
+    int k;
+    char dset_name[20];
+    H5F_t* f = NULL;
+    H5C_t* cache_ptr = NULL;
     H5AC_cache_config_t config;
-    H5CX_node_t         api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool                api_ctx_pushed = false;       /* Whether API context pushed */
-    herr_t              ret;
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
+    herr_t ret;
 
     file_id = H5Fcreate(filename, H5F_ACC_TRUNC, fcpl, fapl);
     VRFY((file_id >= 0), "");
@@ -499,7 +513,7 @@ create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_str
     VRFY((ret == 0), "H5CX_push()");
     api_ctx_pushed = true;
 
-    f = (H5F_t *)H5I_object(file_id);
+    f = (H5F_t*)H5I_object(file_id);
     VRFY((f != NULL), "");
 
     cache_ptr = f->shared->cache;
@@ -521,26 +535,27 @@ create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_str
 
     dims[0] = (hsize_t)(ROW_FACTOR * mpi_size);
     dims[1] = (hsize_t)(COL_FACTOR * mpi_size);
-    sid     = H5Screate_simple(RANK, dims, NULL);
+    sid = H5Screate_simple(RANK, dims, NULL);
     VRFY((sid >= 0), "H5Screate_simple succeeded");
 
     /* Each process takes a slabs of rows. */
-    block[0]  = dims[0] / (hsize_t)mpi_size;
-    block[1]  = dims[1];
+    block[0] = dims[0] / (hsize_t)mpi_size;
+    block[1] = dims[1];
     stride[0] = block[0];
     stride[1] = block[1];
-    count[0]  = 1;
-    count[1]  = 1;
-    start[0]  = (hsize_t)mpi_rank * block[0];
-    start[1]  = 0;
+    count[0] = 1;
+    count[1] = 1;
+    start[0] = (hsize_t)mpi_rank * block[0];
+    start[1] = 0;
 
     num_elements = block[0] * block[1];
     /* allocate memory for data buffer */
-    data_array = (DATATYPE *)malloc(num_elements * sizeof(DATATYPE));
+    data_array = (DATATYPE*)malloc(num_elements * sizeof(DATATYPE));
     VRFY((data_array != NULL), "data_array malloc succeeded");
     /* put some trivial data in the data_array */
-    for (i = 0; i < num_elements; i++)
+    for (i = 0; i < num_elements; i++) {
         data_array[i] = mpi_rank + 1;
+    }
 
     ret = H5Sselect_hyperslab(sid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "H5Sset_hyperslab succeeded");
@@ -588,8 +603,9 @@ create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_str
         ret = H5Dclose(dset_id);
         VRFY((ret == 0), "");
 
-        for (i = 0; i < num_elements; i++)
+        for (i = 0; i < num_elements; i++) {
             VRFY((data_array[i] == mpi_rank + 1), "Dataset Verify failed");
+        }
 
         snprintf(dset_name, sizeof(dset_name), "D1dset%d", k);
         ret = H5Ldelete(grp_id, dset_name, H5P_DEFAULT);
@@ -623,30 +639,28 @@ create_file(const char *filename, hid_t fcpl, hid_t fapl, int metadata_write_str
     return 0;
 } /* create_file */
 
-static int
-open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t page_size,
-          size_t page_buffer_size)
+static int open_file(const char* filename, hid_t fapl, int metadata_write_strategy, hsize_t page_size, size_t page_buffer_size)
 {
-    hid_t               file_id, dset_id, grp_id, grp_id2;
-    hid_t               sid, mem_dataspace;
-    DATATYPE           *data_array = NULL;
-    hsize_t             dims[RANK];
-    hsize_t             start[RANK];
-    hsize_t             count[RANK];
-    hsize_t             stride[RANK];
-    hsize_t             block[RANK];
-    int                 i, k, ndims;
-    hsize_t             num_elements;
-    char                dset_name[20];
-    H5F_t              *f         = NULL;
-    H5C_t              *cache_ptr = NULL;
+    hid_t file_id, dset_id, grp_id, grp_id2;
+    hid_t sid, mem_dataspace;
+    DATATYPE* data_array = NULL;
+    hsize_t dims[RANK];
+    hsize_t start[RANK];
+    hsize_t count[RANK];
+    hsize_t stride[RANK];
+    hsize_t block[RANK];
+    int i, k, ndims;
+    hsize_t num_elements;
+    char dset_name[20];
+    H5F_t* f = NULL;
+    H5C_t* cache_ptr = NULL;
     H5AC_cache_config_t config;
-    H5CX_node_t         api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool                api_ctx_pushed = false;       /* Whether API context pushed */
-    herr_t              ret;
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
+    herr_t ret;
 
     config.version = H5AC__CURR_CACHE_CONFIG_VERSION;
-    ret            = H5Pget_mdc_config(fapl, &config);
+    ret = H5Pget_mdc_config(fapl, &config);
     VRFY((ret == 0), "");
 
     config.metadata_write_strategy = metadata_write_strategy;
@@ -666,7 +680,7 @@ open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t
     ret = H5Fflush(file_id, H5F_SCOPE_GLOBAL);
     VRFY((ret == 0), "");
 
-    f = (H5F_t *)H5I_object(file_id);
+    f = (H5F_t*)H5I_object(file_id);
     VRFY((f != NULL), "");
 
     cache_ptr = f->shared->cache;
@@ -684,18 +698,18 @@ open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t
     dims[1] = (hsize_t)(COL_FACTOR * mpi_size);
 
     /* Each process takes a slabs of rows. */
-    block[0]  = dims[0] / (hsize_t)mpi_size;
-    block[1]  = dims[1];
+    block[0] = dims[0] / (hsize_t)mpi_size;
+    block[1] = dims[1];
     stride[0] = block[0];
     stride[1] = block[1];
-    count[0]  = 1;
-    count[1]  = 1;
-    start[0]  = (hsize_t)mpi_rank * block[0];
-    start[1]  = 0;
+    count[0] = 1;
+    count[1] = 1;
+    start[0] = (hsize_t)mpi_rank * block[0];
+    start[1] = 0;
 
     num_elements = block[0] * block[1];
     /* allocate memory for data buffer */
-    data_array = (DATATYPE *)malloc(num_elements * sizeof(DATATYPE));
+    data_array = (DATATYPE*)malloc(num_elements * sizeof(DATATYPE));
     VRFY((data_array != NULL), "data_array malloc succeeded");
 
     /* create a memory dataspace independently */
@@ -726,8 +740,9 @@ open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t
         ret = H5Sclose(sid);
         VRFY((ret == 0), "");
 
-        for (i = 0; i < (int)num_elements; i++)
+        for (i = 0; i < (int)num_elements; i++) {
             VRFY((data_array[i] == mpi_rank + 1), "Dataset Verify failed");
+        }
     }
 
     grp_id2 = H5Gcreate2(file_id, "GROUP/GROUP2", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -743,7 +758,7 @@ open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t
      * working inward.
      */
     for (i = 0; i < H5C__HASH_TABLE_LEN; i++) {
-        H5C_cache_entry_t *entry_ptr = NULL;
+        H5C_cache_entry_t* entry_ptr = NULL;
 
         entry_ptr = cache_ptr->index[i];
 
@@ -792,22 +807,21 @@ open_file(const char *filename, hid_t fapl, int metadata_write_strategy, hsize_t
  *        incoming fapl that could conflict with the existing values in H5F_shared_t on
  *        multiple opens of the same file.
  */
-void
-test_file_properties(void *params)
+void test_file_properties(void* params)
 {
-    hid_t       fid          = H5I_INVALID_HID; /* HDF5 file ID */
-    hid_t       fapl_id      = H5I_INVALID_HID; /* File access plist */
-    hid_t       fapl_copy_id = H5I_INVALID_HID; /* File access plist */
-    bool        is_coll;
-    htri_t      are_equal;
-    const char *filename;
-    MPI_Comm    comm     = MPI_COMM_WORLD;
-    MPI_Info    info     = MPI_INFO_NULL;
-    MPI_Comm    comm_out = MPI_COMM_NULL;
-    MPI_Info    info_out = MPI_INFO_NULL;
-    herr_t      ret;     /* Generic return value */
-    int         mpi_ret; /* MPI return value */
-    int         cmp;     /* Compare value */
+    hid_t fid = H5I_INVALID_HID;          /* HDF5 file ID */
+    hid_t fapl_id = H5I_INVALID_HID;      /* File access plist */
+    hid_t fapl_copy_id = H5I_INVALID_HID; /* File access plist */
+    bool is_coll;
+    htri_t are_equal;
+    const char* filename;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    MPI_Comm comm_out = MPI_COMM_NULL;
+    MPI_Info info_out = MPI_INFO_NULL;
+    herr_t ret;  /* Generic return value */
+    int mpi_ret; /* MPI return value */
+    int cmp;     /* Compare value */
 
     /* set up MPI parameters */
     mpi_ret = MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -826,7 +840,7 @@ test_file_properties(void *params)
         return;
     }
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     mpi_ret = MPI_Info_create(&info);
     VRFY((mpi_ret >= 0), "MPI_Info_create succeeded");
@@ -849,7 +863,7 @@ test_file_properties(void *params)
 
     /* Check the communicator */
     VRFY((comm != comm_out), "Communicators should not be bitwise identical");
-    cmp     = MPI_UNEQUAL;
+    cmp = MPI_UNEQUAL;
     mpi_ret = MPI_Comm_compare(comm, comm_out, &cmp);
     VRFY((ret >= 0), "MPI_Comm_compare succeeded");
     VRFY((cmp == MPI_CONGRUENT), "Communicators should be congruent via MPI_Comm_compare");
@@ -997,18 +1011,17 @@ test_file_properties(void *params)
 
 } /* end test_file_properties() */
 
-void
-test_delete(void *params)
+void test_delete(void* params)
 {
-    hid_t       fid           = H5I_INVALID_HID; /* HDF5 file ID */
-    hid_t       fapl_id       = H5I_INVALID_HID; /* File access plist */
-    const char *filename      = NULL;
-    MPI_Comm    comm          = MPI_COMM_WORLD;
-    MPI_Info    info          = MPI_INFO_NULL;
-    htri_t      is_accessible = FAIL; /* Whether a file is accessible */
-    herr_t      ret;                  /* Generic return value */
+    hid_t fid = H5I_INVALID_HID;     /* HDF5 file ID */
+    hid_t fapl_id = H5I_INVALID_HID; /* File access plist */
+    const char* filename = NULL;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    htri_t is_accessible = FAIL; /* Whether a file is accessible */
+    herr_t ret;                  /* Generic return value */
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -1018,8 +1031,9 @@ test_delete(void *params)
     if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file or file more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file or file more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -1077,18 +1091,17 @@ test_delete(void *params)
  * to occur when the library fails to create a file in parallel
  * due to an invalid library version bounds setting
  */
-void
-test_invalid_libver_bounds_file_close_assert(void *params)
+void test_invalid_libver_bounds_file_close_assert(void* params)
 {
-    const char *filename = NULL;
-    MPI_Comm    comm     = MPI_COMM_WORLD;
-    MPI_Info    info     = MPI_INFO_NULL;
-    herr_t      ret;
-    hid_t       fid     = H5I_INVALID_HID;
-    hid_t       fapl_id = H5I_INVALID_HID;
-    hid_t       fcpl_id = H5I_INVALID_HID;
+    const char* filename = NULL;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    herr_t ret;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t fcpl_id = H5I_INVALID_HID;
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -1127,17 +1140,16 @@ test_invalid_libver_bounds_file_close_assert(void *params)
  * Tests that H5Pevict_on_close properly succeeds in serial/one rank and fails when
  * called by multiple ranks.
  */
-void
-test_evict_on_close_parallel_unsupp(void *params)
+void test_evict_on_close_parallel_unsupp(void* params)
 {
-    const char *filename = NULL;
-    MPI_Comm    comm     = MPI_COMM_WORLD;
-    MPI_Info    info     = MPI_INFO_NULL;
-    hid_t       fid      = H5I_INVALID_HID;
-    hid_t       fapl_id  = H5I_INVALID_HID;
-    herr_t      ret;
+    const char* filename = NULL;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    herr_t ret;
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -1187,26 +1199,25 @@ test_evict_on_close_parallel_unsupp(void *params)
  * as described in issue #3025
  * This is a test program from the user.
  */
-void
-test_fapl_preserve_hints(void *params)
+void test_fapl_preserve_hints(void* params)
 {
-    const char *filename;
-    const char *key       = "hdf_info_fapl";
-    const char *value     = "xyz";
-    MPI_Info    info_used = MPI_INFO_NULL;
-    MPI_Info    info      = MPI_INFO_NULL;
-    hid_t       fid       = H5I_INVALID_HID; /* HDF5 file ID */
-    hid_t       fapl_id   = H5I_INVALID_HID; /* File access plist */
-    char        key_used[MPI_MAX_INFO_KEY + 1];
-    char       *value_used = NULL;
-    bool        same       = false;
-    int         flag       = -1;
-    int         nkeys_used;
-    int         i;
-    int         mpi_ret; /* MPI return value */
-    herr_t      ret;     /* Generic return value */
+    const char* filename;
+    const char* key = "hdf_info_fapl";
+    const char* value = "xyz";
+    MPI_Info info_used = MPI_INFO_NULL;
+    MPI_Info info = MPI_INFO_NULL;
+    hid_t fid = H5I_INVALID_HID;     /* HDF5 file ID */
+    hid_t fapl_id = H5I_INVALID_HID; /* File access plist */
+    char key_used[MPI_MAX_INFO_KEY + 1];
+    char* value_used = NULL;
+    bool same = false;
+    int flag = -1;
+    int nkeys_used;
+    int i;
+    int mpi_ret; /* MPI return value */
+    herr_t ret;  /* Generic return value */
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     value_used = malloc(MPI_MAX_INFO_VAL + 1);
     VRFY(value_used, "malloc succeeded");
@@ -1243,7 +1254,6 @@ test_fapl_preserve_hints(void *params)
 
     /* Loop over the # of keys */
     for (i = 0; i < nkeys_used; i++) {
-
         /* Memset the buffers to zero */
         memset(key_used, 0, MPI_MAX_INFO_KEY + 1);
         memset(value_used, 0, MPI_MAX_INFO_VAL + 1);
@@ -1257,7 +1267,6 @@ test_fapl_preserve_hints(void *params)
             VRFY((mpi_ret == MPI_SUCCESS), "MPI_Info_get succeeded");
 
             if (!strcmp(value_used, value)) {
-
                 /* Both key_used and value_used are the same */
                 same = true;
                 break;

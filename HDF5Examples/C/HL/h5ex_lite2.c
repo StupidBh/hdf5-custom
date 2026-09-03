@@ -15,13 +15,12 @@
 
 #define FILENAME "h5ex_lite1.h5"
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file_id;
-    int     data[6];
+    hid_t file_id;
+    int data[6];
     hsize_t dims[2];
-    size_t  i, j, nrow, n_values;
+    size_t i, j, nrow, n_values;
 
     /* open file from ex_lite1.c */
     file_id = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -34,10 +33,11 @@ main(void)
 
     /* print it by rows */
     n_values = (size_t)(dims[0] * dims[1]);
-    nrow     = (size_t)dims[1];
+    nrow = (size_t)dims[1];
     for (i = 0; i < n_values / nrow; i++) {
-        for (j = 0; j < nrow; j++)
+        for (j = 0; j < nrow; j++) {
             printf("  %d", data[i * nrow + j]);
+        }
         printf("\n");
     }
 

@@ -16,7 +16,7 @@
 
 #include "H5CXprivate.h" /* API Contexts                         */
 
-static const char *FILENAME[] = {"unregister_filter_1", "unregister_filter_2", NULL};
+static const char* FILENAME[] = { "unregister_filter_1", "unregister_filter_2", NULL };
 
 #define GROUP_NAME        "test_group"
 #define DSET_NAME         "test_dataset"
@@ -29,19 +29,19 @@ static const char *FILENAME[] = {"unregister_filter_1", "unregister_filter_2", N
 
 #define H5Z_FILTER_DUMMY 312
 
-static size_t do_nothing(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values, size_t nbytes,
-                         size_t *buf_size, void **buf);
+static size_t do_nothing(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf);
 
 /* Dummy filter for test_unregister_filters only */
-static const H5Z_class2_t H5Z_DUMMY[1] = {{
+static const H5Z_class2_t H5Z_DUMMY[1] = { {
     H5Z_CLASS_T_VERS, /* H5Z_class_t version              */
     H5Z_FILTER_DUMMY, /* Filter ID number                 */
-    1, 1,             /* Encoding and decoding enabled    */
+    1,
+    1,                /* Encoding and decoding enabled    */
     "dummy",          /* Filter name for debugging        */
     NULL,             /* The "can apply" callback         */
     NULL,             /* The "set local" callback         */
     do_nothing,       /* The actual filter function       */
-}};
+} };
 
 /*-------------------------------------------------------------------------
  * Function:    do_nothing
@@ -54,10 +54,12 @@ static const H5Z_class2_t H5Z_DUMMY[1] = {{
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-do_nothing(unsigned int H5_ATTR_UNUSED flags, size_t H5_ATTR_UNUSED cd_nelmts,
-           const unsigned int H5_ATTR_UNUSED *cd_values, size_t nbytes, size_t H5_ATTR_UNUSED *buf_size,
-           void H5_ATTR_UNUSED **buf)
+static size_t do_nothing(unsigned int H5_ATTR_UNUSED flags,
+                         size_t H5_ATTR_UNUSED cd_nelmts,
+                         const unsigned int H5_ATTR_UNUSED* cd_values,
+                         size_t nbytes,
+                         size_t H5_ATTR_UNUSED* buf_size,
+                         void H5_ATTR_UNUSED** buf)
 {
     return nbytes;
 }
@@ -71,78 +73,90 @@ do_nothing(unsigned int H5_ATTR_UNUSED flags, size_t H5_ATTR_UNUSED cd_nelmts,
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_unregister_filters(hid_t fapl_id)
+static herr_t test_unregister_filters(hid_t fapl_id)
 {
-    hid_t         fid1     = H5I_INVALID_HID;
-    hid_t         fid2     = H5I_INVALID_HID;
-    hid_t         dcpl_id  = H5I_INVALID_HID;
-    hid_t         gcpl_id  = H5I_INVALID_HID;
-    hid_t         gid      = H5I_INVALID_HID;
-    hid_t         gid_loop = H5I_INVALID_HID;
-    hid_t         did      = H5I_INVALID_HID;
-    hid_t         sid      = H5I_INVALID_HID;
-    int           i, j, n;
-    char          group_name[32];
-    char          filename[FILENAME_BUF_SIZE];
-    const hsize_t chunk_dims[2] = {FILTER_CHUNK_DIM1, FILTER_CHUNK_DIM2}; /* Chunk dimensions */
-    hsize_t       dims[2];
-    int         **buf      = NULL;
-    int          *buf_data = NULL;
-    herr_t        ret;
+    hid_t fid1 = H5I_INVALID_HID;
+    hid_t fid2 = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    hid_t gcpl_id = H5I_INVALID_HID;
+    hid_t gid = H5I_INVALID_HID;
+    hid_t gid_loop = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    hid_t sid = H5I_INVALID_HID;
+    int i, j, n;
+    char group_name[32];
+    char filename[FILENAME_BUF_SIZE];
+    const hsize_t chunk_dims[2] = { FILTER_CHUNK_DIM1, FILTER_CHUNK_DIM2 }; /* Chunk dimensions */
+    hsize_t dims[2];
+    int** buf = NULL;
+    int* buf_data = NULL;
+    herr_t ret;
 
     TESTING("Unregistering filter");
 
     /* Set up data array */
-    if (NULL == (buf_data = (int *)calloc(DSET_DIM1 * DSET_DIM2, sizeof(int))))
+    if (NULL == (buf_data = (int*)calloc(DSET_DIM1 * DSET_DIM2, sizeof(int)))) {
         TEST_ERROR;
-    if (NULL == (buf = (int **)calloc(DSET_DIM1, sizeof(buf_data))))
+    }
+    if (NULL == (buf = (int**)calloc(DSET_DIM1, sizeof(buf_data)))) {
         TEST_ERROR;
-    for (i = 0; i < DSET_DIM1; i++)
+    }
+    for (i = 0; i < DSET_DIM1; i++) {
         buf[i] = buf_data + (i * DSET_DIM2);
+    }
 
     /* Create first file */
     h5_fixname(FILENAME[0], fapl_id, filename, sizeof(filename));
-    if ((fid1 = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0)
+    if ((fid1 = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0) {
         goto error;
+    }
 
     /* Create second file */
     h5_fixname(FILENAME[1], fapl_id, filename, sizeof(filename));
-    if ((fid2 = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0)
+    if ((fid2 = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0) {
         goto error;
+    }
 
     /* Register DUMMY filter */
-    if (H5Zregister(H5Z_DUMMY) < 0)
+    if (H5Zregister(H5Z_DUMMY) < 0) {
         goto error;
-    if (H5Zfilter_avail(H5Z_FILTER_DUMMY) != true)
+    }
+    if (H5Zfilter_avail(H5Z_FILTER_DUMMY) != true) {
         goto error;
+    }
 
     /*******************
      * PART 1 - GROUPS *
      *******************/
 
     /* Use DUMMY filter for creating groups */
-    if ((gcpl_id = H5Pcreate(H5P_GROUP_CREATE)) < 0)
+    if ((gcpl_id = H5Pcreate(H5P_GROUP_CREATE)) < 0) {
         goto error;
-    if (H5Pset_filter(gcpl_id, H5Z_FILTER_DUMMY, H5Z_FLAG_MANDATORY, (size_t)0, NULL) < 0)
+    }
+    if (H5Pset_filter(gcpl_id, H5Z_FILTER_DUMMY, H5Z_FLAG_MANDATORY, (size_t)0, NULL) < 0) {
         goto error;
+    }
 
     /* Create a group using this filter */
-    if ((gid = H5Gcreate2(fid1, GROUP_NAME, H5P_DEFAULT, gcpl_id, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid1, GROUP_NAME, H5P_DEFAULT, gcpl_id, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Create multiple groups under the main group */
     for (i = 0; i < GROUP_ITERATION; i++) {
         snprintf(group_name, sizeof(group_name), "group_%d", i);
-        if ((gid_loop = H5Gcreate2(gid, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((gid_loop = H5Gcreate2(gid, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto error;
-        if (H5Gclose(gid_loop) < 0)
+        }
+        if (H5Gclose(gid_loop) < 0) {
             goto error;
+        }
     }
 
     /* Flush the file containing the groups */
-    if (H5Fflush(fid1, H5F_SCOPE_GLOBAL) < 0)
+    if (H5Fflush(fid1, H5F_SCOPE_GLOBAL) < 0) {
         goto error;
+    }
 
     /* Unregister the filter before closing the group.  It should fail */
     H5E_BEGIN_TRY
@@ -157,43 +171,53 @@ test_unregister_filters(hid_t fapl_id)
     }
 
     /* Close the group */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         goto error;
+    }
 
     /* Clean up objects used for this test */
-    if (H5Pclose(gcpl_id) < 0)
+    if (H5Pclose(gcpl_id) < 0) {
         goto error;
+    }
 
     /*********************
      * PART 2 - DATASETS *
      *********************/
 
     /* Use DUMMY filter for creating datasets */
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
-    if (H5Pset_chunk(dcpl_id, 2, chunk_dims) < 0)
+    }
+    if (H5Pset_chunk(dcpl_id, 2, chunk_dims) < 0) {
         goto error;
-    if (H5Pset_filter(dcpl_id, H5Z_FILTER_DUMMY, 0, (size_t)0, NULL) < 0)
+    }
+    if (H5Pset_filter(dcpl_id, H5Z_FILTER_DUMMY, 0, (size_t)0, NULL) < 0) {
         goto error;
+    }
 
     /* Initialize the data for writing */
-    for (i = n = 0; i < DSET_DIM1; i++)
-        for (j = 0; j < DSET_DIM2; j++)
+    for (i = n = 0; i < DSET_DIM1; i++) {
+        for (j = 0; j < DSET_DIM2; j++) {
             buf[i][j] = n++;
+        }
+    }
 
     /* Create the dataspace */
     dims[0] = DSET_DIM1;
     dims[1] = DSET_DIM2;
-    if ((sid = H5Screate_simple(2, dims, NULL)) < 0)
+    if ((sid = H5Screate_simple(2, dims, NULL)) < 0) {
         goto error;
+    }
 
     /* Create a dataset in the first file */
-    if ((did = H5Dcreate2(fid1, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid1, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Write the data to the dataset */
-    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_data) < 0)
+    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_data) < 0) {
         goto error;
+    }
 
     /* Unregister the filter before closing the dataset.  It should fail */
     H5E_BEGIN_TRY
@@ -208,34 +232,42 @@ test_unregister_filters(hid_t fapl_id)
     }
 
     /* Close the dataset */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto error;
+    }
 
     /* Create a dataset in the second file */
-    if ((did = H5Dcreate2(fid2, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0)
+    if ((did = H5Dcreate2(fid2, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl_id, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Write the data to the dataset */
-    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_data) < 0)
+    if (H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_data) < 0) {
         goto error;
+    }
 
     /* Close the dataset in the second file */
-    if (H5Dclose(did) < 0)
+    if (H5Dclose(did) < 0) {
         goto error;
+    }
 
     /* Unregister the filter after closing all objects but before closing files.
      * It should flush all files.
      */
-    if (H5Zunregister(H5Z_FILTER_DUMMY) < 0)
+    if (H5Zunregister(H5Z_FILTER_DUMMY) < 0) {
         goto error;
+    }
 
     /* Clean up objects used for this test */
-    if (H5Pclose(dcpl_id) < 0)
+    if (H5Pclose(dcpl_id) < 0) {
         goto error;
-    if (H5Fclose(fid1) < 0)
+    }
+    if (H5Fclose(fid1) < 0) {
         goto error;
-    if (H5Fclose(fid2) < 0)
+    }
+    if (H5Fclose(fid2) < 0) {
         goto error;
+    }
 
     free(buf);
     free(buf_data);
@@ -272,21 +304,21 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hid_t       fapl_id        = H5I_INVALID_HID;
-    int         nerrors        = 0;
-    H5CX_node_t api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool        api_ctx_pushed = false;       /* Whether API context pushed */
+    hid_t fapl_id = H5I_INVALID_HID;
+    int nerrors = 0;
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
 
     /* Testing setup */
     h5_test_init();
     fapl_id = h5_fileaccess();
 
     /* Push API context */
-    if (H5CX_push(&api_ctx) < 0)
+    if (H5CX_push(&api_ctx) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = true;
 
     /* Test unregistering filter in its own file */
@@ -294,13 +326,15 @@ main(void)
 
     h5_cleanup(FILENAME, fapl_id);
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
     printf("All filter unregistration tests passed.\n");
 
     /* Pop API context */
-    if (api_ctx_pushed && H5CX_pop(false) < 0)
+    if (api_ctx_pushed && H5CX_pop(false) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = false;
 
     exit(EXIT_SUCCESS);
@@ -309,8 +343,9 @@ error:
     nerrors = MAX(1, nerrors);
     printf("***** %d FILTER UNREGISTRATION TEST%s FAILED! *****\n", nerrors, 1 == nerrors ? "" : "S");
 
-    if (api_ctx_pushed)
+    if (api_ctx_pushed) {
         H5CX_pop(false);
+    }
 
     exit(EXIT_FAILURE);
 } /* end main() */

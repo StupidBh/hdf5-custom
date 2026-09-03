@@ -65,8 +65,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5B2_stat_info(H5B2_t *bt2, H5B2_stat_t *info)
+herr_t H5B2_stat_info(H5B2_t* bt2, H5B2_stat_t* info)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -74,7 +73,7 @@ H5B2_stat_info(H5B2_t *bt2, H5B2_stat_t *info)
     assert(info);
 
     /* Get information about the B-tree */
-    info->depth    = bt2->hdr->depth;
+    info->depth = bt2->hdr->depth;
     info->nrecords = bt2->hdr->root.all_nrec;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -90,11 +89,10 @@ H5B2_stat_info(H5B2_t *bt2, H5B2_stat_t *info)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5B2_size(H5B2_t *bt2, hsize_t *btree_size)
+herr_t H5B2_size(H5B2_t* bt2, hsize_t* btree_size)
 {
-    H5B2_hdr_t *hdr;                 /* Pointer to the B-tree header */
-    herr_t      ret_value = SUCCEED; /* Return value */
+    H5B2_hdr_t* hdr;            /* Pointer to the B-tree header */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -114,12 +112,14 @@ H5B2_size(H5B2_t *bt2, hsize_t *btree_size)
     /* Iterate through records */
     if (hdr->root.node_nrec > 0) {
         /* Check for root node being a leaf */
-        if (hdr->depth == 0)
+        if (hdr->depth == 0) {
             *btree_size += hdr->node_size;
+        }
         else
             /* Iterate through nodes */
-            if (H5B2__node_size(hdr, hdr->depth, &hdr->root, hdr, btree_size) < 0)
+            if (H5B2__node_size(hdr, hdr->depth, &hdr->root, hdr, btree_size) < 0) {
                 HGOTO_ERROR(H5E_BTREE, H5E_CANTLIST, FAIL, "node iteration failed");
+            }
     } /* end if */
 
 done:

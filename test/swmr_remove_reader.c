@@ -41,9 +41,8 @@ static hid_t symbol_tid = H5I_INVALID_HID;
 /* Local Prototypes */
 /********************/
 
-static int  check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *record, hid_t rec_sid);
-static int  read_records(const char *filename, unsigned verbose, unsigned long nseconds, unsigned poll_time,
-                         unsigned ncommon, unsigned nrandom);
+static int check_dataset(hid_t fid, unsigned verbose, const char* sym_name, symbol_t* record, hid_t rec_sid);
+static int read_records(const char* filename, unsigned verbose, unsigned long nseconds, unsigned poll_time, unsigned ncommon, unsigned nrandom);
 static void usage(void);
 
 /*-------------------------------------------------------------------------
@@ -75,13 +74,12 @@ static void usage(void);
  *
  *-------------------------------------------------------------------------
  */
-static int
-check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *record, hid_t rec_sid)
+static int check_dataset(hid_t fid, unsigned verbose, const char* sym_name, symbol_t* record, hid_t rec_sid)
 {
-    hid_t    dsid;                                 /* Dataset ID */
-    hid_t    file_sid;                             /* Dataset's space ID */
-    hssize_t snpoints;                             /* Number of elements in dataset */
-    hsize_t  start[2] = {0, 0}, count[2] = {1, 1}; /* Hyperslab selection values */
+    hid_t dsid;                                       /* Dataset ID */
+    hid_t file_sid;                                   /* Dataset's space ID */
+    hssize_t snpoints;                                /* Number of elements in dataset */
+    hsize_t start[2] = { 0, 0 }, count[2] = { 1, 1 }; /* Hyperslab selection values */
 
     assert(fid >= 0);
     assert(sym_name);
@@ -89,32 +87,38 @@ check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *recor
     assert(rec_sid >= 0);
 
     /* Open dataset for symbol */
-    if ((dsid = H5Dopen2(fid, sym_name, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, sym_name, H5P_DEFAULT)) < 0) {
         return -1;
+    }
 
     /* Get the dataset's dataspace */
-    if ((file_sid = H5Dget_space(dsid)) < 0)
+    if ((file_sid = H5Dget_space(dsid)) < 0) {
         return -1;
+    }
 
     /* Get the number of elements (= records, for 1-D datasets) */
-    if ((snpoints = H5Sget_simple_extent_npoints(file_sid)) < 0)
+    if ((snpoints = H5Sget_simple_extent_npoints(file_sid)) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Symbol = '%s', # of records = %lld\n", sym_name, (long long)snpoints);
+    }
 
     /* Check if there are records for symbol */
     if (snpoints > 0) {
         /* Choose a random record in the dataset, choosing the last record half
          * the time */
         start[1] = (hsize_t)(rand() % (snpoints * 2));
-        if (start[1] > (hsize_t)(snpoints - 1))
+        if (start[1] > (hsize_t)(snpoints - 1)) {
             start[1] = (hsize_t)(snpoints - 1);
-        if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0)
+        }
+        if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0) {
             return -1;
+        }
 
-            /* Read record from dataset */
+        /* Read record from dataset */
 #ifdef FILLVAL_WORKS
         /* When shrinking the dataset, we cannot guarantee that the buffer will
          * even be touched, unless there is a fill value.  Since fill values do
@@ -124,8 +128,9 @@ check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *recor
 #else  /* FILLVAL_WORKS */
         record->rec_id = (uint64_t)0;
 #endif /* FILLVAL_WORKS */
-        if (H5Dread(dsid, symbol_tid, rec_sid, file_sid, H5P_DEFAULT, record) < 0)
+        if (H5Dread(dsid, symbol_tid, rec_sid, file_sid, H5P_DEFAULT, record) < 0) {
             return -1;
+        }
 
         /* Verify record value - note that it may be the fill value, because the
          * chunk may be deleted before the object header has the updated
@@ -133,19 +138,20 @@ check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *recor
         if (record->rec_id != start[1] && record->rec_id != (uint64_t)0) {
             fprintf(stderr, "*** ERROR ***\n");
             fprintf(stderr, "Incorrect record value!\n");
-            fprintf(stderr, "Symbol = '%s', # of records = %lld, record->rec_id = %llx\n", sym_name,
-                    (long long)snpoints, (unsigned long long)record->rec_id);
+            fprintf(stderr, "Symbol = '%s', # of records = %lld, record->rec_id = %llx\n", sym_name, (long long)snpoints, (unsigned long long)record->rec_id);
             return -1;
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     /* Close the dataset's dataspace */
-    if (H5Sclose(file_sid) < 0)
+    if (H5Sclose(file_sid) < 0) {
         return -1;
+    }
 
     /* Close dataset for symbol */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         return -1;
+    }
 
     return 0;
 } /* end check_dataset() */
@@ -185,19 +191,17 @@ check_dataset(hid_t fid, unsigned verbose, const char *sym_name, symbol_t *recor
  *
  *-------------------------------------------------------------------------
  */
-static int
-read_records(const char *filename, unsigned verbose, unsigned long nseconds, unsigned poll_time,
-             unsigned ncommon, unsigned nrandom)
+static int read_records(const char* filename, unsigned verbose, unsigned long nseconds, unsigned poll_time, unsigned ncommon, unsigned nrandom)
 {
-    time_t          start_time;      /* Starting time */
-    time_t          curr_time;       /* Current time */
-    symbol_info_t **sym_com  = NULL; /* Pointers to array of common dataset IDs */
-    symbol_info_t **sym_rand = NULL; /* Pointers to array of random dataset IDs */
-    hid_t           mem_sid;         /* Memory dataspace ID */
-    hid_t           fid;             /* SWMR test file ID */
-    hid_t           fapl;            /* File access property list */
-    symbol_t        record;          /* The record to add to the dataset */
-    unsigned        v;               /* Local index variable */
+    time_t start_time;               /* Starting time */
+    time_t curr_time;                /* Current time */
+    symbol_info_t** sym_com = NULL;  /* Pointers to array of common dataset IDs */
+    symbol_info_t** sym_rand = NULL; /* Pointers to array of random dataset IDs */
+    hid_t mem_sid;                   /* Memory dataspace ID */
+    hid_t fid;                       /* SWMR test file ID */
+    hid_t fapl;                      /* File access property list */
+    symbol_t record;                 /* The record to add to the dataset */
+    unsigned v;                      /* Local index variable */
 
     assert(filename);
     assert(nseconds != 0);
@@ -208,14 +212,16 @@ read_records(const char *filename, unsigned verbose, unsigned long nseconds, uns
     memset(&record, 0, sizeof(record));
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Choosing datasets\n");
+    }
 
     /* Allocate space for 'common' datasets, if any */
     if (ncommon > 0) {
         /* Allocate array to hold pointers to symbols for common datasets */
-        if (NULL == (sym_com = (symbol_info_t **)malloc(sizeof(symbol_info_t *) * ncommon)))
+        if (NULL == (sym_com = (symbol_info_t**)malloc(sizeof(symbol_info_t*) * ncommon))) {
             return -1;
+        }
 
         /* Open the common datasets */
         for (v = 0; v < ncommon; v++) {
@@ -223,100 +229,114 @@ read_records(const char *filename, unsigned verbose, unsigned long nseconds, uns
 
             /* Determine the offset of the symbol, within level 0 symbols */
             /* (level 0 symbols are the most common symbols) */
-            offset     = (unsigned)rand() % symbol_count[0];
+            offset = (unsigned)rand() % symbol_count[0];
             sym_com[v] = &symbol_info[0][offset];
 
             /* Emit informational message */
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "Common symbol #%u = '%s'\n", v, symbol_info[0][offset].name);
+            }
         } /* end for */
-    }     /* end if */
+    } /* end if */
 
     /* Allocate space for 'random' datasets, if any */
     if (nrandom > 0) {
         /* Allocate array to hold pointers to symbols for random datasets */
-        if (NULL == (sym_rand = (symbol_info_t **)malloc(sizeof(symbol_info_t *) * nrandom)))
+        if (NULL == (sym_rand = (symbol_info_t**)malloc(sizeof(symbol_info_t*) * nrandom))) {
             return -1;
+        }
 
         /* Determine the random datasets */
         for (v = 0; v < nrandom; v++) {
-            symbol_info_t *sym; /* Symbol to use */
+            symbol_info_t* sym; /* Symbol to use */
 
             /* Determine the symbol, within all symbols */
-            if (NULL == (sym = choose_dataset()))
+            if (NULL == (sym = choose_dataset())) {
                 return -1;
+            }
             sym_rand[v] = sym;
 
             /* Emit informational message */
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "Random symbol #%u = '%s'\n", v, sym->name);
+            }
         } /* end for */
-    }     /* end if */
+    } /* end if */
 
     /* Create a dataspace for the record to read */
-    if ((mem_sid = H5Screate(H5S_SCALAR)) < 0)
+    if ((mem_sid = H5Screate(H5S_SCALAR)) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Reading records\n");
+    }
 
     /* Get the starting time */
     start_time = time(NULL);
-    curr_time  = start_time;
+    curr_time = start_time;
 
     /* Create file access property list */
-    if ((fapl = h5_fileaccess()) < 0)
+    if ((fapl = h5_fileaccess()) < 0) {
         return -1;
+    }
 
     /* Loop over reading records until [at least] the correct # of seconds have passed */
     while (curr_time < (time_t)(start_time + (time_t)nseconds)) {
-
         /* Emit informational message */
-        if (verbose)
+        if (verbose) {
             fprintf(stderr, "Opening file: %s\n", filename);
+        }
 
         /* Open the file */
-        if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0)
+        if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0) {
             return -1;
+        }
 
         /* Check 'common' datasets, if any */
         if (ncommon > 0) {
             /* Emit informational message */
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "Checking common symbols\n");
+            }
 
             /* Iterate over common datasets */
             for (v = 0; v < ncommon; v++) {
                 /* Check common dataset */
-                if (check_dataset(fid, verbose, sym_com[v]->name, &record, mem_sid) < 0)
+                if (check_dataset(fid, verbose, sym_com[v]->name, &record, mem_sid) < 0) {
                     return -1;
+                }
                 memset(&record, 0, sizeof(record));
             } /* end for */
-        }     /* end if */
+        } /* end if */
 
         /* Check 'random' datasets, if any */
         if (nrandom > 0) {
             /* Emit informational message */
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "Checking random symbols\n");
+            }
 
             /* Iterate over random datasets */
             for (v = 0; v < nrandom; v++) {
                 /* Check random dataset */
-                if (check_dataset(fid, verbose, sym_rand[v]->name, &record, mem_sid) < 0)
+                if (check_dataset(fid, verbose, sym_rand[v]->name, &record, mem_sid) < 0) {
                     return -1;
+                }
                 memset(&record, 0, sizeof(record));
             } /* end for */
-        }     /* end if */
+        } /* end if */
 
         /* Emit informational message */
-        if (verbose)
+        if (verbose) {
             fprintf(stderr, "Closing file\n");
+        }
 
         /* Close the file */
-        if (H5Fclose(fid) < 0)
+        if (H5Fclose(fid) < 0) {
             return -1;
+        }
 
         /* Sleep for the appropriate # of seconds */
         HDsleep(poll_time);
@@ -326,16 +346,19 @@ read_records(const char *filename, unsigned verbose, unsigned long nseconds, uns
     } /* end while */
 
     /* Close the fapl */
-    if (H5Pclose(fapl) < 0)
+    if (H5Pclose(fapl) < 0) {
         return -1;
+    }
 
     /* Close the memory dataspace */
-    if (H5Sclose(mem_sid) < 0)
+    if (H5Sclose(mem_sid) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Closing datasets\n");
+    }
 
     /* Close 'random' datasets, if any */
     if (nrandom > 0) {
@@ -352,8 +375,7 @@ read_records(const char *filename, unsigned verbose, unsigned long nseconds, uns
     return 0;
 } /* end read_records() */
 
-static void
-usage(void)
+static void usage(void)
 {
     printf("\n");
     printf("Usage error!\n");
@@ -369,87 +391,93 @@ usage(void)
     exit(EXIT_FAILURE);
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    long     nseconds    = 0;  /* # of seconds to test */
-    int      poll_time   = 1;  /* # of seconds between polling */
-    int      ncommon     = 5;  /* # of common symbols to poll */
-    int      nrandom     = 10; /* # of random symbols to poll */
-    unsigned verbose     = 1;  /* Whether to emit some informational messages */
-    unsigned use_seed    = 0;  /* Set to 1 if a seed was set on the command line */
-    unsigned random_seed = 0;  /* Random # seed */
-    unsigned u;                /* Local index variables */
-    int      temp;
+    long nseconds = 0;        /* # of seconds to test */
+    int poll_time = 1;        /* # of seconds between polling */
+    int ncommon = 5;          /* # of common symbols to poll */
+    int nrandom = 10;         /* # of random symbols to poll */
+    unsigned verbose = 1;     /* Whether to emit some informational messages */
+    unsigned use_seed = 0;    /* Set to 1 if a seed was set on the command line */
+    unsigned random_seed = 0; /* Random # seed */
+    unsigned u;               /* Local index variables */
+    int temp;
 
     /* Parse command line options */
-    if (argc < 2)
+    if (argc < 2) {
         usage();
+    }
     if (argc > 1) {
         u = 1;
         while (u < (unsigned)argc) {
             if (argv[u][0] == '-') {
                 switch (argv[u][1]) {
-                    /* # of common symbols to poll */
-                    case 'h':
-                        ncommon = atoi(argv[u + 1]);
-                        if (ncommon < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    /* # of random symbols to poll */
-                    case 'l':
-                        nrandom = atoi(argv[u + 1]);
-                        if (nrandom < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    /* Be quiet */
-                    case 'q':
-                        verbose = 0;
-                        u++;
-                        break;
-
-                    /* Random # seed */
-                    case 'r':
-                        use_seed = 1;
-                        temp     = atoi(argv[u + 1]);
-                        if (temp < 0)
-                            usage();
-                        else
-                            random_seed = (unsigned)temp;
-                        u += 2;
-                        break;
-
-                    /* # of seconds between polling */
-                    case 's':
-                        poll_time = atoi(argv[u + 1]);
-                        if (poll_time < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    default:
+                /* # of common symbols to poll */
+                case 'h':
+                    ncommon = atoi(argv[u + 1]);
+                    if (ncommon < 0) {
                         usage();
-                        break;
+                    }
+                    u += 2;
+                    break;
+
+                /* # of random symbols to poll */
+                case 'l':
+                    nrandom = atoi(argv[u + 1]);
+                    if (nrandom < 0) {
+                        usage();
+                    }
+                    u += 2;
+                    break;
+
+                /* Be quiet */
+                case 'q':
+                    verbose = 0;
+                    u++;
+                    break;
+
+                /* Random # seed */
+                case 'r':
+                    use_seed = 1;
+                    temp = atoi(argv[u + 1]);
+                    if (temp < 0) {
+                        usage();
+                    }
+                    else {
+                        random_seed = (unsigned)temp;
+                    }
+                    u += 2;
+                    break;
+
+                /* # of seconds between polling */
+                case 's':
+                    poll_time = atoi(argv[u + 1]);
+                    if (poll_time < 0) {
+                        usage();
+                    }
+                    u += 2;
+                    break;
+
+                default: usage(); break;
                 } /* end switch */
-            }     /* end if */
+            } /* end if */
             else {
                 /* Get the number of records to append */
                 nseconds = atol(argv[u]);
-                if (nseconds <= 0)
+                if (nseconds <= 0) {
                     usage();
+                }
 
                 u++;
             } /* end else */
-        }     /* end while */
-    }         /* end if */
-    if (nseconds <= 0)
+        } /* end while */
+    } /* end if */
+    if (nseconds <= 0) {
         usage();
-    if (poll_time >= nseconds)
+    }
+    if (poll_time >= nseconds) {
         usage();
+    }
 
     /* Emit informational message */
     if (verbose) {
@@ -471,8 +499,9 @@ main(int argc, char *argv[])
     fprintf(stderr, "Using reader random seed: %u\n", random_seed);
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Generating symbol names\n");
+    }
 
     /* Generate dataset names */
     if (generate_symbols() < 0) {
@@ -481,19 +510,20 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Create datatype for creating datasets */
-    if ((symbol_tid = create_symbol_datatype()) < 0)
+    if ((symbol_tid = create_symbol_datatype()) < 0) {
         return -1;
+    }
 
     /* Reading records from datasets */
-    if (read_records(FILENAME, verbose, (unsigned long)nseconds, (unsigned)poll_time, (unsigned)ncommon,
-                     (unsigned)nrandom) < 0) {
+    if (read_records(FILENAME, verbose, (unsigned long)nseconds, (unsigned)poll_time, (unsigned)ncommon, (unsigned)nrandom) < 0) {
         fprintf(stderr, "Error reading records from datasets!\n");
         exit(EXIT_FAILURE);
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Releasing symbols\n");
+    }
 
     /* Clean up the symbols */
     if (shutdown_symbols() < 0) {
@@ -502,8 +532,9 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Closing objects\n");
+    }
 
     /* Close objects created */
     if (H5Tclose(symbol_tid) < 0) {

@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -32,7 +31,7 @@ fail_set:;
     {
         __label__ fail_read;
         unsigned size, mask;
-        char     buf[255];
+        char buf[255];
 
         // retrieve the number of entries in the plugin path list
         if (H5PLsize(&size) < 0) {

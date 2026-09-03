@@ -26,7 +26,7 @@
 #include "H5Oprivate.h"
 #include "H5VMprivate.h"
 
-static const char *FILENAME[] = {"istore", NULL};
+static const char* FILENAME[] = { "istore", NULL };
 
 #define TEST_SMALL  0x0001
 #define TEST_MEDIUM 0x0002
@@ -36,7 +36,7 @@ static const char *FILENAME[] = {"istore", NULL};
 #define TEST_DATATYPE H5T_NATIVE_UCHAR
 
 #define TEST_CHUNK_SIZE  50
-#define TEST_SPARSE_SIZE 1000000
+#define TEST_SPARSE_SIZE 1'000'000
 
 static hsize_t chunk_dims[H5O_LAYOUT_NDIMS];
 
@@ -53,25 +53,30 @@ static hsize_t chunk_dims[H5O_LAYOUT_NDIMS];
  *
  *-------------------------------------------------------------------------
  */
-static int
-is_sparse(void)
+static int is_sparse(void)
 {
-    int       fd;
+    int fd;
     h5_stat_t sb;
 
-    if ((fd = HDopen("x.h5", O_RDWR | O_TRUNC | O_CREAT, H5_POSIX_CREATE_MODE_RW)) < 0)
+    if ((fd = HDopen("x.h5", O_RDWR | O_TRUNC | O_CREAT, H5_POSIX_CREATE_MODE_RW)) < 0) {
         return 0;
-    if (HDlseek(fd, (1024 * 1024), SEEK_SET) != 1024 * 1024)
+    }
+    if (HDlseek(fd, (1024 * 1024), SEEK_SET) != 1024 * 1024) {
         return 0;
-    if (5 != HDwrite(fd, "hello", (size_t)5))
+    }
+    if (5 != HDwrite(fd, "hello", (size_t)5)) {
         return 0;
-    if (HDclose(fd) < 0)
+    }
+    if (HDclose(fd) < 0) {
         return 0;
+    }
     memset(&sb, 0, sizeof(h5_stat_t));
-    if (HDstat("x.h5", &sb) < 0)
+    if (HDstat("x.h5", &sb) < 0) {
         return 0;
-    if (HDremove("x.h5") < 0)
+    }
+    if (HDremove("x.h5") < 0) {
         return 0;
+    }
 #ifdef H5_HAVE_STAT_ST_BLOCKS
     return ((unsigned long)sb.st_blocks * 512 < (unsigned long)sb.st_size);
 #else
@@ -88,8 +93,7 @@ is_sparse(void)
  *
  *-------------------------------------------------------------------------
  */
-static void
-print_array(uint8_t *array, size_t nx, size_t ny, size_t nz)
+static void print_array(uint8_t* array, size_t nx, size_t ny, size_t nz)
 {
     size_t i, j, k;
 
@@ -102,13 +106,15 @@ print_array(uint8_t *array, size_t nx, size_t ny, size_t nz)
         }
 
         for (j = 0; j < ny; j++) {
-            if (nz > 1)
+            if (nz > 1) {
                 fprintf(stderr, "%03lu:", (unsigned long)j);
+            }
             for (k = 0; k < nz; k++) {
                 fprintf(stderr, " %3d", *array++);
             }
-            if (nz > 1)
+            if (nz > 1) {
                 fprintf(stderr, "\n");
+            }
         }
         fprintf(stderr, "\n");
     }
@@ -126,38 +132,43 @@ print_array(uint8_t *array, size_t nx, size_t ny, size_t nz)
  *
  *-------------------------------------------------------------------------
  */
-static hid_t
-new_object(hid_t f, const char *name, int ndims, hsize_t dims[], hsize_t cdims[])
+static hid_t new_object(hid_t f, const char* name, int ndims, hsize_t dims[], hsize_t cdims[])
 {
     hid_t dataset; /* Dataset ID */
     hid_t space;   /* Dataspace ID */
     hid_t dcpl;    /* Dataset creation property list ID */
 
     /* Create the dataset creation property list */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         TEST_ERROR;
+    }
 
     /* Set the chunk dimensions */
-    if (H5Pset_chunk(dcpl, ndims, cdims) < 0)
+    if (H5Pset_chunk(dcpl, ndims, cdims) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the dataspace */
-    if ((space = H5Screate_simple(ndims, dims, NULL)) < 0)
+    if ((space = H5Screate_simple(ndims, dims, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the dataset */
-    if ((dataset = H5Dcreate2(f, name, TEST_DATATYPE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((dataset = H5Dcreate2(f, name, TEST_DATATYPE, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Clean up */
 
     /* Close property lists */
-    if (H5Pclose(dcpl) < 0)
+    if (H5Pclose(dcpl) < 0) {
         TEST_ERROR;
+    }
 
     /* Close dataspace */
-    if (H5Sclose(space) < 0)
+    if (H5Sclose(space) < 0) {
         TEST_ERROR;
+    }
 
     return dataset;
 
@@ -177,14 +188,13 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_create(hid_t f, const char *prefix)
+static herr_t test_create(hid_t f, const char* prefix)
 {
-    hid_t    dataset;                             /* Dataset ID */
-    hsize_t  dims[H5O_LAYOUT_NDIMS + 1];          /* Dimensions of dataset */
-    hsize_t  my_chunk_dims[H5O_LAYOUT_NDIMS + 1]; /* Dimensions of chunks */
-    char     name[256];                           /* Dataset name */
-    unsigned u;                                   /* Local index variable */
+    hid_t dataset;                               /* Dataset ID */
+    hsize_t dims[H5O_LAYOUT_NDIMS + 1];          /* Dimensions of dataset */
+    hsize_t my_chunk_dims[H5O_LAYOUT_NDIMS + 1]; /* Dimensions of chunks */
+    char name[256];                              /* Dataset name */
+    unsigned u;                                  /* Local index variable */
 
     TESTING("istore create");
 
@@ -195,12 +205,14 @@ test_create(hid_t f, const char *prefix)
 
         /* Create chunked dataset of this dimensionality */
         snprintf(name, sizeof name, "%s_%02u", prefix, u);
-        if ((dataset = new_object(f, name, (int)u, dims, my_chunk_dims)) < 0)
+        if ((dataset = new_object(f, name, (int)u, dims, my_chunk_dims)) < 0) {
             return FAIL;
+        }
 
         /* Close dataset created */
-        if (H5Dclose(dataset) < 0)
+        if (H5Dclose(dataset) < 0) {
             return FAIL;
+        }
     }
 
     PASSED();
@@ -220,21 +232,20 @@ test_create(hid_t f, const char *prefix)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
+static herr_t test_extend(hid_t f, const char* prefix, size_t nx, size_t ny, size_t nz)
 {
-    hid_t    dataset; /* Dataset ID */
-    hid_t    fspace;  /* Dataset's file dataspace */
-    hid_t    mspace;  /* Dataset's memory dataspace */
-    size_t   i, j, k, ctr;
-    int      ndims;
+    hid_t dataset; /* Dataset ID */
+    hid_t fspace;  /* Dataset's file dataspace */
+    hid_t mspace;  /* Dataset's memory dataspace */
+    size_t i, j, k, ctr;
+    int ndims;
     uint8_t *buf = NULL, *check = NULL, *whole = NULL;
-    char     dims[64], s[256], name[256];
-    hsize_t  offset[3];
-    hsize_t  max_corner[3];
-    hsize_t  size[3];
-    hsize_t  whole_size[3];
-    hsize_t  nelmts;
+    char dims[64], s[256], name[256];
+    hsize_t offset[3];
+    hsize_t max_corner[3];
+    hsize_t size[3];
+    hsize_t whole_size[3];
+    hsize_t nelmts;
 
     if (!nz) {
         if (!ny) {
@@ -244,7 +255,7 @@ test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
         }
         else {
             ndims = 2;
-            nz    = 1;
+            nz = 1;
             snprintf(dims, sizeof(dims), "%lux%lu", (unsigned long)nx, (unsigned long)ny);
         }
     }
@@ -255,9 +266,9 @@ test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
 
     snprintf(s, sizeof(s), "istore extend: %s", dims);
     TESTING(s);
-    buf   = (uint8_t *)malloc(nx * ny * nz);
-    check = (uint8_t *)malloc(nx * ny * nz);
-    whole = (uint8_t *)calloc((size_t)1, nx * ny * nz);
+    buf = (uint8_t*)malloc(nx * ny * nz);
+    check = (uint8_t*)malloc(nx * ny * nz);
+    whole = (uint8_t*)calloc((size_t)1, nx * ny * nz);
 
     whole_size[0] = nx;
     whole_size[1] = ny;
@@ -274,43 +285,46 @@ test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
     }
 
     /* Get dataset's dataspace */
-    if ((fspace = H5Dget_space(dataset)) < 0)
+    if ((fspace = H5Dget_space(dataset)) < 0) {
         TEST_ERROR;
+    }
 
     for (ctr = 0; H5VM_vector_lt_u((unsigned)ndims, max_corner, whole_size); ctr++) {
-
         /* Size and location */
         if (0 == ctr) {
             offset[0] = offset[1] = offset[2] = 0;
             size[0] = size[1] = size[2] = 1;
-            nelmts                      = 1;
+            nelmts = 1;
         }
         else {
             for (i = 0, nelmts = 1; i < (size_t)ndims; i++) {
                 if (ctr % (size_t)ndims == i) {
                     offset[i] = max_corner[i];
-                    size[i]   = MIN(1, whole_size[i] - offset[i]);
+                    size[i] = MIN(1, whole_size[i] - offset[i]);
                 }
                 else {
                     offset[i] = 0;
-                    size[i]   = max_corner[i];
+                    size[i] = max_corner[i];
                 }
                 nelmts *= size[i];
             }
         }
 
         /* Fill the source array */
-        if (0 == nelmts)
+        if (0 == nelmts) {
             continue;
+        }
         memset(buf, (signed)(128 + ctr), (size_t)nelmts);
 
         /* Create dataspace for selection in memory */
-        if ((mspace = H5Screate_simple(1, &nelmts, NULL)) < 0)
+        if ((mspace = H5Screate_simple(1, &nelmts, NULL)) < 0) {
             TEST_ERROR;
+        }
 
         /* Select region in file dataspace */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, offset, NULL, size, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, offset, NULL, size, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Write to disk */
         if (H5Dwrite(dataset, TEST_DATATYPE, mspace, fspace, H5P_DEFAULT, buf) < 0) {
@@ -337,16 +351,24 @@ test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
         }
 
         /* Close memory dataspace */
-        if (H5Sclose(mspace) < 0)
+        if (H5Sclose(mspace) < 0) {
             TEST_ERROR;
+        }
 
         /* Write to `whole' buffer for later checking */
-        H5VM_hyper_copy((unsigned)ndims, size, whole_size, offset, whole, /*dst*/
-                        size, H5VM_ZERO, buf);                            /*src*/
+        H5VM_hyper_copy((unsigned)ndims,
+                        size,
+                        whole_size,
+                        offset,
+                        whole, /*dst*/
+                        size,
+                        H5VM_ZERO,
+                        buf); /*src*/
 
         /* Update max corner */
-        for (i = 0; i < (size_t)ndims; i++)
+        for (i = 0; i < (size_t)ndims; i++) {
             max_corner[i] = MAX(max_corner[i], offset[i] + size[i]);
+        }
     }
 
     /* Now read the entire array back out and check it */
@@ -379,12 +401,14 @@ test_extend(hid_t f, const char *prefix, size_t nx, size_t ny, size_t nz)
     }
 
     /* Close dataset's dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Close dataset */
-    if (H5Dclose(dataset) < 0)
+    if (H5Dclose(dataset) < 0) {
         TEST_ERROR;
+    }
 
     /* Free memory used */
     free(buf);
@@ -413,20 +437,19 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, size_t nz, int skip_test)
+static herr_t test_sparse(hid_t f, const char* prefix, size_t nblocks, size_t nx, size_t ny, size_t nz, int skip_test)
 {
-    hid_t    dataset; /* Dataset ID */
-    hid_t    fspace;  /* Dataset's file dataspace */
-    hid_t    mspace;  /* Dataset's memory dataspace */
-    int      ndims;
-    hsize_t  ctr;
-    char     dims[64], s[256], name[256];
-    hsize_t  offset[3];
-    hsize_t  size[3];
-    uint8_t *buf = NULL;
-    hsize_t  whole_size[3]; /* Size of dataset's dataspace */
-    size_t   u;             /* Local index variable */
+    hid_t dataset; /* Dataset ID */
+    hid_t fspace;  /* Dataset's file dataspace */
+    hid_t mspace;  /* Dataset's memory dataspace */
+    int ndims;
+    hsize_t ctr;
+    char dims[64], s[256], name[256];
+    hsize_t offset[3];
+    hsize_t size[3];
+    uint8_t* buf = NULL;
+    hsize_t whole_size[3]; /* Size of dataset's dataspace */
+    size_t u;              /* Local index variable */
 
     if (!nz) {
         if (!ny) {
@@ -436,7 +459,7 @@ test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, s
         }
         else {
             ndims = 2;
-            nz    = 1;
+            nz = 1;
             snprintf(dims, sizeof(dims), "%lux%lu", (unsigned long)nx, (unsigned long)ny);
         }
     }
@@ -451,12 +474,13 @@ test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, s
         SKIPPED();
         return SUCCEED;
     }
-    buf = (uint8_t *)malloc(nx * ny * nz);
+    buf = (uint8_t*)malloc(nx * ny * nz);
     memset(buf, 128, nx * ny * nz);
 
     /* Set dimensions of dataset */
-    for (u = 0; u < (size_t)ndims; u++)
+    for (u = 0; u < (size_t)ndims; u++) {
         whole_size[u] = TEST_SPARSE_SIZE;
+    }
 
     /* Set dimensions of selection */
     size[0] = nx;
@@ -471,12 +495,14 @@ test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, s
     }
 
     /* Get dataset's dataspace */
-    if ((fspace = H5Dget_space(dataset)) < 0)
+    if ((fspace = H5Dget_space(dataset)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create dataspace for memory buffer */
-    if ((mspace = H5Screate_simple(ndims, size, NULL)) < 0)
+    if ((mspace = H5Screate_simple(ndims, size, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     for (ctr = 0; ctr < nblocks; ctr++) {
         offset[0] = (hsize_t)(rand() % (int)(TEST_SPARSE_SIZE - nx));
@@ -484,23 +510,28 @@ test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, s
         offset[2] = (hsize_t)(rand() % (int)(TEST_SPARSE_SIZE - nz));
 
         /* Select region in file dataspace */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, offset, NULL, size, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, offset, NULL, size, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* write to disk */
         if (H5Dwrite(dataset, TEST_DATATYPE, mspace, fspace, H5P_DEFAULT, buf) < 0) {
             H5_FAILED();
             printf("    Write failed: ctr=%lu\n", (unsigned long)ctr);
             printf("    offset=(%lu", (unsigned long)(offset[0]));
-            if (ndims > 1)
+            if (ndims > 1) {
                 printf(",%lu", (unsigned long)(offset[1]));
-            if (ndims > 2)
+            }
+            if (ndims > 2) {
                 printf(",%lu", (unsigned long)(offset[2]));
+            }
             printf("), size=(%lu", (unsigned long)(size[0]));
-            if (ndims > 1)
+            if (ndims > 1) {
                 printf(",%lu", (unsigned long)(size[1]));
-            if (ndims > 2)
+            }
+            if (ndims > 2) {
                 printf(",%lu", (unsigned long)(size[2]));
+            }
             printf(")\n");
             goto error;
         }
@@ -509,16 +540,19 @@ test_sparse(hid_t f, const char *prefix, size_t nblocks, size_t nx, size_t ny, s
     }
 
     /* Close memory dataspace */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Close dataset's dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Close dataset */
-    if (H5Dclose(dataset) < 0)
+    if (H5Dclose(dataset) < 0) {
         TEST_ERROR;
+    }
 
     free(buf);
     PASSED();
@@ -538,17 +572,16 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hid_t    fapl = H5I_INVALID_HID, file = H5I_INVALID_HID, fcpl = H5I_INVALID_HID;
-    herr_t   status;
-    int      nerrors = 0;
+    hid_t fapl = H5I_INVALID_HID, file = H5I_INVALID_HID, fcpl = H5I_INVALID_HID;
+    herr_t status;
+    int nerrors = 0;
     unsigned size_of_test;
     unsigned u; /* Local index variable */
-    char     filename[1024];
-    int      skip_test          = 0;
-    int      has_sparse_support = 0;
+    char filename[1024];
+    int skip_test = 0;
+    int has_sparse_support = 0;
 
     /* Parse arguments or assume these tests (`small', `medium' ) */
     if (1 == argc) {
@@ -572,12 +605,15 @@ main(int argc, char *argv[])
         }
     }
     printf("Test sizes: ");
-    if (size_of_test & TEST_SMALL)
+    if (size_of_test & TEST_SMALL) {
         printf(" SMALL");
-    if (size_of_test & TEST_MEDIUM)
+    }
+    if (size_of_test & TEST_MEDIUM) {
         printf(" MEDIUM");
-    if (size_of_test & TEST_LARGE)
+    }
+    if (size_of_test & TEST_LARGE) {
         printf(" LARGE");
+    }
     printf("\n");
 
     /* Set the random # seed */
@@ -605,8 +641,9 @@ main(int argc, char *argv[])
     }
 
     /* Initialize chunk dimensions */
-    for (u = 0; u < H5O_LAYOUT_NDIMS; u++)
+    for (u = 0; u < H5O_LAYOUT_NDIMS; u++) {
         chunk_dims[u] = TEST_CHUNK_SIZE;
+    }
 
     /*
      * Creation test: Creates empty objects with various raw data sizes
@@ -654,8 +691,9 @@ main(int argc, char *argv[])
          * e.g.: Windows NTFS filesystems
          */
         status = test_sparse(file, "sparse", (size_t)800, (size_t)50, (size_t)50, (size_t)50, skip_test);
-        if (skip_test)
+        if (skip_test) {
             printf("    The current VFD does not support sparse files on this platform.\n");
+        }
         nerrors += status < 0 ? 1 : 0;
     }
 

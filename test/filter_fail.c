@@ -22,21 +22,21 @@
 #define DIM                  10
 #define FILTER_CHUNK_DIM     2
 
-static const char *FILENAME[] = {"filter_fail_with_cache", "filter_fail_without_cache", NULL};
+static const char* FILENAME[] = { "filter_fail_with_cache", "filter_fail_without_cache", NULL };
 
-static size_t filter_fail(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values, size_t nbytes,
-                          size_t *buf_size, void **buf);
+static size_t filter_fail(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf);
 
 /* This message derives from H5Z */
-const H5Z_class2_t H5Z_FAIL_TEST[1] = {{
+const H5Z_class2_t H5Z_FAIL_TEST[1] = { {
     H5Z_CLASS_T_VERS,     /* H5Z_class_t version */
     H5Z_FILTER_FAIL_TEST, /* Filter id number		*/
-    1, 1,                 /* Encoding and decoding enabled */
+    1,
+    1,                    /* Encoding and decoding enabled */
     "filter_fail_test",   /* Filter name for debugging	*/
     NULL,                 /* The "can apply" callback     */
     NULL,                 /* The "set local" callback     */
     filter_fail,          /* The actual filter function	*/
-}};
+} };
 
 /*-------------------------------------------------------------------------
  * Function:    filter_fail
@@ -50,16 +50,15 @@ const H5Z_class2_t H5Z_FAIL_TEST[1] = {{
  *-------------------------------------------------------------------------
  */
 static size_t
-filter_fail(unsigned int flags, size_t H5_ATTR_UNUSED cd_nelmts, const unsigned int H5_ATTR_UNUSED *cd_values,
-            size_t nbytes, size_t *buf_size, void **buf)
+    filter_fail(unsigned int flags, size_t H5_ATTR_UNUSED cd_nelmts, const unsigned int H5_ATTR_UNUSED* cd_values, size_t nbytes, size_t* buf_size, void** buf)
 {
-    int   *dst       = (int *)(*buf);
+    int* dst = (int*)(*buf);
     size_t ret_value = 0;
 
     if (flags & H5Z_FLAG_REVERSE) { /* do nothing during read */
         *buf_size = nbytes;
         ret_value = nbytes;
-    }      /* end if */
+    } /* end if */
     else { /* Write data */
         /* If it's the last chunk, pretend to fail. Otherwise, do nothing. */
         if (*dst == 8 || *dst == 9) {
@@ -90,18 +89,17 @@ filter_fail(unsigned int flags, size_t H5_ATTR_UNUSED cd_nelmts, const unsigned 
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_filter_write(char *file_name, hid_t my_fapl, bool cache_enabled)
+static herr_t test_filter_write(char* file_name, hid_t my_fapl, bool cache_enabled)
 {
-    hid_t   file          = H5I_INVALID_HID;
-    hid_t   dataset       = H5I_INVALID_HID;    /* dataset ID */
-    hid_t   sid           = H5I_INVALID_HID;    /* dataspace ID */
-    hid_t   dcpl          = H5I_INVALID_HID;    /* dataset creation property list ID */
-    hsize_t dims[1]       = {DIM};              /* dataspace dimension - 10*/
-    hsize_t chunk_dims[1] = {FILTER_CHUNK_DIM}; /* chunk dimension - 2*/
-    int     points[DIM];                        /* Data */
-    herr_t  ret;                                /* generic return value */
-    int     i;
+    hid_t file = H5I_INVALID_HID;
+    hid_t dataset = H5I_INVALID_HID;              /* dataset ID */
+    hid_t sid = H5I_INVALID_HID;                  /* dataspace ID */
+    hid_t dcpl = H5I_INVALID_HID;                 /* dataset creation property list ID */
+    hsize_t dims[1] = { DIM };                    /* dataspace dimension - 10*/
+    hsize_t chunk_dims[1] = { FILTER_CHUNK_DIM }; /* chunk dimension - 2*/
+    int points[DIM];                              /* Data */
+    herr_t ret;                                   /* generic return value */
+    int i;
 
     if (cache_enabled) {
         TESTING("data writing when a mandatory filter fails and chunk cache is enabled");
@@ -111,44 +109,54 @@ test_filter_write(char *file_name, hid_t my_fapl, bool cache_enabled)
     }
 
     /* Create file */
-    if ((file = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, my_fapl)) < 0)
+    if ((file = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, my_fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* create the data space */
-    if ((sid = H5Screate_simple(1, dims, NULL)) < 0)
+    if ((sid = H5Screate_simple(1, dims, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create dcpl and register the filter */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Pset_chunk(dcpl, 1, chunk_dims) < 0)
+    if (H5Pset_chunk(dcpl, 1, chunk_dims) < 0) {
         TEST_ERROR;
+    }
 
-    if (H5Zregister(H5Z_FAIL_TEST) < 0)
+    if (H5Zregister(H5Z_FAIL_TEST) < 0) {
         TEST_ERROR;
+    }
 
     /* Check that the filter was registered */
-    if (true != H5Zfilter_avail(H5Z_FILTER_FAIL_TEST))
+    if (true != H5Zfilter_avail(H5Z_FILTER_FAIL_TEST)) {
         FAIL_STACK_ERROR;
+    }
 
     /* Enable the filter as mandatory */
-    if (H5Pset_filter(dcpl, H5Z_FILTER_FAIL_TEST, 0, (size_t)0, NULL) < 0)
+    if (H5Pset_filter(dcpl, H5Z_FILTER_FAIL_TEST, 0, (size_t)0, NULL) < 0) {
         TEST_ERROR;
+    }
 
     /* create a dataset */
-    if ((dataset = H5Dcreate2(file, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((dataset = H5Dcreate2(file, DSET_NAME, H5T_NATIVE_INT, sid, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Initialize the write buffer */
-    for (i = 0; i < DIM; i++)
+    for (i = 0; i < DIM; i++) {
         points[i] = i;
+    }
 
     /* Write data.  If the chunk cache is enabled, H5Dwrite should succeed.  If it is
      * disabled, H5Dwrite should fail. */
     if (cache_enabled) {
-        if (H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, sid, H5P_DEFAULT, points) < 0)
+        if (H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, sid, H5P_DEFAULT, points) < 0) {
             TEST_ERROR;
+        }
     }
     else {
         /* Data writing should fail */
@@ -165,10 +173,12 @@ test_filter_write(char *file_name, hid_t my_fapl, bool cache_enabled)
     }
 
     /* clean up objects used for this test */
-    if (H5Pclose(dcpl) < 0)
+    if (H5Pclose(dcpl) < 0) {
         TEST_ERROR;
-    if (H5Sclose(sid) < 0)
+    }
+    if (H5Sclose(sid) < 0) {
         TEST_ERROR;
+    }
 
     /* Close dataset.  If the chunk cache is enabled, the flushing of chunks should fail
      * during H5Dclose.  If it is disabled, H5Dwrite should fail but H5Dclose should succeed. */
@@ -185,14 +195,16 @@ test_filter_write(char *file_name, hid_t my_fapl, bool cache_enabled)
         }
     }
     else {
-        if (H5Dclose(dataset) < 0)
+        if (H5Dclose(dataset) < 0) {
             TEST_ERROR;
+        }
     }
 
     /* Even though H5Dclose or H5Dwrite fails, it should release all resources.
      * So the file should close successfully. */
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -222,44 +234,48 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_filter_read(char *file_name, hid_t my_fapl)
+static herr_t test_filter_read(char* file_name, hid_t my_fapl)
 {
-    hid_t   file    = H5I_INVALID_HID;
-    hid_t   dataset = H5I_INVALID_HID; /* dataset ID */
-    hid_t   sid     = H5I_INVALID_HID;
-    hid_t   mspace  = H5I_INVALID_HID;
-    hsize_t dims[1] = {DIM}; /* dataspace dimension - 10*/
-    int     rbuf[DIM];       /* Data */
-    hsize_t dset_size = 0;   /* Dataset storage size */
+    hid_t file = H5I_INVALID_HID;
+    hid_t dataset = H5I_INVALID_HID; /* dataset ID */
+    hid_t sid = H5I_INVALID_HID;
+    hid_t mspace = H5I_INVALID_HID;
+    hsize_t dims[1] = { DIM }; /* dataspace dimension - 10*/
+    int rbuf[DIM];             /* Data */
+    hsize_t dset_size = 0;     /* Dataset storage size */
     hsize_t hs_offset[H5S_MAX_RANK];
     hsize_t hs_size[H5S_MAX_RANK];
-    hsize_t stride[1] = {2};
+    hsize_t stride[1] = { 2 };
     hsize_t zero[8];
     hsize_t nelmts = DIM / 2;
-    int     i;
+    int i;
 
     TESTING("data reading when a mandatory filter fails");
 
     /* Open file */
-    if ((file = H5Fopen(file_name, H5F_ACC_RDONLY, my_fapl)) < 0)
+    if ((file = H5Fopen(file_name, H5F_ACC_RDONLY, my_fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Open dataset */
-    if ((dataset = H5Dopen2(file, DSET_NAME, H5P_DEFAULT)) < 0)
+    if ((dataset = H5Dopen2(file, DSET_NAME, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Verify the storage size is equal to 4 chunks */
-    if ((dset_size = H5Dget_storage_size(dataset)) == 0)
+    if ((dset_size = H5Dget_storage_size(dataset)) == 0) {
         TEST_ERROR;
+    }
 
-    if (dset_size != 4 * FILTER_CHUNK_DIM * sizeof(int))
+    if (dset_size != 4 * FILTER_CHUNK_DIM * sizeof(int)) {
         TEST_ERROR;
+    }
 
     /* Read the chunks */
     memset(rbuf, 0, DIM * sizeof(int));
-    if (H5Dread(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0)
+    if (H5Dread(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, rbuf) < 0) {
         TEST_ERROR;
+    }
 
     /* Check that the values read are the same as the values written.
      * The last chunk should not be in the file. */
@@ -281,28 +297,33 @@ test_filter_read(char *file_name, hid_t my_fapl)
     }
 
     /* Try to read in hyperslab simulating the h5dump's way of printing data */
-    if ((sid = H5Dget_space(dataset)) < 0)
+    if ((sid = H5Dget_space(dataset)) < 0) {
         TEST_ERROR;
+    }
 
     memset(hs_offset, 0, sizeof(hs_offset));
     memset(hs_size, 0, sizeof(hs_size));
     hs_size[0] = DIM / 2;
 
-    if (H5Sselect_hyperslab(sid, H5S_SELECT_SET, hs_offset, stride, hs_size, NULL) < 0)
+    if (H5Sselect_hyperslab(sid, H5S_SELECT_SET, hs_offset, stride, hs_size, NULL) < 0) {
         TEST_ERROR;
+    }
 
     /* create the data space */
-    if ((mspace = H5Screate_simple(1, dims, NULL)) < 0)
+    if ((mspace = H5Screate_simple(1, dims, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     memset(zero, 0, sizeof zero);
 
-    if (H5Sselect_hyperslab(mspace, H5S_SELECT_SET, zero, stride, &nelmts, NULL) < 0)
+    if (H5Sselect_hyperslab(mspace, H5S_SELECT_SET, zero, stride, &nelmts, NULL) < 0) {
         TEST_ERROR;
+    }
 
     memset(rbuf, 0, DIM * sizeof(int));
-    if (H5Dread(dataset, H5T_NATIVE_INT, H5S_ALL, sid, H5P_DEFAULT, rbuf) < 0)
+    if (H5Dread(dataset, H5T_NATIVE_INT, H5S_ALL, sid, H5P_DEFAULT, rbuf) < 0) {
         TEST_ERROR;
+    }
 
     /* Check that the values read are the same as the values written.
      * The last chunk should not be in the file. */
@@ -323,14 +344,18 @@ test_filter_read(char *file_name, hid_t my_fapl)
         }
     }
 
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         TEST_ERROR;
-    if (H5Sclose(mspace) < 0)
+    }
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
-    if (H5Dclose(dataset) < 0)
+    }
+    if (H5Dclose(dataset) < 0) {
         TEST_ERROR;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -357,15 +382,14 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hid_t    fapl;
-    int      mdc_nelmts  = 0;
-    size_t   rdcc_nelmts = 0;
-    size_t   rdcc_nbytes = 0;
-    double   rdcc_w0     = 0;
-    char     filename[1024];
+    hid_t fapl;
+    int mdc_nelmts = 0;
+    size_t rdcc_nelmts = 0;
+    size_t rdcc_nbytes = 0;
+    double rdcc_w0 = 0;
+    char filename[1024];
     unsigned nerrors = 0;
 
     h5_test_init();
@@ -382,8 +406,9 @@ main(void)
 
     /* Disable the chunk cache so that the writing of data chunks happens
      * during H5Dwrite. */
-    if (H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes, rdcc_w0) < 0)
+    if (H5Pset_cache(fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes, rdcc_w0) < 0) {
         TEST_ERROR;
+    }
 
     /* Run the test again. */
     nerrors += (test_filter_write(filename, fapl, false) < 0 ? 1 : 0);
@@ -395,11 +420,13 @@ main(void)
     h5_cleanup(FILENAME, fapl);
 
     /* Make sure we can close the library */
-    if (H5close() < 0)
+    if (H5close() < 0) {
         TEST_ERROR;
+    }
 
-    if (nerrors)
+    if (nerrors) {
         TEST_ERROR;
+    }
 
     exit(EXIT_SUCCESS);
 

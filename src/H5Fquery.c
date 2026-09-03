@@ -71,8 +71,7 @@
  * Return:   'intent' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_shared_get_intent(const H5F_shared_t *f_sh)
+unsigned H5F_shared_get_intent(const H5F_shared_t* f_sh)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -92,8 +91,7 @@ H5F_shared_get_intent(const H5F_shared_t *f_sh)
  * Return:   'intent' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_intent(const H5F_t *f)
+unsigned H5F_get_intent(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -114,8 +112,7 @@ H5F_get_intent(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-H5F_libver_t
-H5F_get_low_bound(const H5F_t *f)
+H5F_libver_t H5F_get_low_bound(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -136,8 +133,7 @@ H5F_get_low_bound(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-H5F_libver_t
-H5F_get_high_bound(const H5F_t *f)
+H5F_libver_t H5F_get_high_bound(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -156,8 +152,7 @@ H5F_get_high_bound(const H5F_t *f)
  *           Failure:    ? (should not happen)
  *-------------------------------------------------------------------------
  */
-char *
-H5F_get_open_name(const H5F_t *f)
+char* H5F_get_open_name(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -177,8 +172,7 @@ H5F_get_open_name(const H5F_t *f)
  *           Failure:    ? (should not happen)
  *-------------------------------------------------------------------------
  */
-char *
-H5F_get_actual_name(const H5F_t *f)
+char* H5F_get_actual_name(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -199,8 +193,7 @@ H5F_get_actual_name(const H5F_t *f)
  * Return:   'extpath' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-char *
-H5F_get_extpath(const H5F_t *f)
+char* H5F_get_extpath(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -220,8 +213,7 @@ H5F_get_extpath(const H5F_t *f)
  * Return:   'shared' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-H5F_shared_t *
-H5F_get_shared(const H5F_t *f)
+H5F_shared_t* H5F_get_shared(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -239,8 +231,7 @@ H5F_get_shared(const H5F_t *f)
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_same_shared(const H5F_t *f1, const H5F_t *f2)
+bool H5F_same_shared(const H5F_t* f1, const H5F_t* f2)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -261,8 +252,7 @@ H5F_same_shared(const H5F_t *f1, const H5F_t *f2)
  * Return:   'nopen_objs' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_nopen_objs(const H5F_t *f)
+unsigned H5F_get_nopen_objs(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -280,8 +270,7 @@ H5F_get_nopen_objs(const H5F_t *f)
  * Return:      true/false
  *-------------------------------------------------------------------------
  */
-bool
-H5F_file_id_exists(const H5F_t *f)
+bool H5F_file_id_exists(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -299,8 +288,7 @@ H5F_file_id_exists(const H5F_t *f)
  * Return:   'parent' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-H5F_t *
-H5F_get_parent(const H5F_t *f)
+H5F_t* H5F_get_parent(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -318,8 +306,7 @@ H5F_get_parent(const H5F_t *f)
  * Return:   'nmounts' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_nmounts(const H5F_t *f)
+unsigned H5F_get_nmounts(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -337,8 +324,7 @@ H5F_get_nmounts(const H5F_t *f)
  * Return:   '# of read attempts' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_read_attempts(const H5F_t *f)
+unsigned H5F_get_read_attempts(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -357,8 +343,7 @@ H5F_get_read_attempts(const H5F_t *f)
  *           Failure:    ? (should not happen)
  *-------------------------------------------------------------------------
  */
-hid_t
-H5F_get_fcpl(const H5F_t *f)
+hid_t H5F_get_fcpl(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -378,8 +363,7 @@ H5F_get_fcpl(const H5F_t *f)
  * Return:   'sizeof_addr' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-uint8_t
-H5F_sizeof_addr(const H5F_t *f)
+uint8_t H5F_sizeof_addr(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -399,8 +383,7 @@ H5F_sizeof_addr(const H5F_t *f)
  * Return:   'sizeof_size' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-uint8_t
-H5F_sizeof_size(const H5F_t *f)
+uint8_t H5F_sizeof_size(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -419,8 +402,7 @@ H5F_sizeof_size(const H5F_t *f)
  * Return:   'sohm_addr' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5F_get_sohm_addr(const H5F_t *f)
+haddr_t H5F_get_sohm_addr(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -439,8 +421,7 @@ H5F_get_sohm_addr(const H5F_t *f)
  * Return:   'sohm_vers' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_sohm_vers(const H5F_t *f)
+unsigned H5F_get_sohm_vers(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -459,8 +440,7 @@ H5F_get_sohm_vers(const H5F_t *f)
  * Return:   'sohm_nindexes' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_sohm_nindexes(const H5F_t *f)
+unsigned H5F_get_sohm_nindexes(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -483,8 +463,7 @@ H5F_get_sohm_nindexes(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_sym_leaf_k(const H5F_t *f)
+unsigned H5F_sym_leaf_k(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -504,8 +483,7 @@ H5F_sym_leaf_k(const H5F_t *f)
  * Return:   true/false as set in file
  *-------------------------------------------------------------------------
  */
-bool
-H5F_get_min_dset_ohdr(const H5F_t *f)
+bool H5F_get_min_dset_ohdr(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -526,8 +504,7 @@ H5F_get_min_dset_ohdr(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_kvalue(const H5F_t *f, const H5B_class_t *type)
+unsigned H5F_kvalue(const H5F_t* f, const H5B_class_t* type)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -548,8 +525,7 @@ H5F_kvalue(const H5F_t *f, const H5B_class_t *type)
  * Return:   'nrefs' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_get_nrefs(const H5F_t *f)
+unsigned H5F_get_nrefs(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -572,8 +548,7 @@ H5F_get_nrefs(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-size_t
-H5F_rdcc_nslots(const H5F_t *f)
+size_t H5F_rdcc_nslots(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -596,8 +571,7 @@ H5F_rdcc_nslots(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-size_t
-H5F_rdcc_nbytes(const H5F_t *f)
+size_t H5F_rdcc_nbytes(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -620,8 +594,7 @@ H5F_rdcc_nbytes(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-double
-H5F_rdcc_w0(const H5F_t *f)
+double H5F_rdcc_w0(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -642,8 +615,7 @@ H5F_rdcc_w0(const H5F_t *f)
  * Return:   Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5F_get_base_addr(const H5F_t *f)
+haddr_t H5F_get_base_addr(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -667,8 +639,7 @@ H5F_get_base_addr(const H5F_t *f)
  *           Failure:    void (should not happen)
  *-------------------------------------------------------------------------
  */
-H5UC_t *
-H5F_grp_btree_shared(const H5F_t *f)
+H5UC_t* H5F_grp_btree_shared(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -691,8 +662,7 @@ H5F_grp_btree_shared(const H5F_t *f)
  *           Failure:    void (should not happen)
  *-------------------------------------------------------------------------
  */
-size_t
-H5F_sieve_buf_size(const H5F_t *f)
+size_t H5F_sieve_buf_size(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -715,8 +685,7 @@ H5F_sieve_buf_size(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-unsigned
-H5F_gc_ref(const H5F_t *f)
+unsigned H5F_gc_ref(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -736,8 +705,7 @@ H5F_gc_ref(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-H5F_close_degree_t
-H5F_get_fc_degree(const H5F_t *f)
+H5F_close_degree_t H5F_get_fc_degree(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -759,8 +727,7 @@ H5F_get_fc_degree(const H5F_t *f)
  *              Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_get_evict_on_close(const H5F_t *f)
+bool H5F_get_evict_on_close(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -780,8 +747,7 @@ H5F_get_evict_on_close(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_store_msg_crt_idx(const H5F_t *f)
+bool H5F_store_msg_crt_idx(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -801,8 +767,7 @@ H5F_store_msg_crt_idx(const H5F_t *f)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_shared_has_feature(const H5F_shared_t *f_sh, unsigned feature)
+bool H5F_shared_has_feature(const H5F_shared_t* f_sh, unsigned feature)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -821,8 +786,7 @@ H5F_shared_has_feature(const H5F_shared_t *f_sh, unsigned feature)
  *           Failure:    Negative (should not happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_has_feature(const H5F_t *f, unsigned feature)
+bool H5F_has_feature(const H5F_t* f, unsigned feature)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -843,8 +807,7 @@ H5F_has_feature(const H5F_t *f, unsigned feature)
  * Return:   'driver_id' on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-hid_t
-H5F_get_driver_id(const H5F_t *f)
+hid_t H5F_get_driver_id(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -866,8 +829,7 @@ H5F_get_driver_id(const H5F_t *f)
  * Return:   Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_get_fileno(const H5F_t *f, unsigned long *filenum)
+herr_t H5F_get_fileno(const H5F_t* f, unsigned long* filenum)
 {
     herr_t ret_value = SUCCEED;
 
@@ -879,8 +841,9 @@ H5F_get_fileno(const H5F_t *f, unsigned long *filenum)
     assert(filenum);
 
     /* Retrieve the file's serial number */
-    if (H5FD_get_fileno(f->shared->lf, filenum) < 0)
+    if (H5FD_get_fileno(f->shared->lf, filenum) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_BADRANGE, FAIL, "can't retrieve fileno");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -894,8 +857,7 @@ done:
  * Return:   Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5F_shared_get_eoa(const H5F_shared_t *f_sh, H5FD_mem_t type)
+haddr_t H5F_shared_get_eoa(const H5F_shared_t* f_sh, H5FD_mem_t type)
 {
     haddr_t ret_value = HADDR_UNDEF; /* Return value */
 
@@ -904,8 +866,9 @@ H5F_shared_get_eoa(const H5F_shared_t *f_sh, H5FD_mem_t type)
     assert(f_sh);
 
     /* Dispatch to driver */
-    if (HADDR_UNDEF == (ret_value = H5FD_get_eoa(f_sh->lf, type)))
+    if (HADDR_UNDEF == (ret_value = H5FD_get_eoa(f_sh->lf, type))) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTINIT, HADDR_UNDEF, "driver get_eoa request failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -919,8 +882,7 @@ done:
  * Return:   Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5F_get_eoa(const H5F_t *f, H5FD_mem_t type)
+haddr_t H5F_get_eoa(const H5F_t* f, H5FD_mem_t type)
 {
     haddr_t ret_value = HADDR_UNDEF; /* Return value */
 
@@ -930,8 +892,9 @@ H5F_get_eoa(const H5F_t *f, H5FD_mem_t type)
     assert(f->shared);
 
     /* Dispatch to driver */
-    if (HADDR_UNDEF == (ret_value = H5FD_get_eoa(f->shared->lf, type)))
+    if (HADDR_UNDEF == (ret_value = H5FD_get_eoa(f->shared->lf, type))) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTINIT, HADDR_UNDEF, "driver get_eoa request failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -946,8 +909,7 @@ done:
  * Return:      file handle on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_get_file_driver(const H5F_shared_t *f_sh, H5FD_t **file_handle)
+herr_t H5F_shared_get_file_driver(const H5F_shared_t* f_sh, H5FD_t** file_handle)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -970,8 +932,7 @@ H5F_shared_get_file_driver(const H5F_shared_t *f_sh, H5FD_t **file_handle)
  *              Failure:        negative.
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_get_vfd_handle(const H5F_t *file, hid_t fapl, void **file_handle)
+herr_t H5F_get_vfd_handle(const H5F_t* file, hid_t fapl, void** file_handle)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -982,8 +943,9 @@ H5F_get_vfd_handle(const H5F_t *file, hid_t fapl, void **file_handle)
     assert(file_handle);
 
     /* Get the VFD handle */
-    if (H5FD_get_vfd_handle(file->shared->lf, fapl, file_handle) < 0)
+    if (H5FD_get_vfd_handle(file->shared->lf, fapl, file_handle) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTGET, FAIL, "can't get file handle for file driver");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1000,8 +962,7 @@ done:
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_is_tmp_addr(const H5F_t *f, haddr_t addr)
+bool H5F_is_tmp_addr(const H5F_t* f, haddr_t addr)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1023,8 +984,7 @@ H5F_is_tmp_addr(const H5F_t *f, haddr_t addr)
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_use_tmp_space(const H5F_t *f)
+bool H5F_use_tmp_space(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1046,8 +1006,7 @@ H5F_use_tmp_space(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-H5P_coll_md_read_flag_t
-H5F_coll_md_read(const H5F_t *f)
+H5P_coll_md_read_flag_t H5F_coll_md_read(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1066,8 +1025,7 @@ H5F_coll_md_read(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-H5P_coll_md_read_flag_t
-H5F_shared_coll_md_read(const H5F_shared_t *f_sh)
+H5P_coll_md_read_flag_t H5F_shared_coll_md_read(const H5F_shared_t* f_sh)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1087,8 +1045,7 @@ H5F_shared_coll_md_read(const H5F_shared_t *f_sh)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_get_mpi_file_sync_required(const H5F_shared_t *f_sh, bool *flag /*out*/)
+herr_t H5F_shared_get_mpi_file_sync_required(const H5F_shared_t* f_sh, bool* flag /*out*/)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1098,8 +1055,9 @@ H5F_shared_get_mpi_file_sync_required(const H5F_shared_t *f_sh, bool *flag /*out
     assert(flag);
 
     /* Dispatch to driver */
-    if ((ret_value = H5FD_mpi_get_file_sync_required(f_sh->lf, flag)) < 0)
+    if ((ret_value = H5FD_mpi_get_file_sync_required(f_sh->lf, flag)) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTGET, FAIL, "driver get_file_sync_required request failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1117,8 +1075,7 @@ done:
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_use_mdc_logging(const H5F_t *f)
+bool H5F_use_mdc_logging(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1140,8 +1097,7 @@ H5F_use_mdc_logging(const H5F_t *f)
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_start_mdc_log_on_access(const H5F_t *f)
+bool H5F_start_mdc_log_on_access(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1163,8 +1119,7 @@ H5F_start_mdc_log_on_access(const H5F_t *f)
  * Return:   true/false on success/abort on failure (shouldn't fail)
  *-------------------------------------------------------------------------
  */
-char *
-H5F_mdc_log_location(const H5F_t *f)
+char* H5F_mdc_log_location(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1184,8 +1139,7 @@ H5F_mdc_log_location(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5F_get_alignment(const H5F_t *f)
+hsize_t H5F_get_alignment(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1205,8 +1159,7 @@ H5F_get_alignment(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5F_get_threshold(const H5F_t *f)
+hsize_t H5F_get_threshold(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1226,8 +1179,7 @@ H5F_get_threshold(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5F_get_pgend_meta_thres(const H5F_t *f)
+hsize_t H5F_get_pgend_meta_thres(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1247,8 +1199,7 @@ H5F_get_pgend_meta_thres(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_get_point_of_no_return(const H5F_t *f)
+bool H5F_get_point_of_no_return(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1268,8 +1219,7 @@ H5F_get_point_of_no_return(const H5F_t *f)
  *           Failure:    (can't happen)
  *-------------------------------------------------------------------------
  */
-bool
-H5F_get_null_fsm_addr(const H5F_t *f)
+bool H5F_get_null_fsm_addr(const H5F_t* f)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -1289,8 +1239,7 @@ H5F_get_null_fsm_addr(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-H5VL_object_t *
-H5F_get_vol_obj(const H5F_t *f)
+H5VL_object_t* H5F_get_vol_obj(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1309,8 +1258,7 @@ H5F_get_vol_obj(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F__get_cont_info(const H5F_t *f, H5VL_file_cont_info_t *info)
+herr_t H5F__get_cont_info(const H5F_t* f, H5VL_file_cont_info_t* info)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1321,13 +1269,14 @@ H5F__get_cont_info(const H5F_t *f, H5VL_file_cont_info_t *info)
     assert(f->shared);
 
     /* Verify structure version */
-    if (info->version != H5VL_CONTAINER_INFO_VERSION)
+    if (info->version != H5VL_CONTAINER_INFO_VERSION) {
         HGOTO_ERROR(H5E_FILE, H5E_VERSION, FAIL, "wrong container info version #");
+    }
 
     /* Set the container info fields */
     info->feature_flags = 0; /* None currently defined */
-    info->token_size    = H5F_SIZEOF_ADDR(f);
-    info->blob_id_size  = H5HG_HEAP_ID_SIZE(f);
+    info->token_size = H5F_SIZEOF_ADDR(f);
+    info->blob_id_size = H5HG_HEAP_ID_SIZE(f);
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1342,8 +1291,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5F_get_use_file_locking(const H5F_t *f)
+bool H5F_get_use_file_locking(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1362,8 +1310,7 @@ H5F_get_use_file_locking(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5F_has_vector_select_io(const H5F_t *f, bool is_write)
+bool H5F_has_vector_select_io(const H5F_t* f, bool is_write)
 {
     bool ret_value = false; /* Return value */
 
@@ -1372,10 +1319,12 @@ H5F_has_vector_select_io(const H5F_t *f, bool is_write)
     assert(f);
     assert(f->shared);
 
-    if (is_write)
+    if (is_write) {
         ret_value = (f->shared->lf->cls->write_vector != NULL || f->shared->lf->cls->write_selection != NULL);
-    else
+    }
+    else {
         ret_value = (f->shared->lf->cls->read_vector != NULL || f->shared->lf->cls->read_selection != NULL);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5F_has_vector_select_io */
@@ -1389,8 +1338,7 @@ H5F_has_vector_select_io(const H5F_t *f, bool is_write)
  *
  *-------------------------------------------------------------------------
  */
-uint64_t
-H5F_get_rfic_flags(const H5F_t *f)
+uint64_t H5F_get_rfic_flags(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 

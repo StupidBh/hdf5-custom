@@ -28,17 +28,17 @@
 /* Headers */
 /***********/
 
-#include "H5private.h"  /* Generic Functions                        */
-#include "H5Eprivate.h" /* Error handling                           */
-#include "H5Iprivate.h" /* IDs                                      */
-#include "H5Pprivate.h" /* Property lists                           */
-#include "H5VLpkg.h"    /* Virtual Object Layer                     */
+#include "H5private.h"            /* Generic Functions                        */
+#include "H5Eprivate.h"           /* Error handling                           */
+#include "H5Iprivate.h"           /* IDs                                      */
+#include "H5Pprivate.h"           /* Property lists                           */
+#include "H5VLpkg.h"              /* Virtual Object Layer                     */
 
 #include "H5VLpassthru_private.h" /* Passthru  VOL connector        */
 
 /* The native passthru VOL connector */
-hid_t             H5VL_PASSTHRU_g      = H5I_INVALID_HID;
-H5VL_connector_t *H5VL_PASSTHRU_conn_g = NULL;
+hid_t H5VL_PASSTHRU_g = H5I_INVALID_HID;
+H5VL_connector_t* H5VL_PASSTHRU_conn_g = NULL;
 
 /*-------------------------------------------------------------------------
  * Function:    H5VL__passthru_register
@@ -49,23 +49,24 @@ H5VL_connector_t *H5VL_PASSTHRU_conn_g = NULL;
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VL__passthru_register(void)
+herr_t H5VL__passthru_register(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Register the passthru VOL connector, if it isn't already */
-    if (NULL == H5VL_PASSTHRU_conn_g)
-        if (NULL == (H5VL_PASSTHRU_conn_g =
-                         H5VL__register_connector(&H5VL_pass_through_g, H5P_VOL_INITIALIZE_DEFAULT)))
+    if (NULL == H5VL_PASSTHRU_conn_g) {
+        if (NULL == (H5VL_PASSTHRU_conn_g = H5VL__register_connector(&H5VL_pass_through_g, H5P_VOL_INITIALIZE_DEFAULT))) {
             HGOTO_ERROR(H5E_VOL, H5E_CANTREGISTER, FAIL, "can't register passthru VOL connector");
+        }
+    }
 
     /* Get ID for connector */
     if (H5I_VOL != H5I_get_type(H5VL_PASSTHRU_g)) {
-        if ((H5VL_PASSTHRU_g = H5I_register(H5I_VOL, H5VL_PASSTHRU_conn_g, false)) < 0)
+        if ((H5VL_PASSTHRU_g = H5I_register(H5I_VOL, H5VL_PASSTHRU_conn_g, false)) < 0) {
             HGOTO_ERROR(H5E_VOL, H5E_CANTREGISTER, FAIL, "can't create ID for passthru VOL connector");
+        }
 
         /* ID is holding a reference to the connector */
         H5VL_conn_inc_rc(H5VL_PASSTHRU_conn_g);
@@ -84,13 +85,12 @@ done:
  *
  *---------------------------------------------------------------------------
  */
-herr_t
-H5VL__passthru_unregister(void)
+herr_t H5VL__passthru_unregister(void)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     /* Reset VOL connector info */
-    H5VL_PASSTHRU_g      = H5I_INVALID_HID;
+    H5VL_PASSTHRU_g = H5I_INVALID_HID;
     H5VL_PASSTHRU_conn_g = NULL;
 
     FUNC_LEAVE_NOAPI(SUCCEED)

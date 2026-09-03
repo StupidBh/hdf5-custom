@@ -19,14 +19,12 @@
 
 #define FILENAME "dset.h5"
 
-int
-main(void)
+int main(void)
 {
-
-    hid_t   file_id, dataset_id, attribute_id, dataspace_id; /* identifiers */
+    hid_t file_id, dataset_id, attribute_id, dataspace_id; /* identifiers */
     hsize_t dims;
-    int     attr_data[2];
-    herr_t  status;
+    int attr_data[2];
+    herr_t status;
 
     /* Initialize the attribute data. */
     attr_data[0] = 100;
@@ -39,7 +37,7 @@ main(void)
     dataset_id = H5Dopen2(file_id, "/dset", H5P_DEFAULT);
 
     /* Create the data space for the attribute. */
-    dims         = 2;
+    dims = 2;
     dataspace_id = H5Screate_simple(1, &dims, NULL);
 
     /* Create a dataset attribute. */

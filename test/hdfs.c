@@ -25,317 +25,317 @@
 #include "H5FDhdfs.h" /* this file driver's utilities */
 
 #ifdef H5_HAVE_LIBHDFS
-#define HDFS_TEST_DEBUG        0
-#define HDFS_TEST_MAX_BUF_SIZE 256
+    #define HDFS_TEST_DEBUG        0
+    #define HDFS_TEST_MAX_BUF_SIZE 256
 
-/*****************************************************************************
- *
- * FILE-LOCAL TESTING MACROS
- *
- * Purpose:
- *
- *     1) Upon test failure, goto-jump to single-location teardown in test
- *        function. E.g., `error:` (consistency with HDF corpus) or
- *        `failed:` (reflects purpose).
- *            >>> using "error", in part because `H5E_BEGIN_TRY` expects it.
- *     2) Increase clarity and reduce overhead found with `TEST_ERROR`.
- *        e.g., "if(somefunction(arg, arg2) < 0) TEST_ERROR:"
- *        requires reading of entire line to know whether this if/call is
- *        part of the test setup, test operation, or a test unto itself.
- *     3) Provide testing macros with optional user-supplied failure message;
- *        if not supplied (NULL), generate comparison output in the spirit of
- *        test-driven development. E.g., "expected 5 but was -3"
- *        User messages clarify test's purpose in code, encouraging description
- *        without relying on comments.
- *     4) Configurable expected-actual order in generated comparison strings.
- *        Some prefer `VERIFY(expected, actual)`, others
- *        `VERIFY(actual, expected)`. Provide preprocessor ifdef switch
- *        to satisfy both parties, assuming one paradigm per test file.
- *        (One could #undef and redefine the flag through the file as desired,
- *         but _why_.)
- *
- *     Provided as courtesy, per consideration for inclusion in the library
- *     proper.
- *
- *     Macros:
- *
- *         JSVERIFY_EXP_ACT - ifdef flag, configures comparison order
- *         FAIL_IF()        - check condition
- *         FAIL_UNLESS()    - check _not_ condition
- *         JSVERIFY()       - long-int equality check; prints reason/comparison
- *         JSVERIFY_NOT()   - long-int inequality check; prints
- *         JSVERIFY_STR()   - string equality check; prints
- *
- *****************************************************************************/
+    /*****************************************************************************
+     *
+     * FILE-LOCAL TESTING MACROS
+     *
+     * Purpose:
+     *
+     *     1) Upon test failure, goto-jump to single-location teardown in test
+     *        function. E.g., `error:` (consistency with HDF corpus) or
+     *        `failed:` (reflects purpose).
+     *            >>> using "error", in part because `H5E_BEGIN_TRY` expects it.
+     *     2) Increase clarity and reduce overhead found with `TEST_ERROR`.
+     *        e.g., "if(somefunction(arg, arg2) < 0) TEST_ERROR:"
+     *        requires reading of entire line to know whether this if/call is
+     *        part of the test setup, test operation, or a test unto itself.
+     *     3) Provide testing macros with optional user-supplied failure message;
+     *        if not supplied (NULL), generate comparison output in the spirit of
+     *        test-driven development. E.g., "expected 5 but was -3"
+     *        User messages clarify test's purpose in code, encouraging description
+     *        without relying on comments.
+     *     4) Configurable expected-actual order in generated comparison strings.
+     *        Some prefer `VERIFY(expected, actual)`, others
+     *        `VERIFY(actual, expected)`. Provide preprocessor ifdef switch
+     *        to satisfy both parties, assuming one paradigm per test file.
+     *        (One could #undef and redefine the flag through the file as desired,
+     *         but _why_.)
+     *
+     *     Provided as courtesy, per consideration for inclusion in the library
+     *     proper.
+     *
+     *     Macros:
+     *
+     *         JSVERIFY_EXP_ACT - ifdef flag, configures comparison order
+     *         FAIL_IF()        - check condition
+     *         FAIL_UNLESS()    - check _not_ condition
+     *         JSVERIFY()       - long-int equality check; prints reason/comparison
+     *         JSVERIFY_NOT()   - long-int inequality check; prints
+     *         JSVERIFY_STR()   - string equality check; prints
+     *
+     *****************************************************************************/
 
-/*----------------------------------------------------------------------------
- *
- * ifdef flag: JSVERIFY_EXP_ACT
- *
- * JSVERIFY macros accept arguments as (EXPECTED, ACTUAL[, reason])
- *   default, if this is undefined, is (ACTUAL, EXPECTED[, reason])
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_EXP_ACT 1L
+    /*----------------------------------------------------------------------------
+     *
+     * ifdef flag: JSVERIFY_EXP_ACT
+     *
+     * JSVERIFY macros accept arguments as (EXPECTED, ACTUAL[, reason])
+     *   default, if this is undefined, is (ACTUAL, EXPECTED[, reason])
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY_EXP_ACT 1L
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSFAILED_AT()
- *
- * Purpose:
- *
- *     Preface a test failure by printing "*FAILED*" and location to stdout
- *     Similar to `H5_FAILED(); AT();` from h5test.h
- *
- *     *FAILED* at somefile.c:12 in function_name()...
- *
- *----------------------------------------------------------------------------
- */
-#define JSFAILED_AT()                                                                                        \
-    {                                                                                                        \
-        printf("*FAILED* at %s:%d in %s()...\n", __FILE__, __LINE__, __func__);                              \
-    }
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSFAILED_AT()
+     *
+     * Purpose:
+     *
+     *     Preface a test failure by printing "*FAILED*" and location to stdout
+     *     Similar to `H5_FAILED(); AT();` from h5test.h
+     *
+     *     *FAILED* at somefile.c:12 in function_name()...
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSFAILED_AT()                                                           \
+        {                                                                           \
+            printf("*FAILED* at %s:%d in %s()...\n", __FILE__, __LINE__, __func__); \
+        }
 
-/*----------------------------------------------------------------------------
- *
- * Macro: FAIL_IF()
- *
- * Purpose:
- *
- *     Make tests more accessible and less cluttered than
- *         `if (thing == otherthing()) TEST_ERROR`
- *         paradigm.
- *
- *     The following lines are roughly equivalent:
- *
- *         `if (myfunc() < 0) TEST_ERROR;` (as seen elsewhere in HDF tests)
- *         `FAIL_IF(myfunc() < 0)`
- *
- *     Prints a generic "FAILED AT" line to stdout and jumps to `error`,
- *     similar to `TEST_ERROR` in h5test.h
- *
- *----------------------------------------------------------------------------
- */
-#define FAIL_IF(condition)                                                                                   \
-    if (condition) {                                                                                         \
-        JSFAILED_AT()                                                                                        \
-        goto error;                                                                                          \
-    }
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: FAIL_IF()
+     *
+     * Purpose:
+     *
+     *     Make tests more accessible and less cluttered than
+     *         `if (thing == otherthing()) TEST_ERROR`
+     *         paradigm.
+     *
+     *     The following lines are roughly equivalent:
+     *
+     *         `if (myfunc() < 0) TEST_ERROR;` (as seen elsewhere in HDF tests)
+     *         `FAIL_IF(myfunc() < 0)`
+     *
+     *     Prints a generic "FAILED AT" line to stdout and jumps to `error`,
+     *     similar to `TEST_ERROR` in h5test.h
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define FAIL_IF(condition) \
+        if (condition) {       \
+            JSFAILED_AT()      \
+            goto error;        \
+        }
 
-/*----------------------------------------------------------------------------
- *
- * Macro: FAIL_UNLESS()
- *
- * Purpose:
- *
- *     TEST_ERROR wrapper to reduce cognitive overhead from "negative tests",
- *     e.g., "a != b".
- *
- *     Opposite of FAIL_IF; fails if the given condition is _not_ true.
- *
- *     `FAIL_IF( 5 != my_op() )`
- *     is equivalent to
- *     `FAIL_UNLESS( 5 == my_op() )`
- *     However, `JSVERIFY(5, my_op(), "bad return")` may be even clearer.
- *         (see JSVERIFY)
- *
- *----------------------------------------------------------------------------
- */
-#if 0 /* UNUSED */
-#define FAIL_UNLESS(condition)                                                                               \
-    if (!(condition)) {                                                                                      \
-        JSFAILED_AT()                                                                                        \
-        goto error;                                                                                          \
-    }
-#endif /* UNUSED */
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: FAIL_UNLESS()
+     *
+     * Purpose:
+     *
+     *     TEST_ERROR wrapper to reduce cognitive overhead from "negative tests",
+     *     e.g., "a != b".
+     *
+     *     Opposite of FAIL_IF; fails if the given condition is _not_ true.
+     *
+     *     `FAIL_IF( 5 != my_op() )`
+     *     is equivalent to
+     *     `FAIL_UNLESS( 5 == my_op() )`
+     *     However, `JSVERIFY(5, my_op(), "bad return")` may be even clearer.
+     *         (see JSVERIFY)
+     *
+     *----------------------------------------------------------------------------
+     */
+    #if 0 /* UNUSED */
+        #define FAIL_UNLESS(condition) \
+            if (!(condition)) {        \
+                JSFAILED_AT()          \
+                goto error;            \
+            }
+    #endif /* UNUSED */
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSERR_LONG()
- *
- * Purpose:
- *
- *     Print an failure message for long-int arguments.
- *     ERROR-AT printed first.
- *     If `reason` is given, it is printed on own line and newlined after
- *     else, prints "expected/actual" aligned on own lines.
- *
- *     *FAILED* at myfile.c:488 in somefunc()...
- *     forest must be made of trees.
- *
- *     or
- *
- *     *FAILED* at myfile.c:488 in somefunc()...
- *       ! Expected 425
- *       ! Actual   3
- *
- *----------------------------------------------------------------------------
- */
-#define JSERR_LONG(expected, actual, reason)                                                                 \
-    {                                                                                                        \
-        JSFAILED_AT()                                                                                        \
-        if (reason != NULL) {                                                                                \
-            printf("%s\n", (reason));                                                                        \
-        }                                                                                                    \
-        else {                                                                                               \
-            printf("  ! Expected %ld\n  ! Actual   %ld\n", (long)(expected), (long)(actual));                \
-        }                                                                                                    \
-    }
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSERR_LONG()
+     *
+     * Purpose:
+     *
+     *     Print an failure message for long-int arguments.
+     *     ERROR-AT printed first.
+     *     If `reason` is given, it is printed on own line and newlined after
+     *     else, prints "expected/actual" aligned on own lines.
+     *
+     *     *FAILED* at myfile.c:488 in somefunc()...
+     *     forest must be made of trees.
+     *
+     *     or
+     *
+     *     *FAILED* at myfile.c:488 in somefunc()...
+     *       ! Expected 425
+     *       ! Actual   3
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSERR_LONG(expected, actual, reason)                                                  \
+        {                                                                                         \
+            JSFAILED_AT()                                                                         \
+            if (reason != NULL) {                                                                 \
+                printf("%s\n", (reason));                                                         \
+            }                                                                                     \
+            else {                                                                                \
+                printf("  ! Expected %ld\n  ! Actual   %ld\n", (long)(expected), (long)(actual)); \
+            }                                                                                     \
+        }
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSERR_STR()
- *
- * Purpose:
- *
- *     Print an failure message for string arguments.
- *     ERROR-AT printed first.
- *     If `reason` is given, it is printed on own line and newlined after
- *     else, prints "expected/actual" aligned on own lines.
- *
- *     *FAILED*  at myfile.c:421 in myfunc()...
- *     Blue and Red strings don't match!
- *
- *     or
- *
- *     *FAILED*  at myfile.c:421 in myfunc()...
- *     !!! Expected:
- *     this is my expected
- *     string
- *     !!! Actual:
- *     not what I expected at all
- *
- *----------------------------------------------------------------------------
- */
-#define JSERR_STR(expected, actual, reason)                                                                  \
-    {                                                                                                        \
-        const char *_reason = reason;                                                                        \
-        JSFAILED_AT()                                                                                        \
-        if (_reason != NULL) {                                                                               \
-            printf("%s\n", _reason);                                                                         \
-        }                                                                                                    \
-        else {                                                                                               \
-            printf("!!! Expected:\n%s\n!!!Actual:\n%s\n", (expected), (actual));                             \
-        }                                                                                                    \
-    }
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSERR_STR()
+     *
+     * Purpose:
+     *
+     *     Print an failure message for string arguments.
+     *     ERROR-AT printed first.
+     *     If `reason` is given, it is printed on own line and newlined after
+     *     else, prints "expected/actual" aligned on own lines.
+     *
+     *     *FAILED*  at myfile.c:421 in myfunc()...
+     *     Blue and Red strings don't match!
+     *
+     *     or
+     *
+     *     *FAILED*  at myfile.c:421 in myfunc()...
+     *     !!! Expected:
+     *     this is my expected
+     *     string
+     *     !!! Actual:
+     *     not what I expected at all
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSERR_STR(expected, actual, reason)                                      \
+        {                                                                            \
+            const char* _reason = reason;                                            \
+            JSFAILED_AT()                                                            \
+            if (_reason != NULL) {                                                   \
+                printf("%s\n", _reason);                                             \
+            }                                                                        \
+            else {                                                                   \
+                printf("!!! Expected:\n%s\n!!!Actual:\n%s\n", (expected), (actual)); \
+            }                                                                        \
+        }
 
-#ifdef JSVERIFY_EXP_ACT
+    #ifdef JSVERIFY_EXP_ACT
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY()
- *
- * Purpose:
- *
- *     Verify that two long integers are equal.
- *     If unequal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY(expected, actual, reason)                                                                   \
-    if ((long)(actual) != (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY */
+        /*----------------------------------------------------------------------------
+         *
+         * Macro: JSVERIFY()
+         *
+         * Purpose:
+         *
+         *     Verify that two long integers are equal.
+         *     If unequal, print failure message
+         *     (with `reason`, if not NULL; expected/actual if NULL)
+         *     and jump to `error` at end of function
+         *
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY(expected, actual, reason)         \
+            if ((long)(actual) != (long)(expected)) {      \
+                JSERR_LONG((expected), (actual), (reason)) \
+                goto error;                                \
+            } /* JSVERIFY */
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY_NOT()
- *
- * Purpose:
- *
- *     Verify that two long integers are _not_ equal.
- *     If equal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_NOT(expected, actual, reason)                                                               \
-    if ((long)(actual) == (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_NOT */
+        /*----------------------------------------------------------------------------
+         *
+         * Macro: JSVERIFY_NOT()
+         *
+         * Purpose:
+         *
+         *     Verify that two long integers are _not_ equal.
+         *     If equal, print failure message
+         *     (with `reason`, if not NULL; expected/actual if NULL)
+         *     and jump to `error` at end of function
+         *
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY_NOT(expected, actual, reason)     \
+            if ((long)(actual) == (long)(expected)) {      \
+                JSERR_LONG((expected), (actual), (reason)) \
+                goto error;                                \
+            } /* JSVERIFY_NOT */
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY_STR()
- *
- * Purpose:
- *
- *     Verify that two strings are equal.
- *     If unequal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_STR(expected, actual, reason)                                                               \
-    if (strcmp((actual), (expected)) != 0) {                                                                 \
-        JSERR_STR((expected), (actual), (reason));                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_STR */
+        /*----------------------------------------------------------------------------
+         *
+         * Macro: JSVERIFY_STR()
+         *
+         * Purpose:
+         *
+         *     Verify that two strings are equal.
+         *     If unequal, print failure message
+         *     (with `reason`, if not NULL; expected/actual if NULL)
+         *     and jump to `error` at end of function
+         *
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY_STR(expected, actual, reason)     \
+            if (strcmp((actual), (expected)) != 0) {       \
+                JSERR_STR((expected), (actual), (reason)); \
+                goto error;                                \
+            } /* JSVERIFY_STR */
 
-#else
-/* JSVERIFY_EXP_ACT not defined
- *
- * Repeats macros above, but with actual/expected parameters reversed.
- */
+    #else
+        /* JSVERIFY_EXP_ACT not defined
+         *
+         * Repeats macros above, but with actual/expected parameters reversed.
+         */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY()
- * See: JSVERIFY documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY(actual, expected, reason)                                                                   \
-    if ((long)(actual) != (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason));                                                          \
-        goto error;                                                                                          \
-    } /* JSVERIFY */
+        /*----------------------------------------------------------------------------
+         * Macro: JSVERIFY()
+         * See: JSVERIFY documentation above.
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY(actual, expected, reason)          \
+            if ((long)(actual) != (long)(expected)) {       \
+                JSERR_LONG((expected), (actual), (reason)); \
+                goto error;                                 \
+            } /* JSVERIFY */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY_NOT()
- * See: JSVERIFY_NOT documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_NOT(actual, expected, reason)                                                               \
-    if ((long)(actual) == (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_NOT */
+        /*----------------------------------------------------------------------------
+         * Macro: JSVERIFY_NOT()
+         * See: JSVERIFY_NOT documentation above.
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY_NOT(actual, expected, reason)     \
+            if ((long)(actual) == (long)(expected)) {      \
+                JSERR_LONG((expected), (actual), (reason)) \
+                goto error;                                \
+            } /* JSVERIFY_NOT */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY_STR()
- * See: JSVERIFY_STR documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_STR(actual, expected, reason)                                                               \
-    if (strcmp((actual), (expected)) != 0) {                                                                 \
-        JSERR_STR((expected), (actual), (reason));                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_STR */
+        /*----------------------------------------------------------------------------
+         * Macro: JSVERIFY_STR()
+         * See: JSVERIFY_STR documentation above.
+         *----------------------------------------------------------------------------
+         */
+        #define JSVERIFY_STR(actual, expected, reason)     \
+            if (strcmp((actual), (expected)) != 0) {       \
+                JSERR_STR((expected), (actual), (reason)); \
+                goto error;                                \
+            } /* JSVERIFY_STR */
 
-#endif /* ifdef/else JSVERIFY_EXP_ACT */
+    #endif /* ifdef/else JSVERIFY_EXP_ACT */
 
-/********************************
- * OTHER MACROS AND DEFINITIONS *
- ********************************/
+    /********************************
+     * OTHER MACROS AND DEFINITIONS *
+     ********************************/
 
-/* copied from src/hdfs.c */
-#define MAXADDR (((haddr_t)1 << (8 * sizeof(HDoff_t) - 1)) - 1)
+    /* copied from src/hdfs.c */
+    #define MAXADDR (((haddr_t)1 << (8 * sizeof(HDoff_t) - 1)) - 1)
 
-#define HDFS_NAMENODE_NAME_MAX_SIZE 128
+    #define HDFS_NAMENODE_NAME_MAX_SIZE 128
 
 /*******************************
  * FILE-LOCAL GLOBAL VARIABLES *
  *******************************/
 
-static const char filename_missing[]    = "/tmp/missing.txt";
-static const char filename_bard[]       = "/tmp/t8.shakespeare.txt";
-static const char filename_raven[]      = "/tmp/Poe_Raven.txt";
+static const char filename_missing[] = "/tmp/missing.txt";
+static const char filename_bard[] = "/tmp/t8.shakespeare.txt";
+static const char filename_raven[] = "/tmp/Poe_Raven.txt";
 static const char filename_example_h5[] = "/tmp/t.h5";
 
 static H5FD_hdfs_fapl_t default_fa = {
@@ -368,8 +368,7 @@ static H5FD_hdfs_fapl_t default_fa = {
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_fapl_config_validation(void)
+static int test_fapl_config_validation(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS fapl configuration validation");
@@ -387,9 +386,10 @@ test_fapl_config_validation(void)
      * test-local structures *
      *************************/
 
-    struct testcase {
-        const char      *msg;
-        herr_t           expected;
+    struct testcase
+    {
+        const char* msg;
+        herr_t expected;
         H5FD_hdfs_fapl_t config;
     };
 
@@ -397,13 +397,13 @@ test_fapl_config_validation(void)
      * test-local variables *
      ************************/
 
-    hid_t            fapl_id = H5I_INVALID_HID; /* file access property list ID */
+    hid_t fapl_id = H5I_INVALID_HID; /* file access property list ID */
     H5FD_hdfs_fapl_t config;
     H5FD_hdfs_fapl_t fa_fetch;
-    herr_t           success  = SUCCEED;
-    unsigned int     i        = 0;
-    unsigned int     ncases   = 6;    /* should equal number of cases */
-    struct testcase *case_ptr = NULL; /* dumb work-around for possible     */
+    herr_t success = SUCCEED;
+    unsigned int i = 0;
+    unsigned int ncases = 6;          /* should equal number of cases */
+    struct testcase* case_ptr = NULL; /* dumb work-around for possible     */
                                       /* dynamic cases creation because    */
                                       /* of compiler warnings Wlarger-than */
     struct testcase cases_arr[] = {
@@ -488,13 +488,12 @@ test_fapl_config_validation(void)
      *********/
 
     for (i = 0; i < ncases; i++) {
-
         /*---------------
          * per-test setup
          *---------------
          */
         case_ptr = &cases_arr[i];
-        fapl_id  = H5Pcreate(H5P_FILE_ACCESS);
+        fapl_id = H5Pcreate(H5P_FILE_ACCESS);
         FAIL_IF(fapl_id < 0) /* sanity-check */
 
         /*-----------------------------------
@@ -526,8 +525,7 @@ test_fapl_config_validation(void)
             JSVERIFY(config.stream_buffer_size, fa_fetch.stream_buffer_size, "streambuffer size mismatch")
             JSVERIFY_STR(config.namenode_name, fa_fetch.namenode_name, "node name mismatch")
             JSVERIFY_STR(config.user_name, fa_fetch.user_name, "user name mismatch")
-            JSVERIFY_STR(config.kerberos_ticket_cache, fa_fetch.kerberos_ticket_cache,
-                         "kerberos ticket cache mismatch")
+            JSVERIFY_STR(config.kerberos_ticket_cache, fa_fetch.kerberos_ticket_cache, "kerberos ticket cache mismatch")
         }
 
         /*-----------------------------
@@ -573,8 +571,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_hdfs_fapl(void)
+static int test_hdfs_fapl(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS fapl ");
@@ -588,16 +585,16 @@ test_hdfs_fapl(void)
      * test-local variables *
      ************************/
 
-    hid_t            fapl_id      = H5I_INVALID_HID; /* file access property list ID */
-    hid_t            driver_id    = H5I_INVALID_HID; /* ID for this VFD              */
-    unsigned long    driver_flags = 0;               /* VFD feature flags            */
-    H5FD_hdfs_fapl_t hdfs_fa_0    = {
-        1,    /* version*/
-        "",   /* node name */
-        9000, /* node port */
-        "",   /* username */
-        "",   /* kerb cache path */
-        1024, /* stream buffer size */
+    hid_t fapl_id = H5I_INVALID_HID;   /* file access property list ID */
+    hid_t driver_id = H5I_INVALID_HID; /* ID for this VFD              */
+    unsigned long driver_flags = 0;    /* VFD feature flags            */
+    H5FD_hdfs_fapl_t hdfs_fa_0 = {
+        1,                             /* version*/
+        "",                            /* node name */
+        9000,                          /* node port */
+        "",                            /* username */
+        "",                            /* kerb cache path */
+        1024,                          /* stream buffer size */
     };
 
     TESTING("HDFS fapl ");
@@ -619,7 +616,8 @@ test_hdfs_fapl(void)
 
     FAIL_IF(H5FDdriver_query(driver_id, &driver_flags) < 0)
 
-    JSVERIFY_NOT(0, (driver_flags & H5FD_FEAT_DATA_SIEVE),
+    JSVERIFY_NOT(0,
+                 (driver_flags & H5FD_FEAT_DATA_SIEVE),
                  "bit(s) in `driver_flags` must align with "
                  "H5FD_FEAT_DATA_SIEVE")
 
@@ -655,10 +653,8 @@ error:
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_vfd_open(void)
+static int test_vfd_open(void)
 {
-
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS VFD-level open");
     SKIPPED();
@@ -673,21 +669,22 @@ test_vfd_open(void)
      *********************/
 
     /* selectors for which fapl to use in testcase */
-#define FAPL_H5P_DEFAULT  -2
-#define FAPL_UNCONFIGURED -3 /* H5P_FILE_ACCESS */
-#define FAPL_HDFS         -4
+    #define FAPL_H5P_DEFAULT  -2
+    #define FAPL_UNCONFIGURED -3 /* H5P_FILE_ACCESS */
+    #define FAPL_HDFS         -4
 
     /*************************
      * test-local structures *
      *************************/
 
-    struct test_condition {
-        const char *message;
-        const char *url;
-        unsigned    flags;
-        int         which_fapl;
-        haddr_t     maxaddr;
-        bool        might_use_other_driver;
+    struct test_condition
+    {
+        const char* message;
+        const char* url;
+        unsigned flags;
+        int which_fapl;
+        haddr_t maxaddr;
+        bool might_use_other_driver;
     };
 
     /************************
@@ -776,11 +773,11 @@ test_vfd_open(void)
             false,
         },
     };
-    unsigned i                        = 0;
+    unsigned i = 0;
     unsigned failing_conditions_count = 10;
-    H5FD_t  *fd                       = NULL;
-    hid_t    fapl_hdfs                = H5I_INVALID_HID;
-    hid_t    fapl_unconfigured        = H5I_INVALID_HID;
+    H5FD_t* fd = NULL;
+    hid_t fapl_hdfs = H5I_INVALID_HID;
+    hid_t fapl_unconfigured = H5I_INVALID_HID;
 
     TESTING("HDFS VFD-level open");
 
@@ -798,8 +795,8 @@ test_vfd_open(void)
     /* all the test cases that will _not_ open
      */
     for (i = 0; i < failing_conditions_count; i++) {
-        struct test_condition T       = failing_conditions[i];
-        hid_t                 fapl_id = H5P_DEFAULT;
+        struct test_condition T = failing_conditions[i];
+        hid_t fapl_id = H5P_DEFAULT;
 
         fd = NULL;
 
@@ -810,9 +807,9 @@ test_vfd_open(void)
             fapl_id = fapl_hdfs;
         }
 
-#if HDFS_TEST_DEBUG
+    #if HDFS_TEST_DEBUG
         fprintf(stderr, "testing: %s\n", T.message);
-#endif /* HDFS_TEST_DEBUG */
+    #endif /* HDFS_TEST_DEBUG */
 
         H5E_BEGIN_TRY
         {
@@ -821,9 +818,10 @@ test_vfd_open(void)
         H5E_END_TRY
         if (NULL != fd) {
             if (true == T.might_use_other_driver && H5FD_HDFS != fd->driver_id) {
-                fprintf(stderr, "\n!!!!! WARNING !!!!!\n"
-                                "    Successful open of file on local system "
-                                "with non-HDFS VFD.\n");
+                fprintf(stderr,
+                        "\n!!!!! WARNING !!!!!\n"
+                        "    Successful open of file on local system "
+                        "with non-HDFS VFD.\n");
                 JSVERIFY(SUCCEED, H5FDclose(fd), "unable to close errant open");
                 fd = NULL;
             }
@@ -835,9 +833,9 @@ test_vfd_open(void)
 
     FAIL_IF(NULL != fd) /* sanity check */
 
-#if HDFS_TEST_DEBUG
+    #if HDFS_TEST_DEBUG
     fprintf(stderr, "nominal open\n");
-#endif /* HDFS_TEST_DEBUG */
+    #endif /* HDFS_TEST_DEBUG */
 
     /* finally, show that a file can be opened
      */
@@ -848,9 +846,9 @@ test_vfd_open(void)
      * TEARDOWN *
      ************/
 
-#if HDFS_TEST_DEBUG
+    #if HDFS_TEST_DEBUG
     fprintf(stderr, "teardown...\n");
-#endif /* HDFS_TEST_DEBUG */
+    #endif /* HDFS_TEST_DEBUG */
 
     FAIL_IF(FAIL == H5FDclose(fd))
     fd = NULL;
@@ -886,9 +884,9 @@ error:
 
     return 1;
 
-#undef FAPL_H5P_DEFAULT
-#undef FAPL_UNCONFIGURED
-#undef FAPL_HDFS
+    #undef FAPL_H5P_DEFAULT
+    #undef FAPL_UNCONFIGURED
+    #undef FAPL_HDFS
 
 #endif /* H5_HAVE_LIBHDFS */
 
@@ -909,8 +907,7 @@ error:
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_eof_eoa(void)
+static int test_eof_eoa(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS eof/eoa gets and sets");
@@ -933,8 +930,8 @@ test_eof_eoa(void)
      * test-local variables *
      ************************/
 
-    H5FD_t *fd_shakespeare = NULL;
-    hid_t   fapl_id        = H5I_INVALID_HID;
+    H5FD_t* fd_shakespeare = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("HDFS eof/eoa gets and sets");
 
@@ -955,22 +952,21 @@ test_eof_eoa(void)
 
     /* verify as found
      */
-    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EOF mismatch")
-    JSVERIFY(H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), H5FDget_eof(fd_shakespeare, H5FD_MEM_DRAW),
-             "mismatch between DEFAULT and RAW memory types")
+    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EOF mismatch")
+    JSVERIFY(H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), H5FDget_eof(fd_shakespeare, H5FD_MEM_DRAW), "mismatch between DEFAULT and RAW memory types")
     JSVERIFY(0, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA should be unset by H5FDopen")
 
     /* set EoA below EoF
      */
-    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 44442202), "unable to set EoA (lower)")
-    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
-    JSVERIFY(44442202, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
+    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 44'442'202), "unable to set EoA (lower)")
+    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
+    JSVERIFY(44'442'202, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
 
     /* set EoA above EoF
      */
-    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 6789012), "unable to set EoA (higher)")
-    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
-    JSVERIFY(6789012, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
+    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 6'789'012), "unable to set EoA (higher)")
+    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
+    JSVERIFY(6'789'012, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
 
     /************
      * TEARDOWN *
@@ -1019,8 +1015,7 @@ error:
  *
  *-----------------------------------------------------------------------------
  */
-static int
-test_H5FDread_without_eoa_set_fails(void)
+static int test_H5FDread_without_eoa_set_fails(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS VFD read-eoa temporal coupling library limitation");
@@ -1031,10 +1026,10 @@ test_H5FDread_without_eoa_set_fails(void)
 
 #else
 
-    char         buffer[HDFS_TEST_MAX_BUF_SIZE];
-    unsigned int i                = 0;
-    H5FD_t      *file_shakespeare = NULL;
-    hid_t        fapl_id          = H5I_INVALID_HID;
+    char buffer[HDFS_TEST_MAX_BUF_SIZE];
+    unsigned int i = 0;
+    H5FD_t* file_shakespeare = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("HDFS VFD read-eoa temporal coupling library limitation");
 
@@ -1062,20 +1057,14 @@ test_H5FDread_without_eoa_set_fails(void)
      * TEST *
      ********/
 
-    H5E_BEGIN_TRY
-    {/* mute stack trace on expected failure */
-     JSVERIFY(FAIL, H5FDread(file_shakespeare, H5FD_MEM_DRAW, H5P_DEFAULT, 1200699, 102, buffer),
-              "cannot read before eoa is set")} H5E_END_TRY
-    for (i = 0; i < HDFS_TEST_MAX_BUF_SIZE; i++) {
-        JSVERIFY(0, (unsigned)buffer[i], "buffer was modified by write!")
-    }
+    H5E_BEGIN_TRY {
+        /* mute stack trace on expected failure */
+        JSVERIFY(FAIL, H5FDread(file_shakespeare, H5FD_MEM_DRAW, H5P_DEFAULT, 1'200'699, 102, buffer), "cannot read before eoa is set")
+    } H5E_END_TRY for (i = 0; i < HDFS_TEST_MAX_BUF_SIZE; i++) { JSVERIFY(0, (unsigned)buffer[i], "buffer was modified by write!") } /************
+                                                                                                                                      * TEARDOWN *
+                                                                                                                                      ************/
 
-    /************
-     * TEARDOWN *
-     ************/
-
-    FAIL_IF(FAIL == H5FDclose(file_shakespeare))
-    file_shakespeare = NULL;
+    FAIL_IF(FAIL == H5FDclose(file_shakespeare)) file_shakespeare = NULL;
 
     FAIL_IF(FAIL == H5Pclose(fapl_id))
     fapl_id = -1;
@@ -1119,8 +1108,7 @@ error:
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_read(void)
+static int test_read(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS VFD read/range-gets");
@@ -1138,13 +1126,14 @@ test_read(void)
     /*************************
      * test-local structures *
      *************************/
-    struct testcase {
-        const char *message;  /* purpose of test case */
-        haddr_t     eoa_set;  /* set file EOA to this prior to read */
-        size_t      addr;     /* offset of read in file */
-        size_t      len;      /* length of read in file */
-        herr_t      success;  /* expected return value of read function */
-        const char *expected; /* expected contents of buffer; failure ignores */
+    struct testcase
+    {
+        const char* message;  /* purpose of test case */
+        haddr_t eoa_set;      /* set file EOA to this prior to read */
+        size_t addr;          /* offset of read in file */
+        size_t len;           /* length of read in file */
+        herr_t success;       /* expected return value of read function */
+        const char* expected; /* expected contents of buffer; failure ignores */
     };
 
     /************************
@@ -1200,14 +1189,14 @@ test_read(void)
             NULL,
         },
     };
-    unsigned        testcase_count = 6;
-    unsigned        test_i         = 0;
+    unsigned testcase_count = 6;
+    unsigned test_i = 0;
     struct testcase test;
-    herr_t          open_return = FAIL;
-    char            buffer[HDFS_TEST_MAX_BUF_SIZE];
-    unsigned int    i          = 0;
-    H5FD_t         *file_raven = NULL;
-    hid_t           fapl_id    = H5I_INVALID_HID;
+    herr_t open_return = FAIL;
+    char buffer[HDFS_TEST_MAX_BUF_SIZE];
+    unsigned int i = 0;
+    H5FD_t* file_raven = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("HDFS VFD read/range-gets");
 
@@ -1228,8 +1217,7 @@ test_read(void)
 
     /* open file
      */
-    file_raven = H5FDopen(filename_raven, H5F_ACC_RDONLY, fapl_id,
-                          HADDR_UNDEF); /* Demonstrate success with "automatic" value */
+    file_raven = H5FDopen(filename_raven, H5F_ACC_RDONLY, fapl_id, HADDR_UNDEF); /* Demonstrate success with "automatic" value */
     FAIL_IF(NULL == file_raven)
 
     JSVERIFY(6464, H5FDget_eof(file_raven, H5FD_MEM_DEFAULT), "EOF mismatch")
@@ -1239,12 +1227,11 @@ test_read(void)
      *********/
 
     for (test_i = 0; test_i < testcase_count; test_i++) {
-
         /* -------------- *
          * per-test setup *
          * -------------- */
 
-        test        = cases[test_i];
+        test = cases[test_i];
         open_return = FAIL;
 
         FAIL_IF(HDFS_TEST_MAX_BUF_SIZE < test.len) /* buffer too small! */
@@ -1326,8 +1313,7 @@ error:
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_noops_and_autofails(void)
+static int test_noops_and_autofails(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS VFD always-fail and no-op routines");
@@ -1350,8 +1336,8 @@ test_noops_and_autofails(void)
      * test-local variables *
      ************************/
 
-    hid_t      fapl_id  = H5I_INVALID_HID;
-    H5FD_t    *file     = NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
+    H5FD_t* file = NULL;
     const char data[36] = "The Force shall be with you, always";
 
     TESTING("HDFS VFD always-fail and no-op routines");
@@ -1377,22 +1363,15 @@ test_noops_and_autofails(void)
 
     /* auto-fail calls to write and truncate
      */
-    H5E_BEGIN_TRY
-    {JSVERIFY(FAIL, H5FDwrite(file, H5FD_MEM_DRAW, H5P_DEFAULT, 1000, 35, data),
-              "write must fail")} H5E_END_TRY
+    H5E_BEGIN_TRY { JSVERIFY(FAIL, H5FDwrite(file, H5FD_MEM_DRAW, H5P_DEFAULT, 1000, 35, data), "write must fail") } H5E_END_TRY H5E_BEGIN_TRY {
+        JSVERIFY(FAIL, H5FDtruncate(file, H5P_DEFAULT, false), "truncate must fail")
+    } H5E_END_TRY H5E_BEGIN_TRY { JSVERIFY(FAIL, H5FDtruncate(file, H5P_DEFAULT, true), "truncate must fail (closing)") } H5E_END_TRY
 
-    H5E_BEGIN_TRY
-    {JSVERIFY(FAIL, H5FDtruncate(file, H5P_DEFAULT, false), "truncate must fail")} H5E_END_TRY
+        /************
+         * TEARDOWN *
+         ************/
 
-    H5E_BEGIN_TRY
-    {JSVERIFY(FAIL, H5FDtruncate(file, H5P_DEFAULT, true), "truncate must fail (closing)")} H5E_END_TRY
-
-    /************
-     * TEARDOWN *
-     ************/
-
-    FAIL_IF(FAIL == H5FDclose(file))
-    file = NULL;
+        FAIL_IF(FAIL == H5FDclose(file)) file = NULL;
 
     FAIL_IF(FAIL == H5Pclose(fapl_id))
     fapl_id = -1;
@@ -1438,8 +1417,7 @@ error:
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_cmp(void)
+static int test_cmp(void)
 {
     TESTING("HDFS cmp (comparison)");
     SKIPPED();
@@ -1464,8 +1442,7 @@ test_cmp(void)
  *
  *---------------------------------------------------------------------------
  */
-static int
-test_H5F_integration(void)
+static int test_H5F_integration(void)
 {
 #ifndef H5_HAVE_LIBHDFS
     TESTING("HDFS file access through HD5F library (H5F API)");
@@ -1488,7 +1465,7 @@ test_H5F_integration(void)
      * test-local variables *
      ************************/
 
-    hid_t file    = H5I_INVALID_HID;
+    hid_t file = H5I_INVALID_HID;
     hid_t fapl_id = H5I_INVALID_HID;
 
     TESTING("HDFS file access through HD5F library (H5F API)");
@@ -1507,17 +1484,15 @@ test_H5F_integration(void)
 
     /* Read-Write Open access is not allowed with this file driver.
      */
-    H5E_BEGIN_TRY
-    {FAIL_IF(0 <= H5Fopen(filename_example_h5, H5F_ACC_RDWR, fapl_id))} H5E_END_TRY
+    H5E_BEGIN_TRY { FAIL_IF(0 <= H5Fopen(filename_example_h5, H5F_ACC_RDWR, fapl_id)) } H5E_END_TRY
 
-    /* H5Fcreate() is not allowed with this file driver.
-     */
-    H5E_BEGIN_TRY
-    {FAIL_IF(0 <= H5Fcreate(filename_missing, H5F_ACC_RDONLY, H5P_DEFAULT, fapl_id))} H5E_END_TRY
+        /* H5Fcreate() is not allowed with this file driver.
+         */
+        H5E_BEGIN_TRY { FAIL_IF(0 <= H5Fcreate(filename_missing, H5F_ACC_RDONLY, H5P_DEFAULT, fapl_id)) } H5E_END_TRY
 
-    /* Successful open.
-     */
-    file = H5Fopen(filename_example_h5, H5F_ACC_RDONLY, fapl_id);
+            /* Successful open.
+             */
+            file = H5Fopen(filename_example_h5, H5F_ACC_RDONLY, fapl_id);
     FAIL_IF(file < 0)
 
     /************
@@ -1538,10 +1513,10 @@ error:
      * CLEANUP *
      ***********/
 
-#if HDFS_TEST_DEBUG
+    #if HDFS_TEST_DEBUG
     printf("\nerror!");
     fflush(stdout);
-#endif /* HDFS_TEST_DEBUG */
+    #endif /* HDFS_TEST_DEBUG */
 
     if (fapl_id >= 0) {
         H5E_BEGIN_TRY
@@ -1556,7 +1531,7 @@ error:
 
     return 1;
 
-#endif /* H5_HAVE_LIBHDFS */
+#endif     /* H5_HAVE_LIBHDFS */
 
 } /* test_H5F_integration */
 
@@ -1571,8 +1546,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int nerrors = 0;
 
@@ -1582,7 +1556,7 @@ main(void)
 
 #ifdef H5_HAVE_LIBHDFS
     static char hdfs_namenode_name[HDFS_NAMENODE_NAME_MAX_SIZE] = "";
-    const char *hdfs_namenode_name_env                          = NULL;
+    const char* hdfs_namenode_name_env = NULL;
 
     hdfs_namenode_name_env = getenv("HDFS_TEST_NAMENODE_NAME");
     if (hdfs_namenode_name_env == NULL || hdfs_namenode_name_env[0] == '\0') {
@@ -1590,7 +1564,9 @@ main(void)
     }
     else {
         strncpy(/* TODO: error-check? */
-                default_fa.namenode_name, hdfs_namenode_name_env, HDFS_NAMENODE_NAME_MAX_SIZE);
+                default_fa.namenode_name,
+                hdfs_namenode_name_env,
+                HDFS_NAMENODE_NAME_MAX_SIZE);
     }
 #endif /* H5_HAVE_LIBHDFS */
 

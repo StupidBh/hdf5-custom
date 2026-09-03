@@ -30,7 +30,7 @@
  * This file needs to access private information from the H5F package.
  * This file also needs to access the file testing code.
  */
-#define H5F_FRIEND /*suppress error about including H5Fpkg */
+#define H5F_FRIEND  /*suppress error about including H5Fpkg */
 #define H5F_TESTING
 #include "H5Fpkg.h" /* File access                             */
 
@@ -151,14 +151,14 @@
 #define NON_NULL_BUF "NON_NULL_BUF"
 
 /* Files created under 1.6 branch and 1.8 branch--used in test_filespace_compatible() */
-static const char *OLD_FILENAME[] = {
+static const char* OLD_FILENAME[] = {
     "filespace_1_6.h5", /* 1.6 HDF5 file */
     "filespace_1_8.h5"  /* 1.8 HDF5 file */
 };
 
 /* Files created in 1.10.0 release --used in test_filespace_1.10.0_compatible() */
 /* These files are copied from release 1.10.0 tools/h5format_convert/testfiles */
-static const char *OLD_1_10_0_FILENAME[] = {
+static const char* OLD_1_10_0_FILENAME[] = {
     "h5fc_ext1_i.h5",   /* 0 */
     "h5fc_ext1_f.h5",   /* 1 */
     "h5fc_ext2_if.h5",  /* 2 */
@@ -168,7 +168,7 @@ static const char *OLD_1_10_0_FILENAME[] = {
 };
 
 /* Files used in test_filespace_round_compatible() */
-static const char *FSPACE_FILENAMES[] = {
+static const char* FSPACE_FILENAMES[] = {
     "fsm_aggr_nopersist.h5", /* H5F_FILE_SPACE_AGGR, not persisting free-space */
     "fsm_aggr_persist.h5",   /* H5F_FILE_SPACE_AGGR, persisting free-space */
     "paged_nopersist.h5",    /* H5F_FILE_SPACE_PAGE, not persisting free-space */
@@ -177,7 +177,7 @@ static const char *FSPACE_FILENAMES[] = {
     "none.h5"                /* H5F_FILE_SPACE_NONE */
 };
 
-static const char *FILESPACE_NAME[] = {"tfilespace", NULL};
+static const char* FILESPACE_NAME[] = { "tfilespace", NULL };
 
 /* Declarations for test_libver_bounds_copy():                          */
 /* SRC_FILE: source file created under 1.8 branch with latest format    */
@@ -188,8 +188,8 @@ static const char *FILESPACE_NAME[] = {"tfilespace", NULL};
 #define DSET_DS1 "DS1"
 
 /* Local test function declarations for version bounds */
-static void test_libver_bounds_low_high(const char *driver_name);
-static void test_libver_bounds_super(hid_t fapl, const char *driver_name);
+static void test_libver_bounds_low_high(const char* driver_name);
+static void test_libver_bounds_super(hid_t fapl, const char* driver_name);
 static void test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm);
 static void test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm);
 static void test_libver_bounds_obj(hid_t fapl);
@@ -205,12 +205,12 @@ static void test_libver_bounds_attributes(hid_t fapl);
 #define DSETB     "DSETB"
 #define DSETC     "DSETC"
 
-static void create_objects(hid_t, hid_t, hid_t *, hid_t *, hid_t *, hid_t *);
+static void create_objects(hid_t, hid_t, hid_t*, hid_t*, hid_t*, hid_t*);
 static void test_obj_count_and_id(hid_t, hid_t, hid_t, hid_t, hid_t, hid_t);
 static void check_file_id(hid_t, hid_t);
 
 /* Helper routine used by test_rw_noupdate() */
-static int cal_chksum(const char *file, uint32_t *chksum);
+static int cal_chksum(const char* file, uint32_t* chksum);
 
 static void test_rw_noupdate(void);
 
@@ -219,19 +219,18 @@ static void test_rw_noupdate(void);
 **  test_file_create(): Low-level file creation I/O test routine.
 **
 ****************************************************************/
-static void
-test_file_create(void)
+static void test_file_create(void)
 {
-    hid_t    fid1 = H5I_INVALID_HID;
-    hid_t    fid2 = H5I_INVALID_HID;
-    hid_t    fid3 = H5I_INVALID_HID; /* HDF5 File IDs               */
-    hid_t    tmpl1, tmpl2;           /* file creation templates     */
-    hsize_t  ublock;                 /* sizeof userblock            */
-    size_t   parm;                   /* file-creation parameters    */
-    size_t   parm2;                  /* file-creation parameters    */
+    hid_t fid1 = H5I_INVALID_HID;
+    hid_t fid2 = H5I_INVALID_HID;
+    hid_t fid3 = H5I_INVALID_HID; /* HDF5 File IDs               */
+    hid_t tmpl1, tmpl2;           /* file creation templates     */
+    hsize_t ublock;               /* sizeof userblock            */
+    size_t parm;                  /* file-creation parameters    */
+    size_t parm2;                 /* file-creation parameters    */
     unsigned iparm;
     unsigned iparm2;
-    herr_t   ret; /*generic return value        */
+    herr_t ret; /*generic return value        */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Low-Level File Creation I/O\n"));
@@ -346,7 +345,6 @@ test_file_create(void)
     CHECK(ret, FAIL, "H5Pclose");
 
     if (h5_using_default_driver(NULL)) {
-
         /* Create a new file with a non-standard file-creation template */
         tmpl1 = H5Pcreate(H5P_FILE_CREATE);
         CHECK(tmpl1, FAIL, "H5Pcreate");
@@ -418,25 +416,26 @@ test_file_create(void)
 
         /* Make certain we can create a dataset properly in the file with the userblock */
         {
-            hid_t    dataset_id, dataspace_id; /* identifiers */
-            hsize_t  dims[F2_RANK];
+            hid_t dataset_id, dataspace_id; /* identifiers */
+            hsize_t dims[F2_RANK];
             unsigned data[F2_DIM0][F2_DIM1];
             unsigned i, j;
 
             /* Create the data space for the dataset. */
-            dims[0]      = F2_DIM0;
-            dims[1]      = F2_DIM1;
+            dims[0] = F2_DIM0;
+            dims[1] = F2_DIM1;
             dataspace_id = H5Screate_simple(F2_RANK, dims, NULL);
             CHECK(dataspace_id, FAIL, "H5Screate_simple");
 
             /* Create the dataset. */
-            dataset_id = H5Dcreate2(fid2, F2_DSET, H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT,
-                                    H5P_DEFAULT);
+            dataset_id = H5Dcreate2(fid2, F2_DSET, H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             CHECK(dataset_id, FAIL, "H5Dcreate2");
 
-            for (i = 0; i < F2_DIM0; i++)
-                for (j = 0; j < F2_DIM1; j++)
+            for (i = 0; i < F2_DIM0; i++) {
+                for (j = 0; j < F2_DIM1; j++) {
                     data[i][j] = i * 10 + j;
+                }
+            }
 
             /* Write data to the new dataset */
             ret = H5Dwrite(dataset_id, H5T_NATIVE_UINT, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
@@ -535,29 +534,29 @@ test_file_create(void)
 **  test_file_open(): Low-level file open I/O test routine.
 **
 ****************************************************************/
-static void
-test_file_open(const char *driver_name)
+static void test_file_open(const char* driver_name)
 {
-    hid_t    fid1, fid2; /*HDF5 File IDs            */
-    hid_t    did;        /*dataset ID                    */
-    hid_t    fapl_id;    /*file access property list ID  */
-    hid_t    tmpl1;      /*file creation templates    */
-    hsize_t  ublock;     /*sizeof user block        */
-    size_t   parm;       /*file-creation parameters    */
-    size_t   parm2;      /*file-creation parameters    */
+    hid_t fid1, fid2; /*HDF5 File IDs            */
+    hid_t did;        /*dataset ID                    */
+    hid_t fapl_id;    /*file access property list ID  */
+    hid_t tmpl1;      /*file creation templates    */
+    hsize_t ublock;   /*sizeof user block        */
+    size_t parm;      /*file-creation parameters    */
+    size_t parm2;     /*file-creation parameters    */
     unsigned iparm;
     unsigned iparm2;
     unsigned intent;
-    bool     vol_is_native;
-    herr_t   ret; /*generic return value        */
+    bool vol_is_native;
+    herr_t ret; /*generic return value        */
 
     /*
      * Test single file open
      */
 
     /* Only run this test with sec2/default driver */
-    if (!h5_using_default_driver(driver_name))
+    if (!h5_using_default_driver(driver_name)) {
         return;
+    }
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Low-Level File Opening I/O\n"));
@@ -670,15 +669,14 @@ test_file_open(const char *driver_name)
 **  test_file_reopen(): File reopen test routine.
 **
 ****************************************************************/
-static void
-test_file_reopen(void)
+static void test_file_reopen(void)
 {
-    hid_t   fid  = H5I_INVALID_HID; /* file ID from initial open            */
-    hid_t   rfid = H5I_INVALID_HID; /* file ID from reopen                  */
-    hid_t   did  = H5I_INVALID_HID; /* dataset ID (both opens)              */
-    hid_t   sid  = H5I_INVALID_HID; /* dataspace ID for dataset creation    */
-    hsize_t dims = 6;               /* dataspace size                       */
-    herr_t  ret;                    /* Generic return value                 */
+    hid_t fid = H5I_INVALID_HID;  /* file ID from initial open            */
+    hid_t rfid = H5I_INVALID_HID; /* file ID from reopen                  */
+    hid_t did = H5I_INVALID_HID;  /* dataset ID (both opens)              */
+    hid_t sid = H5I_INVALID_HID;  /* dataspace ID for dataset creation    */
+    hsize_t dims = 6;             /* dataspace size                       */
+    herr_t ret;                   /* Generic return value                 */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing File Re-opening\n"));
@@ -729,15 +727,14 @@ test_file_reopen(void)
 **                      It mainly tests behavior with close degree.
 **
 *****************************************************************/
-static void
-test_file_close(void)
+static void test_file_close(void)
 {
-    hid_t              fid1, fid2;
-    hid_t              fapl_id, access_id;
-    hid_t              dataset_id, group_id1, group_id2, group_id3;
+    hid_t fid1, fid2;
+    hid_t fapl_id, access_id;
+    hid_t dataset_id, group_id1, group_id2, group_id3;
     H5F_close_degree_t fc_degree;
-    bool               vol_is_native;
-    herr_t             ret;
+    bool vol_is_native;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing File Closing with file close degrees\n"));
@@ -1022,50 +1019,48 @@ test_file_close(void)
     CHECK(ret, FAIL, "H5Pget_fclose_degree");
 
     switch (fc_degree) {
-        case H5F_CLOSE_STRONG:
-            /* Close first open */
-            ret = H5Fclose(fid1);
-            CHECK(ret, FAIL, "H5Fclose");
-            /* Close second open */
-            ret = H5Fclose(fid2);
-            CHECK(ret, FAIL, "H5Fclose");
-            break;
-        case H5F_CLOSE_SEMI:
-            /* Close first open */
-            ret = H5Fclose(fid1);
-            CHECK(ret, FAIL, "H5Fclose");
-            ret = H5Dclose(dataset_id);
-            CHECK(ret, FAIL, "H5Dclose");
-            ret = H5Gclose(group_id1);
-            CHECK(ret, FAIL, "H5Gclose");
-            ret = H5Gclose(group_id2);
-            CHECK(ret, FAIL, "H5Gclose");
-            ret = H5Gclose(group_id3);
-            CHECK(ret, FAIL, "H5Gclose");
-            /* Close second open */
-            ret = H5Fclose(fid2);
-            CHECK(ret, FAIL, "H5Fclose");
-            break;
-        case H5F_CLOSE_WEAK:
-            /* Close first open */
-            ret = H5Fclose(fid1);
-            CHECK(ret, FAIL, "H5Fclose");
-            /* Close second open */
-            ret = H5Fclose(fid2);
-            CHECK(ret, FAIL, "H5Fclose");
-            ret = H5Dclose(dataset_id);
-            CHECK(ret, FAIL, "H5Dclose");
-            ret = H5Gclose(group_id1);
-            CHECK(ret, FAIL, "H5Gclose");
-            ret = H5Gclose(group_id2);
-            CHECK(ret, FAIL, "H5Gclose");
-            ret = H5Gclose(group_id3);
-            CHECK(ret, FAIL, "H5Gclose");
-            break;
-        case H5F_CLOSE_DEFAULT:
-        default:
-            CHECK(fc_degree, H5F_CLOSE_DEFAULT, "H5Pget_fclose_degree");
-            break;
+    case H5F_CLOSE_STRONG:
+        /* Close first open */
+        ret = H5Fclose(fid1);
+        CHECK(ret, FAIL, "H5Fclose");
+        /* Close second open */
+        ret = H5Fclose(fid2);
+        CHECK(ret, FAIL, "H5Fclose");
+        break;
+    case H5F_CLOSE_SEMI:
+        /* Close first open */
+        ret = H5Fclose(fid1);
+        CHECK(ret, FAIL, "H5Fclose");
+        ret = H5Dclose(dataset_id);
+        CHECK(ret, FAIL, "H5Dclose");
+        ret = H5Gclose(group_id1);
+        CHECK(ret, FAIL, "H5Gclose");
+        ret = H5Gclose(group_id2);
+        CHECK(ret, FAIL, "H5Gclose");
+        ret = H5Gclose(group_id3);
+        CHECK(ret, FAIL, "H5Gclose");
+        /* Close second open */
+        ret = H5Fclose(fid2);
+        CHECK(ret, FAIL, "H5Fclose");
+        break;
+    case H5F_CLOSE_WEAK:
+        /* Close first open */
+        ret = H5Fclose(fid1);
+        CHECK(ret, FAIL, "H5Fclose");
+        /* Close second open */
+        ret = H5Fclose(fid2);
+        CHECK(ret, FAIL, "H5Fclose");
+        ret = H5Dclose(dataset_id);
+        CHECK(ret, FAIL, "H5Dclose");
+        ret = H5Gclose(group_id1);
+        CHECK(ret, FAIL, "H5Gclose");
+        ret = H5Gclose(group_id2);
+        CHECK(ret, FAIL, "H5Gclose");
+        ret = H5Gclose(group_id3);
+        CHECK(ret, FAIL, "H5Gclose");
+        break;
+    case H5F_CLOSE_DEFAULT:
+    default               : CHECK(fc_degree, H5F_CLOSE_DEFAULT, "H5Pget_fclose_degree"); break;
     }
 
     /* Close file access property list */
@@ -1081,11 +1076,10 @@ test_file_close(void)
 **                    a dataset and a group in file.
 **
 ****************************************************************/
-static void
-create_objects(hid_t fid1, hid_t fid2, hid_t *ret_did, hid_t *ret_gid1, hid_t *ret_gid2, hid_t *ret_gid3)
+static void create_objects(hid_t fid1, hid_t fid2, hid_t* ret_did, hid_t* ret_gid1, hid_t* ret_gid2, hid_t* ret_gid3)
 {
     ssize_t oid_count;
-    herr_t  ret;
+    herr_t ret;
 
     /* Check reference counts of file IDs and opened object IDs.
      * The verification is hard-coded.  If in any case, this testing
@@ -1111,32 +1105,34 @@ create_objects(hid_t fid1, hid_t fid2, hid_t *ret_did, hid_t *ret_gid1, hid_t *r
 
     /* create a dataset in the first file open */
     {
-        hid_t    dataset_id, dataspace_id; /* identifiers */
-        hsize_t  dims[F2_RANK];
+        hid_t dataset_id, dataspace_id; /* identifiers */
+        hsize_t dims[F2_RANK];
         unsigned data[F2_DIM0][F2_DIM1];
         unsigned i, j;
 
         /* Create the data space for the dataset. */
-        dims[0]      = F2_DIM0;
-        dims[1]      = F2_DIM1;
+        dims[0] = F2_DIM0;
+        dims[1] = F2_DIM1;
         dataspace_id = H5Screate_simple(F2_RANK, dims, NULL);
         CHECK(dataspace_id, FAIL, "H5Screate_simple");
 
         /* Create the dataset. */
-        dataset_id =
-            H5Dcreate2(fid1, "/dset", H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        dataset_id = H5Dcreate2(fid1, "/dset", H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         CHECK(dataset_id, FAIL, "H5Dcreate2");
 
-        for (i = 0; i < F2_DIM0; i++)
-            for (j = 0; j < F2_DIM1; j++)
+        for (i = 0; i < F2_DIM0; i++) {
+            for (j = 0; j < F2_DIM1; j++) {
                 data[i][j] = i * 10 + j;
+            }
+        }
 
         /* Write data to the new dataset */
         ret = H5Dwrite(dataset_id, H5T_NATIVE_UINT, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
         CHECK(ret, FAIL, "H5Dwrite");
 
-        if (ret_did != NULL)
+        if (ret_did != NULL) {
             *ret_did = dataset_id;
+        }
 
         /* Terminate access to the data space. */
         ret = H5Sclose(dataspace_id);
@@ -1148,18 +1144,21 @@ create_objects(hid_t fid1, hid_t fid2, hid_t *ret_did, hid_t *ret_gid1, hid_t *r
         hid_t gid1, gid2, gid3;
         gid1 = H5Gcreate2(fid2, "/group", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         CHECK(gid1, FAIL, "H5Gcreate2");
-        if (ret_gid1 != NULL)
+        if (ret_gid1 != NULL) {
             *ret_gid1 = gid1;
+        }
 
         gid2 = H5Gopen2(fid2, "/group", H5P_DEFAULT);
         CHECK(gid2, FAIL, "H5Gopen2");
-        if (ret_gid2 != NULL)
+        if (ret_gid2 != NULL) {
             *ret_gid2 = gid2;
+        }
 
         gid3 = H5Gopen2(fid2, "/group", H5P_DEFAULT);
         CHECK(gid3, FAIL, "H5Gopen2");
-        if (ret_gid3 != NULL)
+        if (ret_gid3 != NULL) {
             *ret_gid3 = gid3;
+        }
     }
 
     /* Check reference counts of file IDs and opened object IDs.
@@ -1190,12 +1189,11 @@ create_objects(hid_t fid1, hid_t fid2, hid_t *ret_did, hid_t *ret_gid1, hid_t *r
 **  test_obj_count_and_id(): test object count and ID list functions.
 **
 ****************************************************************/
-static void
-test_obj_count_and_id(hid_t fid1, hid_t fid2, hid_t did, hid_t gid1, hid_t gid2, hid_t gid3)
+static void test_obj_count_and_id(hid_t fid1, hid_t fid2, hid_t did, hid_t gid1, hid_t gid2, hid_t gid3)
 {
-    hid_t   fid3, fid4;
+    hid_t fid3, fid4;
     ssize_t oid_count, ret_count;
-    herr_t  ret;
+    herr_t ret;
 
     /* Create two new files */
     fid3 = H5Fcreate(FILE2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -1234,9 +1232,9 @@ test_obj_count_and_id(hid_t fid1, hid_t fid2, hid_t did, hid_t gid1, hid_t gid2,
     VERIFY(oid_count, OBJ_ID_COUNT_8, "H5Fget_obj_count");
 
     if (oid_count > 0) {
-        hid_t *oid_list;
+        hid_t* oid_list;
 
-        oid_list = (hid_t *)calloc((size_t)oid_count, sizeof(hid_t));
+        oid_list = (hid_t*)calloc((size_t)oid_count, sizeof(hid_t));
         if (oid_list != NULL) {
             int i;
 
@@ -1248,47 +1246,45 @@ test_obj_count_and_id(hid_t fid1, hid_t fid2, hid_t did, hid_t gid1, hid_t gid2,
 
                 id_type = H5Iget_type(oid_list[i]);
                 switch (id_type) {
-                    case H5I_FILE:
-                        if (oid_list[i] != fid1 && oid_list[i] != fid2 && oid_list[i] != fid3 &&
-                            oid_list[i] != fid4)
-                            ERROR("H5Fget_obj_ids");
-                        break;
-
-                    case H5I_GROUP:
-                        if (oid_list[i] != gid1 && oid_list[i] != gid2 && oid_list[i] != gid3)
-                            ERROR("H5Fget_obj_ids");
-                        break;
-
-                    case H5I_DATASET:
-                        VERIFY(oid_list[i], did, "H5Fget_obj_ids");
-                        break;
-
-                    case H5I_MAP:
-                        /* TODO: Not supported in native VOL connector yet */
-
-                    case H5I_UNINIT:
-                    case H5I_BADID:
-                    case H5I_DATATYPE:
-                    case H5I_DATASPACE:
-                    case H5I_ATTR:
-                    case H5I_VFL:
-                    case H5I_VOL:
-                    case H5I_GENPROP_CLS:
-                    case H5I_GENPROP_LST:
-                    case H5I_ERROR_CLASS:
-                    case H5I_ERROR_MSG:
-                    case H5I_ERROR_STACK:
-                    case H5I_SPACE_SEL_ITER:
-                    case H5I_EVENTSET:
-                    case H5I_NTYPES:
-                    default:
+                case H5I_FILE:
+                    if (oid_list[i] != fid1 && oid_list[i] != fid2 && oid_list[i] != fid3 && oid_list[i] != fid4) {
                         ERROR("H5Fget_obj_ids");
+                    }
+                    break;
+
+                case H5I_GROUP:
+                    if (oid_list[i] != gid1 && oid_list[i] != gid2 && oid_list[i] != gid3) {
+                        ERROR("H5Fget_obj_ids");
+                    }
+                    break;
+
+                case H5I_DATASET: VERIFY(oid_list[i], did, "H5Fget_obj_ids"); break;
+
+                case H5I_MAP:
+                    /* TODO: Not supported in native VOL connector yet */
+
+                case H5I_UNINIT:
+                case H5I_BADID:
+                case H5I_DATATYPE:
+                case H5I_DATASPACE:
+                case H5I_ATTR:
+                case H5I_VFL:
+                case H5I_VOL:
+                case H5I_GENPROP_CLS:
+                case H5I_GENPROP_LST:
+                case H5I_ERROR_CLASS:
+                case H5I_ERROR_MSG:
+                case H5I_ERROR_STACK:
+                case H5I_SPACE_SEL_ITER:
+                case H5I_EVENTSET:
+                case H5I_NTYPES:
+                default                : ERROR("H5Fget_obj_ids");
                 } /* end switch */
-            }     /* end for */
+            } /* end for */
 
             free(oid_list);
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     /* close the two new files */
     ret = H5Fclose(fid3);
@@ -1305,18 +1301,17 @@ test_obj_count_and_id(hid_t fid1, hid_t fid2, hid_t did, hid_t gid1, hid_t gid2,
 **                      for test_obj_count_and_id().
 **
 ****************************************************************/
-static void
-test_get_obj_ids(void)
+static void test_get_obj_ids(void)
 {
-    hid_t   fid, gid[NGROUPS], dset[NDSETS];
-    hid_t   filespace;
-    hsize_t file_dims[F2_RANK] = {F2_DIM0, F2_DIM1};
+    hid_t fid, gid[NGROUPS], dset[NDSETS];
+    hid_t filespace;
+    hsize_t file_dims[F2_RANK] = { F2_DIM0, F2_DIM1 };
     ssize_t oid_count, ret_count;
-    hid_t  *oid_list = NULL;
-    herr_t  ret;
-    int     i, m, n;
+    hid_t* oid_list = NULL;
+    herr_t ret;
+    int i, m, n;
     ssize_t oid_list_size = NDSETS;
-    char    gname[64], dname[64];
+    char gname[64], dname[64];
 
     MESSAGE(5, ("Testing retrieval of object IDs\n"));
 
@@ -1351,7 +1346,7 @@ test_get_obj_ids(void)
     CHECK(oid_count, FAIL, "H5Fget_obj_count");
     VERIFY(oid_count, (NGROUPS + NDSETS + 1), "H5Fget_obj_count");
 
-    oid_list = (hid_t *)calloc((size_t)oid_list_size, sizeof(hid_t));
+    oid_list = (hid_t*)calloc((size_t)oid_list_size, sizeof(hid_t));
     CHECK_PTR(oid_list, "calloc");
 
     /* Call the public function H5F_get_obj_ids to use H5F__get_objects.  User reported having problem here.
@@ -1414,7 +1409,7 @@ test_get_obj_ids(void)
     CHECK(oid_count, FAIL, "H5Fget_obj_count");
     VERIFY(oid_count, NDSETS, "H5Fget_obj_count");
 
-    oid_list = (hid_t *)calloc((size_t)oid_count, sizeof(hid_t));
+    oid_list = (hid_t*)calloc((size_t)oid_count, sizeof(hid_t));
     CHECK_PTR(oid_list, "calloc");
 
     /* Get the list of all opened objects */
@@ -1425,8 +1420,9 @@ test_get_obj_ids(void)
     H5E_BEGIN_TRY
     {
         /* Close all open objects with H5Oclose */
-        for (n = 0; n < oid_count; n++)
+        for (n = 0; n < oid_count; n++) {
             H5Oclose(oid_list[n]);
+        }
     }
     H5E_END_TRY
 
@@ -1438,15 +1434,14 @@ test_get_obj_ids(void)
 **  test_get_file_id(): Test H5Iget_file_id()
 **
 *****************************************************************/
-static void
-test_get_file_id(void)
+static void test_get_file_id(void)
 {
-    hid_t    fid, fid2, fid3;
-    hid_t    datatype_id, dataset_id, dataspace_id, group_id, attr_id;
-    hid_t    plist;
-    hsize_t  dims[F2_RANK];
+    hid_t fid, fid2, fid3;
+    hid_t datatype_id, dataset_id, dataspace_id, group_id, attr_id;
+    hid_t plist;
+    hsize_t dims[F2_RANK];
     unsigned intent;
-    herr_t   ret;
+    herr_t ret;
 
     MESSAGE(5, ("Testing H5Iget_file_id\n"));
 
@@ -1504,13 +1499,12 @@ test_get_file_id(void)
     /* Create a dataset in the group.  Make a duplicated file ID from the
      * dataset.  And close this duplicated ID.
      */
-    dims[0]      = F2_DIM0;
-    dims[1]      = F2_DIM1;
+    dims[0] = F2_DIM0;
+    dims[1] = F2_DIM1;
     dataspace_id = H5Screate_simple(F2_RANK, dims, NULL);
     CHECK(dataspace_id, FAIL, "H5Screate_simple");
 
-    dataset_id =
-        H5Dcreate2(group_id, DSET_NAME, H5T_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset_id = H5Dcreate2(group_id, DSET_NAME, H5T_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset_id, FAIL, "H5Dcreate2");
 
     /* Test H5Iget_file_id() */
@@ -1578,10 +1572,9 @@ test_get_file_id(void)
 **  check_file_id(): Internal function of test_get_file_id()
 **
 *****************************************************************/
-static void
-check_file_id(hid_t fid, hid_t object_id)
+static void check_file_id(hid_t fid, hid_t object_id)
 {
-    hid_t  new_fid;
+    hid_t new_fid;
     herr_t ret;
 
     /* Return a duplicated file ID even not expecting user to do it.
@@ -1589,10 +1582,12 @@ check_file_id(hid_t fid, hid_t object_id)
      */
     new_fid = H5Iget_file_id(object_id);
 
-    if (fid >= 0)
+    if (fid >= 0) {
         VERIFY(new_fid, fid, "H5Iget_file_id");
-    else
+    }
+    else {
         CHECK(new_fid, FAIL, "H5Iget_file_id");
+    }
 
     ret = H5Fclose(new_fid);
     CHECK(ret, FAIL, "H5Fclose");
@@ -1606,13 +1601,12 @@ check_file_id(hid_t fid, hid_t object_id)
 **      appropriately.
 **
 *****************************************************************/
-static void
-test_file_perm(void)
+static void test_file_perm(void)
 {
-    hid_t  file;   /* File opened with read-write permission */
-    hid_t  filero; /* Same file opened with read-only permission */
-    hid_t  dspace; /* Dataspace ID */
-    hid_t  dset;   /* Dataset ID */
+    hid_t file;   /* File opened with read-write permission */
+    hid_t filero; /* Same file opened with read-only permission */
+    hid_t dspace; /* Dataspace ID */
+    hid_t dset;   /* Dataset ID */
     herr_t ret;
 
     /* Output message about test being performed */
@@ -1666,16 +1660,15 @@ test_file_perm(void)
 **      file that is opened for read-only.
 **
 *****************************************************************/
-static void
-test_file_perm2(void)
+static void test_file_perm2(void)
 {
-    hid_t  file;   /* File opened with read-write permission */
-    hid_t  filero; /* Same file opened with read-only permission */
-    hid_t  dspace; /* Dataspace ID */
-    hid_t  group;  /* Group ID */
-    hid_t  dset;   /* Dataset ID */
-    hid_t  type;   /* Datatype ID */
-    hid_t  attr;   /* Attribute ID */
+    hid_t file;   /* File opened with read-write permission */
+    hid_t filero; /* Same file opened with read-only permission */
+    hid_t dspace; /* Dataspace ID */
+    hid_t group;  /* Group ID */
+    hid_t dset;   /* Dataset ID */
+    hid_t type;   /* Datatype ID */
+    hid_t attr;   /* Attribute ID */
     herr_t ret;
 
     /* Output message about test being performed */
@@ -1749,24 +1742,24 @@ test_file_perm2(void)
 *****************************************************************/
 #define FILE_IS_ACCESSIBLE          "tfile_is_accessible"
 #define FILE_IS_ACCESSIBLE_NON_HDF5 "tfile_is_accessible_non_hdf5"
-static void
-test_file_is_accessible(const char *driver_name)
+
+static void test_file_is_accessible(const char* driver_name)
 {
-    hid_t         fid     = H5I_INVALID_HID;          /* File opened with read-write permission */
-    hid_t         fcpl_id = H5I_INVALID_HID;          /* File creation property list */
-    hid_t         fapl_id = H5I_INVALID_HID;          /* File access property list */
-    int           fd;                                 /* POSIX file descriptor */
-    char          filename[FILENAME_LEN];             /* Filename to use */
-    char          non_hdf5_filename[FILENAME_LEN];    /* Base name of non-hdf5 file */
-    char          non_hdf5_sb_filename[FILENAME_LEN]; /* Name of non-hdf5 superblock file */
-    ssize_t       nbytes;                             /* Number of bytes written */
-    unsigned      u;                                  /* Local index variable */
-    unsigned char buf[1024];                          /* Buffer of data to write */
-    htri_t        is_hdf5;                            /* Whether a file is an HDF5 file */
-    int           posix_ret;                          /* Return value from POSIX calls */
-    bool          vol_is_native;
-    bool          driver_is_default_compatible;
-    herr_t        ret; /* Return value from HDF5 calls */
+    hid_t fid = H5I_INVALID_HID;             /* File opened with read-write permission */
+    hid_t fcpl_id = H5I_INVALID_HID;         /* File creation property list */
+    hid_t fapl_id = H5I_INVALID_HID;         /* File access property list */
+    int fd;                                  /* POSIX file descriptor */
+    char filename[FILENAME_LEN];             /* Filename to use */
+    char non_hdf5_filename[FILENAME_LEN];    /* Base name of non-hdf5 file */
+    char non_hdf5_sb_filename[FILENAME_LEN]; /* Name of non-hdf5 superblock file */
+    ssize_t nbytes;                          /* Number of bytes written */
+    unsigned u;                              /* Local index variable */
+    unsigned char buf[1024];                 /* Buffer of data to write */
+    htri_t is_hdf5;                          /* Whether a file is an HDF5 file */
+    int posix_ret;                           /* Return value from POSIX calls */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
+    herr_t ret; /* Return value from HDF5 calls */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Detection of HDF5 Files\n"));
@@ -1783,8 +1776,7 @@ test_file_is_accessible(const char *driver_name)
     /* Fix up filenames */
     h5_fixname(FILE_IS_ACCESSIBLE, fapl_id, filename, sizeof(filename));
     h5_fixname(FILE_IS_ACCESSIBLE_NON_HDF5, fapl_id, non_hdf5_filename, sizeof(non_hdf5_filename));
-    h5_fixname_superblock(FILE_IS_ACCESSIBLE_NON_HDF5, fapl_id, non_hdf5_sb_filename,
-                          sizeof(non_hdf5_sb_filename));
+    h5_fixname_superblock(FILE_IS_ACCESSIBLE_NON_HDF5, fapl_id, non_hdf5_sb_filename, sizeof(non_hdf5_sb_filename));
 
     /****************/
     /* Normal usage */
@@ -1886,8 +1878,9 @@ test_file_is_accessible(const char *driver_name)
         CHECK(fd, (-1), "HDopen");
 
         /* Initialize information to write */
-        for (u = 0; u < 1024; u++)
+        for (u = 0; u < 1024; u++) {
             buf[u] = (unsigned char)u;
+        }
 
         /* Write some information */
         nbytes = HDwrite(fd, buf, (size_t)1024);
@@ -1920,25 +1913,25 @@ test_file_is_accessible(const char *driver_name)
 **
 *****************************************************************/
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-static void
-test_file_ishdf5(const char *driver_name)
+static void test_file_ishdf5(const char* driver_name)
 {
-    hid_t         fid     = H5I_INVALID_HID; /* File opened with read-write permission */
-    hid_t         fcpl_id = H5I_INVALID_HID; /* File creation property list */
-    hid_t         fapl_id = H5I_INVALID_HID; /* File access property list */
-    int           fd;                        /* POSIX file descriptor */
-    char          filename[FILENAME_LEN];    /* Filename to use */
-    char          sb_filename[FILENAME_LEN]; /* Name of file w/ superblock */
-    ssize_t       nbytes;                    /* Number of bytes written */
-    unsigned      u;                         /* Local index variable */
-    unsigned char buf[1024];                 /* Buffer of data to write */
-    htri_t        is_hdf5;                   /* Whether a file is an HDF5 file */
-    int           posix_ret;                 /* Return value from POSIX calls */
-    bool          vol_is_native;
-    herr_t        ret; /* Return value from HDF5 calls */
+    hid_t fid = H5I_INVALID_HID;     /* File opened with read-write permission */
+    hid_t fcpl_id = H5I_INVALID_HID; /* File creation property list */
+    hid_t fapl_id = H5I_INVALID_HID; /* File access property list */
+    int fd;                          /* POSIX file descriptor */
+    char filename[FILENAME_LEN];     /* Filename to use */
+    char sb_filename[FILENAME_LEN];  /* Name of file w/ superblock */
+    ssize_t nbytes;                  /* Number of bytes written */
+    unsigned u;                      /* Local index variable */
+    unsigned char buf[1024];         /* Buffer of data to write */
+    htri_t is_hdf5;                  /* Whether a file is an HDF5 file */
+    int posix_ret;                   /* Return value from POSIX calls */
+    bool vol_is_native;
+    herr_t ret;                      /* Return value from HDF5 calls */
 
-    if (!h5_using_default_driver(driver_name))
+    if (!h5_using_default_driver(driver_name)) {
         return;
+    }
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Detection of HDF5 Files (using deprecated H5Fis_hdf5() call)\n"));
@@ -2019,8 +2012,9 @@ test_file_ishdf5(const char *driver_name)
     CHECK(fd, (-1), "HDopen");
 
     /* Initialize information to write */
-    for (u = 0; u < 1024; u++)
+    for (u = 0; u < 1024; u++) {
         buf[u] = (unsigned char)u;
+    }
 
     /* Write some information */
     nbytes = HDwrite(fd, buf, (size_t)1024);
@@ -2051,15 +2045,15 @@ test_file_ishdf5(const char *driver_name)
 *****************************************************************/
 #define FILE_DELETE          "test_file_delete"
 #define FILE_DELETE_NOT_HDF5 "test_file_delete_not_hdf5"
-static void
-test_file_delete(hid_t fapl_id)
+
+static void test_file_delete(hid_t fapl_id)
 {
-    hid_t  fid = H5I_INVALID_HID;  /* File to be deleted */
-    char   filename[FILENAME_LEN]; /* Filename to use */
-    htri_t is_hdf5;                /* Whether a file is an HDF5 file */
-    int    fd;                     /* POSIX file descriptor */
-    int    iret;
-    bool   vol_is_native;
+    hid_t fid = H5I_INVALID_HID; /* File to be deleted */
+    char filename[FILENAME_LEN]; /* Filename to use */
+    htri_t is_hdf5;              /* Whether a file is an HDF5 file */
+    int fd;                      /* POSIX file descriptor */
+    int iret;
+    bool vol_is_native;
     herr_t ret;
 
     /* Output message about test being performed */
@@ -2153,14 +2147,13 @@ test_file_delete(hid_t fapl_id)
 **      works correctly in various situations.
 **
 *****************************************************************/
-static void
-test_file_open_dot(void)
+static void test_file_open_dot(void)
 {
-    hid_t  fid;       /* File ID */
-    hid_t  gid, gid2; /* Group IDs */
-    hid_t  did;       /* Dataset ID */
-    hid_t  sid;       /* Dataspace ID */
-    hid_t  tid, tid2; /* Datatype IDs */
+    hid_t fid;       /* File ID */
+    hid_t gid, gid2; /* Group IDs */
+    hid_t did;       /* Dataset ID */
+    hid_t sid;       /* Dataspace ID */
+    hid_t tid, tid2; /* Datatype IDs */
     herr_t ret;
 
     /* Output message about test being performed */
@@ -2295,17 +2288,16 @@ test_file_open_dot(void)
 **      (as opposed to a nested manner) works correctly.
 **
 *****************************************************************/
-static void
-test_file_open_overlap(void)
+static void test_file_open_overlap(void)
 {
-    hid_t         fid1, fid2;
-    hid_t         did1, did2;
-    hid_t         gid;
-    hid_t         sid;
-    ssize_t       nobjs; /* # of open objects */
-    unsigned      intent;
+    hid_t fid1, fid2;
+    hid_t did1, did2;
+    hid_t gid;
+    hid_t sid;
+    ssize_t nobjs;                  /* # of open objects */
+    unsigned intent;
     unsigned long fileno1, fileno2; /* File number */
-    herr_t        ret;              /* Generic return value */
+    herr_t ret;                     /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing opening overlapping file opens\n"));
@@ -2330,10 +2322,10 @@ test_file_open_overlap(void)
 
     /* Check the file numbers */
     fileno1 = 0;
-    ret     = H5Fget_fileno(fid1, &fileno1);
+    ret = H5Fget_fileno(fid1, &fileno1);
     CHECK(ret, FAIL, "H5Fget_fileno");
     fileno2 = 0;
-    ret     = H5Fget_fileno(fid2, &fileno2);
+    ret = H5Fget_fileno(fid2, &fileno2);
     CHECK(ret, FAIL, "H5Fget_fileno");
     VERIFY(fileno1, fileno2, "H5Fget_fileno");
 
@@ -2396,27 +2388,27 @@ test_file_open_overlap(void)
 **      This test checks whether H5Fget_name works correctly.
 **
 *****************************************************************/
-static void
-test_file_getname(void)
+static void test_file_getname(void)
 {
     /* Compound datatype */
-    typedef struct s1_t {
+    typedef struct s1_t
+    {
         unsigned int a;
-        float        b;
+        float b;
     } s1_t;
 
-    hid_t   file_id;
-    hid_t   group_id;
-    hid_t   dataset_id;
-    hid_t   space_id;
-    hid_t   type_id;
-    hid_t   attr_id;
-    hsize_t dims[TESTA_RANK] = {TESTA_NX, TESTA_NY};
-    char    name[TESTA_NAME_BUF_SIZE];
+    hid_t file_id;
+    hid_t group_id;
+    hid_t dataset_id;
+    hid_t space_id;
+    hid_t type_id;
+    hid_t attr_id;
+    hsize_t dims[TESTA_RANK] = { TESTA_NX, TESTA_NY };
+    char name[TESTA_NAME_BUF_SIZE];
     ssize_t name_len;
-    char    non_null_buf[80]; /* Buffer to test non-null buffer calls */
-    char   *buf_ptr;          /* To pass mid-string */
-    herr_t  ret;              /* Generic return value */
+    char non_null_buf[80]; /* Buffer to test non-null buffer calls */
+    char* buf_ptr;         /* To pass mid-string */
+    herr_t ret;            /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing H5Fget_name() functionality\n"));
@@ -2434,7 +2426,7 @@ test_file_getname(void)
     /* Verify that passing a non-null buffer with size 0 still returns the correct name
        size and the buffer is not modified */
     strcpy(non_null_buf, NON_NULL_BUF);
-    buf_ptr  = &non_null_buf[4];
+    buf_ptr = &non_null_buf[4];
     name_len = H5Fget_name(file_id, buf_ptr, 0);
     CHECK(name_len, FAIL, "H5Fget_name");
     VERIFY(name_len, strlen(FILE1), "H5Fget_name");
@@ -2463,8 +2455,7 @@ test_file_getname(void)
     VERIFY(name_len, FAIL, "H5Fget_name");
 
     /* Create a new dataset */
-    dataset_id =
-        H5Dcreate2(file_id, TESTA_DSETNAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset_id = H5Dcreate2(file_id, TESTA_DSETNAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dataset_id, FAIL, "H5Dcreate2");
 
     /* Get and verify file name */
@@ -2529,11 +2520,10 @@ test_file_getname(void)
 **      different files works correctly.
 **
 *****************************************************************/
-static void
-test_file_double_root_open(void)
+static void test_file_double_root_open(void)
 {
-    hid_t  file1_id, file2_id;
-    hid_t  grp1_id, grp2_id;
+    hid_t file1_id, file2_id;
+    hid_t grp1_id, grp2_id;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -2568,11 +2558,10 @@ test_file_double_root_open(void)
 **      different files works correctly.
 **
 *****************************************************************/
-static void
-test_file_double_group_open(void)
+static void test_file_double_group_open(void)
 {
-    hid_t  file1_id, file2_id;
-    hid_t  grp1_id, grp2_id;
+    hid_t file1_id, file2_id;
+    hid_t grp1_id, grp2_id;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -2607,12 +2596,11 @@ test_file_double_group_open(void)
 **      different files works correctly.
 **
 *****************************************************************/
-static void
-test_file_double_dataset_open(void)
+static void test_file_double_dataset_open(void)
 {
-    hid_t  file1_id, file2_id;
-    hid_t  dset1_id, dset2_id;
-    hid_t  space_id;
+    hid_t file1_id, file2_id;
+    hid_t dset1_id, dset2_id;
+    hid_t space_id;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -2627,8 +2615,7 @@ test_file_double_dataset_open(void)
     space_id = H5Screate(H5S_SCALAR);
     CHECK(space_id, FAIL, "H5Screate");
 
-    dset1_id =
-        H5Dcreate2(file1_id, DSET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset1_id = H5Dcreate2(file1_id, DSET_NAME, H5T_NATIVE_INT, space_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     CHECK(dset1_id, FAIL, "H5Dcreate2");
     dset2_id = H5Dopen2(file2_id, DSET_NAME, H5P_DEFAULT);
     CHECK(dset2_id, FAIL, "H5Dopen2");
@@ -2659,30 +2646,28 @@ test_file_double_dataset_open(void)
 **    is important.
 **
 *****************************************************************/
-static void
-test_file_double_file_dataset_open(bool new_format)
+static void test_file_double_file_dataset_open(bool new_format)
 {
-    hid_t   fapl = H5I_INVALID_HID;                         /* File access property list */
-    hid_t   dcpl = H5I_INVALID_HID;                         /* Dataset creation property list */
-    hid_t   fid1 = H5I_INVALID_HID, fid2 = H5I_INVALID_HID; /* File IDs */
-    hid_t   did1 = H5I_INVALID_HID, did2 = H5I_INVALID_HID; /* Dataset IDs */
-    hid_t   sid1 = H5I_INVALID_HID, sid2 = H5I_INVALID_HID; /* Dataspace IDs */
-    hid_t   tid1 = H5I_INVALID_HID, tid2 = H5I_INVALID_HID; /* Datatype IDs */
-    hsize_t dims[1] = {5}, dims2[2] = {1, 4};               /* Dimension sizes */
-    hsize_t e_ext_dims[1] = {7};                            /* Expanded dimension sizes */
-    hsize_t s_ext_dims[1] = {3};                            /* Shrunk dimension sizes */
-    hsize_t max_dims0[1]  = {8};                            /* Maximum dimension sizes */
-    hsize_t max_dims1[1]  = {H5S_UNLIMITED}; /* Maximum dimension sizes for extensible array index */
-    hsize_t max_dims2[2]  = {H5S_UNLIMITED, H5S_UNLIMITED}; /* Maximum dimension sizes for v2 B-tree index */
-    hsize_t chunks[1] = {2}, chunks2[2] = {4, 5};           /* Chunk dimension sizes */
-    hsize_t size;                                           /* File size */
-    char    filename[FILENAME_LEN];                         /* Filename to use */
-    const char *data[]   = {"String 1", "String 2", "String 3", "String 4", "String 5"}; /* Input Data */
-    const char *e_data[] = {"String 1", "String 2", "String 3", "String 4",
-                            "String 5", "String 6", "String 7"}; /* Input Data */
-    char       *buffer[5];                                       /* Output buffer */
-    int         wbuf[4] = {1, 2, 3, 4};                          /* Input data */
-    herr_t      ret;                                             /* Generic return value */
+    hid_t fapl = H5I_INVALID_HID;                                                        /* File access property list */
+    hid_t dcpl = H5I_INVALID_HID;                                                        /* Dataset creation property list */
+    hid_t fid1 = H5I_INVALID_HID, fid2 = H5I_INVALID_HID;                                /* File IDs */
+    hid_t did1 = H5I_INVALID_HID, did2 = H5I_INVALID_HID;                                /* Dataset IDs */
+    hid_t sid1 = H5I_INVALID_HID, sid2 = H5I_INVALID_HID;                                /* Dataspace IDs */
+    hid_t tid1 = H5I_INVALID_HID, tid2 = H5I_INVALID_HID;                                /* Datatype IDs */
+    hsize_t dims[1] = { 5 }, dims2[2] = { 1, 4 };                                        /* Dimension sizes */
+    hsize_t e_ext_dims[1] = { 7 };                                                       /* Expanded dimension sizes */
+    hsize_t s_ext_dims[1] = { 3 };                                                       /* Shrunk dimension sizes */
+    hsize_t max_dims0[1] = { 8 };                                                        /* Maximum dimension sizes */
+    hsize_t max_dims1[1] = { H5S_UNLIMITED };                                            /* Maximum dimension sizes for extensible array index */
+    hsize_t max_dims2[2] = { H5S_UNLIMITED, H5S_UNLIMITED };                             /* Maximum dimension sizes for v2 B-tree index */
+    hsize_t chunks[1] = { 2 }, chunks2[2] = { 4, 5 };                                    /* Chunk dimension sizes */
+    hsize_t size;                                                                        /* File size */
+    char filename[FILENAME_LEN];                                                         /* Filename to use */
+    const char* data[] = { "String 1", "String 2", "String 3", "String 4", "String 5" }; /* Input Data */
+    const char* e_data[] = { "String 1", "String 2", "String 3", "String 4", "String 5", "String 6", "String 7" }; /* Input Data */
+    char* buffer[5];                                                                                               /* Output buffer */
+    int wbuf[4] = { 1, 2, 3, 4 };                                                                                  /* Input data */
+    herr_t ret;                                                                                                    /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing double file and dataset open/close\n"));
@@ -2870,7 +2855,7 @@ test_file_double_file_dataset_open(bool new_format)
     CHECK(tid1, FAIL, "H5Tcopy");
 
     /* Second file's dataset read */
-    memset(buffer, 0, sizeof(char *) * 5);
+    memset(buffer, 0, sizeof(char*) * 5);
     ret = H5Dread(did2, tid2, H5S_ALL, H5S_ALL, H5P_DEFAULT, buffer);
     CHECK(ret, FAIL, "H5Dread");
     ret = H5Treclaim(tid2, sid1, H5P_DEFAULT, buffer);
@@ -2885,7 +2870,7 @@ test_file_double_file_dataset_open(bool new_format)
     CHECK(ret, FAIL, "H5Fclose");
 
     /* First file's dataset read */
-    memset(buffer, 0, sizeof(char *) * 5);
+    memset(buffer, 0, sizeof(char*) * 5);
     ret = H5Dread(did1, tid1, H5S_ALL, H5S_ALL, H5P_DEFAULT, buffer);
     CHECK(ret, FAIL, "H5Dread");
     ret = H5Treclaim(tid2, sid1, H5P_DEFAULT, buffer);
@@ -3024,11 +3009,10 @@ test_file_double_file_dataset_open(bool new_format)
 **      different files works correctly.
 **
 *****************************************************************/
-static void
-test_file_double_datatype_open(void)
+static void test_file_double_datatype_open(void)
 {
-    hid_t  file1_id, file2_id;
-    hid_t  type1_id, type2_id;
+    hid_t file1_id, file2_id;
+    hid_t type1_id, type2_id;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -3069,24 +3053,23 @@ test_file_double_datatype_open(void)
 **      differ exactly by the userblock size.
 **
 *****************************************************************/
-static void
-test_userblock_file_size(const char *driver_name)
+static void test_userblock_file_size(const char* driver_name)
 {
-    hid_t         file1_id, file2_id;
-    hid_t         group1_id, group2_id;
-    hid_t         dset1_id, dset2_id;
-    hid_t         space_id;
-    hid_t         fcpl2_id;
-    hsize_t       dims[2] = {3, 4};
-    hsize_t       filesize1, filesize2, filesize;
+    hid_t file1_id, file2_id;
+    hid_t group1_id, group2_id;
+    hid_t dset1_id, dset2_id;
+    hid_t space_id;
+    hid_t fcpl2_id;
+    hsize_t dims[2] = { 3, 4 };
+    hsize_t filesize1, filesize2, filesize;
     unsigned long fileno1, fileno2; /* File number */
-    bool          vol_is_native;
-    herr_t        ret; /* Generic return value */
+    bool vol_is_native;
+    herr_t ret;                     /* Generic return value */
 
     /* Don't run with multi/split, family or direct drivers */
-    if (!strcmp(driver_name, "multi") || !strcmp(driver_name, "split") || !strcmp(driver_name, "family") ||
-        !strcmp(driver_name, "direct"))
+    if (!strcmp(driver_name, "multi") || !strcmp(driver_name, "split") || !strcmp(driver_name, "family") || !strcmp(driver_name, "direct")) {
         return;
+    }
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing file size with user block\n"));
@@ -3113,10 +3096,10 @@ test_userblock_file_size(const char *driver_name)
 
     /* Check the file numbers */
     fileno1 = 0;
-    ret     = H5Fget_fileno(file1_id, &fileno1);
+    ret = H5Fget_fileno(file1_id, &fileno1);
     CHECK(ret, FAIL, "H5Fget_fileno");
     fileno2 = 0;
-    ret     = H5Fget_fileno(file2_id, &fileno2);
+    ret = H5Fget_fileno(file2_id, &fileno2);
     CHECK(ret, FAIL, "H5Fget_fileno");
     CHECK(fileno1, fileno2, "H5Fget_fileno");
 
@@ -3170,8 +3153,7 @@ test_userblock_file_size(const char *driver_name)
         CHECK(ret, FAIL, "H5Fget_filesize");
 
         /* Verify that the file sizes differ exactly by the userblock size */
-        VERIFY_TYPE((unsigned long long)filesize2, (unsigned long long)(filesize1 + USERBLOCK_SIZE),
-                    unsigned long long, "%llu", "H5Fget_filesize");
+        VERIFY_TYPE((unsigned long long)filesize2, (unsigned long long)(filesize1 + USERBLOCK_SIZE), unsigned long long, "%llu", "H5Fget_filesize");
     }
 
     /* Close files */
@@ -3212,13 +3194,12 @@ test_userblock_file_size(const char *driver_name)
 **      compatibility with versions from 1.3.0 to 1.6.3.
 **
 *****************************************************************/
-static void
-test_cached_stab_info(void)
+static void test_cached_stab_info(void)
 {
-    hid_t  file_id;
-    hid_t  fapl_id;
-    hid_t  group_id;
-    bool   vol_is_native;
+    hid_t file_id;
+    hid_t fapl_id;
+    hid_t group_id;
+    bool vol_is_native;
     herr_t ret; /* Generic return value */
 
     /* Output message about test being performed */
@@ -3273,15 +3254,14 @@ test_cached_stab_info(void)
  * To calculate the checksum for a file.
  * This is a helper routine for test_rw_noupdate().
  */
-static int
-cal_chksum(const char *file, uint32_t *chksum)
+static int cal_chksum(const char* file, uint32_t* chksum)
 {
-    int       curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
-    int       fdes          = -1;               /* File descriptor */
-    void     *file_data     = NULL;             /* Copy of file data */
-    ssize_t   bytes_read;                       /* # of bytes read */
-    h5_stat_t sb;                               /* Stat buffer for file */
-    herr_t    ret;                              /* Generic return value */
+    int curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
+    int fdes = -1;                        /* File descriptor */
+    void* file_data = NULL;               /* Copy of file data */
+    ssize_t bytes_read;                   /* # of bytes read */
+    h5_stat_t sb;                         /* Stat buffer for file */
+    herr_t ret;                           /* Generic return value */
 
     /* Open the file */
     fdes = HDopen(file, O_RDONLY);
@@ -3326,13 +3306,12 @@ cal_chksum(const char *file, uint32_t *chksum)
 **    instead of timestamp to verify the file is not changed.
 **
 *****************************************************************/
-static void
-test_rw_noupdate(void)
+static void test_rw_noupdate(void)
 {
-    herr_t   ret;              /* Generic return value */
-    hid_t    fid;              /* File ID */
+    herr_t ret;                /* Generic return value */
+    hid_t fid;                 /* File ID */
     uint32_t chksum1, chksum2; /* Checksum value */
-    bool     vol_is_native;
+    bool vol_is_native;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing to verify that nothing is written if nothing is changed.\n"));
@@ -3380,13 +3359,12 @@ test_rw_noupdate(void)
 **      test_userblock_alignment() test, to handle common testing
 **
 *****************************************************************/
-static int
-test_userblock_alignment_helper1(hid_t fcpl, hid_t fapl)
+static int test_userblock_alignment_helper1(hid_t fcpl, hid_t fapl)
 {
-    hid_t  fid;                              /* File ID */
-    int    curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
-    bool   vol_is_native;
-    herr_t ret; /* Generic return value */
+    hid_t fid;                            /* File ID */
+    int curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
+    bool vol_is_native;
+    herr_t ret;                           /* Generic return value */
 
     /* Create a file with FAPL & FCPL */
     fid = H5Fcreate(FILE1, H5F_ACC_TRUNC, fcpl, fapl);
@@ -3401,10 +3379,10 @@ test_userblock_alignment_helper1(hid_t fcpl, hid_t fapl)
 
     /* Only proceed further if file ID is OK */
     if (fid > 0) {
-        hid_t gid;     /* Group ID */
-        hid_t sid;     /* Dataspace ID */
-        hid_t did;     /* Dataset ID */
-        int   val = 2; /* Dataset value */
+        hid_t gid;   /* Group ID */
+        hid_t sid;   /* Dataspace ID */
+        hid_t did;   /* Dataset ID */
+        int val = 2; /* Dataset value */
 
         /* Create a group */
         gid = H5Gcreate2(fid, "group1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -3446,13 +3424,12 @@ test_userblock_alignment_helper1(hid_t fcpl, hid_t fapl)
 **      test_userblock_alignment() test, to handle common testing
 **
 *****************************************************************/
-static int
-test_userblock_alignment_helper2(hid_t fapl, bool open_rw)
+static int test_userblock_alignment_helper2(hid_t fapl, bool open_rw)
 {
-    hid_t  fid;                              /* File ID */
-    int    curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
-    bool   vol_is_native;
-    herr_t ret; /* Generic return value */
+    hid_t fid;                            /* File ID */
+    int curr_num_errs = GetTestNumErrs(); /* Retrieve the current # of errors */
+    bool vol_is_native;
+    herr_t ret;                           /* Generic return value */
 
     /* Re-open file */
     fid = H5Fopen(FILE1, (open_rw ? H5F_ACC_RDWR : H5F_ACC_RDONLY), fapl);
@@ -3467,9 +3444,9 @@ test_userblock_alignment_helper2(hid_t fapl, bool open_rw)
 
     /* Only proceed further if file ID is OK */
     if (fid > 0) {
-        hid_t gid;      /* Group ID */
-        hid_t did;      /* Dataset ID */
-        int   val = -1; /* Dataset value */
+        hid_t gid;    /* Group ID */
+        hid_t did;    /* Dataset ID */
+        int val = -1; /* Dataset value */
 
         /* Open group */
         gid = H5Gopen2(fid, "group1", H5P_DEFAULT);
@@ -3520,17 +3497,17 @@ test_userblock_alignment_helper2(hid_t fapl, bool open_rw)
 **      object [allocation] alignment size set interact properly.
 **
 *****************************************************************/
-static void
-test_userblock_alignment(const char *driver_name)
+static void test_userblock_alignment(const char* driver_name)
 {
-    hid_t  fid;  /* File ID */
-    hid_t  fcpl; /* File creation property list ID */
-    hid_t  fapl; /* File access property list ID */
-    herr_t ret;  /* Generic return value */
+    hid_t fid;  /* File ID */
+    hid_t fcpl; /* File creation property list ID */
+    hid_t fapl; /* File access property list ID */
+    herr_t ret; /* Generic return value */
 
     /* Only run with sec2 driver */
-    if (!h5_using_default_driver(driver_name))
+    if (!h5_using_default_driver(driver_name)) {
         return;
+    }
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing that non-zero userblocks and object alignment interact correctly.\n"));
@@ -3740,21 +3717,22 @@ test_userblock_alignment(const char *driver_name)
 **        -- alignment via paged aggregation
 **
 *****************************************************************/
-static void
-test_userblock_alignment_paged(const char *driver_name)
+static void test_userblock_alignment_paged(const char* driver_name)
 {
-    hid_t  fid;  /* File ID */
-    hid_t  fcpl; /* File creation property list ID */
-    hid_t  fapl; /* File access property list ID */
-    herr_t ret;  /* Generic return value */
+    hid_t fid;  /* File ID */
+    hid_t fcpl; /* File creation property list ID */
+    hid_t fapl; /* File access property list ID */
+    herr_t ret; /* Generic return value */
 
     /* Only run with sec2 driver */
-    if (!h5_using_default_driver(driver_name))
+    if (!h5_using_default_driver(driver_name)) {
         return;
+    }
 
     /* Output message about test being performed */
-    MESSAGE(5, ("Testing interaction between userblock and alignment (via paged aggregation and "
-                "H5Pset_alignment)\n"));
+    MESSAGE(5,
+            ("Testing interaction between userblock and alignment (via paged aggregation and "
+             "H5Pset_alignment)\n"));
 
     /*
      * Case 1:
@@ -4164,28 +4142,28 @@ test_userblock_alignment_paged(const char *driver_name)
 **          Retrieve and set the page size for paged aggregation
 **
 ****************************************************************/
-static void
-test_filespace_info(const char *driver_name)
+static void test_filespace_info(const char* driver_name)
 {
-    hid_t                 fid;                    /* File IDs    */
-    hid_t                 fapl, new_fapl;         /* File access property lists */
-    hid_t                 fcpl, fcpl1, fcpl2;     /* File creation property lists */
-    H5F_fspace_strategy_t strategy;               /* File space strategy */
-    bool                  persist;                /* Persist free-space or not */
-    hsize_t               threshold;              /* Free-space section threshold */
-    unsigned              new_format;             /* New or old format */
-    H5F_fspace_strategy_t fs_strategy;            /* File space strategy--iteration variable */
-    unsigned              fs_persist;             /* Persist free-space or not--iteration variable */
-    hsize_t               fs_threshold;           /* Free-space section threshold--iteration variable */
-    hsize_t               fsp_size;               /* File space page size */
-    char                  filename[FILENAME_LEN]; /* Filename to use */
-    bool                  contig_addr_vfd;        /* Whether VFD used has a contiguous address space */
-    bool                  vol_is_native;
-    herr_t                ret; /* Return value    */
+    hid_t fid;                         /* File IDs    */
+    hid_t fapl, new_fapl;              /* File access property lists */
+    hid_t fcpl, fcpl1, fcpl2;          /* File creation property lists */
+    H5F_fspace_strategy_t strategy;    /* File space strategy */
+    bool persist;                      /* Persist free-space or not */
+    hsize_t threshold;                 /* Free-space section threshold */
+    unsigned new_format;               /* New or old format */
+    H5F_fspace_strategy_t fs_strategy; /* File space strategy--iteration variable */
+    unsigned fs_persist;               /* Persist free-space or not--iteration variable */
+    hsize_t fs_threshold;              /* Free-space section threshold--iteration variable */
+    hsize_t fsp_size;                  /* File space page size */
+    char filename[FILENAME_LEN];       /* Filename to use */
+    bool contig_addr_vfd;              /* Whether VFD used has a contiguous address space */
+    bool vol_is_native;
+    herr_t ret;                        /* Return value    */
 
     /* Output message about test being performed */
-    MESSAGE(5, ("Testing file creation public routines: H5Pget/set_file_space_strategy & "
-                "H5Pget/set_file_space_page_size\n"));
+    MESSAGE(5,
+            ("Testing file creation public routines: H5Pget/set_file_space_strategy & "
+             "H5Pget/set_file_space_page_size\n"));
 
     contig_addr_vfd = (bool)(strcmp(driver_name, "split") != 0 && strcmp(driver_name, "multi") != 0);
 
@@ -4395,16 +4373,13 @@ test_filespace_info(const char *driver_name)
 
         /* Test with true or false for persisting free-space */
         for (fs_persist = false; fs_persist <= true; fs_persist++) {
-
             /* Test with free-space section threshold size: 0 to 10 */
             for (fs_threshold = 0; fs_threshold <= TEST_THRESHOLD10; fs_threshold++) {
-
                 /* Test with 4 file space strategies */
-                for (fs_strategy = H5F_FSPACE_STRATEGY_FSM_AGGR; fs_strategy < H5F_FSPACE_STRATEGY_NTYPES;
-                     fs_strategy++) {
-
-                    if (!contig_addr_vfd && (fs_strategy == H5F_FSPACE_STRATEGY_PAGE || fs_persist))
+                for (fs_strategy = H5F_FSPACE_STRATEGY_FSM_AGGR; fs_strategy < H5F_FSPACE_STRATEGY_NTYPES; fs_strategy++) {
+                    if (!contig_addr_vfd && (fs_strategy == H5F_FSPACE_STRATEGY_PAGE || fs_persist)) {
                         continue;
+                    }
 
                     /* Create file creation property list template */
                     fcpl = H5Pcreate(H5P_FILE_CREATE);
@@ -4511,8 +4486,8 @@ test_filespace_info(const char *driver_name)
                     ret = H5Pclose(fcpl2);
                     CHECK(ret, FAIL, "H5Pclose");
                 } /* end for file space strategy type */
-            }     /* end for free-space section threshold */
-        }         /* end for fs_persist */
+            } /* end for free-space section threshold */
+        } /* end for fs_persist */
 
         /* close fapl_ and remove the file */
         h5_delete_all_test_files(FILESPACE_NAME, my_fapl);
@@ -4529,14 +4504,13 @@ test_filespace_info(const char *driver_name)
 **  This is used by test_file_freespace() and test_sects_freespace().
 **
 *****************************************************************/
-static int
-set_multi_split(hid_t fapl, hsize_t pagesize, bool split)
+static int set_multi_split(hid_t fapl, hsize_t pagesize, bool split)
 {
     H5FD_mem_t memb_map[H5FD_MEM_NTYPES];
-    hid_t      memb_fapl_arr[H5FD_MEM_NTYPES];
-    char      *memb_name[H5FD_MEM_NTYPES];
-    haddr_t    memb_addr[H5FD_MEM_NTYPES];
-    bool       relax;
+    hid_t memb_fapl_arr[H5FD_MEM_NTYPES];
+    char* memb_name[H5FD_MEM_NTYPES];
+    haddr_t memb_addr[H5FD_MEM_NTYPES];
+    bool relax;
     H5FD_mem_t mt;
 
     assert(split);
@@ -4544,28 +4518,31 @@ set_multi_split(hid_t fapl, hsize_t pagesize, bool split)
     memset(memb_name, 0, sizeof memb_name);
 
     /* Get current split settings */
-    if (H5Pget_fapl_multi(fapl, memb_map, memb_fapl_arr, memb_name, memb_addr, &relax) < 0)
+    if (H5Pget_fapl_multi(fapl, memb_map, memb_fapl_arr, memb_name, memb_addr, &relax) < 0) {
         TEST_ERROR;
+    }
 
     if (split) {
         /* Set memb_addr aligned */
         memb_addr[H5FD_MEM_SUPER] = ((memb_addr[H5FD_MEM_SUPER] + pagesize - 1) / pagesize) * pagesize;
-        memb_addr[H5FD_MEM_DRAW]  = ((memb_addr[H5FD_MEM_DRAW] + pagesize - 1) / pagesize) * pagesize;
+        memb_addr[H5FD_MEM_DRAW] = ((memb_addr[H5FD_MEM_DRAW] + pagesize - 1) / pagesize) * pagesize;
     }
     else {
         /* Set memb_addr aligned */
-        for (mt = H5FD_MEM_DEFAULT; mt < H5FD_MEM_NTYPES; mt++)
+        for (mt = H5FD_MEM_DEFAULT; mt < H5FD_MEM_NTYPES; mt++) {
             memb_addr[mt] = ((memb_addr[mt] + pagesize - 1) / pagesize) * pagesize;
+        }
     } /* end else */
 
     /* Set multi driver with new FAPLs */
-    if (H5Pset_fapl_multi(fapl, memb_map, memb_fapl_arr, (const char *const *)memb_name, memb_addr, relax) <
-        0)
+    if (H5Pset_fapl_multi(fapl, memb_map, memb_fapl_arr, (const char* const*)memb_name, memb_addr, relax) < 0) {
         TEST_ERROR;
+    }
 
     /* Free memb_name */
-    for (mt = H5FD_MEM_DEFAULT; mt < H5FD_MEM_NTYPES; mt++)
+    for (mt = H5FD_MEM_DEFAULT; mt < H5FD_MEM_NTYPES; mt++) {
         free(memb_name[mt]);
+    }
 
     return 0;
 
@@ -4582,34 +4559,34 @@ error:
 **
 **
 *****************************************************************/
-static void
-test_file_freespace(const char *driver_name)
+static void test_file_freespace(const char* driver_name)
 {
-    hid_t          file;                   /* File opened with read-write permission */
-    h5_stat_size_t empty_filesize;         /* Size of file when empty */
-    h5_stat_size_t mod_filesize;           /* Size of file after being modified */
-    hssize_t       free_space;             /* Amount of free space in file */
-    hid_t          fcpl;                   /* File creation property list */
-    hid_t          fapl, new_fapl;         /* File access property list IDs */
-    hid_t          dspace;                 /* Dataspace ID */
-    hid_t          dset;                   /* Dataset ID */
-    hid_t          dcpl;                   /* Dataset creation property list */
-    int            k;                      /* Local index variable */
-    unsigned       u;                      /* Local index variable */
-    char           filename[FILENAME_LEN]; /* Filename to use */
-    char           name[32];               /* Dataset name */
-    unsigned       new_format;             /* To use old or new format */
-    bool           split_vfd, multi_vfd;   /* Indicate multi/split driver */
-    hsize_t        expected_freespace;     /* Freespace expected */
-    hsize_t        expected_fs_del;        /* Freespace expected after delete */
-    bool           vol_is_native;
-    herr_t         ret; /* Return value */
+    hid_t file;                    /* File opened with read-write permission */
+    h5_stat_size_t empty_filesize; /* Size of file when empty */
+    h5_stat_size_t mod_filesize;   /* Size of file after being modified */
+    hssize_t free_space;           /* Amount of free space in file */
+    hid_t fcpl;                    /* File creation property list */
+    hid_t fapl, new_fapl;          /* File access property list IDs */
+    hid_t dspace;                  /* Dataspace ID */
+    hid_t dset;                    /* Dataset ID */
+    hid_t dcpl;                    /* Dataset creation property list */
+    int k;                         /* Local index variable */
+    unsigned u;                    /* Local index variable */
+    char filename[FILENAME_LEN];   /* Filename to use */
+    char name[32];                 /* Dataset name */
+    unsigned new_format;           /* To use old or new format */
+    bool split_vfd, multi_vfd;     /* Indicate multi/split driver */
+    hsize_t expected_freespace;    /* Freespace expected */
+    hsize_t expected_fs_del;       /* Freespace expected after delete */
+    bool vol_is_native;
+    herr_t ret;                    /* Return value */
 
     split_vfd = !strcmp(driver_name, "split");
     multi_vfd = !strcmp(driver_name, "multi");
 
-    if (split_vfd || multi_vfd)
+    if (split_vfd || multi_vfd) {
         return;
+    }
 
     fapl = h5_fileaccess();
     h5_fixname(FILESPACE_NAME[0], fapl, filename, sizeof filename);
@@ -4647,21 +4624,25 @@ test_file_freespace(const char *driver_name)
             CHECK(ret, FAIL, "H5P_set_file_space_strategy");
 
             expected_freespace = 4534;
-            if (split_vfd)
+            if (split_vfd) {
                 expected_freespace = 427;
-            if (multi_vfd)
+            }
+            if (multi_vfd) {
                 expected_freespace = 248;
+            }
             expected_fs_del = 0;
         } /* end if */
         else {
             MESSAGE(5, ("Testing with old group format\n"));
             /* Default: non-paged aggregation, non-persistent free-space */
-            my_fapl            = fapl;
+            my_fapl = fapl;
             expected_freespace = 2464;
-            if (split_vfd)
+            if (split_vfd) {
                 expected_freespace = 264;
-            if (multi_vfd)
+            }
+            if (multi_vfd) {
                 expected_freespace = 0;
+            }
             expected_fs_del = 4096;
 
         } /* end else */
@@ -4676,8 +4657,9 @@ test_file_freespace(const char *driver_name)
         ret = H5Fclose(file);
         CHECK_I(ret, "H5Fclose");
 
-        if (!vol_is_native)
+        if (!vol_is_native) {
             continue;
+        }
 
         /* Get the "empty" file size */
         empty_filesize = h5_get_file_size(filename, H5P_DEFAULT);
@@ -4762,34 +4744,33 @@ test_file_freespace(const char *driver_name)
 **    file as returned by the public routine H5Fget_free_sections().
 **
 *****************************************************************/
-static void
-test_sects_freespace(const char *driver_name, bool new_format)
+static void test_sects_freespace(const char* driver_name, bool new_format)
 {
-    char            filename[FILENAME_LEN]; /* Filename to use */
-    hid_t           file;                   /* File ID */
-    hid_t           fcpl;                   /* File creation property list template */
-    hid_t           fapl;                   /* File access property list template */
-    hssize_t        free_space;             /* Amount of free-space in the file */
-    hid_t           dspace;                 /* Dataspace ID */
-    hid_t           dset;                   /* Dataset ID */
-    hid_t           dcpl;                   /* Dataset creation property list */
-    char            name[32];               /* Dataset name */
-    hssize_t        nsects = 0;             /* # of free-space sections */
-    hssize_t        nall;                   /* # of free-space sections for all types of data */
-    hssize_t        nmeta = 0, nraw = 0;    /* # of free-space sections for meta/raw/generic data */
-    H5F_sect_info_t sect_info[15];          /* Array to hold free-space information */
-    H5F_sect_info_t all_sect_info[15];      /* Array to hold free-space information for all types of data */
-    H5F_sect_info_t meta_sect_info[15];     /* Array to hold free-space information for metadata */
-    H5F_sect_info_t raw_sect_info[15];      /* Array to hold free-space information for raw data */
-    hsize_t         total   = 0;            /* sum of the free-space section sizes */
-    hsize_t         tmp_tot = 0;            /* Sum of the free-space section sizes */
-    hsize_t         last_size;              /* Size of last free-space section */
-    hsize_t         dims[1];                /* Dimension sizes */
-    unsigned        u;                      /* Local index variable */
-    H5FD_mem_t      type;
-    bool            split_vfd = false, multi_vfd = false;
-    bool            vol_is_native;
-    herr_t          ret; /* Return value */
+    char filename[FILENAME_LEN];        /* Filename to use */
+    hid_t file;                         /* File ID */
+    hid_t fcpl;                         /* File creation property list template */
+    hid_t fapl;                         /* File access property list template */
+    hssize_t free_space;                /* Amount of free-space in the file */
+    hid_t dspace;                       /* Dataspace ID */
+    hid_t dset;                         /* Dataset ID */
+    hid_t dcpl;                         /* Dataset creation property list */
+    char name[32];                      /* Dataset name */
+    hssize_t nsects = 0;                /* # of free-space sections */
+    hssize_t nall;                      /* # of free-space sections for all types of data */
+    hssize_t nmeta = 0, nraw = 0;       /* # of free-space sections for meta/raw/generic data */
+    H5F_sect_info_t sect_info[15];      /* Array to hold free-space information */
+    H5F_sect_info_t all_sect_info[15];  /* Array to hold free-space information for all types of data */
+    H5F_sect_info_t meta_sect_info[15]; /* Array to hold free-space information for metadata */
+    H5F_sect_info_t raw_sect_info[15];  /* Array to hold free-space information for raw data */
+    hsize_t total = 0;                  /* sum of the free-space section sizes */
+    hsize_t tmp_tot = 0;                /* Sum of the free-space section sizes */
+    hsize_t last_size;                  /* Size of last free-space section */
+    hsize_t dims[1];                    /* Dimension sizes */
+    unsigned u;                         /* Local index variable */
+    H5FD_mem_t type;
+    bool split_vfd = false, multi_vfd = false;
+    bool vol_is_native;
+    herr_t ret; /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing H5Fget_free_sections()--free-space section info in the file\n"));
@@ -4854,8 +4835,8 @@ test_sects_freespace(const char *driver_name, bool new_format)
 
     /* Create 1 large dataset */
     dims[0] = 1200;
-    dspace  = H5Screate_simple(1, dims, NULL);
-    dset    = H5Dcreate2(file, "Dataset_large", H5T_STD_U32LE, dspace, H5P_DEFAULT, dcpl, H5P_DEFAULT);
+    dspace = H5Screate_simple(1, dims, NULL);
+    dset = H5Dcreate2(file, "Dataset_large", H5T_STD_U32LE, dspace, H5P_DEFAULT, dcpl, H5P_DEFAULT);
     CHECK(dset, FAIL, "H5Dcreate2");
 
     /* Close dataset */
@@ -4895,7 +4876,7 @@ test_sects_freespace(const char *driver_name, bool new_format)
             ret = H5Ldelete(file, name, H5P_DEFAULT);
             CHECK(ret, FAIL, "H5Ldelete");
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
     /* Close file */
     ret = H5Fclose(file);
@@ -4927,8 +4908,9 @@ test_sects_freespace(const char *driver_name, bool new_format)
     VERIFY(nsects, nall, "H5Fget_free_sections");
 
     /* Verify the amount of free-space is correct */
-    for (u = 0; u < nall; u++)
+    for (u = 0; u < nall; u++) {
         total += all_sect_info[u].size;
+    }
     VERIFY(free_space, total, "H5Fget_free_sections");
 
     /* Save the last section's size */
@@ -4969,8 +4951,9 @@ test_sects_freespace(const char *driver_name, bool new_format)
         hssize_t ntmp;
 
         for (type = H5FD_MEM_SUPER; type < H5FD_MEM_NTYPES; type++) {
-            if (type == H5FD_MEM_DRAW || type == H5FD_MEM_GHEAP)
+            if (type == H5FD_MEM_DRAW || type == H5FD_MEM_GHEAP) {
                 continue;
+            }
             /* Get the # of free-space sections in the file for metadata */
             ntmp = H5Fget_free_sections(file, type, (size_t)0, NULL);
             CHECK(ntmp, FAIL, "H5Fget_free_sections");
@@ -5002,11 +4985,13 @@ test_sects_freespace(const char *driver_name, bool new_format)
     VERIFY(nsects, nraw, "H5Fget_free_sections");
 
     /* Sum all the free-space sections */
-    for (u = 0; u < nmeta; u++)
+    for (u = 0; u < nmeta; u++) {
         tmp_tot += meta_sect_info[u].size;
+    }
 
-    for (u = 0; u < nraw; u++)
+    for (u = 0; u < nraw; u++) {
         tmp_tot += raw_sect_info[u].size;
+    }
 
     /* Verify free-space info */
     VERIFY(nmeta + nraw, nall, "H5Fget_free_sections");
@@ -5032,24 +5017,23 @@ test_sects_freespace(const char *driver_name, bool new_format)
 **    and the amount of free space.
 **
 ****************************************************************/
-static void
-test_filespace_compatible(void)
+static void test_filespace_compatible(void)
 {
-    int                   fd_old = (-1), fd_new = (-1); /* File descriptors for copying data */
-    hid_t                 fid = H5I_INVALID_HID;        /* File id */
-    hid_t                 did = H5I_INVALID_HID;        /* Dataset id */
-    hid_t                 fcpl;                         /* File creation property list template */
-    int                   check[100];                   /* Temporary buffer for verifying dataset data */
-    int                   rdbuf[100];                   /* Temporary buffer for reading in dataset data */
-    uint8_t               buf[READ_OLD_BUFSIZE];        /* temporary buffer for reading */
-    ssize_t               nread;                        /* Number of bytes read in */
-    unsigned              i, j;                         /* Local index variable */
-    hssize_t              free_space;                   /* Amount of free-space in the file */
-    bool                  persist;                      /* Persist free-space or not */
-    hsize_t               threshold;                    /* Free-space section threshold */
-    H5F_fspace_strategy_t strategy;                     /* File space handling strategy */
-    bool                  vol_is_native;
-    herr_t                ret; /* Return value */
+    int fd_old = (-1), fd_new = (-1); /* File descriptors for copying data */
+    hid_t fid = H5I_INVALID_HID;      /* File id */
+    hid_t did = H5I_INVALID_HID;      /* Dataset id */
+    hid_t fcpl;                       /* File creation property list template */
+    int check[100];                   /* Temporary buffer for verifying dataset data */
+    int rdbuf[100];                   /* Temporary buffer for reading in dataset data */
+    uint8_t buf[READ_OLD_BUFSIZE];    /* temporary buffer for reading */
+    ssize_t nread;                    /* Number of bytes read in */
+    unsigned i, j;                    /* Local index variable */
+    hssize_t free_space;              /* Amount of free-space in the file */
+    bool persist;                     /* Persist free-space or not */
+    hsize_t threshold;                /* Free-space section threshold */
+    H5F_fspace_strategy_t strategy;   /* File space handling strategy */
+    bool vol_is_native;
+    herr_t ret;                       /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("File space compatibility testing for 1.6 and 1.8 files\n"));
@@ -5062,7 +5046,7 @@ test_filespace_compatible(void)
     }
 
     for (j = 0; j < NELMTS(OLD_FILENAME); j++) {
-        const char *filename = H5_get_srcdir_filename(OLD_FILENAME[j]); /* Corrected test file name */
+        const char* filename = H5_get_srcdir_filename(OLD_FILENAME[j]); /* Corrected test file name */
 
         /* Open and copy the test file into a temporary file */
         fd_old = HDopen(filename, O_RDONLY);
@@ -5107,8 +5091,9 @@ test_filespace_compatible(void)
         VERIFY(threshold, 1, "H5Pget_file_space_strategy");
 
         /* Generate raw data */
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 100; i++) {
             check[i] = (int)i;
+        }
 
         /* Open and read the dataset */
         did = H5Dopen2(fid, DSETNAME, H5P_DEFAULT);
@@ -5117,8 +5102,9 @@ test_filespace_compatible(void)
         CHECK(ret, FAIL, "H5Dread");
 
         /* Verify the data read is correct */
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 100; i++) {
             VERIFY(rdbuf[i], check[i], "test_compatible");
+        }
 
         /* Close the dataset */
         ret = H5Dclose(did);
@@ -5176,21 +5162,20 @@ test_filespace_compatible(void)
 **  The above files are copied from release 1.10.0 tools/h5format_convert/testfiles.
 **
 ****************************************************************/
-static void
-test_filespace_1_10_0_compatible(void)
+static void test_filespace_1_10_0_compatible(void)
 {
-    hid_t                 fid = H5I_INVALID_HID; /* File id */
-    hid_t                 did = H5I_INVALID_HID; /* Dataset id */
-    hid_t                 fcpl;                  /* File creation property list */
-    bool                  persist;               /* Persist free-space or not */
-    hsize_t               threshold;             /* Free-space section threshold */
-    H5F_fspace_strategy_t strategy;              /* File space handling strategy */
-    int                   wbuf[24];              /* Buffer for dataset data */
-    int                   rdbuf[24];             /* Buffer for dataset data */
-    int                   status;                /* Status from copying the existing file */
-    unsigned              i, j;                  /* Local index variable */
-    bool                  vol_is_native;
-    herr_t                ret; /* Return value */
+    hid_t fid = H5I_INVALID_HID;    /* File id */
+    hid_t did = H5I_INVALID_HID;    /* Dataset id */
+    hid_t fcpl;                     /* File creation property list */
+    bool persist;                   /* Persist free-space or not */
+    hsize_t threshold;              /* Free-space section threshold */
+    H5F_fspace_strategy_t strategy; /* File space handling strategy */
+    int wbuf[24];                   /* Buffer for dataset data */
+    int rdbuf[24];                  /* Buffer for dataset data */
+    int status;                     /* Status from copying the existing file */
+    unsigned i, j;                  /* Local index variable */
+    bool vol_is_native;
+    herr_t ret;                     /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("File space compatibility testing for 1.10.0 files\n"));
@@ -5220,133 +5205,138 @@ test_filespace_1_10_0_compatible(void)
         CHECK(ret, FAIL, "H5Pget_file_space_strategy");
 
         switch (j) {
-            case 0:
-                VERIFY(strategy, H5F_FILE_SPACE_STRATEGY_DEF, "H5Pget_file_space_strategy");
-                VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
-                VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
+        case 0:
+            VERIFY(strategy, H5F_FILE_SPACE_STRATEGY_DEF, "H5Pget_file_space_strategy");
+            VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
+            VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/DSET_EA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/DSET_EA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 1:
-                VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
-                VERIFY(persist, true, "H5Pget_file_space_strategy");
-                VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
+        case 1:
+            VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
+            VERIFY(persist, true, "H5Pget_file_space_strategy");
+            VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/DSET_NDATA_BT2", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/DSET_NDATA_BT2", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 2:
-                VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
-                VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
-                VERIFY(threshold, 2, "H5Pget_file_space_strategy");
+        case 2:
+            VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
+            VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
+            VERIFY(threshold, 2, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/DSET_NONE", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/DSET_NONE", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 3:
-                VERIFY(strategy, H5F_FSPACE_STRATEGY_NONE, "H5Pget_file_space_strategy");
-                VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
-                VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
+        case 3:
+            VERIFY(strategy, H5F_FSPACE_STRATEGY_NONE, "H5Pget_file_space_strategy");
+            VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
+            VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_EA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_EA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 4:
-                VERIFY(strategy, H5F_FSPACE_STRATEGY_AGGR, "H5Pget_file_space_strategy");
-                VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
-                VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
+        case 4:
+            VERIFY(strategy, H5F_FSPACE_STRATEGY_AGGR, "H5Pget_file_space_strategy");
+            VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
+            VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_FA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_FA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
-            case 5:
-                VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
-                VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
-                VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
+        case 5:
+            VERIFY(strategy, H5F_FSPACE_STRATEGY_FSM_AGGR, "H5Pget_file_space_strategy");
+            VERIFY(persist, H5F_FREE_SPACE_PERSIST_DEF, "H5Pget_file_space_strategy");
+            VERIFY(threshold, H5F_FREE_SPACE_THRESHOLD_DEF, "H5Pget_file_space_strategy");
 
-                /* Open the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_NONE", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_NONE", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                for (i = 0; i < 24; i++)
-                    wbuf[i] = (int)j + 1;
+            for (i = 0; i < 24; i++) {
+                wbuf[i] = (int)j + 1;
+            }
 
-                /* Write to the dataset */
-                ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
-                CHECK(ret, FAIL, "H5Dwrite");
+            /* Write to the dataset */
+            ret = H5Dwrite(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wbuf);
+            CHECK(ret, FAIL, "H5Dwrite");
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            default:
-                break;
+        default: break;
         }
 
         /* Close the plist */
@@ -5362,112 +5352,117 @@ test_filespace_1_10_0_compatible(void)
         CHECK(fid, FAIL, "H5Fopen");
 
         switch (j) {
-            case 0:
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/DSET_EA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+        case 0:
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/DSET_EA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 1:
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/DSET_NDATA_BT2", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+        case 1:
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/DSET_NDATA_BT2", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 2:
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/DSET_NONE", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+        case 2:
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/DSET_NONE", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 3:
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_EA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+        case 3:
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_EA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 4:
+        case 4:
 
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_FA", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_FA", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            case 5:
+        case 5:
 
-                /* Open and read the dataset */
-                did = H5Dopen2(fid, "/GROUP/DSET_NDATA_NONE", H5P_DEFAULT);
-                CHECK(did, FAIL, "H5Dopen");
+            /* Open and read the dataset */
+            did = H5Dopen2(fid, "/GROUP/DSET_NDATA_NONE", H5P_DEFAULT);
+            CHECK(did, FAIL, "H5Dopen");
 
-                ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
-                CHECK(ret, FAIL, "H5Dread");
+            ret = H5Dread(did, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &rdbuf);
+            CHECK(ret, FAIL, "H5Dread");
 
-                /* Verify the data read is correct */
-                for (i = 0; i < 24; i++)
-                    VERIFY(rdbuf[i], j + 1, "test_compatible");
+            /* Verify the data read is correct */
+            for (i = 0; i < 24; i++) {
+                VERIFY(rdbuf[i], j + 1, "test_compatible");
+            }
 
-                /* Close the dataset */
-                ret = H5Dclose(did);
-                CHECK(ret, FAIL, "H5Dclose");
-                break;
+            /* Close the dataset */
+            ret = H5Dclose(did);
+            CHECK(ret, FAIL, "H5Dclose");
+            break;
 
-            default:
-                break;
+        default: break;
         }
 
         /* Close the file */
@@ -5498,19 +5493,18 @@ test_filespace_1_10_0_compatible(void)
 **         and non-paging file space.
 **
 ****************************************************************/
-static void
-test_filespace_round_compatible(void)
+static void test_filespace_round_compatible(void)
 {
-    hid_t                 fid  = H5I_INVALID_HID; /* File id */
-    hid_t                 fcpl = H5I_INVALID_HID; /* File creation property list ID */
-    unsigned              j;                      /* Local index variable */
-    H5F_fspace_strategy_t strategy;               /* File space strategy */
-    bool                  persist;                /* Persist free-space or not */
-    hsize_t               threshold;              /* Free-space section threshold */
-    hssize_t              free_space;             /* Amount of free space in the file */
-    int                   status;                 /* Status from copying the existing file */
-    bool                  vol_is_native;
-    herr_t                ret; /* Return value */
+    hid_t fid = H5I_INVALID_HID;    /* File id */
+    hid_t fcpl = H5I_INVALID_HID;   /* File creation property list ID */
+    unsigned j;                     /* Local index variable */
+    H5F_fspace_strategy_t strategy; /* File space strategy */
+    bool persist;                   /* Persist free-space or not */
+    hsize_t threshold;              /* Free-space section threshold */
+    hssize_t free_space;            /* Amount of free space in the file */
+    int status;                     /* Status from copying the existing file */
+    bool vol_is_native;
+    herr_t ret;                     /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("File space compatibility testing for files from trunk to 1_8 to trunk\n"));
@@ -5562,15 +5556,13 @@ test_filespace_round_compatible(void)
 **      versions for the right objects.
 **
 ****************************************************************/
-static void
-test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F_libver_t libver_mod,
-                        unsigned oh_vers_mod)
+static void test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F_libver_t libver_mod, unsigned oh_vers_mod)
 {
-    hid_t             file, group; /* Handles */
-    hid_t             fapl;        /* File access property list */
-    H5O_native_info_t ninfo;       /* Object info */
-    bool              vol_is_native;
-    herr_t            ret; /* Return value */
+    hid_t file, group;       /* Handles */
+    hid_t fapl;              /* File access property list */
+    H5O_native_info_t ninfo; /* Object info */
+    bool vol_is_native;
+    herr_t ret;              /* Return value */
 
     /*
      * Create a new file using the creation properties.
@@ -5681,19 +5673,19 @@ test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F
 #define VFNAME      "verbounds.h5"
 #define VERBDSNAME  "dataset 1"
 #define SPACE1_DIM1 3
-static void
-test_libver_bounds_open(void)
+
+static void test_libver_bounds_open(void)
 {
-    hid_t        file   = H5I_INVALID_HID;     /* File ID */
-    hid_t        space  = H5I_INVALID_HID;     /* Dataspace ID */
-    hid_t        dset   = H5I_INVALID_HID;     /* Dataset ID */
-    hid_t        fapl   = H5I_INVALID_HID;     /* File access property list ID */
-    hid_t        dcpl   = H5I_INVALID_HID;     /* Dataset creation property list ID */
-    hsize_t      dim[1] = {SPACE1_DIM1};       /* Dataset dimensions */
-    H5F_libver_t low, high;                    /* File format bounds */
-    hsize_t      chunk_dim[1] = {SPACE1_DIM1}; /* Chunk dimensions */
-    bool         vol_is_native;
-    herr_t       ret; /* Generic return value */
+    hid_t file = H5I_INVALID_HID;           /* File ID */
+    hid_t space = H5I_INVALID_HID;          /* Dataspace ID */
+    hid_t dset = H5I_INVALID_HID;           /* Dataset ID */
+    hid_t fapl = H5I_INVALID_HID;           /* File access property list ID */
+    hid_t dcpl = H5I_INVALID_HID;           /* Dataset creation property list ID */
+    hsize_t dim[1] = { SPACE1_DIM1 };       /* Dataset dimensions */
+    H5F_libver_t low, high;                 /* File format bounds */
+    hsize_t chunk_dim[1] = { SPACE1_DIM1 }; /* Chunk dimensions */
+    bool vol_is_native;
+    herr_t ret;                             /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Opening File in Various Version Bounds\n"));
@@ -5729,9 +5721,9 @@ test_libver_bounds_open(void)
        dataset, then close the file */
 
     /* Set version bounds to (LATEST, LATEST) */
-    low  = H5F_LIBVER_LATEST;
+    low = H5F_LIBVER_LATEST;
     high = H5F_LIBVER_LATEST;
-    ret  = H5Pset_libver_bounds(fapl, low, high);
+    ret = H5Pset_libver_bounds(fapl, low, high);
     CHECK(ret, FAIL, "H5Pset_libver_bounds");
 
     /* Create the file */
@@ -5752,8 +5744,9 @@ test_libver_bounds_open(void)
     ret = H5Pset_libver_bounds(fapl, H5F_LIBVER_EARLIEST, H5F_LIBVER_V18);
     CHECK(ret, FAIL, "H5Pset_libver_bounds");
 
-    if ((file = H5Fopen(VFNAME, H5F_ACC_RDONLY, fapl)) < 0)
+    if ((file = H5Fopen(VFNAME, H5F_ACC_RDONLY, fapl)) < 0) {
         VERIFY((file >= 0), true, "Attempt to open latest file with earliest version should succeed");
+    }
     ret = H5Fclose(file);
     CHECK(ret, FAIL, "H5Fclose");
 
@@ -5769,7 +5762,6 @@ test_libver_bounds_open(void)
     /* Opening VERBFNAME in these combination should succeed */
     high = H5F_LIBVER_LATEST;
     for (low = H5F_LIBVER_EARLIEST; low < H5F_LIBVER_NBOUNDS; low++) {
-
         /* Set version bounds for opening file */
         ret = H5Pset_libver_bounds(fapl, low, high);
         CHECK(ret, FAIL, "H5Pset_libver_bounds");
@@ -5812,16 +5804,15 @@ test_libver_bounds_open(void)
  *
  *-------------------------------------------------------------------------
  */
-static void
-test_libver_bounds_copy(void)
+static void test_libver_bounds_copy(void)
 {
-    hid_t       src_fid = H5I_INVALID_HID; /* File ID */
-    hid_t       dst_fid = H5I_INVALID_HID; /* File ID */
-    hid_t       fapl    = H5I_INVALID_HID; /* File access property list ID */
-    const char *src_fname;                 /* Source file name */
-    herr_t      ret;                       /* Generic return value */
-    bool        vol_is_native;
-    bool        driver_is_default_compatible;
+    hid_t src_fid = H5I_INVALID_HID; /* File ID */
+    hid_t dst_fid = H5I_INVALID_HID; /* File ID */
+    hid_t fapl = H5I_INVALID_HID;    /* File access property list ID */
+    const char* src_fname;           /* Source file name */
+    herr_t ret;                      /* Generic return value */
+    bool vol_is_native;
+    bool driver_is_default_compatible;
 
     /* Output message about the test being performed */
     MESSAGE(5, ("Testing H5Ocopy a dataset in a 1.8 library file to a 1.10 library file\n"));
@@ -5893,8 +5884,7 @@ test_libver_bounds_copy(void)
 **      welcome)
 **
 ****************************************************************/
-static void
-test_libver_bounds(void)
+static void test_libver_bounds(void)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing setting library version bounds\n"));
@@ -5928,13 +5918,12 @@ test_libver_bounds(void)
 **          (6) test_libver_bounds_attributes(fapl): attribute message versions
 **
 **************************************************************************************/
-static void
-test_libver_bounds_low_high(const char *driver_name)
+static void test_libver_bounds_low_high(const char* driver_name)
 {
-    hid_t        fapl = H5I_INVALID_HID; /* File access property list */
-    H5F_libver_t low, high;              /* Low and high bounds */
-    bool         vol_is_native;
-    herr_t       ret; /* The return value */
+    hid_t fapl = H5I_INVALID_HID; /* File access property list */
+    H5F_libver_t low, high;       /* Low and high bounds */
+    bool vol_is_native;
+    herr_t ret;                   /* The return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing setting (low, high) format version bounds\n"));
@@ -5951,9 +5940,8 @@ test_libver_bounds_low_high(const char *driver_name)
     CHECK(fapl, H5I_INVALID_HID, "H5Pcreate");
 
     /* Loop through all the combinations of low/high version bounds */
-    for (low = H5F_LIBVER_EARLIEST; low < H5F_LIBVER_NBOUNDS; low++)
+    for (low = H5F_LIBVER_EARLIEST; low < H5F_LIBVER_NBOUNDS; low++) {
         for (high = H5F_LIBVER_EARLIEST; high < H5F_LIBVER_NBOUNDS; high++) {
-
             H5E_BEGIN_TRY
             {
                 /* Set the low/high version bounds */
@@ -5984,6 +5972,7 @@ test_libver_bounds_low_high(const char *driver_name)
             test_libver_bounds_datatype(fapl);
             test_libver_bounds_attributes(fapl);
         }
+    }
 
     ret = H5Pclose(fapl);
     CHECK(ret, FAIL, "H5Pclose");
@@ -6009,11 +5998,10 @@ test_libver_bounds_low_high(const char *driver_name)
 **     These two tests are run with or without SWMR file access.
 **
 *************************************************************************/
-static void
-test_libver_bounds_super(hid_t fapl, const char *driver_name)
+static void test_libver_bounds_super(hid_t fapl, const char* driver_name)
 {
-    hid_t  fcpl = H5I_INVALID_HID; /* File creation property list */
-    herr_t ret;                    /* The return value */
+    hid_t fcpl = H5I_INVALID_HID; /* File creation property list */
+    herr_t ret;                   /* The return value */
 
     /* Create a default fcpl: #A */
     /* This will result in superblock version 0 */
@@ -6022,14 +6010,16 @@ test_libver_bounds_super(hid_t fapl, const char *driver_name)
 
     /* Verify superblock version when creating a file with input fapl,
        fcpl #A and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_create(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_create(fapl, fcpl, false, false);
 
     /* Verify superblock version when opening a file which is created
        with input fapl, fcpl #A and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_open(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_open(fapl, fcpl, false, false);
 
     /* Close the fcpl */
@@ -6045,14 +6035,16 @@ test_libver_bounds_super(hid_t fapl, const char *driver_name)
 
     /* Verify superblock version when creating a file with input fapl,
        fcpl #B and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_create(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_create(fapl, fcpl, false, false);
 
     /* Verify superblock version when opening a file which is created
        with input fapl, fcpl #B and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_open(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_open(fapl, fcpl, false, false);
 
     /* Close the fcpl */
@@ -6070,14 +6062,16 @@ test_libver_bounds_super(hid_t fapl, const char *driver_name)
 
     /* Verify superblock version when creating a file with input fapl,
        fcpl #C and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_create(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_create(fapl, fcpl, false, false);
 
     /* Verify superblock version when opening a file which is created
        with input fapl, fcpl #C and with/without SWMR access */
-    if (H5FD__supports_swmr_test(driver_name))
+    if (H5FD__supports_swmr_test(driver_name)) {
         test_libver_bounds_super_open(fapl, fcpl, true, false);
+    }
     test_libver_bounds_super_open(fapl, fcpl, false, false);
 
     /* Close the fcpl */
@@ -6094,14 +6088,16 @@ test_libver_bounds_super(hid_t fapl, const char *driver_name)
 
         /* Verify superblock version when creating a file with input fapl,
            fcpl #D and with/without SWMR access */
-        if (H5FD__supports_swmr_test(driver_name))
+        if (H5FD__supports_swmr_test(driver_name)) {
             test_libver_bounds_super_create(fapl, fcpl, true, true);
+        }
         test_libver_bounds_super_create(fapl, fcpl, false, true);
 
         /* Verify superblock version when opening a file which is created
            with input fapl, fcpl #D and with/without SWMR access */
-        if (H5FD__supports_swmr_test(driver_name))
+        if (H5FD__supports_swmr_test(driver_name)) {
             test_libver_bounds_super_open(fapl, fcpl, true, true);
+        }
         test_libver_bounds_super_open(fapl, fcpl, false, true);
 
         /* Close the fcpl */
@@ -6160,14 +6156,13 @@ test_libver_bounds_super(hid_t fapl, const char *driver_name)
 **                    |______________________________________________________________________________|
 **
 ******************************************************************************************************/
-static void
-test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm)
+static void test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm)
 {
-    hid_t        fid = H5I_INVALID_HID; /* File ID */
-    H5F_t       *f   = NULL;            /* Internal file pointer */
-    H5F_libver_t low, high;             /* Low and high bounds */
-    bool         ok;                    /* The result is ok or not */
-    herr_t       ret;                   /* The return value */
+    hid_t fid = H5I_INVALID_HID; /* File ID */
+    H5F_t* f = NULL;             /* Internal file pointer */
+    H5F_libver_t low, high;      /* Low and high bounds */
+    bool ok;                     /* The result is ok or not */
+    herr_t ret;                  /* The return value */
 
     /* Try to create the file */
     H5E_BEGIN_TRY
@@ -6178,7 +6173,7 @@ test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t n
 
     /* Get the internal file pointer if the create succeeds */
     if (fid >= 0) {
-        f = (H5F_t *)H5VL_object(fid);
+        f = (H5F_t*)H5VL_object(fid);
         CHECK_PTR(f, "H5VL_object");
     }
 
@@ -6186,8 +6181,9 @@ test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t n
     ret = H5Pget_libver_bounds(fapl, &low, &high);
     CHECK(ret, FAIL, "H5Pget_libver_bounds");
 
-    if (non_def_fsm && high < H5F_LIBVER_V110)
+    if (non_def_fsm && high < H5F_LIBVER_V110) {
         VERIFY(fid, H5I_INVALID_HID, "H5Fcreate");
+    }
 
     else if (is_swmr) {                /* SWMR is enabled */
         if (high >= H5F_LIBVER_V110) { /* Should succeed */
@@ -6195,38 +6191,37 @@ test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t n
             VERIFY(HDF5_SUPERBLOCK_VERSION_3, f->shared->sblock->super_vers, "HDF5_superblock_ver_bounds");
             VERIFY(f->shared->low_bound >= H5F_LIBVER_V110, true, "HDF5_superblock_ver_bounds");
         }
-        else /* Should fail */
+        else { /* Should fail */
             VERIFY(fid >= 0, false, "H5Fcreate");
+        }
     }
     else { /* Should succeed */
         VERIFY(fid >= 0, true, "H5Fcreate");
         VERIFY(low, f->shared->low_bound, "HDF5_superblock_ver_bounds");
 
         switch (low) {
-            case H5F_LIBVER_EARLIEST:
-                ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_DEF ||
-                      f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_1 ||
-                      f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_2);
-                VERIFY(ok, true, "HDF5_superblock_ver_bounds");
-                break;
+        case H5F_LIBVER_EARLIEST:
+            ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_DEF || f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_1 ||
+                  f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_2);
+            VERIFY(ok, true, "HDF5_superblock_ver_bounds");
+            break;
 
-            case H5F_LIBVER_V18:
-                ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_2);
-                VERIFY(ok, true, "HDF5_superblock_ver_bounds");
-                break;
+        case H5F_LIBVER_V18:
+            ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_2);
+            VERIFY(ok, true, "HDF5_superblock_ver_bounds");
+            break;
 
-            case H5F_LIBVER_V110:
-            case H5F_LIBVER_V112:
-            case H5F_LIBVER_V114:
-            case H5F_LIBVER_V200:
-                ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_3);
-                VERIFY(ok, true, "HDF5_superblock_ver_bounds");
-                break;
+        case H5F_LIBVER_V110:
+        case H5F_LIBVER_V112:
+        case H5F_LIBVER_V114:
+        case H5F_LIBVER_V200:
+            ok = (f->shared->sblock->super_vers == HDF5_SUPERBLOCK_VERSION_3);
+            VERIFY(ok, true, "HDF5_superblock_ver_bounds");
+            break;
 
-            case H5F_LIBVER_ERROR:
-            case H5F_LIBVER_NBOUNDS:
-            default:
-                ERROR("H5Pget_libver_bounds");
+        case H5F_LIBVER_ERROR:
+        case H5F_LIBVER_NBOUNDS:
+        default                : ERROR("H5Pget_libver_bounds");
 
         } /* end switch */
 
@@ -6307,13 +6302,12 @@ test_libver_bounds_super_create(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t n
 **
 **
 ******************************************************************************************************/
-static void
-test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm)
+static void test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non_def_fsm)
 {
-    hid_t        fid      = H5I_INVALID_HID; /* File ID */
-    hid_t        new_fapl = H5I_INVALID_HID; /* File access property list */
-    H5F_libver_t low, high;                  /* Low and high bounds */
-    herr_t       ret;                        /* Return value */
+    hid_t fid = H5I_INVALID_HID;      /* File ID */
+    hid_t new_fapl = H5I_INVALID_HID; /* File access property list */
+    H5F_libver_t low, high;           /* Low and high bounds */
+    herr_t ret;                       /* Return value */
 
     /* Create the file with the input fcpl and fapl */
     H5E_BEGIN_TRY
@@ -6350,8 +6344,9 @@ test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non
                 H5E_END_TRY
 
                 /* Invalid combinations */
-                if (ret < 0)
+                if (ret < 0) {
                     continue;
+                }
 
                 /* Open the file with or without SWMR access */
                 H5E_BEGIN_TRY
@@ -6366,12 +6361,11 @@ test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non
                     CHECK(ret, FAIL, "H5Fclose");
                 }
                 else {
-
                     VERIFY((is_swmr || (non_def_fsm && (high < H5F_LIBVER_V110))), true, "H5Fopen");
                 }
 
             } /* end for */
-        }     /* end for */
+        } /* end for */
 
         /* Close the file access property list */
         ret = H5Pclose(new_fapl);
@@ -6406,18 +6400,17 @@ test_libver_bounds_super_open(hid_t fapl, hid_t fcpl, htri_t is_swmr, htri_t non
 **          --Close the file
 **
 ****************************************************************/
-static void
-test_libver_bounds_obj(hid_t fapl)
+static void test_libver_bounds_obj(hid_t fapl)
 {
-    hid_t             fid      = H5I_INVALID_HID; /* File ID */
-    hid_t             gid      = H5I_INVALID_HID; /* Group ID */
-    hid_t             fcpl     = H5I_INVALID_HID; /* File creation property list */
-    hid_t             new_fapl = H5I_INVALID_HID; /* File access property list */
-    H5F_t            *f        = NULL;            /* Internal file pointer */
-    H5F_libver_t      low, high;                  /* Low and high bounds */
-    H5O_native_info_t ninfo;                      /* Object info */
-    H5G_info_t        ginfo;                      /* Group info */
-    herr_t            ret;                        /* Return value */
+    hid_t fid = H5I_INVALID_HID;      /* File ID */
+    hid_t gid = H5I_INVALID_HID;      /* Group ID */
+    hid_t fcpl = H5I_INVALID_HID;     /* File creation property list */
+    hid_t new_fapl = H5I_INVALID_HID; /* File access property list */
+    H5F_t* f = NULL;                  /* Internal file pointer */
+    H5F_libver_t low, high;           /* Low and high bounds */
+    H5O_native_info_t ninfo;          /* Object info */
+    H5G_info_t ginfo;                 /* Group info */
+    herr_t ret;                       /* Return value */
 
     /* Retrieve the low/high bounds from the input fapl */
     ret = H5Pget_libver_bounds(fapl, &low, &high);
@@ -6484,8 +6477,9 @@ test_libver_bounds_obj(hid_t fapl)
             }
             H5E_END_TRY
 
-            if (ret < 0) /* Invalid combinations */
+            if (ret < 0) { /* Invalid combinations */
                 continue;
+            }
 
             /* Open the file */
             H5E_BEGIN_TRY
@@ -6498,7 +6492,7 @@ test_libver_bounds_obj(hid_t fapl)
             if (fid >= 0) { /* The file open succeeds */
 
                 /* Get the internal file pointer */
-                f = (H5F_t *)H5VL_object(fid);
+                f = (H5F_t*)H5VL_object(fid);
                 CHECK_PTR(f, "H5VL_object");
 
                 /* Create a group in the file */
@@ -6510,12 +6504,14 @@ test_libver_bounds_obj(hid_t fapl)
                 CHECK(ret, FAIL, "H5Gget_info");
 
                 /* Verify group storage type */
-                if (f->shared->low_bound >= H5F_LIBVER_V18)
+                if (f->shared->low_bound >= H5F_LIBVER_V18) {
                     /* Links in group are stored in object header */
                     VERIFY(ginfo.storage_type, H5G_STORAGE_TYPE_COMPACT, "H5Gget_info");
-                else
+                }
+                else {
                     /* Links in group are stored with a "symbol table" */
                     VERIFY(ginfo.storage_type, H5G_STORAGE_TYPE_SYMBOL_TABLE, "H5Gget_info");
+                }
 
                 /* Get object header information */
                 ret = H5Oget_native_info_by_name(gid, GRP_NAME, &ninfo, H5O_NATIVE_INFO_HDR, H5P_DEFAULT);
@@ -6537,8 +6533,8 @@ test_libver_bounds_obj(hid_t fapl)
                 CHECK(ret, FAIL, "H5Fclose");
 
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     /* Close the file access property list */
     ret = H5Pclose(new_fapl);
@@ -6571,23 +6567,22 @@ test_libver_bounds_obj(hid_t fapl)
 **              --Close the file
 **
 ****************************************************************/
-static void
-test_libver_bounds_dataset(hid_t fapl)
+static void test_libver_bounds_dataset(hid_t fapl)
 {
-    hid_t        fid      = H5I_INVALID_HID;                      /* File ID */
-    hid_t        new_fapl = H5I_INVALID_HID;                      /* File access property list */
-    hid_t        did      = H5I_INVALID_HID;                      /* Dataset ID */
-    hid_t        sid      = H5I_INVALID_HID;                      /* Dataspace ID */
-    hid_t        dcpl     = H5I_INVALID_HID;                      /* Dataset creation property list */
-    H5D_t       *dset     = NULL;                                 /* Internal dataset pointer */
-    H5F_t       *f        = NULL;                                 /* Internal file pointer */
-    H5F_libver_t low, high;                                       /* Low and high bounds */
-    herr_t       ret;                                             /* Return value */
-    hsize_t      fix_dims2[2]   = {10, 4};                        /* Dimension sizes */
-    hsize_t      fix_chunks2[2] = {4, 3};                         /* Chunk dimension sizes */
-    hsize_t      dims2[2]       = {1, 4};                         /* Dimension sizes */
-    hsize_t      max_dims2[2]   = {H5S_UNLIMITED, H5S_UNLIMITED}; /* Maximum dimension sizes */
-    hsize_t      chunks2[2]     = {4, 5};                         /* Chunk dimension sizes */
+    hid_t fid = H5I_INVALID_HID;                             /* File ID */
+    hid_t new_fapl = H5I_INVALID_HID;                        /* File access property list */
+    hid_t did = H5I_INVALID_HID;                             /* Dataset ID */
+    hid_t sid = H5I_INVALID_HID;                             /* Dataspace ID */
+    hid_t dcpl = H5I_INVALID_HID;                            /* Dataset creation property list */
+    H5D_t* dset = NULL;                                      /* Internal dataset pointer */
+    H5F_t* f = NULL;                                         /* Internal file pointer */
+    H5F_libver_t low, high;                                  /* Low and high bounds */
+    herr_t ret;                                              /* Return value */
+    hsize_t fix_dims2[2] = { 10, 4 };                        /* Dimension sizes */
+    hsize_t fix_chunks2[2] = { 4, 3 };                       /* Chunk dimension sizes */
+    hsize_t dims2[2] = { 1, 4 };                             /* Dimension sizes */
+    hsize_t max_dims2[2] = { H5S_UNLIMITED, H5S_UNLIMITED }; /* Maximum dimension sizes */
+    hsize_t chunks2[2] = { 4, 5 };                           /* Chunk dimension sizes */
 
     /* Retrieve the low/high bounds from the input fapl */
     ret = H5Pget_libver_bounds(fapl, &low, &high);
@@ -6606,7 +6601,7 @@ test_libver_bounds_dataset(hid_t fapl)
     CHECK(did, H5I_INVALID_HID, "H5Dcreate");
 
     /* Get the internal dataset pointer */
-    dset = (H5D_t *)H5VL_object(did);
+    dset = (H5D_t*)H5VL_object(did);
     CHECK_PTR(dset, "H5VL_object");
 
     /* Verify version for layout and fill value messages */
@@ -6652,9 +6647,8 @@ test_libver_bounds_dataset(hid_t fapl)
     H5E_END_TRY
 
     if (did >= 0) {
-
         /* Get the internal dataset pointer */
-        dset = (H5D_t *)H5VL_object(did);
+        dset = (H5D_t*)H5VL_object(did);
         CHECK_PTR(dset, "H5VL_object");
 
         /* Verify layout message version and chunk indexing type */
@@ -6703,8 +6697,9 @@ test_libver_bounds_dataset(hid_t fapl)
             }
             H5E_END_TRY
 
-            if (ret < 0) /* Invalid low/high combinations */
+            if (ret < 0) { /* Invalid low/high combinations */
                 continue;
+            }
 
             /* Open the file */
             H5E_BEGIN_TRY
@@ -6717,7 +6712,7 @@ test_libver_bounds_dataset(hid_t fapl)
             if (fid >= 0) { /* The file open succeeds */
 
                 /* Get the internal file pointer */
-                f = (H5F_t *)H5VL_object(fid);
+                f = (H5F_t*)H5VL_object(fid);
                 CHECK_PTR(f, "H5VL_object");
 
                 /* Create the chunked dataset */
@@ -6725,7 +6720,7 @@ test_libver_bounds_dataset(hid_t fapl)
                 CHECK(did, H5I_INVALID_HID, "H5Dcreate2");
 
                 /* Get the internal file pointer */
-                dset = (H5D_t *)H5VL_object(did);
+                dset = (H5D_t*)H5VL_object(did);
                 CHECK_PTR(dset, "H5VL_object");
 
                 if (dset) {
@@ -6734,28 +6729,24 @@ test_libver_bounds_dataset(hid_t fapl)
                     if (f->shared->low_bound == H5F_LIBVER_EARLIEST) {
                         /* For layout message: the earliest version the library will set is 3 */
                         /* For fill value message: the earliest version the library will set is 2 */
-                        VERIFY(dset->shared->layout.version, H5O_LAYOUT_VERSION_DEFAULT,
-                               "H5O_layout_ver_bounds");
-                        VERIFY(dset->shared->dcpl_cache.fill.version, H5O_FILL_VERSION_2,
-                               "H5O_fill_ver_bounds");
+                        VERIFY(dset->shared->layout.version, H5O_LAYOUT_VERSION_DEFAULT, "H5O_layout_ver_bounds");
+                        VERIFY(dset->shared->dcpl_cache.fill.version, H5O_FILL_VERSION_2, "H5O_fill_ver_bounds");
                     }
                     else {
-                        VERIFY(dset->shared->layout.version, H5O_layout_ver_bounds[f->shared->low_bound],
-                               "H5O_layout_ver_bounds");
-                        VERIFY(dset->shared->dcpl_cache.fill.version,
-                               H5O_fill_ver_bounds[f->shared->low_bound], "H5O_fill_ver_bounds");
+                        VERIFY(dset->shared->layout.version, H5O_layout_ver_bounds[f->shared->low_bound], "H5O_layout_ver_bounds");
+                        VERIFY(dset->shared->dcpl_cache.fill.version, H5O_fill_ver_bounds[f->shared->low_bound], "H5O_fill_ver_bounds");
                     }
 
                     /* Verify the filter pipeline message version */
-                    VERIFY(dset->shared->dcpl_cache.pline.version, H5O_pline_ver_bounds[f->shared->low_bound],
-                           "H5O_pline_ver_bounds");
+                    VERIFY(dset->shared->dcpl_cache.pline.version, H5O_pline_ver_bounds[f->shared->low_bound], "H5O_pline_ver_bounds");
 
                     /* Verify the dataset's chunk indexing type */
-                    if (dset->shared->layout.version == H5O_LAYOUT_VERSION_LATEST)
+                    if (dset->shared->layout.version == H5O_LAYOUT_VERSION_LATEST) {
                         VERIFY(dset->shared->layout.u.chunk.idx_type, H5D_CHUNK_IDX_BT2, "chunk_index_type");
-                    else
-                        VERIFY(dset->shared->layout.u.chunk.idx_type, H5D_CHUNK_IDX_BTREE,
-                               "chunk_index_type");
+                    }
+                    else {
+                        VERIFY(dset->shared->layout.u.chunk.idx_type, H5D_CHUNK_IDX_BTREE, "chunk_index_type");
+                    }
                 }
 
                 /* Close the dataset */
@@ -6771,8 +6762,8 @@ test_libver_bounds_dataset(hid_t fapl)
                 CHECK(ret, FAIL, "H5Fclose");
 
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     /* Close the file access property list */
     ret = H5Pclose(new_fapl);
@@ -6812,25 +6803,24 @@ test_libver_bounds_dataset(hid_t fapl)
 **              --Close the file
 **
 ****************************************************************/
-static void
-test_libver_bounds_dataspace(hid_t fapl)
+static void test_libver_bounds_dataspace(hid_t fapl)
 {
-    hid_t fid      = H5I_INVALID_HID;                                    /* File ID */
+    hid_t fid = H5I_INVALID_HID;                                         /* File ID */
     hid_t new_fapl = H5I_INVALID_HID;                                    /* File access property list */
     hid_t did = H5I_INVALID_HID, did_null = H5I_INVALID_HID;             /* Dataset IDs */
     hid_t did_compact = H5I_INVALID_HID, did_contig = H5I_INVALID_HID;   /* Dataset IDs */
     hid_t sid = H5I_INVALID_HID, sid_null = H5I_INVALID_HID;             /* Dataspace IDs */
     hid_t sid_compact = H5I_INVALID_HID, sid_contig = H5I_INVALID_HID;   /* Dataspace IDs */
-    hid_t dcpl         = H5I_INVALID_HID;                                /* Dataset creation property list */
+    hid_t dcpl = H5I_INVALID_HID;                                        /* Dataset creation property list */
     hid_t dcpl_compact = H5I_INVALID_HID, dcpl_contig = H5I_INVALID_HID; /* Dataset creation property lists */
-    H5S_t       *space = NULL, *space_null = NULL;                       /* Internal dataspace pointers */
-    H5F_t       *f = NULL;                                               /* Internal file pointer */
+    H5S_t *space = NULL, *space_null = NULL;                             /* Internal dataspace pointers */
+    H5F_t* f = NULL;                                                     /* Internal file pointer */
     H5F_libver_t low, high;                                              /* Low and high bounds */
-    hsize_t      dims[1]     = {1};                                      /* Dimension sizes */
-    hsize_t      dims2[2]    = {5, 4};                                   /* Dimension sizes */
-    hsize_t      max_dims[1] = {H5S_UNLIMITED};                          /* Maximum dimension sizes */
-    hsize_t      chunks[1]   = {4};                                      /* Chunk dimension sizes */
-    herr_t       ret;                                                    /* Return value */
+    hsize_t dims[1] = { 1 };                                             /* Dimension sizes */
+    hsize_t dims2[2] = { 5, 4 };                                         /* Dimension sizes */
+    hsize_t max_dims[1] = { H5S_UNLIMITED };                             /* Maximum dimension sizes */
+    hsize_t chunks[1] = { 4 };                                           /* Chunk dimension sizes */
+    herr_t ret;                                                          /* Return value */
 
     /* Retrieve the low/high bounds from the input fapl */
     ret = H5Pget_libver_bounds(fapl, &low, &high);
@@ -6851,7 +6841,7 @@ test_libver_bounds_dataspace(hid_t fapl)
     /* Get the internal dataspace pointer */
     sid = H5Dget_space(did);
     CHECK(sid, H5I_INVALID_HID, "H5Dget_space");
-    space = (H5S_t *)H5I_object(sid);
+    space = (H5S_t*)H5I_object(sid);
     CHECK_PTR(space, "H5I_object");
 
     /* Verify the dataspace version */
@@ -6868,7 +6858,7 @@ test_libver_bounds_dataspace(hid_t fapl)
     /* Get the internal dataspace pointer */
     sid_null = H5Dget_space(did_null);
     CHECK(sid_null, H5I_INVALID_HID, "H5Dget_space");
-    space_null = (H5S_t *)H5I_object(sid_null);
+    space_null = (H5S_t*)H5I_object(sid_null);
     CHECK_PTR(space_null, "H5I_object");
 
     /* Verify the dataspace version */
@@ -6924,7 +6914,7 @@ test_libver_bounds_dataspace(hid_t fapl)
     /* Verify the dataspace message version for the three datasets */
     for (low = H5F_LIBVER_EARLIEST; low < H5F_LIBVER_NBOUNDS; low++) {
         for (high = H5F_LIBVER_EARLIEST; high < H5F_LIBVER_NBOUNDS; high++) {
-            hid_t  tmp_sid, tmp_sid_compact, tmp_sid_contig;         /* Dataspace IDs */
+            hid_t tmp_sid, tmp_sid_compact, tmp_sid_contig;          /* Dataspace IDs */
             H5S_t *tmp_space, *tmp_space_compact, *tmp_space_contig; /* Internal dataspace pointers */
 
             H5E_BEGIN_TRY
@@ -6933,8 +6923,9 @@ test_libver_bounds_dataspace(hid_t fapl)
             }
             H5E_END_TRY
 
-            if (ret < 0) /* Invalid low/high combinations */
+            if (ret < 0) { /* Invalid low/high combinations */
                 continue;
+            }
 
             /* Open the file */
             H5E_BEGIN_TRY
@@ -6947,7 +6938,7 @@ test_libver_bounds_dataspace(hid_t fapl)
             if (fid >= 0) { /* The file open succeeds */
 
                 /* Get the internal file pointer */
-                f = (H5F_t *)H5VL_object(fid);
+                f = (H5F_t*)H5VL_object(fid);
                 CHECK_PTR(f, "H5VL_object");
 
                 /* Create the chunked dataset */
@@ -6957,43 +6948,38 @@ test_libver_bounds_dataspace(hid_t fapl)
                 /* Get the internal dataspace pointer for the chunked dataset */
                 tmp_sid = H5Dget_space(did);
                 CHECK(tmp_sid, H5I_INVALID_HID, "H5Dget_space");
-                tmp_space = (H5S_t *)H5I_object(tmp_sid);
+                tmp_space = (H5S_t*)H5I_object(tmp_sid);
                 CHECK_PTR(tmp_space, "H5I_object");
 
                 /* Create the compact dataset */
-                did_compact = H5Dcreate2(fid, DSETB, H5T_NATIVE_INT, sid_compact, H5P_DEFAULT, dcpl_compact,
-                                         H5P_DEFAULT);
+                did_compact = H5Dcreate2(fid, DSETB, H5T_NATIVE_INT, sid_compact, H5P_DEFAULT, dcpl_compact, H5P_DEFAULT);
                 CHECK(did_compact, H5I_INVALID_HID, "H5Dcreate2");
 
                 /* Get the internal dataspace pointer for the compact dataset */
                 tmp_sid_compact = H5Dget_space(did_compact);
                 CHECK(tmp_sid_compact, H5I_INVALID_HID, "H5Dget_space");
-                tmp_space_compact = (H5S_t *)H5I_object(tmp_sid_compact);
+                tmp_space_compact = (H5S_t*)H5I_object(tmp_sid_compact);
                 CHECK_PTR(tmp_space_compact, "H5I_object");
 
                 /* Create the contiguous dataset */
-                did_contig =
-                    H5Dcreate2(fid, DSETC, H5T_NATIVE_INT, sid_contig, H5P_DEFAULT, dcpl_contig, H5P_DEFAULT);
+                did_contig = H5Dcreate2(fid, DSETC, H5T_NATIVE_INT, sid_contig, H5P_DEFAULT, dcpl_contig, H5P_DEFAULT);
                 CHECK(did_contig, H5I_INVALID_HID, "H5Dcreate2");
 
                 /* Get the internal dataspace pointer for the contiguous dataset */
                 tmp_sid_contig = H5Dget_space(did_contig);
                 CHECK(tmp_sid_contig, H5I_INVALID_HID, "H5Dget_space");
-                tmp_space_contig = (H5S_t *)H5I_object(tmp_sid_contig);
+                tmp_space_contig = (H5S_t*)H5I_object(tmp_sid_contig);
                 CHECK_PTR(tmp_space_contig, "H5I_object");
 
                 if (tmp_space) {
                     /* Verify versions for the three dataspaces */
-                    VERIFY(tmp_space->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound],
-                           "H5O_sdspace_ver_bounds");
+                    VERIFY(tmp_space->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound], "H5O_sdspace_ver_bounds");
                 }
                 if (tmp_space_compact) {
-                    VERIFY(tmp_space_compact->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound],
-                           "H5O_sdspace_ver_bounds");
+                    VERIFY(tmp_space_compact->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound], "H5O_sdspace_ver_bounds");
                 }
                 if (tmp_space_contig) {
-                    VERIFY(tmp_space_contig->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound],
-                           "H5O_sdspace_ver_bounds");
+                    VERIFY(tmp_space_contig->extent.version, H5O_sdspace_ver_bounds[f->shared->low_bound], "H5O_sdspace_ver_bounds");
                 }
 
                 /* Close the three datasets */
@@ -7025,8 +7011,8 @@ test_libver_bounds_dataspace(hid_t fapl)
                 CHECK(ret, FAIL, "H5Fclose");
 
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     /* Close the file access property list */
     ret = H5Pclose(new_fapl);
@@ -7065,19 +7051,21 @@ test_libver_bounds_dataspace(hid_t fapl)
 **          datatype in (a) to verify the datatype message version.
 **
 ****************************************************************/
-static void
-test_libver_bounds_datatype(hid_t fapl)
+static void test_libver_bounds_datatype(hid_t fapl)
 {
     hid_t tid = H5I_INVALID_HID, tid_enum = H5I_INVALID_HID, tid_array = H5I_INVALID_HID; /* Datatype IDs */
     hid_t tid_compound = H5I_INVALID_HID, tid_vlen = H5I_INVALID_HID;                     /* Datatype IDs */
     hid_t tid_complex = H5I_INVALID_HID;                                                  /* Datatype IDs */
-    int   enum_value;   /* Value for enum datatype */
-    typedef struct s1 { /* Data structure for compound datatype */
+    int enum_value;                                                                       /* Value for enum datatype */
+
+    typedef struct s1
+    { /* Data structure for compound datatype */
         char c;
-        int  i;
+        int i;
     } s1;
-    hsize_t dims[1] = {1}; /* Dimension sizes */
-    herr_t  ret;           /* Return value */
+
+    hsize_t dims[1] = { 1 }; /* Dimension sizes */
+    herr_t ret;              /* Return value */
 
     /* Create integer datatype */
     tid = H5Tcopy(H5T_NATIVE_INT);
@@ -7086,7 +7074,7 @@ test_libver_bounds_datatype(hid_t fapl)
     test_libver_bounds_datatype_check(fapl, tid);
 
     /* Create enum datatype */
-    tid_enum   = H5Tenum_create(tid);
+    tid_enum = H5Tenum_create(tid);
     enum_value = 0;
     H5Tenum_insert(tid_enum, "val1", &enum_value);
     enum_value = 1;
@@ -7167,26 +7155,25 @@ test_libver_bounds_datatype(hid_t fapl)
 **              --Close the file
 **
 ****************************************************************/
-static void
-test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
+static void test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
 {
-    hid_t        fid          = H5I_INVALID_HID;                /* File ID */
-    hid_t        new_fapl     = H5I_INVALID_HID;                /* File access property list */
-    hid_t        dcpl         = H5I_INVALID_HID;                /* Dataset creation property list */
-    hid_t        dtid         = H5I_INVALID_HID;                /* Datatype ID for the dataset */
-    hid_t        str_tid      = H5I_INVALID_HID;                /* String datatype ID */
-    hid_t        did          = H5I_INVALID_HID;                /* Dataset ID */
-    hid_t        sid          = H5I_INVALID_HID;                /* Dataspace ID */
-    hsize_t      dims[1]      = {1};                            /* Dimension sizes */
-    hsize_t      dims2[2]     = {5, 4};                         /* Dimension sizes */
-    hsize_t      max_dims2[2] = {H5S_UNLIMITED, H5S_UNLIMITED}; /* Maximum dimension sizes */
-    hsize_t      chunks[2]    = {2, 3};                         /* Chunk dimension sizes */
-    H5T_t       *dtype        = NULL;                           /* Internal datatype pointer */
-    H5T_t       *str_dtype    = NULL;  /* Internal datatype pointer for the string datatype */
-    H5F_t       *f            = NULL;  /* Internal file pointer */
-    bool         is_complex   = false; /* If datatype is a complex number type */
-    H5F_libver_t low, high;            /* Low and high bounds */
-    herr_t       ret;                  /* Return value */
+    hid_t fid = H5I_INVALID_HID;                             /* File ID */
+    hid_t new_fapl = H5I_INVALID_HID;                        /* File access property list */
+    hid_t dcpl = H5I_INVALID_HID;                            /* Dataset creation property list */
+    hid_t dtid = H5I_INVALID_HID;                            /* Datatype ID for the dataset */
+    hid_t str_tid = H5I_INVALID_HID;                         /* String datatype ID */
+    hid_t did = H5I_INVALID_HID;                             /* Dataset ID */
+    hid_t sid = H5I_INVALID_HID;                             /* Dataspace ID */
+    hsize_t dims[1] = { 1 };                                 /* Dimension sizes */
+    hsize_t dims2[2] = { 5, 4 };                             /* Dimension sizes */
+    hsize_t max_dims2[2] = { H5S_UNLIMITED, H5S_UNLIMITED }; /* Maximum dimension sizes */
+    hsize_t chunks[2] = { 2, 3 };                            /* Chunk dimension sizes */
+    H5T_t* dtype = NULL;                                     /* Internal datatype pointer */
+    H5T_t* str_dtype = NULL;                                 /* Internal datatype pointer for the string datatype */
+    H5F_t* f = NULL;                                         /* Internal file pointer */
+    bool is_complex = false;                                 /* If datatype is a complex number type */
+    H5F_libver_t low, high;                                  /* Low and high bounds */
+    herr_t ret;                                              /* Return value */
 
     /* Retrieve the low/high version bounds from the input fapl */
     ret = H5Pget_libver_bounds(fapl, &low, &high);
@@ -7194,8 +7181,9 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
 
     /* Complex numbers can't be created with a high version bound < 2.0 */
     is_complex = (H5T_COMPLEX == H5Tget_class(tid));
-    if (is_complex && high < H5F_LIBVER_V200)
+    if (is_complex && high < H5F_LIBVER_V200) {
         return;
+    }
 
     /* Create the file with the input fapl */
     fid = H5Fcreate(FILE8, H5F_ACC_TRUNC, H5P_DEFAULT, fapl);
@@ -7225,7 +7213,7 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
     CHECK(dtid, H5I_INVALID_HID, "H5Dget_type");
 
     /* Get the internal datatype pointer */
-    dtype = (H5T_t *)H5I_object(dtid);
+    dtype = (H5T_t*)H5I_object(dtid);
     CHECK_PTR(dtype, "H5I_object");
 
     /* Verify the datatype message version */
@@ -7239,19 +7227,21 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
      *  --the library will only use basic version
      */
 
-    if (dtype->shared->type == H5T_COMPOUND || dtype->shared->type == H5T_ENUM ||
-        dtype->shared->type == H5T_ARRAY) {
-        if (dtype->shared->type == H5T_ARRAY && low == H5F_LIBVER_EARLIEST)
+    if (dtype->shared->type == H5T_COMPOUND || dtype->shared->type == H5T_ENUM || dtype->shared->type == H5T_ARRAY) {
+        if (dtype->shared->type == H5T_ARRAY && low == H5F_LIBVER_EARLIEST) {
             VERIFY(dtype->shared->version, H5O_DTYPE_VERSION_2, "H5O_dtype_ver_bounds");
-        else
+        }
+        else {
             VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[low], "H5O_dtype_ver_bounds");
+        }
     }
     else if (is_complex) {
         /* Complex number datatypes do not currently upgrade */
         VERIFY(dtype->shared->version, H5O_DTYPE_VERSION_5, "H5O_dtype_ver_bounds");
     }
-    else
+    else {
         VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[H5F_LIBVER_EARLIEST], "H5O_dtype_ver_bounds");
+    }
 
     /* Close the dataset */
     ret = H5Dclose(did);
@@ -7293,12 +7283,14 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
             }
             H5E_END_TRY
 
-            if (ret < 0) /* Invalid low/high combinations */
+            if (ret < 0) { /* Invalid low/high combinations */
                 continue;
+            }
 
             /* Complex numbers can't be created with a high version bound < 2.0 */
-            if (is_complex && high < H5F_LIBVER_V200)
+            if (is_complex && high < H5F_LIBVER_V200) {
                 continue;
+            }
 
             /* Open the file */
             H5E_BEGIN_TRY
@@ -7311,18 +7303,17 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
             if (fid >= 0) { /* The file open succeeds */
 
                 /* Get the internal file pointer */
-                f = (H5F_t *)H5VL_object(fid);
+                f = (H5F_t*)H5VL_object(fid);
                 CHECK_PTR(f, "H5VL_object");
 
                 /* Open the committed datatype */
                 str_tid = H5Topen2(fid, "datatype", H5P_DEFAULT);
                 CHECK(str_tid, FAIL, "H5Topen2");
-                str_dtype = (H5T_t *)H5VL_object(str_tid);
+                str_dtype = (H5T_t*)H5VL_object(str_tid);
                 CHECK_PTR(str_dtype, "H5VL_object");
 
                 /* Verify the committed datatype message version */
-                VERIFY(str_dtype->shared->version, H5O_dtype_ver_bounds[H5F_LIBVER_EARLIEST],
-                       "H5O_dtype_ver_bounds");
+                VERIFY(str_dtype->shared->version, H5O_dtype_ver_bounds[H5F_LIBVER_EARLIEST], "H5O_dtype_ver_bounds");
 
                 /* Close the committed datatype */
                 ret = H5Tclose(str_tid);
@@ -7337,7 +7328,7 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
                 CHECK(dtid, H5I_INVALID_HID, "H5Dget_type");
 
                 /* Get the internal datatype pointer */
-                dtype = (H5T_t *)H5I_object(dtid);
+                dtype = (H5T_t*)H5I_object(dtid);
                 CHECK_PTR(dtype, "H5I_object");
 
                 if (dtype) {
@@ -7351,21 +7342,21 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
                      * H5T_REFERENCE:
                      *  --the library will only use basic version
                      */
-                    if (dtype->shared->type == H5T_COMPOUND || dtype->shared->type == H5T_ENUM ||
-                        dtype->shared->type == H5T_ARRAY) {
-                        if (dtype->shared->type == H5T_ARRAY && f->shared->low_bound == H5F_LIBVER_EARLIEST)
+                    if (dtype->shared->type == H5T_COMPOUND || dtype->shared->type == H5T_ENUM || dtype->shared->type == H5T_ARRAY) {
+                        if (dtype->shared->type == H5T_ARRAY && f->shared->low_bound == H5F_LIBVER_EARLIEST) {
                             VERIFY(dtype->shared->version, H5O_DTYPE_VERSION_2, "H5O_dtype_ver_bounds");
-                        else
-                            VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[f->shared->low_bound],
-                                   "H5O_dtype_ver_bounds");
+                        }
+                        else {
+                            VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[f->shared->low_bound], "H5O_dtype_ver_bounds");
+                        }
                     }
                     else if (is_complex) {
                         /* Complex number datatypes do not currently upgrade */
                         VERIFY(dtype->shared->version, H5O_DTYPE_VERSION_5, "H5O_dtype_ver_bounds");
                     }
-                    else
-                        VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[H5F_LIBVER_EARLIEST],
-                               "H5O_dtype_ver_bounds");
+                    else {
+                        VERIFY(dtype->shared->version, H5O_dtype_ver_bounds[H5F_LIBVER_EARLIEST], "H5O_dtype_ver_bounds");
+                    }
                 }
 
                 /* Close the dataset */
@@ -7385,8 +7376,8 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
                 CHECK(ret, FAIL, "H5Fclose");
 
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     /* Close the file access property list */
     ret = H5Pclose(new_fapl);
@@ -7434,21 +7425,20 @@ test_libver_bounds_datatype_check(hid_t fapl, hid_t tid)
 **              --Close the group and the file
 **
 ****************************************************************/
-static void
-test_libver_bounds_attributes(hid_t fapl)
+static void test_libver_bounds_attributes(hid_t fapl)
 {
-    hid_t        fid      = H5I_INVALID_HID; /* File ID */
-    hid_t        fcpl     = H5I_INVALID_HID; /* File creation property list */
-    hid_t        new_fapl = H5I_INVALID_HID; /* File access property list */
-    hid_t        tid      = H5I_INVALID_HID; /* Datatype ID */
-    hid_t        gid      = H5I_INVALID_HID; /* Group ID */
-    hid_t        sid      = H5I_INVALID_HID; /* Dataspace ID */
-    hid_t        aid      = H5I_INVALID_HID; /* Attribute ID */
-    hid_t        attr_cpl = H5I_INVALID_HID; /* Attribute creation property list */
-    H5A_t       *attr     = NULL;            /* Internal attribute pointer */
-    H5F_t       *f        = NULL;            /* Internal file pointer */
-    H5F_libver_t low, high;                  /* Low and high bounds */
-    herr_t       ret;                        /* Return value */
+    hid_t fid = H5I_INVALID_HID;      /* File ID */
+    hid_t fcpl = H5I_INVALID_HID;     /* File creation property list */
+    hid_t new_fapl = H5I_INVALID_HID; /* File access property list */
+    hid_t tid = H5I_INVALID_HID;      /* Datatype ID */
+    hid_t gid = H5I_INVALID_HID;      /* Group ID */
+    hid_t sid = H5I_INVALID_HID;      /* Dataspace ID */
+    hid_t aid = H5I_INVALID_HID;      /* Attribute ID */
+    hid_t attr_cpl = H5I_INVALID_HID; /* Attribute creation property list */
+    H5A_t* attr = NULL;               /* Internal attribute pointer */
+    H5F_t* f = NULL;                  /* Internal file pointer */
+    H5F_libver_t low, high;           /* Low and high bounds */
+    herr_t ret;                       /* Return value */
 
     /* Retrieve the low/high bounds from the input fapl */
     ret = H5Pget_libver_bounds(fapl, &low, &high);
@@ -7479,15 +7469,17 @@ test_libver_bounds_attributes(hid_t fapl)
     CHECK(aid, H5I_INVALID_HID, "H5Acreate2");
 
     /* Get the internal attribute pointer */
-    attr = (H5A_t *)H5VL_object(aid);
+    attr = (H5A_t*)H5VL_object(aid);
     CHECK_PTR(attr, "H5VL_object");
 
     /* Verify the attribute version */
-    if (low == H5F_LIBVER_EARLIEST)
+    if (low == H5F_LIBVER_EARLIEST) {
         /* The earliest version the library can set for an attribute with committed datatype is 2 */
         VERIFY(attr->shared->version, H5O_ATTR_VERSION_2, "H5O_attr_ver_bounds");
-    else
+    }
+    else {
         VERIFY(attr->shared->version, H5O_attr_ver_bounds[low], "H5O_attr_ver_bounds");
+    }
 
     /* Close the attribute */
     ret = H5Aclose(aid);
@@ -7498,7 +7490,7 @@ test_libver_bounds_attributes(hid_t fapl)
     CHECK(aid, FAIL, "H5Acreate2");
 
     /* Get the internal attribute pointer */
-    attr = (H5A_t *)H5VL_object(aid);
+    attr = (H5A_t*)H5VL_object(aid);
     CHECK_PTR(attr, "H5VL_object");
 
     /* Verify attribute version */
@@ -7519,15 +7511,17 @@ test_libver_bounds_attributes(hid_t fapl)
     CHECK(aid, H5I_INVALID_HID, "H5Acreate2");
 
     /* Get internal attribute pointer */
-    attr = (H5A_t *)H5VL_object(aid);
+    attr = (H5A_t*)H5VL_object(aid);
     CHECK_PTR(attr, "H5VL_object");
 
     /* Verify attribute version */
-    if (low == H5F_LIBVER_EARLIEST)
+    if (low == H5F_LIBVER_EARLIEST) {
         /* The earliest version the library can set for an attribute with character encoding is 3 */
         VERIFY(attr->shared->version, H5O_ATTR_VERSION_3, "H5O_attr_ver_bounds");
-    else
+    }
+    else {
         VERIFY(attr->shared->version, H5O_attr_ver_bounds[low], "H5O_attr_ver_bounds");
+    }
 
     /* Close the attribute */
     ret = H5Aclose(aid);
@@ -7584,15 +7578,17 @@ test_libver_bounds_attributes(hid_t fapl)
     CHECK(aid, H5I_INVALID_HID, "H5Acreate2");
 
     /* Get the internal attribute pointer */
-    attr = (H5A_t *)H5VL_object(aid);
+    attr = (H5A_t*)H5VL_object(aid);
     CHECK_PTR(attr, "H5VL_object");
 
     /* Verify the attribute version */
-    if (low == H5F_LIBVER_EARLIEST)
+    if (low == H5F_LIBVER_EARLIEST) {
         /* The earliest version the library can set for an attribute with shared datatype is 2 */
         VERIFY(attr->shared->version, H5O_ATTR_VERSION_2, "H5O_attr_ver_bounds");
-    else
+    }
+    else {
         VERIFY(attr->shared->version, H5O_attr_ver_bounds[low], "H5O_attr_ver_bounds");
+    }
 
     /* Close the attribute */
     ret = H5Aclose(aid);
@@ -7633,8 +7629,9 @@ test_libver_bounds_attributes(hid_t fapl)
             }
             H5E_END_TRY
 
-            if (ret < 0) /* Invalid low/high combinations */
+            if (ret < 0) { /* Invalid low/high combinations */
                 continue;
+            }
 
             /* Open the file */
             H5E_BEGIN_TRY
@@ -7647,7 +7644,7 @@ test_libver_bounds_attributes(hid_t fapl)
             if (fid >= 0) { /* The file open succeeds */
 
                 /* Get the internal file pointer */
-                f = (H5F_t *)H5VL_object(fid);
+                f = (H5F_t*)H5VL_object(fid);
                 CHECK_PTR(f, "H5VL_object");
 
                 /* Open the group */
@@ -7659,12 +7656,11 @@ test_libver_bounds_attributes(hid_t fapl)
                 CHECK(aid, FAIL, "H5Acreate2");
 
                 /* Get the internal attribute pointer */
-                attr = (H5A_t *)H5VL_object(aid);
+                attr = (H5A_t*)H5VL_object(aid);
                 CHECK_PTR(attr, "H5VL_object");
 
                 /* Verify the attribute message version */
-                VERIFY(attr->shared->version >= H5O_attr_ver_bounds[f->shared->low_bound], true,
-                       "H5O_attr_ver_bounds");
+                VERIFY(attr->shared->version >= H5O_attr_ver_bounds[f->shared->low_bound], true, "H5O_attr_ver_bounds");
 
                 /* Close the attribute */
                 ret = H5Aclose(aid);
@@ -7683,8 +7679,8 @@ test_libver_bounds_attributes(hid_t fapl)
                 CHECK(ret, FAIL, "H5Fclose");
 
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     /* Close the file access property list */
     ret = H5Pclose(new_fapl);
@@ -7702,11 +7698,10 @@ test_libver_bounds_attributes(hid_t fapl)
 **    Verify that H5_VERSION_GE and H5_VERSION_LE work correactly.
 **
 ****************************************************************/
-static void
-test_libver_macros(void)
+static void test_libver_macros(void)
 {
-    int major   = H5_VERS_MAJOR;
-    int minor   = H5_VERS_MINOR;
+    int major = H5_VERS_MAJOR;
+    int minor = H5_VERS_MINOR;
     int release = H5_VERS_RELEASE;
 
     /* Output message about test being performed */
@@ -7718,8 +7713,9 @@ test_libver_macros(void)
     VERIFY(H5_VERSION_GE(major - 1, minor, release + 1), true, "H5_VERSION_GE");
     VERIFY(H5_VERSION_GE(major, minor - 1, release), true, "H5_VERSION_GE");
     VERIFY(H5_VERSION_GE(major, minor - 1, release + 1), true, "H5_VERSION_GE");
-    if (H5_VERS_RELEASE > 0)
+    if (H5_VERS_RELEASE > 0) {
         VERIFY(H5_VERSION_GE(major, minor, release - 1), true, "H5_VERSION_GE");
+    }
 
     VERIFY(H5_VERSION_GE(major + 1, minor, release), false, "H5_VERSION_GE");
     VERIFY(H5_VERSION_GE(major + 1, minor - 1, release), false, "H5_VERSION_GE");
@@ -7741,8 +7737,9 @@ test_libver_macros(void)
     VERIFY(H5_VERSION_LE(major - 1, minor + 1, release + 1), false, "H5_VERSION_LE");
     VERIFY(H5_VERSION_LE(major, minor - 1, release), false, "H5_VERSION_LE");
     VERIFY(H5_VERSION_LE(major, minor - 1, release + 1), false, "H5_VERSION_LE");
-    if (H5_VERS_RELEASE > 0)
+    if (H5_VERS_RELEASE > 0) {
         VERIFY(H5_VERSION_LE(major, minor, release - 1), false, "H5_VERSION_LE");
+    }
 } /* test_libver_macros() */
 
 /****************************************************************
@@ -7752,11 +7749,10 @@ test_libver_macros(void)
 **      to use it.
 **
 ****************************************************************/
-static void
-test_libver_macros2(void)
+static void test_libver_macros2(void)
 {
-    hid_t  file;
-    hid_t  grp;
+    hid_t file;
+    hid_t grp;
     htri_t status;
     herr_t ret; /* Return value */
 
@@ -7818,24 +7814,23 @@ test_libver_macros2(void)
 **    indicated in the "RFC: Enhancement to the tool h5clear".
 **
 ****************************************************************/
-static void
-test_incr_filesize(void)
+static void test_incr_filesize(void)
 {
-    hid_t          fid;                            /* File opened with read-write permission */
-    h5_stat_size_t filesize;                       /* Size of file when empty */
-    hid_t          fcpl;                           /* File creation property list */
-    hid_t          fapl;                           /* File access property list */
-    hid_t          dspace;                         /* Dataspace ID */
-    hid_t          dset;                           /* Dataset ID */
-    hid_t          dcpl;                           /* Dataset creation property list */
-    unsigned       u;                              /* Local index variable */
-    char           filename[FILENAME_LEN];         /* Filename to use */
-    char           name[32];                       /* Dataset name */
-    haddr_t        stored_eoa;                     /* The stored EOA value */
-    hid_t          driver_id    = H5I_INVALID_HID; /* ID for this VFD */
-    unsigned long  driver_flags = 0;               /* VFD feature flags */
-    bool           vol_is_native;
-    herr_t         ret; /* Return value */
+    hid_t fid;                         /* File opened with read-write permission */
+    h5_stat_size_t filesize;           /* Size of file when empty */
+    hid_t fcpl;                        /* File creation property list */
+    hid_t fapl;                        /* File access property list */
+    hid_t dspace;                      /* Dataspace ID */
+    hid_t dset;                        /* Dataset ID */
+    hid_t dcpl;                        /* Dataset creation property list */
+    unsigned u;                        /* Local index variable */
+    char filename[FILENAME_LEN];       /* Filename to use */
+    char name[32];                     /* Dataset name */
+    haddr_t stored_eoa;                /* The stored EOA value */
+    hid_t driver_id = H5I_INVALID_HID; /* ID for this VFD */
+    unsigned long driver_flags = 0;    /* VFD feature flags */
+    bool vol_is_native;
+    herr_t ret;                        /* Return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing H5Fincrement_filesize() and H5Fget_eoa())\n"));
@@ -7859,7 +7854,6 @@ test_incr_filesize(void)
 
     /* Check whether the VFD feature flag supports these two public routines */
     if (driver_flags & H5FD_FEAT_SUPPORTS_SWMR_IO) {
-
         fcpl = H5Pcreate(H5P_FILE_CREATE);
         CHECK(fcpl, FAIL, "H5Pcreate");
 
@@ -7956,16 +7950,15 @@ test_incr_filesize(void)
 **    + dataset header sizes created while changing value of toggle
 **
 ****************************************************************/
-static void
-test_min_dset_ohdr(void)
+static void test_min_dset_ohdr(void)
 {
-    const char basename[]             = "min_dset_ohdr_testfile";
-    char       filename[FILENAME_LEN] = "";
-    hid_t      file_id                = H5I_INVALID_HID;
-    hid_t      file2_id               = H5I_INVALID_HID;
-    bool       minimize;
-    bool       vol_is_native;
-    herr_t     ret;
+    const char basename[] = "min_dset_ohdr_testfile";
+    char filename[FILENAME_LEN] = "";
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t file2_id = H5I_INVALID_HID;
+    bool minimize;
+    bool vol_is_native;
+    herr_t ret;
 
     MESSAGE(5, ("Testing dataset object header minimization\n"));
 
@@ -8093,8 +8086,7 @@ test_min_dset_ohdr(void)
 **    Test that attempting to create/open an unseekable file fails gracefully
 **    without a segfault (see hdf5#1498)
 ****************************************************************/
-static void
-test_unseekable_file(void)
+static void test_unseekable_file(void)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing creating/opening an unseekable file\n"));
@@ -8123,6 +8115,7 @@ test_unseekable_file(void)
     /* TODO - Does not properly fail on all systems */
     /* VERIFY(file_id, H5I_INVALID_HID, "H5Fopen"); */
 }
+
 /****************************************************************
 **
 **  test_deprec():
@@ -8130,20 +8123,19 @@ test_unseekable_file(void)
 **
 ****************************************************************/
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-static void
-test_deprec(const char *driver_name)
+static void test_deprec(const char* driver_name)
 {
-    hid_t       file; /* File IDs for old & new files */
-    hid_t       fcpl; /* File creation property list */
-    hid_t       fapl; /* File creation property list */
-    hsize_t     align;
-    unsigned    super;    /* Superblock version # */
-    unsigned    freelist; /* Free list version # */
-    unsigned    stab;     /* Symbol table entry version # */
-    unsigned    shhdr;    /* Shared object header version # */
-    H5F_info1_t finfo;    /* global information about file */
-    bool        vol_is_native;
-    herr_t      ret; /* Generic return value */
+    hid_t file;        /* File IDs for old & new files */
+    hid_t fcpl;        /* File creation property list */
+    hid_t fapl;        /* File creation property list */
+    hsize_t align;
+    unsigned super;    /* Superblock version # */
+    unsigned freelist; /* Free list version # */
+    unsigned stab;     /* Symbol table entry version # */
+    unsigned shhdr;    /* Shared object header version # */
+    H5F_info1_t finfo; /* global information about file */
+    bool vol_is_native;
+    herr_t ret;        /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing deprecated routines\n"));
@@ -8219,7 +8211,7 @@ test_deprec(const char *driver_name)
         CHECK(ret, FAIL, "H5Pset_file_space_strategy");
 
         tmp_fapl = H5Pcopy(fapl);
-        ret      = H5Pset_alignment(tmp_fapl, (hsize_t)1, (hsize_t)1024);
+        ret = H5Pset_alignment(tmp_fapl, (hsize_t)1, (hsize_t)1024);
         CHECK(ret, FAIL, "H5Pset_alignment");
 
         /* Creating a file with the non-default file creation property list should
@@ -8306,9 +8298,9 @@ test_deprec(const char *driver_name)
         { /* Test deprecated H5Pget/set_file_space() */
 
             H5F_file_space_type_t old_strategy;
-            hsize_t               old_threshold;
-            hid_t                 fid;
-            hid_t                 ffcpl;
+            hsize_t old_threshold;
+            hid_t fid;
+            hid_t ffcpl;
 
             fcpl = H5Pcreate(H5P_FILE_CREATE);
             CHECK(fcpl, FAIL, "H5Pcreate");
@@ -8340,10 +8332,10 @@ test_deprec(const char *driver_name)
             fid = H5Fcreate(FILE1, H5F_ACC_TRUNC, fcpl, fapl);
             CHECK(file, FAIL, "H5Fcreate");
 
-            old_strategy  = H5F_FILE_SPACE_DEFAULT;
+            old_strategy = H5F_FILE_SPACE_DEFAULT;
             old_threshold = 0;
-            ffcpl         = H5Fget_create_plist(fid);
-            ret           = H5Pget_file_space(ffcpl, &old_strategy, &old_threshold);
+            ffcpl = H5Fget_create_plist(fid);
+            ret = H5Pget_file_space(ffcpl, &old_strategy, &old_threshold);
             CHECK(ret, FAIL, "H5Pget_file_space");
             VERIFY(old_strategy, H5F_FILE_SPACE_ALL_PERSIST, "H5Pget_file_space");
             VERIFY(old_threshold, 3, "H5Pget_file_space");
@@ -8362,10 +8354,10 @@ test_deprec(const char *driver_name)
             fid = H5Fopen(FILE1, H5F_ACC_RDONLY, fapl);
             CHECK(fid, FAIL, "H5Fcreate");
 
-            old_strategy  = H5F_FILE_SPACE_DEFAULT;
+            old_strategy = H5F_FILE_SPACE_DEFAULT;
             old_threshold = 0;
-            ffcpl         = H5Fget_create_plist(fid);
-            ret           = H5Pget_file_space(ffcpl, &old_strategy, &old_threshold);
+            ffcpl = H5Fget_create_plist(fid);
+            ret = H5Pget_file_space(ffcpl, &old_strategy, &old_threshold);
             CHECK(ret, FAIL, "H5Pget_file_space");
             VERIFY(old_strategy, H5F_FILE_SPACE_ALL_PERSIST, "H5Pget_file_space");
             VERIFY(old_threshold, 3, "H5Pget_file_space");
@@ -8390,13 +8382,12 @@ test_deprec(const char *driver_name)
 **  test_file(): Main low-level file I/O test routine.
 **
 ****************************************************************/
-void
-test_file(void H5_ATTR_UNUSED *params)
+void test_file(void H5_ATTR_UNUSED* params)
 {
-    const char *driver_name;               /* File Driver value from environment */
-    hid_t       fapl_id = H5I_INVALID_HID; /* VFD-dependent fapl ID */
-    bool        driver_is_default_compatible;
-    herr_t      ret;
+    const char* driver_name;         /* File Driver value from environment */
+    hid_t fapl_id = H5I_INVALID_HID; /* VFD-dependent fapl ID */
+    bool driver_is_default_compatible;
+    herr_t ret;
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Low-Level File I/O\n"));
@@ -8430,33 +8421,30 @@ test_file(void H5_ATTR_UNUSED *params)
     test_file_double_datatype_open();     /* Test opening same named datatype from two files works properly */
     test_file_double_file_dataset_open(true);
     test_file_double_file_dataset_open(false);
-    test_userblock_file_size(
-        driver_name);        /* Tests that files created with a userblock have the correct size */
-    test_cached_stab_info(); /* Tests that files are created with cached stab info in the superblock */
+    test_userblock_file_size(driver_name); /* Tests that files created with a userblock have the correct size */
+    test_cached_stab_info();               /* Tests that files are created with cached stab info in the superblock */
 
     if (driver_is_default_compatible) {
         test_rw_noupdate(); /* Test to ensure that RW permissions don't write the file unless dirtied */
     }
 
-    test_userblock_alignment(
-        driver_name); /* Tests that files created with a userblock and alignment interact properly */
+    test_userblock_alignment(driver_name);       /* Tests that files created with a userblock and alignment interact properly */
     test_userblock_alignment_paged(driver_name); /* Tests files created with a userblock and alignment (via
                                                     paged aggregation) interact properly */
     test_filespace_info(driver_name);            /* Test file creation public routines: */
     /* H5Pget/set_file_space_strategy() & H5Pget/set_file_space_page_size() */
     /* Skipped testing for multi/split drivers */
-    test_file_freespace(driver_name); /* Test file public routine H5Fget_freespace() */
-                                      /* Skipped testing for multi/split drivers */
-                                      /* Setup for multi/split drivers are there already */
-    test_sects_freespace(driver_name,
-                         true); /* Test file public routine H5Fget_free_sections() for new format */
-                                /* Skipped testing for multi/split drivers */
-                                /* Setup for multi/split drivers are there already */
+    test_file_freespace(driver_name);         /* Test file public routine H5Fget_freespace() */
+                                              /* Skipped testing for multi/split drivers */
+                                              /* Setup for multi/split drivers are there already */
+    test_sects_freespace(driver_name, true);  /* Test file public routine H5Fget_free_sections() for new format */
+                                              /* Skipped testing for multi/split drivers */
+                                              /* Setup for multi/split drivers are there already */
     test_sects_freespace(driver_name, false); /* Test file public routine H5Fget_free_sections() */
                                               /* Skipped testing for multi/split drivers */
 
     if (driver_is_default_compatible) {
-        test_filespace_compatible(); /* Test compatibility for file space management */
+        test_filespace_compatible();        /* Test compatibility for file space management */
 
         test_filespace_round_compatible();  /* Testing file space compatibility for files from trunk to 1_8 to
                                                trunk */
@@ -8464,7 +8452,7 @@ test_file(void H5_ATTR_UNUSED *params)
                                              */
     }
 
-    test_libver_bounds(); /* Test compatibility for file space management */
+    test_libver_bounds();   /* Test compatibility for file space management */
     test_libver_bounds_low_high(driver_name);
     test_libver_macros();   /* Test the macros for library version comparison */
     test_libver_macros2();  /* Test the macros for library version comparison */
@@ -8474,7 +8462,7 @@ test_file(void H5_ATTR_UNUSED *params)
 #ifndef H5_NO_DEPRECATED_SYMBOLS
     test_file_ishdf5(driver_name); /* Test detecting HDF5 files correctly */
     test_deprec(driver_name);      /* Test deprecated routines */
-#endif                             /* H5_NO_DEPRECATED_SYMBOLS */
+#endif /* H5_NO_DEPRECATED_SYMBOLS */
 
     ret = H5Pclose(fapl_id);
     CHECK(ret, FAIL, "H5Pclose");
@@ -8490,8 +8478,7 @@ test_file(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_file(void H5_ATTR_UNUSED *params)
+void cleanup_file(void H5_ATTR_UNUSED* params)
 {
     if (GetTestCleanup()) {
         H5E_BEGIN_TRY

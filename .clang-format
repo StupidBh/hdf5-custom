@@ -1,133 +1,259 @@
----
-BasedOnStyle:  LLVM
-AlignConsecutiveAssignments: true
-BraceWrapping:
-  AfterFunction:   true
-  #llvm10-11: AfterControlStatement: false - Never
-  BeforeCatch:     true
-  BeforeElse:      true
-  #llvm11:   BeforeLambdaBody: false
-  #llvm11:   BeforeWhile:     false
-BreakBeforeBraces: Stroustrup
-BreakStringLiterals: true
-ColumnLimit:     110
-IndentWidth:     4
----
-Language:        Cpp
-#llvm11: AlignConsecutiveBitFields: false
-AlignConsecutiveDeclarations: true
-AlignConsecutiveMacros: true
-#llvm10-11: AlignOperands:   true - Align
-#llvm11: AllowShortEnumsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: None
-AlwaysBreakAfterReturnType: AllDefinitions
-# Can enable the following section when llvm 12.x is out
-#AttributeMacros:
-#  - H5_ATTR_FORMAT
-#  - H5_ATTR_UNUSED
-#  - H5_ATTR_DEPRECATED_USED
-#  - H5_ATTR_NDEBUG_UNUSED
-#  - H5_ATTR_DEBUG_API_USED
-#  - H5_ATTR_PARALLEL_UNUSED
-#  - H5_ATTR_PARALLEL_USED
-#  - H5_ATTR_NORETURN
-#  - H5_ATTR_CONST
-#  - H5_ATTR_PURE
-#  - H5_ATTR_FALLTHROUGH
-ForEachMacros: ['ALL_MEMBERS', 'UNIQUE_MEMBERS']
-IncludeCategories:
-  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority:        3
-    SortPriority:    0
-  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
-    Priority:        4
-    SortPriority:    0
-  - Regex:           '.*'
-    Priority:        0
-    SortPriority:    0
-  - Regex:           '^H5*.*'
-    Priority:        1
-    SortPriority:    0
-  - Regex:           'private.*'
-    Priority:        2
-    SortPriority:    0
-IncludeIsMainRegex: '(public)?$'
-IndentCaseLabels: true
-#llvm11: IndentCaseBlocks: false
+# doc: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+# ============================================================================
+# 基础设置
+# ============================================================================
+Language: Cpp
+BasedOnStyle: WebKit
+Standard: Latest
+LineEnding: LF
+DisableFormat: false
+
+# ============================================================================
+# 换行控制
+# ============================================================================
+ColumnLimit: 165
+
+# ============================================================================
+# 缩进
+# ============================================================================
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+NamespaceIndentation: All
 IndentGotoLabels: false
-#llvm11: IndentExternBlock: AfterExternBlock
-#llvm11: InsertTrailingCommas: None
-MacroBlockBegin: "^H5_BEFORE_USER_CB*|^H5E_PAUSE_ERRORS"
-MacroBlockEnd: "^H5_AFTER_USER_CB*|^H5E_RESUME_ERRORS"
-ObjCBlockIndentWidth: 4
-#llvm11: ObjCBreakBeforeNestedBlockParam: true
-ReflowComments:  true
-SortIncludes:    false
-StatementMacros:
-  - CATCH
-  - END_MEMBERS
-  - FUNC_ENTER_API
-  - FUNC_ENTER_API_NAMECHECK_ONLY
-  - FUNC_ENTER_NOAPI
-  - FUNC_ENTER_NOAPI_NAMECHECK_ONLY
-  - FUNC_ENTER_NOAPI_NOERR
-  - FUNC_ENTER_NOAPI_NOINIT
-  - FUNC_ENTER_NOAPI_NOINIT_NOERR
-  - FUNC_ENTER_PACKAGE
-  - FUNC_LEAVE_API
-  - FUNC_LEAVE_API_NAMECHECK_ONLY
-  - FUNC_LEAVE_NOAPI
-  - FUNC_LEAVE_NOAPI_NAMECHECK_ONLY
-  - FUNC_LEAVE_NOAPI_VOID_NAMECHECK_ONLY
-  - FUNC_LEAVE_NOAPI_NOFS
-  - H5E_BEGIN_TRY
-  - H5E_END_TRY
-  - H5_BEGIN_TAG
-  - H5_END_TAG
-  - H5_LEAVE
-  - H5_WARN_C11_EXTENSIONS_OFF
-  - H5_WARN_C11_EXTENSIONS_ON
-  - H5_WARN_CAST_ALIGNMENT_OFF
-  - H5_WARN_CAST_ALIGNMENT_ON
-  - H5_WARN_CAST_AWAY_CONST_OFF
-  - H5_WARN_CAST_AWAY_CONST_ON
-  - H5_WARN_DUPLICATED_BRANCHES_OFF
-  - H5_WARN_DUPLICATED_BRANCHES_ON
-  - H5_WARN_FLOAT_CONVERSION_OFF
-  - H5_WARN_FLOAT_CONVERSION_ON
-  - H5_WARN_FLOAT_EQUAL_OFF
-  - H5_WARN_FLOAT_EQUAL_ON
-  - H5_WARN_FORMAT_NONLITERAL_OFF
-  - H5_WARN_FORMAT_NONLITERAL_ON
-  - H5_WARN_FORMAT_TRUNCATION_OFF
-  - H5_WARN_FORMAT_TRUNCATION_ON
-  - H5_WARN_IMPLICIT_FALLTHROUGH_OFF
-  - H5_WARN_IMPLICIT_FALLTHROUGH_ON
-  - H5_WARN_LARGE_STACK_OBJECTS_OFF
-  - H5_WARN_LARGE_STACK_OBJECTS_ON
-  - H5_WARN_MISSING_PROTOTYPE_OFF
-  - H5_WARN_MISSING_PROTOTYPE_ON
-  - H5_WARN_MPI_STATUSES_IGNORE_OFF
-  - H5_WARN_MPI_STATUSES_IGNORE_ON
-  - H5_WARN_NONSTD_SUFFIX_OFF
-  - H5_WARN_NONSTD_SUFFIX_ON
-  - H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
-  - H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
-  - H5_WARN_SIGN_CONVERSION_OFF
-  - H5_WARN_SIGN_CONVERSION_ON
-  - H5_WARN_UNUSED_PARAMETER_OFF
-  - H5_WARN_UNUSED_PARAMETER_ON
-  - H5_WARN_USELESS_COMPARISON_OFF
-  - H5_WARN_USELESS_COMPARISON_ON
-  - HGOTO_DONE
-  - HMPI_DONE_ERROR
-  - HMPI_ERROR
-  - HMPI_GOTO_ERROR
-  - HSYS_DONE_ERROR
-  - HSYS_GOTO_ERROR
-#llvm10: TypenameMacros:
-#llvm10:   - STACK_OF
-#llvm10:   - LIST
-#llvm11: WhitespaceSensitiveMacros:
-#llvm11:   - STRINGIZE
-#llvm11:   - PP_STRINGIZE
+IndentAccessModifiers: false
+IndentExternBlock: AfterExternBlock
+IndentRequiresClause: false
+IndentPPDirectives: BeforeHash
+IndentWrappedFunctionNames: true
+LambdaBodyIndentation: Signature
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+
+# ============================================================================
+# 大括号风格
+# ============================================================================
+BreakBeforeBraces: Custom
+BraceWrapping:
+  IndentBraces: false
+
+  AfterEnum: true
+  AfterUnion: true
+  AfterStruct: true
+  AfterClass: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterCaseLabel: false
+  AfterExternBlock: true
+  AfterControlStatement: Never
+  BeforeElse: true
+  BeforeCatch: true
+  BeforeWhile: false
+  BeforeLambdaBody: false
+  SplitEmptyRecord: true
+  SplitEmptyFunction: true
+  SplitEmptyNamespace: true
+
+
+# 函数返回类型后不强制换行
+AlwaysBreakAfterDefinitionReturnType: None
+
+# 模板声明总是换行
+BreakTemplateDeclarations: Yes
+BreakBeforeConceptDeclarations: Always
+
+# 三元运算符前换行，二元运算符后换行
+BreakBeforeTernaryOperators: true
+BreakBeforeBinaryOperators: None
+
+# 多行字符串与数组允许打断
+AlwaysBreakBeforeMultilineStrings: true
+BreakStringLiterals: true
+BreakArrays: true
+
+# 属性后不换行
+BreakAfterAttributes: Never
+BreakAfterJavaFieldAnnotations: true
+BreakBeforeInlineASMColon: OnlyMultiline
+
+# 构造函数初始化列表 & 继承列表：冒号后换行
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+
+# requires 子句
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: OuterScope
+
+# ============================================================================
+# 单行 / 紧凑控制
+# ============================================================================
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortEnumsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+AllowShortCaseLabelsOnASingleLine: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+ShortNamespaceLines: 10
+CompactNamespaces: false
+
+# ============================================================================
+# 参数打包
+# ============================================================================
+BinPackArguments: false
+BinPackParameters: false
+PackConstructorInitializers: Never
+
+# ============================================================================
+# 空格
+# ============================================================================
+
+# ---- 括号前空格 ----
+SpaceBeforeParens: ControlStatements
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeSquareBrackets: false
+
+# ---- 冒号前空格 ----
+SpaceBeforeCaseColon: false
+SpaceBeforeJsonColon: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeRangeBasedForLoopColon: true
+
+# ---- 赋值/运算符空格 ----
+SpaceBeforeAssignmentOperators: true
+
+# ---- 关键字后空格 ----
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+
+# ---- 尖括号 ----
+SpacesInAngles: Never
+
+# ---- 圆括号 ----
+SpacesInParens: Never
+SpacesInParensOptions:
+  InEmptyParentheses: false
+  ExceptDoubleParentheses: false
+  InConditionalStatements: false
+
+# ---- 方括号 ----
+SpacesInSquareBrackets: false
+
+# ---- 花括号 / 容器 ----
+SpacesInContainerLiterals: true
+SpaceInEmptyBlock: false
+
+# ---- 指针/引用修饰符 ----
+SpaceAroundPointerQualifiers: Default
+
+# ---- 尾注释 ----
+SpacesBeforeTrailingComments: 1
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+
+# ---- 位域冒号 ----
+BitFieldColonSpacing: After
+
+# ============================================================================
+# 对齐
+# ============================================================================
+
+# ---- 通用操作数对齐 ----
+AlignOperands: Align
+AlignAfterOpenBracket: true
+AlignEscapedNewlines: Left
+AlignArrayOfStructures: None
+
+# ---- 连续声明/赋值/宏/位域 ----
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossComments: false    # 是否跨注释对齐
+  AcrossEmptyLines: false  # 是否跨空行对齐
+
+AlignConsecutiveBitFields: None
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+
+# ---- switch case ----
+IndentCaseBlocks: true
+IndentCaseLabels: false
+
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCaseColons: true
+
+# ---- 尾注释对齐 ----
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+
+# ============================================================================
+# 指针与引用
+# ============================================================================
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# ============================================================================
+# 插入 / 移除
+# ============================================================================
+
+# ---- 大括号相关 ----
+InsertBraces: true
+Cpp11BracedListStyle: false
+RemoveBracesLLVM: false
+
+# ---- 尾部 ----
+InsertNewlineAtEOF: true
+InsertTrailingCommas: Wrapped
+RemoveSemicolon: false
+
+# ---- 多余括号 ----
+RemoveParentheses: Leave
+
+# ============================================================================
+# 空行
+# ============================================================================
+MaxEmptyLinesToKeep: 1
+KeepEmptyLines:
+  AtEndOfFile: false
+  AtStartOfFile: false
+  AtStartOfBlock: false
+RemoveEmptyLinesInUnwrappedLines: true
+
+# ---- 访问修饰符前后空行 ----
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+
+# ---- 定义块分隔 ----
+SeparateDefinitionBlocks: Always
+
+# ============================================================================
+# Include & Using
+# ============================================================================
+SortIncludes: Never
+IncludeBlocks: Preserve
+SortUsingDeclarations: Lexicographic
+
+# ============================================================================
+# 注释
+# ============================================================================
+ReflowComments: Always
+FixNamespaceComments: true
+
+# ============================================================================
+# 数字字面量分隔符
+# ============================================================================
+IntegerLiteralSeparator:
+  Hex: -1
+  Binary: 4
+  BinaryMinDigits: 9
+  Decimal: 3
+  DecimalMinDigits: 7

@@ -76,8 +76,7 @@
  *
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5F__alloc(H5F_t *f, H5F_mem_t type, hsize_t size, haddr_t *frag_addr, hsize_t *frag_size)
+haddr_t H5F__alloc(H5F_t* f, H5F_mem_t type, hsize_t size, haddr_t* frag_addr, hsize_t* frag_size)
 {
     haddr_t ret_value = 0; /* Return value */
 
@@ -95,23 +94,26 @@ H5F__alloc(H5F_t *f, H5F_mem_t type, hsize_t size, haddr_t *frag_addr, hsize_t *
         haddr_t eoa; /* Current EOA for the file */
 
         /* Get the EOA for the file */
-        if (HADDR_UNDEF == (eoa = H5F_get_eoa(f, type)))
+        if (HADDR_UNDEF == (eoa = H5F_get_eoa(f, type))) {
             HGOTO_ERROR(H5E_FILE, H5E_CANTGET, HADDR_UNDEF, "Unable to get eoa");
+        }
 
         /* Check for overlapping into file's temporary allocation space */
-        if (H5_addr_gt((eoa + size), f->shared->tmp_addr))
-            HGOTO_ERROR(H5E_FILE, H5E_BADRANGE, HADDR_UNDEF,
-                        "'normal' file space allocation request will overlap into 'temporary' file space");
+        if (H5_addr_gt((eoa + size), f->shared->tmp_addr)) {
+            HGOTO_ERROR(H5E_FILE, H5E_BADRANGE, HADDR_UNDEF, "'normal' file space allocation request will overlap into 'temporary' file space");
+        }
     } /* end if */
 
     /* Call the file driver 'alloc' routine */
     ret_value = H5FD_alloc(f->shared->lf, type, f, size, frag_addr, frag_size);
-    if (!H5_addr_defined(ret_value))
+    if (!H5_addr_defined(ret_value)) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTALLOC, HADDR_UNDEF, "file driver 'alloc' request failed");
+    }
 
     /* Mark EOA dirty */
-    if (H5F_eoa_dirty(f) < 0)
+    if (H5F_eoa_dirty(f) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTMARKDIRTY, HADDR_UNDEF, "unable to mark EOA as dirty");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -132,8 +134,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F__free(H5F_t *f, H5FD_mem_t type, haddr_t addr, hsize_t size)
+herr_t H5F__free(H5F_t* f, H5FD_mem_t type, haddr_t addr, hsize_t size)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -147,12 +148,14 @@ H5F__free(H5F_t *f, H5FD_mem_t type, haddr_t addr, hsize_t size)
     assert(size > 0);
 
     /* Call the file driver 'free' routine */
-    if (H5FD_free(f->shared->lf, type, f, addr, size) < 0)
+    if (H5FD_free(f->shared->lf, type, f, addr, size) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTFREE, FAIL, "file driver 'free' request failed");
+    }
 
     /* Mark EOA dirty */
-    if (H5F_eoa_dirty(f) < 0)
+    if (H5F_eoa_dirty(f) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTMARKDIRTY, FAIL, "unable to mark EOA as dirty");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -173,8 +176,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5F__try_extend(H5F_t *f, H5FD_mem_t type, haddr_t blk_end, hsize_t extra_requested)
+htri_t H5F__try_extend(H5F_t* f, H5FD_mem_t type, haddr_t blk_end, hsize_t extra_requested)
 {
     htri_t ret_value = false; /* Return value */
 
@@ -188,8 +190,9 @@ H5F__try_extend(H5F_t *f, H5FD_mem_t type, haddr_t blk_end, hsize_t extra_reques
     assert(extra_requested > 0);
 
     /* Extend the object by extending the underlying file */
-    if ((ret_value = H5FD_try_extend(f->shared->lf, type, f, blk_end, extra_requested)) < 0)
+    if ((ret_value = H5FD_try_extend(f->shared->lf, type, f, blk_end, extra_requested)) < 0) {
         HGOTO_ERROR(H5E_FILE, H5E_CANTEXTEND, FAIL, "driver try extend request failed");
+    }
 
     /* H5FD_try_extend() updates driver message and marks the superblock
      * dirty, so no need to do it again here.

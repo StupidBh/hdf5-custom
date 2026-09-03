@@ -63,7 +63,7 @@
 /* Local Variables */
 /*******************/
 
-#if defined(_WIN32)
+    #if defined(_WIN32)
 /*-------------------------------------------------------------------------
  * Function: H5TS_semaphore_init
  *
@@ -73,15 +73,16 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
+herr_t H5TS_semaphore_init(H5TS_semaphore_t* sem, unsigned initial_count)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(NULL == (*sem = CreateSemaphore(NULL, (LONG)initial_count, LONG_MAX, NULL))))
+    if (H5_UNLIKELY(NULL == (*sem = CreateSemaphore(NULL, (LONG)initial_count, LONG_MAX, NULL)))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_init() */
@@ -95,20 +96,21 @@ H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_destroy(H5TS_semaphore_t *sem)
+herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(0 == CloseHandle(*sem)))
+    if (H5_UNLIKELY(0 == CloseHandle(*sem))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_destroy() */
 
-#elif defined(__unix__) && !defined(__MACH__)
+    #elif defined(__unix__) && !defined(__MACH__)
 /*
  * POSIX semaphores
  */
@@ -122,15 +124,16 @@ H5TS_semaphore_destroy(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
+herr_t H5TS_semaphore_init(H5TS_semaphore_t* sem, unsigned initial_count)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(0 != sem_init(sem, 0, initial_count)))
+    if (H5_UNLIKELY(0 != sem_init(sem, 0, initial_count))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_init() */
@@ -144,19 +147,20 @@ H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_destroy(H5TS_semaphore_t *sem)
+herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(0 != sem_destroy(sem)))
+    if (H5_UNLIKELY(0 != sem_destroy(sem))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_destroy() */
-#else
+    #else
 /*
  * Emulate semaphore w/mutex & condition variable
  */
@@ -170,15 +174,16 @@ H5TS_semaphore_destroy(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
+herr_t H5TS_semaphore_init(H5TS_semaphore_t* sem, unsigned initial_count)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(H5TS_mutex_init(&sem->mutex, H5TS_MUTEX_TYPE_PLAIN) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_init(&sem->mutex, H5TS_MUTEX_TYPE_PLAIN) < 0)) {
         return FAIL;
+    }
     if (H5_UNLIKELY(H5TS_cond_init(&sem->cond) < 0)) {
         H5TS_mutex_destroy(&sem->mutex);
         return FAIL;
@@ -198,22 +203,24 @@ H5TS_semaphore_init(H5TS_semaphore_t *sem, unsigned initial_count)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_semaphore_destroy(H5TS_semaphore_t *sem)
+herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
 {
     herr_t ret_value = SUCCEED;
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(H5TS_mutex_destroy(&sem->mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_destroy(&sem->mutex) < 0)) {
         ret_value = FAIL;
-    if (H5_UNLIKELY(H5TS_cond_destroy(&sem->cond) < 0))
+    }
+    if (H5_UNLIKELY(H5TS_cond_destroy(&sem->cond) < 0)) {
         return FAIL;
+    }
 
     return ret_value;
 } /* end H5TS_semaphore_destroy() */
-#endif
+    #endif
 
 #endif /* H5_HAVE_THREADS */

@@ -7,15 +7,14 @@
 #include <stdlib.h>
 
 //! <!-- [closing_shop] -->
-void
-closing_shop(void *ctx)
+void closing_shop(void* ctx)
 {
     printf("GoodBye, Cruel World!\n");
 }
+
 //! <!-- [closing_shop] -->
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -34,7 +33,7 @@ main(void)
     {
         __label__ fail_read;
         unsigned majnum, minnum, relnum;
-        bool     flag;
+        bool flag;
 
         // retrieve the library version
         if (H5get_libversion(&majnum, &minnum, &relnum) < 0) {
@@ -57,8 +56,7 @@ fail_read:;
     //! <!-- [update] -->
     {
         // update the library instance free list limits
-        if (H5set_free_list_limits(512 * 1024, 32 * 1024, 2048 * 1024, 128 * 1024, 8192 * 1024, 512 * 1024) <
-            0) {
+        if (H5set_free_list_limits(512 * 1024, 32 * 1024, 2048 * 1024, 128 * 1024, 8192 * 1024, 512 * 1024) < 0) {
             ret_val = EXIT_FAILURE;
         }
     }

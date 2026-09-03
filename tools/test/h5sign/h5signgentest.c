@@ -28,10 +28,9 @@
  *              Failure: 1
  *-------------------------------------------------------------------------
  */
-static int
-create_dummy_plugin(const char *filename, size_t size)
+static int create_dummy_plugin(const char* filename, size_t size)
 {
-    FILE  *fp;
+    FILE* fp;
     size_t i;
 
     if (NULL == (fp = fopen(filename, "wb"))) {
@@ -62,18 +61,20 @@ create_dummy_plugin(const char *filename, size_t size)
  *              Failure: EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     /* Create dummy plugin files of various sizes */
-    if (create_dummy_plugin("plugin_small.so", 1024) != 0)
+    if (create_dummy_plugin("plugin_small.so", 1024) != 0) {
         return EXIT_FAILURE;
+    }
 
-    if (create_dummy_plugin("plugin_medium.so", 64 * 1024) != 0)
+    if (create_dummy_plugin("plugin_medium.so", 64 * 1024) != 0) {
         return EXIT_FAILURE;
+    }
 
-    if (create_dummy_plugin("plugin_large.so", 1024 * 1024) != 0)
+    if (create_dummy_plugin("plugin_large.so", 1024 * 1024) != 0) {
         return EXIT_FAILURE;
+    }
 
     printf("Test files created successfully\n");
     return EXIT_SUCCESS;

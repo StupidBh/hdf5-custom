@@ -19,25 +19,22 @@
 
 #define FILENAME "dset.h5"
 
-int
-main(void)
+int main(void)
 {
-
-    hid_t   file_id, dataset_id, dataspace_id; /* identifiers */
+    hid_t file_id, dataset_id, dataspace_id; /* identifiers */
     hsize_t dims[2];
-    herr_t  status;
+    herr_t status;
 
     /* Create a new file using default properties. */
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Create the data space for the dataset. */
-    dims[0]      = 4;
-    dims[1]      = 6;
+    dims[0] = 4;
+    dims[1] = 6;
     dataspace_id = H5Screate_simple(2, dims, NULL);
 
     /* Create the dataset. */
-    dataset_id =
-        H5Dcreate2(file_id, "/dset", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dataset_id = H5Dcreate2(file_id, "/dset", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /* End access to the dataset and release resources used by it. */
     status = H5Dclose(dataset_id);

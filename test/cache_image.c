@@ -19,16 +19,23 @@
 
 /* global variable declarations: */
 
-static const char *FILENAMES[] = {"cache_image_test", NULL};
+static const char* FILENAMES[] = { "cache_image_test", NULL };
 
 /* local utility function declarations */
 static void create_datasets(hid_t file_id, int min_dset, int max_dset);
 static void delete_datasets(hid_t file_id, int min_dset, int max_dset);
-static void open_hdf5_file(bool create_file, bool mdci_sbem_expected, bool read_only, bool set_mdci_fapl,
-                           bool config_fsm, bool set_eoc, const char *hdf_file_name,
-                           unsigned cache_image_flags, hid_t *file_id_ptr, H5F_t **file_ptr_ptr,
-                           H5C_t **cache_ptr_ptr);
-static void attempt_swmr_open_hdf5_file(bool create_file, bool set_mdci_fapl, const char *hdf_file_name);
+static void open_hdf5_file(bool create_file,
+                           bool mdci_sbem_expected,
+                           bool read_only,
+                           bool set_mdci_fapl,
+                           bool config_fsm,
+                           bool set_eoc,
+                           const char* hdf_file_name,
+                           unsigned cache_image_flags,
+                           hid_t* file_id_ptr,
+                           H5F_t** file_ptr_ptr,
+                           H5C_t** cache_ptr_ptr);
+static void attempt_swmr_open_hdf5_file(bool create_file, bool set_mdci_fapl, const char* hdf_file_name);
 static void verify_datasets(hid_t file_id, int min_dset, int max_dset);
 
 /* local test function declarations */
@@ -81,30 +88,30 @@ static unsigned evict_on_close_test(bool single_file_vfd);
 #define DSET_SIZE     (40 * CHUNK_SIZE)
 #define MAX_NUM_DSETS 256
 
-static void
-create_datasets(hid_t file_id, int min_dset, int max_dset)
+static void create_datasets(hid_t file_id, int min_dset, int max_dset)
 {
-    const char *fcn_name = "create_datasets()";
-    char        dset_name[64];
-    bool        show_progress = false;
-    bool        valid_chunk;
-    bool        verbose = false;
-    int         cp      = 0;
-    int         i, j, k, l, m;
-    int         data_chunk[CHUNK_SIZE][CHUNK_SIZE];
-    herr_t      status;
-    hid_t       dataspace_id = H5I_INVALID_HID;
-    hid_t       filespace_ids[MAX_NUM_DSETS];
-    hid_t       memspace_id = H5I_INVALID_HID;
-    hid_t       dataset_ids[MAX_NUM_DSETS];
-    hid_t       properties = H5I_INVALID_HID;
-    hsize_t     dims[2];
-    hsize_t     a_size[2];
-    hsize_t     offset[2];
-    hsize_t     chunk_size[2];
+    const char* fcn_name = "create_datasets()";
+    char dset_name[64];
+    bool show_progress = false;
+    bool valid_chunk;
+    bool verbose = false;
+    int cp = 0;
+    int i, j, k, l, m;
+    int data_chunk[CHUNK_SIZE][CHUNK_SIZE];
+    herr_t status;
+    hid_t dataspace_id = H5I_INVALID_HID;
+    hid_t filespace_ids[MAX_NUM_DSETS];
+    hid_t memspace_id = H5I_INVALID_HID;
+    hid_t dataset_ids[MAX_NUM_DSETS];
+    hid_t properties = H5I_INVALID_HID;
+    hsize_t dims[2];
+    hsize_t a_size[2];
+    hsize_t offset[2];
+    hsize_t chunk_size[2];
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     assert(0 <= min_dset);
     assert(min_dset <= max_dset);
@@ -113,18 +120,16 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
     /* create the datasets */
 
     if (pass) {
-
         i = min_dset;
 
         while ((pass) && (i <= max_dset)) {
             /* create a dataspace for the chunked dataset */
-            dims[0]      = DSET_SIZE;
-            dims[1]      = DSET_SIZE;
+            dims[0] = DSET_SIZE;
+            dims[1] = DSET_SIZE;
             dataspace_id = H5Screate_simple(2, dims, NULL);
 
             if (dataspace_id < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Screate_simple() failed.";
             }
 
@@ -133,49 +138,40 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
              */
 
             if (pass) {
-
                 chunk_size[0] = CHUNK_SIZE;
                 chunk_size[1] = CHUNK_SIZE;
-                properties    = H5Pcreate(H5P_DATASET_CREATE);
+                properties = H5Pcreate(H5P_DATASET_CREATE);
 
                 if (properties < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Pcreate() failed.";
                 }
             }
 
             if (pass) {
-
                 if (H5Pset_chunk(properties, 2, chunk_size) < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Pset_chunk() failed.";
                 }
             }
 
             /* create the dataset */
             if (pass) {
-
                 snprintf(dset_name, sizeof(dset_name), "/dset%03d", i);
-                dataset_ids[i] = H5Dcreate2(file_id, dset_name, H5T_STD_I32BE, dataspace_id, H5P_DEFAULT,
-                                            properties, H5P_DEFAULT);
+                dataset_ids[i] = H5Dcreate2(file_id, dset_name, H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, properties, H5P_DEFAULT);
 
                 if (dataset_ids[i] < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Dcreate() failed.";
                 }
             }
 
             /* get the file space ID */
             if (pass) {
-
                 filespace_ids[i] = H5Dget_space(dataset_ids[i]);
 
                 if (filespace_ids[i] < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Dget_space() failed.";
                 }
             }
@@ -184,44 +180,43 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* create the mem space to be used to read and write chunks */
     if (pass) {
-
-        dims[0]     = CHUNK_SIZE;
-        dims[1]     = CHUNK_SIZE;
+        dims[0] = CHUNK_SIZE;
+        dims[1] = CHUNK_SIZE;
         memspace_id = H5Screate_simple(2, dims, NULL);
 
         if (memspace_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Screate_simple() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* select in memory hyperslab */
     if (pass) {
-
-        offset[0] = 0; /*offset of hyperslab in memory*/
+        offset[0] = 0;          /*offset of hyperslab in memory*/
         offset[1] = 0;
         a_size[0] = CHUNK_SIZE; /*size of hyperslab*/
         a_size[1] = CHUNK_SIZE;
-        status    = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, offset, NULL, a_size, NULL);
+        status = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, offset, NULL, a_size, NULL);
 
         if (status < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sselect_hyperslab() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* initialize all datasets on a round robin basis */
     i = 0;
@@ -242,21 +237,18 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
                 offset[1] = (hsize_t)j;
                 a_size[0] = CHUNK_SIZE; /*size of hyperslab*/
                 a_size[1] = CHUNK_SIZE;
-                status    = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
+                status = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
 
                 if (status < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "disk H5Sselect_hyperslab() failed.";
                 }
 
                 /* write the chunk to file */
-                status = H5Dwrite(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m], H5P_DEFAULT,
-                                  data_chunk);
+                status = H5Dwrite(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m], H5P_DEFAULT, data_chunk);
 
                 if (status < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Dwrite() failed.";
                 }
                 m++;
@@ -267,8 +259,9 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
         i += CHUNK_SIZE;
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* read data from datasets and validate it */
     i = 0;
@@ -277,63 +270,54 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
         while ((pass) && (j < DSET_SIZE)) {
             m = min_dset;
             while ((pass) && (m <= max_dset)) {
-
                 /* select on disk hyperslab */
                 offset[0] = (hsize_t)i; /* offset of hyperslab in file */
                 offset[1] = (hsize_t)j;
                 a_size[0] = CHUNK_SIZE; /* size of hyperslab */
                 a_size[1] = CHUNK_SIZE;
-                status    = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
+                status = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
 
                 if (status < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "disk hyperslab create failed.";
                 }
 
                 /* read the chunk from file */
                 if (pass) {
-
-                    status = H5Dread(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m],
-                                     H5P_DEFAULT, data_chunk);
+                    status = H5Dread(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m], H5P_DEFAULT, data_chunk);
 
                     if (status < 0) {
-
-                        pass         = false;
+                        pass = false;
                         failure_mssg = "disk hyperslab create failed.";
                     }
                 }
 
                 /* validate the slab */
                 if (pass) {
-
                     valid_chunk = true;
                     for (k = 0; k < CHUNK_SIZE; k++) {
                         for (l = 0; l < CHUNK_SIZE; l++) {
-                            if (data_chunk[k][l] !=
-                                ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l)) {
-
+                            if (data_chunk[k][l] != ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l)) {
                                 valid_chunk = false;
 
                                 if (verbose) {
-
-                                    fprintf(stdout, "data_chunk[%0d][%0d] = %0d, expect %0d.\n", k, l,
+                                    fprintf(stdout,
+                                            "data_chunk[%0d][%0d] = %0d, expect %0d.\n",
+                                            k,
+                                            l,
                                             data_chunk[k][l],
                                             ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l));
-                                    fprintf(stdout, "m = %d, i = %d, j = %d, k = %d, l = %d\n", m, i, j, k,
-                                            l);
+                                    fprintf(stdout, "m = %d, i = %d, j = %d, k = %d, l = %d\n", m, i, j, k, l);
                                 }
                             }
                         }
                     }
 
                     if (!valid_chunk) {
-
-                        pass         = false;
+                        pass = false;
                         failure_mssg = "slab validation failed.";
 
                         if (verbose) {
-
                             fprintf(stdout, "Chunk (%0d, %0d) in /dset%03d is invalid.\n", i, j, m);
                         }
                     }
@@ -345,15 +329,15 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
         i += CHUNK_SIZE;
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* close the file spaces */
     i = min_dset;
     while ((pass) && (i <= max_dset)) {
         if (H5Sclose(filespace_ids[i]) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sclose() failed.";
         }
         i++;
@@ -363,8 +347,7 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
     i = min_dset;
     while ((pass) && (i <= max_dset)) {
         if (H5Dclose(dataset_ids[i]) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Dclose() failed.";
         }
         i++;
@@ -372,10 +355,8 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
 
     /* close the mem space */
     if (pass) {
-
         if (H5Sclose(memspace_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sclose(memspace_id) failed.";
         }
     }
@@ -402,42 +383,42 @@ create_datasets(hid_t file_id, int min_dset, int max_dset)
  *-------------------------------------------------------------------------
  */
 
-static void
-delete_datasets(hid_t file_id, int min_dset, int max_dset)
+static void delete_datasets(hid_t file_id, int min_dset, int max_dset)
 {
-    const char *fcn_name = "delete_datasets()";
-    char        dset_name[64];
-    bool        show_progress = false;
-    int         cp            = 0;
-    int         i;
+    const char* fcn_name = "delete_datasets()";
+    char dset_name[64];
+    bool show_progress = false;
+    int cp = 0;
+    int i;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     assert(0 <= min_dset);
     assert(min_dset <= max_dset);
     assert(max_dset < MAX_NUM_DSETS);
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* first, verify the contents of the target dataset(s) */
     verify_datasets(file_id, min_dset, max_dset);
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* now delete the target datasets */
     if (pass) {
-
         i = min_dset;
 
         while ((pass) && (i <= max_dset)) {
             snprintf(dset_name, sizeof(dset_name), "/dset%03d", i);
 
             if (H5Ldelete(file_id, dset_name, H5P_DEFAULT) < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Ldelete() failed.";
             }
 
@@ -445,8 +426,9 @@ delete_datasets(hid_t file_id, int min_dset, int max_dset)
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
 } /* delete_datasets() */
 
@@ -489,193 +471,181 @@ delete_datasets(hid_t file_id, int min_dset, int max_dset)
  *-------------------------------------------------------------------------
  */
 
-static void
-open_hdf5_file(bool create_file, bool mdci_sbem_expected, bool read_only, bool set_mdci_fapl, bool config_fsm,
-               bool set_eoc, const char *hdf_file_name, unsigned cache_image_flags, hid_t *file_id_ptr,
-               H5F_t **file_ptr_ptr, H5C_t **cache_ptr_ptr)
+static void open_hdf5_file(bool create_file,
+                           bool mdci_sbem_expected,
+                           bool read_only,
+                           bool set_mdci_fapl,
+                           bool config_fsm,
+                           bool set_eoc,
+                           const char* hdf_file_name,
+                           unsigned cache_image_flags,
+                           hid_t* file_id_ptr,
+                           H5F_t** file_ptr_ptr,
+                           H5C_t** cache_ptr_ptr)
 {
-    const char               *fcn_name      = "open_hdf5_file()";
-    bool                      show_progress = false;
-    bool                      verbose       = false;
-    int                       cp            = 0;
-    hid_t                     fapl_id       = H5I_INVALID_HID;
-    hid_t                     fcpl_id       = H5I_INVALID_HID;
-    hid_t                     file_id       = H5I_INVALID_HID;
-    herr_t                    result;
-    H5F_t                    *file_ptr  = NULL;
-    H5C_t                    *cache_ptr = NULL;
-    H5C_cache_image_ctl_t     image_ctl;
-    H5AC_cache_image_config_t cache_image_config = {H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION, true, false,
-                                                    H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE};
+    const char* fcn_name = "open_hdf5_file()";
+    bool show_progress = false;
+    bool verbose = false;
+    int cp = 0;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t fcpl_id = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    herr_t result;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    H5C_cache_image_ctl_t image_ctl;
+    H5AC_cache_image_config_t cache_image_config = { H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION, true, false, H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE };
 
     if (pass) {
         /* opening the file both read only and with a cache image
          * requested is a contradiction.  We resolve it by ignoring
          * the cache image request silently.
          */
-        if ((create_file && mdci_sbem_expected) || (create_file && read_only) ||
-            (config_fsm && !create_file) || (hdf_file_name == NULL) ||
-            ((set_mdci_fapl) && (cache_image_flags == 0)) ||
-            ((set_mdci_fapl) && ((cache_image_flags & ~H5C_CI__ALL_FLAGS) != 0)) || (file_id_ptr == NULL) ||
+        if ((create_file && mdci_sbem_expected) || (create_file && read_only) || (config_fsm && !create_file) || (hdf_file_name == NULL) ||
+            ((set_mdci_fapl) && (cache_image_flags == 0)) || ((set_mdci_fapl) && ((cache_image_flags & ~H5C_CI__ALL_FLAGS) != 0)) || (file_id_ptr == NULL) ||
             (file_ptr_ptr == NULL) || (cache_ptr_ptr == NULL)) {
-
             failure_mssg = "Bad param(s) on entry to open_hdf5_file().\n";
-            pass         = false;
+            pass = false;
         }
         else if (verbose) {
-
             fprintf(stdout, "%s: HDF file name = \"%s\".\n", fcn_name, hdf_file_name);
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* create a file access property list. */
     if (pass) {
-
         fapl_id = h5_fileaccess();
 
         if (fapl_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fileaccess() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* call H5Pset_libver_bounds() on the fapl_id */
     if (pass) {
-
         if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_libver_bounds() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* get metadata cache image config -- verify that it is the default */
     if (pass) {
-
         result = H5Pget_mdc_image_config(fapl_id, &cache_image_config);
 
         if (result < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pget_mdc_image_config() failed.\n";
         }
 
-        if ((cache_image_config.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) ||
-            (cache_image_config.generate_image != false) ||
-            (cache_image_config.save_resize_status != false) ||
-            (cache_image_config.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE)) {
-
-            pass         = false;
+        if ((cache_image_config.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) || (cache_image_config.generate_image != false) ||
+            (cache_image_config.save_resize_status != false) || (cache_image_config.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE)) {
+            pass = false;
             failure_mssg = "Unexpected default cache image config.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* set metadata cache image fapl entry if indicated */
     if ((pass) && (set_mdci_fapl)) {
-
         /* set cache image config fields to taste */
-        cache_image_config.generate_image     = true;
+        cache_image_config.generate_image = true;
         cache_image_config.save_resize_status = false;
-        cache_image_config.entry_ageout       = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
+        cache_image_config.entry_ageout = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
 
         result = H5Pset_mdc_image_config(fapl_id, &cache_image_config);
 
         if (result < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_mdc_image_config() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the persistent free space manager if indicated */
     if ((pass) && (config_fsm)) {
-
         fcpl_id = H5Pcreate(H5P_FILE_CREATE);
 
         if (fcpl_id <= 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pcreate(H5P_FILE_CREATE) failed.";
         }
     }
 
     if ((pass) && (config_fsm)) {
         if (H5Pset_file_space_strategy(fcpl_id, H5F_FSPACE_STRATEGY_PAGE, true, (hsize_t)1) < 0) {
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_file_space_strategy() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* set evict on close if indicated */
     if ((pass) && (set_eoc)) {
-
         if (H5Pset_evict_on_close(fapl_id, true) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_evict_on_close() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* open the file */
     if (pass) {
-
         if (create_file) {
-
-            if (fcpl_id != -1)
-
+            if (fcpl_id != -1) {
                 file_id = H5Fcreate(hdf_file_name, H5F_ACC_TRUNC, fcpl_id, fapl_id);
-            else
-
+            }
+            else {
                 file_id = H5Fcreate(hdf_file_name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
+            }
         }
         else {
-
-            if (read_only)
-
+            if (read_only) {
                 file_id = H5Fopen(hdf_file_name, H5F_ACC_RDONLY, fapl_id);
+            }
 
-            else
-
+            else {
                 file_id = H5Fopen(hdf_file_name, H5F_ACC_RDWR, fapl_id);
+            }
         }
 
         /* tidy up */
         H5Pclose(fapl_id);
 
         if (file_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fcreate() or H5Fopen() failed.\n";
         }
         else {
-
-            file_ptr = (struct H5F_t *)H5VL_object_verify(file_id, H5I_FILE);
+            file_ptr = (struct H5F_t*)H5VL_object_verify(file_id, H5I_FILE);
 
             if (file_ptr == NULL) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "Can't get file_ptr.";
 
                 if (verbose) {
@@ -685,27 +655,26 @@ open_hdf5_file(bool create_file, bool mdci_sbem_expected, bool read_only, bool s
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* get a pointer to the files internal data structure and then
      * to the cache structure
      */
     if (pass) {
-
         if (file_ptr->shared->cache == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "can't get cache pointer(1).\n";
         }
         else {
-
             cache_ptr = file_ptr->shared->cache;
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* verify expected metadata cache status */
 
@@ -715,123 +684,100 @@ open_hdf5_file(bool create_file, bool mdci_sbem_expected, bool read_only, bool s
      * Then set the flags in this structure to the specified value.
      */
     if (pass) {
-
         if (H5C__get_cache_image_config(cache_ptr, &image_ctl) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "error returned by H5C__get_cache_image_config().";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         if (set_mdci_fapl) {
-
             if (read_only) {
-
-                if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) ||
-                    (image_ctl.generate_image != false) || (image_ctl.save_resize_status != false) ||
-                    (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) ||
-                    (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
-
-                    pass         = false;
+                if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) || (image_ctl.generate_image != false) || (image_ctl.save_resize_status != false) ||
+                    (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) || (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
+                    pass = false;
                     failure_mssg = "Unexpected image_ctl values(1).\n";
                 }
             }
             else {
-
-                if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) ||
-                    (image_ctl.generate_image != true) || (image_ctl.save_resize_status != false) ||
-                    (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) ||
-                    (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
-
-                    pass         = false;
+                if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) || (image_ctl.generate_image != true) || (image_ctl.save_resize_status != false) ||
+                    (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) || (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
+                    pass = false;
                     failure_mssg = "Unexpected image_ctl values(2).\n";
                 }
             }
         }
         else {
-
-            if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) ||
-                (image_ctl.generate_image != false) || (image_ctl.save_resize_status != false) ||
-                (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) ||
-                (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
-
-                pass         = false;
+            if ((image_ctl.version != H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION) || (image_ctl.generate_image != false) || (image_ctl.save_resize_status != false) ||
+                (image_ctl.entry_ageout != H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE) || (image_ctl.flags != H5C_CI__ALL_FLAGS)) {
+                pass = false;
                 failure_mssg = "Unexpected image_ctl values(3).\n";
             }
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if ((pass) && (set_mdci_fapl)) {
-
         image_ctl.flags = cache_image_flags;
 
         if (H5C_set_cache_image_config(file_ptr, cache_ptr, &image_ctl) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "error returned by H5C_set_cache_image_config().";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         if (cache_ptr->close_warning_received == true) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "Unexpected value of close_warning_received.\n";
         }
 
         if (mdci_sbem_expected) {
-
             if (read_only) {
-
                 if ((cache_ptr->load_image != true) || (cache_ptr->delete_image != false)) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "mdci sb extension message not present?\n";
                 }
             }
             else {
-
                 if ((cache_ptr->load_image != true) || (cache_ptr->delete_image != true)) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "mdci sb extension message not present?\n";
                 }
             }
         }
         else {
-
             if ((cache_ptr->load_image == true) || (cache_ptr->delete_image == true)) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "mdci sb extension message present?\n";
             }
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
-        *file_id_ptr   = file_id;
-        *file_ptr_ptr  = file_ptr;
+        *file_id_ptr = file_id;
+        *file_ptr_ptr = file_ptr;
         *cache_ptr_ptr = cache_ptr;
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d -- exiting.\n", fcn_name, cp++, pass);
+    }
 
 } /* open_hdf5_file() */
 
@@ -851,71 +797,64 @@ open_hdf5_file(bool create_file, bool mdci_sbem_expected, bool read_only, bool s
  *-------------------------------------------------------------------------
  */
 
-static void
-attempt_swmr_open_hdf5_file(const bool create_file, const bool set_mdci_fapl, const char *hdf_file_name)
+static void attempt_swmr_open_hdf5_file(const bool create_file, const bool set_mdci_fapl, const char* hdf_file_name)
 {
-    const char               *fcn_name      = "attempt_swmr_open_hdf5_file()";
-    bool                      show_progress = false;
-    int                       cp            = 0;
-    hid_t                     fapl_id       = H5I_INVALID_HID;
-    hid_t                     file_id       = H5I_INVALID_HID;
-    herr_t                    result;
-    H5AC_cache_image_config_t cache_image_config = {H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION, true, false,
-                                                    H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE};
+    const char* fcn_name = "attempt_swmr_open_hdf5_file()";
+    bool show_progress = false;
+    int cp = 0;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    herr_t result;
+    H5AC_cache_image_config_t cache_image_config = { H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION, true, false, H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE };
 
     /* create a file access property list. */
     if (pass) {
-
         fapl_id = h5_fileaccess();
 
         if (fapl_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fileaccess() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* call H5Pset_libver_bounds() on the fapl_id */
     if (pass) {
-
         if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_libver_bounds() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* set metadata cache image fapl entry if indicated */
     if ((pass) && (set_mdci_fapl)) {
-
         /* set cache image config fields to taste */
-        cache_image_config.generate_image     = true;
+        cache_image_config.generate_image = true;
         cache_image_config.save_resize_status = false;
-        cache_image_config.entry_ageout       = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
+        cache_image_config.entry_ageout = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
 
         result = H5Pset_mdc_image_config(fapl_id, &cache_image_config);
 
         if (result < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_mdc_image_config() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* open the file */
     if (pass) {
-
         if (create_file) {
-
             H5E_BEGIN_TRY
             {
                 file_id = H5Fcreate(hdf_file_name, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE, H5P_DEFAULT, fapl_id);
@@ -923,7 +862,6 @@ attempt_swmr_open_hdf5_file(const bool create_file, const bool set_mdci_fapl, co
             H5E_END_TRY
         }
         else {
-
             H5E_BEGIN_TRY
             {
                 file_id = H5Fopen(hdf_file_name, H5F_ACC_RDWR | H5F_ACC_SWMR_WRITE, fapl_id);
@@ -932,14 +870,14 @@ attempt_swmr_open_hdf5_file(const bool create_file, const bool set_mdci_fapl, co
         }
 
         if (file_id >= 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "SWMR H5Fcreate() or H5Fopen() succeeded.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
 } /* attempt_swmr_open_hdf5_file() */
 
@@ -964,27 +902,27 @@ attempt_swmr_open_hdf5_file(const bool create_file, const bool set_mdci_fapl, co
  *-------------------------------------------------------------------------
  */
 
-static void
-verify_datasets(hid_t file_id, int min_dset, int max_dset)
+static void verify_datasets(hid_t file_id, int min_dset, int max_dset)
 {
-    const char *fcn_name = "verify_datasets()";
-    char        dset_name[64];
-    bool        show_progress = false;
-    bool        valid_chunk;
-    bool        verbose = false;
-    int         cp      = 0;
-    int         i, j, k, l, m;
-    int         data_chunk[CHUNK_SIZE][CHUNK_SIZE];
-    herr_t      status;
-    hid_t       filespace_ids[MAX_NUM_DSETS];
-    hid_t       memspace_id = H5I_INVALID_HID;
-    hid_t       dataset_ids[MAX_NUM_DSETS];
-    hsize_t     dims[2];
-    hsize_t     a_size[2];
-    hsize_t     offset[2];
+    const char* fcn_name = "verify_datasets()";
+    char dset_name[64];
+    bool show_progress = false;
+    bool valid_chunk;
+    bool verbose = false;
+    int cp = 0;
+    int i, j, k, l, m;
+    int data_chunk[CHUNK_SIZE][CHUNK_SIZE];
+    herr_t status;
+    hid_t filespace_ids[MAX_NUM_DSETS];
+    hid_t memspace_id = H5I_INVALID_HID;
+    hid_t dataset_ids[MAX_NUM_DSETS];
+    hsize_t dims[2];
+    hsize_t a_size[2];
+    hsize_t offset[2];
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     assert(0 <= min_dset);
     assert(min_dset <= max_dset);
@@ -993,31 +931,26 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
     /* open the datasets */
 
     if (pass) {
-
         i = min_dset;
 
         while ((pass) && (i <= max_dset)) {
             /* open the dataset */
             if (pass) {
-
                 snprintf(dset_name, sizeof(dset_name), "/dset%03d", i);
                 dataset_ids[i] = H5Dopen2(file_id, dset_name, H5P_DEFAULT);
 
                 if (dataset_ids[i] < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Dopen2() failed.";
                 }
             }
 
             /* get the file space ID */
             if (pass) {
-
                 filespace_ids[i] = H5Dget_space(dataset_ids[i]);
 
                 if (filespace_ids[i] < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "H5Dget_space() failed.";
                 }
             }
@@ -1026,44 +959,43 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* create the mem space to be used to read and write chunks */
     if (pass) {
-
-        dims[0]     = CHUNK_SIZE;
-        dims[1]     = CHUNK_SIZE;
+        dims[0] = CHUNK_SIZE;
+        dims[1] = CHUNK_SIZE;
         memspace_id = H5Screate_simple(2, dims, NULL);
 
         if (memspace_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Screate_simple() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* select in memory hyperslab */
     if (pass) {
-
-        offset[0] = 0; /*offset of hyperslab in memory*/
+        offset[0] = 0;          /*offset of hyperslab in memory*/
         offset[1] = 0;
         a_size[0] = CHUNK_SIZE; /*size of hyperslab*/
         a_size[1] = CHUNK_SIZE;
-        status    = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, offset, NULL, a_size, NULL);
+        status = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, offset, NULL, a_size, NULL);
 
         if (status < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sselect_hyperslab() failed.";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* read data from datasets and validate it */
     i = 0;
@@ -1072,63 +1004,54 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
         while ((pass) && (j < DSET_SIZE)) {
             m = min_dset;
             while ((pass) && (m <= max_dset)) {
-
                 /* select on disk hyperslab */
                 offset[0] = (hsize_t)i; /* offset of hyperslab in file */
                 offset[1] = (hsize_t)j;
                 a_size[0] = CHUNK_SIZE; /* size of hyperslab */
                 a_size[1] = CHUNK_SIZE;
-                status    = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
+                status = H5Sselect_hyperslab(filespace_ids[m], H5S_SELECT_SET, offset, NULL, a_size, NULL);
 
                 if (status < 0) {
-
-                    pass         = false;
+                    pass = false;
                     failure_mssg = "disk hyperslab create failed.";
                 }
 
                 /* read the chunk from file */
                 if (pass) {
-
-                    status = H5Dread(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m],
-                                     H5P_DEFAULT, data_chunk);
+                    status = H5Dread(dataset_ids[m], H5T_NATIVE_INT, memspace_id, filespace_ids[m], H5P_DEFAULT, data_chunk);
 
                     if (status < 0) {
-
-                        pass         = false;
+                        pass = false;
                         failure_mssg = "disk hyperslab create failed.";
                     }
                 }
 
                 /* validate the slab */
                 if (pass) {
-
                     valid_chunk = true;
                     for (k = 0; k < CHUNK_SIZE; k++) {
                         for (l = 0; l < CHUNK_SIZE; l++) {
-                            if (data_chunk[k][l] !=
-                                ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l)) {
-
+                            if (data_chunk[k][l] != ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l)) {
                                 valid_chunk = false;
 
                                 if (verbose) {
-
-                                    fprintf(stdout, "data_chunk[%0d][%0d] = %0d, expect %0d.\n", k, l,
+                                    fprintf(stdout,
+                                            "data_chunk[%0d][%0d] = %0d, expect %0d.\n",
+                                            k,
+                                            l,
                                             data_chunk[k][l],
                                             ((DSET_SIZE * DSET_SIZE * m) + (DSET_SIZE * (i + k)) + j + l));
-                                    fprintf(stdout, "m = %d, i = %d, j = %d, k = %d, l = %d\n", m, i, j, k,
-                                            l);
+                                    fprintf(stdout, "m = %d, i = %d, j = %d, k = %d, l = %d\n", m, i, j, k, l);
                                 }
                             }
                         }
                     }
 
                     if (!valid_chunk) {
-
-                        pass         = false;
+                        pass = false;
                         failure_mssg = "slab validation failed.";
 
                         if (verbose) {
-
                             fprintf(stdout, "Chunk (%0d, %0d) in /dset%03d is invalid.\n", i, j, m);
                         }
                     }
@@ -1140,15 +1063,15 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
         i += CHUNK_SIZE;
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d.\n", fcn_name, cp++);
+    }
 
     /* close the file spaces */
     i = min_dset;
     while ((pass) && (i <= max_dset)) {
         if (H5Sclose(filespace_ids[i]) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sclose() failed.";
         }
         i++;
@@ -1158,8 +1081,7 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
     i = min_dset;
     while ((pass) && (i <= max_dset)) {
         if (H5Dclose(dataset_ids[i]) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Dclose() failed.";
         }
         i++;
@@ -1167,10 +1089,8 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
 
     /* close the mem space */
     if (pass) {
-
         if (H5Sclose(memspace_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Sclose(memspace_id) failed.";
         }
     }
@@ -1245,16 +1165,15 @@ verify_datasets(hid_t file_id, int min_dset, int max_dset)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_1(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_1(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_1()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_1()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 1");
 
@@ -1267,21 +1186,21 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -1292,7 +1211,6 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1306,32 +1224,32 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file.
      *
@@ -1342,7 +1260,6 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -1356,8 +1273,9 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open and close a dataset.
      *
@@ -1366,33 +1284,31 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
     if (pass) {
-
         /* think on how to verify that the superblock extension has been
          * deleted, and if it is necessary to verify this directly.
          */
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file.
      *
@@ -1401,7 +1317,6 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1415,30 +1330,28 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -1450,8 +1363,9 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -1519,16 +1433,15 @@ check_cache_image_ctl_flow_1(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_2(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_2(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_2()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_2()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 2");
 
@@ -1541,21 +1454,21 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -1566,7 +1479,6 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1580,22 +1492,22 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Open the file.
      *
@@ -1606,7 +1518,6 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -1620,22 +1531,22 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open the file.
      *
@@ -1644,7 +1555,6 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1658,30 +1568,28 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -1693,8 +1601,9 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -1780,16 +1689,15 @@ check_cache_image_ctl_flow_2(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_3(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_3(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_3()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_3()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 3");
 
@@ -1802,21 +1710,21 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress) /* 0 */
+    if (show_progress) { /* 0 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress) /* 1 */
+    if (show_progress) { /* 1 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file WITHOUT the cache image FAPL entry.
      *
@@ -1825,7 +1733,6 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1839,22 +1746,22 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 2 */
+    if (show_progress) { /* 2 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 3 */
+    if (show_progress) { /* 3 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Open the file WITH the cache image FAPL entry.
      *
@@ -1865,7 +1772,6 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -1879,32 +1785,32 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 4 */
+    if (show_progress) { /* 4 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Create some datasets. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 5 */
+    if (show_progress) { /* 5 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 6 */
+    if (show_progress) { /* 6 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Open the file READ ONLY.
      *
@@ -1916,7 +1822,6 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -1930,32 +1835,32 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 7 */
+    if (show_progress) { /* 7 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Verify the contents of the datasets. */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 8 */
+    if (show_progress) { /* 8 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 9 */
+    if (show_progress) { /* 9 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Open the file READ/WRITE.
      *
@@ -1967,7 +1872,6 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -1981,32 +1885,32 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 10 */
+    if (show_progress) { /* 10 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Verify the contents of the datasets. */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 11 */
+    if (show_progress) { /* 11 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 12 */
+    if (show_progress) { /* 12 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Open the file
      *
@@ -2015,7 +1919,6 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2029,30 +1932,28 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 13 */
+    if (show_progress) { /* 13 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 14 */
+    if (show_progress) { /* 14 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Delete the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -2064,8 +1965,9 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -2143,16 +2045,15 @@ check_cache_image_ctl_flow_3(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_4(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_4(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_4()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_4()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 4");
 
@@ -2165,21 +2066,21 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress) /* 0 */
+    if (show_progress) { /* 0 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress) /* 1 */
+    if (show_progress) { /* 1 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file WITHOUT the cache image FAPL entry.
      *
@@ -2188,7 +2089,6 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2202,22 +2102,22 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 2 */
+    if (show_progress) { /* 2 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 3 */
+    if (show_progress) { /* 3 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Open the file WITH the cache image FAPL entry.
      *
@@ -2228,7 +2128,6 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2242,22 +2141,22 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 4 */
+    if (show_progress) { /* 4 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 5 */
+    if (show_progress) { /* 5 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open the file READ ONLY.
      *
@@ -2269,7 +2168,6 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -2283,22 +2181,22 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 6 */
+    if (show_progress) { /* 6 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 7 */
+    if (show_progress) { /* 7 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file READ/WRITE.
      *
@@ -2310,7 +2208,6 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -2324,22 +2221,22 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 8 */
+    if (show_progress) { /* 8 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 9 */
+    if (show_progress) { /* 9 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Open the file
      *
@@ -2348,7 +2245,6 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2362,30 +2258,28 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 10 */
+    if (show_progress) { /* 10 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 11 */
+    if (show_progress) { /* 11 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Delete the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -2397,8 +2291,9 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -2469,16 +2364,15 @@ check_cache_image_ctl_flow_4(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_5(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_5(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_5()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_5()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 5");
 
@@ -2491,21 +2385,21 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress) /* 0 */
+    if (show_progress) { /* 0 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress) /* 1 */
+    if (show_progress) { /* 1 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -2516,7 +2410,6 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2530,32 +2423,32 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 2 */
+    if (show_progress) { /* 2 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 3 */
+    if (show_progress) { /* 3 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 4 */
+    if (show_progress) { /* 4 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file WITH the cache image FAPL entry.
      *
@@ -2573,7 +2466,6 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -2587,32 +2479,32 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 5 */
+    if (show_progress) { /* 5 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Verify the contents of the datasets. */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 6 */
+    if (show_progress) { /* 6 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 7 */
+    if (show_progress) { /* 7 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file.
      *
@@ -2624,7 +2516,6 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -2638,40 +2529,38 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 8 */
+    if (show_progress) { /* 8 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Verify the contents of the datasets. */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
-    if (show_progress) /* 9 */
+    if (show_progress) { /* 9 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 10 */
+    if (show_progress) { /* 10 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Delete the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -2683,8 +2572,9 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -2747,16 +2637,15 @@ check_cache_image_ctl_flow_5(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-check_cache_image_ctl_flow_6(bool single_file_vfd)
+static unsigned check_cache_image_ctl_flow_6(bool single_file_vfd)
 {
-    const char *fcn_name = "check_cache_image_ctl_flow_6()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "check_cache_image_ctl_flow_6()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image control flow test 6");
 
@@ -2769,21 +2658,21 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress) /* 0 */
+    if (show_progress) { /* 0 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress) /* 1 */
+    if (show_progress) { /* 1 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -2794,7 +2683,6 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -2808,22 +2696,22 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 2 */
+    if (show_progress) { /* 2 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 3 */
+    if (show_progress) { /* 3 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file WITH the cache image FAPL entry.
      *
@@ -2841,7 +2729,6 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -2855,22 +2742,22 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 4 */
+    if (show_progress) { /* 4 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 5 */
+    if (show_progress) { /* 5 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open the file.
      *
@@ -2882,7 +2769,6 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -2896,30 +2782,28 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress) /* 6 */
+    if (show_progress) { /* 6 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress) /* 7 */
+    if (show_progress) { /* 7 */
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Delete the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -2931,8 +2815,9 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -3030,16 +2915,15 @@ check_cache_image_ctl_flow_6(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_smoke_check_1(bool single_file_vfd)
+static unsigned cache_image_smoke_check_1(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_smoke_check_1()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_smoke_check_1()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image smoke check 1");
 
@@ -3052,21 +2936,21 @@ cache_image_smoke_check_1(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -3076,7 +2960,6 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3090,43 +2973,41 @@ cache_image_smoke_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file.
      *
@@ -3137,7 +3018,6 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -3151,8 +3031,9 @@ cache_image_smoke_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open and close a dataset.
      *
@@ -3161,37 +3042,34 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 1) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file.
      *
@@ -3200,7 +3078,6 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3214,8 +3091,9 @@ cache_image_smoke_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open and close a dataset.
      *
@@ -3224,37 +3102,34 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Open the file with the cache image FAPL entry.
      *
@@ -3263,7 +3138,6 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3277,8 +3151,9 @@ cache_image_smoke_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Close the file.  Since there has been no access to
      *       any entries that would be included in the cache image,
@@ -3286,16 +3161,15 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Open the file.
      *
@@ -3304,7 +3178,6 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3318,8 +3191,9 @@ cache_image_smoke_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Open a dataset.
      *
@@ -3327,45 +3201,40 @@ cache_image_smoke_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(3).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -3377,8 +3246,9 @@ cache_image_smoke_check_1(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -3438,16 +3308,15 @@ cache_image_smoke_check_1(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_smoke_check_2(bool single_file_vfd)
+static unsigned cache_image_smoke_check_2(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_smoke_check_2()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_smoke_check_2()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image smoke check 2");
 
@@ -3460,21 +3329,21 @@ cache_image_smoke_check_2(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -3484,7 +3353,6 @@ cache_image_smoke_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3498,43 +3366,41 @@ cache_image_smoke_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file.
      *
@@ -3543,7 +3409,6 @@ cache_image_smoke_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -3563,22 +3428,22 @@ cache_image_smoke_check_2(bool single_file_vfd)
      * incremented just before the cache is shut down.
      */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Open the file.
      *
@@ -3587,7 +3452,6 @@ cache_image_smoke_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3601,8 +3465,9 @@ cache_image_smoke_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open and close a dataset.
      *
@@ -3611,34 +3476,31 @@ cache_image_smoke_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -3650,8 +3512,9 @@ cache_image_smoke_check_2(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -3733,16 +3596,15 @@ cache_image_smoke_check_2(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_smoke_check_3(bool single_file_vfd)
+static unsigned cache_image_smoke_check_3(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_smoke_check_3()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_smoke_check_3()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image smoke check 3");
 
@@ -3755,21 +3617,21 @@ cache_image_smoke_check_3(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -3779,7 +3641,6 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3793,43 +3654,41 @@ cache_image_smoke_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file read only.
      *
@@ -3838,7 +3697,6 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -3852,8 +3710,9 @@ cache_image_smoke_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open and close a dataset.
      *
@@ -3862,37 +3721,34 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded == 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file.
      *
@@ -3901,7 +3757,6 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -3915,8 +3770,9 @@ cache_image_smoke_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open and close a dataset.
      *
@@ -3925,31 +3781,27 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded == 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
@@ -3961,7 +3813,6 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -3975,8 +3826,9 @@ cache_image_smoke_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open and close a dataset.
      *
@@ -3985,45 +3837,40 @@ cache_image_smoke_check_3(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -4035,8 +3882,9 @@ cache_image_smoke_check_3(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -4107,18 +3955,17 @@ cache_image_smoke_check_3(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_smoke_check_4(bool single_file_vfd)
+static unsigned cache_image_smoke_check_4(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_smoke_check_4()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
-    int         min_dset      = 0;
-    int         max_dset      = 0;
+    const char* fcn_name = "cache_image_smoke_check_4()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
+    int min_dset = 0;
+    int max_dset = 0;
 
     TESTING("metadata cache image smoke check 4");
 
@@ -4131,21 +3978,21 @@ cache_image_smoke_check_4(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -4155,7 +4002,6 @@ cache_image_smoke_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -4169,46 +4015,43 @@ cache_image_smoke_check_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create a dataset in the file. */
 
     if (pass) {
-
         create_datasets(file_id, min_dset++, max_dset++);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     while ((pass) && (max_dset < MAX_NUM_DSETS)) {
-
         /* 4) Open the file.
          *
          *    Verify that the metadata cache is instructed to load the
@@ -4216,7 +4059,6 @@ cache_image_smoke_check_4(bool single_file_vfd)
          */
 
         if (pass) {
-
             open_hdf5_file(/* create_file        */ false,
                            /* mdci_sbem_expected */ true,
                            /* read_only          */ false,
@@ -4230,43 +4072,41 @@ cache_image_smoke_check_4(bool single_file_vfd)
                            /* cache_ptr_ptr      */ &cache_ptr);
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L1 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp, max_dset, pass);
+        }
 
         /* 5) Create a dataset in the file. */
 
         if (pass) {
-
             create_datasets(file_id, min_dset++, max_dset++);
         }
 
 #if H5C_COLLECT_CACHE_STATS
         if (pass) {
-
             if (cache_ptr->images_loaded == 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "metadata cache image block not loaded(1).";
             }
         }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L2 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp + 1, max_dset, pass);
+        }
 
         /* 6) Close the file. */
 
         if (pass) {
-
             if (H5Fclose(file_id) < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Fclose() failed.\n";
             }
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L3 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp + 2, max_dset, pass);
+        }
     } /* end while */
     cp += 3;
 
@@ -4277,7 +4117,6 @@ cache_image_smoke_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -4291,8 +4130,9 @@ cache_image_smoke_check_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open and close all datasets.
      *
@@ -4301,31 +4141,27 @@ cache_image_smoke_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, max_dset - 1);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded == 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
@@ -4337,7 +4173,6 @@ cache_image_smoke_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -4351,8 +4186,9 @@ cache_image_smoke_check_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open and close all datasets.
      *
@@ -4361,45 +4197,40 @@ cache_image_smoke_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, max_dset - 1);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -4411,8 +4242,9 @@ cache_image_smoke_check_4(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 } /* cache_image_smoke_check_4() */
@@ -4497,21 +4329,20 @@ cache_image_smoke_check_4(bool single_file_vfd)
 
 #define MAX_NUM_GROUPS 64
 
-static unsigned
-cache_image_smoke_check_5(bool single_file_vfd)
+static unsigned cache_image_smoke_check_5(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_smoke_check_5()";
-    char        filename[512];
-    char        process_group_name[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    hid_t       proc_gid      = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
-    int         i;
-    int         min_group = 0;
-    int         max_group = 0;
+    const char* fcn_name = "cache_image_smoke_check_5()";
+    char filename[512];
+    char process_group_name[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    hid_t proc_gid = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
+    int i;
+    int min_group = 0;
+    int max_group = 0;
 
     TESTING("metadata cache image smoke check 5");
 
@@ -4524,25 +4355,25 @@ cache_image_smoke_check_5(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         hid_t fapl_id = h5_fileaccess();
 
         if (h5_fixname(FILENAMES[0], fapl_id, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
 
         H5Pclose(fapl_id);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -4552,7 +4383,6 @@ cache_image_smoke_check_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -4566,69 +4396,65 @@ cache_image_smoke_check_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create a process specific group. */
     if (pass) {
-
         snprintf(process_group_name, sizeof(process_group_name), "/process_%d", min_group);
 
         proc_gid = H5Gcreate2(file_id, process_group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         if (proc_gid < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Gcreate2() failed (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Construct a "zoo" in the above group, and validate it. */
-    if (pass)
+    if (pass) {
         create_zoo(file_id, process_group_name, min_group);
+    }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Close the file. */
 
     if (pass) {
-
         if (H5Gclose(proc_gid) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Gclose(proc_gid) failed. (1)";
         }
     }
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     while ((pass) && (max_group < MAX_NUM_GROUPS)) {
-
         /* 5) Open the file.
          *
          *    Verify that the metadata cache is instructed to load the
@@ -4636,7 +4462,6 @@ cache_image_smoke_check_5(bool single_file_vfd)
          */
 
         if (pass) {
-
             open_hdf5_file(/* create_file        */ false,
                            /* mdci_sbem_expected */ true,
                            /* read_only          */ false,
@@ -4650,74 +4475,73 @@ cache_image_smoke_check_5(bool single_file_vfd)
                            /* cache_ptr_ptr      */ &cache_ptr);
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L1 cp = %d, max_group = %d, pass = %d.\n", fcn_name, cp, max_group, pass);
+        }
 
         /* 6) Validate the "zoo" created in the previous file open. */
-        if (pass)
+        if (pass) {
             validate_zoo(file_id, process_group_name, max_group);
+        }
 
 #if H5C_COLLECT_CACHE_STATS
         if (pass) {
-
             if (cache_ptr->images_loaded == 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "metadata cache image block not loaded(1).";
             }
         }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L2 cp = %d, max_group = %d, pass = %d.\n", fcn_name, cp + 1, max_group, pass);
+        }
 
         /* 7) Create a process specific group for this file open */
         if (pass) {
-
             max_group++;
             snprintf(process_group_name, sizeof(process_group_name), "/process_%d", max_group);
 
             proc_gid = H5Gcreate2(file_id, process_group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
             if (proc_gid < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Gcreate2() failed (2).\n";
             }
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L3 cp = %d, max_group = %d, pass = %d.\n", fcn_name, cp + 2, max_group, pass);
+        }
 
         /* 8) Construct a "zoo" in the above group, and validate it. */
-        if (pass)
+        if (pass) {
             create_zoo(file_id, process_group_name, max_group);
+        }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L4 cp = %d, max_group = %d, pass = %d.\n", fcn_name, cp + 3, max_group, pass);
+        }
 
         /* 9) Close the file. */
 
         if (pass) {
-
             if (H5Gclose(proc_gid) < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Gclose(process_gid) failed. (2)";
             }
         }
 
         if (pass) {
-
             if (H5Fclose(file_id) < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Fclose() failed.\n";
             }
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L5 cp = %d, max_group = %d, pass = %d.\n", fcn_name, cp + 4, max_group, pass);
+        }
     } /* end while */
     cp += 5;
 
@@ -4740,8 +4564,9 @@ cache_image_smoke_check_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Validate all the zoos. */
     i = min_group;
@@ -4753,19 +4578,20 @@ cache_image_smoke_check_5(bool single_file_vfd)
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
         if (cache_ptr->images_loaded == 0) {
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Close the file. */
     if (pass) {
         if (H5Fclose(file_id) < 0) {
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
@@ -4777,7 +4603,6 @@ cache_image_smoke_check_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -4791,38 +4616,35 @@ cache_image_smoke_check_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Validate all the zoos. */
     i = min_group;
     while ((pass) && (i <= max_group)) {
-
         snprintf(process_group_name, sizeof(process_group_name), "/process_%d", i);
         validate_zoo(file_id, process_group_name, i++);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded == 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
@@ -4834,7 +4656,6 @@ cache_image_smoke_check_5(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -4848,8 +4669,9 @@ cache_image_smoke_check_5(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 17) Validate all the zoos.
      *
@@ -4864,39 +4686,35 @@ cache_image_smoke_check_5(bool single_file_vfd)
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 18) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 19) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -4908,8 +4726,9 @@ cache_image_smoke_check_5(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -4992,19 +4811,18 @@ cache_image_smoke_check_5(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_smoke_check_6(bool single_file_vfd)
+static unsigned cache_image_smoke_check_6(bool single_file_vfd)
 {
-    const char    *fcn_name = "cache_image_smoke_check_6()";
-    char           filename[512];
-    bool           show_progress = false;
-    hid_t          file_id       = H5I_INVALID_HID;
-    H5F_t         *file_ptr      = NULL;
-    H5C_t         *cache_ptr     = NULL;
+    const char* fcn_name = "cache_image_smoke_check_6()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
     h5_stat_size_t file_size;
-    int            cp       = 0;
-    int            min_dset = 0;
-    int            max_dset = 0;
+    int cp = 0;
+    int min_dset = 0;
+    int max_dset = 0;
 
     TESTING("metadata cache image smoke check 6");
 
@@ -5017,21 +4835,21 @@ cache_image_smoke_check_6(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with the cache image FAPL entry.
      *
@@ -5041,7 +4859,6 @@ cache_image_smoke_check_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -5055,46 +4872,43 @@ cache_image_smoke_check_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create a dataset in the file. */
 
     if (pass) {
-
         create_datasets(file_id, min_dset++, max_dset++);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     while ((pass) && (max_dset < MAX_NUM_DSETS)) {
-
         /* 4) Open the file.
          *
          *    Verify that the metadata cache is instructed to load the
@@ -5102,7 +4916,6 @@ cache_image_smoke_check_6(bool single_file_vfd)
          */
 
         if (pass) {
-
             open_hdf5_file(/* create_file        */ false,
                            /* mdci_sbem_expected */ true,
                            /* read_only          */ false,
@@ -5116,52 +4929,50 @@ cache_image_smoke_check_6(bool single_file_vfd)
                            /* cache_ptr_ptr      */ &cache_ptr);
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L1 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp, max_dset, pass);
+        }
 
         /* 5) Create a dataset in the file. */
 
         if (pass) {
-
             create_datasets(file_id, min_dset++, max_dset++);
         }
 
 #if H5C_COLLECT_CACHE_STATS
         if (pass) {
-
             if (cache_ptr->images_loaded == 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "metadata cache image block not loaded(1).";
             }
         }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L2 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp + 1, max_dset, pass);
+        }
 
         /* 6) Verify and delete the old dataset. */
         if (pass) {
-
             delete_datasets(file_id, min_dset - 2, max_dset - 2);
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L3 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp + 2, max_dset, pass);
+        }
 
         /* 7) Close the file. */
 
         if (pass) {
-
             if (H5Fclose(file_id) < 0) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "H5Fclose() failed.\n";
             }
         }
 
-        if (show_progress)
+        if (show_progress) {
             fprintf(stdout, "%s:L4 cp = %d, max_dset = %d, pass = %d.\n", fcn_name, cp + 3, max_dset, pass);
+        }
     } /* end while */
     cp += 4;
 
@@ -5172,7 +4983,6 @@ cache_image_smoke_check_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -5186,37 +4996,34 @@ cache_image_smoke_check_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Verify the last dataset created. */
 
     if (pass) {
-
         verify_datasets(file_id, min_dset - 1, max_dset - 1);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded == 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
@@ -5228,7 +5035,6 @@ cache_image_smoke_check_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -5242,8 +5048,9 @@ cache_image_smoke_check_6(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Verify and delete the last dataset.
      *
@@ -5251,16 +5058,13 @@ cache_image_smoke_check_6(bool single_file_vfd)
      */
 
     if (pass) {
-
         delete_datasets(file_id, min_dset - 1, max_dset - 1);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
@@ -5269,16 +5073,15 @@ cache_image_smoke_check_6(bool single_file_vfd)
     /* 13) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Get the size of the file.  Verify that it is less
      *     than 20 KB.  Without deletions and persistent free
@@ -5293,24 +5096,23 @@ cache_image_smoke_check_6(bool single_file_vfd)
      */
     if (pass) {
         if ((file_size = h5_get_file_size(filename, H5P_DEFAULT)) < 0) {
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_get_file_size() failed.\n";
         }
         else if (file_size > 20 * 1024) {
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpectedly large file size.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Delete the file */
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -5322,8 +5124,9 @@ cache_image_smoke_check_6(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -5384,16 +5187,15 @@ cache_image_smoke_check_6(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_api_error_check_1(bool single_file_vfd)
+static unsigned cache_image_api_error_check_1(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_api_error_check_1()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_api_error_check_1()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image api error check 1");
 
@@ -5406,26 +5208,25 @@ cache_image_api_error_check_1(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -5439,48 +5240,45 @@ cache_image_api_error_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file read only with a cache image FAPL entry requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ true,
@@ -5494,8 +5292,9 @@ cache_image_api_error_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open and close a dataset.
      *
@@ -5505,42 +5304,38 @@ cache_image_api_error_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file read only. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ true,
@@ -5554,8 +5349,9 @@ cache_image_api_error_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open and close a dataset.
      *
@@ -5565,42 +5361,38 @@ cache_image_api_error_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(3).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Open the file read / write. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -5614,8 +5406,9 @@ cache_image_api_error_check_1(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open and close a dataset.
      *
@@ -5625,45 +5418,40 @@ cache_image_api_error_check_1(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(4).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Close the file.  */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -5675,8 +5463,9 @@ cache_image_api_error_check_1(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -5749,16 +5538,15 @@ cache_image_api_error_check_1(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_api_error_check_2(bool single_file_vfd)
+static unsigned cache_image_api_error_check_2(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_api_error_check_2()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_api_error_check_2()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image api error check 2");
 
@@ -5771,26 +5559,25 @@ cache_image_api_error_check_2(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with a cache image requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -5804,48 +5591,45 @@ cache_image_api_error_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file read only with a cache image FAPL entry requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -5859,8 +5643,9 @@ cache_image_api_error_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open and close a dataset.
      *
@@ -5870,42 +5655,38 @@ cache_image_api_error_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 1) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block was not loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Open the file read only. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -5919,8 +5700,9 @@ cache_image_api_error_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open and close a dataset.
      *
@@ -5930,42 +5712,38 @@ cache_image_api_error_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 1) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block was not loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Open the file read / write. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -5979,8 +5757,9 @@ cache_image_api_error_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open and close a dataset.
      *
@@ -5990,42 +5769,38 @@ cache_image_api_error_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 1) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block was not loaded(3).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Close the file.  */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Open the file read / write. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -6039,8 +5814,9 @@ cache_image_api_error_check_2(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Open and close a dataset.
      *
@@ -6050,45 +5826,40 @@ cache_image_api_error_check_2(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block was loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Close the file.  */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
@@ -6100,8 +5871,9 @@ cache_image_api_error_check_2(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -6147,16 +5919,15 @@ cache_image_api_error_check_2(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_api_error_check_3(bool single_file_vfd)
+static unsigned cache_image_api_error_check_3(bool single_file_vfd)
 {
-    const char *fcn_name = "cache_image_api_error_check_3()";
-    char        filename[512];
-    bool        show_progress = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "cache_image_api_error_check_3()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 
     TESTING("metadata cache image api error check 3");
 
@@ -6169,26 +5940,25 @@ cache_image_api_error_check_3(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with a cache image requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -6202,46 +5972,44 @@ cache_image_api_error_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Try to start SWMR write -- should fail. */
 
     if (pass) {
-
         H5E_BEGIN_TRY
         {
             if (H5Fstart_swmr_write(file_id) == SUCCEED) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "SWMR start succeeded in file with cache image.";
             }
         }
         H5E_END_TRY
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Discard the file if necessary */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
 
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Attempt to create a HDF5 file with SWMR write
      *    access and cache image requested -- should fail.
@@ -6251,26 +6019,26 @@ cache_image_api_error_check_3(bool single_file_vfd)
                                 /* set_mdci_fapl */ true,
                                 /* hdf_file_name */ filename);
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Discard the file if necessary */
 
     if (pass) {
-
         /* file probably doesn't exist, so don't
          * error check the remove call.
          */
         HDremove(filename);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Create a HDF5 file with a cache image requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -6284,43 +6052,41 @@ cache_image_api_error_check_3(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Attempt to open the file with SWMR write access -- should fail. */
 
@@ -6328,22 +6094,22 @@ cache_image_api_error_check_3(bool single_file_vfd)
                                 /* set_mdci_fapl */ true,
                                 /* hdf_file_name */ filename);
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Discard the file if necessary. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
         PASSED();
@@ -6352,8 +6118,9 @@ cache_image_api_error_check_3(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -6425,17 +6192,16 @@ cache_image_api_error_check_3(bool single_file_vfd)
  *-------------------------------------------------------------------------
  */
 
-static unsigned
-cache_image_api_error_check_4(bool single_file_vfd)
+static unsigned cache_image_api_error_check_4(bool single_file_vfd)
 {
-    const char               *fcn_name = "cache_image_api_error_check_4()";
-    char                      filename[512];
-    bool                      show_progress = false;
-    hid_t                     fapl_id       = H5I_INVALID_HID;
-    hid_t                     file_id       = H5I_INVALID_HID;
-    H5F_t                    *file_ptr      = NULL;
-    H5C_t                    *cache_ptr     = NULL;
-    int                       cp            = 0;
+    const char* fcn_name = "cache_image_api_error_check_4()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
     H5AC_cache_image_config_t cache_image_config;
 
     TESTING("metadata cache image api error check 4");
@@ -6449,149 +6215,137 @@ cache_image_api_error_check_4(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /*    1) Create a FAPL requesting  a cache image, but WITHOUT
      *           specifying the latest file format.
      */
     if (pass) {
-
         fapl_id = h5_fileaccess();
 
         if (fapl_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fileaccess() failed.\n";
         }
 
         if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_EARLIEST, H5F_LIBVER_V18) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_libver_bounds() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         /* set cache image config fields to taste */
-        cache_image_config.version            = H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION;
-        cache_image_config.generate_image     = true;
+        cache_image_config.version = H5AC__CURR_CACHE_IMAGE_CONFIG_VERSION;
+        cache_image_config.generate_image = true;
         cache_image_config.save_resize_status = false;
-        cache_image_config.entry_ageout       = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
+        cache_image_config.entry_ageout = H5AC__CACHE_IMAGE__ENTRY_AGEOUT__NONE;
 
         if (H5Pset_mdc_image_config(fapl_id, &cache_image_config) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Pset_mdc_image_config() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create a HDF5 file using the above FAPL. */
 
     if (pass) {
-
         file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
 
         if (file_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fcreate() failed.\n";
         }
         else {
-
-            file_ptr = (struct H5F_t *)H5VL_object_verify(file_id, H5I_FILE);
+            file_ptr = (struct H5F_t*)H5VL_object_verify(file_id, H5I_FILE);
 
             if (file_ptr == NULL) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "Can't get file_ptr.";
             }
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* get a pointer to the files internal data structure and then
      * to the cache structure
      */
     if (pass) {
-
         if (file_ptr->shared->cache == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "can't get cache pointer(1).\n";
         }
         else {
-
             cache_ptr = file_ptr->shared->cache;
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Create some datasets in the file. */
 
     if (pass) {
-
         create_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         assert(cache_ptr);
 
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(1).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Open the file read only. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ true,
@@ -6605,45 +6359,43 @@ cache_image_api_error_check_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Verify that the datasets exist and contain the
      *    expected data
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open the file R/W using the FAPL defined in 1) above.
      *
@@ -6651,132 +6403,119 @@ cache_image_api_error_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         file_id = H5Fopen(filename, H5F_ACC_RDWR, fapl_id);
 
         if (file_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fopen() failed.\n";
         }
         else {
-
-            file_ptr = (struct H5F_t *)H5VL_object_verify(file_id, H5I_FILE);
+            file_ptr = (struct H5F_t*)H5VL_object_verify(file_id, H5I_FILE);
 
             if (file_ptr == NULL) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "Can't get file_ptr.";
             }
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* get a pointer to the files internal data structure and then
      * to the cache structure
      */
     if (pass) {
-
         if (file_ptr->shared->cache == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "can't get cache pointer(1).\n";
         }
         else {
-
             cache_ptr = file_ptr->shared->cache;
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         if ((cache_ptr->load_image == true) || (cache_ptr->delete_image == true)) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "mdci sb extension message present?\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Open the file R/W using the FAPL defined in 1) above.
      *     Verify that the file does not contain a cache image.
      */
 
     if (pass) {
-
         file_id = H5Fopen(filename, H5F_ACC_RDWR, fapl_id);
 
         if (file_id < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fopen() failed.\n";
         }
         else {
-
-            file_ptr = (struct H5F_t *)H5VL_object_verify(file_id, H5I_FILE);
+            file_ptr = (struct H5F_t*)H5VL_object_verify(file_id, H5I_FILE);
 
             if (file_ptr == NULL) {
-
-                pass         = false;
+                pass = false;
                 failure_mssg = "Can't get file_ptr.";
             }
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* get a pointer to the files internal data structure and then
      * to the cache structure
      */
     if (pass) {
-
         if (file_ptr->shared->cache == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "can't get cache pointer(1).\n";
         }
         else {
-
             cache_ptr = file_ptr->shared->cache;
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         if ((cache_ptr->load_image == true) || (cache_ptr->delete_image == true)) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "mdci sb extension message present?\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Verify that the data sets contain the expected data
      *
@@ -6784,47 +6523,44 @@ cache_image_api_error_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 5);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Create several more data sets. */
 
     if (pass) {
-
         create_datasets(file_id, 6, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Open the file read write.
      *
@@ -6832,7 +6568,6 @@ cache_image_api_error_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -6846,8 +6581,9 @@ cache_image_api_error_check_4(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Verify the data sets exist and contain the expected  data.
      *
@@ -6855,55 +6591,52 @@ cache_image_api_error_check_4(bool single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 0, 10);
     }
 
 #if H5C_COLLECT_CACHE_STATS
     if (pass) {
-
         if (cache_ptr->images_loaded != 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "metadata cache image block loaded(2).";
         }
     }
 #endif /* H5C_COLLECT_CACHE_STATS */
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 16) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 17) Delete the file */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* tidy up */
-    if (fapl_id != -1)
+    if (fapl_id != -1) {
         H5Pclose(fapl_id);
+    }
 
     if (pass) {
         PASSED();
@@ -6912,8 +6645,9 @@ cache_image_api_error_check_4(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -7000,17 +6734,16 @@ cache_image_api_error_check_4(bool single_file_vfd)
  *
  *-------------------------------------------------------------------------
  */
-static unsigned
-get_free_sections_test(bool single_file_vfd)
+static unsigned get_free_sections_test(bool single_file_vfd)
 {
-    const char    *fcn_name = "get_free_sections_test()";
-    char           filename[512];
-    bool           show_progress = false;
-    hid_t          file_id       = H5I_INVALID_HID;
-    H5F_t         *file_ptr      = NULL;
-    H5C_t         *cache_ptr     = NULL;
+    const char* fcn_name = "get_free_sections_test()";
+    char filename[512];
+    bool show_progress = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
     h5_stat_size_t file_size;
-    int            cp = 0;
+    int cp = 0;
 
     TESTING("Cache image / H5Fget_free_sections() interaction");
 
@@ -7023,28 +6756,27 @@ get_free_sections_test(bool single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file with a cache image requested
      *    and persistent free space managers enabled.
      */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -7058,55 +6790,54 @@ get_free_sections_test(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some data sets, and then delete some of
      *    of those near the beginning of the file.
      */
 
     if (pass) {
-
         create_datasets(file_id, 1, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         verify_datasets(file_id, 1, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         delete_datasets(file_id, 1, 5);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file read only. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -7120,22 +6851,22 @@ get_free_sections_test(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Verify that a cache image exists, and has not been loaded. */
 
     if (pass) {
-
         if ((!file_ptr->shared->cache->load_image) || (file_ptr->shared->cache->image_loaded)) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpected cache image status.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Verify that one or more self referential FSMs
      *    have been stored at the end of the file just
@@ -7143,79 +6874,73 @@ get_free_sections_test(bool single_file_vfd)
      */
 
     if (pass) {
-
         /* file_ptr->shared->first_alloc_dealloc is set to false if the
          * file is opened R/O.
          */
-        if ((!H5_addr_defined(file_ptr->shared->eoa_fsm_fsalloc)) ||
-            (!H5_addr_defined(file_ptr->shared->cache->image_addr)) ||
+        if ((!H5_addr_defined(file_ptr->shared->eoa_fsm_fsalloc)) || (!H5_addr_defined(file_ptr->shared->cache->image_addr)) ||
             (H5_addr_gt(file_ptr->shared->eoa_fsm_fsalloc, file_ptr->shared->cache->image_addr))) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpected cache image status (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Call H5Fget_free_sections(). */
 
     if (pass) {
-
         if (H5Fget_free_sections(file_id, H5FD_MEM_DEFAULT, (size_t)0, NULL) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fget_free_sections() failed (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Verify that the cache image has been loaded and
      *    that the self referential FSMs have been floated.
      */
     if (pass) {
-
         if (!file_ptr->shared->cache->image_loaded) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "cache image not loaded (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Verify that the remaining data sets contain the expected data. */
 
     if (pass) {
-
         verify_datasets(file_id, 6, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (2).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open the file R/W. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -7229,136 +6954,128 @@ get_free_sections_test(bool single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Verify that a cache image exists, and has not been loaded. */
 
     if (pass) {
-
         if ((!file_ptr->shared->cache->load_image) || (file_ptr->shared->cache->image_loaded)) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpected cache image status.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Verify that one or more self referential FSMs
      *     have been stored at the end of the file just
      *     before the cache image.
      */
     if (pass) {
-
-        if ((!H5_addr_defined(file_ptr->shared->eoa_fsm_fsalloc)) ||
-            (!H5_addr_defined(file_ptr->shared->cache->image_addr)) ||
+        if ((!H5_addr_defined(file_ptr->shared->eoa_fsm_fsalloc)) || (!H5_addr_defined(file_ptr->shared->cache->image_addr)) ||
             (H5_addr_gt(file_ptr->shared->eoa_fsm_fsalloc, file_ptr->shared->cache->image_addr))) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpected cache image status (2).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Call H5Fget_free_sections(). */
 
     if (pass) {
-
         if (H5Fget_free_sections(file_id, H5FD_MEM_DEFAULT, (size_t)0, NULL) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fget_free_sections() failed (2).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 15) Verify that the cache image has been loaded and
      *     that the self referential FSMs have been floated.
      */
     if (pass) {
-
         if (!file_ptr->shared->cache->image_loaded) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "cache image not loaded (2).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 16) Verify that the remaining data sets contain the expected data. */
 
     if (pass) {
-
         verify_datasets(file_id, 6, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 17) Delete the remaining data sets. */
 
     if (pass) {
-
         delete_datasets(file_id, 6, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 18) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (3).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 19) Verify that file space has been reclaimed. */
 
     if (pass) {
-
         if ((file_size = h5_get_file_size(filename, H5P_DEFAULT)) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_get_file_size() failed.\n";
         }
         else if (file_size > 20 * 1024) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "unexpectedly large file size.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 20) Discard the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
         PASSED();
@@ -7367,8 +7084,9 @@ get_free_sections_test(bool single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 
@@ -7438,18 +7156,17 @@ get_free_sections_test(bool single_file_vfd)
  *
  *-------------------------------------------------------------------------
  */
-static unsigned
-evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
+static unsigned evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
 {
 #ifndef H5_HAVE_PARALLEL
-    const char *fcn_name = "evict_on_close_test()";
-    char        filename[512];
-    bool        show_progress = false;
-    bool        verbose       = false;
-    hid_t       file_id       = H5I_INVALID_HID;
-    H5F_t      *file_ptr      = NULL;
-    H5C_t      *cache_ptr     = NULL;
-    int         cp            = 0;
+    const char* fcn_name = "evict_on_close_test()";
+    char filename[512];
+    bool show_progress = false;
+    bool verbose = false;
+    hid_t file_id = H5I_INVALID_HID;
+    H5F_t* file_ptr = NULL;
+    H5C_t* cache_ptr = NULL;
+    int cp = 0;
 #endif /* H5_HAVE_PARALLEL */
 
     TESTING("Cache image / evict on close interaction");
@@ -7469,27 +7186,26 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
 
     pass = true;
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* setup the file name */
     if (pass) {
-
         if (h5_fixname(FILENAMES[0], H5P_DEFAULT, filename, sizeof(filename)) == NULL) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "h5_fixname() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 1) Create a HDF5 file without a cache image requested
      *    and persistent free space managers enabled.
      */
     if (pass) {
-
         open_hdf5_file(/* create_file        */ true,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -7503,45 +7219,44 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 2) Create some data sets and verify them.  */
 
     if (pass) {
-
         create_datasets(file_id, 1, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         verify_datasets(file_id, 1, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 3) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (1).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 4) Open the file R/W, and with cache image requested. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ false,
                        /* read_only          */ false,
@@ -7555,8 +7270,9 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 5) Verify the datasets created in 2) above.  This will
      *    force their (clean) metadata into the metadata cache,
@@ -7564,57 +7280,53 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
      */
 
     if (pass) {
-
         verify_datasets(file_id, 1, 10);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 6) Create some more datasets and verify them */
 
     if (pass) {
-
         create_datasets(file_id, 11, 20);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         verify_datasets(file_id, 11, 20);
     }
 
     if (verbose) {
-
         assert(cache_ptr);
 
-        fprintf(stdout, "index size / index dirty size = %lld / %lld\n", (long long)(cache_ptr->index_size),
-                (long long)(cache_ptr->dirty_index_size));
+        fprintf(stdout, "index size / index dirty size = %lld / %lld\n", (long long)(cache_ptr->index_size), (long long)(cache_ptr->dirty_index_size));
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 7) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (2).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 8) Open the file R/O and with evict on close enabled. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ true,
@@ -7628,45 +7340,44 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s*: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 9) Verify all datasets twice */
 
     if (pass) {
-
         verify_datasets(file_id, 1, 20);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         verify_datasets(file_id, 1, 20);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 10) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (3).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 11) Open the file R/w and with evict on close enabled. */
 
     if (pass) {
-
         open_hdf5_file(/* create_file        */ false,
                        /* mdci_sbem_expected */ true,
                        /* read_only          */ false,
@@ -7680,54 +7391,53 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
                        /* cache_ptr_ptr      */ &cache_ptr);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s*: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 12) Verify all datasets twice */
 
     if (pass) {
-
         verify_datasets(file_id, 1, 20);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
-
         verify_datasets(file_id, 1, 20);
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 13) Close the file. */
 
     if (pass) {
-
         if (H5Fclose(file_id) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "H5Fclose() failed (3).\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     /* 14) Discard the file. */
 
     if (pass) {
-
         if (HDremove(filename) < 0) {
-
-            pass         = false;
+            pass = false;
             failure_mssg = "HDremove() failed.\n";
         }
     }
 
-    if (show_progress)
+    if (show_progress) {
         fprintf(stdout, "%s: cp = %d, pass = %d.\n", fcn_name, cp++, pass);
+    }
 
     if (pass) {
         PASSED();
@@ -7736,8 +7446,9 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
         H5_FAILED();
     }
 
-    if (!pass)
+    if (!pass) {
         fprintf(stdout, "%s: failure_mssg = \"%s\".\n", __func__, failure_mssg);
+    }
 
     return !pass;
 #endif /* H5_HAVE_PARALLEL */
@@ -7755,13 +7466,12 @@ evict_on_close_test(bool H5_ATTR_PARALLEL_UNUSED single_file_vfd)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    const char *driver_name;     /* File driver value from environment */
-    bool        single_file_vfd; /* Whether VFD used stores data in a single file */
-    unsigned    nerrs = 0;
-    int         express_test;
+    const char* driver_name; /* File driver value from environment */
+    bool single_file_vfd;    /* Whether VFD used stores data in a single file */
+    unsigned nerrs = 0;
+    int express_test;
 
     /* Get the VFD to use */
     driver_name = h5_get_test_driver_name();

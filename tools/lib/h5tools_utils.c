@@ -21,13 +21,13 @@
 #include "h5trav.h"
 
 #ifdef H5_HAVE_ROS3_VFD
-#include "H5FDros3.h"
+    #include "H5FDros3.h"
 #endif
 
 /* Global variables */
-unsigned           h5tools_nCols    = 80;
-static int         h5tools_d_status = 0;
-static const char *h5tools_progname = "h5tools";
+unsigned h5tools_nCols = 80;
+static int h5tools_d_status = 0;
+static const char* h5tools_progname = "h5tools";
 
 /*
  * The output functions need a temporary buffer to hold a piece of the
@@ -42,16 +42,16 @@ hsize_t H5TOOLS_BUFSIZE = (32 * 1024 * 1024); /* 32 MB */
 
 /* ``parallel_print'' variables */
 unsigned char g_Parallel = 0; /*0 for serial, 1 for parallel */
-char          outBuff[OUTBUFF_SIZE];
-unsigned      outBuffOffset;
-FILE         *overflow_file = NULL;
+char outBuff[OUTBUFF_SIZE];
+unsigned outBuffOffset;
+FILE* overflow_file = NULL;
 
 /* local functions */
-static void init_table(hid_t fid, table_t **tbl);
+static void init_table(hid_t fid, table_t** tbl);
 #ifdef H5DUMP_DEBUG
-static void dump_table(hid_t fid, char *tablename, table_t *table);
+static void dump_table(hid_t fid, char* tablename, table_t* table);
 #endif /* H5DUMP_DEBUG */
-static void add_obj(table_t *table, const H5O_token_t *obj_token, const char *objname, bool recorded);
+static void add_obj(table_t* table, const H5O_token_t* obj_token, const char* objname, bool recorded);
 
 /*-------------------------------------------------------------------------
  * Function: parallel_print
@@ -59,16 +59,16 @@ static void add_obj(table_t *table, const H5O_token_t *obj_token, const char *ob
  * Purpose:  wrapper for printf for use in parallel mode.
  *-------------------------------------------------------------------------
  */
-void
-parallel_print(const char *format, ...)
+void parallel_print(const char* format, ...)
 {
-    int     bytes_written;
+    int bytes_written;
     va_list ap;
 
     va_start(ap, format);
 
-    if (!g_Parallel)
+    if (!g_Parallel) {
         vprintf(format, ap);
+    }
     else {
         if (overflow_file == NULL) /*no overflow has occurred yet */ {
             bytes_written = vsnprintf(outBuff + outBuffOffset, OUTBUFF_SIZE - outBuffOffset, format, ap);
@@ -80,17 +80,20 @@ parallel_print(const char *format, ...)
                 outBuff[outBuffOffset] = '\0';
 
                 overflow_file = tmpfile();
-                if (overflow_file == NULL)
-                    fprintf(rawerrorstream,
-                            "warning: could not create overflow file.  Output may be truncated.\n");
-                else
+                if (overflow_file == NULL) {
+                    fprintf(rawerrorstream, "warning: could not create overflow file.  Output may be truncated.\n");
+                }
+                else {
                     bytes_written = vfprintf(overflow_file, format, ap);
+                }
             }
-            else
+            else {
                 outBuffOffset += (unsigned)bytes_written;
+            }
         }
-        else
+        else {
             bytes_written = vfprintf(overflow_file, format, ap);
+        }
     }
     va_end(ap);
 }
@@ -104,8 +107,7 @@ parallel_print(const char *format, ...)
  * Return:   Nothing
  *-------------------------------------------------------------------------
  */
-void
-error_msg(const char *fmt, ...)
+void error_msg(const char* fmt, ...)
 {
     va_list ap;
 
@@ -128,8 +130,7 @@ error_msg(const char *fmt, ...)
  * Return:   Nothing
  *-------------------------------------------------------------------------
  */
-void
-warn_msg(const char *fmt, ...)
+void warn_msg(const char* fmt, ...)
 {
     va_list ap;
 
@@ -150,8 +151,7 @@ warn_msg(const char *fmt, ...)
  * Return:   Nothing
  *-------------------------------------------------------------------------
  */
-void
-help_ref_msg(FILE *output)
+void help_ref_msg(FILE* output)
 {
     fprintf(output, "Try '-h' or '--help' for more information or ");
     fprintf(output, "see the <%s> entry in the 'HDF5 Reference Manual'.\n", h5tools_getprogname());
@@ -172,30 +172,33 @@ help_ref_msg(FILE *output)
  * Return:      <none>
  *-------------------------------------------------------------------------
  */
-void
-parse_hsize_list(const char *h_list, subset_d *d)
+void parse_hsize_list(const char* h_list, subset_d* d)
 {
-    hsize_t     *p_list;
-    const char  *ptr;
+    hsize_t* p_list;
+    const char* ptr;
     unsigned int size_count = 0;
-    unsigned int i          = 0;
+    unsigned int i = 0;
     unsigned int last_digit = 0;
 
-    if (!h_list || !*h_list || *h_list == ';')
+    if (!h_list || !*h_list || *h_list == ';') {
         return;
+    }
 
     H5TOOLS_START_DEBUG(" - h_list:%s", h_list);
     /* count how many integers do we have */
-    for (ptr = h_list; ptr && *ptr && *ptr != ';' && *ptr != ']'; ptr++)
+    for (ptr = h_list; ptr && *ptr && *ptr != ';' && *ptr != ']'; ptr++) {
         if (isdigit(*ptr)) {
-            if (!last_digit)
+            if (!last_digit) {
                 /* the last read character wasn't a digit */
                 size_count++;
+            }
 
             last_digit = 1;
         }
-        else
+        else {
             last_digit = 0;
+        }
+    }
 
     if (size_count == 0) {
         /* there aren't any integers to read */
@@ -205,20 +208,23 @@ parse_hsize_list(const char *h_list, subset_d *d)
     H5TOOLS_DEBUG("Number integers to read=%ld", size_count);
 
     /* allocate an array for the integers in the list */
-    if ((p_list = (hsize_t *)calloc(size_count, sizeof(hsize_t))) == NULL)
+    if ((p_list = (hsize_t*)calloc(size_count, sizeof(hsize_t))) == NULL) {
         H5TOOLS_INFO("Unable to allocate space for subset data");
+    }
 
-    for (ptr = h_list; i < size_count && ptr && *ptr && *ptr != ';' && *ptr != ']'; ptr++)
+    for (ptr = h_list; i < size_count && ptr && *ptr && *ptr != ';' && *ptr != ']'; ptr++) {
         if (isdigit(*ptr)) {
             /* we should have an integer now */
             p_list[i++] = (hsize_t)strtoull(ptr, NULL, 0);
 
-            while (isdigit(*ptr))
+            while (isdigit(*ptr)) {
                 /* scroll to end of integer */
                 ptr++;
+            }
         }
+    }
     d->data = p_list;
-    d->len  = size_count;
+    d->len = size_count;
     H5TOOLS_ENDDEBUG(" ");
 }
 
@@ -231,46 +237,53 @@ parse_hsize_list(const char *h_list, subset_d *d)
  *              Failure:    NULL
  *-------------------------------------------------------------------------
  */
-struct subset_t *
-parse_subset_params(const char *dset)
+struct subset_t* parse_subset_params(const char* dset)
 {
-    struct subset_t *s = NULL;
-    char            *brace;
-    const char      *q_dset;
+    struct subset_t* s = NULL;
+    char* brace;
+    const char* q_dset;
 
     H5TOOLS_START_DEBUG(" - dset:%s", dset);
     /* if dset name is quoted wait till after second quote to look for subset brackets */
-    if (*dset == '"')
+    if (*dset == '"') {
         q_dset = strchr(dset, '"');
-    else
+    }
+    else {
         q_dset = dset;
+    }
     if ((brace = strrchr(q_dset, '[')) != NULL) {
         *brace++ = '\0';
 
-        s = (struct subset_t *)calloc(1, sizeof(struct subset_t));
+        s = (struct subset_t*)calloc(1, sizeof(struct subset_t));
         parse_hsize_list(brace, &s->start);
 
-        while (*brace && *brace != ';')
+        while (*brace && *brace != ';') {
             brace++;
+        }
 
-        if (*brace)
+        if (*brace) {
             brace++;
+        }
 
         parse_hsize_list(brace, &s->stride);
 
-        while (*brace && *brace != ';')
+        while (*brace && *brace != ';') {
             brace++;
+        }
 
-        if (*brace)
+        if (*brace) {
             brace++;
+        }
 
         parse_hsize_list(brace, &s->count);
 
-        while (*brace && *brace != ';')
+        while (*brace && *brace != ';') {
             brace++;
+        }
 
-        if (*brace)
+        if (*brace) {
             brace++;
+        }
 
         parse_hsize_list(brace, &s->block);
     }
@@ -339,17 +352,16 @@ parse_subset_params(const char *dset)
  *
  *****************************************************************************
  */
-herr_t
-parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char ***ptrs_out)
+herr_t parse_tuple(const char* start, int sep, char** cpy_out, unsigned* nelems, char*** ptrs_out)
 {
-    char    *elem_ptr    = NULL;
-    char    *dest_ptr    = NULL;
+    char* elem_ptr = NULL;
+    char* dest_ptr = NULL;
     unsigned elems_count = 0;
-    char   **elems       = NULL; /* more like *elems[], but compiler... */
-    char   **elems_re    = NULL; /* temporary pointer, for realloc */
-    char    *cpy         = NULL;
-    herr_t   ret_value   = SUCCEED;
-    unsigned init_slots  = 2;
+    char** elems = NULL;    /* more like *elems[], but compiler... */
+    char** elems_re = NULL; /* temporary pointer, for realloc */
+    char* cpy = NULL;
+    herr_t ret_value = SUCCEED;
+    unsigned init_slots = 2;
 
     /*****************
      * SANITY-CHECKS *
@@ -380,7 +392,7 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
 
     /* create list
      */
-    elems = (char **)malloc(sizeof(char *) * (init_slots + 1));
+    elems = (char**)malloc(sizeof(char*) * (init_slots + 1));
     if (elems == NULL) {
         ret_value = FAIL;
         goto done;
@@ -388,8 +400,8 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
 
     /* create destination string
      */
-    start++;                                              /* advance past opening paren '(' */
-    cpy = (char *)malloc(sizeof(char) * (strlen(start))); /* no +1; less '(' */
+    start++;                                             /* advance past opening paren '(' */
+    cpy = (char*)malloc(sizeof(char) * (strlen(start))); /* no +1; less '(' */
     if (cpy == NULL) {
         ret_value = FAIL;
         goto done;
@@ -397,8 +409,8 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
 
     /* set pointers
      */
-    dest_ptr             = cpy;      /* start writing copy here */
-    elem_ptr             = cpy;      /* first element starts here */
+    dest_ptr = cpy;                  /* start writing copy here */
+    elem_ptr = cpy;                  /* first element starts here */
     elems[elems_count++] = elem_ptr; /* set first element pointer into list */
 
     /*********
@@ -442,7 +454,7 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
              */
             if (elems_count == init_slots) {
                 init_slots *= 2;
-                elems_re = (char **)realloc(elems, sizeof(char *) * (init_slots + 1));
+                elems_re = (char**)realloc(elems, sizeof(char*) * (init_slots + 1));
                 if (elems_re == NULL) {
                     /* CANTREALLOC */
                     ret_value = FAIL;
@@ -465,7 +477,7 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
             *(dest_ptr++) = *(start++);
         }
     }
-    *dest_ptr          = '\0'; /* Null-terminate destination string. */
+    *dest_ptr = '\0';          /* Null-terminate destination string. */
     elems[elems_count] = NULL; /* Null-terminate elements list. */
 
     /********************
@@ -473,16 +485,18 @@ parse_tuple(const char *start, int sep, char **cpy_out, unsigned *nelems, char *
      ********************/
 
     *ptrs_out = elems;
-    *nelems   = elems_count;
-    *cpy_out  = cpy;
+    *nelems = elems_count;
+    *cpy_out = cpy;
 
 done:
     if (ret_value == FAIL) {
         /* CLEANUP */
-        if (cpy)
+        if (cpy) {
             free(cpy);
-        if (elems)
+        }
+        if (elems) {
             free(elems);
+        }
     }
 
     return ret_value;
@@ -497,12 +511,12 @@ done:
  * Return:   void
  *-------------------------------------------------------------------------
  */
-void
-indentation(unsigned x)
+void indentation(unsigned x)
 {
     if (x < h5tools_nCols) {
-        while (x-- > 0)
+        while (x-- > 0) {
             PRINTVALSTREAM(rawoutstream, " ");
+        }
     }
     else {
         fprintf(rawerrorstream, "error: the indentation exceeds the number of cols.\n");
@@ -519,11 +533,16 @@ indentation(unsigned x)
  * Return:   void
  *-------------------------------------------------------------------------
  */
-void
-print_version(const char *progname)
+void print_version(const char* progname)
 {
-    PRINTSTREAM(rawoutstream, "%s: Version %u.%u.%u%s%s\n", progname, H5_VERS_MAJOR, H5_VERS_MINOR,
-                H5_VERS_RELEASE, ((const char *)H5_VERS_SUBRELEASE)[0] ? "-" : "", H5_VERS_SUBRELEASE);
+    PRINTSTREAM(rawoutstream,
+                "%s: Version %u.%u.%u%s%s\n",
+                progname,
+                H5_VERS_MAJOR,
+                H5_VERS_MINOR,
+                H5_VERS_RELEASE,
+                ((const char*)H5_VERS_SUBRELEASE)[0] ? "-" : "",
+                H5_VERS_SUBRELEASE);
 }
 
 /*-------------------------------------------------------------------------
@@ -535,15 +554,14 @@ print_version(const char *progname)
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-init_table(hid_t fid, table_t **tbl)
+static void init_table(hid_t fid, table_t** tbl)
 {
-    table_t *table = (table_t *)malloc(sizeof(table_t));
+    table_t* table = (table_t*)malloc(sizeof(table_t));
 
-    table->fid   = fid;
-    table->size  = 20;
+    table->fid = fid;
+    table->size = 20;
     table->nobjs = 0;
-    table->objs  = (obj_t *)malloc(table->size * sizeof(obj_t));
+    table->objs = (obj_t*)malloc(table->size * sizeof(obj_t));
 
     *tbl = table;
 }
@@ -557,15 +575,16 @@ init_table(hid_t fid, table_t **tbl)
  * Return:      void
  *-------------------------------------------------------------------------
  */
-void
-free_table(table_t *table)
+void free_table(table_t* table)
 {
     unsigned u; /* Local index value */
 
     /* Free the names for the objects in the table */
-    for (u = 0; u < table->nobjs; u++)
-        if (table->objs[u].objname)
+    for (u = 0; u < table->nobjs; u++) {
+        if (table->objs[u].objname) {
             free(table->objs[u].objname);
+        }
+    }
 
     free(table->objs);
     free(table);
@@ -581,18 +600,16 @@ free_table(table_t *table)
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-dump_table(hid_t fid, char *tablename, table_t *table)
+static void dump_table(hid_t fid, char* tablename, table_t* table)
 {
     unsigned u;
-    char    *obj_tok_str = NULL;
+    char* obj_tok_str = NULL;
 
     PRINTSTREAM(rawoutstream, "%s: # of entries = %d\n", tablename, table->nobjs);
     for (u = 0; u < table->nobjs; u++) {
         H5Otoken_to_str(fid, &table->objs[u].obj_token, &obj_tok_str);
 
-        PRINTSTREAM(rawoutstream, "%s %s %d %d\n", obj_tok_str, table->objs[u].objname,
-                    table->objs[u].displayed, table->objs[u].recorded);
+        PRINTSTREAM(rawoutstream, "%s %s %d %d\n", obj_tok_str, table->objs[u].objname, table->objs[u].displayed, table->objs[u].recorded);
 
         H5free_memory(obj_tok_str);
     }
@@ -606,8 +623,7 @@ dump_table(hid_t fid, char *tablename, table_t *table)
  * Return:      void
  *-------------------------------------------------------------------------
  */
-void
-dump_tables(find_objs_t *info)
+void dump_tables(find_objs_t* info)
 {
     dump_table(info->fid, "group_table", info->group_table);
     dump_table(info->fid, "dset_table", info->dset_table);
@@ -625,17 +641,18 @@ dump_tables(find_objs_t *info)
  *              Failure:    FAIL   if object is not found
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE obj_t *
-search_obj(table_t *table, const H5O_token_t *obj_token)
+H5_ATTR_PURE obj_t* search_obj(table_t* table, const H5O_token_t* obj_token)
 {
     unsigned u;
-    int      token_cmp;
+    int token_cmp;
 
     for (u = 0; u < table->nobjs; u++) {
-        if (H5Otoken_cmp(table->fid, &table->objs[u].obj_token, obj_token, &token_cmp) < 0)
+        if (H5Otoken_cmp(table->fid, &table->objs[u].obj_token, obj_token, &token_cmp) < 0) {
             return NULL;
-        if (!token_cmp)
+        }
+        if (!token_cmp) {
             return &(table->objs[u]);
+        }
     }
 
     return NULL;
@@ -651,68 +668,69 @@ search_obj(table_t *table, const H5O_token_t *obj_token)
  *              Failure:    FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-find_objs_cb(const char *name, const H5O_info2_t *oinfo, bool already_seen,
-             const trav_seen_t H5_ATTR_UNUSED *visited_obj_info, void *op_data)
+static herr_t find_objs_cb(const char* name, const H5O_info2_t* oinfo, bool already_seen, const trav_seen_t H5_ATTR_UNUSED* visited_obj_info, void* op_data)
 {
-    find_objs_t *info      = (find_objs_t *)op_data;
-    herr_t       ret_value = 0;
+    find_objs_t* info = (find_objs_t*)op_data;
+    herr_t ret_value = 0;
 
     switch (oinfo->type) {
-        case H5O_TYPE_GROUP:
-            if (!already_seen)
-                add_obj(info->group_table, &oinfo->token, name, true);
-            break;
+    case H5O_TYPE_GROUP:
+        if (!already_seen) {
+            add_obj(info->group_table, &oinfo->token, name, true);
+        }
+        break;
 
-        case H5O_TYPE_DATASET:
-            if (!already_seen) {
-                hid_t dset = H5I_INVALID_HID;
+    case H5O_TYPE_DATASET:
+        if (!already_seen) {
+            hid_t dset = H5I_INVALID_HID;
 
-                /* Add the dataset to the list of objects */
-                add_obj(info->dset_table, &oinfo->token, name, true);
+            /* Add the dataset to the list of objects */
+            add_obj(info->dset_table, &oinfo->token, name, true);
 
-                /* Check for a dataset that uses a named datatype */
-                if ((dset = H5Dopen2(info->fid, name, H5P_DEFAULT)) >= 0) {
-                    hid_t type = H5Dget_type(dset);
+            /* Check for a dataset that uses a named datatype */
+            if ((dset = H5Dopen2(info->fid, name, H5P_DEFAULT)) >= 0) {
+                hid_t type = H5Dget_type(dset);
 
-                    if (H5Tcommitted(type) > 0) {
-                        H5O_info2_t type_oinfo;
+                if (H5Tcommitted(type) > 0) {
+                    H5O_info2_t type_oinfo;
 
-                        H5Oget_info3(type, &type_oinfo, H5O_INFO_BASIC);
-                        if (search_obj(info->type_table, &type_oinfo.token) == NULL)
-                            add_obj(info->type_table, &type_oinfo.token, name, false);
-                    } /* end if */
-
-                    H5Tclose(type);
-                    H5Dclose(dset);
+                    H5Oget_info3(type, &type_oinfo, H5O_INFO_BASIC);
+                    if (search_obj(info->type_table, &type_oinfo.token) == NULL) {
+                        add_obj(info->type_table, &type_oinfo.token, name, false);
+                    }
                 } /* end if */
-                else
-                    ret_value = FAIL;
+
+                H5Tclose(type);
+                H5Dclose(dset);
             } /* end if */
-            break;
+            else {
+                ret_value = FAIL;
+            }
+        } /* end if */
+        break;
 
-        case H5O_TYPE_NAMED_DATATYPE:
-            if (!already_seen) {
-                obj_t *found_obj;
+    case H5O_TYPE_NAMED_DATATYPE:
+        if (!already_seen) {
+            obj_t* found_obj;
 
-                if ((found_obj = search_obj(info->type_table, &oinfo->token)) == NULL)
-                    add_obj(info->type_table, &oinfo->token, name, true);
-                else {
-                    /* Use latest version of name */
-                    free(found_obj->objname);
-                    found_obj->objname = strdup(name);
+            if ((found_obj = search_obj(info->type_table, &oinfo->token)) == NULL) {
+                add_obj(info->type_table, &oinfo->token, name, true);
+            }
+            else {
+                /* Use latest version of name */
+                free(found_obj->objname);
+                found_obj->objname = strdup(name);
 
-                    /* Mark named datatype as having valid name */
-                    found_obj->recorded = true;
-                } /* end else */
-            }     /* end if */
-            break;
+                /* Mark named datatype as having valid name */
+                found_obj->recorded = true;
+            } /* end else */
+        } /* end if */
+        break;
 
-        case H5O_TYPE_MAP:
-        case H5O_TYPE_UNKNOWN:
-        case H5O_TYPE_NTYPES:
-        default:
-            break;
+    case H5O_TYPE_MAP:
+    case H5O_TYPE_UNKNOWN:
+    case H5O_TYPE_NTYPES:
+    default              : break;
     } /* end switch */
 
     return ret_value;
@@ -728,8 +746,7 @@ find_objs_cb(const char *name, const H5O_info2_t *oinfo, bool already_seen,
  *              Failure:    FAIL
  *-------------------------------------------------------------------------
  */
-herr_t
-init_objs(hid_t fid, find_objs_t *info, table_t **group_table, table_t **dset_table, table_t **type_table)
+herr_t init_objs(hid_t fid, find_objs_t* info, table_t** group_table, table_t** dset_table, table_t** type_table)
 {
     herr_t ret_value = SUCCEED;
 
@@ -739,14 +756,15 @@ init_objs(hid_t fid, find_objs_t *info, table_t **group_table, table_t **dset_ta
     init_table(fid, type_table);
 
     /* Init the find_objs_t */
-    info->fid         = fid;
+    info->fid = fid;
     info->group_table = *group_table;
-    info->type_table  = *type_table;
-    info->dset_table  = *dset_table;
+    info->type_table = *type_table;
+    info->dset_table = *dset_table;
 
     /* Find all shared objects */
-    if ((ret_value = h5trav_visit(fid, "/", true, true, find_objs_cb, NULL, info, H5O_INFO_BASIC)) < 0)
+    if ((ret_value = h5trav_visit(fid, "/", true, true, find_objs_cb, NULL, info, H5O_INFO_BASIC)) < 0) {
         H5TOOLS_GOTO_ERROR(FAIL, "finding shared objects failed");
+    }
 
 done:
     /* Release resources */
@@ -770,15 +788,14 @@ done:
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-add_obj(table_t *table, const H5O_token_t *obj_token, const char *objname, bool record)
+static void add_obj(table_t* table, const H5O_token_t* obj_token, const char* objname, bool record)
 {
     size_t u;
 
     /* See if we need to make table larger */
     if (table->nobjs == table->size) {
         table->size *= 2;
-        table->objs = (struct obj_t *)realloc(table->objs, table->size * sizeof(table->objs[0]));
+        table->objs = (struct obj_t*)realloc(table->objs, table->size * sizeof(table->objs[0]));
     } /* end if */
 
     /* Increment number of objects in table */
@@ -786,8 +803,8 @@ add_obj(table_t *table, const H5O_token_t *obj_token, const char *objname, bool 
 
     /* Set information about object */
     memcpy(&table->objs[u].obj_token, obj_token, sizeof(H5O_token_t));
-    table->objs[u].objname   = strdup(objname);
-    table->objs[u].recorded  = record;
+    table->objs[u].objname = strdup(objname);
+    table->objs[u].recorded = record;
     table->objs[u].displayed = 0;
 }
 
@@ -802,8 +819,7 @@ add_obj(table_t *table, const H5O_token_t *obj_token, const char *objname, bool 
  *              NULL if fails.
  *-------------------------------------------------------------------------
  */
-FILE *
-tmpfile(void)
+FILE* tmpfile(void)
 {
     return NULL;
 }
@@ -830,15 +846,13 @@ tmpfile(void)
  * NOTE:
  *  link_info->trg_path must be freed out of this function
  *-------------------------------------------------------------------------*/
-int
-H5tools_get_symlink_info(hid_t file_id, const char *linkpath, h5tool_link_info_t *link_info,
-                         bool get_obj_type)
+int H5tools_get_symlink_info(hid_t file_id, const char* linkpath, h5tool_link_info_t* link_info, bool get_obj_type)
 {
-    htri_t      l_ret;
+    htri_t l_ret;
     H5O_info2_t trg_oinfo;
-    hid_t       fapl      = H5P_DEFAULT;
-    hid_t       lapl      = H5P_DEFAULT;
-    int         ret_value = -1; /* init to fail */
+    hid_t fapl = H5P_DEFAULT;
+    hid_t lapl = H5P_DEFAULT;
+    int ret_value = -1; /* init to fail */
 
     /* init */
     link_info->trg_type = H5O_TYPE_UNKNOWN;
@@ -851,34 +865,38 @@ H5tools_get_symlink_info(hid_t file_id, const char *linkpath, h5tool_link_info_t
 
     /* check if link itself exist */
     if (H5Lexists(file_id, linkpath, H5P_DEFAULT) <= 0) {
-        if (link_info->opt.msg_mode == 1)
+        if (link_info->opt.msg_mode == 1) {
             parallel_print("Warning: link <%s> doesn't exist \n", linkpath);
+        }
         H5TOOLS_GOTO_DONE(FAIL);
     } /* end if */
 
     /* get info from link */
     if (H5Lget_info2(file_id, linkpath, &(link_info->linfo), H5P_DEFAULT) < 0) {
-        if (link_info->opt.msg_mode == 1)
+        if (link_info->opt.msg_mode == 1) {
             parallel_print("Warning: unable to get link info from <%s>\n", linkpath);
+        }
         H5TOOLS_GOTO_DONE(FAIL);
     } /* end if */
 
     /* given path is hard link (object) */
-    if (link_info->linfo.type == H5L_TYPE_HARD)
+    if (link_info->linfo.type == H5L_TYPE_HARD) {
         H5TOOLS_GOTO_DONE(2);
+    }
 
     /* trg_path must be freed out of this function when finished using */
-    if ((link_info->trg_path = (char *)calloc(link_info->linfo.u.val_size, sizeof(char))) == NULL) {
-        if (link_info->opt.msg_mode == 1)
+    if ((link_info->trg_path = (char*)calloc(link_info->linfo.u.val_size, sizeof(char))) == NULL) {
+        if (link_info->opt.msg_mode == 1) {
             parallel_print("Warning: unable to allocate buffer for <%s>\n", linkpath);
+        }
         H5TOOLS_GOTO_DONE(FAIL);
     } /* end if */
 
     /* get link value */
-    if (H5Lget_val(file_id, linkpath, (void *)link_info->trg_path, link_info->linfo.u.val_size, H5P_DEFAULT) <
-        0) {
-        if (link_info->opt.msg_mode == 1)
+    if (H5Lget_val(file_id, linkpath, (void*)link_info->trg_path, link_info->linfo.u.val_size, H5P_DEFAULT) < 0) {
+        if (link_info->opt.msg_mode == 1) {
             parallel_print("Warning: unable to get link value from <%s>\n", linkpath);
+        }
         H5TOOLS_GOTO_DONE(FAIL);
     } /* end if */
 
@@ -887,14 +905,18 @@ H5tools_get_symlink_info(hid_t file_id, const char *linkpath, h5tool_link_info_t
      * follow object in other file
      */
     if (link_info->linfo.type == H5L_TYPE_EXTERNAL) {
-        if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+        if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
             H5TOOLS_GOTO_DONE(FAIL);
-        if (H5Pset_fapl_sec2(fapl) < 0)
+        }
+        if (H5Pset_fapl_sec2(fapl) < 0) {
             H5TOOLS_GOTO_DONE(FAIL);
-        if ((lapl = H5Pcreate(H5P_LINK_ACCESS)) < 0)
+        }
+        if ((lapl = H5Pcreate(H5P_LINK_ACCESS)) < 0) {
             H5TOOLS_GOTO_DONE(FAIL);
-        if (H5Pset_elink_fapl(lapl, fapl) < 0)
+        }
+        if (H5Pset_elink_fapl(lapl, fapl) < 0) {
             H5TOOLS_GOTO_DONE(FAIL);
+        }
     } /* end if */
 
     /* Check for retrieving object info */
@@ -915,34 +937,39 @@ H5tools_get_symlink_info(hid_t file_id, const char *linkpath, h5tool_link_info_t
 
         /* get target object info */
         if (H5Oget_info_by_name3(file_id, linkpath, &trg_oinfo, H5O_INFO_BASIC, lapl) < 0) {
-            if (link_info->opt.msg_mode == 1)
+            if (link_info->opt.msg_mode == 1) {
                 parallel_print("Warning: unable to get object information for <%s>\n", linkpath);
+            }
             H5TOOLS_GOTO_DONE(FAIL);
         } /* end if */
 
         /* check unknown type */
         if (trg_oinfo.type < H5O_TYPE_GROUP || trg_oinfo.type >= H5O_TYPE_NTYPES) {
-            if (link_info->opt.msg_mode == 1)
+            if (link_info->opt.msg_mode == 1) {
                 parallel_print("Warning: target object of <%s> is unknown type\n", linkpath);
+            }
             H5TOOLS_GOTO_DONE(FAIL);
         } /* end if */
 
         /* set target obj type to return */
         memcpy(&link_info->obj_token, &trg_oinfo.token, sizeof(H5O_token_t));
         link_info->trg_type = trg_oinfo.type;
-        link_info->fileno   = trg_oinfo.fileno;
+        link_info->fileno = trg_oinfo.fileno;
     } /* end if */
-    else
+    else {
         link_info->trg_type = H5O_TYPE_UNKNOWN;
+    }
 
     /* succeed */
     ret_value = 1;
 
 done:
-    if (fapl != H5P_DEFAULT)
+    if (fapl != H5P_DEFAULT) {
         H5Pclose(fapl);
-    if (lapl != H5P_DEFAULT)
+    }
+    if (lapl != H5P_DEFAULT) {
         H5Pclose(lapl);
+    }
 
     return ret_value;
 } /* end H5tools_get_symlink_info() */
@@ -956,26 +983,22 @@ done:
  *      These are utility functions to set/get the program name and operation status.
  *-------------------------------------------------------------------------
  */
-void
-h5tools_setprogname(const char *Progname)
+void h5tools_setprogname(const char* Progname)
 {
     h5tools_progname = Progname;
 }
 
-void
-h5tools_setstatus(int D_status)
+void h5tools_setstatus(int D_status)
 {
     h5tools_d_status = D_status;
 }
 
-H5_ATTR_PURE const char *
-h5tools_getprogname(void)
+H5_ATTR_PURE const char* h5tools_getprogname(void)
 {
     return h5tools_progname;
 }
 
-H5_ATTR_PURE int
-h5tools_getstatus(void)
+H5_ATTR_PURE int h5tools_getstatus(void)
 {
     return h5tools_d_status;
 }
@@ -987,19 +1010,19 @@ h5tools_getstatus(void)
  * This can be called from each tools main() as part of initial act.
  * Note: this is more of debugging purpose for now.
  */
-int
-h5tools_getenv_update_hyperslab_bufsize(void)
+int h5tools_getenv_update_hyperslab_bufsize(void)
 {
-    const char *env_str = NULL;
-    long        hyperslab_bufsize_mb;
-    int         ret_value = 1;
+    const char* env_str = NULL;
+    long hyperslab_bufsize_mb;
+    int ret_value = 1;
 
     /* check if environment variable is set for the hyperslab buffer size */
     if (NULL != (env_str = getenv("H5TOOLS_BUFSIZE"))) {
-        errno                = 0;
-        hyperslab_bufsize_mb = strtol(env_str, (char **)NULL, 10);
-        if (errno != 0 || hyperslab_bufsize_mb <= 0)
+        errno = 0;
+        hyperslab_bufsize_mb = strtol(env_str, (char**)NULL, 10);
+        if (errno != 0 || hyperslab_bufsize_mb <= 0) {
             H5TOOLS_GOTO_ERROR(FAIL, "hyperslab buffer size failed");
+        }
 
         /* convert MB to byte */
         H5TOOLS_BUFSIZE = (hsize_t)hyperslab_bufsize_mb * 1024 * 1024;
@@ -1025,41 +1048,45 @@ done:
  *
  *----------------------------------------------------------------------------
  */
-herr_t
-h5tools_parse_ros3_fapl_tuple(const char *tuple_str, int delim, H5FD_ros3_fapl_ext_t *fapl_config_out)
+herr_t h5tools_parse_ros3_fapl_tuple(const char* tuple_str, int delim, H5FD_ros3_fapl_ext_t* fapl_config_out)
 {
-    const char *ccred[4];
-    unsigned    nelems     = 0;
-    char       *s3cred_src = NULL;
-    char      **s3cred     = NULL;
-    herr_t      ret_value  = SUCCEED;
+    const char* ccred[4];
+    unsigned nelems = 0;
+    char* s3cred_src = NULL;
+    char** s3cred = NULL;
+    herr_t ret_value = SUCCEED;
 
     /* Attempt to parse S3 credentials tuple */
-    if (parse_tuple(tuple_str, delim, &s3cred_src, &nelems, &s3cred) < 0)
+    if (parse_tuple(tuple_str, delim, &s3cred_src, &nelems, &s3cred) < 0) {
         H5TOOLS_GOTO_ERROR(FAIL, "failed to parse S3 VFD info tuple");
+    }
 
     /* Sanity-check tuple count */
-    if (nelems != 3 && nelems != 4)
+    if (nelems != 3 && nelems != 4) {
         H5TOOLS_GOTO_ERROR(FAIL, "invalid S3 VFD credentials");
+    }
 
-    ccred[0] = (const char *)s3cred[0]; /* aws_region */
-    ccred[1] = (const char *)s3cred[1]; /* aws_access_key_id */
-    ccred[2] = (const char *)s3cred[2]; /* aws_secret_access_key */
+    ccred[0] = (const char*)s3cred[0]; /* aws_region */
+    ccred[1] = (const char*)s3cred[1]; /* aws_access_key_id */
+    ccred[2] = (const char*)s3cred[2]; /* aws_secret_access_key */
     if (nelems == 3) {
         ccred[3] = "";
     }
     else {
-        ccred[3] = (const char *)s3cred[3]; /* aws_session_token */
+        ccred[3] = (const char*)s3cred[3]; /* aws_session_token */
     }
 
-    if (FAIL == h5tools_populate_ros3_fapl(fapl_config_out, ccred, 4))
+    if (FAIL == h5tools_populate_ros3_fapl(fapl_config_out, ccred, 4)) {
         H5TOOLS_GOTO_ERROR(FAIL, "failed to populate S3 VFD FAPL config");
+    }
 
 done:
-    if (s3cred)
+    if (s3cred) {
         free(s3cred);
-    if (s3cred_src)
+    }
+    if (s3cred_src) {
         free(s3cred_src);
+    }
 
     return ret_value;
 }
@@ -1126,59 +1153,68 @@ done:
  *
  *----------------------------------------------------------------------------
  */
-herr_t
-h5tools_populate_ros3_fapl(H5FD_ros3_fapl_ext_t *fa, const char **values, size_t num_values)
+herr_t h5tools_populate_ros3_fapl(H5FD_ros3_fapl_ext_t* fa, const char** values, size_t num_values)
 {
     herr_t ret_value = SUCCEED;
 
     H5TOOLS_START_DEBUG("");
 
-    if (fa == NULL)
+    if (fa == NULL) {
         H5TOOLS_GOTO_ERROR(FAIL, "ERROR: null pointer to fapl_t\n");
-    if (values && (num_values < 3))
+    }
+    if (values && (num_values < 3)) {
         H5TOOLS_GOTO_ERROR(FAIL, "ERROR: too few values (< 3) provided\n");
+    }
 
     H5TOOLS_DEBUG("  preset fapl with default values\n");
-    fa->fa.version       = H5FD_CURR_ROS3_FAPL_T_VERSION;
-    fa->fa.authenticate  = false;
+    fa->fa.version = H5FD_CURR_ROS3_FAPL_T_VERSION;
+    fa->fa.authenticate = false;
     *(fa->fa.aws_region) = '\0';
-    *(fa->fa.secret_id)  = '\0';
+    *(fa->fa.secret_id) = '\0';
     *(fa->fa.secret_key) = '\0';
-    *(fa->token)         = '\0';
+    *(fa->token) = '\0';
 
     /* sanity-check supplied values */
     if (values != NULL) {
-        if (values[0] == NULL)
+        if (values[0] == NULL) {
             H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: aws_region value cannot be NULL\n");
-        if (values[1] == NULL)
+        }
+        if (values[1] == NULL) {
             H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: secret_id value cannot be NULL\n");
-        if (values[2] == NULL)
+        }
+        if (values[2] == NULL) {
             H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: secret_key value cannot be NULL\n");
-        if ((num_values > 3) && (values[3] == NULL))
+        }
+        if ((num_values > 3) && (values[3] == NULL)) {
             H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: token value cannot be NULL\n");
+        }
 
         /* if region and ID are supplied (key optional), write to fapl...
          * fail if value would overflow
          */
         if (*values[0] != '\0' && *values[1] != '\0') {
-            if (strlen(values[0]) > H5FD_ROS3_MAX_REGION_LEN)
+            if (strlen(values[0]) > H5FD_ROS3_MAX_REGION_LEN) {
                 H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: aws_region value too long\n");
+            }
             memcpy(fa->fa.aws_region, values[0], (strlen(values[0]) + 1));
             H5TOOLS_DEBUG("  aws_region set\n");
 
-            if (strlen(values[1]) > H5FD_ROS3_MAX_SECRET_ID_LEN)
+            if (strlen(values[1]) > H5FD_ROS3_MAX_SECRET_ID_LEN) {
                 H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: secret_id value too long\n");
+            }
             memcpy(fa->fa.secret_id, values[1], (strlen(values[1]) + 1));
             H5TOOLS_DEBUG("  secret_id set\n");
 
-            if (strlen(values[2]) > H5FD_ROS3_MAX_SECRET_KEY_LEN)
+            if (strlen(values[2]) > H5FD_ROS3_MAX_SECRET_KEY_LEN) {
                 H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: secret_key value too long\n");
+            }
             memcpy(fa->fa.secret_key, values[2], (strlen(values[2]) + 1));
             H5TOOLS_DEBUG("  secret_key set\n");
 
             if (num_values > 3) {
-                if (strlen(values[3]) > H5FD_ROS3_MAX_SECRET_TOK_LEN)
+                if (strlen(values[3]) > H5FD_ROS3_MAX_SECRET_TOK_LEN) {
                     H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: token value too long\n");
+                }
                 memcpy(fa->token, values[3], (strlen(values[3]) + 1));
                 H5TOOLS_DEBUG("  token set\n");
             }
@@ -1186,8 +1222,7 @@ h5tools_populate_ros3_fapl(H5FD_ros3_fapl_ext_t *fa, const char **values, size_t
             fa->fa.authenticate = true;
             H5TOOLS_DEBUG("  set to authenticate\n");
         }
-        else if (*values[0] != '\0' || *values[1] != '\0' || *values[2] != '\0' ||
-                 ((num_values > 3) && (*values[3] != '\0'))) {
+        else if (*values[0] != '\0' || *values[1] != '\0' || *values[2] != '\0' || ((num_values > 3) && (*values[3] != '\0'))) {
             H5TOOLS_GOTO_ERROR(FAIL, "  ERROR: invalid assortment of empty/non-empty values\n");
         }
     } /* values != NULL */
@@ -1210,54 +1245,59 @@ done:
  *
  *----------------------------------------------------------------------------
  */
-herr_t
-h5tools_parse_hdfs_fapl_tuple(const char *tuple_str, int delim, H5FD_hdfs_fapl_t *fapl_config_out)
+herr_t h5tools_parse_hdfs_fapl_tuple(const char* tuple_str, int delim, H5FD_hdfs_fapl_t* fapl_config_out)
 {
-    unsigned long k         = 0;
-    unsigned      nelems    = 0;
-    char         *props_src = NULL;
-    char        **props     = NULL;
-    herr_t        ret_value = SUCCEED;
+    unsigned long k = 0;
+    unsigned nelems = 0;
+    char* props_src = NULL;
+    char** props = NULL;
+    herr_t ret_value = SUCCEED;
 
     /* Attempt to parse HDFS configuration tuple */
-    if (parse_tuple(tuple_str, delim, &props_src, &nelems, &props) < 0)
+    if (parse_tuple(tuple_str, delim, &props_src, &nelems, &props) < 0) {
         H5TOOLS_GOTO_ERROR(FAIL, "failed to parse HDFS VFD configuration tuple");
+    }
 
     /* Sanity-check tuple count */
-    if (nelems != 5)
+    if (nelems != 5) {
         H5TOOLS_GOTO_ERROR(FAIL, "invalid HDFS VFD configuration");
+    }
 
     /* Populate fapl configuration structure with given properties.
      * WARNING: No error-checking is done on length of input strings...
      *          Silent overflow is possible, albeit unlikely.
      */
     if (strncmp(props[0], "", 1)) {
-        strncpy(fapl_config_out->namenode_name, (const char *)props[0], strlen(props[0]));
+        strncpy(fapl_config_out->namenode_name, (const char*)props[0], strlen(props[0]));
     }
     if (strncmp(props[1], "", 1)) {
-        k = strtoul((const char *)props[1], NULL, 0);
-        if (errno == ERANGE)
+        k = strtoul((const char*)props[1], NULL, 0);
+        if (errno == ERANGE) {
             H5TOOLS_GOTO_ERROR(FAIL, "supposed port number wasn't");
+        }
         fapl_config_out->namenode_port = (int32_t)k;
     }
     if (strncmp(props[2], "", 1)) {
-        strncpy(fapl_config_out->kerberos_ticket_cache, (const char *)props[2], strlen(props[2]));
+        strncpy(fapl_config_out->kerberos_ticket_cache, (const char*)props[2], strlen(props[2]));
     }
     if (strncmp(props[3], "", 1)) {
-        strncpy(fapl_config_out->user_name, (const char *)props[3], strlen(props[3]));
+        strncpy(fapl_config_out->user_name, (const char*)props[3], strlen(props[3]));
     }
     if (strncmp(props[4], "", 1)) {
-        k = strtoul((const char *)props[4], NULL, 0);
-        if (errno == ERANGE)
+        k = strtoul((const char*)props[4], NULL, 0);
+        if (errno == ERANGE) {
             H5TOOLS_GOTO_ERROR(FAIL, "supposed buffersize number wasn't");
+        }
         fapl_config_out->stream_buffer_size = (int32_t)k;
     }
 
 done:
-    if (props)
+    if (props) {
         free(props);
-    if (props_src)
+    }
+    if (props_src) {
         free(props_src);
+    }
 
     return ret_value;
 }

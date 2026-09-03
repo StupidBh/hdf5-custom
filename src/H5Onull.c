@@ -25,7 +25,7 @@
 #include "H5Opkg.h"    /* Object headers			*/
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_NULL[1] = {{
+const H5O_msg_class_t H5O_MSG_NULL[1] = { {
     H5O_NULL_ID, /*message id number             */
     "null",      /*message name for debugging    */
     0,           /*native message size           */
@@ -46,4 +46,4 @@ const H5O_msg_class_t H5O_MSG_NULL[1] = {{
     NULL,        /*no get creation index		*/
     NULL,        /*no set creation index		*/
     NULL         /*no debug method               */
-}};
+} };

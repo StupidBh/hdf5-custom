@@ -17,19 +17,18 @@
 #include "H5VMprivate.h"
 
 /* Local typedefs */
-typedef struct H5VM_memcpy_ud_t {
-    unsigned char       *dst; /* Pointer to destination buffer */
-    const unsigned char *src; /* Pointer to source buffer */
+typedef struct H5VM_memcpy_ud_t
+{
+    unsigned char* dst;       /* Pointer to destination buffer */
+    const unsigned char* src; /* Pointer to source buffer */
 } H5VM_memcpy_ud_t;
 
 /* Local macros */
 #define H5VM_HYPER_NDIMS H5O_LAYOUT_NDIMS
 
 /* Local prototypes */
-static void H5VM__stride_optimize1(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/,
-                                   const hsize_t *size, hsize_t *stride1);
-static void H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/,
-                                   const hsize_t *size, hsize_t *stride1, hsize_t *stride2);
+static void H5VM__stride_optimize1(unsigned* np /*in,out*/, hsize_t* elmt_size /*in,out*/, const hsize_t* size, hsize_t* stride1);
+static void H5VM__stride_optimize2(unsigned* np /*in,out*/, hsize_t* elmt_size /*in,out*/, const hsize_t* size, hsize_t* stride1, hsize_t* stride2);
 
 /*-------------------------------------------------------------------------
  * Function:    H5VM__stride_optimize1
@@ -46,9 +45,7 @@ static void H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /
  *
  *-------------------------------------------------------------------------
  */
-static void
-H5VM__stride_optimize1(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, const hsize_t *size,
-                       hsize_t *stride1)
+static void H5VM__stride_optimize1(unsigned* np /*in,out*/, hsize_t* elmt_size /*in,out*/, const hsize_t* size, hsize_t* stride1)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -60,8 +57,9 @@ H5VM__stride_optimize1(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
     /* Combine adjacent memory accesses */
     while (*np && stride1[*np - 1] > 0 && (hsize_t)(stride1[*np - 1]) == *elmt_size) {
         *elmt_size *= size[*np - 1];
-        if (--*np)
+        if (--*np) {
             stride1[*np - 1] += size[*np] * stride1[*np];
+        }
     }
 
     FUNC_LEAVE_NOAPI_VOID
@@ -82,9 +80,7 @@ H5VM__stride_optimize1(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
  *
  *-------------------------------------------------------------------------
  */
-static void
-H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, const hsize_t *size,
-                       hsize_t *stride1, hsize_t *stride2)
+static void H5VM__stride_optimize2(unsigned* np /*in,out*/, hsize_t* elmt_size /*in,out*/, const hsize_t* size, hsize_t* stride1, hsize_t* stride2)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -98,14 +94,34 @@ H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
 
     /* Unroll loop for common cases */
     switch (*np) {
-        case 1: /* For 0-D datasets (dunno if this ever gets used...) */
+    case 1: /* For 0-D datasets (dunno if this ever gets used...) */
+        if (stride1[0] == *elmt_size && stride2[0] == *elmt_size) {
+            *elmt_size *= size[0];
+            --*np; /* *np decrements to a value of 0 now */
+        } /* end if */
+        break;
+
+    case 2: /* For 1-D datasets */
+        if (stride1[1] == *elmt_size && stride2[1] == *elmt_size) {
+            *elmt_size *= size[1];
+            --*np; /* *np decrements to a value of 1 now */
+            stride1[0] += size[1] * stride1[1];
+            stride2[0] += size[1] * stride2[1];
+
             if (stride1[0] == *elmt_size && stride2[0] == *elmt_size) {
                 *elmt_size *= size[0];
                 --*np; /* *np decrements to a value of 0 now */
-            }          /* end if */
-            break;
+            } /* end if */
+        } /* end if */
+        break;
 
-        case 2: /* For 1-D datasets */
+    case 3: /* For 2-D datasets */
+        if (stride1[2] == *elmt_size && stride2[2] == *elmt_size) {
+            *elmt_size *= size[2];
+            --*np; /* *np decrements to a value of 2 now */
+            stride1[1] += size[2] * stride1[2];
+            stride2[1] += size[2] * stride2[2];
+
             if (stride1[1] == *elmt_size && stride2[1] == *elmt_size) {
                 *elmt_size *= size[1];
                 --*np; /* *np decrements to a value of 1 now */
@@ -115,11 +131,18 @@ H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
                 if (stride1[0] == *elmt_size && stride2[0] == *elmt_size) {
                     *elmt_size *= size[0];
                     --*np; /* *np decrements to a value of 0 now */
-                }          /* end if */
-            }              /* end if */
-            break;
+                } /* end if */
+            } /* end if */
+        } /* end if */
+        break;
 
-        case 3: /* For 2-D datasets */
+    case 4: /* For 3-D datasets */
+        if (stride1[3] == *elmt_size && stride2[3] == *elmt_size) {
+            *elmt_size *= size[3];
+            --*np; /* *np decrements to a value of 3 now */
+            stride1[2] += size[3] * stride1[3];
+            stride2[2] += size[3] * stride2[3];
+
             if (stride1[2] == *elmt_size && stride2[2] == *elmt_size) {
                 *elmt_size *= size[2];
                 --*np; /* *np decrements to a value of 2 now */
@@ -135,48 +158,21 @@ H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
                     if (stride1[0] == *elmt_size && stride2[0] == *elmt_size) {
                         *elmt_size *= size[0];
                         --*np; /* *np decrements to a value of 0 now */
-                    }          /* end if */
-                }              /* end if */
-            }                  /* end if */
-            break;
+                    } /* end if */
+                } /* end if */
+            } /* end if */
+        } /* end if */
+        break;
 
-        case 4: /* For 3-D datasets */
-            if (stride1[3] == *elmt_size && stride2[3] == *elmt_size) {
-                *elmt_size *= size[3];
-                --*np; /* *np decrements to a value of 3 now */
-                stride1[2] += size[3] * stride1[3];
-                stride2[2] += size[3] * stride2[3];
-
-                if (stride1[2] == *elmt_size && stride2[2] == *elmt_size) {
-                    *elmt_size *= size[2];
-                    --*np; /* *np decrements to a value of 2 now */
-                    stride1[1] += size[2] * stride1[2];
-                    stride2[1] += size[2] * stride2[2];
-
-                    if (stride1[1] == *elmt_size && stride2[1] == *elmt_size) {
-                        *elmt_size *= size[1];
-                        --*np; /* *np decrements to a value of 1 now */
-                        stride1[0] += size[1] * stride1[1];
-                        stride2[0] += size[1] * stride2[1];
-
-                        if (stride1[0] == *elmt_size && stride2[0] == *elmt_size) {
-                            *elmt_size *= size[0];
-                            --*np; /* *np decrements to a value of 0 now */
-                        }          /* end if */
-                    }              /* end if */
-                }                  /* end if */
-            }                      /* end if */
-            break;
-
-        default:
-            while (*np && stride1[*np - 1] == *elmt_size && stride2[*np - 1] == *elmt_size) {
-                *elmt_size *= size[*np - 1];
-                if (--*np) {
-                    stride1[*np - 1] += size[*np] * stride1[*np];
-                    stride2[*np - 1] += size[*np] * stride2[*np];
-                }
+    default:
+        while (*np && stride1[*np - 1] == *elmt_size && stride2[*np - 1] == *elmt_size) {
+            *elmt_size *= size[*np - 1];
+            if (--*np) {
+                stride1[*np - 1] += size[*np] * stride1[*np];
+                stride2[*np - 1] += size[*np] * stride2[*np];
             }
-            break;
+        }
+        break;
     } /* end switch */
 
     FUNC_LEAVE_NOAPI_VOID
@@ -203,13 +199,11 @@ H5VM__stride_optimize2(unsigned *np /*in,out*/, hsize_t *elmt_size /*in,out*/, c
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5VM_hyper_stride(unsigned n, const hsize_t *size, const hsize_t *total_size, const hsize_t *offset,
-                  hsize_t *stride /*out*/)
+hsize_t H5VM_hyper_stride(unsigned n, const hsize_t* size, const hsize_t* total_size, const hsize_t* offset, hsize_t* stride /*out*/)
 {
     hsize_t skip;      /*starting point byte offset		*/
     hsize_t acc;       /*accumulator				*/
-    int     i;         /*counter				*/
+    int i;             /*counter				*/
     hsize_t ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -222,54 +216,54 @@ H5VM_hyper_stride(unsigned n, const hsize_t *size, const hsize_t *total_size, co
     /* init */
     assert(n > 0);
     stride[n - 1] = 1;
-    skip          = offset ? offset[n - 1] : 0;
+    skip = offset ? offset[n - 1] : 0;
 
     switch (n) {
-        case 2: /* 1-D dataset */
-            assert(total_size[1] >= size[1]);
-            stride[0] = total_size[1] - size[1]; /*overflow checked*/
-            acc       = total_size[1];
-            skip += acc * (offset ? offset[0] : 0);
-            break;
+    case 2:                                  /* 1-D dataset */
+        assert(total_size[1] >= size[1]);
+        stride[0] = total_size[1] - size[1]; /*overflow checked*/
+        acc = total_size[1];
+        skip += acc * (offset ? offset[0] : 0);
+        break;
 
-        case 3: /* 2-D dataset */
-            assert(total_size[2] >= size[2]);
-            stride[1] = total_size[2] - size[2]; /*overflow checked*/
-            acc       = total_size[2];
-            skip += acc * (offset ? (hsize_t)offset[1] : 0);
+    case 3:                                  /* 2-D dataset */
+        assert(total_size[2] >= size[2]);
+        stride[1] = total_size[2] - size[2]; /*overflow checked*/
+        acc = total_size[2];
+        skip += acc * (offset ? (hsize_t)offset[1] : 0);
 
-            assert(total_size[1] >= size[1]);
-            stride[0] = acc * (total_size[1] - size[1]); /*overflow checked*/
-            acc *= total_size[1];
-            skip += acc * (offset ? (hsize_t)offset[0] : 0);
-            break;
+        assert(total_size[1] >= size[1]);
+        stride[0] = acc * (total_size[1] - size[1]); /*overflow checked*/
+        acc *= total_size[1];
+        skip += acc * (offset ? (hsize_t)offset[0] : 0);
+        break;
 
-        case 4: /* 3-D dataset */
-            assert(total_size[3] >= size[3]);
-            stride[2] = total_size[3] - size[3]; /*overflow checked*/
-            acc       = total_size[3];
-            skip += acc * (offset ? (hsize_t)offset[2] : 0);
+    case 4:                                  /* 3-D dataset */
+        assert(total_size[3] >= size[3]);
+        stride[2] = total_size[3] - size[3]; /*overflow checked*/
+        acc = total_size[3];
+        skip += acc * (offset ? (hsize_t)offset[2] : 0);
 
-            assert(total_size[2] >= size[2]);
-            stride[1] = acc * (total_size[2] - size[2]); /*overflow checked*/
-            acc *= total_size[2];
-            skip += acc * (offset ? (hsize_t)offset[1] : 0);
+        assert(total_size[2] >= size[2]);
+        stride[1] = acc * (total_size[2] - size[2]); /*overflow checked*/
+        acc *= total_size[2];
+        skip += acc * (offset ? (hsize_t)offset[1] : 0);
 
-            assert(total_size[1] >= size[1]);
-            stride[0] = acc * (total_size[1] - size[1]); /*overflow checked*/
-            acc *= total_size[1];
-            skip += acc * (offset ? (hsize_t)offset[0] : 0);
-            break;
+        assert(total_size[1] >= size[1]);
+        stride[0] = acc * (total_size[1] - size[1]); /*overflow checked*/
+        acc *= total_size[1];
+        skip += acc * (offset ? (hsize_t)offset[0] : 0);
+        break;
 
-        default:
-            /* others */
-            for (i = (int)(n - 2), acc = 1; i >= 0; --i) {
-                assert(total_size[i + 1] >= size[i + 1]);
-                stride[i] = acc * (total_size[i + 1] - size[i + 1]); /*overflow checked*/
-                acc *= total_size[i + 1];
-                skip += acc * (offset ? (hsize_t)offset[i] : 0);
-            }
-            break;
+    default:
+        /* others */
+        for (i = (int)(n - 2), acc = 1; i >= 0; --i) {
+            assert(total_size[i + 1] >= size[i + 1]);
+            stride[i] = acc * (total_size[i + 1] - size[i + 1]); /*overflow checked*/
+            acc *= total_size[i + 1];
+            skip += acc * (offset ? (hsize_t)offset[i] : 0);
+        }
+        break;
     } /* end switch */
 
     /* Set return value */
@@ -295,29 +289,32 @@ H5VM_hyper_stride(unsigned n, const hsize_t *size, const hsize_t *total_size, co
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5VM_hyper_eq(unsigned n, const hsize_t *offset1, const hsize_t *size1, const hsize_t *offset2,
-              const hsize_t *size2)
+htri_t H5VM_hyper_eq(unsigned n, const hsize_t* offset1, const hsize_t* size1, const hsize_t* offset2, const hsize_t* size2)
 {
-    hsize_t  nelmts1 = 1, nelmts2 = 1;
+    hsize_t nelmts1 = 1, nelmts2 = 1;
     unsigned i;
-    htri_t   ret_value = true; /* Return value */
+    htri_t ret_value = true; /* Return value */
 
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
-    if (n == 0)
+    if (n == 0) {
         HGOTO_DONE(true);
+    }
 
     for (i = 0; i < n; i++) {
-        if ((offset1 ? offset1[i] : 0) != (offset2 ? offset2[i] : 0))
+        if ((offset1 ? offset1[i] : 0) != (offset2 ? offset2[i] : 0)) {
             HGOTO_DONE(false);
-        if ((size1 ? size1[i] : 0) != (size2 ? size2[i] : 0))
+        }
+        if ((size1 ? size1[i] : 0) != (size2 ? size2[i] : 0)) {
             HGOTO_DONE(false);
-        if (0 == (nelmts1 *= (size1 ? size1[i] : 0)))
+        }
+        if (0 == (nelmts1 *= (size1 ? size1[i] : 0))) {
             HGOTO_DONE(false);
-        if (0 == (nelmts2 *= (size2 ? size2[i] : 0)))
+        }
+        if (0 == (nelmts2 *= (size2 ? size2[i] : 0))) {
             HGOTO_DONE(false);
+        }
     }
 
 done:
@@ -340,16 +337,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_hyper_fill(unsigned n, const hsize_t *_size, const hsize_t *total_size, const hsize_t *offset,
-                void *_dst, unsigned fill_value)
+herr_t H5VM_hyper_fill(unsigned n, const hsize_t* _size, const hsize_t* total_size, const hsize_t* offset, void* _dst, unsigned fill_value)
 {
-    uint8_t *dst = (uint8_t *)_dst;        /*cast for ptr arithmetic	*/
-    hsize_t  size[H5VM_HYPER_NDIMS];       /*a modifiable copy of _size	*/
-    hsize_t  dst_stride[H5VM_HYPER_NDIMS]; /*destination stride info  */
-    hsize_t  dst_start;                    /*byte offset to start of stride*/
-    hsize_t  elmt_size = 1;                /*bytes per element		*/
-    herr_t   ret_value;                    /*function return status	*/
+    uint8_t* dst = (uint8_t*)_dst;        /*cast for ptr arithmetic	*/
+    hsize_t size[H5VM_HYPER_NDIMS];       /*a modifiable copy of _size	*/
+    hsize_t dst_stride[H5VM_HYPER_NDIMS]; /*destination stride info  */
+    hsize_t dst_start;                    /*byte offset to start of stride*/
+    hsize_t elmt_size = 1;                /*bytes per element		*/
+    herr_t ret_value;                     /*function return status	*/
 #ifndef NDEBUG
     unsigned u;
 #endif
@@ -407,18 +402,23 @@ H5VM_hyper_fill(unsigned n, const hsize_t *_size, const hsize_t *total_size, con
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_hyper_copy(unsigned n, const hsize_t *_size, const hsize_t *dst_size, const hsize_t *dst_offset,
-                void *_dst, const hsize_t *src_size, const hsize_t *src_offset, const void *_src)
+herr_t H5VM_hyper_copy(unsigned n,
+                       const hsize_t* _size,
+                       const hsize_t* dst_size,
+                       const hsize_t* dst_offset,
+                       void* _dst,
+                       const hsize_t* src_size,
+                       const hsize_t* src_offset,
+                       const void* _src)
 {
-    const uint8_t *src = (const uint8_t *)_src;  /*cast for ptr arithmtc */
-    uint8_t       *dst = (uint8_t *)_dst;        /*cast for ptr arithmtc */
-    hsize_t        size[H5VM_HYPER_NDIMS];       /*a modifiable _size	*/
-    hsize_t        src_stride[H5VM_HYPER_NDIMS]; /*source stride info	*/
-    hsize_t        dst_stride[H5VM_HYPER_NDIMS]; /*dest stride info	*/
-    hsize_t        dst_start, src_start;         /*offset to start at	*/
-    hsize_t        elmt_size = 1;                /*element size in bytes */
-    herr_t         ret_value;                    /*return status		*/
+    const uint8_t* src = (const uint8_t*)_src; /*cast for ptr arithmtc */
+    uint8_t* dst = (uint8_t*)_dst;             /*cast for ptr arithmtc */
+    hsize_t size[H5VM_HYPER_NDIMS];            /*a modifiable _size	*/
+    hsize_t src_stride[H5VM_HYPER_NDIMS];      /*source stride info	*/
+    hsize_t dst_stride[H5VM_HYPER_NDIMS];      /*dest stride info	*/
+    hsize_t dst_start, src_start;              /*offset to start at	*/
+    hsize_t elmt_size = 1;                     /*element size in bytes */
+    herr_t ret_value;                          /*return status		*/
 #ifndef NDEBUG
     unsigned u;
 #endif
@@ -452,90 +452,90 @@ H5VM_hyper_copy(unsigned n, const hsize_t *_size, const hsize_t *dst_size, const
     {
         hsize_t dst_acc; /*accumulator				*/
         hsize_t src_acc; /*accumulator				*/
-        int     ii;      /*counter				*/
+        int ii;          /*counter				*/
 
         /* init */
         assert(n > 0);
         dst_stride[n - 1] = 1;
         src_stride[n - 1] = 1;
-        dst_start         = dst_offset ? dst_offset[n - 1] : 0;
-        src_start         = src_offset ? src_offset[n - 1] : 0;
+        dst_start = dst_offset ? dst_offset[n - 1] : 0;
+        src_start = src_offset ? src_offset[n - 1] : 0;
 
         /* Unroll loop for common cases */
         switch (n) {
-            case 2:
-                assert(dst_size[1] >= size[1]);
-                assert(src_size[1] >= size[1]);
-                dst_stride[0] = dst_size[1] - size[1]; /*overflow checked*/
-                src_stride[0] = src_size[1] - size[1]; /*overflow checked*/
-                dst_acc       = dst_size[1];
-                src_acc       = src_size[1];
-                dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
-                src_start += src_acc * (src_offset ? src_offset[0] : 0);
-                break;
+        case 2:
+            assert(dst_size[1] >= size[1]);
+            assert(src_size[1] >= size[1]);
+            dst_stride[0] = dst_size[1] - size[1]; /*overflow checked*/
+            src_stride[0] = src_size[1] - size[1]; /*overflow checked*/
+            dst_acc = dst_size[1];
+            src_acc = src_size[1];
+            dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
+            src_start += src_acc * (src_offset ? src_offset[0] : 0);
+            break;
 
-            case 3:
-                assert(dst_size[2] >= size[2]);
-                assert(src_size[2] >= size[2]);
-                dst_stride[1] = dst_size[2] - size[2]; /*overflow checked*/
-                src_stride[1] = src_size[2] - size[2]; /*overflow checked*/
-                dst_acc       = dst_size[2];
-                src_acc       = src_size[2];
-                dst_start += dst_acc * (dst_offset ? dst_offset[1] : 0);
-                src_start += src_acc * (src_offset ? src_offset[1] : 0);
+        case 3:
+            assert(dst_size[2] >= size[2]);
+            assert(src_size[2] >= size[2]);
+            dst_stride[1] = dst_size[2] - size[2]; /*overflow checked*/
+            src_stride[1] = src_size[2] - size[2]; /*overflow checked*/
+            dst_acc = dst_size[2];
+            src_acc = src_size[2];
+            dst_start += dst_acc * (dst_offset ? dst_offset[1] : 0);
+            src_start += src_acc * (src_offset ? src_offset[1] : 0);
 
-                assert(dst_size[1] >= size[1]);
-                assert(src_size[1] >= size[1]);
-                dst_stride[0] = dst_acc * (dst_size[1] - size[1]); /*overflow checked*/
-                src_stride[0] = src_acc * (src_size[1] - size[1]); /*overflow checked*/
-                dst_acc *= dst_size[1];
-                src_acc *= src_size[1];
-                dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
-                src_start += src_acc * (src_offset ? src_offset[0] : 0);
-                break;
+            assert(dst_size[1] >= size[1]);
+            assert(src_size[1] >= size[1]);
+            dst_stride[0] = dst_acc * (dst_size[1] - size[1]); /*overflow checked*/
+            src_stride[0] = src_acc * (src_size[1] - size[1]); /*overflow checked*/
+            dst_acc *= dst_size[1];
+            src_acc *= src_size[1];
+            dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
+            src_start += src_acc * (src_offset ? src_offset[0] : 0);
+            break;
 
-            case 4:
-                assert(dst_size[3] >= size[3]);
-                assert(src_size[3] >= size[3]);
-                dst_stride[2] = dst_size[3] - size[3]; /*overflow checked*/
-                src_stride[2] = src_size[3] - size[3]; /*overflow checked*/
-                dst_acc       = dst_size[3];
-                src_acc       = src_size[3];
-                dst_start += dst_acc * (dst_offset ? dst_offset[2] : 0);
-                src_start += src_acc * (src_offset ? src_offset[2] : 0);
+        case 4:
+            assert(dst_size[3] >= size[3]);
+            assert(src_size[3] >= size[3]);
+            dst_stride[2] = dst_size[3] - size[3]; /*overflow checked*/
+            src_stride[2] = src_size[3] - size[3]; /*overflow checked*/
+            dst_acc = dst_size[3];
+            src_acc = src_size[3];
+            dst_start += dst_acc * (dst_offset ? dst_offset[2] : 0);
+            src_start += src_acc * (src_offset ? src_offset[2] : 0);
 
-                assert(dst_size[2] >= size[2]);
-                assert(src_size[2] >= size[2]);
-                dst_stride[1] = dst_acc * (dst_size[2] - size[2]); /*overflow checked*/
-                src_stride[1] = src_acc * (src_size[2] - size[2]); /*overflow checked*/
-                dst_acc *= dst_size[2];
-                src_acc *= src_size[2];
-                dst_start += dst_acc * (dst_offset ? dst_offset[1] : 0);
-                src_start += src_acc * (src_offset ? src_offset[1] : 0);
+            assert(dst_size[2] >= size[2]);
+            assert(src_size[2] >= size[2]);
+            dst_stride[1] = dst_acc * (dst_size[2] - size[2]); /*overflow checked*/
+            src_stride[1] = src_acc * (src_size[2] - size[2]); /*overflow checked*/
+            dst_acc *= dst_size[2];
+            src_acc *= src_size[2];
+            dst_start += dst_acc * (dst_offset ? dst_offset[1] : 0);
+            src_start += src_acc * (src_offset ? src_offset[1] : 0);
 
-                assert(dst_size[1] >= size[1]);
-                assert(src_size[1] >= size[1]);
-                dst_stride[0] = dst_acc * (dst_size[1] - size[1]); /*overflow checked*/
-                src_stride[0] = src_acc * (src_size[1] - size[1]); /*overflow checked*/
-                dst_acc *= dst_size[1];
-                src_acc *= src_size[1];
-                dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
-                src_start += src_acc * (src_offset ? src_offset[0] : 0);
-                break;
+            assert(dst_size[1] >= size[1]);
+            assert(src_size[1] >= size[1]);
+            dst_stride[0] = dst_acc * (dst_size[1] - size[1]); /*overflow checked*/
+            src_stride[0] = src_acc * (src_size[1] - size[1]); /*overflow checked*/
+            dst_acc *= dst_size[1];
+            src_acc *= src_size[1];
+            dst_start += dst_acc * (dst_offset ? dst_offset[0] : 0);
+            src_start += src_acc * (src_offset ? src_offset[0] : 0);
+            break;
 
-            default:
-                /* others */
-                for (ii = (int)(n - 2), dst_acc = 1, src_acc = 1; ii >= 0; --ii) {
-                    assert(dst_size[ii + 1] >= size[ii + 1]);
-                    assert(src_size[ii + 1] >= size[ii + 1]);
-                    dst_stride[ii] = dst_acc * (dst_size[ii + 1] - size[ii + 1]); /*overflow checked*/
-                    src_stride[ii] = src_acc * (src_size[ii + 1] - size[ii + 1]); /*overflow checked*/
-                    dst_acc *= dst_size[ii + 1];
-                    src_acc *= src_size[ii + 1];
-                    dst_start += dst_acc * (dst_offset ? dst_offset[ii] : 0);
-                    src_start += src_acc * (src_offset ? src_offset[ii] : 0);
-                }
-                break;
+        default:
+            /* others */
+            for (ii = (int)(n - 2), dst_acc = 1, src_acc = 1; ii >= 0; --ii) {
+                assert(dst_size[ii + 1] >= size[ii + 1]);
+                assert(src_size[ii + 1] >= size[ii + 1]);
+                dst_stride[ii] = dst_acc * (dst_size[ii + 1] - size[ii + 1]); /*overflow checked*/
+                src_stride[ii] = src_acc * (src_size[ii + 1] - size[ii + 1]); /*overflow checked*/
+                dst_acc *= dst_size[ii + 1];
+                src_acc *= src_size[ii + 1];
+                dst_start += dst_acc * (dst_offset ? dst_offset[ii] : 0);
+                src_start += src_acc * (src_offset ? src_offset[ii] : 0);
+            }
+            break;
         } /* end switch */
     }
 #endif /* NO_INLINED_CODE */
@@ -544,8 +544,7 @@ H5VM_hyper_copy(unsigned n, const hsize_t *_size, const hsize_t *dst_size, const
     H5VM__stride_optimize2(&n, &elmt_size, size, dst_stride, src_stride);
 
     /* Perform the copy in terms of stride */
-    ret_value =
-        H5VM_stride_copy(n, elmt_size, size, dst_stride, dst + dst_start, src_stride, src + src_start);
+    ret_value = H5VM_stride_copy(n, elmt_size, size, dst_stride, dst + dst_start, src_stride, src + src_start);
 
     FUNC_LEAVE_NOAPI(ret_value)
 }
@@ -560,16 +559,14 @@ H5VM_hyper_copy(unsigned n, const hsize_t *_size, const hsize_t *dst_size, const
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_stride_fill(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize_t *stride, void *_dst,
-                 unsigned fill_value)
+herr_t H5VM_stride_fill(unsigned n, hsize_t elmt_size, const hsize_t* size, const hsize_t* stride, void* _dst, unsigned fill_value)
 {
-    uint8_t *dst = (uint8_t *)_dst; /*cast for ptr arithmetic	*/
-    hsize_t  idx[H5VM_HYPER_NDIMS]; /*1-origin indices		*/
-    hsize_t  nelmts;                /*number of elements to fill	*/
-    hsize_t  i;                     /*counter			*/
-    int      j;                     /*counter			*/
-    bool     carry;                 /*subtraction carray value	*/
+    uint8_t* dst = (uint8_t*)_dst; /*cast for ptr arithmetic	*/
+    hsize_t idx[H5VM_HYPER_NDIMS]; /*1-origin indices		*/
+    hsize_t nelmts;                /*number of elements to fill	*/
+    hsize_t i;                     /*counter			*/
+    int j;                         /*counter			*/
+    bool carry;                    /*subtraction carray value	*/
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -586,8 +583,9 @@ H5VM_stride_fill(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize
         for (j = (int)(n - 1), carry = true; j >= 0 && carry; --j) {
             dst += stride[j];
 
-            if (--idx[j])
+            if (--idx[j]) {
                 carry = false;
+            }
             else {
                 assert(size);
                 idx[j] = size[j];
@@ -614,17 +612,15 @@ H5VM_stride_fill(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_stride_copy(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize_t *dst_stride, void *_dst,
-                 const hsize_t *src_stride, const void *_src)
+herr_t H5VM_stride_copy(unsigned n, hsize_t elmt_size, const hsize_t* size, const hsize_t* dst_stride, void* _dst, const hsize_t* src_stride, const void* _src)
 {
-    uint8_t       *dst = (uint8_t *)_dst;       /*cast for ptr arithmetic*/
-    const uint8_t *src = (const uint8_t *)_src; /*cast for ptr arithmetic*/
-    hsize_t        idx[H5VM_HYPER_NDIMS];       /*1-origin indices	*/
-    hsize_t        nelmts;                      /*num elements to copy	*/
-    hsize_t        i;                           /*counter		*/
-    int            j;                           /*counters		*/
-    bool           carry;                       /*carray for subtraction*/
+    uint8_t* dst = (uint8_t*)_dst;             /*cast for ptr arithmetic*/
+    const uint8_t* src = (const uint8_t*)_src; /*cast for ptr arithmetic*/
+    hsize_t idx[H5VM_HYPER_NDIMS];             /*1-origin indices	*/
+    hsize_t nelmts;                            /*num elements to copy	*/
+    hsize_t i;                                 /*counter		*/
+    int j;                                     /*counters		*/
+    bool carry;                                /*carray for subtraction*/
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -634,7 +630,6 @@ H5VM_stride_copy(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize
         H5VM_vector_cpy(n, idx, size);
         nelmts = H5VM_vector_reduce_product(n, size);
         for (i = 0; i < nelmts; i++) {
-
             /* Copy an element */
             H5_CHECK_OVERFLOW(elmt_size, hsize_t, size_t);
             H5MM_memcpy(dst, src, (size_t)elmt_size);
@@ -644,8 +639,9 @@ H5VM_stride_copy(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize
                 src += src_stride[j];
                 dst += dst_stride[j];
 
-                if (--idx[j])
+                if (--idx[j]) {
                     carry = false;
+                }
                 else {
                     assert(size);
                     idx[j] = size[j];
@@ -677,17 +673,15 @@ H5VM_stride_copy(unsigned n, hsize_t elmt_size, const hsize_t *size, const hsize
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_stride_copy_s(unsigned n, hsize_t elmt_size, const hsize_t *size, const hssize_t *dst_stride, void *_dst,
-                   const hssize_t *src_stride, const void *_src)
+herr_t H5VM_stride_copy_s(unsigned n, hsize_t elmt_size, const hsize_t* size, const hssize_t* dst_stride, void* _dst, const hssize_t* src_stride, const void* _src)
 {
-    uint8_t       *dst = (uint8_t *)_dst;       /*cast for ptr arithmetic*/
-    const uint8_t *src = (const uint8_t *)_src; /*cast for ptr arithmetic*/
-    hsize_t        idx[H5VM_HYPER_NDIMS];       /*1-origin indices	*/
-    hsize_t        nelmts;                      /*num elements to copy	*/
-    hsize_t        i;                           /*counter		*/
-    int            j;                           /*counters		*/
-    bool           carry;                       /*carray for subtraction*/
+    uint8_t* dst = (uint8_t*)_dst;             /*cast for ptr arithmetic*/
+    const uint8_t* src = (const uint8_t*)_src; /*cast for ptr arithmetic*/
+    hsize_t idx[H5VM_HYPER_NDIMS];             /*1-origin indices	*/
+    hsize_t nelmts;                            /*num elements to copy	*/
+    hsize_t i;                                 /*counter		*/
+    int j;                                     /*counters		*/
+    bool carry;                                /*carray for subtraction*/
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -697,7 +691,6 @@ H5VM_stride_copy_s(unsigned n, hsize_t elmt_size, const hsize_t *size, const hss
         H5VM_vector_cpy(n, idx, size);
         nelmts = H5VM_vector_reduce_product(n, size);
         for (i = 0; i < nelmts; i++) {
-
             /* Copy an element */
             H5_CHECK_OVERFLOW(elmt_size, hsize_t, size_t);
             H5MM_memcpy(dst, src, (size_t)elmt_size);
@@ -707,8 +700,9 @@ H5VM_stride_copy_s(unsigned n, hsize_t elmt_size, const hsize_t *size, const hss
                 src += src_stride[j];
                 dst += dst_stride[j];
 
-                if (--idx[j])
+                if (--idx[j]) {
                     carry = false;
+                }
                 else {
                     assert(size);
                     idx[j] = size[j];
@@ -735,13 +729,12 @@ H5VM_stride_copy_s(unsigned n, hsize_t elmt_size, const hsize_t *size, const hss
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_array_fill(void *_dst, const void *src, size_t size, size_t count)
+herr_t H5VM_array_fill(void* _dst, const void* src, size_t size, size_t count)
 {
-    size_t   copy_size;             /* size of the buffer to copy	*/
-    size_t   copy_items;            /* number of items currently copying*/
-    size_t   items_left;            /* number of items left to copy 	*/
-    uint8_t *dst = (uint8_t *)_dst; /* alias for pointer arithmetic	*/
+    size_t copy_size;              /* size of the buffer to copy	*/
+    size_t copy_items;             /* number of items currently copying*/
+    size_t items_left;             /* number of items left to copy 	*/
+    uint8_t* dst = (uint8_t*)_dst; /* alias for pointer arithmetic	*/
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -753,7 +746,7 @@ H5VM_array_fill(void *_dst, const void *src, size_t size, size_t count)
     H5MM_memcpy(dst, src, size); /* copy first item */
 
     /* Initialize counters, etc. while compensating for first element copied */
-    copy_size  = size;
+    copy_size = size;
     copy_items = 1;
     items_left = count - 1;
     dst += size;
@@ -764,11 +757,12 @@ H5VM_array_fill(void *_dst, const void *src, size_t size, size_t count)
         dst += copy_size;                  /* move the offset for the next chunk */
         items_left -= copy_items;          /* decrement the number of items left */
 
-        copy_size *= 2;  /* increase the size of the chunk to copy */
-        copy_items *= 2; /* increase the count of items we are copying */
-    }                    /* end while */
-    if (items_left > 0)  /* if there are any items left to copy */
+        copy_size *= 2;                    /* increase the size of the chunk to copy */
+        copy_items *= 2;                   /* increase the count of items we are copying */
+    } /* end while */
+    if (items_left > 0) { /* if there are any items left to copy */
         H5MM_memcpy(dst, _dst, items_left * size);
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* H5VM_array_fill() */
@@ -785,11 +779,10 @@ H5VM_array_fill(void *_dst, const void *src, size_t size, size_t count)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5VM_array_down(unsigned n, const hsize_t *total_size, hsize_t *down)
+void H5VM_array_down(unsigned n, const hsize_t* total_size, hsize_t* down)
 {
     hsize_t acc; /* Accumulator */
-    int     i;   /* Counter */
+    int i;       /* Counter */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -822,11 +815,10 @@ H5VM_array_down(unsigned n, const hsize_t *total_size, hsize_t *down)
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5VM_array_offset_pre(unsigned n, const hsize_t *acc, const hsize_t *offset)
+hsize_t H5VM_array_offset_pre(unsigned n, const hsize_t* acc, const hsize_t* offset)
 {
-    unsigned u;         /* Local index variable */
-    hsize_t  ret_value; /* Return value */
+    unsigned u;        /* Local index variable */
+    hsize_t ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -835,8 +827,9 @@ H5VM_array_offset_pre(unsigned n, const hsize_t *acc, const hsize_t *offset)
     assert(offset);
 
     /* Compute offset in array */
-    for (u = 0, ret_value = 0; u < n; u++)
+    for (u = 0, ret_value = 0; u < n; u++) {
         ret_value += acc[u] * offset[u];
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5VM_array_offset_pre() */
@@ -855,8 +848,7 @@ H5VM_array_offset_pre(unsigned n, const hsize_t *acc, const hsize_t *offset)
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5VM_array_offset(unsigned n, const hsize_t *total_size, const hsize_t *offset)
+hsize_t H5VM_array_offset(unsigned n, const hsize_t* total_size, const hsize_t* offset)
 {
     hsize_t acc_arr[H5VM_HYPER_NDIMS]; /* Accumulated size of down dimensions */
     hsize_t ret_value;                 /* Return value */
@@ -891,8 +883,7 @@ H5VM_array_offset(unsigned n, const hsize_t *total_size, const hsize_t *offset)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_array_calc_pre(hsize_t offset, unsigned n, const hsize_t *down, hsize_t *coords)
+herr_t H5VM_array_calc_pre(hsize_t offset, unsigned n, const hsize_t* down, hsize_t* coords)
 {
     unsigned u; /* Local index variable */
 
@@ -926,11 +917,10 @@ H5VM_array_calc_pre(hsize_t offset, unsigned n, const hsize_t *down, hsize_t *co
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5VM_array_calc(hsize_t offset, unsigned n, const hsize_t *total_size, hsize_t *coords)
+herr_t H5VM_array_calc(hsize_t offset, unsigned n, const hsize_t* total_size, hsize_t* coords)
 {
     hsize_t idx[H5VM_HYPER_NDIMS]; /* Size of each dimension in bytes */
-    herr_t  ret_value = SUCCEED;   /* Return value */
+    herr_t ret_value = SUCCEED;    /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -943,8 +933,9 @@ H5VM_array_calc(hsize_t offset, unsigned n, const hsize_t *total_size, hsize_t *
     H5VM_array_down(n, total_size, idx);
 
     /* Compute the coordinates from the offset */
-    if (H5VM_array_calc_pre(offset, n, idx, coords) < 0)
+    if (H5VM_array_calc_pre(offset, n, idx, coords) < 0) {
         HGOTO_ERROR(H5E_INTERNAL, H5E_BADVALUE, FAIL, "can't compute coordinates");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -987,8 +978,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5VM_chunk_index(unsigned ndims, const hsize_t *coord, const hsize_t *chunk, const hsize_t *down_nchunks)
+hsize_t H5VM_chunk_index(unsigned ndims, const hsize_t* coord, const hsize_t* chunk, const hsize_t* down_nchunks)
 {
     hsize_t scaled_coord[H5VM_HYPER_NDIMS]; /* Scaled, coordinates, in terms of chunks */
     hsize_t chunk_idx;                      /* Chunk index computed */
@@ -1016,8 +1006,7 @@ H5VM_chunk_index(unsigned ndims, const hsize_t *coord, const hsize_t *chunk, con
  *
  *-------------------------------------------------------------------------
  */
-void
-H5VM_chunk_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chunk, hsize_t *scaled)
+void H5VM_chunk_scaled(unsigned ndims, const hsize_t* coord, const hsize_t* chunk, hsize_t* scaled)
 {
     unsigned u; /* Local index variable */
 
@@ -1031,8 +1020,9 @@ H5VM_chunk_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chunk, hs
 
     /* Compute the scaled coordinates for actual coordinates */
     /* (Note that the 'scaled' array is an 'OUT' parameter) */
-    for (u = 0; u < ndims; u++)
+    for (u = 0; u < ndims; u++) {
         scaled[u] = coord[u] / chunk[u];
+    }
 
     FUNC_LEAVE_NOAPI_VOID
 } /* end H5VM_chunk_scaled() */
@@ -1077,12 +1067,10 @@ H5VM_chunk_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chunk, hs
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5VM_chunk_index_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chunk,
-                        const hsize_t *down_nchunks, hsize_t *scaled)
+hsize_t H5VM_chunk_index_scaled(unsigned ndims, const hsize_t* coord, const hsize_t* chunk, const hsize_t* down_nchunks, hsize_t* scaled)
 {
-    hsize_t  chunk_idx; /* Computed chunk index */
-    unsigned u;         /* Local index variable */
+    hsize_t chunk_idx; /* Computed chunk index */
+    unsigned u;        /* Local index variable */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1095,8 +1083,9 @@ H5VM_chunk_index_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chu
 
     /* Compute the scaled coordinates for actual coordinates */
     /* (Note that the 'scaled' array is an 'OUT' parameter) */
-    for (u = 0; u < ndims; u++)
+    for (u = 0; u < ndims; u++) {
         scaled[u] = coord[u] / chunk[u];
+    }
 
     /* Compute the chunk index */
     chunk_idx = H5VM_array_offset_pre(ndims, down_nchunks, scaled);
@@ -1123,18 +1112,24 @@ H5VM_chunk_index_scaled(unsigned ndims, const hsize_t *coord, const hsize_t *chu
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5VM_opvv(size_t dst_max_nseq, size_t *dst_curr_seq, size_t dst_len_arr[], hsize_t dst_off_arr[],
-          size_t src_max_nseq, size_t *src_curr_seq, size_t src_len_arr[], hsize_t src_off_arr[],
-          H5VM_opvv_func_t op, void *op_data)
+ssize_t H5VM_opvv(size_t dst_max_nseq,
+                  size_t* dst_curr_seq,
+                  size_t dst_len_arr[],
+                  hsize_t dst_off_arr[],
+                  size_t src_max_nseq,
+                  size_t* src_curr_seq,
+                  size_t src_len_arr[],
+                  hsize_t src_off_arr[],
+                  H5VM_opvv_func_t op,
+                  void* op_data)
 {
     hsize_t *max_dst_off_ptr, *max_src_off_ptr; /* Pointers to max. source and destination offset locations */
     hsize_t *dst_off_ptr, *src_off_ptr;         /* Pointers to source and destination offset arrays */
-    size_t  *dst_len_ptr, *src_len_ptr;         /* Pointers to source and destination length arrays */
-    hsize_t  tmp_dst_off, tmp_src_off;          /* Temporary source and destination offset values */
-    size_t   tmp_dst_len, tmp_src_len;          /* Temporary source and destination length values */
-    size_t   acc_len;                           /* Accumulated length of sequences */
-    ssize_t  ret_value = 0;                     /* Return value (Total size of sequence in bytes) */
+    size_t *dst_len_ptr, *src_len_ptr;          /* Pointers to source and destination length arrays */
+    hsize_t tmp_dst_off, tmp_src_off;           /* Temporary source and destination offset values */
+    size_t tmp_dst_len, tmp_src_len;            /* Temporary source and destination length values */
+    size_t acc_len;                             /* Accumulated length of sequences */
+    ssize_t ret_value = 0;                      /* Return value (Total size of sequence in bytes) */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1174,8 +1169,9 @@ src_smaller:
         acc_len = 0;
         do {
             /* Make operator callback */
-            if ((*op)(tmp_dst_off, tmp_src_off, tmp_src_len, op_data) < 0)
+            if ((*op)(tmp_dst_off, tmp_src_off, tmp_src_len, op_data) < 0) {
                 HGOTO_ERROR(H5E_INTERNAL, H5E_CANTOPERATE, FAIL, "can't perform operation");
+            }
 
             /* Accumulate number of bytes copied */
             acc_len += tmp_src_len;
@@ -1205,10 +1201,12 @@ src_smaller:
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_dst_len < tmp_src_len)
+        if (tmp_dst_len < tmp_src_len) {
             goto dst_smaller;
-        else
+        }
+        else {
             goto equal;
+        }
     } /* end if */
     /* Destination sequence is less than source sequence */
     else if (tmp_dst_len < tmp_src_len) {
@@ -1216,8 +1214,9 @@ dst_smaller:
         acc_len = 0;
         do {
             /* Make operator callback */
-            if ((*op)(tmp_dst_off, tmp_src_off, tmp_dst_len, op_data) < 0)
+            if ((*op)(tmp_dst_off, tmp_src_off, tmp_dst_len, op_data) < 0) {
                 HGOTO_ERROR(H5E_INTERNAL, H5E_CANTOPERATE, FAIL, "can't perform operation");
+            }
 
             /* Accumulate number of bytes copied */
             acc_len += tmp_dst_len;
@@ -1247,10 +1246,12 @@ dst_smaller:
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_src_len < tmp_dst_len)
+        if (tmp_src_len < tmp_dst_len) {
             goto src_smaller;
-        else
+        }
+        else {
             goto equal;
+        }
     } /* end else-if */
     /* Destination sequence and source sequence are same length */
     else {
@@ -1258,8 +1259,9 @@ equal:
         acc_len = 0;
         do {
             /* Make operator callback */
-            if ((*op)(tmp_dst_off, tmp_src_off, tmp_dst_len, op_data) < 0)
+            if ((*op)(tmp_dst_off, tmp_src_off, tmp_dst_len, op_data) < 0) {
                 HGOTO_ERROR(H5E_INTERNAL, H5E_CANTOPERATE, FAIL, "can't perform operation");
+            }
 
             /* Accumulate number of bytes copied */
             acc_len += tmp_dst_len;
@@ -1267,9 +1269,10 @@ equal:
             /* Advance source & destination offset & check for being finished */
             src_off_ptr++;
             dst_off_ptr++;
-            if (src_off_ptr >= max_src_off_ptr || dst_off_ptr >= max_dst_off_ptr)
+            if (src_off_ptr >= max_src_off_ptr || dst_off_ptr >= max_dst_off_ptr) {
                 /* Done with sequences */
                 goto finished;
+            }
             tmp_src_off = *src_off_ptr;
             tmp_dst_off = *dst_off_ptr;
 
@@ -1286,10 +1289,12 @@ equal:
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_dst_len < tmp_src_len)
+        if (tmp_dst_len < tmp_src_len) {
             goto dst_smaller;
-        else
+        }
+        else {
             goto src_smaller;
+        }
     } /* end else */
 
 finished:
@@ -1324,20 +1329,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5VM_memcpyvv(void *_dst, size_t dst_max_nseq, size_t *dst_curr_seq, size_t dst_len_arr[],
-              hsize_t dst_off_arr[], const void *_src, size_t src_max_nseq, size_t *src_curr_seq,
-              size_t src_len_arr[], hsize_t src_off_arr[])
+ssize_t H5VM_memcpyvv(void* _dst,
+                      size_t dst_max_nseq,
+                      size_t* dst_curr_seq,
+                      size_t dst_len_arr[],
+                      hsize_t dst_off_arr[],
+                      const void* _src,
+                      size_t src_max_nseq,
+                      size_t* src_curr_seq,
+                      size_t src_len_arr[],
+                      hsize_t src_off_arr[])
 {
-    unsigned char       *dst;                   /* Destination buffer pointer */
-    const unsigned char *src;                   /* Source buffer pointer */
+    unsigned char* dst;                         /* Destination buffer pointer */
+    const unsigned char* src;                   /* Source buffer pointer */
     hsize_t *max_dst_off_ptr, *max_src_off_ptr; /* Pointers to max. source and destination offset locations */
     hsize_t *dst_off_ptr, *src_off_ptr;         /* Pointers to source and destination offset arrays */
-    size_t  *dst_len_ptr, *src_len_ptr;         /* Pointers to source and destination length arrays */
-    size_t   tmp_dst_len;                       /* Temporary dest. length value */
-    size_t   tmp_src_len;                       /* Temporary source length value */
-    size_t   acc_len;                           /* Accumulated length of sequences */
-    ssize_t  ret_value = 0;                     /* Return value (Total size of sequence in bytes) */
+    size_t *dst_len_ptr, *src_len_ptr;          /* Pointers to source and destination length arrays */
+    size_t tmp_dst_len;                         /* Temporary dest. length value */
+    size_t tmp_src_len;                         /* Temporary source length value */
+    size_t acc_len;                             /* Accumulated length of sequences */
+    ssize_t ret_value = 0;                      /* Return value (Total size of sequence in bytes) */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1368,8 +1379,8 @@ H5VM_memcpyvv(void *_dst, size_t dst_max_nseq, size_t *dst_curr_seq, size_t dst_
     max_src_off_ptr = src_off_arr + src_max_nseq;
 
     /* Compute buffer offsets */
-    dst = (unsigned char *)_dst + *dst_off_ptr;
-    src = (const unsigned char *)_src + *src_off_ptr;
+    dst = (unsigned char*)_dst + *dst_off_ptr;
+    src = (const unsigned char*)_src + *src_off_ptr;
 
     /* Work through the sequences */
     /* (Choose smallest sequence available initially) */
@@ -1405,17 +1416,19 @@ src_smaller:
             /* Update source information */
             src_len_ptr++;
             tmp_src_len = *src_len_ptr;
-            src         = (const unsigned char *)_src + *src_off_ptr;
+            src = (const unsigned char*)_src + *src_off_ptr;
         } while (tmp_src_len < tmp_dst_len);
 
         /* Roll accumulated sequence lengths into return value */
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_dst_len < tmp_src_len)
+        if (tmp_dst_len < tmp_src_len) {
             goto dst_smaller;
-        else
+        }
+        else {
             goto equal;
+        }
     } /* end if */
     /* Destination sequence is less than source sequence */
     else if (tmp_dst_len < tmp_src_len) {
@@ -1448,17 +1461,19 @@ dst_smaller:
             /* Update destination information */
             dst_len_ptr++;
             tmp_dst_len = *dst_len_ptr;
-            dst         = (unsigned char *)_dst + *dst_off_ptr;
+            dst = (unsigned char*)_dst + *dst_off_ptr;
         } while (tmp_dst_len < tmp_src_len);
 
         /* Roll accumulated sequence lengths into return value */
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_src_len < tmp_dst_len)
+        if (tmp_src_len < tmp_dst_len) {
             goto src_smaller;
-        else
+        }
+        else {
             goto equal;
+        }
     } /* end else-if */
     /* Destination sequence and source sequence are same length */
     else {
@@ -1474,29 +1489,32 @@ equal:
             /* Advance source & destination offset & check for being finished */
             src_off_ptr++;
             dst_off_ptr++;
-            if (src_off_ptr >= max_src_off_ptr || dst_off_ptr >= max_dst_off_ptr)
+            if (src_off_ptr >= max_src_off_ptr || dst_off_ptr >= max_dst_off_ptr) {
                 /* Done with sequences */
                 goto finished;
+            }
 
             /* Update source information */
             src_len_ptr++;
             tmp_src_len = *src_len_ptr;
-            src         = (const unsigned char *)_src + *src_off_ptr;
+            src = (const unsigned char*)_src + *src_off_ptr;
 
             /* Update destination information */
             dst_len_ptr++;
             tmp_dst_len = *dst_len_ptr;
-            dst         = (unsigned char *)_dst + *dst_off_ptr;
+            dst = (unsigned char*)_dst + *dst_off_ptr;
         } while (tmp_dst_len == tmp_src_len);
 
         /* Roll accumulated sequence lengths into return value */
         ret_value += (ssize_t)acc_len;
 
         /* Transition to next state */
-        if (tmp_dst_len < tmp_src_len)
+        if (tmp_dst_len < tmp_src_len) {
             goto dst_smaller;
-        else
+        }
+        else {
             goto src_smaller;
+        }
     } /* end else */
 
 finished:

@@ -10,8 +10,8 @@
  * help@hdfgroup.org.                                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "H5Omodule.h" /* This source code file is part of the H5O module */
-#define H5S_FRIEND     /*prevent warning from including H5Spkg.h */
+#include "H5Omodule.h"   /* This source code file is part of the H5O module */
+#define H5S_FRIEND       /*prevent warning from including H5Spkg.h */
 
 #include "H5private.h"   /* Generic Functions			*/
 #include "H5Dprivate.h"  /* Datasets				*/
@@ -21,16 +21,14 @@
 #include "H5Spkg.h"      /* Dataspaces 				*/
 
 /* PRIVATE PROTOTYPES */
-static void  *H5O__sdspace_decode(H5F_t *f, H5O_t *open_oh, unsigned mesg_flags, unsigned *ioflags,
-                                  size_t p_size, const uint8_t *p);
-static herr_t H5O__sdspace_encode(H5F_t *f, uint8_t *p, const void *_mesg);
-static void  *H5O__sdspace_copy(const void *_mesg, void *_dest);
-static size_t H5O__sdspace_size(const H5F_t *f, const void *_mesg);
-static herr_t H5O__sdspace_reset(void *_mesg);
-static herr_t H5O__sdspace_free(void *_mesg);
-static herr_t H5O__sdspace_pre_copy_file(H5F_t *file_src, const void *mesg_src, bool *deleted,
-                                         const H5O_copy_t *cpy_info, void *_udata);
-static herr_t H5O__sdspace_debug(H5F_t *f, const void *_mesg, FILE *stream, int indent, int fwidth);
+static void* H5O__sdspace_decode(H5F_t* f, H5O_t* open_oh, unsigned mesg_flags, unsigned* ioflags, size_t p_size, const uint8_t* p);
+static herr_t H5O__sdspace_encode(H5F_t* f, uint8_t* p, const void* _mesg);
+static void* H5O__sdspace_copy(const void* _mesg, void* _dest);
+static size_t H5O__sdspace_size(const H5F_t* f, const void* _mesg);
+static herr_t H5O__sdspace_reset(void* _mesg);
+static herr_t H5O__sdspace_free(void* _mesg);
+static herr_t H5O__sdspace_pre_copy_file(H5F_t* file_src, const void* mesg_src, bool* deleted, const H5O_copy_t* cpy_info, void* _udata);
+static herr_t H5O__sdspace_debug(H5F_t* f, const void* _mesg, FILE* stream, int indent, int fwidth);
 
 /* Set up & include shared message "interface" info */
 #define H5O_SHARED_TYPE        H5O_MSG_SDSPACE
@@ -54,7 +52,7 @@ static herr_t H5O__sdspace_debug(H5F_t *f, const void *_mesg, FILE *stream, int 
 #include "H5Oshared.h" /* Shared Object Header Message Callbacks */
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_SDSPACE[1] = {{
+const H5O_msg_class_t H5O_MSG_SDSPACE[1] = { {
     H5O_SDSPACE_ID,                            /* message id number		    	*/
     "dataspace",                               /* message name for debugging	   	*/
     sizeof(H5S_extent_t),                      /* native message size		    	*/
@@ -75,7 +73,7 @@ const H5O_msg_class_t H5O_MSG_SDSPACE[1] = {{
     NULL,                                      /* get creation index		        */
     NULL,                                      /* set creation index		        */
     H5O__sdspace_shared_debug                  /* debug the message		    	*/
-}};
+} };
 
 /* Declare external the free list for H5S_extent_t's */
 H5FL_EXTERN(H5S_extent_t);
@@ -101,104 +99,129 @@ H5FL_ARR_EXTERN(hsize_t);
     message into a struct in memory native format.  The struct is allocated
     within this function using malloc() and is returned to the caller.
 --------------------------------------------------------------------------*/
-static void *
-H5O__sdspace_decode(H5F_t *f, H5O_t H5_ATTR_UNUSED *open_oh, unsigned H5_ATTR_UNUSED mesg_flags,
-                    unsigned H5_ATTR_UNUSED *ioflags, size_t p_size, const uint8_t *p)
+static void* H5O__sdspace_decode(H5F_t* f,
+                                 H5O_t H5_ATTR_UNUSED* open_oh,
+                                 unsigned H5_ATTR_UNUSED mesg_flags,
+                                 unsigned H5_ATTR_UNUSED* ioflags,
+                                 size_t p_size,
+                                 const uint8_t* p)
 {
-    const uint8_t *p_end = p + p_size - 1; /* End of the p buffer */
-    H5S_extent_t  *sdim  = NULL;           /* New extent dimensionality structure */
-    unsigned       flags, version;
-    unsigned       i;
-    void          *ret_value = NULL; /* Return value */
+    const uint8_t* p_end = p + p_size - 1; /* End of the p buffer */
+    H5S_extent_t* sdim = NULL;             /* New extent dimensionality structure */
+    unsigned flags, version;
+    unsigned i;
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     assert(f);
     assert(p);
 
-    if (NULL == (sdim = H5FL_CALLOC(H5S_extent_t)))
+    if (NULL == (sdim = H5FL_CALLOC(H5S_extent_t))) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_CANTALLOC, NULL, "dataspace structure allocation failed");
+    }
     sdim->type = H5S_NO_CLASS;
 
     /* Check version */
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     version = *p++;
 
-    if (version < H5O_SDSPACE_VERSION_1 || version > H5O_SDSPACE_VERSION_2)
+    if (version < H5O_SDSPACE_VERSION_1 || version > H5O_SDSPACE_VERSION_2) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "wrong version number in dataspace message");
+    }
     sdim->version = version;
 
     /* Get rank */
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     sdim->rank = *p++;
 
-    if (sdim->rank > H5S_MAX_RANK)
+    if (sdim->rank > H5S_MAX_RANK) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "simple dataspace dimensionality is too large");
+    }
 
     /* Get dataspace flags for later */
-    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
         HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+    }
     flags = *p++;
 
     /* Get or determine the type of the extent */
     if (version >= H5O_SDSPACE_VERSION_2) {
-        if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+        if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
             HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+        }
         sdim->type = (H5S_class_t)*p++;
 
-        if (sdim->type != H5S_SIMPLE && sdim->rank > 0)
+        if (sdim->type != H5S_SIMPLE && sdim->rank > 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "invalid rank for scalar or NULL dataspace");
+        }
     }
     else {
         /* Set the dataspace type to be simple or scalar as appropriate
          * (version 1 does not allow H5S_NULL)
          */
-        if (sdim->rank > 0)
+        if (sdim->rank > 0) {
             sdim->type = H5S_SIMPLE;
-        else
+        }
+        else {
             sdim->type = H5S_SCALAR;
+        }
 
         /* Increment past reserved byte */
-        if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end))
+        if (H5_IS_BUFFER_OVERFLOW(p, 1, p_end)) {
             HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+        }
         p++;
     }
 
     /* Version 1 has 4 reserved bytes */
     if (version == H5O_SDSPACE_VERSION_1) {
-        if (H5_IS_BUFFER_OVERFLOW(p, 4, p_end))
+        if (H5_IS_BUFFER_OVERFLOW(p, 4, p_end)) {
             HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+        }
         p += 4;
     }
 
     /* Decode dimension sizes */
     if (sdim->rank > 0) {
         /* Check that we have space to decode sdim->rank values */
-        if (H5_IS_BUFFER_OVERFLOW(p, (H5F_sizeof_size(f) * sdim->rank), p_end))
+        if (H5_IS_BUFFER_OVERFLOW(p, (H5F_sizeof_size(f) * sdim->rank), p_end)) {
             HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+        }
 
         /* Sizes */
-        if (NULL == (sdim->size = (hsize_t *)H5FL_ARR_MALLOC(hsize_t, (size_t)sdim->rank)))
+        if (NULL == (sdim->size = (hsize_t*)H5FL_ARR_MALLOC(hsize_t, (size_t)sdim->rank))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, NULL, "memory allocation failed");
-        for (i = 0; i < sdim->rank; i++)
+        }
+        for (i = 0; i < sdim->rank; i++) {
             H5F_DECODE_LENGTH(f, p, sdim->size[i]);
+        }
 
         if (flags & H5S_VALID_MAX) {
             /* Check that we have space to decode sdim->rank values */
-            if (H5_IS_BUFFER_OVERFLOW(p, (H5F_sizeof_size(f) * sdim->rank), p_end))
+            if (H5_IS_BUFFER_OVERFLOW(p, (H5F_sizeof_size(f) * sdim->rank), p_end)) {
                 HGOTO_ERROR(H5E_OHDR, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
 
             /* Max sizes */
-            if (NULL == (sdim->max = (hsize_t *)H5FL_ARR_MALLOC(hsize_t, (size_t)sdim->rank)))
+            if (NULL == (sdim->max = (hsize_t*)H5FL_ARR_MALLOC(hsize_t, (size_t)sdim->rank))) {
                 HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, NULL, "memory allocation failed");
+            }
             for (i = 0; i < sdim->rank; i++) {
                 H5F_DECODE_LENGTH(f, p, sdim->max[i]);
-                if (sdim->size[i] > sdim->max[i])
-                    HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL,
-                                "dataspace dim %u size of %llu is greater than maxdim size of %llu", i,
-                                (unsigned long long)sdim->size[i], (unsigned long long)sdim->max[i]);
+                if (sdim->size[i] > sdim->max[i]) {
+                    HGOTO_ERROR(H5E_OHDR,
+                                H5E_BADVALUE,
+                                NULL,
+                                "dataspace dim %u size of %llu is greater than maxdim size of %llu",
+                                i,
+                                (unsigned long long)sdim->size[i],
+                                (unsigned long long)sdim->max[i]);
+                }
             }
         }
 
@@ -208,15 +231,17 @@ H5O__sdspace_decode(H5F_t *f, H5O_t H5_ATTR_UNUSED *open_oh, unsigned H5_ATTR_UN
     }
 
     /* Compute the number of elements in the extent */
-    if (sdim->type == H5S_NULL)
+    if (sdim->type == H5S_NULL) {
         sdim->nelem = 0;
+    }
     else {
-        for (i = 0, sdim->nelem = 1; i < sdim->rank; i++)
+        for (i = 0, sdim->nelem = 1; i < sdim->rank; i++) {
             sdim->nelem *= sdim->size[i];
+        }
     }
 
     /* Set return value */
-    ret_value = (void *)sdim;
+    ret_value = (void*)sdim;
 
 done:
     if (!ret_value && sdim) {
@@ -245,12 +270,11 @@ done:
     dimensionality message in the "raw" disk form.
 
 --------------------------------------------------------------------------*/
-static herr_t
-H5O__sdspace_encode(H5F_t *f, uint8_t *p, const void *_mesg)
+static herr_t H5O__sdspace_encode(H5F_t* f, uint8_t* p, const void* _mesg)
 {
-    const H5S_extent_t *sdim  = (const H5S_extent_t *)_mesg;
-    unsigned            flags = 0;
-    unsigned            u; /* Local counting variable */
+    const H5S_extent_t* sdim = (const H5S_extent_t*)_mesg;
+    unsigned flags = 0;
+    unsigned u; /* Local counting variable */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -268,32 +292,37 @@ H5O__sdspace_encode(H5F_t *f, uint8_t *p, const void *_mesg)
     *p++ = (uint8_t)sdim->rank;
 
     /* Flags */
-    if (sdim->max)
+    if (sdim->max) {
         flags |= H5S_VALID_MAX;
+    }
     *p++ = (uint8_t)flags;
 
     /* Dataspace type */
-    if (sdim->version > H5O_SDSPACE_VERSION_1)
+    if (sdim->version > H5O_SDSPACE_VERSION_1) {
         *p++ = (uint8_t)sdim->type;
+    }
     else {
         *p++ = 0; /*reserved*/
         *p++ = 0; /*reserved*/
         *p++ = 0; /*reserved*/
         *p++ = 0; /*reserved*/
         *p++ = 0; /*reserved*/
-    }             /* end else */
+    } /* end else */
 
     /* Encode dataspace dimensions for simple dataspaces */
     if (H5S_SIMPLE == sdim->type) {
         /* Encode current & maximum dimensions */
         if (sdim->rank > 0) {
-            for (u = 0; u < sdim->rank; u++)
+            for (u = 0; u < sdim->rank; u++) {
                 H5F_ENCODE_LENGTH(f, p, sdim->size[u]);
-            if (flags & H5S_VALID_MAX)
-                for (u = 0; u < sdim->rank; u++)
+            }
+            if (flags & H5S_VALID_MAX) {
+                for (u = 0; u < sdim->rank; u++) {
                     H5F_ENCODE_LENGTH(f, p, sdim->max[u]);
+                }
+            }
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5O__sdspace_encode() */
@@ -313,31 +342,34 @@ H5O__sdspace_encode(H5F_t *f, uint8_t *p, const void *_mesg)
         This function copies a native (memory) simple dimensionality message,
     allocating the destination structure if necessary.
 --------------------------------------------------------------------------*/
-static void *
-H5O__sdspace_copy(const void *_mesg, void *_dest)
+static void* H5O__sdspace_copy(const void* _mesg, void* _dest)
 {
-    const H5S_extent_t *mesg      = (const H5S_extent_t *)_mesg;
-    H5S_extent_t       *dest      = (H5S_extent_t *)_dest;
-    void               *ret_value = NULL; /* Return value */
+    const H5S_extent_t* mesg = (const H5S_extent_t*)_mesg;
+    H5S_extent_t* dest = (H5S_extent_t*)_dest;
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* check args */
     assert(mesg);
-    if (!dest && NULL == (dest = H5FL_CALLOC(H5S_extent_t)))
+    if (!dest && NULL == (dest = H5FL_CALLOC(H5S_extent_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Copy extent information */
-    if (H5S__extent_copy_real(dest, mesg, true) < 0)
+    if (H5S__extent_copy_real(dest, mesg, true) < 0) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_CANTCOPY, NULL, "can't copy extent");
+    }
 
     /* Set return value */
     ret_value = dest;
 
 done:
-    if (NULL == ret_value)
-        if (dest && NULL == _dest)
+    if (NULL == ret_value) {
+        if (dest && NULL == _dest) {
             dest = H5FL_FREE(H5S_extent_t, dest);
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O__sdspace_copy() */
@@ -359,11 +391,10 @@ done:
     portion of the message).  It doesn't take into account alignment.
 
 --------------------------------------------------------------------------*/
-static size_t
-H5O__sdspace_size(const H5F_t *f, const void *_mesg)
+static size_t H5O__sdspace_size(const H5F_t* f, const void* _mesg)
 {
-    const H5S_extent_t *space     = (const H5S_extent_t *)_mesg;
-    size_t              ret_value = 0; /* Return value */
+    const H5S_extent_t* space = (const H5S_extent_t*)_mesg;
+    size_t ret_value = 0; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -393,10 +424,9 @@ H5O__sdspace_size(const H5F_t *f, const void *_mesg)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__sdspace_reset(void *_mesg)
+static herr_t H5O__sdspace_reset(void* _mesg)
 {
-    H5S_extent_t *mesg = (H5S_extent_t *)_mesg;
+    H5S_extent_t* mesg = (H5S_extent_t*)_mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -414,8 +444,7 @@ H5O__sdspace_reset(void *_mesg)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__sdspace_free(void *mesg)
+static herr_t H5O__sdspace_free(void* mesg)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -439,12 +468,11 @@ H5O__sdspace_free(void *mesg)
  *-------------------------------------------------------------------------
  */
 static herr_t
-H5O__sdspace_pre_copy_file(H5F_t H5_ATTR_UNUSED *file_src, const void *mesg_src, bool H5_ATTR_UNUSED *deleted,
-                           const H5O_copy_t *cpy_info, void *_udata)
+    H5O__sdspace_pre_copy_file(H5F_t H5_ATTR_UNUSED* file_src, const void* mesg_src, bool H5_ATTR_UNUSED* deleted, const H5O_copy_t* cpy_info, void* _udata)
 {
-    const H5S_extent_t *src_space_extent = (const H5S_extent_t *)mesg_src; /* Source dataspace extent */
-    H5D_copy_file_ud_t *udata            = (H5D_copy_file_ud_t *)_udata;   /* Dataset copying user data */
-    herr_t              ret_value        = SUCCEED;                        /* Return value */
+    const H5S_extent_t* src_space_extent = (const H5S_extent_t*)mesg_src; /* Source dataspace extent */
+    H5D_copy_file_ud_t* udata = (H5D_copy_file_ud_t*)_udata;              /* Dataset copying user data */
+    herr_t ret_value = SUCCEED;                                           /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -456,8 +484,9 @@ H5O__sdspace_pre_copy_file(H5F_t H5_ATTR_UNUSED *file_src, const void *mesg_src,
 
     /* Check to ensure that the version of the message to be copied does not exceed
        the message version allowed by the destination file's high bound */
-    if (src_space_extent->version > H5O_sdspace_ver_bounds[H5F_HIGH_BOUND(cpy_info->file_dst)])
+    if (src_space_extent->version > H5O_sdspace_ver_bounds[H5F_HIGH_BOUND(cpy_info->file_dst)]) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADRANGE, FAIL, "dataspace message version out of bounds");
+    }
 
     /* If the user data is non-NULL, assume we are copying a dataset
      * and make a copy of the dataspace extent for later in the object copying
@@ -467,12 +496,14 @@ H5O__sdspace_pre_copy_file(H5F_t H5_ATTR_UNUSED *file_src, const void *mesg_src,
      */
     if (udata) {
         /* Allocate copy of dataspace extent */
-        if (NULL == (udata->src_space_extent = H5FL_CALLOC(H5S_extent_t)))
+        if (NULL == (udata->src_space_extent = H5FL_CALLOC(H5S_extent_t))) {
             HGOTO_ERROR(H5E_DATASPACE, H5E_NOSPACE, FAIL, "dataspace extent allocation failed");
+        }
 
         /* Create a copy of the dataspace extent */
-        if (H5S__extent_copy_real(udata->src_space_extent, src_space_extent, true) < 0)
+        if (H5S__extent_copy_real(udata->src_space_extent, src_space_extent, true) < 0) {
             HGOTO_ERROR(H5E_DATASPACE, H5E_CANTCOPY, FAIL, "can't copy extent");
+        }
     } /* end if */
 
 done:
@@ -497,10 +528,9 @@ done:
         This function prints debugging output to the stream passed as a
     parameter.
 --------------------------------------------------------------------------*/
-static herr_t
-H5O__sdspace_debug(H5F_t H5_ATTR_UNUSED *f, const void *mesg, FILE *stream, int indent, int fwidth)
+static herr_t H5O__sdspace_debug(H5F_t H5_ATTR_UNUSED* f, const void* mesg, FILE* stream, int indent, int fwidth)
 {
-    const H5S_extent_t *sdim = (const H5S_extent_t *)mesg;
+    const H5S_extent_t* sdim = (const H5S_extent_t*)mesg;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -517,23 +547,27 @@ H5O__sdspace_debug(H5F_t H5_ATTR_UNUSED *f, const void *mesg, FILE *stream, int 
         unsigned u; /* local counting variable */
 
         fprintf(stream, "%*s%-*s {", indent, "", fwidth, "Dim Size:");
-        for (u = 0; u < sdim->rank; u++)
+        for (u = 0; u < sdim->rank; u++) {
             fprintf(stream, "%s%" PRIuHSIZE, u ? ", " : "", sdim->size[u]);
+        }
         fprintf(stream, "}\n");
 
         fprintf(stream, "%*s%-*s ", indent, "", fwidth, "Dim Max:");
         if (sdim->max) {
             fprintf(stream, "{");
             for (u = 0; u < sdim->rank; u++) {
-                if (H5S_UNLIMITED == sdim->max[u])
+                if (H5S_UNLIMITED == sdim->max[u]) {
                     fprintf(stream, "%sUNLIM", u ? ", " : "");
-                else
+                }
+                else {
                     fprintf(stream, "%s%" PRIuHSIZE, u ? ", " : "", sdim->max[u]);
+                }
             } /* end for */
             fprintf(stream, "}\n");
         } /* end if */
-        else
+        else {
             fprintf(stream, "CONSTANT\n");
+        }
     } /* end if */
 
     FUNC_LEAVE_NOAPI(SUCCEED)

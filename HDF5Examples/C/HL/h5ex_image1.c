@@ -19,23 +19,23 @@
 #define PAL_ENTRIES 9
 static unsigned char buf[WIDTH * HEIGHT];
 
-int
-main(void)
+int main(void)
 {
-    hid_t         file_id;
-    hsize_t       pal_dims[] = {PAL_ENTRIES, 3};
-    size_t        i, j;
-    int           n, space;
-    unsigned char pal[PAL_ENTRIES * 3] = {               /* create a palette with 9 colors */
-                                          0,   0,   168, /* dark blue */
-                                          0,   0,   252, /* blue */
-                                          0,   168, 252, /* ocean blue */
-                                          84,  252, 252, /* light blue */
-                                          168, 252, 168, /* light green */
-                                          0,   252, 168, /* green */
-                                          252, 252, 84,  /* yellow */
-                                          252, 168, 0,   /* orange */
-                                          252, 0,   0};  /* red */
+    hid_t file_id;
+    hsize_t pal_dims[] = { PAL_ENTRIES, 3 };
+    size_t i, j;
+    int n, space;
+    unsigned char pal[PAL_ENTRIES * 3] = {                /* create a palette with 9 colors */
+                                           0,   0,   168, /* dark blue */
+                                           0,   0,   252, /* blue */
+                                           0,   168, 252, /* ocean blue */
+                                           84,  252, 252, /* light blue */
+                                           168, 252, 168, /* light green */
+                                           0,   252, 168, /* green */
+                                           252, 252, 84,  /* yellow */
+                                           252, 168, 0,   /* orange */
+                                           252, 0,   0
+    }; /* red */
 
     /* create an image of 9 values divided evenly by the array */
     space = WIDTH * HEIGHT / PAL_ENTRIES;
@@ -45,8 +45,9 @@ main(void)
             n++;
             j = 0;
         }
-        if (n > PAL_ENTRIES - 1)
+        if (n > PAL_ENTRIES - 1) {
             n = 0;
+        }
     }
 
     /* create a new HDF5 file using default properties. */

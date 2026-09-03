@@ -51,10 +51,9 @@ H5FL_DEFINE_STATIC(H5UC_t);
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-H5UC_t *
-H5UC_create(void *o, H5UC_free_func_t free_func)
+H5UC_t* H5UC_create(void* o, H5UC_free_func_t free_func)
 {
-    H5UC_t *ret_value; /* Return value */
+    H5UC_t* ret_value; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -63,12 +62,13 @@ H5UC_create(void *o, H5UC_free_func_t free_func)
     assert(free_func);
 
     /* Allocate ref-counted string structure */
-    if (NULL == (ret_value = H5FL_MALLOC(H5UC_t)))
+    if (NULL == (ret_value = H5FL_MALLOC(H5UC_t))) {
         HGOTO_ERROR(H5E_RS, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Set the internal fields */
-    ret_value->o         = o;
-    ret_value->n         = 1;
+    ret_value->o = o;
+    ret_value->n = 1;
     ret_value->free_func = free_func;
 
 done:
@@ -94,8 +94,7 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5UC_decr(H5UC_t *rc)
+herr_t H5UC_decr(H5UC_t* rc)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 

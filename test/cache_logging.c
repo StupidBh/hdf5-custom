@@ -16,7 +16,7 @@
 
 #define LOG_LOCATION "cache_logging.out"
 
-static const char *FILENAME[] = {"cache_logging", NULL};
+static const char* FILENAME[] = { "cache_logging", NULL };
 
 #define N_GROUPS 100
 
@@ -29,23 +29,22 @@ static const char *FILENAME[] = {"cache_logging", NULL};
  *              Failure:        -1
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_logging_api(void)
+static herr_t test_logging_api(void)
 {
-    hid_t  fapl = H5I_INVALID_HID;
-    bool   is_enabled;
-    bool   is_enabled_out;
-    bool   start_on_access;
-    bool   start_on_access_out;
-    char  *location = NULL;
+    hid_t fapl = H5I_INVALID_HID;
+    bool is_enabled;
+    bool is_enabled_out;
+    bool start_on_access;
+    bool start_on_access_out;
+    char* location = NULL;
     size_t size;
 
     hid_t fid = H5I_INVALID_HID;
     hid_t gid = H5I_INVALID_HID;
-    bool  is_currently_logging;
-    char  group_name[12];
-    char  filename[1024];
-    int   i;
+    bool is_currently_logging;
+    char group_name[12];
+    char filename[1024];
+    int i;
 
     TESTING("metadata cache log api calls");
 
@@ -53,83 +52,96 @@ test_logging_api(void)
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
 
     /* Set up metadata cache logging */
-    is_enabled      = true;
+    is_enabled = true;
     start_on_access = false;
-    if (H5Pset_mdc_log_options(fapl, is_enabled, LOG_LOCATION, start_on_access) < 0)
+    if (H5Pset_mdc_log_options(fapl, is_enabled, LOG_LOCATION, start_on_access) < 0) {
         TEST_ERROR;
+    }
 
     /* Ensure that setting the property twice doesn't cause problems
      * (addresses a previous bug).
      */
-    if (H5Pset_mdc_log_options(fapl, is_enabled, LOG_LOCATION, start_on_access) < 0)
+    if (H5Pset_mdc_log_options(fapl, is_enabled, LOG_LOCATION, start_on_access) < 0) {
         TEST_ERROR;
+    }
 
     /* Check to make sure that the property list getter returns the correct
      * location string buffer size;
      */
-    is_enabled_out      = false;
+    is_enabled_out = false;
     start_on_access_out = true;
-    location            = NULL;
-    size                = 999;
-    if (H5Pget_mdc_log_options(fapl, &is_enabled_out, location, &size, &start_on_access_out) < 0)
+    location = NULL;
+    size = 999;
+    if (H5Pget_mdc_log_options(fapl, &is_enabled_out, location, &size, &start_on_access_out) < 0) {
         TEST_ERROR;
-    if (size != strlen(LOG_LOCATION) + 1)
+    }
+    if (size != strlen(LOG_LOCATION) + 1) {
         TEST_ERROR;
+    }
 
     /* Check to make sure that the property list getter works */
-    if (NULL == (location = (char *)calloc(size, sizeof(char))))
+    if (NULL == (location = (char*)calloc(size, sizeof(char)))) {
         TEST_ERROR;
-    if (H5Pget_mdc_log_options(fapl, &is_enabled_out, location, &size, &start_on_access_out) < 0)
+    }
+    if (H5Pget_mdc_log_options(fapl, &is_enabled_out, location, &size, &start_on_access_out) < 0) {
         TEST_ERROR;
-    if ((is_enabled != is_enabled_out) || (start_on_access != start_on_access_out) ||
-        strcmp(LOG_LOCATION, location) != 0)
+    }
+    if ((is_enabled != is_enabled_out) || (start_on_access != start_on_access_out) || strcmp(LOG_LOCATION, location) != 0) {
         TEST_ERROR;
+    }
 
     /* Create a file */
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         TEST_ERROR;
-    if ((fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    }
+    if ((fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Check to see if the logging flags were set correctly */
-    is_enabled           = false;
+    is_enabled = false;
     is_currently_logging = true;
-    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) ||
-        (is_currently_logging != false))
+    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) || (is_currently_logging != false)) {
         TEST_ERROR;
+    }
 
     /* Turn on logging and check flags */
-    if (H5Fstart_mdc_logging(fid) < 0)
+    if (H5Fstart_mdc_logging(fid) < 0) {
         TEST_ERROR;
-    is_enabled           = false;
+    }
+    is_enabled = false;
     is_currently_logging = false;
-    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) ||
-        (is_currently_logging != true))
+    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) || (is_currently_logging != true)) {
         TEST_ERROR;
+    }
 
     /* Perform some manipulations */
     for (i = 0; i < N_GROUPS; i++) {
         memset(group_name, 0, sizeof(group_name));
         snprintf(group_name, sizeof(group_name), "%d", i);
-        if ((gid = H5Gcreate2(fid, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((gid = H5Gcreate2(fid, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             TEST_ERROR;
-        if (H5Gclose(gid) < 0)
+        }
+        if (H5Gclose(gid) < 0) {
             TEST_ERROR;
+        }
     }
 
     /* Turn off logging and check flags */
-    if (H5Fstop_mdc_logging(fid) < 0)
+    if (H5Fstop_mdc_logging(fid) < 0) {
         TEST_ERROR;
-    is_enabled           = false;
+    }
+    is_enabled = false;
     is_currently_logging = true;
-    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) ||
-        (is_currently_logging != false))
+    if ((H5Fget_mdc_logging_status(fid, &is_enabled, &is_currently_logging) < 0) || (is_enabled != true) || (is_currently_logging != false)) {
         TEST_ERROR;
+    }
 
     /* Clean up */
     free(location);
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     HDremove(LOG_LOCATION);
     h5_delete_all_test_files(FILENAME, fapl);
@@ -158,8 +170,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int nerrors = 0;
 

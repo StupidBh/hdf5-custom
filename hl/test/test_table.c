@@ -57,29 +57,32 @@
  * structure used for all tests, a particle with properties
  *-------------------------------------------------------------------------
  */
-typedef struct particle_t {
-    char   name[16];
-    long   longi;
-    float  pressure;
+typedef struct particle_t
+{
+    char name[16];
+    long longi;
+    float pressure;
     double temperature;
-    int    lati;
+    int lati;
 } particle_t;
 
 /*-------------------------------------------------------------------------
  * a subset of particle_t, with latitude and longitude fields
  *-------------------------------------------------------------------------
  */
-typedef struct position_t {
+typedef struct position_t
+{
     long longi;
-    int  lati;
+    int lati;
 } position_t;
 
 /*-------------------------------------------------------------------------
  * a subset of particle_t, with name and pressure fields
  *-------------------------------------------------------------------------
  */
-typedef struct namepressure_t {
-    char  name[16];
+typedef struct namepressure_t
+{
+    char name[16];
     float pressure;
 } namepressure_t;
 
@@ -87,24 +90,26 @@ typedef struct namepressure_t {
  * an extended particle, used in the insert field test
  *-------------------------------------------------------------------------
  */
-typedef struct particle2_t {
-    char   name[16];
-    long   longi;
-    float  pressure;
+typedef struct particle2_t
+{
+    char name[16];
+    long longi;
+    float pressure;
     double temperature;
-    int    lati;
-    int    new_field;
+    int lati;
+    int new_field;
 } particle2_t;
 
 /*-------------------------------------------------------------------------
  * a particle with one field less, used in the delete field test
  *-------------------------------------------------------------------------
  */
-typedef struct particle3_t {
-    char   name[16];
-    long   longi;
+typedef struct particle3_t
+{
+    char name[16];
+    long longi;
     double temperature;
-    int    lati;
+    int lati;
 } particle3_t;
 
 /*-------------------------------------------------------------------------
@@ -116,14 +121,17 @@ typedef struct particle3_t {
  *  to the internal stack ...
  */
 #pragma pack(push, 4)
-typedef struct particle4_t {
+
+typedef struct particle4_t
+{
     uint32_t state;
-    double   posx;
-    double   posy;
-    float    atx[3];
-    float    aty[3];
-    float    rro[2];
+    double posx;
+    double posy;
+    float atx[3];
+    float aty[3];
+    float rro[2];
 } particle4_t;
+
 /*
  * ... and restore original alignment rules from stack
  */
@@ -133,12 +141,10 @@ typedef struct particle4_t {
  * function to open an HDF5 file and return its file identifier
  *-------------------------------------------------------------------------
  */
-static hid_t
-h5file_open(const char *fname, unsigned flags)
+static hid_t h5file_open(const char* fname, unsigned flags)
 {
-
-    hid_t       fid; /* identifier for the file */
-    const char *data_file = H5_get_srcdir_filename(fname);
+    hid_t fid; /* identifier for the file */
+    const char* data_file = H5_get_srcdir_filename(fname);
 
     /* open */
     if ((fid = H5Fopen(data_file, flags, H5P_DEFAULT)) < 0) {
@@ -153,17 +159,13 @@ h5file_open(const char *fname, unsigned flags)
  * function that compares one particle
  *-------------------------------------------------------------------------
  */
-static int
-cmp_par(hsize_t i, hsize_t j, particle_t *rbuf, particle_t *wbuf)
+static int cmp_par(hsize_t i, hsize_t j, particle_t* rbuf, particle_t* wbuf)
 {
-    if ((strcmp(rbuf[i].name, wbuf[j].name) != 0) || rbuf[i].lati != wbuf[j].lati ||
-        rbuf[i].longi != wbuf[j].longi || !H5_FLT_ABS_EQUAL(rbuf[i].pressure, wbuf[j].pressure) ||
-        !H5_DBL_ABS_EQUAL(rbuf[i].temperature, wbuf[j].temperature)) {
+    if ((strcmp(rbuf[i].name, wbuf[j].name) != 0) || rbuf[i].lati != wbuf[j].lati || rbuf[i].longi != wbuf[j].longi ||
+        !H5_FLT_ABS_EQUAL(rbuf[i].pressure, wbuf[j].pressure) || !H5_DBL_ABS_EQUAL(rbuf[i].temperature, wbuf[j].temperature)) {
         fprintf(stderr, "read and write buffers have differences\n");
-        fprintf(stderr, "%s %ld %f %f %d\n", rbuf[i].name, rbuf[i].longi, (double)rbuf[i].pressure,
-                rbuf[i].temperature, rbuf[i].lati);
-        fprintf(stderr, "%s %ld %f %f %d\n", wbuf[j].name, wbuf[j].longi, (double)wbuf[j].pressure,
-                wbuf[j].temperature, wbuf[j].lati);
+        fprintf(stderr, "%s %ld %f %f %d\n", rbuf[i].name, rbuf[i].longi, (double)rbuf[i].pressure, rbuf[i].temperature, rbuf[i].lati);
+        fprintf(stderr, "%s %ld %f %f %d\n", wbuf[j].name, wbuf[j].longi, (double)wbuf[j].pressure, wbuf[j].temperature, wbuf[j].lati);
         return -1;
     }
     return 0;
@@ -173,19 +175,20 @@ cmp_par(hsize_t i, hsize_t j, particle_t *rbuf, particle_t *wbuf)
  * function to compare deleted records
  *-------------------------------------------------------------------------
  */
-static int
-compare_deleted(hsize_t rrecords, hsize_t dstart, hsize_t drecords, particle_t *rbuf, particle_t *wbuf)
+static int compare_deleted(hsize_t rrecords, hsize_t dstart, hsize_t drecords, particle_t* rbuf, particle_t* wbuf)
 {
     hsize_t i, j;
     for (i = 0; i < rrecords; i++) {
         if (i < dstart) {
-            if (cmp_par(i, i, rbuf, wbuf) < 0)
+            if (cmp_par(i, i, rbuf, wbuf) < 0) {
                 return -1;
+            }
         }
         else {
             j = i + drecords;
-            if (cmp_par(i, j, rbuf, wbuf) < 0)
+            if (cmp_par(i, j, rbuf, wbuf) < 0) {
                 return -1;
+            }
         }
     }
     return 0;
@@ -196,21 +199,20 @@ compare_deleted(hsize_t rrecords, hsize_t dstart, hsize_t drecords, particle_t *
  *-------------------------------------------------------------------------
  */
 
-static int
-test_table(hid_t fid, int do_write)
+static int test_table(hid_t fid, int do_write)
 {
-    hid_t      fid1;
-    hid_t      fid2;
-    hsize_t    chunk_size   = 10;
-    int        compress     = 0;
-    int       *fill         = NULL;
-    particle_t fill1[1]     = {{"no data", -1, -99.0F, -99.0, -1}};
-    int        fill1_new[1] = {-100};
-    hsize_t    position;
-    char       tname[20];
-    hsize_t    i, j;
+    hid_t fid1;
+    hid_t fid2;
+    hsize_t chunk_size = 10;
+    int compress = 0;
+    int* fill = NULL;
+    particle_t fill1[1] = { { "no data", -1, -99.0F, -99.0, -1 } };
+    int fill1_new[1] = { -100 };
+    hsize_t position;
+    char tname[20];
+    hsize_t i, j;
     /* write, read, append, delete, insert some records and fields */
-    hsize_t FIELDS  = NFIELDS;
+    hsize_t FIELDS = NFIELDS;
     hsize_t RECORDS = NRECORDS;
     hsize_t start;
     hsize_t wstart;
@@ -228,39 +230,38 @@ test_table(hid_t fid, int do_write)
     hsize_t start1; /* record to start reading from 1st table */
     hsize_t start2; /* record to start writing in 2nd table */
     /* read, write, insert, append buffers */
-    particle_t  rbuf[NRECORDS + 4];
+    particle_t rbuf[NRECORDS + 4];
     particle2_t rbuf2[NRECORDS];
     particle3_t rbuf3[NRECORDS];
-    particle_t  rbufc[NRECORDS * 2];
-    particle_t  abuf[2] = {{"eight", 80, 8.0F, 80.0, 80}, {"nine", 90, 9.0F, 90.0, 90}};
-    particle_t  ibuf[2] = {{"zero", 0, 0.0F, 0.0, 0}, {"zero", 0, 0.0F, 0.0, 0}};
-    particle_t  wbufd[NRECORDS];
-    particle_t  wbuf[NRECORDS] = {{
-                                     "zero",
-                                     0,
-                                     0.0F,
-                                     0.0,
-                                     0,
-                                 },
-                                  {"one", 10, 1.0F, 10.0, 10},
-                                  {"two", 20, 2.0F, 20.0, 20},
-                                  {"three", 30, 3.0F, 30.0, 30},
-                                  {"four", 40, 4.0F, 40.0, 40},
-                                  {"five", 50, 5.0F, 50.0, 50},
-                                  {"six", 60, 6.0F, 60.0, 60},
-                                  {"seven", 70, 7.0F, 70.0, 70}};
+    particle_t rbufc[NRECORDS * 2];
+    particle_t abuf[2] = { { "eight", 80, 8.0F, 80.0, 80 }, { "nine", 90, 9.0F, 90.0, 90 } };
+    particle_t ibuf[2] = { { "zero", 0, 0.0F, 0.0, 0 }, { "zero", 0, 0.0F, 0.0, 0 } };
+    particle_t wbufd[NRECORDS];
+    particle_t wbuf[NRECORDS] = { {
+                                      "zero",
+                                      0,
+                                      0.0F,
+                                      0.0,
+                                      0,
+                                  },
+                                  { "one", 10, 1.0F, 10.0, 10 },
+                                  { "two", 20, 2.0F, 20.0, 20 },
+                                  { "three", 30, 3.0F, 30.0, 30 },
+                                  { "four", 40, 4.0F, 40.0, 40 },
+                                  { "five", 50, 5.0F, 50.0, 50 },
+                                  { "six", 60, 6.0F, 60.0, 60 },
+                                  { "seven", 70, 7.0F, 70.0, 70 } };
     /* buffers for the field "Pressure" and "New_field" */
-    float pressure_in[NRECORDS] = {0.0F, 1.0F, 2.0F, 3.0F, 4.0F, 5.0F, 6.0F, 7.0F};
+    float pressure_in[NRECORDS] = { 0.0F, 1.0F, 2.0F, 3.0F, 4.0F, 5.0F, 6.0F, 7.0F };
     float pressure_out[NRECORDS];
-    int   buf_new[NRECORDS] = {0, 1, 2, 3, 4, 5, 6, 7};
+    int buf_new[NRECORDS] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     /* buffers for the fields "Latitude,Longitude"  */
     position_t position_out[NRECORDS_ADD];
-    position_t position_in[NRECORDS_ADD] = {{0, 0}, {10, 10}, {20, 20}};
+    position_t position_in[NRECORDS_ADD] = { { 0, 0 }, { 10, 10 }, { 20, 20 } };
     /* buffers for the fields "Name,Pressure"  */
     namepressure_t namepre_out[NRECORDS];
     namepressure_t namepre_in[NRECORDS] = {
-        {"zero", 0.0F}, {"one", 1.0F},  {"two", 2.0F}, {"three", 3.0F},
-        {"four", 4.0F}, {"five", 5.0F}, {"six", 6.0F}, {"seven", 7.0F},
+        { "zero", 0.0F }, { "one", 1.0F }, { "two", 2.0F }, { "three", 3.0F }, { "four", 4.0F }, { "five", 5.0F }, { "six", 6.0F }, { "seven", 7.0F },
     };
 
     /*-------------------------------------------------------------------------
@@ -269,17 +270,17 @@ test_table(hid_t fid, int do_write)
      *-------------------------------------------------------------------------
      */
 
-    size_t field_offset_pos[2]     = {HOFFSET(position_t, longi), HOFFSET(position_t, lati)};
-    size_t field_offset_namepre[2] = {HOFFSET(namepressure_t, name), HOFFSET(namepressure_t, pressure)};
-    size_t field_sizes_pos[2]      = {sizeof(position_in[0].longi), sizeof(position_in[0].lati)};
-    size_t field_sizes_namepre[2]  = {sizeof(namepre_in[0].name), sizeof(namepre_in[0].pressure)};
-    size_t field_sizes_pre[1]      = {sizeof(namepre_in[0].pressure)};
+    size_t field_offset_pos[2] = { HOFFSET(position_t, longi), HOFFSET(position_t, lati) };
+    size_t field_offset_namepre[2] = { HOFFSET(namepressure_t, name), HOFFSET(namepressure_t, pressure) };
+    size_t field_sizes_pos[2] = { sizeof(position_in[0].longi), sizeof(position_in[0].lati) };
+    size_t field_sizes_namepre[2] = { sizeof(namepre_in[0].name), sizeof(namepre_in[0].pressure) };
+    size_t field_sizes_pre[1] = { sizeof(namepre_in[0].pressure) };
 
     /*-------------------------------------------------------------------------
      * query table test
      *-------------------------------------------------------------------------
      */
-    char **names_out;
+    char** names_out;
     size_t sizes_out[NFIELDS];
     size_t offset_out[NFIELDS];
     size_t size_out;
@@ -290,10 +291,10 @@ test_table(hid_t fid, int do_write)
      * "Name 0","Longitude 1","Pressure 2","Temperature 3","Latitude 4"
      *-------------------------------------------------------------------------
      */
-    int field_index_pre[1]     = {2};
-    int field_index_pos[2]     = {1, 4};
-    int field_index_namepre[2] = {0, 2};
-    int field_index[NFIELDS]   = {0, 1, 2, 3, 4};
+    int field_index_pre[1] = { 2 };
+    int field_index_pos[2] = { 1, 4 };
+    int field_index_namepre[2] = { 0, 2 };
+    int field_index[NFIELDS] = { 0, 1, 2, 3, 4 };
 
     /*-------------------------------------------------------------------------
      * initialize table parameters
@@ -302,26 +303,22 @@ test_table(hid_t fid, int do_write)
      * these are used for the insert field test
      *-------------------------------------------------------------------------
      */
-    hid_t  field_type_new           = H5T_NATIVE_INT;
-    size_t dst_size2                = sizeof(particle2_t);
-    size_t dst_offset2[NFIELDS + 1] = {HOFFSET(particle2_t, name),     HOFFSET(particle2_t, longi),
-                                       HOFFSET(particle2_t, pressure), HOFFSET(particle2_t, temperature),
-                                       HOFFSET(particle2_t, lati),     HOFFSET(particle2_t, new_field)};
-    size_t dst_sizes2[NFIELDS + 1]  = {sizeof(rbuf2[0].name),     sizeof(rbuf2[0].longi),
-                                       sizeof(rbuf2[0].pressure), sizeof(rbuf2[0].temperature),
-                                       sizeof(rbuf2[0].lati),     sizeof(rbuf2[0].new_field)};
+    hid_t field_type_new = H5T_NATIVE_INT;
+    size_t dst_size2 = sizeof(particle2_t);
+    size_t dst_offset2[NFIELDS + 1] = { HOFFSET(particle2_t, name),        HOFFSET(particle2_t, longi), HOFFSET(particle2_t, pressure),
+                                        HOFFSET(particle2_t, temperature), HOFFSET(particle2_t, lati),  HOFFSET(particle2_t, new_field) };
+    size_t dst_sizes2[NFIELDS + 1] = { sizeof(rbuf2[0].name),        sizeof(rbuf2[0].longi), sizeof(rbuf2[0].pressure),
+                                       sizeof(rbuf2[0].temperature), sizeof(rbuf2[0].lati),  sizeof(rbuf2[0].new_field) };
     /*-------------------------------------------------------------------------
      * initialize table parameters
      * size and the offsets of struct members in memory
      * these are used for the delete field test
      *-------------------------------------------------------------------------
      */
-    size_t dst_size3                = sizeof(particle3_t);
-    size_t dst_offset3[NFIELDS - 1] = {HOFFSET(particle3_t, name), HOFFSET(particle3_t, longi),
-                                       HOFFSET(particle3_t, temperature), HOFFSET(particle3_t, lati)};
+    size_t dst_size3 = sizeof(particle3_t);
+    size_t dst_offset3[NFIELDS - 1] = { HOFFSET(particle3_t, name), HOFFSET(particle3_t, longi), HOFFSET(particle3_t, temperature), HOFFSET(particle3_t, lati) };
 
-    size_t dst_sizes3[NFIELDS - 1] = {sizeof(rbuf3[0].name), sizeof(rbuf3[0].longi),
-                                      sizeof(rbuf3[0].temperature), sizeof(rbuf3[0].lati)};
+    size_t dst_sizes3[NFIELDS - 1] = { sizeof(rbuf3[0].name), sizeof(rbuf3[0].longi), sizeof(rbuf3[0].temperature), sizeof(rbuf3[0].lati) };
 
     /*-------------------------------------------------------------------------
      * initialize table parameters
@@ -331,20 +328,15 @@ test_table(hid_t fid, int do_write)
      */
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t tbl_size                = sizeof(particle4_t);
-    size_t tbl_offset[NFIELDS + 1] = {HOFFSET(particle4_t, state), HOFFSET(particle4_t, posx),
-                                      HOFFSET(particle4_t, posy),  HOFFSET(particle4_t, atx),
-                                      HOFFSET(particle4_t, aty),   HOFFSET(particle4_t, rro)};
+    size_t tbl_size = sizeof(particle4_t);
+    size_t tbl_offset[NFIELDS + 1] = { HOFFSET(particle4_t, state), HOFFSET(particle4_t, posx), HOFFSET(particle4_t, posy),
+                                       HOFFSET(particle4_t, atx),   HOFFSET(particle4_t, aty),  HOFFSET(particle4_t, rro) };
 
     /* Define an array of Particles */
-    particle4_t p_data[NRECORDS] = {{12112, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12113, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12114, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12115, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12116, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12117, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12118, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}},
-                                    {12119, 1.4, 2.5, {1, 2, 3}, {4, 5, 6}, {99, 100}}};
+    particle4_t p_data[NRECORDS] = { { 12112, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } }, { 12113, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } },
+                                     { 12114, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } }, { 12115, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } },
+                                     { 12116, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } }, { 12117, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } },
+                                     { 12118, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } }, { 12119, 1.4, 2.5, { 1, 2, 3 }, { 4, 5, 6 }, { 99, 100 } } };
 
     /*-------------------------------------------------------------------------
      * initialize table parameters
@@ -354,26 +346,27 @@ test_table(hid_t fid, int do_write)
      *-------------------------------------------------------------------------
      */
 
-    size_t type_size_mem         = sizeof(particle_t);
-    size_t field_offset[NFIELDS] = {HOFFSET(particle_t, name), HOFFSET(particle_t, longi),
-                                    HOFFSET(particle_t, pressure), HOFFSET(particle_t, temperature),
-                                    HOFFSET(particle_t, lati)};
-    size_t field_size[NFIELDS]   = {sizeof(rbuf[0].name), sizeof(rbuf[0].longi), sizeof(rbuf[0].pressure),
-                                    sizeof(rbuf[0].temperature), sizeof(rbuf[0].lati)};
+    size_t type_size_mem = sizeof(particle_t);
+    size_t field_offset[NFIELDS] = { HOFFSET(particle_t, name),
+                                     HOFFSET(particle_t, longi),
+                                     HOFFSET(particle_t, pressure),
+                                     HOFFSET(particle_t, temperature),
+                                     HOFFSET(particle_t, lati) };
+    size_t field_size[NFIELDS] = { sizeof(rbuf[0].name), sizeof(rbuf[0].longi), sizeof(rbuf[0].pressure), sizeof(rbuf[0].temperature), sizeof(rbuf[0].lati) };
 
-    const char *field_names4[NFIELDS + 1] = {"F1", "F2", "F3", "F4", "F5", "F6"};
-    hid_t       field_type4[NFIELDS + 1];
-    particle4_t fill_data[1] = {{9999999, -9999999, 999999, {999, 999, 999}, {999, 999, 999}, {999, 999}}};
+    const char* field_names4[NFIELDS + 1] = { "F1", "F2", "F3", "F4", "F5", "F6" };
+    hid_t field_type4[NFIELDS + 1];
+    particle4_t fill_data[1] = { { 9'999'999, -9'999'999, 999999, { 999, 999, 999 }, { 999, 999, 999 }, { 999, 999 } } };
 
     hsize_t nfields_out;
     hsize_t nrecords_out;
-    hid_t   arry3_32f;
-    hid_t   arry2_32f;
+    hid_t arry3_32f;
+    hid_t arry2_32f;
     hsize_t dims;
 
-    const char *field_names[NFIELDS] = {"Name", "Longitude", "Pressure", "Temperature", "Latitude"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type = H5Tcopy(H5T_C_S1);
+    const char* field_names[NFIELDS] = { "Name", "Longitude", "Pressure", "Temperature", "Latitude" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type = H5Tcopy(H5T_C_S1);
 
     H5Tset_size(string_type, 16);
     field_type[0] = string_type;
@@ -396,9 +389,9 @@ test_table(hid_t fid, int do_write)
     if (do_write) {
         HL_TESTING2("making table");
 
-        if (H5TBmake_table(TITLE, fid, "table1", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid, "table1", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
+        }
         PASSED();
     }
 
@@ -409,13 +402,15 @@ test_table(hid_t fid, int do_write)
      *-------------------------------------------------------------------------
      */
 
-    if (H5TBread_table(fid, "table1", type_size_mem, field_offset, field_size, rbuf) < 0)
+    if (H5TBread_table(fid, "table1", type_size_mem, field_offset, field_size, rbuf) < 0) {
         goto out;
+    }
 
     /* compare the extracted table with the original array */
     for (i = 0; i < NRECORDS; i++) {
-        if (cmp_par(i, i, rbuf, wbuf) < 0)
+        if (cmp_par(i, i, rbuf, wbuf) < 0) {
             goto out;
+        }
     }
 
     PASSED();
@@ -432,9 +427,9 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("writing records");
 
         /* create an empty table */
-        if (H5TBmake_table(TITLE, fid, "table2", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, 0) < 0)
+        if (H5TBmake_table(TITLE, fid, "table2", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, 0) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * write records, start at 0, write 8
@@ -442,20 +437,22 @@ test_table(hid_t fid, int do_write)
          * data= 0 1 2 3 4 5 6 7
          *-------------------------------------------------------------------------
          */
-        wstart   = 0;
+        wstart = 0;
         wrecords = 8;
-        if (H5TBwrite_records(fid, "table2", wstart, wrecords, type_size_mem, field_offset, field_size,
-                              wbuf) < 0)
+        if (H5TBwrite_records(fid, "table2", wstart, wrecords, type_size_mem, field_offset, field_size, wbuf) < 0) {
             goto out;
+        }
 
         /* read it back */
-        if (H5TBread_table(fid, "table2", type_size_mem, field_offset, field_size, rbuf) < 0)
+        if (H5TBread_table(fid, "table2", type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* compare  */
         for (i = 0; i < NRECORDS; i++) {
-            if (cmp_par(i, i, rbuf, wbuf) < 0)
+            if (cmp_par(i, i, rbuf, wbuf) < 0) {
                 goto out;
+            }
         }
 
         PASSED();
@@ -484,20 +481,24 @@ test_table(hid_t fid, int do_write)
      * we use the original "table1" instead
      *-------------------------------------------------------------------------
      */
-    if (do_write)
+    if (do_write) {
         strcpy(tname, "table2");
-    else
+    }
+    else {
         strcpy(tname, "table1");
+    }
 
-    rstart   = 0;
+    rstart = 0;
     rrecords = 8;
-    if (H5TBread_records(fid, tname, rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0)
+    if (H5TBread_records(fid, tname, rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
         goto out;
+    }
 
     /* compare */
     for (i = rstart; i < rrecords; i++) {
-        if (cmp_par(i, i, rbuf, wbuf) < 0)
+        if (cmp_par(i, i, rbuf, wbuf) < 0) {
             goto out;
+        }
     }
     PASSED();
 
@@ -520,27 +521,31 @@ test_table(hid_t fid, int do_write)
          *-------------------------------------------------------------------------
          */
         arecords = 2;
-        if (H5TBappend_records(fid, "table2", arecords, type_size_mem, field_offset, field_size, abuf) < 0)
+        if (H5TBappend_records(fid, "table2", arecords, type_size_mem, field_offset, field_size, abuf) < 0) {
             return 1;
+        }
 
-        if (H5TBget_table_info(fid, "table2", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table2", &rfields, &rrecords) < 0) {
             return 1;
+        }
 
-        rstart   = 0;
+        rstart = 0;
         rrecords = NRECORDS + arecords;
-        if (H5TBread_records(fid, "table2", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table2", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             return 1;
+        }
 
         /* compare */
         wrecords = 8;
         for (i = rstart; i < wrecords; i++) {
-            if (cmp_par(i, i, rbuf, wbuf) < 0)
+            if (cmp_par(i, i, rbuf, wbuf) < 0) {
                 goto out;
+            }
         }
         for (i = wrecords, j = 0; i < rrecords; i++, j++) {
-            if (cmp_par(i, j, rbuf, abuf) < 0)
+            if (cmp_par(i, j, rbuf, abuf) < 0) {
                 goto out;
+            }
         }
         PASSED();
     }
@@ -563,39 +568,44 @@ test_table(hid_t fid, int do_write)
          * data= 0 0 0 1 2 3 4 5 6 7 8  9
          *-------------------------------------------------------------------------
          */
-        istart   = 1;
+        istart = 1;
         irecords = 2;
-        if (H5TBinsert_record(fid, "table2", istart, irecords, type_size_mem, field_offset, field_size,
-                              ibuf) < 0)
+        if (H5TBinsert_record(fid, "table2", istart, irecords, type_size_mem, field_offset, field_size, ibuf) < 0) {
             return 1;
+        }
 
-        if (H5TBget_table_info(fid, "table2", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table2", &rfields, &rrecords) < 0) {
             return 1;
+        }
 
-        if (H5TBread_records(fid, "table2", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table2", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             return 1;
+        }
 
         /* compare */
         for (i = 0; i < 12; i++) {
             if (i < istart) {
-                if (cmp_par(i, i, rbuf, wbuf) < 0)
+                if (cmp_par(i, i, rbuf, wbuf) < 0) {
                     goto out;
+                }
             }
             else if (i >= istart && i < istart + irecords) {
                 j = i - istart;
-                if (cmp_par(i, j, rbuf, ibuf) < 0)
+                if (cmp_par(i, j, rbuf, ibuf) < 0) {
                     goto out;
+                }
             }
             else if (i >= istart + irecords && i < 10) {
                 j = i - irecords;
-                if (cmp_par(i, j, rbuf, wbuf) < 0)
+                if (cmp_par(i, j, rbuf, wbuf) < 0) {
                     goto out;
+                }
             }
             else {
                 j = i - 10;
-                if (cmp_par(i, j, rbuf, abuf) < 0)
+                if (cmp_par(i, j, rbuf, abuf) < 0) {
                     goto out;
+                }
             }
         }
         PASSED();
@@ -621,16 +631,16 @@ test_table(hid_t fid, int do_write)
          */
 
         for (i = 0; i < NRECORDS; i++) {
-            wbufd[i].lati        = wbuf[i].lati;
-            wbufd[i].longi       = wbuf[i].longi;
-            wbufd[i].pressure    = wbuf[i].pressure;
+            wbufd[i].lati = wbuf[i].lati;
+            wbufd[i].longi = wbuf[i].longi;
+            wbufd[i].pressure = wbuf[i].pressure;
             wbufd[i].temperature = wbuf[i].temperature;
             strcpy(wbufd[i].name, wbuf[i].name);
         }
 
-        if (H5TBmake_table(TITLE, fid, "table3", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbufd) < 0)
+        if (H5TBmake_table(TITLE, fid, "table3", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbufd) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * Delete records, start at 2, delete 3
@@ -638,24 +648,27 @@ test_table(hid_t fid, int do_write)
          * data= 0 1 5 6 7
          *-------------------------------------------------------------------------
          */
-        dstart   = 2;
+        dstart = 2;
         drecords = 3;
-        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0)
+        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0) {
             goto out;
+        }
 
-        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0) {
             goto out;
+        }
 
         rstart = 0;
-        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* compare */
         nrecords = NRECORDS;
         assert(rrecords == nrecords - drecords);
-        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0)
+        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * reset compare buffer
@@ -672,23 +685,26 @@ test_table(hid_t fid, int do_write)
          * data= 5 6 7
          *-------------------------------------------------------------------------
          */
-        dstart   = 0;
+        dstart = 0;
         drecords = 2;
-        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0)
+        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0) {
             goto out;
+        }
 
-        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0) {
             goto out;
+        }
 
         rstart = 0;
-        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* Compare */
         assert(rrecords == nrecords - drecords);
-        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0)
+        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * reset compare buffer
@@ -705,23 +721,26 @@ test_table(hid_t fid, int do_write)
          * data= 5 7
          *-------------------------------------------------------------------------
          */
-        dstart   = 1;
+        dstart = 1;
         drecords = 1;
-        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0)
+        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0) {
             goto out;
+        }
 
-        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0) {
             goto out;
+        }
 
         rstart = 0;
-        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* Compare */
         assert(rrecords == nrecords - drecords);
-        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0)
+        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * reset compare buffer
@@ -738,23 +757,26 @@ test_table(hid_t fid, int do_write)
          * data= 7
          *-------------------------------------------------------------------------
          */
-        dstart   = 0;
+        dstart = 0;
         drecords = 1;
-        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0)
+        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0) {
             goto out;
+        }
 
-        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0) {
             goto out;
+        }
 
         rstart = 0;
-        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) <
-            0)
+        if (H5TBread_records(fid, "table3", rstart, rrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* Compare */
         assert(rrecords == nrecords - drecords);
-        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0)
+        if (compare_deleted(rrecords, dstart, drecords, rbuf, wbufd) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * reset compare buffer
@@ -766,8 +788,9 @@ test_table(hid_t fid, int do_write)
         }
 
         /* Read complete table */
-        if (H5TBread_table(fid, "table3", type_size_mem, field_offset, field_size, rbuf) < 0)
+        if (H5TBread_table(fid, "table3", type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* Compare */
         for (i = 0; i < rrecords; i++) {
@@ -782,16 +805,19 @@ test_table(hid_t fid, int do_write)
          * data= empty
          *-------------------------------------------------------------------------
          */
-        dstart   = 0;
+        dstart = 0;
         drecords = 1;
-        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0)
+        if (H5TBdelete_record(fid, "table3", dstart, drecords) < 0) {
             goto out;
+        }
 
-        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0)
+        if (H5TBget_table_info(fid, "table3", &rfields, &rrecords) < 0) {
             goto out;
+        }
 
-        if (rrecords)
+        if (rrecords) {
             goto out;
+        }
 
         PASSED();
     }
@@ -807,10 +833,10 @@ test_table(hid_t fid, int do_write)
     if (do_write) {
         HL_TESTING2("deleting records (differing memory layout)");
 
-        dims      = 3;
+        dims = 3;
         arry3_32f = H5Tarray_create2(H5T_NATIVE_FLOAT, 1, &dims);
 
-        dims      = 2;
+        dims = 2;
         arry2_32f = H5Tarray_create2(H5T_NATIVE_FLOAT, 1, &dims);
 
         /* Initialize the field field_type */
@@ -822,25 +848,40 @@ test_table(hid_t fid, int do_write)
         field_type4[5] = arry2_32f;
 
         /* Make the table */
-        if (H5TBmake_table("Table Title", fid, "table", NFIELDS + 1, (hsize_t)NRECORDS, tbl_size,
-                           field_names4, tbl_offset, field_type4, chunk_size, fill_data, compress,
-                           p_data) < 0)
+        if (H5TBmake_table("Table Title",
+                           fid,
+                           "table",
+                           NFIELDS + 1,
+                           (hsize_t)NRECORDS,
+                           tbl_size,
+                           field_names4,
+                           tbl_offset,
+                           field_type4,
+                           chunk_size,
+                           fill_data,
+                           compress,
+                           p_data) < 0) {
             goto out;
+        }
         /* Delete records */
-        start    = 3;
+        start = 3;
         nrecords = 3;
-        if (H5TBdelete_record(fid, "table", start, nrecords) < 0)
+        if (H5TBdelete_record(fid, "table", start, nrecords) < 0) {
             goto out;
+        }
 
         /* Get table info */
-        if (H5TBget_table_info(fid, "table", &nfields_out, &nrecords_out) < 0)
+        if (H5TBget_table_info(fid, "table", &nfields_out, &nrecords_out) < 0) {
             goto out;
+        }
         /* check */
-        if ((int)nfields_out != (int)NFIELDS + 1)
+        if ((int)nfields_out != (int)NFIELDS + 1) {
             goto out;
+        }
 
-        if ((int)nrecords_out != (int)NRECORDS - 3)
+        if ((int)nrecords_out != (int)NRECORDS - 3) {
             goto out;
+        }
 
         /* close type */
         H5Tclose(arry3_32f);
@@ -863,39 +904,44 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("adding records");
 
         /* create 2 tables */
-        if (H5TBmake_table(TITLE, fid, "table4", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid, "table4", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
-        if (H5TBmake_table(TITLE, fid, "table5", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        }
+        if (H5TBmake_table(TITLE, fid, "table5", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
+        }
 
         /* add the records from "table4" to "table5"  */
-        start1   = 3;
+        start1 = 3;
         nrecords = 2;
-        start2   = 6;
-        if (H5TBadd_records_from(fid, "table4", start1, nrecords, "table5", start2) < 0)
+        start2 = 6;
+        if (H5TBadd_records_from(fid, "table4", start1, nrecords, "table5", start2) < 0) {
             goto out;
+        }
 
         /* read final table */
-        if (H5TBread_table(fid, "table5", type_size_mem, field_offset, field_size, rbuf) < 0)
+        if (H5TBread_table(fid, "table5", type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* compare */
         for (i = 0; i < NRECORDS + 2; i++) {
             if (i < start2) {
-                if (cmp_par(i, i, rbuf, wbuf) < 0)
+                if (cmp_par(i, i, rbuf, wbuf) < 0) {
                     goto out;
+                }
             }
             else if (i < start2 + nrecords) {
                 j = i - start1;
-                if (cmp_par(i, j, rbuf, wbuf) < 0)
+                if (cmp_par(i, j, rbuf, wbuf) < 0) {
                     goto out;
+                }
             }
             else {
                 j = i - nrecords;
-                if (cmp_par(i, j, rbuf, wbuf) < 0)
+                if (cmp_par(i, j, rbuf, wbuf) < 0) {
                     goto out;
+                }
             }
         }
 
@@ -916,30 +962,34 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("combining tables");
 
         /* create 2 tables */
-        if (H5TBmake_table(TITLE, fid, "table6", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid, "table6", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
-        if (H5TBmake_table(TITLE, fid, "table7", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        }
+        if (H5TBmake_table(TITLE, fid, "table7", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
+        }
 
         /* combine the two tables into a third  */
-        if (H5TBcombine_tables(fid, "table6", fid, "table7", "table8") < 0)
+        if (H5TBcombine_tables(fid, "table6", fid, "table7", "table8") < 0) {
             goto out;
+        }
 
         /* read merged table */
-        if (H5TBread_table(fid, "table8", type_size_mem, field_offset, field_size, rbufc) < 0)
+        if (H5TBread_table(fid, "table8", type_size_mem, field_offset, field_size, rbufc) < 0) {
             goto out;
+        }
 
         /* compare  */
         for (i = 0; i < NRECORDS * 2; i++) {
             if (i < NRECORDS) {
-                if (cmp_par(i, i, rbufc, wbuf) < 0)
+                if (cmp_par(i, i, rbufc, wbuf) < 0) {
                     goto out;
+                }
             }
             else {
-                if (cmp_par(i, i - NRECORDS, rbufc, wbuf) < 0)
+                if (cmp_par(i, i - NRECORDS, rbufc, wbuf) < 0) {
                     goto out;
+                }
             }
         }
 
@@ -953,30 +1003,34 @@ test_table(hid_t fid, int do_write)
         fid2 = H5Fcreate("combine_tables2.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
         /* create 2 tables, one in each file */
-        if (H5TBmake_table(TITLE, fid1, "table1", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid1, "table1", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
-        if (H5TBmake_table(TITLE, fid2, "table2", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        }
+        if (H5TBmake_table(TITLE, fid2, "table2", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
+        }
 
         /* combine the two tables into a third  */
-        if (H5TBcombine_tables(fid1, "table1", fid2, "table2", "table3") < 0)
+        if (H5TBcombine_tables(fid1, "table1", fid2, "table2", "table3") < 0) {
             goto out;
+        }
 
         /* read merged table */
-        if (H5TBread_table(fid1, "table3", type_size_mem, field_offset, field_size, rbufc) < 0)
+        if (H5TBread_table(fid1, "table3", type_size_mem, field_offset, field_size, rbufc) < 0) {
             goto out;
+        }
 
         /* compare  */
         for (i = 0; i < NRECORDS * 2; i++) {
             if (i < NRECORDS) {
-                if (cmp_par(i, i, rbufc, wbuf) < 0)
+                if (cmp_par(i, i, rbufc, wbuf) < 0) {
                     goto out;
+                }
             }
             else {
-                if (cmp_par(i, i - NRECORDS, rbufc, wbuf) < 0)
+                if (cmp_par(i, i - NRECORDS, rbufc, wbuf) < 0) {
                     goto out;
+                }
             }
         }
 
@@ -999,55 +1053,55 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("writing fields by name");
 
         /* make an empty table with fill values */
-        if (H5TBmake_table(TITLE, fid, "table9", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill1, compress, 0) < 0)
+        if (H5TBmake_table(TITLE, fid, "table9", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill1, compress, 0) < 0) {
             goto out;
+        }
 
         /* write the pressure field starting at record 2 */
-        start    = 2;
+        start = 2;
         nrecords = NRECORDS_ADD;
-        if (H5TBwrite_fields_name(fid, "table9", "Pressure", start, nrecords, sizeof(float), 0,
-                                  field_sizes_pre, pressure_in) < 0)
+        if (H5TBwrite_fields_name(fid, "table9", "Pressure", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in) < 0) {
             goto out;
+        }
 
         /* write the new longitude and latitude information starting at record 2 */
-        start    = 2;
+        start = 2;
         nrecords = 3;
-        if (H5TBwrite_fields_name(fid, "table9", "Latitude,Longitude", start, nrecords, sizeof(position_t),
-                                  field_offset_pos, field_sizes_pos, position_in) < 0)
+        if (H5TBwrite_fields_name(fid, "table9", "Latitude,Longitude", start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) < 0) {
             goto out;
+        }
 
         /* write an invalid field name whose prefix matches a real field, should fail */
-        if (H5TBwrite_fields_name(fid, "table9", "PressureExtra", start, nrecords, sizeof(float), 0,
-                                  field_sizes_pre, pressure_in) >= 0)
+        if (H5TBwrite_fields_name(fid, "table9", "PressureExtra", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in) >= 0) {
             goto out;
+        }
 
         /* Read back the whole table.  Verify two things:
          *  1. The valid writes (Pressure records 2-4, Latitude/Longitude records 2-4)
          *     are intact.
          *  2. The failing PressureExtra write left no partial mutation: records
          *     outside the written range still carry the fill value (-99.0F). */
-        start    = 0;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBread_table(fid, "table9", type_size_mem, field_offset, field_size, rbuf) < 0)
+        if (H5TBread_table(fid, "table9", type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         {
             for (i = 0; i < NRECORDS; i++) {
                 if (i >= 2 && i <= 4) {
-                    if (rbuf[i].lati != position_in[i - NRECORDS_ADD + 1].lati ||
-                        rbuf[i].longi != position_in[i - NRECORDS_ADD + 1].longi ||
+                    if (rbuf[i].lati != position_in[i - NRECORDS_ADD + 1].lati || rbuf[i].longi != position_in[i - NRECORDS_ADD + 1].longi ||
                         !H5_FLT_ABS_EQUAL(rbuf[i].pressure, pressure_in[i - NRECORDS_ADD + 1])) {
                         fprintf(stderr, "%ld %f %d\n", rbuf[i].longi, (double)rbuf[i].pressure, rbuf[i].lati);
-                        fprintf(stderr, "%ld %f %d\n", position_in[i].longi, (double)pressure_in[i],
-                                position_in[i].lati);
+                        fprintf(stderr, "%ld %f %d\n", position_in[i].longi, (double)pressure_in[i], position_in[i].lati);
                         goto out;
                     }
                 }
                 else {
                     /* Records outside the written range must still be at fill value */
-                    if (!H5_FLT_ABS_EQUAL(rbuf[i].pressure, fill1[0].pressure))
+                    if (!H5_FLT_ABS_EQUAL(rbuf[i].pressure, fill1[0].pressure)) {
                         goto out;
+                    }
                 }
             }
         }
@@ -1070,35 +1124,35 @@ test_table(hid_t fid, int do_write)
      *-------------------------------------------------------------------------
      */
     if (do_write) {
-        if (H5TBmake_table(TITLE, fid, "table10", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill1, compress, 0) < 0)
+        if (H5TBmake_table(TITLE, fid, "table10", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill1, compress, 0) < 0) {
             goto out;
+        }
 
         /* write the pressure field to all the records */
-        start    = 0;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBwrite_fields_name(fid, "table10", "Pressure", start, nrecords, sizeof(float), 0,
-                                  field_sizes_pre, pressure_in) < 0)
+        if (H5TBwrite_fields_name(fid, "table10", "Pressure", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in) < 0) {
             goto out;
+        }
     }
 
-    start    = 0;
+    start = 0;
     nrecords = NRECORDS;
 
     /* read an invalid field, should fail */
-    if (H5TBread_fields_name(fid, "table10", "DoesNotExist", start, nrecords, sizeof(float), 0,
-                             field_sizes_pre, pressure_out) >= 0)
+    if (H5TBread_fields_name(fid, "table10", "DoesNotExist", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_out) >= 0) {
         goto out;
+    }
 
     /* read an invalid field name whose prefix matches a real field, should fail */
-    if (H5TBread_fields_name(fid, "table10", "PressureExtra", start, nrecords, sizeof(float), 0,
-                             field_sizes_pre, pressure_out) >= 0)
+    if (H5TBread_fields_name(fid, "table10", "PressureExtra", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_out) >= 0) {
         goto out;
+    }
 
     /* read the "Pressure" field */
-    if (H5TBread_fields_name(fid, "table10", "Pressure", start, nrecords, sizeof(float), 0, field_sizes_pre,
-                             pressure_out) < 0)
+    if (H5TBread_fields_name(fid, "table10", "Pressure", start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_out) < 0) {
         goto out;
+    }
 
     /* Compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS; i++) {
@@ -1113,24 +1167,25 @@ test_table(hid_t fid, int do_write)
      */
     if (do_write) {
         /* Write the new longitude and latitude information to all the records */
-        start    = 0;
+        start = 0;
         nrecords = NRECORDS_ADD;
-        if (H5TBwrite_fields_name(fid, "table10", "Latitude,Longitude", start, nrecords, sizeof(position_t),
-                                  field_offset_pos, field_sizes_pos, position_in) < 0)
+        if (H5TBwrite_fields_name(fid, "table10", "Latitude,Longitude", start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) < 0) {
             goto out;
+        }
     } /*write*/
 
     /* Read the "Latitude,Longitude" fields */
-    start    = 0;
+    start = 0;
     nrecords = NRECORDS_ADD;
-    if (H5TBread_fields_name(fid, "table10", "Latitude,Longitude", start, nrecords, sizeof(position_t),
-                             field_offset_pos, field_sizes_pos, position_out) < 0)
+    if (H5TBread_fields_name(fid, "table10", "Latitude,Longitude", start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_out) < 0) {
         goto out;
+    }
 
     /* Compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS_ADD; i++) {
-        if (position_out[i].lati != position_in[i].lati || position_out[i].longi != position_in[i].longi)
+        if (position_out[i].lati != position_in[i].lati || position_out[i].longi != position_in[i].longi) {
             goto out;
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -1139,24 +1194,24 @@ test_table(hid_t fid, int do_write)
      */
     if (do_write) {
         /* Write the new name and pressure information to all the records */
-        start    = 0;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBwrite_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t),
-                                  field_offset_namepre, field_sizes_namepre, namepre_in) < 0)
+        if (H5TBwrite_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre, namepre_in) <
+            0) {
             goto out;
+        }
     } /*write*/
 
     /* Read the "Name,Pressure" fields */
-    start    = 0;
+    start = 0;
     nrecords = NRECORDS;
-    if (H5TBread_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t),
-                             field_offset_namepre, field_sizes_namepre, namepre_out) < 0)
+    if (H5TBread_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre, namepre_out) < 0) {
         goto out;
+    }
 
     /* Compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS; i++) {
-        if ((strcmp(namepre_out[i].name, namepre_in[i].name) != 0) ||
-            !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[i].pressure)) {
+        if ((strcmp(namepre_out[i].name, namepre_in[i].name) != 0) || !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[i].pressure)) {
             goto out;
         }
     }
@@ -1171,17 +1226,16 @@ test_table(hid_t fid, int do_write)
      * read only 3 records of the "Name,Pressure" fields, starting at record 2
      *-------------------------------------------------------------------------
      */
-    start    = 2;
+    start = 2;
     nrecords = 3;
-    if (H5TBread_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t),
-                             field_offset_namepre, field_sizes_namepre, namepre_out) < 0)
+    if (H5TBread_fields_name(fid, "table10", "Name,Pressure", start, nrecords, sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre, namepre_out) < 0) {
         goto out;
+    }
 
     /* Compare the extracted table with the initial values */
     for (i = 0; i < 3; i++) {
         hsize_t iistart = start;
-        if ((strcmp(namepre_out[i].name, namepre_in[iistart + i].name) != 0) ||
-            !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[iistart + i].pressure)) {
+        if ((strcmp(namepre_out[i].name, namepre_in[iistart + i].name) != 0) || !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[iistart + i].pressure)) {
             goto out;
         }
     }
@@ -1200,41 +1254,42 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("writing fields by index");
 
         /* make an empty table */
-        if (H5TBmake_table(TITLE, fid, "table11", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, NULL) < 0)
+        if (H5TBmake_table(TITLE, fid, "table11", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, NULL) < 0) {
             goto out;
+        }
 
         /* write the pressure field starting at record 2 */
-        nfields  = 1;
-        start    = 2;
+        nfields = 1;
+        start = 2;
         nrecords = NRECORDS_ADD;
-        if (H5TBwrite_fields_index(fid, "table11", nfields, field_index_pre, start, nrecords, sizeof(float),
-                                   0, field_sizes_pre, pressure_in) < 0)
+        if (H5TBwrite_fields_index(fid, "table11", nfields, field_index_pre, start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in) < 0) {
             goto out;
+        }
 
         /* write the new longitude and latitude information starting at record 2  */
-        nfields  = 2;
-        start    = 2;
+        nfields = 2;
+        start = 2;
         nrecords = NRECORDS_ADD;
-        if (H5TBwrite_fields_index(fid, "table11", nfields, field_index_pos, start, nrecords,
-                                   sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) < 0)
+        if (H5TBwrite_fields_index(fid, "table11", nfields, field_index_pos, start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) <
+            0) {
             goto out;
+        }
 
         /* read back the all table */
-        nfields  = 5;
-        start    = 0;
+        nfields = 5;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBread_fields_index(fid, "table11", nfields, field_index, start, nrecords, type_size_mem,
-                                  field_offset, field_size, rbuf) < 0)
+        if (H5TBread_fields_index(fid, "table11", nfields, field_index, start, nrecords, type_size_mem, field_offset, field_size, rbuf) < 0) {
             goto out;
+        }
 
         /* Compare the extracted table with the initial values */
         for (i = 0; i < NRECORDS; i++) {
             if (i >= 2 && i <= 4) {
-                if (rbuf[i].lati != position_in[i - NRECORDS_ADD + 1].lati ||
-                    rbuf[i].longi != position_in[i - NRECORDS_ADD + 1].longi ||
-                    !H5_FLT_ABS_EQUAL(rbuf[i].pressure, pressure_in[i - NRECORDS_ADD + 1]))
+                if (rbuf[i].lati != position_in[i - NRECORDS_ADD + 1].lati || rbuf[i].longi != position_in[i - NRECORDS_ADD + 1].longi ||
+                    !H5_FLT_ABS_EQUAL(rbuf[i].pressure, pressure_in[i - NRECORDS_ADD + 1])) {
                     goto out;
+                }
             }
         }
 
@@ -1254,9 +1309,9 @@ test_table(hid_t fid, int do_write)
 
     if (do_write) {
         /* make an empty table */
-        if (H5TBmake_table(TITLE, fid, "table12", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, NULL) < 0)
+        if (H5TBmake_table(TITLE, fid, "table12", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, NULL) < 0) {
             goto out;
+        }
 
         /*-------------------------------------------------------------------------
          * write and read the "Pressure" field
@@ -1264,21 +1319,21 @@ test_table(hid_t fid, int do_write)
          */
 
         /* write the pressure field to all the records */
-        nfields  = 1;
-        start    = 0;
+        nfields = 1;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBwrite_fields_index(fid, "table12", nfields, field_index_pre, start, nrecords, sizeof(float),
-                                   0, field_sizes_pre, pressure_in) < 0)
+        if (H5TBwrite_fields_index(fid, "table12", nfields, field_index_pre, start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_in) < 0) {
             goto out;
+        }
     }
 
     /* read the "Pressure" field */
-    nfields  = 1;
-    start    = 0;
+    nfields = 1;
+    start = 0;
     nrecords = NRECORDS;
-    if (H5TBread_fields_index(fid, "table12", nfields, field_index_pre, start, nrecords, sizeof(float), 0,
-                              field_sizes_pre, pressure_out) < 0)
+    if (H5TBread_fields_index(fid, "table12", nfields, field_index_pre, start, nrecords, sizeof(float), 0, field_sizes_pre, pressure_out) < 0) {
         goto out;
+    }
 
     /* compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS; i++) {
@@ -1293,21 +1348,22 @@ test_table(hid_t fid, int do_write)
      */
     if (do_write) {
         /* write the new longitude and latitude information to all the records */
-        nfields  = 2;
-        start    = 0;
+        nfields = 2;
+        start = 0;
         nrecords = NRECORDS_ADD;
-        if (H5TBwrite_fields_index(fid, "table12", nfields, field_index_pos, start, nrecords,
-                                   sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) < 0)
+        if (H5TBwrite_fields_index(fid, "table12", nfields, field_index_pos, start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_in) <
+            0) {
             goto out;
+        }
     } /*write*/
 
     /* read the "Latitude,Longitude" fields */
-    nfields  = 2;
-    start    = 0;
+    nfields = 2;
+    start = 0;
     nrecords = NRECORDS_ADD;
-    if (H5TBread_fields_index(fid, "table12", nfields, field_index_pos, start, nrecords, sizeof(position_t),
-                              field_offset_pos, field_sizes_pos, position_out) < 0)
+    if (H5TBread_fields_index(fid, "table12", nfields, field_index_pos, start, nrecords, sizeof(position_t), field_offset_pos, field_sizes_pos, position_out) < 0) {
         goto out;
+    }
 
     /* compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS_ADD; i++) {
@@ -1323,28 +1379,43 @@ test_table(hid_t fid, int do_write)
 
     if (do_write) {
         /* write the new name and pressure information to all the records */
-        nfields  = 2;
-        start    = 0;
+        nfields = 2;
+        start = 0;
         nrecords = NRECORDS;
-        if (H5TBwrite_fields_index(fid, "table12", nfields, field_index_namepre, start, nrecords,
-                                   sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre,
-                                   namepre_in) < 0)
+        if (H5TBwrite_fields_index(fid,
+                                   "table12",
+                                   nfields,
+                                   field_index_namepre,
+                                   start,
+                                   nrecords,
+                                   sizeof(namepressure_t),
+                                   field_offset_namepre,
+                                   field_sizes_namepre,
+                                   namepre_in) < 0) {
             goto out;
+        }
     }
 
     /* read the "Name,Pressure" fields */
-    nfields  = 2;
-    start    = 0;
+    nfields = 2;
+    start = 0;
     nrecords = NRECORDS;
-    if (H5TBread_fields_index(fid, "table12", nfields, field_index_namepre, start, nrecords,
-                              sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre,
-                              namepre_out) < 0)
+    if (H5TBread_fields_index(fid,
+                              "table12",
+                              nfields,
+                              field_index_namepre,
+                              start,
+                              nrecords,
+                              sizeof(namepressure_t),
+                              field_offset_namepre,
+                              field_sizes_namepre,
+                              namepre_out) < 0) {
         goto out;
+    }
 
     /* compare the extracted table with the initial values */
     for (i = 0; i < NRECORDS; i++) {
-        if ((strcmp(namepre_out[i].name, namepre_in[i].name) != 0) ||
-            !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[i].pressure)) {
+        if ((strcmp(namepre_out[i].name, namepre_in[i].name) != 0) || !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, namepre_in[i].pressure)) {
             goto out;
         }
     }
@@ -1361,19 +1432,26 @@ test_table(hid_t fid, int do_write)
      */
 
     /* write the new name and pressure information to all the records */
-    nfields  = 2;
-    start    = 2;
+    nfields = 2;
+    start = 2;
     nrecords = 3;
-    if (H5TBread_fields_index(fid, "table12", nfields, field_index_namepre, start, nrecords,
-                              sizeof(namepressure_t), field_offset_namepre, field_sizes_namepre,
-                              namepre_out) < 0)
+    if (H5TBread_fields_index(fid,
+                              "table12",
+                              nfields,
+                              field_index_namepre,
+                              start,
+                              nrecords,
+                              sizeof(namepressure_t),
+                              field_offset_namepre,
+                              field_sizes_namepre,
+                              namepre_out) < 0) {
         goto out;
+    }
 
     /* compare the extracted table with the initial values */
     for (i = 0; i < 3; i++) {
         int iistart = (int)start;
-        if ((strcmp(namepre_out[i].name, wbuf[iistart + (int)i].name) != 0) ||
-            !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, wbuf[iistart + (int)i].pressure)) {
+        if ((strcmp(namepre_out[i].name, wbuf[iistart + (int)i].name) != 0) || !H5_FLT_ABS_EQUAL(namepre_out[i].pressure, wbuf[iistart + (int)i].pressure)) {
             goto out;
         }
     }
@@ -1393,24 +1471,25 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("inserting fields");
 
         /* make a table */
-        if (H5TBmake_table(TITLE, fid, "table13", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill1, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid, "table13", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill1, compress, wbuf) < 0) {
             goto out;
+        }
 
         /* insert the new field at the end of the field list */
         position = NFIELDS;
-        if (H5TBinsert_field(fid, "table13", "New Field", field_type_new, position, fill1_new, buf_new) < 0)
+        if (H5TBinsert_field(fid, "table13", "New Field", field_type_new, position, fill1_new, buf_new) < 0) {
             goto out;
+        }
 
         /* read the table */
-        if (H5TBread_table(fid, "table13", dst_size2, dst_offset2, dst_sizes2, rbuf2) < 0)
+        if (H5TBread_table(fid, "table13", dst_size2, dst_offset2, dst_sizes2, rbuf2) < 0) {
             goto out;
+        }
 
         /* compare the extracted table with the original array */
         for (i = 0; i < NRECORDS; i++) {
-            if ((strcmp(rbuf2[i].name, wbuf[i].name) != 0) || rbuf2[i].lati != wbuf[i].lati ||
-                rbuf2[i].longi != wbuf[i].longi || !H5_FLT_ABS_EQUAL(rbuf2[i].pressure, wbuf[i].pressure) ||
-                !H5_DBL_ABS_EQUAL(rbuf2[i].temperature, wbuf[i].temperature) ||
+            if ((strcmp(rbuf2[i].name, wbuf[i].name) != 0) || rbuf2[i].lati != wbuf[i].lati || rbuf2[i].longi != wbuf[i].longi ||
+                !H5_FLT_ABS_EQUAL(rbuf2[i].pressure, wbuf[i].pressure) || !H5_DBL_ABS_EQUAL(rbuf2[i].temperature, wbuf[i].temperature) ||
                 rbuf2[i].new_field != buf_new[i]) {
                 goto out;
             }
@@ -1430,22 +1509,23 @@ test_table(hid_t fid, int do_write)
         HL_TESTING2("deleting fields");
 
         /* make a table */
-        if (H5TBmake_table(TITLE, fid, "table14", FIELDS, RECORDS, type_size_mem, field_names, field_offset,
-                           field_type, chunk_size, fill, compress, wbuf) < 0)
+        if (H5TBmake_table(TITLE, fid, "table14", FIELDS, RECORDS, type_size_mem, field_names, field_offset, field_type, chunk_size, fill, compress, wbuf) < 0) {
             goto out;
+        }
 
         /* delete the field */
-        if (H5TBdelete_field(fid, "table14", "Pressure") < 0)
+        if (H5TBdelete_field(fid, "table14", "Pressure") < 0) {
             goto out;
+        }
 
         /* read the table */
-        if (H5TBread_table(fid, "table14", dst_size3, dst_offset3, dst_sizes3, rbuf3) < 0)
+        if (H5TBread_table(fid, "table14", dst_size3, dst_offset3, dst_sizes3, rbuf3) < 0) {
             goto out;
+        }
 
         /* compare the extracted table with the original array */
         for (i = 0; i < NRECORDS; i++) {
-            if ((strcmp(rbuf3[i].name, wbuf[i].name) != 0) || rbuf3[i].lati != wbuf[i].lati ||
-                rbuf3[i].longi != wbuf[i].longi ||
+            if ((strcmp(rbuf3[i].name, wbuf[i].name) != 0) || rbuf3[i].lati != wbuf[i].lati || rbuf3[i].longi != wbuf[i].longi ||
                 !H5_DBL_ABS_EQUAL(rbuf3[i].temperature, wbuf[i].temperature)) {
                 goto out;
             }
@@ -1467,8 +1547,9 @@ test_table(hid_t fid, int do_write)
     HL_TESTING2("getting table info");
 
     /* get table info  */
-    if (H5TBget_table_info(fid, "table1", &rfields, &rrecords) < 0)
+    if (H5TBget_table_info(fid, "table1", &rfields, &rrecords) < 0) {
         goto out;
+    }
 
     if (NFIELDS != rfields || rrecords != NRECORDS) {
         goto out;
@@ -1488,18 +1569,21 @@ test_table(hid_t fid, int do_write)
     HL_TESTING2("getting field info");
 
     /* allocate */
-    names_out = (char **)malloc(sizeof(char *) * (size_t)NFIELDS);
-    if (!names_out)
+    names_out = (char**)malloc(sizeof(char*) * (size_t)NFIELDS);
+    if (!names_out) {
         goto out;
+    }
     for (i = 0; i < NFIELDS; i++) {
-        names_out[i] = (char *)malloc(sizeof(char) * 255);
-        if (!names_out[i])
+        names_out[i] = (char*)malloc(sizeof(char) * 255);
+        if (!names_out[i]) {
             goto out;
+        }
     }
 
     /* Get field info */
-    if (H5TBget_field_info(fid, "table1", names_out, sizes_out, offset_out, &size_out) < 0)
+    if (H5TBget_field_info(fid, "table1", names_out, sizes_out, offset_out, &size_out) < 0) {
         goto out;
+    }
 
     for (i = 0; i < NFIELDS; i++) {
         if ((strcmp(field_names[i], names_out[i]) != 0)) {
@@ -1524,17 +1608,20 @@ test_table(hid_t fid, int do_write)
 
     HL_TESTING2("field info with small buffers (backward compatibility)");
 
-    names_out = (char **)malloc(sizeof(char *) * (size_t)NFIELDS);
-    if (!names_out)
+    names_out = (char**)malloc(sizeof(char*) * (size_t)NFIELDS);
+    if (!names_out) {
         goto out;
+    }
     for (i = 0; i < NFIELDS; i++) {
-        names_out[i] = (char *)malloc(sizeof(char) * 32);
-        if (!names_out[i])
+        names_out[i] = (char*)malloc(sizeof(char) * 32);
+        if (!names_out[i]) {
             goto out;
+        }
     }
 
-    if (H5TBget_field_info(fid, "table1", names_out, sizes_out, offset_out, &size_out) < 0)
+    if (H5TBget_field_info(fid, "table1", names_out, sizes_out, offset_out, &size_out) < 0) {
         goto out;
+    }
 
     for (i = 0; i < NFIELDS; i++) {
         if ((strcmp(field_names[i], names_out[i]) != 0)) {
@@ -1560,26 +1647,27 @@ test_table(hid_t fid, int do_write)
     HL_TESTING2("field name length boundaries");
 
     {
-        hid_t   fid_boundary = H5I_INVALID_HID;
-        hid_t   boundary_field_types[BOUNDARY_NFIELDS];
-        size_t  boundary_field_offsets[BOUNDARY_NFIELDS];
-        char  **boundary_names_out = NULL;
-        size_t  boundary_sizes_out[BOUNDARY_NFIELDS];
-        size_t  boundary_offset_out[BOUNDARY_NFIELDS];
-        size_t  boundary_size_out;
+        hid_t fid_boundary = H5I_INVALID_HID;
+        hid_t boundary_field_types[BOUNDARY_NFIELDS];
+        size_t boundary_field_offsets[BOUNDARY_NFIELDS];
+        char** boundary_names_out = NULL;
+        size_t boundary_sizes_out[BOUNDARY_NFIELDS];
+        size_t boundary_offset_out[BOUNDARY_NFIELDS];
+        size_t boundary_size_out;
         hsize_t boundary_nfields;
         hsize_t boundary_nrecords;
         /* one below max name length: no truncation */
-        char *field_below_max = (char *)malloc(HLTB_MAX_FIELD_LEN - 1);
+        char* field_below_max = (char*)malloc(HLTB_MAX_FIELD_LEN - 1);
         /* exactly max name length: fits at boundary, no truncation */
-        char *field_at_max = (char *)malloc(HLTB_MAX_FIELD_LEN);
+        char* field_at_max = (char*)malloc(HLTB_MAX_FIELD_LEN);
         /* one above max name length: truncated when read back */
-        char *field_over_max = (char *)malloc(HLTB_MAX_FIELD_LEN + 1);
+        char* field_over_max = (char*)malloc(HLTB_MAX_FIELD_LEN + 1);
         /* far above max: truncated when read back */
-        char *field_far_over = (char *)malloc(BOUNDARY_OVERLONG_LEN + 1);
+        char* field_far_over = (char*)malloc(BOUNDARY_OVERLONG_LEN + 1);
 
-        if (!field_below_max || !field_at_max || !field_over_max || !field_far_over)
+        if (!field_below_max || !field_at_max || !field_over_max || !field_far_over) {
             goto boundary_out;
+        }
 
         memset(field_below_max, 'A', HLTB_MAX_FIELD_LEN - 2);
         field_below_max[HLTB_MAX_FIELD_LEN - 2] = '\0';
@@ -1590,72 +1678,90 @@ test_table(hid_t fid, int do_write)
         memset(field_far_over, 'D', BOUNDARY_OVERLONG_LEN);
         field_far_over[BOUNDARY_OVERLONG_LEN] = '\0';
 
-        const char *boundary_field_names[BOUNDARY_NFIELDS] = {field_below_max, field_at_max, field_over_max,
-                                                              field_far_over, BOUNDARY_SHORT_NAME};
+        const char* boundary_field_names[BOUNDARY_NFIELDS] = { field_below_max, field_at_max, field_over_max, field_far_over, BOUNDARY_SHORT_NAME };
 
-        if ((fid_boundary = H5Fcreate(BOUNDARY_FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((fid_boundary = H5Fcreate(BOUNDARY_FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto boundary_out;
+        }
 
         for (i = 0; i < BOUNDARY_NFIELDS; i++) {
-            boundary_field_types[i]   = H5T_NATIVE_INT;
+            boundary_field_types[i] = H5T_NATIVE_INT;
             boundary_field_offsets[i] = i * sizeof(int);
         }
 
-        int boundary_data[BOUNDARY_NRECORDS][BOUNDARY_NFIELDS] = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}};
+        int boundary_data[BOUNDARY_NRECORDS][BOUNDARY_NFIELDS] = { { 1, 2, 3, 4, 5 }, { 6, 7, 8, 9, 10 } };
 
-        if (H5TBmake_table("Boundary Test", fid_boundary, "boundary_table", BOUNDARY_NFIELDS,
-                           BOUNDARY_NRECORDS, BOUNDARY_NFIELDS * sizeof(int), boundary_field_names,
-                           boundary_field_offsets, boundary_field_types, 10, NULL, 0, boundary_data) < 0)
+        if (H5TBmake_table("Boundary Test",
+                           fid_boundary,
+                           "boundary_table",
+                           BOUNDARY_NFIELDS,
+                           BOUNDARY_NRECORDS,
+                           BOUNDARY_NFIELDS * sizeof(int),
+                           boundary_field_names,
+                           boundary_field_offsets,
+                           boundary_field_types,
+                           10,
+                           NULL,
+                           0,
+                           boundary_data) < 0) {
             goto boundary_out;
-
-        boundary_names_out = (char **)malloc(sizeof(char *) * BOUNDARY_NFIELDS);
-        if (!boundary_names_out)
-            goto boundary_out;
-        for (i = 0; i < BOUNDARY_NFIELDS; i++) {
-            boundary_names_out[i] = (char *)malloc(HLTB_MAX_FIELD_LEN);
-            if (!boundary_names_out[i])
-                goto boundary_out;
         }
 
-        if (H5TBget_field_info(fid_boundary, "boundary_table", boundary_names_out, boundary_sizes_out,
-                               boundary_offset_out, &boundary_size_out) < 0)
+        boundary_names_out = (char**)malloc(sizeof(char*) * BOUNDARY_NFIELDS);
+        if (!boundary_names_out) {
             goto boundary_out;
+        }
+        for (i = 0; i < BOUNDARY_NFIELDS; i++) {
+            boundary_names_out[i] = (char*)malloc(HLTB_MAX_FIELD_LEN);
+            if (!boundary_names_out[i]) {
+                goto boundary_out;
+            }
+        }
+
+        if (H5TBget_field_info(fid_boundary, "boundary_table", boundary_names_out, boundary_sizes_out, boundary_offset_out, &boundary_size_out) < 0) {
+            goto boundary_out;
+        }
 
         /* HLTB_MAX_FIELD_LEN-2 char name: fits without truncation */
-        if (strlen(boundary_names_out[0]) != HLTB_MAX_FIELD_LEN - 2 ||
-            strncmp(boundary_names_out[0], field_below_max, HLTB_MAX_FIELD_LEN - 2) != 0)
+        if (strlen(boundary_names_out[0]) != HLTB_MAX_FIELD_LEN - 2 || strncmp(boundary_names_out[0], field_below_max, HLTB_MAX_FIELD_LEN - 2) != 0) {
             goto boundary_out;
+        }
         /* HLTB_MAX_FIELD_LEN-1 char name: fits exactly at boundary, no truncation */
-        if (strlen(boundary_names_out[1]) != HLTB_MAX_FIELD_LEN - 1 ||
-            strncmp(boundary_names_out[1], field_at_max, HLTB_MAX_FIELD_LEN - 1) != 0)
+        if (strlen(boundary_names_out[1]) != HLTB_MAX_FIELD_LEN - 1 || strncmp(boundary_names_out[1], field_at_max, HLTB_MAX_FIELD_LEN - 1) != 0) {
             goto boundary_out;
+        }
         /* HLTB_MAX_FIELD_LEN char name: truncated to HLTB_MAX_FIELD_LEN-1 chars */
-        if (strlen(boundary_names_out[2]) != HLTB_MAX_FIELD_LEN - 1 ||
-            strncmp(boundary_names_out[2], field_over_max, HLTB_MAX_FIELD_LEN - 1) != 0)
+        if (strlen(boundary_names_out[2]) != HLTB_MAX_FIELD_LEN - 1 || strncmp(boundary_names_out[2], field_over_max, HLTB_MAX_FIELD_LEN - 1) != 0) {
             goto boundary_out;
+        }
         /* far-over-max name: truncated to HLTB_MAX_FIELD_LEN-1 chars */
-        if (strlen(boundary_names_out[3]) != HLTB_MAX_FIELD_LEN - 1 ||
-            strncmp(boundary_names_out[3], field_far_over, HLTB_MAX_FIELD_LEN - 1) != 0)
+        if (strlen(boundary_names_out[3]) != HLTB_MAX_FIELD_LEN - 1 || strncmp(boundary_names_out[3], field_far_over, HLTB_MAX_FIELD_LEN - 1) != 0) {
             goto boundary_out;
+        }
         /* short name: unchanged */
-        if (strcmp(boundary_names_out[4], BOUNDARY_SHORT_NAME) != 0)
+        if (strcmp(boundary_names_out[4], BOUNDARY_SHORT_NAME) != 0) {
             goto boundary_out;
+        }
 
-        if (H5TBget_table_info(fid_boundary, "boundary_table", &boundary_nfields, &boundary_nrecords) < 0)
+        if (H5TBget_table_info(fid_boundary, "boundary_table", &boundary_nfields, &boundary_nrecords) < 0) {
             goto boundary_out;
-        if (boundary_nfields != BOUNDARY_NFIELDS || boundary_nrecords != BOUNDARY_NRECORDS)
+        }
+        if (boundary_nfields != BOUNDARY_NFIELDS || boundary_nrecords != BOUNDARY_NRECORDS) {
             goto boundary_out;
+        }
 
-        for (i = 0; i < BOUNDARY_NFIELDS; i++)
+        for (i = 0; i < BOUNDARY_NFIELDS; i++) {
             free(boundary_names_out[i]);
+        }
         free(boundary_names_out);
         free(field_below_max);
         free(field_at_max);
         free(field_over_max);
         free(field_far_over);
 
-        if (H5Fclose(fid_boundary) < 0)
+        if (H5Fclose(fid_boundary) < 0) {
             goto out;
+        }
 
         PASSED();
         goto boundary_cleanup;
@@ -1663,8 +1769,9 @@ test_table(hid_t fid, int do_write)
 boundary_out:
         H5_FAILED();
         if (boundary_names_out) {
-            for (i = 0; i < BOUNDARY_NFIELDS; i++)
+            for (i = 0; i < BOUNDARY_NFIELDS; i++) {
                 free(boundary_names_out[i]);
+            }
             free(boundary_names_out);
         }
         free(field_below_max);
@@ -1696,10 +1803,9 @@ out:
  *-------------------------------------------------------------------------
  */
 
-int
-main(void)
+int main(void)
 {
-    hid_t    fid; /* identifier for the file */
+    hid_t fid; /* identifier for the file */
     unsigned flags = H5F_ACC_RDONLY;
 
     /*-------------------------------------------------------------------------
@@ -1713,8 +1819,9 @@ main(void)
     puts("Testing table with file creation mode (read/write in native architecture):");
 
     /* test, do write */
-    if (test_table(fid, 1) < 0)
+    if (test_table(fid, 1) < 0) {
         goto out;
+    }
 
     /* close */
     H5Fclose(fid);
@@ -1728,8 +1835,9 @@ main(void)
     fid = h5file_open(TEST_FILE_BE, flags);
 
     /* test, do not write */
-    if (test_table(fid, 0) < 0)
+    if (test_table(fid, 0) < 0) {
         goto out;
+    }
 
     /* close */
     H5Fclose(fid);
@@ -1743,8 +1851,9 @@ main(void)
     fid = h5file_open(TEST_FILE_LE, flags);
 
     /* test, do not write */
-    if (test_table(fid, 0) < 0)
+    if (test_table(fid, 0) < 0) {
         goto out;
+    }
 
     /* close */
     H5Fclose(fid);
@@ -1758,8 +1867,9 @@ main(void)
     fid = h5file_open(TEST_FILE_CRAY, flags);
 
     /* test, do not write */
-    if (test_table(fid, 0) < 0)
+    if (test_table(fid, 0) < 0) {
         goto out;
+    }
 
     /* close */
     H5Fclose(fid);

@@ -45,24 +45,23 @@
 
 #include "hdf5.h"
 
-#define BUF_SIZE 1048576
+#define BUF_SIZE 1'048'576
 #define N_LOOPS  64
 
 #define TESTFILE "h5_debug_trace_out.h5"
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    int  i, j;
-    int *data;
+    int i, j;
+    int* data;
 
     hid_t fid;
     hid_t pid;
     hid_t did;
     hid_t sid;
 
-    hsize_t dims[1]        = {BUF_SIZE};
-    hsize_t chunk_sizes[1] = {1024};
+    hsize_t dims[1] = { BUF_SIZE };
+    hsize_t chunk_sizes[1] = { 1024 };
 
     herr_t err;
 
@@ -81,9 +80,8 @@ main(int argc, char **argv)
     /* This will emit H5Tconvert() performance information */
 
     for (i = 0; i < N_LOOPS; i++) {
-
         /* The buffer has to be large enough to hold the conversion output */
-        data = (int *)malloc(BUF_SIZE * sizeof(double));
+        data = (int*)malloc(BUF_SIZE * sizeof(double));
 
         for (j = 0; j < BUF_SIZE; j++) {
             data[j] = j;
@@ -102,7 +100,7 @@ main(int argc, char **argv)
 
     /* This will emit H5Z performance information */
 
-    data = (int *)malloc(BUF_SIZE * sizeof(int));
+    data = (int*)malloc(BUF_SIZE * sizeof(int));
 
     for (i = 0; i < BUF_SIZE; i++) {
         data[i] = i;

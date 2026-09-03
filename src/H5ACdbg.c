@@ -70,8 +70,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5AC_stats(const H5F_t *f)
+herr_t H5AC_stats(const H5F_t* f)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -98,8 +97,7 @@ H5AC_stats(const H5F_t *f)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5AC_dump_cache(const H5F_t *f)
+herr_t H5AC_dump_cache(const H5F_t* f)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -110,8 +108,9 @@ H5AC_dump_cache(const H5F_t *f)
     assert(f->shared);
     assert(f->shared->cache);
 
-    if (H5C_dump_cache(f->shared->cache, H5F_OPEN_NAME(f)) < 0)
+    if (H5C_dump_cache(f->shared->cache, H5F_OPEN_NAME(f)) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "H5C_dump_cache() failed.");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -156,10 +155,9 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5AC_get_entry_ptr_from_addr(const H5F_t *f, haddr_t addr, void **entry_ptr_ptr)
+herr_t H5AC_get_entry_ptr_from_addr(const H5F_t* f, haddr_t addr, void** entry_ptr_ptr)
 {
-    H5C_t *cache_ptr;           /* Ptr to cache */
+    H5C_t* cache_ptr;           /* Ptr to cache */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -169,8 +167,9 @@ H5AC_get_entry_ptr_from_addr(const H5F_t *f, haddr_t addr, void **entry_ptr_ptr)
     assert(f->shared);
     cache_ptr = f->shared->cache;
 
-    if (H5C_get_entry_ptr_from_addr(cache_ptr, addr, entry_ptr_ptr) < 0)
+    if (H5C_get_entry_ptr_from_addr(cache_ptr, addr, entry_ptr_ptr) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "H5C_get_entry_ptr_from_addr() failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -200,10 +199,9 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5AC_flush_dependency_exists(H5F_t *f, haddr_t parent_addr, haddr_t child_addr, bool *fd_exists_ptr)
+herr_t H5AC_flush_dependency_exists(H5F_t* f, haddr_t parent_addr, haddr_t child_addr, bool* fd_exists_ptr)
 {
-    H5C_t *cache_ptr;        /* Ptr to cache */
+    H5C_t* cache_ptr;        /* Ptr to cache */
     herr_t ret_value = FAIL; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -246,11 +244,9 @@ H5AC_flush_dependency_exists(H5F_t *f, haddr_t parent_addr, haddr_t child_addr, 
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-herr_t
-H5AC_verify_entry_type(const H5F_t *f, haddr_t addr, const H5AC_class_t *expected_type, bool *in_cache_ptr,
-                       bool *type_ok_ptr)
+herr_t H5AC_verify_entry_type(const H5F_t* f, haddr_t addr, const H5AC_class_t* expected_type, bool* in_cache_ptr, bool* type_ok_ptr)
 {
-    H5C_t *cache_ptr;
+    H5C_t* cache_ptr;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -260,8 +256,9 @@ H5AC_verify_entry_type(const H5F_t *f, haddr_t addr, const H5AC_class_t *expecte
     assert(f->shared);
     cache_ptr = f->shared->cache;
 
-    if (H5C_verify_entry_type(cache_ptr, addr, expected_type, in_cache_ptr, type_ok_ptr) < 0)
+    if (H5C_verify_entry_type(cache_ptr, addr, expected_type, in_cache_ptr, type_ok_ptr) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "H5C_verify_entry_type() failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -279,11 +276,10 @@ done:
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-bool
-H5AC_get_serialization_in_progress(H5F_t *f)
+bool H5AC_get_serialization_in_progress(H5F_t* f)
 {
-    H5C_t *cache_ptr;
-    bool   ret_value = false; /* Return value */
+    H5C_t* cache_ptr;
+    bool ret_value = false; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -315,11 +311,10 @@ H5AC_get_serialization_in_progress(H5F_t *f)
  *-------------------------------------------------------------------------
  */
 #ifndef NDEBUG
-bool
-H5AC_cache_is_clean(const H5F_t *f, H5AC_ring_t inner_ring)
+bool H5AC_cache_is_clean(const H5F_t* f, H5AC_ring_t inner_ring)
 {
-    H5C_t *cache_ptr;
-    bool   ret_value = false; /* Return value */
+    H5C_t* cache_ptr;
+    bool ret_value = false; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 

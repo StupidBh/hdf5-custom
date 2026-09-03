@@ -22,8 +22,7 @@
 #define FAMILY_H5REPART_SIZE1 20000
 #define FAMILY_H5REPART_SIZE2 (5 * KB)
 
-static const char *FILENAME[] = {"fst_family%05d.h5", "scd_family%05d.h5", "family_to_single.h5",
-                                 "family_to_sec2.h5", NULL};
+static const char* FILENAME[] = { "fst_family%05d.h5", "scd_family%05d.h5", "family_to_single.h5", "family_to_sec2.h5", NULL };
 
 herr_t test_family_h5repart_opens(void);
 herr_t test_single_h5repart_opens(void);
@@ -37,37 +36,44 @@ herr_t test_single_h5repart_opens(void);
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-test_family_h5repart_opens(void)
+herr_t test_family_h5repart_opens(void)
 {
-    hid_t fid     = H5I_INVALID_HID;
+    hid_t fid = H5I_INVALID_HID;
     hid_t fapl_id = H5I_INVALID_HID;
 
     /* open 1st file(single member file) with correct family size(20000 byte) */
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         goto error;
+    }
 
-    if (H5Pset_fapl_family(fapl_id, (hsize_t)FAMILY_H5REPART_SIZE1, H5P_DEFAULT) < 0)
+    if (H5Pset_fapl_family(fapl_id, (hsize_t)FAMILY_H5REPART_SIZE1, H5P_DEFAULT) < 0) {
         goto error;
+    }
 
-    if ((fid = H5Fopen(FILENAME[0], H5F_ACC_RDWR, fapl_id)) < 0)
+    if ((fid = H5Fopen(FILENAME[0], H5F_ACC_RDWR, fapl_id)) < 0) {
         goto error;
+    }
 
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     /* open 2nd file(multiple member files) with correct family size(5KB) */
-    if (H5Pset_fapl_family(fapl_id, (hsize_t)FAMILY_H5REPART_SIZE2, H5P_DEFAULT) < 0)
+    if (H5Pset_fapl_family(fapl_id, (hsize_t)FAMILY_H5REPART_SIZE2, H5P_DEFAULT) < 0) {
         goto error;
+    }
 
-    if ((fid = H5Fopen(FILENAME[1], H5F_ACC_RDWR, fapl_id)) < 0)
+    if ((fid = H5Fopen(FILENAME[1], H5F_ACC_RDWR, fapl_id)) < 0) {
         goto error;
+    }
 
-    if (H5Pclose(fapl_id) < 0)
+    if (H5Pclose(fapl_id) < 0) {
         goto error;
+    }
 
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     return SUCCEED;
 
@@ -92,22 +98,25 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-test_single_h5repart_opens(void)
+herr_t test_single_h5repart_opens(void)
 {
     hid_t fid = H5I_INVALID_HID;
 
     /* open the single file */
-    if ((fid = H5Fopen(FILENAME[2], H5F_ACC_RDWR, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fopen(FILENAME[2], H5F_ACC_RDWR, H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     /* open the single file (created using the old argument) */
-    if ((fid = H5Fopen(FILENAME[3], H5F_ACC_RDWR, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fopen(FILENAME[3], H5F_ACC_RDWR, H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     return SUCCEED;
 
@@ -131,16 +140,16 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int nerrors = 0;
 
     nerrors += test_family_h5repart_opens() < 0 ? 1 : 0;
     nerrors += test_single_h5repart_opens() < 0 ? 1 : 0;
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
 
     exit(EXIT_SUCCESS);
 

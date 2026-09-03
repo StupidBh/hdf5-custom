@@ -52,15 +52,15 @@
 
 #ifdef H5_HAVE_PARALLEL
 
-#define EXAMPLE_FILE      "ph5_comm_split.h5"
-#define EXAMPLE_DSET_NAME "DSET"
+    #define EXAMPLE_FILE      "ph5_comm_split.h5"
+    #define EXAMPLE_DSET_NAME "DSET"
 
-/* Number of elements each rank of the writer group contributes */
-#define EXAMPLE_DSET_ROW_LEN 8
+    /* Number of elements each rank of the writer group contributes */
+    #define EXAMPLE_DSET_ROW_LEN 8
 
-#ifndef PATH_MAX
-#define PATH_MAX 512
-#endif
+    #ifndef PATH_MAX
+        #define PATH_MAX 512
+    #endif
 /*
  * Abort the entire job if an HDF5 call fails.
  *
@@ -70,8 +70,7 @@
  * over MPI_COMM_WORLD is the only way to ensure all ranks, including those
  * outside the writer group, are released.
  */
-static void
-check(bool succeeded, const char *what)
+static void check(bool succeeded, const char* what)
 {
     if (!succeeded) {
         fprintf(stderr, "%s failed\n", what);
@@ -85,20 +84,20 @@ check(bool succeeded, const char *what)
  * row. Each rank fills its row with its MPI_COMM_WORLD rank, allowing
  * verification to confirm that each row was written to the correct location.
  */
-static void
-write_dataset(hid_t file_id, int world_rank, int group_rank, int group_size)
+static void write_dataset(hid_t file_id, int world_rank, int group_rank, int group_size)
 {
-    hid_t   dset_id    = H5I_INVALID_HID;
-    hid_t   file_space = H5I_INVALID_HID;
-    hid_t   mem_space  = H5I_INVALID_HID;
-    hid_t   dxpl_id    = H5I_INVALID_HID;
-    hsize_t dims[2]    = {(hsize_t)group_size, EXAMPLE_DSET_ROW_LEN};
-    hsize_t start[2]   = {(hsize_t)group_rank, 0};
-    hsize_t count[2]   = {1, EXAMPLE_DSET_ROW_LEN};
-    int     data[EXAMPLE_DSET_ROW_LEN];
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t file_space = H5I_INVALID_HID;
+    hid_t mem_space = H5I_INVALID_HID;
+    hid_t dxpl_id = H5I_INVALID_HID;
+    hsize_t dims[2] = { (hsize_t)group_size, EXAMPLE_DSET_ROW_LEN };
+    hsize_t start[2] = { (hsize_t)group_rank, 0 };
+    hsize_t count[2] = { 1, EXAMPLE_DSET_ROW_LEN };
+    int data[EXAMPLE_DSET_ROW_LEN];
 
-    for (int i = 0; i < EXAMPLE_DSET_ROW_LEN; i++)
+    for (int i = 0; i < EXAMPLE_DSET_ROW_LEN; i++) {
         data[i] = world_rank;
+    }
 
     /*
      * The dataset gets one row per rank of the writer group, so its shape
@@ -113,13 +112,11 @@ write_dataset(hid_t file_id, int world_rank, int group_rank, int group_size)
      * H5Dcreate2 is collective over the file's communicator, which is the
      * sub-communicator the FAPL was built with.
      */
-    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, H5T_NATIVE_INT, file_space, H5P_DEFAULT, H5P_DEFAULT,
-                         H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, H5T_NATIVE_INT, file_space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     check(dset_id >= 0, "H5Dcreate2");
 
     /* Select the single row this rank owns */
-    check(H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL) >= 0,
-          "H5Sselect_hyperslab (write)");
+    check(H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL) >= 0, "H5Sselect_hyperslab (write)");
 
     /* The in-memory buffer holds exactly that one row */
     mem_space = H5Screate_simple(2, count, NULL);
@@ -146,16 +143,15 @@ write_dataset(hid_t file_id, int world_rank, int group_rank, int group_size)
  * been reopened read-only on the same sub-communicator, so these calls are
  * collective over the writer group exactly as the write calls were.
  */
-static void
-verify_dataset(hid_t file_id, int world_rank, int group_rank)
+static void verify_dataset(hid_t file_id, int world_rank, int group_rank)
 {
-    hid_t   dset_id    = H5I_INVALID_HID;
-    hid_t   file_space = H5I_INVALID_HID;
-    hid_t   mem_space  = H5I_INVALID_HID;
-    hid_t   dxpl_id    = H5I_INVALID_HID;
-    hsize_t start[2]   = {(hsize_t)group_rank, 0};
-    hsize_t count[2]   = {1, EXAMPLE_DSET_ROW_LEN};
-    int     data[EXAMPLE_DSET_ROW_LEN];
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t file_space = H5I_INVALID_HID;
+    hid_t mem_space = H5I_INVALID_HID;
+    hid_t dxpl_id = H5I_INVALID_HID;
+    hsize_t start[2] = { (hsize_t)group_rank, 0 };
+    hsize_t count[2] = { 1, EXAMPLE_DSET_ROW_LEN };
+    int data[EXAMPLE_DSET_ROW_LEN];
 
     dset_id = H5Dopen2(file_id, EXAMPLE_DSET_NAME, H5P_DEFAULT);
     check(dset_id >= 0, "H5Dopen2");
@@ -163,8 +159,7 @@ verify_dataset(hid_t file_id, int world_rank, int group_rank)
     /* Ask the file for the dataset's shape and select this rank's row in it */
     file_space = H5Dget_space(dset_id);
     check(file_space >= 0, "H5Dget_space");
-    check(H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL) >= 0,
-          "H5Sselect_hyperslab (read)");
+    check(H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL) >= 0, "H5Sselect_hyperslab (read)");
 
     mem_space = H5Screate_simple(2, count, NULL);
     check(mem_space >= 0, "H5Screate_simple (read memory dataspace)");
@@ -177,8 +172,7 @@ verify_dataset(hid_t file_id, int world_rank, int group_rank)
 
     for (int i = 0; i < EXAMPLE_DSET_ROW_LEN; i++) {
         if (data[i] != world_rank) {
-            fprintf(stderr, "rank %d read %d at element %d of its row, expected %d\n", world_rank, data[i], i,
-                    world_rank);
+            fprintf(stderr, "rank %d read %d at element %d of its row, expected %d\n", world_rank, data[i], i, world_rank);
             fflush(stderr);
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
@@ -194,8 +188,7 @@ verify_dataset(hid_t file_id, int world_rank, int group_rank)
  * Build a FAPL bound to the given communicator, with the collective
  * metadata settings that are generally recommended for parallel access.
  */
-static hid_t
-make_fapl(MPI_Comm comm)
+static hid_t make_fapl(MPI_Comm comm)
 {
     hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
 
@@ -230,17 +223,16 @@ make_fapl(MPI_Comm comm)
     return fapl_id;
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    MPI_Comm sub_comm   = MPI_COMM_NULL;
-    hid_t    fapl_id    = H5I_INVALID_HID;
-    hid_t    file_id    = H5I_INVALID_HID;
-    char    *par_prefix = NULL;
-    char     filename[PATH_MAX];
-    int      world_rank, world_size;
-    int      group_rank, group_size;
-    int      color;
+    MPI_Comm sub_comm = MPI_COMM_NULL;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
+    char* par_prefix = NULL;
+    char filename[PATH_MAX];
+    int world_rank, world_size;
+    int group_rank, group_size;
+    int color;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
@@ -280,8 +272,9 @@ main(int argc, char **argv)
          * sub_comm. The odd ranks are not in sub_comm and make none of
          * these calls.
          */
-        if (group_rank == 0)
+        if (group_rank == 0) {
             printf("%d of %d ranks form the writer group\n", group_size, world_size);
+        }
 
         fapl_id = make_fapl(sub_comm);
 
@@ -324,8 +317,9 @@ main(int argc, char **argv)
          * that the writer group never makes, and it would block forever in
          * the MPI collective it issues internally.
          */
-        if (group_rank == 0)
+        if (group_rank == 0) {
             printf("%d of %d ranks are doing other work and stay out of HDF5\n", group_size, world_size);
+        }
     }
 
     /*
@@ -339,11 +333,13 @@ main(int argc, char **argv)
      * one rank makes the call, and it does so after the barrier above has
      * confirmed that every writer rank has closed the file.
      */
-    if (world_rank == 0 && !getenv(HDF5_NOCLEANUP))
+    if (world_rank == 0 && !getenv(HDF5_NOCLEANUP)) {
         MPI_File_delete(filename, MPI_INFO_NULL);
+    }
 
-    if (world_rank == 0)
+    if (world_rank == 0) {
         printf("PHDF5 example finished with no errors\n");
+    }
 
     /* MPI_Comm_free is collective over sub_comm, so both groups free theirs */
     MPI_Comm_free(&sub_comm);
@@ -355,8 +351,7 @@ main(int argc, char **argv)
 
 #else
 
-int
-main(void)
+int main(void)
 {
     printf("HDF5 not configured with parallel support!\n");
     return 0;

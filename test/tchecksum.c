@@ -38,11 +38,10 @@
 **  test_chksum_size_one(): Checksum 1 byte buffer
 **
 ****************************************************************/
-static void
-test_chksum_size_one(void)
+static void test_chksum_size_one(void)
 {
-    uint8_t  buf[1] = {23}; /* Buffer to checksum */
-    uint32_t chksum;        /* Checksum value */
+    uint8_t buf[1] = { 23 }; /* Buffer to checksum */
+    uint32_t chksum;         /* Checksum value */
 
     /* Buffer w/real data */
     chksum = H5_checksum_fletcher32(buf, sizeof(buf));
@@ -71,11 +70,10 @@ test_chksum_size_one(void)
 **  test_chksum_size_two(): Checksum 2 byte buffer
 **
 ****************************************************************/
-static void
-test_chksum_size_two(void)
+static void test_chksum_size_two(void)
 {
-    uint8_t  buf[2] = {23, 187}; /* Buffer to checksum */
-    uint32_t chksum;             /* Checksum value */
+    uint8_t buf[2] = { 23, 187 }; /* Buffer to checksum */
+    uint32_t chksum;              /* Checksum value */
 
     /* Buffer w/real data */
     chksum = H5_checksum_fletcher32(buf, sizeof(buf));
@@ -104,11 +102,10 @@ test_chksum_size_two(void)
 **  test_chksum_size_three(): Checksum 3 byte buffer
 **
 ****************************************************************/
-static void
-test_chksum_size_three(void)
+static void test_chksum_size_three(void)
 {
-    uint8_t  buf[3] = {23, 187, 98}; /* Buffer to checksum */
-    uint32_t chksum;                 /* Checksum value */
+    uint8_t buf[3] = { 23, 187, 98 }; /* Buffer to checksum */
+    uint32_t chksum;                  /* Checksum value */
 
     /* Buffer w/real data */
     chksum = H5_checksum_fletcher32(buf, sizeof(buf));
@@ -137,11 +134,10 @@ test_chksum_size_three(void)
 **  test_chksum_size_four(): Checksum 4 byte buffer
 **
 ****************************************************************/
-static void
-test_chksum_size_four(void)
+static void test_chksum_size_four(void)
 {
-    uint8_t  buf[4] = {23, 187, 98, 217}; /* Buffer to checksum */
-    uint32_t chksum;                      /* Checksum value */
+    uint8_t buf[4] = { 23, 187, 98, 217 }; /* Buffer to checksum */
+    uint32_t chksum;                       /* Checksum value */
 
     /* Buffer w/real data */
     chksum = H5_checksum_fletcher32(buf, sizeof(buf));
@@ -170,20 +166,20 @@ test_chksum_size_four(void)
 **  test_chksum_large(): Checksum larger buffer
 **
 ****************************************************************/
-static void
-test_chksum_large(void)
+static void test_chksum_large(void)
 {
-    uint8_t *large_buf; /* Buffer for checksum calculations */
+    uint8_t* large_buf; /* Buffer for checksum calculations */
     uint32_t chksum;    /* Checksum value */
-    size_t   u;         /* Local index variable */
+    size_t u;           /* Local index variable */
 
     /* Allocate the buffer */
-    large_buf = (uint8_t *)malloc((size_t)BUF_LEN);
+    large_buf = (uint8_t*)malloc((size_t)BUF_LEN);
     CHECK_PTR(large_buf, "malloc");
 
     /* Initialize buffer w/known data */
-    for (u = 0; u < BUF_LEN; u++)
+    for (u = 0; u < BUF_LEN; u++) {
         large_buf[u] = (uint8_t)(u * 3);
+    }
 
     /* Buffer w/real data */
     chksum = H5_checksum_fletcher32(large_buf, (size_t)BUF_LEN);
@@ -215,8 +211,7 @@ test_chksum_large(void)
 **  test_checksum(): Main checksum testing routine.
 **
 ****************************************************************/
-void
-test_checksum(void H5_ATTR_UNUSED *params)
+void test_checksum(void H5_ATTR_UNUSED* params)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing checksum algorithms\n"));
@@ -239,8 +234,7 @@ test_checksum(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_checksum(void H5_ATTR_UNUSED *params)
+void cleanup_checksum(void H5_ATTR_UNUSED* params)
 {
     /* no file to clean */
 }

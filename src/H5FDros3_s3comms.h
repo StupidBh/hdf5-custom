@@ -53,36 +53,33 @@
 
 #ifdef H5_HAVE_ROS3_VFD
 
-/**********
- * MACROS *
- **********/
+    /**********
+     * MACROS *
+     **********/
 
-/*
- * Macro to define level of debugging from the S3comms module.
- *
- *  0 -> no debugging
- *  1 -> minimal debugging information
- *  2 -> trace level debugging
- */
-#define S3COMMS_DEBUG 0
+    /*
+     * Macro to define level of debugging from the S3comms module.
+     *
+     *  0 -> no debugging
+     *  1 -> minimal debugging information
+     *  2 -> trace level debugging
+     */
+    #define S3COMMS_DEBUG 0
 
-/* Defines for the use of HTTP status codes */
-#define HTTP_CLIENT_SUCCESS_MIN 200 /* Minimum and maximum values for the 200 class of */
-#define HTTP_CLIENT_SUCCESS_MAX 299 /* HTTP client success responses */
+    /* Defines for the use of HTTP status codes */
+    #define HTTP_CLIENT_SUCCESS_MIN 200 /* Minimum and maximum values for the 200 class of */
+    #define HTTP_CLIENT_SUCCESS_MAX 299 /* HTTP client success responses */
 
-#define HTTP_CLIENT_ERROR_MIN 400 /* Minimum and maximum values for the 400 class of */
-#define HTTP_CLIENT_ERROR_MAX 499 /* HTTP client error responses */
+    #define HTTP_CLIENT_ERROR_MIN 400   /* Minimum and maximum values for the 400 class of */
+    #define HTTP_CLIENT_ERROR_MAX 499   /* HTTP client error responses */
 
-#define HTTP_SERVER_ERROR_MIN 500 /* Minimum and maximum values for the 500 class of */
-#define HTTP_SERVER_ERROR_MAX 599 /* HTTP server error responses */
+    #define HTTP_SERVER_ERROR_MIN 500   /* Minimum and maximum values for the 500 class of */
+    #define HTTP_SERVER_ERROR_MAX 599   /* HTTP server error responses */
 
-/* Macros to check for classes of HTTP response */
-#define HTTP_CLIENT_SUCCESS(status_code)                                                                     \
-    (status_code >= HTTP_CLIENT_SUCCESS_MIN && status_code <= HTTP_CLIENT_SUCCESS_MAX)
-#define HTTP_CLIENT_ERROR(status_code)                                                                       \
-    (status_code >= HTTP_CLIENT_ERROR_MIN && status_code <= HTTP_CLIENT_ERROR_MAX)
-#define HTTP_SERVER_ERROR(status_code)                                                                       \
-    (status_code >= HTTP_SERVER_ERROR_MIN && status_code <= HTTP_SERVER_ERROR_MAX)
+    /* Macros to check for classes of HTTP response */
+    #define HTTP_CLIENT_SUCCESS(status_code) (status_code >= HTTP_CLIENT_SUCCESS_MIN && status_code <= HTTP_CLIENT_SUCCESS_MAX)
+    #define HTTP_CLIENT_ERROR(status_code)   (status_code >= HTTP_CLIENT_ERROR_MIN && status_code <= HTTP_CLIENT_ERROR_MAX)
+    #define HTTP_SERVER_ERROR(status_code)   (status_code >= HTTP_SERVER_ERROR_MIN && status_code <= HTTP_SERVER_ERROR_MAX)
 
 /*********************
  * PUBLIC STRUCTURES *
@@ -139,14 +136,15 @@
  *     S3 object key to access.
  *----------------------------------------------------------------------------
  */
-typedef struct {
-    char *scheme; /* required */
-    char *host;   /* required */
-    char *port;
-    char *path;
-    char *query;
-    char *bucket_name;
-    char *key;
+typedef struct
+{
+    char* scheme; /* required */
+    char* host;   /* required */
+    char* port;
+    char* path;
+    char* query;
+    char* bucket_name;
+    char* key;
 } parsed_url_t;
 
 /*----------------------------------------------------------------------------
@@ -192,33 +190,34 @@ typedef struct {
  *     e.g., "us-east-1".
  *----------------------------------------------------------------------------
  */
-typedef struct {
-    parsed_url_t *purl;
-    parsed_url_t *alternate_purl;
-    size_t        filesize;
-    char         *aws_region;
+typedef struct
+{
+    parsed_url_t* purl;
+    parsed_url_t* alternate_purl;
+    size_t filesize;
+    char* aws_region;
 
     /* Information specific to the backend used for S3 communication */
-    void *priv_data;
+    void* priv_data;
 } s3r_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+    #ifdef __cplusplus
+extern "C"
+{
+    #endif
 
-H5_DLL herr_t H5FD__s3comms_init(void);
-H5_DLL herr_t H5FD__s3comms_term(void);
+    H5_DLL herr_t H5FD__s3comms_init(void);
+    H5_DLL herr_t H5FD__s3comms_term(void);
 
-/* S3 request buffer routines */
-H5_DLL s3r_t *H5FD__s3comms_s3r_open(const char *url, const H5FD_ros3_fapl_t *fa, const char *fapl_token,
-                                     const char *alt_endpoint);
-H5_DLL herr_t H5FD__s3comms_s3r_close(s3r_t *handle);
-H5_DLL size_t H5FD__s3comms_s3r_get_filesize(s3r_t *handle);
-H5_DLL herr_t H5FD__s3comms_s3r_read(s3r_t *handle, haddr_t offset, size_t len, void *dest, size_t dest_size);
+    /* S3 request buffer routines */
+    H5_DLL s3r_t* H5FD__s3comms_s3r_open(const char* url, const H5FD_ros3_fapl_t* fa, const char* fapl_token, const char* alt_endpoint);
+    H5_DLL herr_t H5FD__s3comms_s3r_close(s3r_t* handle);
+    H5_DLL size_t H5FD__s3comms_s3r_get_filesize(s3r_t* handle);
+    H5_DLL herr_t H5FD__s3comms_s3r_read(s3r_t* handle, haddr_t offset, size_t len, void* dest, size_t dest_size);
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 }
-#endif
+    #endif
 
 #endif /* H5_HAVE_ROS3_VFD */
 

@@ -23,8 +23,8 @@
  * parameters. The long-named ones can be partially spelled. When
  * adding more, make sure that they don't clash with each other.
  */
-static const char            *s_opts   = "h";
-static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'}, {"hel", no_arg, 'h'}, {NULL, 0, '\0'}};
+static const char* s_opts = "h";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' }, { "hel", no_arg, 'h' }, { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function:    usage
@@ -34,8 +34,7 @@ static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'}, {"hel", no_arg,
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     fflush(stdout);
     fprintf(stdout, "usage: %s h5_file\n", prog);
@@ -54,22 +53,19 @@ usage(const char *prog)
  *-------------------------------------------------------------------------
  */
 
-static void
-parse_command_line(int argc, const char *const *argv)
+static void parse_command_line(int argc, const char* const* argv)
 {
     int opt;
 
     /* parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'h':
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                break;
-            case '?':
-            default:
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_FAILURE);
+        case 'h':
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            break;
+        case '?':
+        default : usage(h5tools_getprogname()); h5tools_setstatus(EXIT_FAILURE);
         }
     }
 
@@ -81,8 +77,7 @@ parse_command_line(int argc, const char *const *argv)
     }
 } /* end parse_command_line() */
 
-static void
-leave(int ret)
+static void leave(int ret)
 {
     h5tools_close();
     exit(ret);
@@ -96,15 +91,14 @@ leave(int ret)
  * Return:      EXIT_SUCCESS/EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    char   *ifname;
-    hid_t   ifile = H5I_INVALID_HID;
+    char* ifname;
+    hid_t ifile = H5I_INVALID_HID;
     hsize_t usize;
-    htri_t  testval;
-    herr_t  status;
-    hid_t   plist = H5I_INVALID_HID;
+    htri_t testval;
+    herr_t status;
+    hid_t plist = H5I_INVALID_HID;
 
     h5tools_setprogname(PROGRAMNAME);
     h5tools_setstatus(EXIT_SUCCESS);
@@ -112,7 +106,7 @@ main(int argc, char *argv[])
     /* Initialize h5tools lib */
     h5tools_init();
 
-    parse_command_line(argc, (const char *const *)argv);
+    parse_command_line(argc, (const char* const*)argv);
 
     /* enable error reporting if command line option */
     h5tools_error_report();
@@ -160,8 +154,9 @@ main(int argc, char *argv[])
 
 done:
     H5Pclose(plist);
-    if (ifile >= 0)
+    if (ifile >= 0) {
         H5Fclose(ifile);
+    }
     free(ifname);
 
     leave(h5tools_getstatus());

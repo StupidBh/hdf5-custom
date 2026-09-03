@@ -29,8 +29,7 @@
  *-------------------------------------------------------------------------
  */
 
-int
-main(void)
+int main(void)
 {
     h5tools_setprogname(PROGRAMNAME);
     h5tools_setstatus(EXIT_SUCCESS);

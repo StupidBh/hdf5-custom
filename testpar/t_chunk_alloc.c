@@ -24,11 +24,10 @@ static int mpi_size, mpi_rank;
 #define CLOSE        1
 #define NO_CLOSE     0
 
-static MPI_Offset
-get_filesize(const char *filename)
+static MPI_Offset get_filesize(const char* filename)
 {
-    int        mpierr;
-    MPI_File   fd;
+    int mpierr;
+    MPI_File fd;
     MPI_Offset filesize;
 
     mpierr = MPI_File_open(MPI_COMM_SELF, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &fd);
@@ -43,32 +42,41 @@ get_filesize(const char *filename)
     return (filesize);
 }
 
-typedef enum write_pattern { none, sec_last, all } write_type;
+typedef enum write_pattern
+{
+    none,
+    sec_last,
+    all
+} write_type;
 
-typedef enum access_ { write_all, open_only, extend_only } access_type;
+typedef enum access_
+{
+    write_all,
+    open_only,
+    extend_only
+} access_type;
 
 /*
  * This creates a dataset serially with chunks, each of CHUNK_SIZE
  * elements. The allocation time is set to H5D_ALLOC_TIME_EARLY. Another
  * routine will open this in parallel for extension test.
  */
-static void
-create_chunked_dataset(const char *filename, int chunk_factor, write_type write_pattern)
+static void create_chunked_dataset(const char* filename, int chunk_factor, write_type write_pattern)
 {
-    hid_t   file_id, dataset; /* handles */
-    hid_t   dataspace, memspace;
-    hid_t   cparms;
+    hid_t file_id, dataset; /* handles */
+    hid_t dataspace, memspace;
+    hid_t cparms;
     hsize_t dims[1];
-    hsize_t maxdims[1] = {H5S_UNLIMITED};
+    hsize_t maxdims[1] = { H5S_UNLIMITED };
 
-    hsize_t chunk_dims[1] = {CHUNK_SIZE};
+    hsize_t chunk_dims[1] = { CHUNK_SIZE };
     hsize_t count[1];
     hsize_t stride[1];
     hsize_t block[1];
     hsize_t offset[1]; /* Selection offset within dataspace */
     /* Variables used in reading data back */
-    char   buffer[CHUNK_SIZE];
-    long   nchunks;
+    char buffer[CHUNK_SIZE];
+    long nchunks;
     herr_t hrc;
 
     MPI_Offset filesize, /* actual file size */
@@ -109,16 +117,15 @@ create_chunked_dataset(const char *filename, int chunk_factor, write_type write_
         VRFY((hrc >= 0), "");
 
         /* Create a new dataset within the file using cparms creation properties. */
-        dataset =
-            H5Dcreate2(file_id, DSET_NAME, H5T_NATIVE_UCHAR, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
+        dataset = H5Dcreate2(file_id, DSET_NAME, H5T_NATIVE_UCHAR, dataspace, H5P_DEFAULT, cparms, H5P_DEFAULT);
         VRFY((dataset >= 0), "");
 
         if (write_pattern == sec_last) {
             memset(buffer, 100, CHUNK_SIZE);
 
-            count[0]  = 1;
+            count[0] = 1;
             stride[0] = 1;
-            block[0]  = chunk_dims[0];
+            block[0] = chunk_dims[0];
             offset[0] = (hsize_t)(nchunks - 2) * chunk_dims[0];
 
             hrc = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, stride, count, block);
@@ -149,7 +156,7 @@ create_chunked_dataset(const char *filename, int chunk_factor, write_type write_
 
         if (vol_is_native) {
             /* verify file size */
-            filesize     = get_filesize(filename);
+            filesize = get_filesize(filename);
             est_filesize = (MPI_Offset)nchunks * (MPI_Offset)CHUNK_SIZE * (MPI_Offset)sizeof(unsigned char);
             VRFY((filesize >= est_filesize), "file size check");
         }
@@ -169,16 +176,14 @@ create_chunked_dataset(const char *filename, int chunk_factor, write_type write_
  * opens the dataset. At the end, it verifies the size of the dataset to be
  * consistent with argument 'chunk_factor'.
  */
-static void
-parallel_access_dataset(const char *filename, int chunk_factor, access_type action, hid_t *file_id,
-                        hid_t *dataset)
+static void parallel_access_dataset(const char* filename, int chunk_factor, access_type action, hid_t* file_id, hid_t* dataset)
 {
-    hid_t   memspace, dataspace; /* HDF5 file identifier */
-    hid_t   access_plist;        /* HDF5 ID for file access property list */
-    herr_t  hrc;                 /* HDF5 return code */
+    hid_t memspace, dataspace; /* HDF5 file identifier */
+    hid_t access_plist;        /* HDF5 ID for file access property list */
+    herr_t hrc;                /* HDF5 return code */
     hsize_t size[1];
 
-    hsize_t chunk_dims[1] = {CHUNK_SIZE};
+    hsize_t chunk_dims[1] = { CHUNK_SIZE };
     hsize_t count[1];
     hsize_t stride[1];
     hsize_t block[1];
@@ -188,7 +193,7 @@ parallel_access_dataset(const char *filename, int chunk_factor, access_type acti
 
     /* Variables used in reading data back */
     char buffer[CHUNK_SIZE];
-    int  i;
+    int i;
     long nchunks;
     /* MPI Gubbins */
     MPI_Offset filesize, /* actual file size */
@@ -238,45 +243,42 @@ parallel_access_dataset(const char *filename, int chunk_factor, access_type acti
     size[0] = (hsize_t)nchunks * CHUNK_SIZE;
 
     switch (action) {
+    /* all chunks are written by all the processes in an interleaved way*/
+    case write_all:
 
-        /* all chunks are written by all the processes in an interleaved way*/
-        case write_all:
+        memset(buffer, mpi_rank + 1, CHUNK_SIZE);
+        count[0] = 1;
+        stride[0] = 1;
+        block[0] = chunk_dims[0];
+        for (i = 0; i < nchunks / mpi_size; i++) {
+            offset[0] = (hsize_t)(i * mpi_size + mpi_rank) * chunk_dims[0];
 
-            memset(buffer, mpi_rank + 1, CHUNK_SIZE);
-            count[0]  = 1;
-            stride[0] = 1;
-            block[0]  = chunk_dims[0];
-            for (i = 0; i < nchunks / mpi_size; i++) {
-                offset[0] = (hsize_t)(i * mpi_size + mpi_rank) * chunk_dims[0];
-
-                hrc = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, stride, count, block);
-                VRFY((hrc >= 0), "");
-
-                /* Write the buffer out */
-                hrc = H5Dwrite(*dataset, H5T_NATIVE_UCHAR, memspace, dataspace, H5P_DEFAULT, buffer);
-                VRFY((hrc >= 0), "H5Dwrite");
-            }
-
-            break;
-
-        /* only extends the dataset */
-        case extend_only:
-            /* check if new size is larger than old size */
-            hrc = H5Sget_simple_extent_dims(dataspace, dims, maxdims);
+            hrc = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, stride, count, block);
             VRFY((hrc >= 0), "");
 
-            /* Extend dataset*/
-            if (size[0] > dims[0]) {
-                hrc = H5Dset_extent(*dataset, size);
-                VRFY((hrc >= 0), "");
-            }
-            break;
+            /* Write the buffer out */
+            hrc = H5Dwrite(*dataset, H5T_NATIVE_UCHAR, memspace, dataspace, H5P_DEFAULT, buffer);
+            VRFY((hrc >= 0), "H5Dwrite");
+        }
 
-        /* only opens the *dataset */
-        case open_only:
-            break;
-        default:
-            assert(0);
+        break;
+
+    /* only extends the dataset */
+    case extend_only:
+        /* check if new size is larger than old size */
+        hrc = H5Sget_simple_extent_dims(dataspace, dims, maxdims);
+        VRFY((hrc >= 0), "");
+
+        /* Extend dataset*/
+        if (size[0] > dims[0]) {
+            hrc = H5Dset_extent(*dataset, size);
+            VRFY((hrc >= 0), "");
+        }
+        break;
+
+    /* only opens the *dataset */
+    case open_only: break;
+    default       : assert(0);
     }
 
     /* Close up */
@@ -296,7 +298,7 @@ parallel_access_dataset(const char *filename, int chunk_factor, access_type acti
 
     if (vol_is_native) {
         /* verify file size */
-        filesize     = get_filesize(filename);
+        filesize = get_filesize(filename);
         est_filesize = (MPI_Offset)nchunks * (MPI_Offset)CHUNK_SIZE * (MPI_Offset)sizeof(unsigned char);
         VRFY((filesize >= est_filesize), "file size check");
     }
@@ -320,23 +322,21 @@ parallel_access_dataset(const char *filename, int chunk_factor, access_type acti
  * 3. it returns correct values when the whole dataset has been written in an
  *    interleaved pattern.
  */
-static void
-verify_data(const char *filename, int chunk_factor, write_type write_pattern, int vclose, hid_t *file_id,
-            hid_t *dataset)
+static void verify_data(const char* filename, int chunk_factor, write_type write_pattern, int vclose, hid_t* file_id, hid_t* dataset)
 {
-    hid_t  dataspace, memspace; /* HDF5 file identifier */
-    hid_t  access_plist;        /* HDF5 ID for file access property list */
-    herr_t hrc;                 /* HDF5 return code */
+    hid_t dataspace, memspace; /* HDF5 file identifier */
+    hid_t access_plist;        /* HDF5 ID for file access property list */
+    herr_t hrc;                /* HDF5 return code */
 
-    hsize_t chunk_dims[1] = {CHUNK_SIZE};
+    hsize_t chunk_dims[1] = { CHUNK_SIZE };
     hsize_t count[1];
     hsize_t stride[1];
     hsize_t block[1];
     hsize_t offset[1]; /* Selection offset within dataspace */
     /* Variables used in reading data back */
     char buffer[CHUNK_SIZE];
-    int  value, i;
-    int  index_l;
+    int value, i;
+    int index_l;
     long nchunks;
     /* Initialize MPI */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -370,9 +370,9 @@ verify_data(const char *filename, int chunk_factor, write_type write_pattern, in
     VRFY((dataspace >= 0), "");
 
     /* all processes check all chunks. */
-    count[0]  = 1;
+    count[0] = 1;
     stride[0] = 1;
-    block[0]  = chunk_dims[0];
+    block[0] = chunk_dims[0];
     for (i = 0; i < nchunks; i++) {
         /* reset buffer values */
         memset(buffer, -1, CHUNK_SIZE);
@@ -388,25 +388,23 @@ verify_data(const char *filename, int chunk_factor, write_type write_pattern, in
 
         /* set expected value according the write pattern */
         switch (write_pattern) {
-            case all:
-                value = i % mpi_size + 1;
-                break;
-            case none:
+        case all : value = i % mpi_size + 1; break;
+        case none: value = 0; break;
+        case sec_last:
+            if (i == nchunks - 2) {
+                value = 100;
+            }
+            else {
                 value = 0;
-                break;
-            case sec_last:
-                if (i == nchunks - 2)
-                    value = 100;
-                else
-                    value = 0;
-                break;
-            default:
-                assert(0);
+            }
+            break;
+        default: assert(0);
         }
 
         /* verify content of the chunk */
-        for (index_l = 0; index_l < CHUNK_SIZE; index_l++)
+        for (index_l = 0; index_l < CHUNK_SIZE; index_l++) {
             VRFY((buffer[index_l] == value), "data verification");
+        }
     }
 
     hrc = H5Sclose(dataspace);
@@ -455,11 +453,10 @@ verify_data(const char *filename, int chunk_factor, write_type write_pattern, in
  * all parts of the dataset in a interleave pattern, close it, and reopen
  * it, read to verify all data are as written.
  */
-void
-test_chunk_alloc(void *params)
+void test_chunk_alloc(void* params)
 {
-    const char *filename;
-    hid_t       file_id, dataset;
+    const char* filename;
+    hid_t file_id, dataset;
 
     file_id = dataset = -1;
 
@@ -468,21 +465,22 @@ test_chunk_alloc(void *params)
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
         return;
     }
 
-    filename = ((const H5Ptest_param_t *)params)->name;
-    if (VERBOSE_MED)
+    filename = ((const H5Ptest_param_t*)params)->name;
+    if (VERBOSE_MED) {
         printf("Extend Chunked allocation test on file %s\n", filename);
+    }
 
     /* Case 1 */
     /* Create chunked dataset without writing anything.*/
@@ -541,44 +539,43 @@ test_chunk_alloc(void *params)
  *     so file space can be allocated incrementally in a coordinated
  *     fashion.
  */
-void
-test_chunk_alloc_incr_ser_to_par(void *params)
+void test_chunk_alloc_incr_ser_to_par(void* params)
 {
     H5D_space_status_t space_status;
-    const char        *filename;
-    hsize_t            dset_dims[1];
-    hsize_t            start[1];
-    hsize_t            stride[1];
-    hsize_t            count[1];
-    hsize_t            block[1];
-    hsize_t            alloc_size;
-    size_t             nchunks;
-    herr_t             ret;
-    hid_t              fid          = H5I_INVALID_HID;
-    hid_t              fapl_id      = H5I_INVALID_HID;
-    hid_t              dset_id      = H5I_INVALID_HID;
-    hid_t              fspace_id    = H5I_INVALID_HID;
-    hid_t              dxpl_id      = H5I_INVALID_HID;
-    int               *data         = NULL;
-    int               *correct_data = NULL;
-    int               *read_data    = NULL;
-    bool               vol_is_native;
+    const char* filename;
+    hsize_t dset_dims[1];
+    hsize_t start[1];
+    hsize_t stride[1];
+    hsize_t count[1];
+    hsize_t block[1];
+    hsize_t alloc_size;
+    size_t nchunks;
+    herr_t ret;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t dset_id = H5I_INVALID_HID;
+    hid_t fspace_id = H5I_INVALID_HID;
+    hid_t dxpl_id = H5I_INVALID_HID;
+    int* data = NULL;
+    int* correct_data = NULL;
+    int* read_data = NULL;
+    bool vol_is_native;
 
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
-    filename = ((const H5Ptest_param_t *)params)->name;
-    if (MAINPROCESS && VERBOSE_MED)
-        printf("Chunked dataset incremental file space allocation serial to parallel test on file %s\n",
-               filename);
+    filename = ((const H5Ptest_param_t*)params)->name;
+    if (MAINPROCESS && VERBOSE_MED) {
+        printf("Chunked dataset incremental file space allocation serial to parallel test on file %s\n", filename);
+    }
 
-    nchunks      = (size_t)(CHUNK_FACTOR * mpi_size);
+    nchunks = (size_t)(CHUNK_FACTOR * mpi_size);
     dset_dims[0] = (hsize_t)(nchunks * CHUNK_SIZE);
 
     if (mpi_rank == 0) {
-        hsize_t chunk_dims[1] = {CHUNK_SIZE};
-        hid_t   space_id      = H5I_INVALID_HID;
-        hid_t   dcpl_id       = H5I_INVALID_HID;
+        hsize_t chunk_dims[1] = { CHUNK_SIZE };
+        hid_t space_id = H5I_INVALID_HID;
+        hid_t dcpl_id = H5I_INVALID_HID;
 
         fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
         VRFY((fid >= 0), "H5Fcreate");
@@ -596,8 +593,7 @@ test_chunk_alloc_incr_ser_to_par(void *params)
         VRFY((space_id >= 0), "H5Screate_simple");
 
         /* Create a chunked dataset without a filter applied to it */
-        dset_id =
-            H5Dcreate2(fid, "dset_no_filter", H5T_NATIVE_INT, space_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
+        dset_id = H5Dcreate2(fid, "dset_no_filter", H5T_NATIVE_INT, space_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
         VRFY((dset_id >= 0), "H5Dcreate2");
 
         ret = H5Dclose(dset_id);
@@ -653,12 +649,10 @@ test_chunk_alloc_incr_ser_to_par(void *params)
         ret = H5Dget_space_status(dset_id, &space_status);
         VRFY((ret == SUCCEED), "H5Dread");
 
-        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED),
-             "file space allocation status verification succeeded");
+        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED), "file space allocation status verification succeeded");
 
         alloc_size = H5Dget_storage_size(dset_id);
-        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size),
-             "file space allocation size verification succeeded");
+        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size), "file space allocation size verification succeeded");
     }
 
     memset(read_data, 255, dset_dims[0] * sizeof(int));
@@ -674,10 +668,10 @@ test_chunk_alloc_incr_ser_to_par(void *params)
     fspace_id = H5Dget_space(dset_id);
     VRFY((ret == SUCCEED), "H5Dget_space");
 
-    start[0]  = ((hsize_t)mpi_rank * (dset_dims[0] / (hsize_t)mpi_size));
+    start[0] = ((hsize_t)mpi_rank * (dset_dims[0] / (hsize_t)mpi_size));
     stride[0] = 1;
-    count[0]  = (dset_dims[0] / (hsize_t)mpi_size);
-    block[0]  = 1;
+    count[0] = (dset_dims[0] / (hsize_t)mpi_size);
+    block[0] = 1;
 
     ret = H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret == SUCCEED), "H5Sselect_hyperslab");
@@ -693,12 +687,10 @@ test_chunk_alloc_incr_ser_to_par(void *params)
         ret = H5Dget_space_status(dset_id, &space_status);
         VRFY((ret == SUCCEED), "H5Dread");
 
-        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED),
-             "file space allocation status verification succeeded");
+        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED), "file space allocation status verification succeeded");
 
         alloc_size = H5Dget_storage_size(dset_id);
-        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size),
-             "file space allocation size verification succeeded");
+        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size), "file space allocation size verification succeeded");
     }
 
     memset(read_data, 0, dset_dims[0] * sizeof(int));
@@ -728,8 +720,7 @@ test_chunk_alloc_incr_ser_to_par(void *params)
         ret = H5Dget_space_status(dset_id, &space_status);
         VRFY((ret == SUCCEED), "H5Dread");
 
-        VRFY((space_status == H5D_SPACE_STATUS_NOT_ALLOCATED),
-             "file space allocation status verification succeeded");
+        VRFY((space_status == H5D_SPACE_STATUS_NOT_ALLOCATED), "file space allocation status verification succeeded");
 
         alloc_size = H5Dget_storage_size(dset_id);
         VRFY((0 == alloc_size), "file space allocation size verification succeeded");
@@ -748,10 +739,10 @@ test_chunk_alloc_incr_ser_to_par(void *params)
     fspace_id = H5Dget_space(dset_id);
     VRFY((ret == SUCCEED), "H5Dget_space");
 
-    start[0]  = ((hsize_t)mpi_rank * (dset_dims[0] / (hsize_t)mpi_size));
+    start[0] = ((hsize_t)mpi_rank * (dset_dims[0] / (hsize_t)mpi_size));
     stride[0] = 1;
-    count[0]  = (dset_dims[0] / (hsize_t)mpi_size);
-    block[0]  = 1;
+    count[0] = (dset_dims[0] / (hsize_t)mpi_size);
+    block[0] = 1;
 
     ret = H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret == SUCCEED), "H5Sselect_hyperslab");
@@ -773,12 +764,10 @@ test_chunk_alloc_incr_ser_to_par(void *params)
         ret = H5Dget_space_status(dset_id, &space_status);
         VRFY((ret == SUCCEED), "H5Dread");
 
-        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED),
-             "file space allocation status verification succeeded");
+        VRFY((space_status == H5D_SPACE_STATUS_ALLOCATED), "file space allocation status verification succeeded");
 
         alloc_size = H5Dget_storage_size(dset_id);
-        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size),
-             "file space allocation size verification succeeded");
+        VRFY(((dset_dims[0] * sizeof(int)) == alloc_size), "file space allocation size verification succeeded");
     }
 
     memset(read_data, 0, dset_dims[0] * sizeof(int));

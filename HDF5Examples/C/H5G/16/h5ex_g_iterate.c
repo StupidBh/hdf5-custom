@@ -15,12 +15,11 @@
 /*
  * Operator function to be called by H5Giterate.
  */
-herr_t op_func(hid_t loc_id, const char *name, void *operator_data);
+herr_t op_func(hid_t loc_id, const char* name, void* operator_data);
 
-int
-main(void)
+int main(void)
 {
-    hid_t  file; /* Handle */
+    hid_t file; /* Handle */
     herr_t status;
 
     /*
@@ -48,10 +47,9 @@ main(void)
   being examined.
 
  ************************************************************/
-herr_t
-op_func(hid_t loc_id, const char *name, void *operator_data)
+herr_t op_func(hid_t loc_id, const char* name, void* operator_data)
 {
-    herr_t     status;
+    herr_t status;
     H5G_stat_t statbuf;
 
     /*
@@ -61,17 +59,10 @@ op_func(hid_t loc_id, const char *name, void *operator_data)
      */
     status = H5Gget_objinfo(loc_id, name, 0, &statbuf);
     switch (statbuf.type) {
-        case H5G_GROUP:
-            printf("  Group: %s\n", name);
-            break;
-        case H5G_DATASET:
-            printf("  Dataset: %s\n", name);
-            break;
-        case H5G_TYPE:
-            printf("  Datatype: %s\n", name);
-            break;
-        default:
-            printf("  Unknown: %s\n", name);
+    case H5G_GROUP  : printf("  Group: %s\n", name); break;
+    case H5G_DATASET: printf("  Dataset: %s\n", name); break;
+    case H5G_TYPE   : printf("  Datatype: %s\n", name); break;
+    default         : printf("  Unknown: %s\n", name);
     }
 
     return 0;

@@ -26,45 +26,45 @@
 #define TABLE_NAME "table"
 #define FILENAME   "h5ex_table_11.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle1 {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle1
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle1;
 
     /* Define an array of Particles */
-    Particle1 p_data[NRECORDS] = {{"zero", 0, 1, 0.2F, 3.0},    {"one", 10, 11, 1.2F, 13.0},
-                                  {"two", 20, 21, 2.2F, 23.0},  {"three", 30, 31, 3.2F, 33.0},
-                                  {"four", 40, 41, 4.2F, 43.0}, {"five", 50, 51, 5.2F, 53.0},
-                                  {"six", 60, 61, 6.2F, 63.0},  {"seven", 70, 71, 7.2F, 73.0}};
+    Particle1 p_data[NRECORDS] = { { "zero", 0, 1, 0.2F, 3.0 },    { "one", 10, 11, 1.2F, 13.0 },  { "two", 20, 21, 2.2F, 23.0 }, { "three", 30, 31, 3.2F, 33.0 },
+                                   { "four", 40, 41, 4.2F, 43.0 }, { "five", 50, 51, 5.2F, 53.0 }, { "six", 60, 61, 6.2F, 63.0 }, { "seven", 70, 71, 7.2F, 73.0 } };
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t dst_size1            = sizeof(Particle1);
-    size_t dst_offset1[NFIELDS] = {HOFFSET(Particle1, name), HOFFSET(Particle1, lati),
-                                   HOFFSET(Particle1, longi), HOFFSET(Particle1, pressure),
-                                   HOFFSET(Particle1, temperature)};
+    size_t dst_size1 = sizeof(Particle1);
+    size_t dst_offset1[NFIELDS] = { HOFFSET(Particle1, name),
+                                    HOFFSET(Particle1, lati),
+                                    HOFFSET(Particle1, longi),
+                                    HOFFSET(Particle1, pressure),
+                                    HOFFSET(Particle1, temperature) };
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type;
-    hid_t       file_id;
-    hsize_t     chunk_size       = 10;
-    int         compress         = 0;
-    Particle1   fill_data[1]     = {{"no data", -1, -2, -99.0F, -98.0}};
-    int         fill_data_new[1] = {-100};
-    hsize_t     position;
-    hsize_t     nfields_out;
-    hsize_t     nrecords_out;
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    int compress = 0;
+    Particle1 fill_data[1] = { { "no data", -1, -2, -99.0F, -98.0 } };
+    int fill_data_new[1] = { -100 };
+    hsize_t position;
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
 
     /* Define the inserted field information */
     hid_t field_type_new = H5T_NATIVE_INT;
-    int   data[NRECORDS] = {0, 1, 2, 3, 4, 5, 6, 7};
+    int data[NRECORDS] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
     /* Initialize the field type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -79,8 +79,7 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make the table */
-    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size1, field_names, dst_offset1,
-                   field_type, chunk_size, fill_data, compress, p_data);
+    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size1, field_names, dst_offset1, field_type, chunk_size, fill_data, compress, p_data);
 
     /* Insert the new field at the end of the field list */
     position = NFIELDS;

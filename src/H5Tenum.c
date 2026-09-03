@@ -15,7 +15,7 @@
  *      in the H5T interface.
  */
 
-#include "H5Tmodule.h" /* This source code file is part of the H5T module */
+#include "H5Tmodule.h"   /* This source code file is part of the H5T module */
 
 #include "H5private.h"   /*generic functions			  */
 #include "H5Eprivate.h"  /*error handling			  */
@@ -24,8 +24,8 @@
 #include "H5Tpkg.h"      /*data-type functions			  */
 
 /* Static local functions */
-static char  *H5T__enum_nameof(const H5T_t *dt, const void *value, char *name /*out*/, size_t size);
-static herr_t H5T__enum_valueof(const H5T_t *dt, const char *name, void *value /*out*/);
+static char* H5T__enum_nameof(const H5T_t* dt, const void* value, char* name /*out*/, size_t size);
+static herr_t H5T__enum_valueof(const H5T_t* dt, const char* name, void* value /*out*/);
 
 /*-------------------------------------------------------------------------
  * Function:	H5Tenum_create
@@ -39,27 +39,28 @@ static herr_t H5T__enum_valueof(const H5T_t *dt, const char *name, void *value /
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5Tenum_create(hid_t parent_id)
+hid_t H5Tenum_create(hid_t parent_id)
 {
-    H5T_t *parent = NULL; /*base integer data type	*/
-    H5T_t *dt     = NULL; /*new enumeration data type	*/
-    hid_t  ret_value;     /*return value			*/
+    H5T_t* parent = NULL; /*base integer data type	*/
+    H5T_t* dt = NULL;     /*new enumeration data type	*/
+    hid_t ret_value;      /*return value			*/
 
     FUNC_ENTER_API(H5I_INVALID_HID)
 
     /* Check args */
-    if (NULL == (parent = (H5T_t *)H5I_object_verify(parent_id, H5I_DATATYPE)) ||
-        H5T_INTEGER != parent->shared->type)
+    if (NULL == (parent = (H5T_t*)H5I_object_verify(parent_id, H5I_DATATYPE)) || H5T_INTEGER != parent->shared->type) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, H5I_INVALID_HID, "not an integer data type");
+    }
 
     /* Build new type */
-    if (NULL == (dt = H5T__enum_create(parent)))
+    if (NULL == (dt = H5T__enum_create(parent))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, H5I_INVALID_HID, "cannot create enum type");
+    }
 
     /* Register the type */
-    if ((ret_value = H5I_register(H5I_DATATYPE, dt, true)) < 0)
+    if ((ret_value = H5I_register(H5I_DATATYPE, dt, true)) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTREGISTER, H5I_INVALID_HID, "unable to register data type ID");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -77,22 +78,23 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5T_t *
-H5T__enum_create(const H5T_t *parent)
+H5T_t* H5T__enum_create(const H5T_t* parent)
 {
-    H5T_t *ret_value = NULL; /* New enumeration data type	*/
+    H5T_t* ret_value = NULL; /* New enumeration data type	*/
 
     FUNC_ENTER_PACKAGE
 
     assert(parent);
 
     /* Build new type */
-    if (NULL == (ret_value = H5T__alloc()))
+    if (NULL == (ret_value = H5T__alloc())) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
     ret_value->shared->type = H5T_ENUM;
 
-    if (NULL == (ret_value->shared->parent = H5T_copy(parent, H5T_COPY_ALL)))
+    if (NULL == (ret_value->shared->parent = H5T_copy(parent, H5T_COPY_ALL))) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTCOPY, NULL, "unable to copy base datatype for enum");
+    }
 
     ret_value->shared->size = ret_value->shared->parent->shared->size;
 
@@ -116,27 +118,31 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tenum_insert(hid_t type, const char *name, const void *value)
+herr_t H5Tenum_insert(hid_t type, const char* name, const void* value)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    if (H5T_ENUM != dt->shared->type)
+    }
+    if (H5T_ENUM != dt->shared->type) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an enumeration data type");
-    if (!name || !*name)
+    }
+    if (!name || !*name) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no name specified");
-    if (!value)
+    }
+    if (!value) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no value specified");
+    }
 
     /* Do work */
-    if (H5T__enum_insert(dt, name, value) < 0)
+    if (H5T__enum_insert(dt, name, value) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "unable to insert new enumeration member");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -156,11 +162,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5T__enum_insert(const H5T_t *dt, const char *name, const void *value)
+herr_t H5T__enum_insert(const H5T_t* dt, const char* name, const void* value)
 {
     unsigned i;
-    herr_t   ret_value = SUCCEED; /* Return value */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -170,33 +175,37 @@ H5T__enum_insert(const H5T_t *dt, const char *name, const void *value)
 
     /* The name and value had better not already exist */
     for (i = 0; i < dt->shared->u.enumer.nmembs; i++) {
-        if (!strcmp(dt->shared->u.enumer.name[i], name))
+        if (!strcmp(dt->shared->u.enumer.name[i], name)) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "name redefinition");
-        if (!memcmp((uint8_t *)dt->shared->u.enumer.value + (i * dt->shared->size), value, dt->shared->size))
+        }
+        if (!memcmp((uint8_t*)dt->shared->u.enumer.value + (i * dt->shared->size), value, dt->shared->size)) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "value redefinition");
+        }
     }
 
     /* Increase table sizes */
     if (dt->shared->u.enumer.nmembs >= dt->shared->u.enumer.nalloc) {
-        char   **names;
-        uint8_t *values;
+        char** names;
+        uint8_t* values;
         unsigned n = MAX(32, 2 * dt->shared->u.enumer.nalloc);
 
-        if (NULL == (names = (char **)H5MM_realloc(dt->shared->u.enumer.name, n * sizeof(char *))))
+        if (NULL == (names = (char**)H5MM_realloc(dt->shared->u.enumer.name, n * sizeof(char*)))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+        }
         dt->shared->u.enumer.name = names;
 
-        if (NULL == (values = (uint8_t *)H5MM_realloc(dt->shared->u.enumer.value, n * dt->shared->size)))
+        if (NULL == (values = (uint8_t*)H5MM_realloc(dt->shared->u.enumer.value, n * dt->shared->size))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
-        dt->shared->u.enumer.value  = values;
+        }
+        dt->shared->u.enumer.value = values;
         dt->shared->u.enumer.nalloc = n;
     }
 
     /* Insert new member at end of member arrays */
-    dt->shared->u.enumer.sorted  = H5T_SORT_NONE;
-    i                            = dt->shared->u.enumer.nmembs++;
+    dt->shared->u.enumer.sorted = H5T_SORT_NONE;
+    i = dt->shared->u.enumer.nmembs++;
     dt->shared->u.enumer.name[i] = H5MM_xstrdup(name);
-    H5MM_memcpy((uint8_t *)dt->shared->u.enumer.value + (i * dt->shared->size), value, dt->shared->size);
+    H5MM_memcpy((uint8_t*)dt->shared->u.enumer.value + (i * dt->shared->size), value, dt->shared->size);
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -214,25 +223,29 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tget_member_value(hid_t type, unsigned membno, void *value /*out*/)
+herr_t H5Tget_member_value(hid_t type, unsigned membno, void* value /*out*/)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    if (H5T_ENUM != dt->shared->type)
+    }
+    if (H5T_ENUM != dt->shared->type) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "operation not defined for data type class");
-    if (membno >= dt->shared->u.enumer.nmembs)
+    }
+    if (membno >= dt->shared->u.enumer.nmembs) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid member number");
-    if (!value)
+    }
+    if (!value) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "null value buffer");
+    }
 
-    if (H5T__get_member_value(dt, membno, value) < 0)
+    if (H5T__get_member_value(dt, membno, value) < 0) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "unable to get member value");
+    }
 done:
     FUNC_LEAVE_API(ret_value)
 }
@@ -250,15 +263,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5T__get_member_value(const H5T_t *dt, unsigned membno, void *value /*out*/)
+herr_t H5T__get_member_value(const H5T_t* dt, unsigned membno, void* value /*out*/)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     assert(dt);
     assert(value);
 
-    H5MM_memcpy(value, (uint8_t *)dt->shared->u.enumer.value + (membno * dt->shared->size), dt->shared->size);
+    H5MM_memcpy(value, (uint8_t*)dt->shared->u.enumer.value + (membno * dt->shared->size), dt->shared->size);
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 }
@@ -280,26 +292,30 @@ H5T__get_member_value(const H5T_t *dt, unsigned membno, void *value /*out*/)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tenum_nameof(hid_t type, const void *value, char *name /*out*/, size_t size)
+herr_t H5Tenum_nameof(hid_t type, const void* value, char* name /*out*/, size_t size)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    if (H5T_ENUM != dt->shared->type)
+    }
+    if (H5T_ENUM != dt->shared->type) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an enumeration data type");
-    if (!value)
+    }
+    if (!value) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no value supplied");
-    if (!name)
+    }
+    if (!name) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no name buffer supplied");
+    }
 
-    if (NULL == H5T__enum_nameof(dt, value, name, size))
+    if (NULL == H5T__enum_nameof(dt, value, name, size)) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "nameof query failed");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -325,14 +341,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static char *
-H5T__enum_nameof(const H5T_t *dt, const void *value, char *name /*out*/, size_t size)
+static char* H5T__enum_nameof(const H5T_t* dt, const void* value, char* name /*out*/, size_t size)
 {
-    H5T_t   *copied_dt = NULL;   /* Do sorting in copied datatype */
-    unsigned lt, md = 0, rt;     /* Indices for binary search	*/
-    int      cmp        = (-1);  /* Comparison result		*/
-    bool     alloc_name = false; /* Whether name has been allocated */
-    char    *ret_value  = NULL;  /* Return value */
+    H5T_t* copied_dt = NULL; /* Do sorting in copied datatype */
+    unsigned lt, md = 0, rt; /* Indices for binary search	*/
+    int cmp = (-1);          /* Comparison result		*/
+    bool alloc_name = false; /* Whether name has been allocated */
+    char* ret_value = NULL;  /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -341,57 +356,69 @@ H5T__enum_nameof(const H5T_t *dt, const void *value, char *name /*out*/, size_t 
     assert(value);
     assert(name || 0 == size);
 
-    if (name && size > 0)
+    if (name && size > 0) {
         *name = '\0';
+    }
 
     /* Sanity check */
-    if (dt->shared->u.enumer.nmembs == 0)
+    if (dt->shared->u.enumer.nmembs == 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOTFOUND, NULL, "datatype has no members");
+    }
 
     /* Do a binary search over the values to find the correct one.  Do sorting
      * and search on the copied datatype to protect the original order. */
-    if (NULL == (copied_dt = H5T_copy(dt, H5T_COPY_ALL)))
+    if (NULL == (copied_dt = H5T_copy(dt, H5T_COPY_ALL))) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, NULL, "unable to copy data type");
-    if (H5T__sort_value(copied_dt, NULL) < 0)
+    }
+    if (H5T__sort_value(copied_dt, NULL) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTCOMPARE, NULL, "value sort failed");
+    }
 
     lt = 0;
     rt = copied_dt->shared->u.enumer.nmembs;
     while (lt < rt) {
-        md  = (lt + rt) / 2;
-        cmp = memcmp(value, (uint8_t *)copied_dt->shared->u.enumer.value + (md * copied_dt->shared->size),
-                     copied_dt->shared->size);
-        if (cmp < 0)
+        md = (lt + rt) / 2;
+        cmp = memcmp(value, (uint8_t*)copied_dt->shared->u.enumer.value + (md * copied_dt->shared->size), copied_dt->shared->size);
+        if (cmp < 0) {
             rt = md;
-        else if (cmp > 0)
+        }
+        else if (cmp > 0) {
             lt = md + 1;
-        else
+        }
+        else {
             break;
+        }
     } /* end while */
 
     /* Value was not yet defined. This fixes bug # 774, 2002/06/05 EIP */
-    if (cmp != 0)
+    if (cmp != 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOTFOUND, NULL, "value is currently not defined");
+    }
 
     /* Save result name */
     if (!name) {
-        if (NULL == (name = (char *)H5MM_malloc(strlen(copied_dt->shared->u.enumer.name[md]) + 1)))
+        if (NULL == (name = (char*)H5MM_malloc(strlen(copied_dt->shared->u.enumer.name[md]) + 1))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+        }
         alloc_name = true;
     } /* end if */
     strncpy(name, copied_dt->shared->u.enumer.name[md], size);
-    if (strlen(copied_dt->shared->u.enumer.name[md]) >= size)
+    if (strlen(copied_dt->shared->u.enumer.name[md]) >= size) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, NULL, "name has been truncated");
+    }
 
     /* Set return value */
     ret_value = name;
 
 done:
-    if (copied_dt)
-        if (H5T_close_real(copied_dt) < 0)
+    if (copied_dt) {
+        if (H5T_close_real(copied_dt) < 0) {
             HDONE_ERROR(H5E_DATATYPE, H5E_CANTCLOSEOBJ, NULL, "unable to close data type");
-    if (!ret_value && alloc_name)
+        }
+    }
+    if (!ret_value && alloc_name) {
         H5MM_free(name);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5T__enum_nameof() */
@@ -410,26 +437,30 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tenum_valueof(hid_t type, const char *name, void *value /*out*/)
+herr_t H5Tenum_valueof(hid_t type, const char* name, void* value /*out*/)
 {
-    H5T_t *dt;
+    H5T_t* dt;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    if (H5T_ENUM != dt->shared->type)
+    }
+    if (H5T_ENUM != dt->shared->type) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an enumeration data type");
-    if (!name || !*name)
+    }
+    if (!name || !*name) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no name");
-    if (!value)
+    }
+    if (!value) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "no value buffer");
+    }
 
-    if (H5T__enum_valueof(dt, name, value) < 0)
+    if (H5T__enum_valueof(dt, name, value) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "valueof query failed");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -449,13 +480,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__enum_valueof(const H5T_t *dt, const char *name, void *value /*out*/)
+static herr_t H5T__enum_valueof(const H5T_t* dt, const char* name, void* value /*out*/)
 {
-    unsigned lt, md = 0, rt;      /*indices for binary search	*/
-    int      cmp       = (-1);    /*comparison result		*/
-    H5T_t   *copied_dt = NULL;    /*do sorting in copied datatype */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned lt, md = 0, rt;    /*indices for binary search	*/
+    int cmp = (-1);             /*comparison result		*/
+    H5T_t* copied_dt = NULL;    /*do sorting in copied datatype */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -465,21 +495,24 @@ H5T__enum_valueof(const H5T_t *dt, const char *name, void *value /*out*/)
     assert(value);
 
     /* Sanity check */
-    if (dt->shared->u.enumer.nmembs == 0)
+    if (dt->shared->u.enumer.nmembs == 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOTFOUND, FAIL, "datatype has no members");
+    }
 
     /* Do a binary search over the names to find the correct one.  Do sorting
      * and search on the copied datatype to protect the original order. */
-    if (NULL == (copied_dt = H5T_copy(dt, H5T_COPY_ALL)))
+    if (NULL == (copied_dt = H5T_copy(dt, H5T_COPY_ALL))) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "unable to copy data type");
-    if (H5T__sort_name(copied_dt, NULL) < 0)
+    }
+    if (H5T__sort_name(copied_dt, NULL) < 0) {
         HGOTO_ERROR(H5E_INTERNAL, H5E_CANTCOMPARE, FAIL, "value sort failed");
+    }
 
     lt = 0;
     rt = copied_dt->shared->u.enumer.nmembs;
 
     while (lt < rt) {
-        md  = (lt + rt) / 2;
+        md = (lt + rt) / 2;
         cmp = strcmp(name, copied_dt->shared->u.enumer.name[md]);
         if (cmp < 0) {
             rt = md;
@@ -492,16 +525,18 @@ H5T__enum_valueof(const H5T_t *dt, const char *name, void *value /*out*/)
         }
     }
     /* Value was not yet defined. This fixes bug # 774, 2002/06/05 EIP */
-    if (cmp != 0)
+    if (cmp != 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_NOTFOUND, FAIL, "string doesn't exist in the enumeration type");
+    }
 
-    H5MM_memcpy(value, (uint8_t *)copied_dt->shared->u.enumer.value + (md * copied_dt->shared->size),
-                copied_dt->shared->size);
+    H5MM_memcpy(value, (uint8_t*)copied_dt->shared->u.enumer.value + (md * copied_dt->shared->size), copied_dt->shared->size);
 
 done:
-    if (copied_dt)
-        if (H5T_close_real(copied_dt) < 0)
+    if (copied_dt) {
+        if (H5T_close_real(copied_dt) < 0) {
             HDONE_ERROR(H5E_DATATYPE, H5E_CANTCLOSEOBJ, FAIL, "unable to close data type");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 }

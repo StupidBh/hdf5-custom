@@ -7,8 +7,7 @@
 
 #define H5P_DEFAULTx2 H5P_DEFAULT, H5P_DEFAULT
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -16,7 +15,7 @@ main(void)
     {
         __label__ fail_file;
         hid_t file, group;
-        char  src_path[] = "/a/few/groups";
+        char src_path[] = "/a/few/groups";
 
         if ((file = H5Fcreate("o1.h5", H5F_ACC_TRUNC, H5P_DEFAULTx2)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -59,8 +58,8 @@ fail_file:;
     //! <!-- [read] -->
     {
         __label__ fail_info, fail_file;
-        hid_t       file;
-        char        path[] = "/a/few/groups";
+        hid_t file;
+        char path[] = "/a/few/groups";
         H5O_info2_t info;
 
         if ((file = H5Fopen("o1.h5", H5F_ACC_RDONLY, H5P_DEFAULT)) == H5I_INVALID_HID) {
@@ -76,18 +75,10 @@ fail_file:;
 
         // determine the object type
         switch (info.type) {
-            case H5O_TYPE_GROUP:
-                printf("HDF5 group\n");
-                break;
-            case H5O_TYPE_DATASET:
-                printf("HDF5 dataset\n");
-                break;
-            case H5O_TYPE_NAMED_DATATYPE:
-                printf("HDF5 datatype\n");
-                break;
-            default:
-                printf("UFO?\n");
-                break;
+        case H5O_TYPE_GROUP         : printf("HDF5 group\n"); break;
+        case H5O_TYPE_DATASET       : printf("HDF5 dataset\n"); break;
+        case H5O_TYPE_NAMED_DATATYPE: printf("HDF5 datatype\n"); break;
+        default                     : printf("UFO?\n"); break;
         }
         // print basic information
         printf("Reference count: %u\n", info.rc);
@@ -102,8 +93,8 @@ fail_file:;
     //! <!-- [update] -->
     {
         __label__ fail_obj, fail_incr, fail_file;
-        hid_t       file, obj;
-        char        path[] = "/a/few/groups";
+        hid_t file, obj;
+        char path[] = "/a/few/groups";
         H5O_info2_t info;
 
         if ((file = H5Fopen("o1.h5", H5F_ACC_RDWR, H5P_DEFAULT)) == H5I_INVALID_HID) {
@@ -141,8 +132,8 @@ fail_file:;
     //! <!-- [delete] -->
     {
         __label__ fail_obj, fail_delete, fail_file;
-        hid_t       file, obj;
-        char        path[] = "/a/few/groups";
+        hid_t file, obj;
+        char path[] = "/a/few/groups";
         H5O_info2_t info;
 
         if ((file = H5Fopen("o1.h5", H5F_ACC_RDWR, H5P_DEFAULT)) == H5I_INVALID_HID) {
@@ -177,9 +168,10 @@ fail_file:;
             ret_val = EXIT_FAILURE;
             goto fail_delete;
         }
-        else
+        else {
             // attempting to close the object would be like a double H5Oclose and fail
             goto fail_obj;
+        }
 
 fail_delete:
         H5Oclose(obj);

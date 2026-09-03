@@ -17,28 +17,28 @@
 #define FAMILY_SIZE     1024
 #define REPART_FILENAME "family_file%05d.h5"
 
-int **buf      = NULL;
-int  *buf_data = NULL;
+int** buf = NULL;
+int* buf_data = NULL;
 
-void
-gent_repart_family(void)
+void gent_repart_family(void)
 {
-    hid_t   file = (-1), fapl, space = (-1), dset = (-1);
-    char    dname[] = "dataset";
-    int     i, j;
-    hsize_t dims[2] = {FAMILY_NUMBER, FAMILY_SIZE};
+    hid_t file = (-1), fapl, space = (-1), dset = (-1);
+    char dname[] = "dataset";
+    int i, j;
+    hsize_t dims[2] = { FAMILY_NUMBER, FAMILY_SIZE };
 
     /* Set up data array */
-    if (NULL == (buf_data = (int *)calloc(FAMILY_NUMBER * FAMILY_SIZE, sizeof(int)))) {
+    if (NULL == (buf_data = (int*)calloc(FAMILY_NUMBER * FAMILY_SIZE, sizeof(int)))) {
         perror("calloc");
         exit(EXIT_FAILURE);
     }
-    if (NULL == (buf = (int **)calloc(FAMILY_NUMBER, sizeof(buf_data)))) {
+    if (NULL == (buf = (int**)calloc(FAMILY_NUMBER, sizeof(buf_data)))) {
         perror("calloc");
         exit(EXIT_FAILURE);
     }
-    for (i = 0; i < FAMILY_NUMBER; i++)
+    for (i = 0; i < FAMILY_NUMBER; i++) {
         buf[i] = buf_data + (i * FAMILY_SIZE);
+    }
 
     /* Set property list and file name for FAMILY driver */
     if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
@@ -67,9 +67,11 @@ gent_repart_family(void)
         exit(EXIT_FAILURE);
     }
 
-    for (i = 0; i < FAMILY_NUMBER; i++)
-        for (j = 0; j < FAMILY_SIZE; j++)
+    for (i = 0; i < FAMILY_NUMBER; i++) {
+        for (j = 0; j < FAMILY_SIZE; j++) {
             buf[i][j] = i * 10000 + j;
+        }
+    }
 
     if (H5Dwrite(dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf_data) < 0) {
         perror("H5Dwrite");

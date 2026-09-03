@@ -19,12 +19,11 @@
 #define DIM0     4
 #define DIM1     7
 
-int
-main(void)
+int main(void)
 {
-    hid_t         file, space, dset; /* Handles */
-    herr_t        status;
-    hsize_t       dims[2] = {DIM0, DIM1};
+    hid_t file, space, dset; /* Handles */
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
     unsigned char wdata[DIM0][DIM1], /* Write buffer */
         **rdata;                     /* Read buffer */
     int ndims, A, B, C, D, i, j;
@@ -33,7 +32,7 @@ main(void)
      * Initialize data.  We will manually pack 4 2-bit integers into
      * each unsigned char data element.
      */
-    for (i = 0; i < DIM0; i++)
+    for (i = 0; i < DIM0; i++) {
         for (j = 0; j < DIM1; j++) {
             wdata[i][j] = 0;
             wdata[i][j] |= (i * j - j) & 0x03;    /* Field "A" */
@@ -41,6 +40,7 @@ main(void)
             wdata[i][j] |= (j & 0x03) << 4;       /* Field "C" */
             wdata[i][j] |= ((i + j) & 0x03) << 6; /* Field "D" */
         }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -56,7 +56,7 @@ main(void)
     /*
      * Create the dataset and write the bitfield data to it.
      */
-    dset   = H5Dcreate(file, DATASET, H5T_STD_B8BE, space, H5P_DEFAULT);
+    dset = H5Dcreate(file, DATASET, H5T_STD_B8BE, space, H5P_DEFAULT);
     status = H5Dwrite(dset, H5T_NATIVE_B8, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0]);
 
     /*
@@ -90,18 +90,19 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (unsigned char **)malloc(dims[0] * sizeof(unsigned char *));
+    rdata = (unsigned char**)malloc(dims[0] * sizeof(unsigned char*));
 
     /*
      * Allocate space for bitfield data.
      */
-    rdata[0] = (unsigned char *)malloc(dims[0] * dims[1] * sizeof(unsigned char));
+    rdata[0] = (unsigned char*)malloc(dims[0] * dims[1] * sizeof(unsigned char));
 
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * dims[1];
+    }
 
     /*
      * Read the data.

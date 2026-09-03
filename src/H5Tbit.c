@@ -15,7 +15,7 @@
  *              the bytes are in little-endian order.
  */
 
-#include "H5Tmodule.h" /* This source code file is part of the H5T module */
+#include "H5Tmodule.h"   /* This source code file is part of the H5T module */
 
 #include "H5private.h"   /*generic functions			  */
 #include "H5Eprivate.h"  /*error handling			  */
@@ -31,8 +31,7 @@
  *
  *-------------------------------------------------------------------------
  */
-void
-H5T__bit_copy(uint8_t *dst, size_t dst_offset, const uint8_t *src, size_t src_offset, size_t size)
+void H5T__bit_copy(uint8_t* dst, size_t dst_offset, const uint8_t* src, size_t src_offset, size_t size)
 {
     size_t shift;
     size_t mask_lo, mask_hi;
@@ -65,9 +64,9 @@ H5T__bit_copy(uint8_t *dst, size_t dst_offset, const uint8_t *src, size_t src_of
      */
     while (src_offset && size > 0) {
         size_t nbits = MIN3(size, 8 - dst_offset, 8 - src_offset);
-        size_t mask  = ((size_t)1 << nbits) - 1;
+        size_t mask = ((size_t)1 << nbits) - 1;
 
-        dst[d_idx] &= (uint8_t) ~(mask << dst_offset);
+        dst[d_idx] &= (uint8_t)~(mask << dst_offset);
         dst[d_idx] = (uint8_t)(dst[d_idx] | (((src[s_idx] >> src_offset) & (uint8_t)mask) << dst_offset));
 
         src_offset += nbits;
@@ -105,7 +104,7 @@ H5T__bit_copy(uint8_t *dst, size_t dst_offset, const uint8_t *src, size_t src_of
      * bits). SHIFT is three since the source must be shifted right three bits
      * to line up with the destination.
      */
-    shift   = dst_offset;
+    shift = dst_offset;
     mask_lo = ((size_t)1 << (8 - shift)) - 1;
     mask_hi = (~mask_lo) & 0xff;
 
@@ -116,14 +115,15 @@ H5T__bit_copy(uint8_t *dst, size_t dst_offset, const uint8_t *src, size_t src_of
             dst[d_idx + 1] &= (uint8_t)(~(mask_hi >> (8 - shift)));
             dst[d_idx + 1] |= (uint8_t)((src[s_idx] & mask_hi) >> (8 - shift));
         }
-        else
+        else {
             dst[d_idx] = src[s_idx];
+        }
     }
 
     /* Finish up */
     while (size > 0) {
         size_t nbits = (size_t)MIN3(size, 8 - dst_offset, 8 - src_offset);
-        size_t mask  = ((size_t)1 << nbits) - 1;
+        size_t mask = ((size_t)1 << nbits) - 1;
 
         dst[d_idx] &= (uint8_t)(~(mask << dst_offset));
         dst[d_idx] = (uint8_t)(dst[d_idx] | (((src[s_idx] >> src_offset) & (uint8_t)mask) << dst_offset));
@@ -163,12 +163,11 @@ H5T__bit_copy(uint8_t *dst, size_t dst_offset, const uint8_t *src, size_t src_of
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5T__bit_shift(uint8_t *buf, ssize_t shift_dist, size_t offset, size_t size)
+herr_t H5T__bit_shift(uint8_t* buf, ssize_t shift_dist, size_t offset, size_t size)
 {
-    uint8_t tmp_buf[512];        /* Temporary buffer */
-    H5WB_t *wb        = NULL;    /* Wrapped buffer for temporary buffer */
-    herr_t  ret_value = SUCCEED; /* Return value */
+    uint8_t tmp_buf[512];       /* Temporary buffer */
+    H5WB_t* wb = NULL;          /* Wrapped buffer for temporary buffer */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -179,19 +178,22 @@ H5T__bit_shift(uint8_t *buf, ssize_t shift_dist, size_t offset, size_t size)
     if (shift_dist) {
         size_t abs_shift_dist = (size_t)ABS(shift_dist);
 
-        if (abs_shift_dist >= size)
+        if (abs_shift_dist >= size) {
             H5T__bit_set(buf, offset, size, 0);
+        }
         else {
-            size_t   buf_size = (size / 8) + 1; /* Size of shift buffer needed */
-            uint8_t *shift_buf;                 /* Pointer to shift buffer */
+            size_t buf_size = (size / 8) + 1; /* Size of shift buffer needed */
+            uint8_t* shift_buf;               /* Pointer to shift buffer */
 
             /* Wrap the local buffer for serialized header info */
-            if (NULL == (wb = H5WB_wrap(tmp_buf, sizeof(tmp_buf))))
+            if (NULL == (wb = H5WB_wrap(tmp_buf, sizeof(tmp_buf)))) {
                 HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "can't wrap buffer");
+            }
 
             /* Get a pointer to a buffer that's large enough  */
-            if (NULL == (shift_buf = (uint8_t *)H5WB_actual(wb, buf_size)))
+            if (NULL == (shift_buf = (uint8_t*)H5WB_actual(wb, buf_size))) {
                 HGOTO_ERROR(H5E_DATATYPE, H5E_NOSPACE, FAIL, "can't get actual buffer");
+            }
 
             /* Shift vector by making copies */
             if (shift_dist > 0) { /* left shift */
@@ -210,12 +212,13 @@ H5T__bit_shift(uint8_t *buf, ssize_t shift_dist, size_t offset, size_t size)
                 H5T__bit_set(buf, offset + size - abs_shift_dist, abs_shift_dist, 0);
             }
         } /* end else */
-    }     /* end if */
+    } /* end if */
 
 done:
     /* Release resources */
-    if (wb && H5WB_unwrap(wb) < 0)
+    if (wb && H5WB_unwrap(wb) < 0) {
         HDONE_ERROR(H5E_DATATYPE, H5E_CLOSEERROR, FAIL, "can't close wrapped buffer");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5T__bit_shift() */
@@ -230,37 +233,35 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-uint64_t
-H5T__bit_get_d(const uint8_t *buf, size_t offset, size_t size)
+uint64_t H5T__bit_get_d(const uint8_t* buf, size_t offset, size_t size)
 {
     uint64_t val = 0;
-    size_t   i, hs;
+    size_t i, hs;
     uint64_t ret_value = 0; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
 
     assert(8 * sizeof(val) >= size);
 
-    H5T__bit_copy((uint8_t *)&val, (size_t)0, buf, offset, size);
+    H5T__bit_copy((uint8_t*)&val, (size_t)0, buf, offset, size);
     switch (H5T_native_order_g) {
-        case H5T_ORDER_LE:
-            break;
+    case H5T_ORDER_LE: break;
 
-        case H5T_ORDER_BE:
-            for (i = 0, hs = sizeof(val) / 2; i < hs; i++) {
-                uint8_t tmp                              = ((uint8_t *)&val)[i];
-                ((uint8_t *)&val)[i]                     = ((uint8_t *)&val)[sizeof(val) - (i + 1)];
-                ((uint8_t *)&val)[sizeof(val) - (i + 1)] = tmp;
-            }
-            break;
+    case H5T_ORDER_BE:
+        for (i = 0, hs = sizeof(val) / 2; i < hs; i++) {
+            uint8_t tmp = ((uint8_t*)&val)[i];
+            ((uint8_t*)&val)[i] = ((uint8_t*)&val)[sizeof(val) - (i + 1)];
+            ((uint8_t*)&val)[sizeof(val) - (i + 1)] = tmp;
+        }
+        break;
 
-        case H5T_ORDER_ERROR:
-        case H5T_ORDER_VAX:
-        case H5T_ORDER_NONE:
-        case H5T_ORDER_MIXED:
-        default:
-            /* This function can't return errors */
-            assert(0 && "unknown byte order");
+    case H5T_ORDER_ERROR:
+    case H5T_ORDER_VAX:
+    case H5T_ORDER_NONE:
+    case H5T_ORDER_MIXED:
+    default:
+        /* This function can't return errors */
+        assert(0 && "unknown byte order");
     }
 
     /* Set return value */
@@ -278,8 +279,7 @@ H5T__bit_get_d(const uint8_t *buf, size_t offset, size_t size)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5T__bit_set_d(uint8_t *buf, size_t offset, size_t size, uint64_t val)
+void H5T__bit_set_d(uint8_t* buf, size_t offset, size_t size, uint64_t val)
 {
     size_t i, hs;
 
@@ -288,27 +288,26 @@ H5T__bit_set_d(uint8_t *buf, size_t offset, size_t size, uint64_t val)
     assert(8 * sizeof(val) >= size);
 
     switch (H5T_native_order_g) {
-        case H5T_ORDER_LE:
-            break;
+    case H5T_ORDER_LE: break;
 
-        case H5T_ORDER_BE:
-            for (i = 0, hs = sizeof(val) / 2; i < hs; i++) {
-                uint8_t tmp                              = ((uint8_t *)&val)[i];
-                ((uint8_t *)&val)[i]                     = ((uint8_t *)&val)[sizeof(val) - (i + 1)];
-                ((uint8_t *)&val)[sizeof(val) - (i + 1)] = tmp;
-            }
-            break;
+    case H5T_ORDER_BE:
+        for (i = 0, hs = sizeof(val) / 2; i < hs; i++) {
+            uint8_t tmp = ((uint8_t*)&val)[i];
+            ((uint8_t*)&val)[i] = ((uint8_t*)&val)[sizeof(val) - (i + 1)];
+            ((uint8_t*)&val)[sizeof(val) - (i + 1)] = tmp;
+        }
+        break;
 
-        case H5T_ORDER_ERROR:
-        case H5T_ORDER_VAX:
-        case H5T_ORDER_NONE:
-        case H5T_ORDER_MIXED:
-        default:
-            /* This function can't return errors */
-            assert(0 && "unknown byte order");
+    case H5T_ORDER_ERROR:
+    case H5T_ORDER_VAX:
+    case H5T_ORDER_NONE:
+    case H5T_ORDER_MIXED:
+    default:
+        /* This function can't return errors */
+        assert(0 && "unknown byte order");
     }
 
-    H5T__bit_copy(buf, offset, (uint8_t *)&val, (size_t)0, size);
+    H5T__bit_copy(buf, offset, (uint8_t*)&val, (size_t)0, size);
 
     FUNC_LEAVE_NOAPI_VOID
 } /* end H5T__bit_set_d() */
@@ -323,8 +322,7 @@ H5T__bit_set_d(uint8_t *buf, size_t offset, size_t size, uint64_t val)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5T__bit_set(uint8_t *buf, size_t offset, size_t size, bool value)
+void H5T__bit_set(uint8_t* buf, size_t offset, size_t size, bool value)
 {
     int idx;
 
@@ -336,13 +334,15 @@ H5T__bit_set(uint8_t *buf, size_t offset, size_t size, bool value)
 
     /* The first partial byte */
     if (size && offset % 8) {
-        size_t   nbits = MIN(size, 8 - offset);
-        unsigned mask  = ((unsigned)1 << nbits) - 1;
+        size_t nbits = MIN(size, 8 - offset);
+        unsigned mask = ((unsigned)1 << nbits) - 1;
 
-        if (value)
+        if (value) {
             buf[idx] = (uint8_t)(buf[idx] | (mask << offset));
-        else
+        }
+        else {
             buf[idx] &= (uint8_t)(~(mask << offset));
+        }
 
         idx++;
         size -= nbits;
@@ -356,10 +356,12 @@ H5T__bit_set(uint8_t *buf, size_t offset, size_t size, bool value)
 
     /* The last partial byte */
     if (size) {
-        if (value)
+        if (value) {
             buf[idx] |= (uint8_t)(((unsigned)1 << size) - 1);
-        else
+        }
+        else {
             buf[idx] &= (uint8_t)(~(((unsigned)1 << size) - 1));
+        }
     }
 
     FUNC_LEAVE_NOAPI_VOID
@@ -382,12 +384,11 @@ H5T__bit_set(uint8_t *buf, size_t offset, size_t size, bool value)
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5T__bit_find(const uint8_t *buf, size_t offset, size_t size, H5T_sdir_t direction, bool value)
+ssize_t H5T__bit_find(const uint8_t* buf, size_t offset, size_t size, H5T_sdir_t direction, bool value)
 {
     ssize_t base = (ssize_t)offset;
     ssize_t idx, i;
-    size_t  iu;
+    size_t iu;
     ssize_t ret_value = (-1); /* Return value */
 
     /* Use FUNC_ENTER_PACKAGE_NOERR here to avoid performance issues */
@@ -397,74 +398,86 @@ H5T__bit_find(const uint8_t *buf, size_t offset, size_t size, H5T_sdir_t directi
     assert(true == 1);
 
     switch (direction) {
-        case H5T_BIT_LSB:
-            /* Calculate index */
-            idx = (ssize_t)(offset / 8);
-            offset %= 8;
+    case H5T_BIT_LSB:
+        /* Calculate index */
+        idx = (ssize_t)(offset / 8);
+        offset %= 8;
 
-            /* Beginning */
-            if (offset) {
-                for (iu = offset; iu < 8 && size > 0; iu++, size--)
-                    if (value == (bool)((buf[idx] >> iu) & 0x01))
-                        HGOTO_DONE(8 * idx + (ssize_t)iu - base);
-
-                offset = 0;
-                idx++;
-            } /* end if */
-
-            /* Middle */
-            while (size >= 8) {
-                if ((value ? 0x00 : 0xff) != buf[idx])
-                    for (i = 0; i < 8; i++)
-                        if (value == (bool)((buf[idx] >> i) & 0x01))
-                            HGOTO_DONE(8 * idx + i - base);
-
-                size -= 8;
-                idx++;
-            } /* end while */
-
-            /* End */
-            for (i = 0; i < (ssize_t)size; i++)
-                if (value == (bool)((buf[idx] >> i) & 0x01))
-                    HGOTO_DONE(8 * idx + i - base);
-            break;
-
-        case H5T_BIT_MSB:
-            /* Calculate index */
-            idx = (ssize_t)((offset + size - 1) / 8);
-            offset %= 8;
-
-            /* Beginning */
-            if (size > 8 - offset && (offset + size) % 8) {
-                for (iu = (offset + size) % 8; iu > 0; --iu, --size)
-                    if (value == (bool)((buf[idx] >> (iu - 1)) & 0x01))
-                        HGOTO_DONE(8 * idx + (ssize_t)(iu - 1) - base);
-
-                --idx;
-            } /* end if */
-
-            /* Middle */
-            while (size >= 8) {
-                if ((value ? 0x00 : 0xff) != buf[idx]) {
-                    for (i = 7; i >= 0; --i)
-                        if (value == (bool)((buf[idx] >> i) & 0x01))
-                            HGOTO_DONE(8 * idx + i - base);
-                } /* end if */
-
-                size -= 8;
-                --idx;
-            } /* end while */
-
-            /* End */
-            if (size > 0) {
-                for (iu = offset + size; iu > offset; --iu)
-                    if (value == (bool)((buf[idx] >> (iu - 1)) & 0x01))
-                        HGOTO_DONE(8 * idx + (ssize_t)(iu - 1) - base);
+        /* Beginning */
+        if (offset) {
+            for (iu = offset; iu < 8 && size > 0; iu++, size--) {
+                if (value == (bool)((buf[idx] >> iu) & 0x01)) {
+                    HGOTO_DONE(8 * idx + (ssize_t)iu - base);
+                }
             }
-            break;
 
-        default:
-            assert(0 && "Unknown bit search direction");
+            offset = 0;
+            idx++;
+        } /* end if */
+
+        /* Middle */
+        while (size >= 8) {
+            if ((value ? 0x00 : 0xff) != buf[idx]) {
+                for (i = 0; i < 8; i++) {
+                    if (value == (bool)((buf[idx] >> i) & 0x01)) {
+                        HGOTO_DONE(8 * idx + i - base);
+                    }
+                }
+            }
+
+            size -= 8;
+            idx++;
+        } /* end while */
+
+        /* End */
+        for (i = 0; i < (ssize_t)size; i++) {
+            if (value == (bool)((buf[idx] >> i) & 0x01)) {
+                HGOTO_DONE(8 * idx + i - base);
+            }
+        }
+        break;
+
+    case H5T_BIT_MSB:
+        /* Calculate index */
+        idx = (ssize_t)((offset + size - 1) / 8);
+        offset %= 8;
+
+        /* Beginning */
+        if (size > 8 - offset && (offset + size) % 8) {
+            for (iu = (offset + size) % 8; iu > 0; --iu, --size) {
+                if (value == (bool)((buf[idx] >> (iu - 1)) & 0x01)) {
+                    HGOTO_DONE(8 * idx + (ssize_t)(iu - 1) - base);
+                }
+            }
+
+            --idx;
+        } /* end if */
+
+        /* Middle */
+        while (size >= 8) {
+            if ((value ? 0x00 : 0xff) != buf[idx]) {
+                for (i = 7; i >= 0; --i) {
+                    if (value == (bool)((buf[idx] >> i) & 0x01)) {
+                        HGOTO_DONE(8 * idx + i - base);
+                    }
+                }
+            } /* end if */
+
+            size -= 8;
+            --idx;
+        } /* end while */
+
+        /* End */
+        if (size > 0) {
+            for (iu = offset + size; iu > offset; --iu) {
+                if (value == (bool)((buf[idx] >> (iu - 1)) & 0x01)) {
+                    HGOTO_DONE(8 * idx + (ssize_t)(iu - 1) - base);
+                }
+            }
+        }
+        break;
+
+    default: assert(0 && "Unknown bit search direction");
     } /* end switch */
 
 done:
@@ -481,10 +494,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5T__bit_inc(uint8_t *buf, size_t start, size_t size)
+bool H5T__bit_inc(uint8_t* buf, size_t start, size_t size)
 {
-    size_t   idx   = start / 8;
+    size_t idx = start / 8;
     unsigned carry = 1;
     unsigned acc, mask;
 
@@ -497,10 +509,12 @@ H5T__bit_inc(uint8_t *buf, size_t start, size_t size)
 
     /* The first partial byte */
     if (start) {
-        if (size + start < 8)
+        if (size + start < 8) {
             mask = ((unsigned)1 << size) - 1;
-        else
+        }
+        else {
             mask = ((unsigned)1 << (8 - start)) - 1;
+        }
         acc = ((unsigned)buf[idx] >> start) & mask;
         acc++;
         carry = acc & ((unsigned)1 << MIN(size, 8 - start));
@@ -515,7 +529,7 @@ H5T__bit_inc(uint8_t *buf, size_t start, size_t size)
     while (carry && size >= 8) {
         acc = buf[idx];
         acc++;
-        carry    = acc & 0x100;
+        carry = acc & 0x100;
         buf[idx] = (uint8_t)(acc & 0xff);
         idx++;
         size -= 8;
@@ -524,7 +538,7 @@ H5T__bit_inc(uint8_t *buf, size_t start, size_t size)
     /* The last bits */
     if (carry && size > 0) {
         mask = ((unsigned)1 << size) - 1;
-        acc  = buf[idx] & mask;
+        acc = buf[idx] & mask;
         acc++;
         carry = acc & ((unsigned)1 << size);
         buf[idx] &= (uint8_t)(~mask);
@@ -545,12 +559,11 @@ H5T__bit_inc(uint8_t *buf, size_t start, size_t size)
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5T__bit_dec(uint8_t *buf, size_t start, size_t size)
+bool H5T__bit_dec(uint8_t* buf, size_t start, size_t size)
 {
-    size_t   idx = start / 8;
-    size_t   pos = start % 8;
-    uint8_t  tmp;
+    size_t idx = start / 8;
+    size_t pos = start % 8;
+    uint8_t tmp;
     unsigned borrow = 0;
 
     /* Use FUNC_ENTER_PACKAGE_NOERR here to avoid performance issues */
@@ -568,16 +581,18 @@ H5T__bit_dec(uint8_t *buf, size_t start, size_t size)
          * bits and get 00000000.  So we need to borrow from higher byte when we subtract
          * 00001000.
          */
-        if (!(buf[idx] >> pos))
+        if (!(buf[idx] >> pos)) {
             borrow = 1;
+        }
         buf[idx] = (uint8_t)(buf[idx] - (1 << pos));
         idx++;
         size -= (8 - pos);
 
         /* The middle bytes */
         while (borrow && size >= 8) {
-            if (buf[idx])
+            if (buf[idx]) {
                 borrow = 0;
+            }
             buf[idx]--;
 
             idx++;
@@ -589,8 +604,9 @@ H5T__bit_dec(uint8_t *buf, size_t start, size_t size)
             /* Similar to the first byte case, where sequence ends in the same byte as starts */
             tmp = buf[idx];
             buf[idx]--;
-            if ((buf[idx] >> size) != tmp >> size)
+            if ((buf[idx] >> size) != tmp >> size) {
                 buf[idx] = (uint8_t)(buf[idx] + (1 << size));
+            }
         }
     }
     else {
@@ -600,11 +616,11 @@ H5T__bit_dec(uint8_t *buf, size_t start, size_t size)
          * and get 10111100.  A bit is borrowed from 6th bit(buf[idx]>>6=00000010, tmp>>6=00000011,
          * not equal).  We need to put this bit back by increment 1000000.
          */
-        tmp      = buf[idx];
+        tmp = buf[idx];
         buf[idx] = (uint8_t)(buf[idx] - (1 << pos));
         if ((buf[idx] >> (pos + size)) != tmp >> (pos + size)) {
             buf[idx] = (uint8_t)(buf[idx] + (1 << (pos + size)));
-            borrow   = 1;
+            borrow = 1;
         }
     }
 
@@ -621,11 +637,10 @@ H5T__bit_dec(uint8_t *buf, size_t start, size_t size)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5T__bit_neg(uint8_t *buf, size_t start, size_t size)
+void H5T__bit_neg(uint8_t* buf, size_t start, size_t size)
 {
-    size_t  idx = start / 8;
-    size_t  pos = start % 8;
+    size_t idx = start / 8;
+    size_t pos = start % 8;
     uint8_t tmp[1];
 
     /* Use FUNC_ENTER_PACKAGE_NOERR here to avoid performance issues */
@@ -645,7 +660,7 @@ H5T__bit_neg(uint8_t *buf, size_t start, size_t size)
 
         /* The middle bytes */
         while (size >= 8) {
-            buf[idx] = (uint8_t) ~(buf[idx]);
+            buf[idx] = (uint8_t)~(buf[idx]);
             idx++;
             size -= 8;
         }

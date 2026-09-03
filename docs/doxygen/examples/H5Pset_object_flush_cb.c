@@ -1,5 +1,5 @@
-hid_t    file_id, fapl_id;
-hid_t    dataset_id, dapl_id;
+hid_t file_id, fapl_id;
+hid_t dataset_id, dapl_id;
 unsigned counter;
 
 /* Create a copy of the file access property list */
@@ -27,15 +27,15 @@ H5Dflush(dataset_id);
 
 /* The flush will invoke flush_cb() with counter */
 H5Gflush(gid);
+
 /* counter will be equal to 2 */
 
 /* ... */
 
 /* The callback function for object flush property */
-static herr_t
-flush_cb(hid_t obj_id, void *_udata)
+static herr_t flush_cb(hid_t obj_id, void* _udata)
 {
-    unsigned *flush_ct = (unsigned *)_udata;
+    unsigned* flush_ct = (unsigned*)_udata;
     ++(*flush_ct);
     return 0;
 }

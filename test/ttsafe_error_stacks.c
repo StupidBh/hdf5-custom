@@ -13,24 +13,24 @@
 
 #ifdef H5_HAVE_THREADSAFE_API
 
-#define ERR_CLS_NAME        "Custom error class"
-#define ERR_CLS_LIB_NAME    "example_lib"
-#define ERR_CLS_LIB_VERSION "0.1"
+    #define ERR_CLS_NAME        "Custom error class"
+    #define ERR_CLS_LIB_NAME    "example_lib"
+    #define ERR_CLS_LIB_VERSION "0.1"
 
-#define ERR_MAJOR_MSG "Okay, Houston, we've had a problem here"
-#define ERR_MINOR_MSG "Oops!"
+    #define ERR_MAJOR_MSG "Okay, Houston, we've had a problem here"
+    #define ERR_MINOR_MSG "Oops!"
 
-H5TS_THREAD_RETURN_TYPE generate_hdf5_error(void *arg);
-H5TS_THREAD_RETURN_TYPE generate_user_error(void *arg);
+H5TS_THREAD_RETURN_TYPE generate_hdf5_error(void* arg);
+H5TS_THREAD_RETURN_TYPE generate_user_error(void* arg);
 
 hid_t err_cls_id = H5I_INVALID_HID;
 
 /* Helper routine to generate an HDF5 library error */
 H5TS_THREAD_RETURN_TYPE
-generate_hdf5_error(void H5_ATTR_UNUSED *arg)
+generate_hdf5_error(void H5_ATTR_UNUSED* arg)
 {
     H5TS_thread_ret_t ret_value = 0;
-    ssize_t           nobjs     = 0;
+    ssize_t nobjs = 0;
 
     H5E_BEGIN_TRY
     {
@@ -46,12 +46,12 @@ generate_hdf5_error(void H5_ATTR_UNUSED *arg)
 
 /* Helper routine to generate a user-defined error */
 H5TS_THREAD_RETURN_TYPE
-generate_user_error(void H5_ATTR_UNUSED *arg)
+generate_user_error(void H5_ATTR_UNUSED* arg)
 {
     H5TS_thread_ret_t ret_value = 0;
-    hid_t             major     = H5I_INVALID_HID;
-    hid_t             minor     = H5I_INVALID_HID;
-    herr_t            status    = FAIL;
+    hid_t major = H5I_INVALID_HID;
+    hid_t minor = H5I_INVALID_HID;
+    herr_t status = FAIL;
 
     err_cls_id = H5Eregister_class(ERR_CLS_NAME, ERR_CLS_LIB_NAME, ERR_CLS_LIB_VERSION);
     CHECK(err_cls_id, H5I_INVALID_HID, "H5Eregister_class");
@@ -76,11 +76,10 @@ generate_user_error(void H5_ATTR_UNUSED *arg)
 * in secondary threads are properly cleaned up at library shutdown time.
 **********************************************************************
 */
-void
-tts_error_stacks(void H5_ATTR_UNUSED *params)
+void tts_error_stacks(void H5_ATTR_UNUSED* params)
 {
     H5TS_thread_t threads[2];
-    herr_t        status = FAIL;
+    herr_t status = FAIL;
 
     /* Open library */
     H5open();

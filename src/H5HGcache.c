@@ -52,23 +52,22 @@
 /********************/
 
 /* Metadata cache callbacks */
-static herr_t H5HG__cache_heap_get_initial_load_size(void *udata, size_t *image_len);
-static herr_t H5HG__cache_heap_get_final_load_size(const void *_image, size_t image_len, void *udata,
-                                                   size_t *actual_len);
-static void  *H5HG__cache_heap_deserialize(const void *image, size_t len, void *udata, bool *dirty);
-static herr_t H5HG__cache_heap_image_len(const void *thing, size_t *image_len);
-static herr_t H5HG__cache_heap_serialize(const H5F_t *f, void *image, size_t len, void *thing);
-static herr_t H5HG__cache_heap_free_icr(void *thing);
+static herr_t H5HG__cache_heap_get_initial_load_size(void* udata, size_t* image_len);
+static herr_t H5HG__cache_heap_get_final_load_size(const void* _image, size_t image_len, void* udata, size_t* actual_len);
+static void* H5HG__cache_heap_deserialize(const void* image, size_t len, void* udata, bool* dirty);
+static herr_t H5HG__cache_heap_image_len(const void* thing, size_t* image_len);
+static herr_t H5HG__cache_heap_serialize(const H5F_t* f, void* image, size_t len, void* thing);
+static herr_t H5HG__cache_heap_free_icr(void* thing);
 
 /* Prefix deserialization */
-static herr_t H5HG__hdr_deserialize(H5HG_heap_t *heap, const uint8_t *image, size_t len, const H5F_t *f);
+static herr_t H5HG__hdr_deserialize(H5HG_heap_t* heap, const uint8_t* image, size_t len, const H5F_t* f);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* H5HG inherits cache-like properties from H5AC */
-const H5AC_class_t H5AC_GHEAP[1] = {{
+const H5AC_class_t H5AC_GHEAP[1] = { {
     H5AC_GHEAP_ID,                          /* Metadata client ID */
     "global heap",                          /* Metadata client name (for debugging) */
     H5FD_MEM_GHEAP,                         /* File space memory type for client */
@@ -83,7 +82,7 @@ const H5AC_class_t H5AC_GHEAP[1] = {{
     NULL,                                   /* 'notify' callback */
     H5HG__cache_heap_free_icr,              /* 'free_icr' callback */
     NULL,                                   /* 'fsf_size' callback */
-}};
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -101,11 +100,10 @@ const H5AC_class_t H5AC_GHEAP[1] = {{
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__hdr_deserialize(H5HG_heap_t *heap, const uint8_t *image, size_t len, const H5F_t *f)
+static herr_t H5HG__hdr_deserialize(H5HG_heap_t* heap, const uint8_t* image, size_t len, const H5F_t* f)
 {
-    const uint8_t *p_end     = image + len - 1; /* End of image buffer */
-    herr_t         ret_value = SUCCEED;
+    const uint8_t* p_end = image + len - 1; /* End of image buffer */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -114,29 +112,36 @@ H5HG__hdr_deserialize(H5HG_heap_t *heap, const uint8_t *image, size_t len, const
     assert(f);
 
     /* Magic number */
-    if (H5_IS_BUFFER_OVERFLOW(image, H5_SIZEOF_MAGIC, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, H5_SIZEOF_MAGIC, p_end)) {
         HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, FAIL, "ran off end of input buffer while decoding");
-    if (memcmp(image, H5HG_MAGIC, (size_t)H5_SIZEOF_MAGIC) != 0)
+    }
+    if (memcmp(image, H5HG_MAGIC, (size_t)H5_SIZEOF_MAGIC) != 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, FAIL, "bad global heap collection signature");
+    }
     image += H5_SIZEOF_MAGIC;
 
     /* Version */
-    if (H5_IS_BUFFER_OVERFLOW(image, 1, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, 1, p_end)) {
         HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, FAIL, "ran off end of input buffer while decoding");
-    if (H5HG_VERSION != *image++)
+    }
+    if (H5HG_VERSION != *image++) {
         HGOTO_ERROR(H5E_HEAP, H5E_VERSION, FAIL, "wrong version number in global heap");
+    }
 
     /* Reserved */
-    if (H5_IS_BUFFER_OVERFLOW(image, 3, p_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, 3, p_end)) {
         HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, FAIL, "ran off end of input buffer while decoding");
+    }
     image += 3;
 
     /* Size */
-    if (H5_IS_BUFFER_OVERFLOW(image, H5F_sizeof_size(f), p_end))
+    if (H5_IS_BUFFER_OVERFLOW(image, H5F_sizeof_size(f), p_end)) {
         HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, FAIL, "ran off end of input buffer while decoding");
+    }
     H5F_DECODE_LENGTH(f, image, heap->size);
-    if (heap->size < H5HG_MINSIZE)
+    if (heap->size < H5HG_MINSIZE) {
         HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, FAIL, "global heap size is too small");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -154,8 +159,7 @@ done:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__cache_heap_get_initial_load_size(void H5_ATTR_UNUSED *_udata, size_t *image_len)
+static herr_t H5HG__cache_heap_get_initial_load_size(void H5_ATTR_UNUSED* _udata, size_t* image_len)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -175,11 +179,10 @@ H5HG__cache_heap_get_initial_load_size(void H5_ATTR_UNUSED *_udata, size_t *imag
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__cache_heap_get_final_load_size(const void *image, size_t image_len, void *udata, size_t *actual_len)
+static herr_t H5HG__cache_heap_get_final_load_size(const void* image, size_t image_len, void* udata, size_t* actual_len)
 {
     H5HG_heap_t heap;
-    herr_t      ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -191,8 +194,9 @@ H5HG__cache_heap_get_final_load_size(const void *image, size_t image_len, void *
 
     /* Deserialize the heap's header */
     heap.size = 0;
-    if (H5HG__hdr_deserialize(&heap, (const uint8_t *)image, image_len, (const H5F_t *)udata) < 0)
+    if (H5HG__hdr_deserialize(&heap, (const uint8_t*)image, image_len, (const H5F_t*)udata) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTDECODE, FAIL, "can't decode global heap prefix");
+    }
 
     /* Set the actual global heap size */
     *actual_len = heap.size;
@@ -213,16 +217,15 @@ done:
  *              Failure:    NULL
  *-------------------------------------------------------------------------
  */
-static void *
-H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool H5_ATTR_UNUSED *dirty)
+static void* H5HG__cache_heap_deserialize(const void* _image, size_t len, void* _udata, bool H5_ATTR_UNUSED* dirty)
 {
-    H5F_t         *f         = (H5F_t *)_udata; /* File pointer */
-    H5HG_heap_t   *heap      = NULL;            /* New global heap */
-    uint8_t       *p         = NULL;            /* Pointer to objects in (copied) image buffer */
-    const uint8_t *p_end     = NULL;            /* End of (copied) image buffer */
-    size_t         max_idx   = 0;               /* Maximum heap object index seen */
-    size_t         nalloc    = 0;               /* Number of objects allocated */
-    void          *ret_value = NULL;
+    H5F_t* f = (H5F_t*)_udata;   /* File pointer */
+    H5HG_heap_t* heap = NULL;    /* New global heap */
+    uint8_t* p = NULL;           /* Pointer to objects in (copied) image buffer */
+    const uint8_t* p_end = NULL; /* End of (copied) image buffer */
+    size_t max_idx = 0;          /* Maximum heap object index seen */
+    size_t nalloc = 0;           /* Number of objects allocated */
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
@@ -232,11 +235,13 @@ H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool 
     assert(dirty);
 
     /* Allocate a new global heap */
-    if (NULL == (heap = H5FL_CALLOC(H5HG_heap_t)))
+    if (NULL == (heap = H5FL_CALLOC(H5HG_heap_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
     heap->shared = H5F_SHARED(f);
-    if (NULL == (heap->chunk = H5FL_BLK_MALLOC(gheap_chunk, len)))
+    if (NULL == (heap->chunk = H5FL_BLK_MALLOC(gheap_chunk, len))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Copy the image buffer into the newly allocated chunk */
     H5MM_memcpy(heap->chunk, _image, len);
@@ -249,10 +254,12 @@ H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool 
     p_end = heap->chunk + len - 1;
 
     /* Deserialize the heap's header */
-    if (H5_IS_BUFFER_OVERFLOW(heap->chunk, H5HG_SIZEOF_HDR(f), p_end))
+    if (H5_IS_BUFFER_OVERFLOW(heap->chunk, H5HG_SIZEOF_HDR(f), p_end)) {
         HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
-    if (H5HG__hdr_deserialize(heap, (const uint8_t *)heap->chunk, len, f) < 0)
+    }
+    if (H5HG__hdr_deserialize(heap, (const uint8_t*)heap->chunk, len, f) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTDECODE, NULL, "can't decode global heap header");
+    }
 
     /* Decode each object */
 
@@ -265,20 +272,20 @@ H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool 
     /* Calloc the obj array because the file format spec makes no guarantee
      * about the order of the objects, and unused slots must be set to zero.
      */
-    if (NULL == (heap->obj = H5FL_SEQ_CALLOC(H5HG_obj_t, nalloc)))
+    if (NULL == (heap->obj = H5FL_SEQ_CALLOC(H5HG_obj_t, nalloc))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
     heap->nalloc = nalloc;
 
     while (p < (heap->chunk + heap->size)) {
-
         if ((p + H5HG_SIZEOF_OBJHDR(f)) > (heap->chunk + heap->size)) {
-
             /* The last bit of space is too tiny for an object header, so
              * we assume that it's free space.
              */
-            if (NULL != heap->obj[0].begin)
+            if (NULL != heap->obj[0].begin) {
                 HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "object 0 should not be set");
-            heap->obj[0].size  = (size_t)(((const uint8_t *)heap->chunk + heap->size) - p);
+            }
+            heap->obj[0].size = (size_t)(((const uint8_t*)heap->chunk + heap->size) - p);
             heap->obj[0].begin = p;
 
             /* No buffer overflow check here since this just moves the pointer
@@ -287,53 +294,60 @@ H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool 
             p += heap->obj[0].size;
         }
         else {
-            size_t   need = 0;  /* # bytes needed to store the object */
+            size_t need = 0;    /* # bytes needed to store the object */
             unsigned idx;       /* Heap object index */
-            uint8_t *begin = p; /* Pointer to start of object */
+            uint8_t* begin = p; /* Pointer to start of object */
 
             /* Parse a normal heap entry */
 
-            if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end))
+            if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end)) {
                 HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
             UINT16DECODE(p, idx);
 
             /* Check if we need more room to store heap objects */
             if (idx >= heap->nalloc) {
-                size_t      new_alloc; /* New allocation number */
-                H5HG_obj_t *new_obj;   /* New array of object descriptions */
+                size_t new_alloc;    /* New allocation number */
+                H5HG_obj_t* new_obj; /* New array of object descriptions */
 
                 /* Determine the new number of objects to index */
                 new_alloc = MAX(heap->nalloc * 2, (idx + 1));
-                if (idx >= new_alloc)
+                if (idx >= new_alloc) {
                     HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "inappropriate heap index");
+                }
 
                 /* Reallocate array of objects */
-                if (NULL == (new_obj = H5FL_SEQ_REALLOC(H5HG_obj_t, heap->obj, new_alloc)))
+                if (NULL == (new_obj = H5FL_SEQ_REALLOC(H5HG_obj_t, heap->obj, new_alloc))) {
                     HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+                }
 
                 /* Clear newly allocated space */
                 memset(&new_obj[heap->nalloc], 0, (new_alloc - heap->nalloc) * sizeof(heap->obj[0]));
 
                 /* Update heap information */
                 heap->nalloc = new_alloc;
-                heap->obj    = new_obj;
-                if (heap->nalloc <= heap->nused)
+                heap->obj = new_obj;
+                if (heap->nalloc <= heap->nused) {
                     HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "inappropriate # allocated slots");
+                }
             }
 
             /* Number of references */
-            if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end))
+            if (H5_IS_BUFFER_OVERFLOW(p, 2, p_end)) {
                 HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
             UINT16DECODE(p, heap->obj[idx].nrefs);
 
             /* Reserved bytes */
-            if (H5_IS_BUFFER_OVERFLOW(p, 4, p_end))
+            if (H5_IS_BUFFER_OVERFLOW(p, 4, p_end)) {
                 HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
             p += 4;
 
             /* Object length */
-            if (H5_IS_BUFFER_OVERFLOW(p, H5F_sizeof_size(f), p_end))
+            if (H5_IS_BUFFER_OVERFLOW(p, H5F_sizeof_size(f), p_end)) {
                 HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
             H5F_DECODE_LENGTH(f, p, heap->obj[idx].size);
 
             /* Object
@@ -351,46 +365,57 @@ H5HG__cache_heap_deserialize(const void *_image, size_t len, void *_udata, bool 
              */
             if (idx > 0) {
                 need = H5HG_SIZEOF_OBJHDR(f) + H5HG_ALIGN(heap->obj[idx].size);
-                if (idx > max_idx)
+                if (idx > max_idx) {
                     max_idx = idx;
+                }
             }
-            else
+            else {
                 need = heap->obj[idx].size;
+            }
 
             /* Make sure the extra padding doesn't cause us to overrun
              * the buffer
              */
-            if (H5_IS_BUFFER_OVERFLOW(begin, need, p_end))
+            if (H5_IS_BUFFER_OVERFLOW(begin, need, p_end)) {
                 HGOTO_ERROR(H5E_HEAP, H5E_OVERFLOW, NULL, "ran off end of input buffer while decoding");
+            }
             p = begin + need;
         }
     }
 
     /* Post-parse checks */
-    if (p != heap->chunk + heap->size)
+    if (p != heap->chunk + heap->size) {
         HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "partially decoded global heap");
-    if (false == H5HG_ISALIGNED(heap->obj[0].size))
+    }
+    if (false == H5HG_ISALIGNED(heap->obj[0].size)) {
         HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "decoded global heap is not aligned");
+    }
 
     /* Set the next index value to use when creating a new object */
-    if (max_idx > 0)
+    if (max_idx > 0) {
         heap->nused = max_idx + 1;
-    else
+    }
+    else {
         heap->nused = 1;
+    }
 
-    if (max_idx >= heap->nused)
+    if (max_idx >= heap->nused) {
         HGOTO_ERROR(H5E_HEAP, H5E_BADVALUE, NULL, "bad `next unused` heap index value");
+    }
 
     /* Add the new heap to the CWFS list for the file */
-    if (H5F_cwfs_add(f, heap) < 0)
+    if (H5F_cwfs_add(f, heap) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, NULL, "unable to add global heap collection to file's CWFS");
+    }
 
     ret_value = heap;
 
 done:
-    if (!ret_value && heap)
-        if (H5HG__free(heap) < 0)
+    if (!ret_value && heap) {
+        if (H5HG__free(heap) < 0) {
             HDONE_ERROR(H5E_HEAP, H5E_CANTFREE, NULL, "unable to destroy global heap collection");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5HG__cache_heap_deserialize() */
@@ -404,10 +429,9 @@ done:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__cache_heap_image_len(const void *_thing, size_t *image_len)
+static herr_t H5HG__cache_heap_image_len(const void* _thing, size_t* image_len)
 {
-    const H5HG_heap_t *heap = (const H5HG_heap_t *)_thing;
+    const H5HG_heap_t* heap = (const H5HG_heap_t*)_thing;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -432,10 +456,9 @@ H5HG__cache_heap_image_len(const void *_thing, size_t *image_len)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__cache_heap_serialize(const H5F_t H5_ATTR_NDEBUG_UNUSED *f, void *image, size_t len, void *_thing)
+static herr_t H5HG__cache_heap_serialize(const H5F_t H5_ATTR_NDEBUG_UNUSED* f, void* image, size_t len, void* _thing)
 {
-    H5HG_heap_t *heap = (H5HG_heap_t *)_thing;
+    H5HG_heap_t* heap = (H5HG_heap_t*)_thing;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -460,11 +483,10 @@ H5HG__cache_heap_serialize(const H5F_t H5_ATTR_NDEBUG_UNUSED *f, void *image, si
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HG__cache_heap_free_icr(void *_thing)
+static herr_t H5HG__cache_heap_free_icr(void* _thing)
 {
-    H5HG_heap_t *heap      = (H5HG_heap_t *)_thing;
-    herr_t       ret_value = SUCCEED;
+    H5HG_heap_t* heap = (H5HG_heap_t*)_thing;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -472,8 +494,9 @@ H5HG__cache_heap_free_icr(void *_thing)
     assert(heap->cache_info.type == H5AC_GHEAP);
 
     /* Destroy global heap collection */
-    if (H5HG__free(heap) < 0)
+    if (H5HG__free(heap) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTFREE, FAIL, "unable to destroy global heap collection");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

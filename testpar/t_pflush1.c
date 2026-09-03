@@ -19,9 +19,9 @@
  */
 #include "h5test.h"
 
-static const char *FILENAME[] = {"flush", "noflush", NULL};
+static const char* FILENAME[] = { "flush", "noflush", NULL };
 
-static int *data_g = NULL;
+static int* data_g = NULL;
 
 #define N_GROUPS 100
 
@@ -34,55 +34,67 @@ static int *data_g = NULL;
  *              Failure:    H5I_INVALID_HID
  *-------------------------------------------------------------------------
  */
-static hid_t
-create_test_file(char *name, size_t name_length, hid_t fapl_id)
+static hid_t create_test_file(char* name, size_t name_length, hid_t fapl_id)
 {
-    hid_t   fid           = H5I_INVALID_HID;
-    hid_t   dcpl_id       = H5I_INVALID_HID;
-    hid_t   sid           = H5I_INVALID_HID;
-    hid_t   did           = H5I_INVALID_HID;
-    hid_t   top_level_gid = H5I_INVALID_HID;
-    hid_t   gid           = H5I_INVALID_HID;
-    hid_t   dxpl_id       = H5I_INVALID_HID;
-    hsize_t dims[2]       = {100, 100};
-    hsize_t chunk_dims[2] = {5, 5};
+    hid_t fid = H5I_INVALID_HID;
+    hid_t dcpl_id = H5I_INVALID_HID;
+    hid_t sid = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
+    hid_t top_level_gid = H5I_INVALID_HID;
+    hid_t gid = H5I_INVALID_HID;
+    hid_t dxpl_id = H5I_INVALID_HID;
+    hsize_t dims[2] = { 100, 100 };
+    hsize_t chunk_dims[2] = { 5, 5 };
     hsize_t i, j;
 
-    if ((fid = H5Fcreate(name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0)
+    if ((fid = H5Fcreate(name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id)) < 0) {
         goto error;
+    }
 
     /* Create a chunked dataset */
-    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl_id = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
-    if (H5Pset_chunk(dcpl_id, 2, chunk_dims) < 0)
+    }
+    if (H5Pset_chunk(dcpl_id, 2, chunk_dims) < 0) {
         goto error;
-    if ((sid = H5Screate_simple(2, dims, NULL)) < 0)
+    }
+    if ((sid = H5Screate_simple(2, dims, NULL)) < 0) {
         goto error;
-    if ((did = H5Dcreate2(fid, "dset", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    }
+    if ((did = H5Dcreate2(fid, "dset", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
-    if ((dxpl_id = H5Pcreate(H5P_DATASET_XFER)) < 0)
+    if ((dxpl_id = H5Pcreate(H5P_DATASET_XFER)) < 0) {
         goto error;
-    if (H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE) < 0)
+    }
+    if (H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE) < 0) {
         goto error;
+    }
 
     /* Write some data */
-    for (i = 0; i < dims[0]; i++)
-        for (j = 0; j < dims[1]; j++)
+    for (i = 0; i < dims[0]; i++) {
+        for (j = 0; j < dims[1]; j++) {
             data_g[(i * 100) + j] = (int)(i + (i * j) + j);
+        }
+    }
 
-    if (H5Dwrite(did, H5T_NATIVE_INT, sid, sid, dxpl_id, data_g) < 0)
+    if (H5Dwrite(did, H5T_NATIVE_INT, sid, sid, dxpl_id, data_g) < 0) {
         goto error;
+    }
 
     /* Create some groups */
-    if ((top_level_gid = H5Gcreate2(fid, "some_groups", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((top_level_gid = H5Gcreate2(fid, "some_groups", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
     for (i = 0; i < N_GROUPS; i++) {
         snprintf(name, name_length, "grp%02u", (unsigned)i);
-        if ((gid = H5Gcreate2(top_level_gid, name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((gid = H5Gcreate2(top_level_gid, name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto error;
-        if (H5Gclose(gid) < 0)
+        }
+        if (H5Gclose(gid) < 0) {
             goto error;
+        }
     }
 
     return fid;
@@ -99,26 +111,26 @@ error:
  * Return:      EXIT_FAILURE (always)
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hid_t       fid1    = H5I_INVALID_HID;
-    hid_t       fid2    = H5I_INVALID_HID;
-    hid_t       fapl_id = H5I_INVALID_HID;
-    MPI_File   *mpifh_p = NULL;
-    char        name[1024];
-    const char *driver_name;
-    int         mpi_size;
-    int         mpi_rank;
-    MPI_Comm    comm = MPI_COMM_WORLD;
-    MPI_Info    info = MPI_INFO_NULL;
+    hid_t fid1 = H5I_INVALID_HID;
+    hid_t fid2 = H5I_INVALID_HID;
+    hid_t fapl_id = H5I_INVALID_HID;
+    MPI_File* mpifh_p = NULL;
+    char name[1024];
+    const char* driver_name;
+    int mpi_size;
+    int mpi_rank;
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Info info = MPI_INFO_NULL;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(comm, &mpi_size);
     MPI_Comm_rank(comm, &mpi_rank);
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         TESTING("H5Fflush (part1)");
+    }
 
     /* Don't run using the split VFD */
     driver_name = h5_get_test_driver_name();
@@ -132,29 +144,36 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (NULL == (data_g = malloc(100 * 100 * sizeof(*data_g))))
+    if (NULL == (data_g = malloc(100 * 100 * sizeof(*data_g)))) {
         goto error;
+    }
 
-    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         goto error;
-    if (H5Pset_fapl_mpio(fapl_id, comm, info) < 0)
+    }
+    if (H5Pset_fapl_mpio(fapl_id, comm, info) < 0) {
         goto error;
+    }
 
     /* Create the file */
     h5_fixname(FILENAME[0], fapl_id, name, sizeof(name));
-    if ((fid1 = create_test_file(name, sizeof(name), fapl_id)) < 0)
+    if ((fid1 = create_test_file(name, sizeof(name), fapl_id)) < 0) {
         goto error;
+    }
     /* Flush and exit without closing the library */
-    if (H5Fflush(fid1, H5F_SCOPE_GLOBAL) < 0)
+    if (H5Fflush(fid1, H5F_SCOPE_GLOBAL) < 0) {
         goto error;
+    }
 
     /* Create the other file which will not be flushed */
     h5_fixname(FILENAME[1], fapl_id, name, sizeof(name));
-    if ((fid2 = create_test_file(name, sizeof(name), fapl_id)) < 0)
+    if ((fid2 = create_test_file(name, sizeof(name), fapl_id)) < 0) {
         goto error;
+    }
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         PASSED();
+    }
 
     fflush(stdout);
     fflush(stderr);
@@ -167,16 +186,20 @@ main(int argc, char *argv[])
      */
 
     /* Close file 1 */
-    if (H5Fget_vfd_handle(fid1, fapl_id, (void **)&mpifh_p) < 0)
+    if (H5Fget_vfd_handle(fid1, fapl_id, (void**)&mpifh_p) < 0) {
         goto error;
-    if (MPI_File_close(mpifh_p) != MPI_SUCCESS)
+    }
+    if (MPI_File_close(mpifh_p) != MPI_SUCCESS) {
         goto error;
+    }
 
     /* Close file 2 */
-    if (H5Fget_vfd_handle(fid2, fapl_id, (void **)&mpifh_p) < 0)
+    if (H5Fget_vfd_handle(fid2, fapl_id, (void**)&mpifh_p) < 0) {
         goto error;
-    if (MPI_File_close(mpifh_p) != MPI_SUCCESS)
+    }
+    if (MPI_File_close(mpifh_p) != MPI_SUCCESS) {
         goto error;
+    }
 
     fflush(stdout);
     fflush(stderr);
@@ -203,8 +226,9 @@ error:
     printf("THERE WAS A REAL ERROR IN t_pflush1.\n");
     fflush(stdout);
 
-    if (data_g)
+    if (data_g) {
         free(data_g);
+    }
 
     _exit(EXIT_FAILURE);
 } /* end main() */

@@ -24,25 +24,25 @@ Note: This example includes older cases from previous versions
 #define DIM0      4
 #define LEN       7
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file, space, dtype, dset, attr; /* Handles */
-    herr_t  status;
-    hsize_t dims[1] = {DIM0};
-    size_t  len;
-    char    wdata[DIM0 * LEN], /* Write buffer */
-        *rdata,                /* Read buffer */
+    hid_t file, space, dtype, dset, attr; /* Handles */
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    size_t len;
+    char wdata[DIM0 * LEN], /* Write buffer */
+        *rdata,             /* Read buffer */
         str[LEN] = "OPAQUE", *tag;
-    int     ndims;
+    int ndims;
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
     for (i = 0; i < DIM0; i++) {
-        for (j = 0; j < LEN - 1; j++)
+        for (j = 0; j < LEN - 1; j++) {
             wdata[j + i * LEN] = str[j];
+        }
         wdata[LEN - 1 + i * LEN] = (char)i + '0';
     }
 
@@ -54,8 +54,8 @@ main(void)
     /*
      * Create dataset with a null dataspace.
      */
-    space  = H5Screate(H5S_NULL);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -63,7 +63,7 @@ main(void)
      * For this example we will write and view the data as a character
      * array.
      */
-    dtype  = H5Tcreate(H5T_OPAQUE, LEN);
+    dtype = H5Tcreate(H5T_OPAQUE, LEN);
     status = H5Tset_tag(dtype, "Character array");
 
     /*
@@ -75,7 +75,7 @@ main(void)
     /*
      * Create the attribute and write the opaque data to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, dtype, space, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Awrite(attr, dtype, wdata);
 
     /*
@@ -107,15 +107,15 @@ main(void)
      * later.
      */
     dtype = H5Aget_type(attr);
-    len   = H5Tget_size(dtype);
-    tag   = H5Tget_tag(dtype);
+    len = H5Tget_size(dtype);
+    tag = H5Tget_tag(dtype);
 
     /*
      * Get dataspace and allocate memory for read buffer.
      */
     space = H5Aget_space(attr);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-    rdata = (char *)malloc(dims[0] * len);
+    rdata = (char*)malloc(dims[0] * len);
 
     /*
      * Read the data.
@@ -128,8 +128,9 @@ main(void)
     printf("Datatype tag for %s is: \"%s\"\n", ATTRIBUTE, tag);
     for (i = 0; i < dims[0]; i++) {
         printf("%s[%" PRIuHSIZE "]: ", ATTRIBUTE, i);
-        for (j = 0; j < len; j++)
+        for (j = 0; j < len; j++) {
             printf("%c", rdata[j + i * len]);
+        }
         printf("\n");
     }
 

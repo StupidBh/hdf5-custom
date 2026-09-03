@@ -28,42 +28,44 @@
 #define TABLE_NAME     "table"
 #define FILENAME       "h5ex_table_03.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle;
 
     Particle dst_buf[NRECORDS];
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t dst_size            = sizeof(Particle);
-    size_t dst_offset[NFIELDS] = {HOFFSET(Particle, name), HOFFSET(Particle, lati), HOFFSET(Particle, longi),
-                                  HOFFSET(Particle, pressure), HOFFSET(Particle, temperature)};
+    size_t dst_size = sizeof(Particle);
+    size_t dst_offset[NFIELDS] = { HOFFSET(Particle, name),
+                                   HOFFSET(Particle, lati),
+                                   HOFFSET(Particle, longi),
+                                   HOFFSET(Particle, pressure),
+                                   HOFFSET(Particle, temperature) };
 
-    Particle p                  = {"zero", 0, 1, 0.2F, 0.3};
-    size_t   dst_sizes[NFIELDS] = {sizeof(p.name), sizeof(p.lati), sizeof(p.longi), sizeof(p.pressure),
-                                   sizeof(p.temperature)};
+    Particle p = { "zero", 0, 1, 0.2F, 0.3 };
+    size_t dst_sizes[NFIELDS] = { sizeof(p.name), sizeof(p.lati), sizeof(p.longi), sizeof(p.pressure), sizeof(p.temperature) };
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
     /* Fill value particle */
-    Particle fill_data[1] = {{"no data", -1, -2, -99.0F, -98.0}};
-    hid_t    field_type[NFIELDS];
-    hid_t    string_type;
-    hid_t    file_id;
-    hsize_t  chunk_size = 10;
-    hsize_t  start;    /* Record to start reading/writing */
-    hsize_t  nrecords; /* Number of records to read/write */
-    int      i;
+    Particle fill_data[1] = { { "no data", -1, -2, -99.0F, -98.0 } };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    hsize_t start;    /* Record to start reading/writing */
+    hsize_t nrecords; /* Number of records to read/write */
+    int i;
 
     /* Define 2 new particles to write */
-    Particle particle_in[NRECORDS_WRITE] = {{"zero", 0, 1, 0.2F, 0.3}, {"one", 10, 11, 1.2F, 10.3}};
+    Particle particle_in[NRECORDS_WRITE] = { { "zero", 0, 1, 0.2F, 0.3 }, { "one", 10, 11, 1.2F, 10.3 } };
 
     /* Initialize the field field_type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -78,12 +80,22 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make the table */
-    H5TBmake_table("Table Title", file_id, TABLE_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, 0, /* no compression */
-                   NULL);                                /* no data written */
+    H5TBmake_table("Table Title",
+                   file_id,
+                   TABLE_NAME,
+                   NFIELDS,
+                   NRECORDS,
+                   dst_size,
+                   field_names,
+                   dst_offset,
+                   field_type,
+                   chunk_size,
+                   fill_data,
+                   0,     /* no compression */
+                   NULL); /* no data written */
 
     /* Overwrite 2 records starting at record 0 */
-    start    = 0;
+    start = 0;
     nrecords = NRECORDS_WRITE;
     H5TBwrite_records(file_id, TABLE_NAME, start, nrecords, dst_size, dst_offset, dst_sizes, particle_in);
 
@@ -92,8 +104,7 @@ main(void)
 
     /* print it by rows */
     for (i = 0; i < NRECORDS; i++) {
-        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi,
-               dst_buf[i].pressure, dst_buf[i].temperature);
+        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi, dst_buf[i].pressure, dst_buf[i].temperature);
         printf("\n");
     }
 

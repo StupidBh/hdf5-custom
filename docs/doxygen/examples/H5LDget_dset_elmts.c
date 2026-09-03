@@ -2,9 +2,7 @@
 
 //! <!-- [first_declare] -->
 
-DATASET "DSET1" {DATATYPE H5T_STD_I32LE DATASPACE SIMPLE{(4, 13) / (60, 100)} : : }
-
-//! <!-- [first_declare] -->
+DATASET "DSET1" { DATATYPE H5T_STD_I32LE DATASPACE SIMPLE { (4, 13) / (60, 100) } : : } //! <!-- [first_declare] -->
 
 //! <!-- [first_reading] -->
 
@@ -26,7 +24,8 @@ did = H5Dopen2(fid, "DSET1", H5P_DEFAULT);
         H5Dset_extent(did, new_dims)
 
             /* write data to the extended dataset */
-            : :
+            :
+            :
             /* get the size of the dataset's data type */
             type_size = H5LDget_dset_type_size(did, NULL);
         :

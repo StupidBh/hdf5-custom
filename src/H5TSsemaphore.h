@@ -67,15 +67,16 @@
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_signal(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_signal(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(0 == ReleaseSemaphore(*sem, 1, NULL)))
+    if (H5_UNLIKELY(0 == ReleaseSemaphore(*sem, 1, NULL))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_signal() */
@@ -93,15 +94,16 @@ H5TS_semaphore_signal(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_wait(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_wait(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(WAIT_OBJECT_0 != WaitForSingleObject(*sem, INFINITE)))
+    if (H5_UNLIKELY(WAIT_OBJECT_0 != WaitForSingleObject(*sem, INFINITE))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_wait() */
@@ -122,15 +124,16 @@ H5TS_semaphore_wait(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_signal(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_signal(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(0 != sem_post(sem)))
+    if (H5_UNLIKELY(0 != sem_post(sem))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_signal() */
@@ -148,14 +151,14 @@ H5TS_semaphore_signal(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_wait(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_wait(H5TS_semaphore_t* sem)
 {
     int rc;
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
     /* Loop because of:
      *  http://stackoverflow.com/questions/2013181/gdb-causes-sem-wait-to-fail-with-eintr-error
@@ -164,8 +167,9 @@ H5TS_semaphore_wait(H5TS_semaphore_t *sem)
         rc = sem_wait(sem);
     } while (rc == -1 && errno == EINTR);
 
-    if (H5_UNLIKELY(0 != rc))
+    if (H5_UNLIKELY(0 != rc)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_wait() */
@@ -185,30 +189,33 @@ H5TS_semaphore_wait(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_signal(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_signal(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
     /* Acquire the mutex for the semaphore */
-    if (H5_UNLIKELY(H5TS_mutex_lock(&sem->mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_lock(&sem->mutex) < 0)) {
         return FAIL;
+    }
 
     /* Wake a thread up, if any are waiting */
-    if (sem->waiters)
+    if (sem->waiters) {
         if (H5_UNLIKELY(H5TS_cond_signal(&sem->cond) < 0)) {
             H5TS_mutex_unlock(&sem->mutex);
             return FAIL;
         }
+    }
 
     /* Increment the semaphore's value */
     sem->counter++;
 
     /* Release the mutex for the semaphore */
-    if (H5_UNLIKELY(H5TS_mutex_unlock(&sem->mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_unlock(&sem->mutex) < 0)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_signal() */
@@ -226,16 +233,17 @@ H5TS_semaphore_signal(H5TS_semaphore_t *sem)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_semaphore_wait(H5TS_semaphore_t *sem)
+static inline herr_t H5TS_semaphore_wait(H5TS_semaphore_t* sem)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == sem))
+    if (H5_UNLIKELY(NULL == sem)) {
         return FAIL;
+    }
 
     /* Acquire the mutex for the semaphore */
-    if (H5_UNLIKELY(H5TS_mutex_lock(&sem->mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_lock(&sem->mutex) < 0)) {
         return FAIL;
+    }
 
     /* Wait for semaphore value > 0 */
     while (0 == sem->counter) {
@@ -257,8 +265,9 @@ H5TS_semaphore_wait(H5TS_semaphore_t *sem)
     sem->counter--;
 
     /* Release the mutex for the semaphore */
-    if (H5_UNLIKELY(H5TS_mutex_unlock(&sem->mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_unlock(&sem->mutex) < 0)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_semaphore_wait() */

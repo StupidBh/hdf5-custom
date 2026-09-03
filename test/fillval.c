@@ -22,23 +22,24 @@
  */
 /* #define NO_FILLING */
 
-static const char *FILENAME[] = {"fillval_1", "fillval_2", "fillval_3", "fillval_4", "fillval_5",
-                                 "fillval_6", "fillval_7", "fillval_8", "fillval_9", NULL};
+static const char* FILENAME[] = { "fillval_1", "fillval_2", "fillval_3", "fillval_4", "fillval_5", "fillval_6", "fillval_7", "fillval_8", "fillval_9", NULL };
 
 /* Common type for compound datatype operations */
-typedef struct {
-    float  a;
-    int    x;
+typedef struct
+{
+    float a;
+    int x;
     double y;
-    char   z;
+    char z;
 } comp_datatype;
 
 /* Common type for compound+vl datatype operations */
-typedef struct {
-    int   x;
-    char *a;
-    char *b;
-    int   y;
+typedef struct
+{
+    int x;
+    char* a;
+    char* b;
+    int y;
 } comp_vl_datatype;
 
 /* The fill_old.h5 is generated from gen_old_fill.c in HDF5 'test' directory
@@ -58,21 +59,25 @@ typedef struct {
  *
  *-------------------------------------------------------------------------
  */
-static hid_t
-create_compound_type(void)
+static hid_t create_compound_type(void)
 {
     hid_t ret_value = H5I_INVALID_HID;
 
-    if ((ret_value = H5Tcreate(H5T_COMPOUND, sizeof(comp_datatype))) < 0)
+    if ((ret_value = H5Tcreate(H5T_COMPOUND, sizeof(comp_datatype))) < 0) {
         goto error;
-    if (H5Tinsert(ret_value, "a", HOFFSET(comp_datatype, a), H5T_NATIVE_FLOAT) < 0)
+    }
+    if (H5Tinsert(ret_value, "a", HOFFSET(comp_datatype, a), H5T_NATIVE_FLOAT) < 0) {
         goto error;
-    if (H5Tinsert(ret_value, "x", HOFFSET(comp_datatype, x), H5T_NATIVE_INT) < 0)
+    }
+    if (H5Tinsert(ret_value, "x", HOFFSET(comp_datatype, x), H5T_NATIVE_INT) < 0) {
         goto error;
-    if (H5Tinsert(ret_value, "y", HOFFSET(comp_datatype, y), H5T_NATIVE_DOUBLE) < 0)
+    }
+    if (H5Tinsert(ret_value, "y", HOFFSET(comp_datatype, y), H5T_NATIVE_DOUBLE) < 0) {
         goto error;
-    if (H5Tinsert(ret_value, "z", HOFFSET(comp_datatype, z), H5T_NATIVE_CHAR) < 0)
+    }
+    if (H5Tinsert(ret_value, "z", HOFFSET(comp_datatype, z), H5T_NATIVE_CHAR) < 0) {
         goto error;
+    }
 
     return ret_value;
 
@@ -96,32 +101,39 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static hid_t
-create_compound_vl_type(void)
+static hid_t create_compound_vl_type(void)
 {
-    hid_t str_id    = H5I_INVALID_HID; /* Datatype for VL-string fields */
+    hid_t str_id = H5I_INVALID_HID; /* Datatype for VL-string fields */
     hid_t ret_value = H5I_INVALID_HID;
 
     /* Create a string datatype */
-    if ((str_id = H5Tcopy(H5T_C_S1)) < 0)
+    if ((str_id = H5Tcopy(H5T_C_S1)) < 0) {
         TEST_ERROR;
-    if (H5Tset_size(str_id, H5T_VARIABLE) < 0)
+    }
+    if (H5Tset_size(str_id, H5T_VARIABLE) < 0) {
         TEST_ERROR;
+    }
 
-    if ((ret_value = H5Tcreate(H5T_COMPOUND, sizeof(comp_vl_datatype))) < 0)
+    if ((ret_value = H5Tcreate(H5T_COMPOUND, sizeof(comp_vl_datatype))) < 0) {
         TEST_ERROR;
-    if (H5Tinsert(ret_value, "x", HOFFSET(comp_vl_datatype, x), H5T_NATIVE_INT) < 0)
+    }
+    if (H5Tinsert(ret_value, "x", HOFFSET(comp_vl_datatype, x), H5T_NATIVE_INT) < 0) {
         TEST_ERROR;
-    if (H5Tinsert(ret_value, "a", HOFFSET(comp_vl_datatype, a), str_id) < 0)
+    }
+    if (H5Tinsert(ret_value, "a", HOFFSET(comp_vl_datatype, a), str_id) < 0) {
         TEST_ERROR;
-    if (H5Tinsert(ret_value, "b", HOFFSET(comp_vl_datatype, b), str_id) < 0)
+    }
+    if (H5Tinsert(ret_value, "b", HOFFSET(comp_vl_datatype, b), str_id) < 0) {
         TEST_ERROR;
-    if (H5Tinsert(ret_value, "y", HOFFSET(comp_vl_datatype, y), H5T_NATIVE_INT) < 0)
+    }
+    if (H5Tinsert(ret_value, "y", HOFFSET(comp_vl_datatype, y), H5T_NATIVE_INT) < 0) {
         TEST_ERROR;
+    }
 
     /* Close string datatype */
-    if (H5Tclose(str_id) < 0)
+    if (H5Tclose(str_id) < 0) {
         TEST_ERROR;
+    }
 
     return ret_value;
 
@@ -147,16 +159,19 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_getset(void)
+static int test_getset(void)
 {
     hid_t dcpl = H5I_INVALID_HID;
-    int   fill_i;
+    int fill_i;
     hid_t type_ss = H5I_INVALID_HID, type_si = H5I_INVALID_HID;
-    struct fill_si {
+
+    struct fill_si
+    {
         int v1, v2;
     } fill_si;
-    struct fill_ss {
+
+    struct fill_ss
+    {
         short v1, v2;
     } fill_ss, fill_ss_rd;
 
@@ -166,15 +181,14 @@ test_getset(void)
      * Create the dataset creation property list and the data types that will
      * be used during this test.
      */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
-    if ((type_ss = H5Tcreate(H5T_COMPOUND, sizeof fill_ss)) < 0 ||
-        H5Tinsert(type_ss, "v1", HOFFSET(struct fill_ss, v1), H5T_NATIVE_SHORT) < 0 ||
+    }
+    if ((type_ss = H5Tcreate(H5T_COMPOUND, sizeof fill_ss)) < 0 || H5Tinsert(type_ss, "v1", HOFFSET(struct fill_ss, v1), H5T_NATIVE_SHORT) < 0 ||
         H5Tinsert(type_ss, "v2", HOFFSET(struct fill_ss, v2), H5T_NATIVE_SHORT) < 0) {
         goto error;
     }
-    if ((type_si = H5Tcreate(H5T_COMPOUND, sizeof fill_si)) < 0 ||
-        H5Tinsert(type_si, "v1", HOFFSET(struct fill_si, v1), H5T_NATIVE_INT) < 0 ||
+    if ((type_si = H5Tcreate(H5T_COMPOUND, sizeof fill_si)) < 0 || H5Tinsert(type_si, "v1", HOFFSET(struct fill_si, v1), H5T_NATIVE_INT) < 0 ||
         H5Tinsert(type_si, "v2", HOFFSET(struct fill_si, v2), H5T_NATIVE_INT) < 0) {
         goto error;
     }
@@ -199,14 +213,16 @@ test_getset(void)
      */
     fill_ss.v1 = 1111;
     fill_ss.v2 = 2222;
-    if (H5Pset_fill_value(dcpl, type_ss, &fill_ss) < 0)
+    if (H5Pset_fill_value(dcpl, type_ss, &fill_ss) < 0) {
         goto error;
+    }
 
     /*
      * Get the fill value using the same data type that was used to set it.
      */
-    if (H5Pget_fill_value(dcpl, type_ss, &fill_ss_rd) < 0)
+    if (H5Pget_fill_value(dcpl, type_ss, &fill_ss_rd) < 0) {
         goto error;
+    }
     if (fill_ss.v1 != fill_ss_rd.v1 || fill_ss.v2 != fill_ss_rd.v2) {
         H5_FAILED();
         puts("    Failed to get fill value using same data type that was ");
@@ -217,8 +233,9 @@ test_getset(void)
     /*
      * Get the fill value using some other data type.
      */
-    if (H5Pget_fill_value(dcpl, type_si, &fill_si) < 0)
+    if (H5Pget_fill_value(dcpl, type_si, &fill_si) < 0) {
         goto error;
+    }
     if (fill_ss.v1 != fill_si.v1 || fill_ss.v2 != fill_si.v2) {
         H5_FAILED();
         puts("    Failed to get fill value using a data type other than what");
@@ -229,10 +246,12 @@ test_getset(void)
     /*
      * Reset the fill value
      */
-    if (H5Pset_fill_value(dcpl, type_si, &fill_si) < 0)
+    if (H5Pset_fill_value(dcpl, type_si, &fill_si) < 0) {
         goto error;
-    if (H5Pget_fill_value(dcpl, type_ss, &fill_ss) < 0)
+    }
+    if (H5Pget_fill_value(dcpl, type_ss, &fill_ss) < 0) {
         goto error;
+    }
     if (fill_si.v1 != fill_ss.v1 || fill_si.v2 != fill_ss.v2) {
         H5_FAILED();
         puts("    Resetting the fill value was unsuccessful.");
@@ -240,12 +259,15 @@ test_getset(void)
     }
 
     /* Success */
-    if (H5Pclose(dcpl) < 0)
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if (H5Tclose(type_si) < 0)
+    }
+    if (H5Tclose(type_si) < 0) {
         goto error;
-    if (H5Tclose(type_ss) < 0)
+    }
+    if (H5Tclose(type_ss) < 0) {
         goto error;
+    }
     PASSED();
     return 0;
 
@@ -271,97 +293,117 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_getset_vl(hid_t fapl)
+static int test_getset_vl(hid_t fapl)
 {
-    hsize_t dims[1] = {2};
-    hid_t   fileid = (H5I_INVALID_HID), spaceid = (H5I_INVALID_HID), dtypeid = (H5I_INVALID_HID),
-          datasetid = (H5I_INVALID_HID), plistid = (H5I_INVALID_HID);
-    char  fill_value[]      = "aaaa";
-    char  orig_fill_value[] = "aaaa";
-    char *f1                = fill_value;
-    char *f2;
-    char  filename[1024];
+    hsize_t dims[1] = { 2 };
+    hid_t fileid = (H5I_INVALID_HID), spaceid = (H5I_INVALID_HID), dtypeid = (H5I_INVALID_HID), datasetid = (H5I_INVALID_HID), plistid = (H5I_INVALID_HID);
+    char fill_value[] = "aaaa";
+    char orig_fill_value[] = "aaaa";
+    char* f1 = fill_value;
+    char* f2;
+    char filename[1024];
 
     TESTING("property lists, with variable-length datatype");
 
     /* Create string type. */
-    if ((dtypeid = H5Tcopy(H5T_C_S1)) < 0)
+    if ((dtypeid = H5Tcopy(H5T_C_S1)) < 0) {
         TEST_ERROR;
-    if (H5Tset_size(dtypeid, H5T_VARIABLE) < 0)
+    }
+    if (H5Tset_size(dtypeid, H5T_VARIABLE) < 0) {
         TEST_ERROR;
+    }
 
     /* Set up dataset creation property list, with fill value */
-    if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((plistid = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         TEST_ERROR;
-    if (H5Pset_fill_value(plistid, dtypeid, &f1) < 0)
+    }
+    if (H5Pset_fill_value(plistid, dtypeid, &f1) < 0) {
         TEST_ERROR;
+    }
 
     /* Modify original fill value string */
     fill_value[0] = 'b';
 
     /* Retrieve fill value from property */
-    if (H5Pget_fill_value(plistid, dtypeid, &f2) < 0)
+    if (H5Pget_fill_value(plistid, dtypeid, &f2) < 0) {
         TEST_ERROR;
+    }
 
     /* Verify that the fill value is the original value */
-    if (strcmp(f2, orig_fill_value) != 0)
+    if (strcmp(f2, orig_fill_value) != 0) {
         TEST_ERROR;
+    }
 
     /* Release the fill value retrieved */
     free(f2);
 
     /* Open file. */
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
-    if ((fileid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fileid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Write an dataset of this type. */
-    if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0)
+    if ((spaceid = H5Screate_simple(1, dims, NULL)) < 0) {
         TEST_ERROR;
-    if ((datasetid = H5Dcreate2(fileid, "Dataset", dtypeid, spaceid, H5P_DEFAULT, plistid, H5P_DEFAULT)) < 0)
+    }
+    if ((datasetid = H5Dcreate2(fileid, "Dataset", dtypeid, spaceid, H5P_DEFAULT, plistid, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Close IDs (except datatype) */
-    if (H5Dclose(datasetid) < 0)
+    if (H5Dclose(datasetid) < 0) {
         TEST_ERROR;
-    if (H5Pclose(plistid) < 0)
+    }
+    if (H5Pclose(plistid) < 0) {
         TEST_ERROR;
-    if (H5Sclose(spaceid) < 0)
+    }
+    if (H5Sclose(spaceid) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fileid) < 0)
+    }
+    if (H5Fclose(fileid) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open file, group & dataset */
-    if ((fileid = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0)
+    if ((fileid = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if ((datasetid = H5Dopen2(fileid, "Dataset", H5P_DEFAULT)) < 0)
+    }
+    if ((datasetid = H5Dopen2(fileid, "Dataset", H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Get dataset's creation property list */
-    if ((plistid = H5Dget_create_plist(datasetid)) < 0)
+    if ((plistid = H5Dget_create_plist(datasetid)) < 0) {
         TEST_ERROR;
+    }
 
     /* Query fill value */
-    if (H5Pget_fill_value(plistid, dtypeid, &f2) < 0)
+    if (H5Pget_fill_value(plistid, dtypeid, &f2) < 0) {
         TEST_ERROR;
+    }
 
     /* Verify that the fill value is the original value */
-    if (strcmp(f2, orig_fill_value) != 0)
+    if (strcmp(f2, orig_fill_value) != 0) {
         TEST_ERROR;
+    }
 
     /* Release the fill value retrieved */
     free(f2);
 
     /* Close IDs */
-    if (H5Dclose(datasetid) < 0)
+    if (H5Dclose(datasetid) < 0) {
         TEST_ERROR;
-    if (H5Fclose(fileid) < 0)
+    }
+    if (H5Fclose(fileid) < 0) {
         TEST_ERROR;
-    if (H5Pclose(plistid) < 0)
+    }
+    if (H5Pclose(plistid) < 0) {
         TEST_ERROR;
-    if (H5Tclose(dtypeid) < 0)
+    }
+    if (H5Tclose(dtypeid) < 0) {
         TEST_ERROR;
+    }
 
     PASSED();
     return 0;
@@ -385,24 +427,20 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
+static int test_create(hid_t fapl, const char* base_name, H5D_layout_t layout)
 {
-    hid_t file = H5I_INVALID_HID, space = H5I_INVALID_HID, dcpl = H5I_INVALID_HID,
-          comp_type_id = H5I_INVALID_HID;
-    hid_t dset1 = H5I_INVALID_HID, dset2 = H5I_INVALID_HID, dset3 = H5I_INVALID_HID, dset4 = H5I_INVALID_HID,
-          dset5 = H5I_INVALID_HID, dset6 = H5I_INVALID_HID,
-          /* dset7=H5I_INVALID_HID, */ dset8 = H5I_INVALID_HID, dset9 = H5I_INVALID_HID,
-          dset10                   = H5I_INVALID_HID;
-    hsize_t            cur_size[5] = {2, 8, 8, 4, 2};
-    hsize_t            ch_size[5]  = {1, 1, 1, 4, 1};
-    short              rd_s, fill_s = 0x1234;
-    long               rd_l, fill_l = 0x4321;
-    char               filename[1024];
+    hid_t file = H5I_INVALID_HID, space = H5I_INVALID_HID, dcpl = H5I_INVALID_HID, comp_type_id = H5I_INVALID_HID;
+    hid_t dset1 = H5I_INVALID_HID, dset2 = H5I_INVALID_HID, dset3 = H5I_INVALID_HID, dset4 = H5I_INVALID_HID, dset5 = H5I_INVALID_HID, dset6 = H5I_INVALID_HID,
+          /* dset7=H5I_INVALID_HID, */ dset8 = H5I_INVALID_HID, dset9 = H5I_INVALID_HID, dset10 = H5I_INVALID_HID;
+    hsize_t cur_size[5] = { 2, 8, 8, 4, 2 };
+    hsize_t ch_size[5] = { 1, 1, 1, 4, 1 };
+    short rd_s, fill_s = 0x1234;
+    long rd_l, fill_l = 0x4321;
+    char filename[1024];
     H5D_space_status_t allocation;
-    H5D_alloc_time_t   alloc_time;
-    H5D_fill_time_t    fill_time;
-    comp_datatype      rd_c, fill_ctype;
+    H5D_alloc_time_t alloc_time;
+    H5D_fill_time_t fill_time;
+    comp_datatype rd_c, fill_ctype;
 
     if (H5D_CHUNKED == layout) {
         TESTING("chunked dataset creation");
@@ -418,139 +456,176 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
      * Create a file.
      */
     h5_fixname(base_name, fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if ((space = H5Screate_simple(5, cur_size, cur_size)) < 0)
+    }
+    if ((space = H5Screate_simple(5, cur_size, cur_size)) < 0) {
         goto error;
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    }
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
+    }
     if (H5D_CHUNKED == layout) {
-        if (H5Pset_chunk(dcpl, 5, ch_size) < 0)
+        if (H5Pset_chunk(dcpl, 5, ch_size) < 0) {
             goto error;
+        }
     }
     else if (H5D_COMPACT == layout) {
-        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0)
+        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0) {
             goto error;
+        }
     }
 
     /* Create a compound datatype */
-    if ((comp_type_id = create_compound_type()) < 0)
+    if ((comp_type_id = create_compound_type()) < 0) {
         goto error;
+    }
 
     /* I. Test cases for late space allocation except compact dataset */
 
     if (H5D_COMPACT != layout) {
-        if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0)
+        if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0) {
             goto error;
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+        }
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
             goto error;
+        }
 
         /* 1. Compound datatype test */
-        if (H5Pget_fill_value(dcpl, comp_type_id, &fill_ctype) < 0)
+        if (H5Pget_fill_value(dcpl, comp_type_id, &fill_ctype) < 0) {
             goto error;
+        }
         fill_ctype.y = 4444;
-        if (H5Pset_fill_value(dcpl, comp_type_id, &fill_ctype) < 0)
+        if (H5Pset_fill_value(dcpl, comp_type_id, &fill_ctype) < 0) {
             goto error;
-        if ((dset9 = H5Dcreate2(file, "dset9", comp_type_id, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+        }
+        if ((dset9 = H5Dcreate2(file, "dset9", comp_type_id, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
-            /* The three datasets test three fill
-             * conversion paths: small to large, large to small, and no conversion.
-             * They depend on `short' being smaller than `long'.
-             */
-            /* 2. Small to large fill conversion */
+        /* The three datasets test three fill
+         * conversion paths: small to large, large to small, and no conversion.
+         * They depend on `short' being smaller than `long'.
+         */
+        /* 2. Small to large fill conversion */
 #ifndef NO_FILLING
-        if (H5Pset_fill_value(dcpl, H5T_NATIVE_SHORT, &fill_s) < 0)
+        if (H5Pset_fill_value(dcpl, H5T_NATIVE_SHORT, &fill_s) < 0) {
             goto error;
+        }
 #endif
-        if ((dset1 = H5Dcreate2(file, "dset1", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+        if ((dset1 = H5Dcreate2(file, "dset1", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
-            /* 3. Large to small fill conversion */
+        /* 3. Large to small fill conversion */
 #ifndef NO_FILLING
-        if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0)
+        if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0) {
             goto error;
+        }
 #endif
-        if ((dset2 = H5Dcreate2(file, "dset2", H5T_NATIVE_SHORT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+        if ((dset2 = H5Dcreate2(file, "dset2", H5T_NATIVE_SHORT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
-            /* 4. No conversion */
+        /* 4. No conversion */
 #ifndef NO_FILLING
-        if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0)
+        if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0) {
             goto error;
+        }
 #endif
-        if ((dset3 = H5Dcreate2(file, "dset3", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+        if ((dset3 = H5Dcreate2(file, "dset3", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
         /* 5. late space allocation and never write fill value */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
             goto error;
-        if ((dset4 = H5Dcreate2(file, "dset4", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+        }
+        if ((dset4 = H5Dcreate2(file, "dset4", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
         /* 6. fill value is undefined while fill write time is H5D_FILL_TIME_ALLOC.
          * Supposed to fail. */
-        if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0)
+        if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0) {
             goto error;
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+        }
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
             goto error;
+        }
         H5E_BEGIN_TRY
         {
-            if (H5Dcreate2(file, "dset7", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT) != FAIL)
+            if (H5Dcreate2(file, "dset7", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT) != FAIL) {
                 goto error;
+            }
         }
         H5E_END_TRY
     }
 
     /* II. Test early space allocation cases */
 
-    if (H5Pclose(dcpl) < 0)
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    }
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
+    }
     if (H5D_CHUNKED == layout) {
-        if (H5Pset_chunk(dcpl, 5, ch_size) < 0)
+        if (H5Pset_chunk(dcpl, 5, ch_size) < 0) {
             goto error;
+        }
     }
     else if (H5D_COMPACT == layout) {
-        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0)
+        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0) {
             goto error;
+        }
     }
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0) {
         goto error;
+    }
 
     /* 1. Compound datatype test */
-    if (H5Pget_fill_value(dcpl, comp_type_id, &fill_ctype) < 0)
+    if (H5Pget_fill_value(dcpl, comp_type_id, &fill_ctype) < 0) {
         goto error;
+    }
     fill_ctype.y = 4444;
-    if (H5Pset_fill_value(dcpl, comp_type_id, &fill_ctype) < 0)
+    if (H5Pset_fill_value(dcpl, comp_type_id, &fill_ctype) < 0) {
         goto error;
-    if ((dset8 = H5Dcreate2(file, "dset8", comp_type_id, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset8 = H5Dcreate2(file, "dset8", comp_type_id, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0)
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_LONG, &fill_l) < 0) {
         goto error;
+    }
 
     /* 2. Never write fill value */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
-    if ((dset5 = H5Dcreate2(file, "dset5", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset5 = H5Dcreate2(file, "dset5", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* 3. Write fill value at space allocation time */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
-    if ((dset6 = H5Dcreate2(file, "dset6", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset6 = H5Dcreate2(file, "dset6", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* 4. fill value is undefined while fill write time is H5D_FILL_TIME_ALLOC.
      * Supposed to fail. */
-    if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0)
+    if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0) {
         goto error;
+    }
     H5E_BEGIN_TRY
     {
-        if (H5Dcreate2(file, "dset7", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT) != FAIL)
+        if (H5Dcreate2(file, "dset7", H5T_NATIVE_LONG, space, H5P_DEFAULT, dcpl, H5P_DEFAULT) != FAIL) {
             goto error;
+        }
     }
     H5E_END_TRY
 
@@ -561,55 +636,74 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
      * was introduced in the fill value object header message
      * decoding logic.
      */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0) {
         goto error;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, NULL) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, NULL) < 0) {
         goto error;
-    if ((dset10 = H5Dcreate2(file, "dset10", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset10 = H5Dcreate2(file, "dset10", H5T_NATIVE_INT, space, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Close everything */
     if (H5D_COMPACT != layout) {
-        if (H5Dclose(dset1) < 0)
+        if (H5Dclose(dset1) < 0) {
             goto error;
-        if (H5Dclose(dset2) < 0)
+        }
+        if (H5Dclose(dset2) < 0) {
             goto error;
-        if (H5Dclose(dset3) < 0)
+        }
+        if (H5Dclose(dset3) < 0) {
             goto error;
-        if (H5Dclose(dset4) < 0)
+        }
+        if (H5Dclose(dset4) < 0) {
             goto error;
-        if (H5Dclose(dset9) < 0)
+        }
+        if (H5Dclose(dset9) < 0) {
             goto error;
+        }
     }
-    if (H5Dclose(dset5) < 0)
+    if (H5Dclose(dset5) < 0) {
         goto error;
-    if (H5Dclose(dset6) < 0)
+    }
+    if (H5Dclose(dset6) < 0) {
         goto error;
-    if (H5Dclose(dset8) < 0)
+    }
+    if (H5Dclose(dset8) < 0) {
         goto error;
-    if (H5Dclose(dset10) < 0)
+    }
+    if (H5Dclose(dset10) < 0) {
         goto error;
-    if (H5Sclose(space) < 0)
+    }
+    if (H5Sclose(space) < 0) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     /* Open the file and get the dataset fill value from each dataset */
-    if ((file = H5Fopen(filename, H5F_ACC_RDONLY, fapl)) < 0)
+    if ((file = H5Fopen(filename, H5F_ACC_RDONLY, fapl)) < 0) {
         goto error;
+    }
 
     /* I. Check cases for late space allocation except compact dataset */
     if (H5D_COMPACT != layout) {
         /* 1. Large to small conversion */
-        if ((dset1 = H5Dopen2(file, "dset1", H5P_DEFAULT)) < 0)
+        if ((dset1 = H5Dopen2(file, "dset1", H5P_DEFAULT)) < 0) {
             goto error;
-        if ((dcpl = H5Dget_create_plist(dset1)) < 0)
+        }
+        if ((dcpl = H5Dget_create_plist(dset1)) < 0) {
             goto error;
+        }
 #ifndef NO_FILLING
-        if (H5Pget_fill_value(dcpl, H5T_NATIVE_SHORT, &rd_s) < 0)
+        if (H5Pget_fill_value(dcpl, H5T_NATIVE_SHORT, &rd_s) < 0) {
             goto error;
+        }
         if (rd_s != fill_s) {
             H5_FAILED();
             printf("    %d: Got a different fill value than what was set.", __LINE__);
@@ -617,19 +711,24 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
             goto error;
         }
 #endif
-        if (H5Dclose(dset1) < 0)
+        if (H5Dclose(dset1) < 0) {
             goto error;
-        if (H5Pclose(dcpl) < 0)
+        }
+        if (H5Pclose(dcpl) < 0) {
             goto error;
+        }
 
         /* 2. Small to large conversion */
-        if ((dset2 = H5Dopen2(file, "dset2", H5P_DEFAULT)) < 0)
+        if ((dset2 = H5Dopen2(file, "dset2", H5P_DEFAULT)) < 0) {
             goto error;
-        if ((dcpl = H5Dget_create_plist(dset2)) < 0)
+        }
+        if ((dcpl = H5Dget_create_plist(dset2)) < 0) {
             goto error;
+        }
 #ifndef NO_FILLING
-        if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0)
+        if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0) {
             goto error;
+        }
         if (rd_l != fill_l) {
             H5_FAILED();
             printf("    %d: Got a different fill value than what was set.", __LINE__);
@@ -637,19 +736,24 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
             goto error;
         }
 #endif
-        if (H5Dclose(dset2) < 0)
+        if (H5Dclose(dset2) < 0) {
             goto error;
-        if (H5Pclose(dcpl) < 0)
+        }
+        if (H5Pclose(dcpl) < 0) {
             goto error;
+        }
 
         /* 3. No conversion */
-        if ((dset3 = H5Dopen2(file, "dset3", H5P_DEFAULT)) < 0)
+        if ((dset3 = H5Dopen2(file, "dset3", H5P_DEFAULT)) < 0) {
             goto error;
-        if ((dcpl = H5Dget_create_plist(dset3)) < 0)
+        }
+        if ((dcpl = H5Dget_create_plist(dset3)) < 0) {
             goto error;
+        }
 #ifndef NO_FILLING
-        if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0)
+        if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0) {
             goto error;
+        }
         if (rd_l != fill_l) {
             H5_FAILED();
             printf("    %d: Got a different fill value than what was set.", __LINE__);
@@ -657,10 +761,12 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
             goto error;
         }
 #endif
-        if (H5Pget_alloc_time(dcpl, &alloc_time) < 0)
+        if (H5Pget_alloc_time(dcpl, &alloc_time) < 0) {
             goto error;
-        if (H5Pget_fill_time(dcpl, &fill_time) < 0)
+        }
+        if (H5Pget_fill_time(dcpl, &fill_time) < 0) {
             goto error;
+        }
         if (alloc_time != H5D_ALLOC_TIME_LATE) {
             H5_FAILED();
             puts("    Got non-H5D_ALLOC_TIME_LATE space allocation time.");
@@ -671,28 +777,35 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
             puts("    Got non-H5D_FILL_TIME_ALLOC fill value write time.");
             printf("    Got %d\n", fill_time);
         }
-        if (H5Dclose(dset3) < 0)
+        if (H5Dclose(dset3) < 0) {
             goto error;
-        if (H5Pclose(dcpl) < 0)
+        }
+        if (H5Pclose(dcpl) < 0) {
             goto error;
+        }
 
         /* 4. late space allocation and never write fill value */
-        if ((dset4 = H5Dopen2(file, "dset4", H5P_DEFAULT)) < 0)
+        if ((dset4 = H5Dopen2(file, "dset4", H5P_DEFAULT)) < 0) {
             goto error;
-        if (H5Dget_space_status(dset4, &allocation) < 0)
+        }
+        if (H5Dget_space_status(dset4, &allocation) < 0) {
             goto error;
+        }
         if (layout == H5D_CONTIGUOUS && allocation != H5D_SPACE_STATUS_NOT_ALLOCATED) {
             H5_FAILED();
             puts("    Got allocated space instead of unallocated.");
             printf("    Got %d\n", allocation);
             goto error;
         }
-        if ((dcpl = H5Dget_create_plist(dset4)) < 0)
+        if ((dcpl = H5Dget_create_plist(dset4)) < 0) {
             goto error;
-        if (H5Pget_alloc_time(dcpl, &alloc_time) < 0)
+        }
+        if (H5Pget_alloc_time(dcpl, &alloc_time) < 0) {
             goto error;
-        if (H5Pget_fill_time(dcpl, &fill_time) < 0)
+        }
+        if (H5Pget_fill_time(dcpl, &fill_time) < 0) {
             goto error;
+        }
         if (alloc_time != H5D_ALLOC_TIME_LATE) {
             H5_FAILED();
             puts("    Got non-H5D_ALLOC_TIME_LATE space allocation time.");
@@ -703,135 +816,161 @@ test_create(hid_t fapl, const char *base_name, H5D_layout_t layout)
             puts("    Got non-H5D_FILL_TIME_NEVER fill value write time.");
             printf("    Got %d\n", fill_time);
         }
-        if (H5Dclose(dset4) < 0)
+        if (H5Dclose(dset4) < 0) {
             goto error;
-        if (H5Pclose(dcpl) < 0)
+        }
+        if (H5Pclose(dcpl) < 0) {
             goto error;
+        }
 
         /* 5. Compound datatype test */
-        if ((dset9 = H5Dopen2(file, "dset9", H5P_DEFAULT)) < 0)
+        if ((dset9 = H5Dopen2(file, "dset9", H5P_DEFAULT)) < 0) {
             goto error;
-        if ((dcpl = H5Dget_create_plist(dset9)) < 0)
+        }
+        if ((dcpl = H5Dget_create_plist(dset9)) < 0) {
             goto error;
-        if (H5Pget_fill_value(dcpl, comp_type_id, &rd_c) < 0)
+        }
+        if (H5Pget_fill_value(dcpl, comp_type_id, &rd_c) < 0) {
             goto error;
-        if (!H5_FLT_ABS_EQUAL(rd_c.a, 0) || !H5_DBL_ABS_EQUAL(rd_c.y, fill_ctype.y) || rd_c.x != 0 ||
-            rd_c.z != '\0') {
+        }
+        if (!H5_FLT_ABS_EQUAL(rd_c.a, 0) || !H5_DBL_ABS_EQUAL(rd_c.y, fill_ctype.y) || rd_c.x != 0 || rd_c.z != '\0') {
             H5_FAILED();
             puts("    Got wrong fill value");
-            printf("    Got rd_c.a=%f, rd_c.y=%f and rd_c.x=%d, rd_c.z=%c\n", (double)rd_c.a, rd_c.y, rd_c.x,
-                   rd_c.z);
+            printf("    Got rd_c.a=%f, rd_c.y=%f and rd_c.x=%d, rd_c.z=%c\n", (double)rd_c.a, rd_c.y, rd_c.x, rd_c.z);
         }
-        if (H5Dclose(dset9) < 0)
+        if (H5Dclose(dset9) < 0) {
             goto error;
-        if (H5Pclose(dcpl) < 0)
+        }
+        if (H5Pclose(dcpl) < 0) {
             goto error;
+        }
     }
 
     /* II. Check early space allocation cases */
 
     /* 1. Never write fill value */
-    if ((dset5 = H5Dopen2(file, "dset5", H5P_DEFAULT)) < 0)
+    if ((dset5 = H5Dopen2(file, "dset5", H5P_DEFAULT)) < 0) {
         goto error;
-    if ((dcpl = H5Dget_create_plist(dset5)) < 0)
+    }
+    if ((dcpl = H5Dget_create_plist(dset5)) < 0) {
         goto error;
-    if (H5Dget_space_status(dset5, &allocation) < 0)
+    }
+    if (H5Dget_space_status(dset5, &allocation) < 0) {
         goto error;
+    }
     if (layout == H5D_CONTIGUOUS && allocation != H5D_SPACE_STATUS_ALLOCATED) {
         H5_FAILED();
         printf("    %d: Got unallocated space instead of allocated.\n", __LINE__);
         printf("    Got %d\n", allocation);
         goto error;
     }
-    if (H5Pget_alloc_time(dcpl, &alloc_time) < 0)
+    if (H5Pget_alloc_time(dcpl, &alloc_time) < 0) {
         goto error;
+    }
     if (alloc_time != H5D_ALLOC_TIME_EARLY) {
         H5_FAILED();
         puts("    Got non-H5D_ALLOC_TIME_EARLY space allocation time.");
         printf("    Got %d\n", alloc_time);
     }
-    if (H5Pget_fill_time(dcpl, &fill_time) < 0)
+    if (H5Pget_fill_time(dcpl, &fill_time) < 0) {
         goto error;
+    }
     if (fill_time != H5D_FILL_TIME_NEVER) {
         H5_FAILED();
         puts("    Got non-H5D_FILL_TIME_NEVER fill value write time.");
         printf("    Got %d\n", fill_time);
     }
-    if (H5Dclose(dset5) < 0)
+    if (H5Dclose(dset5) < 0) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
+    }
 
     /* 2. test writing fill value at space allocation time */
-    if ((dset6 = H5Dopen2(file, "dset6", H5P_DEFAULT)) < 0)
+    if ((dset6 = H5Dopen2(file, "dset6", H5P_DEFAULT)) < 0) {
         goto error;
-    if ((dcpl = H5Dget_create_plist(dset6)) < 0)
+    }
+    if ((dcpl = H5Dget_create_plist(dset6)) < 0) {
         goto error;
-    if (H5Dget_space_status(dset6, &allocation) < 0)
+    }
+    if (H5Dget_space_status(dset6, &allocation) < 0) {
         goto error;
+    }
     if (layout == H5D_CONTIGUOUS && allocation != H5D_SPACE_STATUS_ALLOCATED) {
         H5_FAILED();
         printf("    %d: Got unallocated space instead of allocated.\n", __LINE__);
         printf("    Got %d\n", allocation);
         goto error;
     }
-    if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0)
+    if (H5Pget_fill_value(dcpl, H5T_NATIVE_LONG, &rd_l) < 0) {
         goto error;
+    }
     if (rd_l != fill_l) {
         H5_FAILED();
         printf("    %d: Got a different fill value than what was set.", __LINE__);
         printf("    Got %ld, set %ld\n", rd_l, fill_l);
         goto error;
     }
-    if (H5Pget_alloc_time(dcpl, &alloc_time) < 0)
+    if (H5Pget_alloc_time(dcpl, &alloc_time) < 0) {
         goto error;
+    }
     if (alloc_time != H5D_ALLOC_TIME_EARLY) {
         H5_FAILED();
         puts("    Got non-H5D_ALLOC_TIME_EARLY space allocation time.");
         printf("    Got %d\n", alloc_time);
     }
-    if (H5Pget_fill_time(dcpl, &fill_time) < 0)
+    if (H5Pget_fill_time(dcpl, &fill_time) < 0) {
         goto error;
+    }
     if (fill_time != H5D_FILL_TIME_ALLOC) {
         H5_FAILED();
         puts("    Got non-H5D_FILL_TIME_ALLOC fill value write time.");
         printf("    Got %d\n", fill_time);
     }
-    if (H5Dclose(dset6) < 0)
+    if (H5Dclose(dset6) < 0) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
+    }
 
     /* 3. Compound datatype test */
-    if ((dset8 = H5Dopen2(file, "dset8", H5P_DEFAULT)) < 0)
+    if ((dset8 = H5Dopen2(file, "dset8", H5P_DEFAULT)) < 0) {
         goto error;
-    if ((dcpl = H5Dget_create_plist(dset8)) < 0)
+    }
+    if ((dcpl = H5Dget_create_plist(dset8)) < 0) {
         goto error;
-    if (H5Pget_fill_value(dcpl, comp_type_id, &rd_c) < 0)
+    }
+    if (H5Pget_fill_value(dcpl, comp_type_id, &rd_c) < 0) {
         goto error;
-    if (!H5_FLT_ABS_EQUAL(rd_c.a, 0) || !H5_DBL_ABS_EQUAL(rd_c.y, fill_ctype.y) || rd_c.x != 0 ||
-        rd_c.z != '\0') {
+    }
+    if (!H5_FLT_ABS_EQUAL(rd_c.a, 0) || !H5_DBL_ABS_EQUAL(rd_c.y, fill_ctype.y) || rd_c.x != 0 || rd_c.z != '\0') {
         H5_FAILED();
         puts("    Got wrong fill value");
-        printf("    Got rd_c.a=%f, rd_c.y=%f and rd_c.x=%d, rd_c.z=%c\n", (double)rd_c.a, rd_c.y, rd_c.x,
-               rd_c.z);
+        printf("    Got rd_c.a=%f, rd_c.y=%f and rd_c.x=%d, rd_c.z=%c\n", (double)rd_c.a, rd_c.y, rd_c.x, rd_c.z);
     }
-    if (H5Dclose(dset8) < 0)
+    if (H5Dclose(dset8) < 0) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
+    }
 
     /*
      * Check that the dataset with an undefined fill value can
      * be opened.
      */
-    if ((dset10 = H5Dopen2(file, "dset10", H5P_DEFAULT)) < 0)
+    if ((dset10 = H5Dopen2(file, "dset10", H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Dclose(dset10) < 0)
+    }
+    if (H5Dclose(dset10) < 0) {
         goto error;
+    }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -870,20 +1009,18 @@ error:
  *-------------------------------------------------------------------------
  */
 static int
-test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_fill_time_t fill_time,
-                H5D_layout_t layout, H5T_class_t datatype, hid_t ctype_id)
+    test_rdwr_cases(hid_t file, hid_t dcpl, const char* dname, void* _fillval, H5D_fill_time_t fill_time, H5D_layout_t layout, H5T_class_t datatype, hid_t ctype_id)
 {
-    hid_t fspace = H5I_INVALID_HID, mspace = H5I_INVALID_HID, dset1 = H5I_INVALID_HID,
-          dset2                    = H5I_INVALID_HID;
-    hsize_t            cur_size[5] = {2, 8, 8, 4, 2};
-    hsize_t            one[5]      = {1, 1, 1, 1, 1};
-    hsize_t            hs_size[5], hs_stride[5];
-    hsize_t            hs_offset[5], nelmts;
-    int                fillval = (-1), val_rd, should_be;
-    int                i, j, *buf = NULL, odd;
-    unsigned           u;
-    comp_datatype      rd_c, fill_c, should_be_c;
-    comp_datatype     *buf_c      = NULL;
+    hid_t fspace = H5I_INVALID_HID, mspace = H5I_INVALID_HID, dset1 = H5I_INVALID_HID, dset2 = H5I_INVALID_HID;
+    hsize_t cur_size[5] = { 2, 8, 8, 4, 2 };
+    hsize_t one[5] = { 1, 1, 1, 1, 1 };
+    hsize_t hs_size[5], hs_stride[5];
+    hsize_t hs_offset[5], nelmts;
+    int fillval = (-1), val_rd, should_be;
+    int i, j, *buf = NULL, odd;
+    unsigned u;
+    comp_datatype rd_c, fill_c, should_be_c;
+    comp_datatype* buf_c = NULL;
     H5D_space_status_t allocation = H5D_SPACE_STATUS_ERROR;
 
     fill_c.a = 0;
@@ -892,13 +1029,13 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
     fill_c.z = 0;
 
     if (datatype == H5T_INTEGER) {
-        fillval = *(int *)_fillval;
+        fillval = *(int*)_fillval;
     }
     else if (datatype == H5T_COMPOUND) {
-        fill_c.a = ((comp_datatype *)_fillval)->a;
-        fill_c.x = ((comp_datatype *)_fillval)->x;
-        fill_c.y = ((comp_datatype *)_fillval)->y;
-        fill_c.z = ((comp_datatype *)_fillval)->z;
+        fill_c.a = ((comp_datatype*)_fillval)->a;
+        fill_c.x = ((comp_datatype*)_fillval)->x;
+        fill_c.y = ((comp_datatype*)_fillval)->y;
+        fill_c.z = ((comp_datatype*)_fillval)->z;
     }
     else {
         puts("Invalid type for test");
@@ -906,28 +1043,33 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
     }
 
     /* Create dataset */
-    if ((fspace = H5Screate_simple(5, cur_size, cur_size)) < 0)
+    if ((fspace = H5Screate_simple(5, cur_size, cur_size)) < 0) {
         goto error;
-    if (datatype == H5T_INTEGER &&
-        (dset1 = H5Dcreate2(file, dname, H5T_NATIVE_INT, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if (datatype == H5T_INTEGER && (dset1 = H5Dcreate2(file, dname, H5T_NATIVE_INT, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
-    if (datatype == H5T_COMPOUND &&
-        (dset2 = H5Dcreate2(file, dname, ctype_id, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if (datatype == H5T_COMPOUND && (dset2 = H5Dcreate2(file, dname, ctype_id, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Read some data and make sure it's the fill value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         goto error;
+    }
     for (i = 0; i < 1000; i++) {
-        for (j = 0; j < 5; j++)
+        for (j = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % cur_size[j];
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        }
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             goto error;
+        }
 
         /* case for atomic datatype */
         if (datatype == H5T_INTEGER) {
-            if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0)
+            if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0) {
                 goto error;
+            }
             if (fill_time != H5D_FILL_TIME_NEVER && val_rd != fillval) {
                 H5_FAILED();
                 fprintf(stdout, "%u: Value read was not a fill value.\n", (unsigned)__LINE__);
@@ -935,44 +1077,63 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
                         "    Elmt={%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE
                         "}, read: %u, "
                         "Fill value: %u\n",
-                        hs_offset[0], hs_offset[1], hs_offset[2], hs_offset[3], hs_offset[4], val_rd,
+                        hs_offset[0],
+                        hs_offset[1],
+                        hs_offset[2],
+                        hs_offset[3],
+                        hs_offset[4],
+                        val_rd,
                         fillval);
                 goto error;
             }
             /* case for compound datatype */
         }
         else if (datatype == H5T_COMPOUND) {
-            if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, &rd_c) < 0)
+            if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, &rd_c) < 0) {
                 goto error;
+            }
             if (fill_time != H5D_FILL_TIME_NEVER &&
-                (!H5_FLT_ABS_EQUAL(rd_c.a, fill_c.a) || rd_c.x != fill_c.x ||
-                 !H5_DBL_ABS_EQUAL(rd_c.y, fill_c.y) || rd_c.z != fill_c.z)) {
+                (!H5_FLT_ABS_EQUAL(rd_c.a, fill_c.a) || rd_c.x != fill_c.x || !H5_DBL_ABS_EQUAL(rd_c.y, fill_c.y) || rd_c.z != fill_c.z)) {
                 H5_FAILED();
                 fprintf(stdout, "%u: Value read was not a fill value.\n", (unsigned)__LINE__);
                 fprintf(stdout,
                         "    Elmt={%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE ",%" PRIuHSIZE
                         "}, read: %f, %d, %f, %c"
                         "Fill value: %f, %d, %f, %c\n",
-                        hs_offset[0], hs_offset[1], hs_offset[2], hs_offset[3], hs_offset[4], (double)rd_c.a,
-                        rd_c.x, rd_c.y, rd_c.z, (double)fill_c.a, fill_c.x, fill_c.y, fill_c.z);
+                        hs_offset[0],
+                        hs_offset[1],
+                        hs_offset[2],
+                        hs_offset[3],
+                        hs_offset[4],
+                        (double)rd_c.a,
+                        rd_c.x,
+                        rd_c.y,
+                        rd_c.z,
+                        (double)fill_c.a,
+                        fill_c.x,
+                        fill_c.y,
+                        fill_c.z);
                 goto error;
             }
         }
     }
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         goto error;
+    }
 
     /* Select all odd data locations in the file dataset */
     for (i = 0, nelmts = 1; i < 5; i++) {
-        hs_size[i]   = cur_size[i] / 2;
+        hs_size[i] = cur_size[i] / 2;
         hs_offset[i] = 0;
         hs_stride[i] = 2;
         nelmts *= hs_size[i];
     }
-    if ((mspace = H5Screate_simple(5, hs_size, hs_size)) < 0)
+    if ((mspace = H5Screate_simple(5, hs_size, hs_size)) < 0) {
         goto error;
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, hs_stride, hs_size, NULL) < 0)
+    }
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, hs_stride, hs_size, NULL) < 0) {
         goto error;
+    }
 
     /* Read non-contiguous selection from empty dataset */
 
@@ -980,10 +1141,11 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
     if (datatype == H5T_INTEGER) {
         /*check for overflow*/
         assert((nelmts * sizeof(int)) == (hsize_t)((size_t)(nelmts * sizeof(int))));
-        buf = (int *)malloc((size_t)(nelmts * sizeof(int)));
+        buf = (int*)malloc((size_t)(nelmts * sizeof(int)));
 
-        if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, buf) < 0)
+        if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, buf) < 0) {
             goto error;
+        }
 
         /* Verify values, except if no fill value written */
         if (fill_time != H5D_FILL_TIME_NEVER) {
@@ -992,53 +1154,70 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not a fill value.\n", (unsigned)__LINE__);
                     fprintf(stdout,
-                            "    Elmt={%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
-                            ", %" PRIuHSIZE "}, read: %u, "
+                            "    Elmt={%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
+                            "}, read: %u, "
                             "Fill value: %u\n",
-                            hs_offset[0], hs_offset[1], hs_offset[2], hs_offset[3], hs_offset[4], buf[u],
+                            hs_offset[0],
+                            hs_offset[1],
+                            hs_offset[2],
+                            hs_offset[3],
+                            hs_offset[4],
+                            buf[u],
                             fillval);
                     goto error;
                 } /* end if */
-            }     /* end for */
-        }         /* end if */
+            } /* end for */
+        } /* end if */
     }
     /* case for compound datatype */
     else if (datatype == H5T_COMPOUND) {
         /*check for overflow*/
         assert((nelmts * sizeof(comp_datatype)) == (hsize_t)((size_t)(nelmts * sizeof(comp_datatype))));
-        buf_c = (comp_datatype *)malloc((size_t)nelmts * sizeof(comp_datatype));
+        buf_c = (comp_datatype*)malloc((size_t)nelmts * sizeof(comp_datatype));
 
-        if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, buf_c) < 0)
+        if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, buf_c) < 0) {
             goto error;
+        }
 
         /* Verify values, except if no fill value written */
         if (fill_time != H5D_FILL_TIME_NEVER) {
             for (u = 0; u < nelmts; u++) {
-                if (!H5_FLT_ABS_EQUAL(buf_c[u].a, fill_c.a) || buf_c[u].x != fill_c.x ||
-                    !H5_DBL_ABS_EQUAL(buf_c[u].y, fill_c.y) || buf_c[u].z != fill_c.z) {
+                if (!H5_FLT_ABS_EQUAL(buf_c[u].a, fill_c.a) || buf_c[u].x != fill_c.x || !H5_DBL_ABS_EQUAL(buf_c[u].y, fill_c.y) || buf_c[u].z != fill_c.z) {
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not a fill value.\n", (unsigned)__LINE__);
                     fprintf(stdout,
-                            "    Elmt={%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
-                            ", %" PRIuHSIZE "}, read: %f, %d, %f, %c"
+                            "    Elmt={%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
+                            "}, read: %f, %d, %f, %c"
                             "Fill value: %f, %d, %f, %c\n",
-                            hs_offset[0], hs_offset[1], hs_offset[2], hs_offset[3], hs_offset[4],
-                            (double)buf_c[u].a, buf_c[u].x, buf_c[u].y, buf_c[u].z, (double)fill_c.a,
-                            fill_c.x, fill_c.y, fill_c.z);
+                            hs_offset[0],
+                            hs_offset[1],
+                            hs_offset[2],
+                            hs_offset[3],
+                            hs_offset[4],
+                            (double)buf_c[u].a,
+                            buf_c[u].x,
+                            buf_c[u].y,
+                            buf_c[u].z,
+                            (double)fill_c.a,
+                            fill_c.x,
+                            fill_c.y,
+                            fill_c.z);
                     goto error;
                 } /* end if */
-            }     /* end for */
-        }         /* end if */
+            } /* end for */
+        } /* end if */
     }
 
     /* Write to all odd data locations */
 
     /* case for atomic datatype */
     if (datatype == H5T_INTEGER) {
-        for (u = 0; u < nelmts; u++)
+        for (u = 0; u < nelmts; u++) {
             buf[u] = 9999;
-        if (H5Dwrite(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, buf) < 0)
+        }
+        if (H5Dwrite(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, buf) < 0) {
             goto error;
+        }
     }
     /* case for compound datatype */
     else if (datatype == H5T_COMPOUND) {
@@ -1049,15 +1228,18 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
             buf_c[u].y = 3333.3333;
             buf_c[u].z = 'd';
         }
-        if (H5Dwrite(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, buf_c) < 0)
+        if (H5Dwrite(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, buf_c) < 0) {
             goto error;
+        }
     }
 
     /* Check if space is allocated */
-    if (datatype == H5T_INTEGER && H5Dget_space_status(dset1, &allocation) < 0)
+    if (datatype == H5T_INTEGER && H5Dget_space_status(dset1, &allocation) < 0) {
         goto error;
-    if (datatype == H5T_COMPOUND && H5Dget_space_status(dset2, &allocation) < 0)
+    }
+    if (datatype == H5T_COMPOUND && H5Dget_space_status(dset2, &allocation) < 0) {
         goto error;
+    }
     if (layout == H5D_CONTIGUOUS && allocation != H5D_SPACE_STATUS_ALLOCATED) {
         H5_FAILED();
         printf("    %d: Got unallocated space instead of allocated.\n", __LINE__);
@@ -1069,29 +1251,38 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
     H5Sclose(mspace);
 
     /* Read some data and make sure it's the right value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         goto error;
+    }
     for (i = 0; i < 1000; i++) {
         for (j = 0, odd = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % cur_size[j];
             odd += (int)(hs_offset[j] % 2);
         } /* end for */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             goto error;
+        }
 
         /* case for atomic datatype */
         if (datatype == H5T_INTEGER) {
-            if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0)
+            if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0) {
                 goto error;
+            }
             if (fill_time == H5D_FILL_TIME_ALLOC) {
                 should_be = odd ? fillval : 9999;
                 if (val_rd != should_be) {
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not correct.\n", (unsigned)__LINE__);
-                    printf("    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %u, "
-                           "should be: %u\n",
-                           (long)hs_offset[0], (long)hs_offset[1], (long)hs_offset[2], (long)hs_offset[3],
-                           (long)hs_offset[4], val_rd, should_be);
+                    printf(
+                        "    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %u, "
+                        "should be: %u\n",
+                        (long)hs_offset[0],
+                        (long)hs_offset[1],
+                        (long)hs_offset[2],
+                        (long)hs_offset[3],
+                        (long)hs_offset[4],
+                        val_rd,
+                        should_be);
                     goto error;
                 }
             }
@@ -1100,10 +1291,16 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
                 if (val_rd != should_be) {
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not correct.\n", (unsigned)__LINE__);
-                    printf("    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %u, "
-                           "should be: %u\n",
-                           (long)hs_offset[0], (long)hs_offset[1], (long)hs_offset[2], (long)hs_offset[3],
-                           (long)hs_offset[4], val_rd, should_be);
+                    printf(
+                        "    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %u, "
+                        "should be: %u\n",
+                        (long)hs_offset[0],
+                        (long)hs_offset[1],
+                        (long)hs_offset[2],
+                        (long)hs_offset[3],
+                        (long)hs_offset[4],
+                        val_rd,
+                        should_be);
                     goto error;
                 }
             }
@@ -1113,8 +1310,9 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
         } /* end for datatype==H5T_INTEGER */
         /* case for compound datatype */
         else if (datatype == H5T_COMPOUND) {
-            if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, &rd_c) < 0)
+            if (H5Dread(dset2, ctype_id, mspace, fspace, H5P_DEFAULT, &rd_c) < 0) {
                 goto error;
+            }
             if (fill_time == H5D_FILL_TIME_ALLOC) {
                 if (odd) {
                     should_be_c.a = fill_c.a;
@@ -1128,15 +1326,25 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
                     should_be_c.y = buf_c[0].y;
                     should_be_c.z = buf_c[0].z;
                 }
-                if (!H5_FLT_ABS_EQUAL(rd_c.a, should_be_c.a) || rd_c.x != should_be_c.x ||
-                    !H5_DBL_ABS_EQUAL(rd_c.y, should_be_c.y) || rd_c.z != should_be_c.z) {
+                if (!H5_FLT_ABS_EQUAL(rd_c.a, should_be_c.a) || rd_c.x != should_be_c.x || !H5_DBL_ABS_EQUAL(rd_c.y, should_be_c.y) || rd_c.z != should_be_c.z) {
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not correct.\n", (unsigned)__LINE__);
-                    printf("    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %f,%d,%f,%c "
-                           "should be: %f,%d,%f,%c\n",
-                           (long)hs_offset[0], (long)hs_offset[1], (long)hs_offset[2], (long)hs_offset[3],
-                           (long)hs_offset[4], (double)rd_c.a, rd_c.x, rd_c.y, rd_c.z, (double)should_be_c.a,
-                           should_be_c.x, should_be_c.y, should_be_c.z);
+                    printf(
+                        "    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %f,%d,%f,%c "
+                        "should be: %f,%d,%f,%c\n",
+                        (long)hs_offset[0],
+                        (long)hs_offset[1],
+                        (long)hs_offset[2],
+                        (long)hs_offset[3],
+                        (long)hs_offset[4],
+                        (double)rd_c.a,
+                        rd_c.x,
+                        rd_c.y,
+                        rd_c.z,
+                        (double)should_be_c.a,
+                        should_be_c.x,
+                        should_be_c.y,
+                        should_be_c.z);
                     goto error;
                 }
             } /* end for fill_time == H5D_FILL_TIME_ALLOC */
@@ -1145,15 +1353,25 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
                 should_be_c.x = buf_c[0].x;
                 should_be_c.y = buf_c[0].y;
                 should_be_c.z = buf_c[0].z;
-                if (!H5_FLT_ABS_EQUAL(rd_c.a, should_be_c.a) || rd_c.x != should_be_c.x ||
-                    !H5_DBL_ABS_EQUAL(rd_c.y, should_be_c.y) || rd_c.z != should_be_c.z) {
+                if (!H5_FLT_ABS_EQUAL(rd_c.a, should_be_c.a) || rd_c.x != should_be_c.x || !H5_DBL_ABS_EQUAL(rd_c.y, should_be_c.y) || rd_c.z != should_be_c.z) {
                     H5_FAILED();
                     fprintf(stdout, "%u: Value read was not correct.\n", (unsigned)__LINE__);
-                    printf("    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %f,%d,%f,%c "
-                           "should be: %f,%d,%f,%c\n",
-                           (long)hs_offset[0], (long)hs_offset[1], (long)hs_offset[2], (long)hs_offset[3],
-                           (long)hs_offset[4], (double)rd_c.a, rd_c.x, rd_c.y, rd_c.z, (double)should_be_c.a,
-                           should_be_c.x, should_be_c.y, should_be_c.z);
+                    printf(
+                        "    Elmt={%ld,%ld,%ld,%ld,%ld}, read: %f,%d,%f,%c "
+                        "should be: %f,%d,%f,%c\n",
+                        (long)hs_offset[0],
+                        (long)hs_offset[1],
+                        (long)hs_offset[2],
+                        (long)hs_offset[3],
+                        (long)hs_offset[4],
+                        (double)rd_c.a,
+                        rd_c.x,
+                        rd_c.y,
+                        rd_c.z,
+                        (double)should_be_c.a,
+                        should_be_c.x,
+                        should_be_c.y,
+                        should_be_c.z);
                     goto error;
                 }
             } /* end for fill_time == H5D_FILL_TIME_NEVER */
@@ -1167,23 +1385,29 @@ test_rdwr_cases(hid_t file, hid_t dcpl, const char *dname, void *_fillval, H5D_f
         buf_c = NULL;
     } /* end if */
 
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         goto error;
-    if (datatype == H5T_INTEGER && H5Dclose(dset1) < 0)
+    }
+    if (datatype == H5T_INTEGER && H5Dclose(dset1) < 0) {
         goto error;
-    if (datatype == H5T_COMPOUND && H5Dclose(dset2) < 0)
+    }
+    if (datatype == H5T_COMPOUND && H5Dclose(dset2) < 0) {
         goto error;
-    if (H5Sclose(fspace) < 0)
+    }
+    if (H5Sclose(fspace) < 0) {
         goto error;
+    }
     return 0;
 
 error:
     H5E_BEGIN_TRY
     {
-        if (datatype == H5T_INTEGER)
+        if (datatype == H5T_INTEGER) {
             H5Dclose(dset1);
-        if (datatype == H5T_COMPOUND)
+        }
+        if (datatype == H5T_COMPOUND) {
             H5Dclose(dset2);
+        }
         H5Sclose(fspace);
         H5Sclose(mspace);
     }
@@ -1203,15 +1427,14 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_rdwr(hid_t fapl, const char *base_name, H5D_layout_t layout)
+static int test_rdwr(hid_t fapl, const char* base_name, H5D_layout_t layout)
 {
-    char          filename[1024];
-    hid_t         file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID, ctype_id = H5I_INVALID_HID;
-    hsize_t       ch_size[5] = {2, 8, 8, 4, 2};
-    int           nerrors    = 0;
-    int           fillval    = 0x4c70f1cd;
-    comp_datatype fill_ctype = {0, 0, 0, 0};
+    char filename[1024];
+    hid_t file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID, ctype_id = H5I_INVALID_HID;
+    hsize_t ch_size[5] = { 2, 8, 8, 4, 2 };
+    int nerrors = 0;
+    int fillval = 0x4c70f1cd;
+    comp_datatype fill_ctype = { 0, 0, 0, 0 };
 
     if (H5D_CHUNKED == layout) {
         TESTING("chunked dataset I/O");
@@ -1224,155 +1447,177 @@ test_rdwr(hid_t fapl, const char *base_name, H5D_layout_t layout)
     }
 
     h5_fixname(base_name, fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
+    }
 
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
+    }
 
     if (H5D_CHUNKED == layout) {
-        if (H5Pset_chunk(dcpl, 5, ch_size) < 0)
+        if (H5Pset_chunk(dcpl, 5, ch_size) < 0) {
             goto error;
+        }
     }
     else if (H5D_COMPACT == layout) {
-        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0)
+        if (H5Pset_layout(dcpl, H5D_COMPACT) < 0) {
             goto error;
+        }
     }
 
-    if ((ctype_id = create_compound_type()) < 0)
+    if ((ctype_id = create_compound_type()) < 0) {
         goto error;
+    }
 
     /* I. Test H5D_ALLOC_TIME_LATE space allocation cases */
     if (H5D_COMPACT != layout) {
-        if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0)
+        if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0) {
             goto error;
+        }
 
         /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value to be default */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
             goto error;
+        }
         fillval = 0;
-        nerrors += test_rdwr_cases(file, dcpl, "dset1", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER,
-                                   (hid_t)-1);
+        nerrors += test_rdwr_cases(file, dcpl, "dset1", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
 
         /* case for H5D_FILL_TIME_NEVER as fill write time and fill value to be default */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
             goto error;
-        nerrors += test_rdwr_cases(file, dcpl, "dset2", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER,
-                                   (hid_t)-1);
+        }
+        nerrors += test_rdwr_cases(file, dcpl, "dset2", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
         /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is user-defined */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
             goto error;
+        }
         fillval = 0x4c70f1cd;
-        if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0)
+        if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0) {
             goto error;
-        nerrors += test_rdwr_cases(file, dcpl, "dset3", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER,
-                                   (hid_t)-1);
+        }
+        nerrors += test_rdwr_cases(file, dcpl, "dset3", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
 
         /* case for H5D_FILL_TIME_NEVER as fill write time and fill value is user-defined */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
             goto error;
-        if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0)
+        }
+        if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0) {
             goto error;
-        nerrors += test_rdwr_cases(file, dcpl, "dset4", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER,
-                                   (hid_t)-1);
+        }
+        nerrors += test_rdwr_cases(file, dcpl, "dset4", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
         /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is undefined */
         /* This case has been tested in test_create() function */
 
         /* case for H5D_FILL_TIME_NEVER as fill write time and fill value is undefined */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
             goto error;
-        if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0)
+        }
+        if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0) {
             goto error;
-        nerrors += test_rdwr_cases(file, dcpl, "dset5", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER,
-                                   (hid_t)-1);
+        }
+        nerrors += test_rdwr_cases(file, dcpl, "dset5", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
         /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is user-defined
          * as compound type */
-        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+        if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
             goto error;
+        }
         memset(&fill_ctype, 0, sizeof(fill_ctype));
         fill_ctype.y = 4444.4444;
-        if (H5Pset_fill_value(dcpl, ctype_id, &fill_ctype) < 0)
+        if (H5Pset_fill_value(dcpl, ctype_id, &fill_ctype) < 0) {
             goto error;
-        nerrors += test_rdwr_cases(file, dcpl, "dset11", &fill_ctype, H5D_FILL_TIME_ALLOC, layout,
-                                   H5T_COMPOUND, ctype_id);
+        }
+        nerrors += test_rdwr_cases(file, dcpl, "dset11", &fill_ctype, H5D_FILL_TIME_ALLOC, layout, H5T_COMPOUND, ctype_id);
 
-        if (H5Pclose(dcpl) < 0)
+        if (H5Pclose(dcpl) < 0) {
             goto error;
-        if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+        }
+        if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
             goto error;
+        }
         if (H5D_CHUNKED == layout) {
-            if (H5Pset_chunk(dcpl, 5, ch_size) < 0)
+            if (H5Pset_chunk(dcpl, 5, ch_size) < 0) {
                 goto error;
+            }
         }
     }
 
     /* II.  Test H5D_ALLOC_TIME_EARLY space allocation cases */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0) {
         goto error;
+    }
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
     fillval = 0;
-    nerrors +=
-        test_rdwr_cases(file, dcpl, "dset6", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
+    nerrors += test_rdwr_cases(file, dcpl, "dset6", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
-    nerrors +=
-        test_rdwr_cases(file, dcpl, "dset7", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
+    }
+    nerrors += test_rdwr_cases(file, dcpl, "dset7", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is user-defined */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
     fillval = 0x4c70f1cd;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0)
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0) {
         goto error;
-    nerrors +=
-        test_rdwr_cases(file, dcpl, "dset8", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
+    }
+    nerrors += test_rdwr_cases(file, dcpl, "dset8", &fillval, H5D_FILL_TIME_ALLOC, layout, H5T_INTEGER, (hid_t)-1);
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value is user-defined */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
-    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval) < 0) {
         goto error;
-    nerrors +=
-        test_rdwr_cases(file, dcpl, "dset9", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
+    }
+    nerrors += test_rdwr_cases(file, dcpl, "dset9", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is undefined */
     /* This case has been tested in test_create() function */
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value is undefined */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
-    if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0)
+    }
+    if (H5Pset_fill_value(dcpl, (hid_t)-1, NULL) < 0) {
         goto error;
-    nerrors +=
-        test_rdwr_cases(file, dcpl, "dset10", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
+    }
+    nerrors += test_rdwr_cases(file, dcpl, "dset10", &fillval, H5D_FILL_TIME_NEVER, layout, H5T_INTEGER, (hid_t)-1);
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value is user-defined
      * as compound type */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
     memset(&fill_ctype, 0, sizeof(fill_ctype));
     fill_ctype.y = 4444.4444;
-    if (H5Pset_fill_value(dcpl, ctype_id, &fill_ctype) < 0)
+    if (H5Pset_fill_value(dcpl, ctype_id, &fill_ctype) < 0) {
         goto error;
-    nerrors += test_rdwr_cases(file, dcpl, "dset12", &fill_ctype, H5D_FILL_TIME_ALLOC, layout, H5T_COMPOUND,
-                               ctype_id);
+    }
+    nerrors += test_rdwr_cases(file, dcpl, "dset12", &fill_ctype, H5D_FILL_TIME_ALLOC, layout, H5T_COMPOUND, ctype_id);
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if (H5Tclose(ctype_id) < 0)
+    }
+    if (H5Tclose(ctype_id) < 0) {
         goto error;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
     PASSED();
     return 0;
 
@@ -1397,11 +1642,10 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_init_integer(void *_buf, size_t nelmts, const void *_val)
+static int test_extend_init_integer(void* _buf, size_t nelmts, const void* _val)
 {
-    int       *buf = (int *)_buf;       /* Buffer to initialize */
-    const int *val = (const int *)_val; /* Value to use */
+    int* buf = (int*)_buf;             /* Buffer to initialize */
+    const int* val = (const int*)_val; /* Value to use */
 
     while (nelmts) {
         *buf++ = *val;
@@ -1421,12 +1665,10 @@ test_extend_init_integer(void *_buf, size_t nelmts, const void *_val)
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_verify_integer(unsigned lineno, const hsize_t *offset, const void *_test_val,
-                           const void *_compare_val)
+static int test_extend_verify_integer(unsigned lineno, const hsize_t* offset, const void* _test_val, const void* _compare_val)
 {
-    const int *test_val    = (const int *)_test_val;    /* Value to test */
-    const int *compare_val = (const int *)_compare_val; /* Value to compare against */
+    const int* test_val = (const int*)_test_val;       /* Value to test */
+    const int* compare_val = (const int*)_compare_val; /* Value to compare against */
 
     /* Verify value */
     if (*test_val != *compare_val) {
@@ -1435,7 +1677,13 @@ test_extend_verify_integer(unsigned lineno, const hsize_t *offset, const void *_
                 "    Elmt = {%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
                 "}, read: %d, "
                 "expected: %d\n",
-                offset[0], offset[1], offset[2], offset[3], offset[4], *test_val, *compare_val);
+                offset[0],
+                offset[1],
+                offset[2],
+                offset[3],
+                offset[4],
+                *test_val,
+                *compare_val);
         goto error;
     } /* end if */
 
@@ -1455,8 +1703,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_release_integer(void H5_ATTR_UNUSED *_elmt)
+static int test_extend_release_integer(void H5_ATTR_UNUSED* _elmt)
 {
     return 0;
 } /* end test_extend_release_integer() */
@@ -1471,11 +1718,10 @@ test_extend_release_integer(void H5_ATTR_UNUSED *_elmt)
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_init_cmpd_vl(void *_buf, size_t nelmts, const void *_val)
+static int test_extend_init_cmpd_vl(void* _buf, size_t nelmts, const void* _val)
 {
-    comp_vl_datatype       *buf = (comp_vl_datatype *)_buf;       /* Buffer to initialize */
-    const comp_vl_datatype *val = (const comp_vl_datatype *)_val; /* Value to use */
+    comp_vl_datatype* buf = (comp_vl_datatype*)_buf;             /* Buffer to initialize */
+    const comp_vl_datatype* val = (const comp_vl_datatype*)_val; /* Value to use */
 
     while (nelmts) {
         /* Shallow copy all fields */
@@ -1502,24 +1748,31 @@ test_extend_init_cmpd_vl(void *_buf, size_t nelmts, const void *_val)
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_verify_cmpd_vl(unsigned lineno, const hsize_t *offset, const void *_test_val,
-                           const void *_compare_val)
+static int test_extend_verify_cmpd_vl(unsigned lineno, const hsize_t* offset, const void* _test_val, const void* _compare_val)
 {
-    const comp_vl_datatype *test_val = (const comp_vl_datatype *)_test_val; /* Value to test */
-    const comp_vl_datatype *compare_val =
-        (const comp_vl_datatype *)_compare_val; /* Value to compare against */
+    const comp_vl_datatype* test_val = (const comp_vl_datatype*)_test_val;       /* Value to test */
+    const comp_vl_datatype* compare_val = (const comp_vl_datatype*)_compare_val; /* Value to compare against */
 
     /* Verify value */
-    if ((test_val->x != compare_val->x) || strcmp(test_val->a, compare_val->a) != 0 ||
-        strcmp(test_val->b, compare_val->b) != 0 || (test_val->y != compare_val->y)) {
+    if ((test_val->x != compare_val->x) || strcmp(test_val->a, compare_val->a) != 0 || strcmp(test_val->b, compare_val->b) != 0 || (test_val->y != compare_val->y)) {
         fprintf(stdout, "%u: Value read was not expected.\n", lineno);
         fprintf(stdout,
                 "    Elmt = {%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
                 "}, read: {%d, '%s', '%s', %d} "
                 "expected: {%d, '%s', '%s', %d}\n",
-                offset[0], offset[1], offset[2], offset[3], offset[4], test_val->x, test_val->a, test_val->b,
-                test_val->y, compare_val->x, compare_val->a, compare_val->b, compare_val->y);
+                offset[0],
+                offset[1],
+                offset[2],
+                offset[3],
+                offset[4],
+                test_val->x,
+                test_val->a,
+                test_val->b,
+                test_val->y,
+                compare_val->x,
+                compare_val->a,
+                compare_val->b,
+                compare_val->y);
         goto error;
     } /* end if */
 
@@ -1539,10 +1792,9 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend_release_cmpd_vl(void *_elmt)
+static int test_extend_release_cmpd_vl(void* _elmt)
 {
-    comp_vl_datatype *elmt = (comp_vl_datatype *)_elmt; /* Element to free */
+    comp_vl_datatype* elmt = (comp_vl_datatype*)_elmt; /* Element to free */
 
     /* Free memory for string fields */
     free(elmt->a);
@@ -1562,115 +1814,126 @@ test_extend_release_cmpd_vl(void *_elmt)
  *-------------------------------------------------------------------------
  */
 static int
-test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t *ch_size, hsize_t *start_size,
-                  hsize_t *max_size, hid_t dtype, void *fillval)
+    test_extend_cases(hid_t file, hid_t _dcpl, const char* dset_name, const hsize_t* ch_size, hsize_t* start_size, hsize_t* max_size, hid_t dtype, void* fillval)
 {
-    hid_t       fspace = H5I_INVALID_HID, mspace = H5I_INVALID_HID; /* File & memory dataspaces */
-    hid_t       dset = H5I_INVALID_HID;                             /* Dataset ID */
-    hid_t       dcpl = H5I_INVALID_HID;                             /* Dataset creation property list */
-    hsize_t     extend_size[5];                                     /* Dimensions to extend to */
-    hsize_t     one[5] = {1, 1, 1, 1, 1}; /* Dimensions of single element dataspace */
-    hsize_t     hs_size[5], hs_stride[5], hs_offset[5];
-    size_t      nelmts;
+    hid_t fspace = H5I_INVALID_HID, mspace = H5I_INVALID_HID; /* File & memory dataspaces */
+    hid_t dset = H5I_INVALID_HID;                             /* Dataset ID */
+    hid_t dcpl = H5I_INVALID_HID;                             /* Dataset creation property list */
+    hsize_t extend_size[5];                                   /* Dimensions to extend to */
+    hsize_t one[5] = { 1, 1, 1, 1, 1 };                       /* Dimensions of single element dataspace */
+    hsize_t hs_size[5], hs_stride[5], hs_offset[5];
+    size_t nelmts;
     H5T_class_t dtype_class; /* Class of datatype */
-    int (*init_rtn)(void *, size_t, const void *);
-    int (*verify_rtn)(unsigned, const hsize_t *, const void *, const void *);
-    int (*release_rtn)(void *);
-    size_t           val_size; /* Size of element */
-    void            *val_rd, *odd_val;
-    const void      *init_val, *should_be, *even_val;
-    int              val_rd_i, init_val_i = 9999;
-    comp_vl_datatype init_val_c = {87, NULL, NULL, 129};
+    int (*init_rtn)(void*, size_t, const void*);
+    int (*verify_rtn)(unsigned, const hsize_t*, const void*, const void*);
+    int (*release_rtn)(void*);
+    size_t val_size; /* Size of element */
+    void *val_rd, *odd_val;
+    const void *init_val, *should_be, *even_val;
+    int val_rd_i, init_val_i = 9999;
+    comp_vl_datatype init_val_c = { 87, NULL, NULL, 129 };
     comp_vl_datatype val_rd_c;
-    void            *buf = NULL;
-    unsigned         odd;  /* Whether an odd or even coord. was read */
-    unsigned         i, j; /* Local index variables */
+    void* buf = NULL;
+    unsigned odd;  /* Whether an odd or even coord. was read */
+    unsigned i, j; /* Local index variables */
 
     /* Set vl datatype init value strings */
     init_val_c.a = strdup("baz");
     init_val_c.b = strdup("mumble");
 
     /* Make copy of dataset creation property list */
-    if ((dcpl = H5Pcopy(_dcpl)) < 0)
+    if ((dcpl = H5Pcopy(_dcpl)) < 0) {
         TEST_ERROR;
+    }
 
 #ifndef NO_FILLING
-    if (H5Pset_fill_value(dcpl, dtype, fillval) < 0)
+    if (H5Pset_fill_value(dcpl, dtype, fillval) < 0) {
         TEST_ERROR;
+    }
 #endif
 
     /* Get class of datatype */
-    if ((dtype_class = H5Tget_class(dtype)) < 0)
+    if ((dtype_class = H5Tget_class(dtype)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create a dataspace */
-    if ((fspace = H5Screate_simple(5, start_size, max_size)) < 0)
+    if ((fspace = H5Screate_simple(5, start_size, max_size)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create dataset */
-    if ((dset = H5Dcreate2(file, dset_name, dtype, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    if ((dset = H5Dcreate2(file, dset_name, dtype, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Set up pointers to elements */
     if (dtype_class == H5T_INTEGER) {
         /* Initialize specific values for this datatype */
-        val_size    = sizeof(int);
-        init_val    = &init_val_i;
-        init_rtn    = test_extend_init_integer;
-        verify_rtn  = test_extend_verify_integer;
+        val_size = sizeof(int);
+        init_val = &init_val_i;
+        init_rtn = test_extend_init_integer;
+        verify_rtn = test_extend_verify_integer;
         release_rtn = test_extend_release_integer;
-        val_rd      = &val_rd_i;
-        odd_val     = fillval;
-        even_val    = &init_val_i;
+        val_rd = &val_rd_i;
+        odd_val = fillval;
+        even_val = &init_val_i;
     } /* end if */
     else {
         /* Sanity check */
         assert(dtype_class == H5T_COMPOUND);
 
         /* Initialize specific values for this datatype */
-        val_size    = sizeof(comp_vl_datatype);
-        init_val    = &init_val_c;
-        init_rtn    = test_extend_init_cmpd_vl;
-        verify_rtn  = test_extend_verify_cmpd_vl;
+        val_size = sizeof(comp_vl_datatype);
+        init_val = &init_val_c;
+        init_rtn = test_extend_init_cmpd_vl;
+        verify_rtn = test_extend_verify_cmpd_vl;
         release_rtn = test_extend_release_cmpd_vl;
-        val_rd      = &val_rd_c;
-        odd_val     = fillval;
-        even_val    = &init_val_c;
+        val_rd = &val_rd_c;
+        odd_val = fillval;
+        even_val = &init_val_c;
     } /* end else */
 
     /* Read some data and make sure it's the fill value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
     for (i = 0; i < 1000; i++) {
         /* Set offset for random element */
-        for (j = 0; j < 5; j++)
+        for (j = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % start_size[j];
+        }
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, fillval) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, fillval) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Initialize dataspace & hyperslab info */
     for (i = 0, nelmts = 1; i < 5; i++) {
-        hs_size[i]   = (start_size[i] + 1) / 2;
+        hs_size[i] = (start_size[i] + 1) / 2;
         hs_offset[i] = 0;
         hs_stride[i] = 2;
         nelmts *= hs_size[i];
@@ -1684,24 +1947,29 @@ test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t 
     init_rtn(buf, nelmts, init_val);
 
     /* Create dataspace describing memory buffer */
-    if ((mspace = H5Screate_simple(5, hs_size, hs_size)) < 0)
+    if ((mspace = H5Screate_simple(5, hs_size, hs_size)) < 0) {
         TEST_ERROR;
+    }
 
     /* Select elements within file dataspace */
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, hs_stride, hs_size, NULL) < 0)
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, hs_stride, hs_size, NULL) < 0) {
         TEST_ERROR;
+    }
 
     /* Write to all even data locations */
-    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, buf) < 0)
+    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, buf) < 0) {
         TEST_ERROR;
+    }
 
     /* Close memory dataspace */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Read some data and make sure it's the right value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
     for (i = 0; i < 1000; i++) {
         /* Set offset for random element */
         for (j = 0, odd = 0; j < 5; j++) {
@@ -1710,193 +1978,239 @@ test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t 
         } /* end for */
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
         should_be = odd ? odd_val : even_val;
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Extend the dataset one element in each dimension */
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++) {
         extend_size[i] = start_size[i] + 1;
-    if (H5Dset_extent(dset, extend_size) < 0)
+    }
+    if (H5Dset_extent(dset, extend_size) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open file dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
-    if ((fspace = H5Dget_space(dset)) < 0)
+    }
+    if ((fspace = H5Dget_space(dset)) < 0) {
         TEST_ERROR;
+    }
 
     /* Read some data and make sure it's the right value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
     for (i = 0; i < 1000; i++) {
         /* Set offset for random element */
         for (j = 0, odd = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % extend_size[j];
-            if (hs_offset[j] >= start_size[j])
+            if (hs_offset[j] >= start_size[j]) {
                 odd = 1;
-            else
+            }
+            else {
                 odd += (unsigned)(hs_offset[j] % 2);
+            }
         } /* end for */
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
         should_be = odd ? odd_val : even_val;
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Extend the dataset to the maximum dimension sizes */
-    if (H5Dset_extent(dset, max_size) < 0)
+    if (H5Dset_extent(dset, max_size) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open file dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
-    if ((fspace = H5Dget_space(dset)) < 0)
+    }
+    if ((fspace = H5Dget_space(dset)) < 0) {
         TEST_ERROR;
+    }
 
     /* Read some data and make sure it's the right value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
     for (i = 0; i < 1000; i++) {
         /* Set offset for random element */
         for (j = 0, odd = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % max_size[j];
-            if (hs_offset[j] >= start_size[j])
+            if (hs_offset[j] >= start_size[j]) {
                 odd = 1;
-            else
+            }
+            else {
                 odd += (unsigned)(hs_offset[j] % 2);
+            }
         } /* end for */
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
         should_be = odd ? odd_val : even_val;
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Shrink the dataset to half of it's maximum size, plus 1/2 of a chunk */
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++) {
         extend_size[i] = (max_size[i] / 2) + (ch_size[i] / 2);
-    if (H5Dset_extent(dset, extend_size) < 0)
+    }
+    if (H5Dset_extent(dset, extend_size) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open file dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
-    if ((fspace = H5Dget_space(dset)) < 0)
+    }
+    if ((fspace = H5Dget_space(dset)) < 0) {
         TEST_ERROR;
+    }
 
     /* Read some data and make sure it's the right value */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
     for (i = 0; i < 1000; i++) {
         /* Set offset for random element */
         for (j = 0, odd = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % extend_size[j];
-            if (hs_offset[j] >= start_size[j])
+            if (hs_offset[j] >= start_size[j]) {
                 odd = 1;
-            else
+            }
+            else {
                 odd += (unsigned)(hs_offset[j] % 2);
+            }
         } /* end for */
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
         should_be = odd ? odd_val : even_val;
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Extend the dataset's size by one element, in a dimension that won't
      *  cause additional chunks to be needed */
     extend_size[2] += 1;
-    if (H5Dset_extent(dset, extend_size) < 0)
+    if (H5Dset_extent(dset, extend_size) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open file dataspace */
-    if (H5Sclose(fspace) < 0)
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
-    if ((fspace = H5Dget_space(dset)) < 0)
+    }
+    if ((fspace = H5Dget_space(dset)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create dataspace for single element sized buffer */
-    if ((mspace = H5Screate_simple(5, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(5, one, NULL)) < 0) {
         TEST_ERROR;
+    }
 
     /* Set location for "top-most" element in dataset to write */
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 5; i++) {
         hs_offset[i] = extend_size[i] - 1;
+    }
 
     /* Select the element */
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
         TEST_ERROR;
+    }
 
     /* Write one element in a chunk that's 'partial' and overwrite a fill
      *  value that was initialized in the H5Dset_extent() routine.  This will
@@ -1904,24 +2218,29 @@ test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t 
      *  next read of another fill-value initialized element in this chunk will
      *  fail.
      */
-    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, buf) < 0)
+    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, buf) < 0) {
         TEST_ERROR;
+    }
 
     /* Read value back in */
-    if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+    if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
         TEST_ERROR;
+    }
 
     /* Verify the element read in is the value written out */
-    if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, buf) < 0)
+    if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, buf) < 0) {
         TEST_ERROR;
+    }
 
     /* Set the element back to fillval */
-    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, fillval) < 0)
+    if (H5Dwrite(dset, dtype, mspace, fspace, H5P_DEFAULT, fillval) < 0) {
         TEST_ERROR;
+    }
 
     /* Release any VL components */
-    if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+    if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
         TEST_ERROR;
+    }
 
     /* Clear the read buffer */
     memset(val_rd, 0, val_size);
@@ -1930,20 +2249,24 @@ test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t 
     hs_offset[3] -= 1;
 
     /* Select the element */
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
         TEST_ERROR;
+    }
 
     /* Read value back in */
-    if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+    if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
         TEST_ERROR;
+    }
 
     /* Verify the element read in is the fill-value */
-    if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, fillval) < 0)
+    if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, fillval) < 0) {
         TEST_ERROR;
+    }
 
     /* Release any VL components */
-    if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+    if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
         TEST_ERROR;
+    }
 
     /* Clear the read buffer */
     memset(val_rd, 0, val_size);
@@ -1953,50 +2276,61 @@ test_extend_cases(hid_t file, hid_t _dcpl, const char *dset_name, const hsize_t 
         /* Set offset for random element */
         for (j = 0, odd = 0; j < 5; j++) {
             hs_offset[j] = (hsize_t)rand() % extend_size[j];
-            if (hs_offset[j] >= start_size[j])
+            if (hs_offset[j] >= start_size[j]) {
                 odd = 1;
-            else
+            }
+            else {
                 odd += (unsigned)(hs_offset[j] % 2);
+            }
         } /* end for */
 
         /* Select the random element */
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
             TEST_ERROR;
+        }
 
         /* Read the random element */
-        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Dread(dset, dtype, mspace, fspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Verify the element read in */
         should_be = odd ? odd_val : even_val;
-        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0)
+        if (verify_rtn((unsigned)__LINE__, hs_offset, val_rd, should_be) < 0) {
             TEST_ERROR;
+        }
 
         /* Release any VL components */
-        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0)
+        if (H5Treclaim(dtype, mspace, H5P_DEFAULT, val_rd) < 0) {
             TEST_ERROR;
+        }
 
         /* Clear the read buffer */
         memset(val_rd, 0, val_size);
     } /* end for */
-    if (H5Sclose(mspace) < 0)
+    if (H5Sclose(mspace) < 0) {
         TEST_ERROR;
+    }
 
     /* Release elements & memory buffer */
-    for (i = 0; i < nelmts; i++)
-        release_rtn((void *)((char *)buf + (val_size * i)));
+    for (i = 0; i < nelmts; i++) {
+        release_rtn((void*)((char*)buf + (val_size * i)));
+    }
 
     free(init_val_c.a);
     free(init_val_c.b);
     free(buf);
 
     /* Cleanup IDs */
-    if (H5Pclose(dcpl) < 0)
+    if (H5Pclose(dcpl) < 0) {
         TEST_ERROR;
-    if (H5Dclose(dset) < 0)
+    }
+    if (H5Dclose(dset) < 0) {
         TEST_ERROR;
-    if (H5Sclose(fspace) < 0)
+    }
+    if (H5Sclose(fspace) < 0) {
         TEST_ERROR;
+    }
 
     return 0;
 
@@ -2028,39 +2362,43 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_extend(hid_t fapl, const char *base_name, H5D_layout_t layout)
+static int test_extend(hid_t fapl, const char* base_name, H5D_layout_t layout)
 {
-    hid_t   file          = H5I_INVALID_HID; /* File ID */
-    hid_t   dcpl          = H5I_INVALID_HID; /* Dataset creation property list ID */
-    hid_t   cmpd_vl_tid   = H5I_INVALID_HID; /* Compound+vl datatype ID */
-    hsize_t start_size[5] = {8, 8, 8, 4, 2};
-    hsize_t max_size[5]   = {32, 32, 32, 16, 8};
-    hsize_t ch_size[5]    = {1, 8, 8, 4, 2};
+    hid_t file = H5I_INVALID_HID;        /* File ID */
+    hid_t dcpl = H5I_INVALID_HID;        /* Dataset creation property list ID */
+    hid_t cmpd_vl_tid = H5I_INVALID_HID; /* Compound+vl datatype ID */
+    hsize_t start_size[5] = { 8, 8, 8, 4, 2 };
+    hsize_t max_size[5] = { 32, 32, 32, 16, 8 };
+    hsize_t ch_size[5] = { 1, 8, 8, 4, 2 };
 #ifdef NO_FILLING
     int fillval_i = 0;
 #else
     int fillval_i = 0x4c70f1cd;
 #endif
-    comp_vl_datatype fillval_c = {32, NULL, NULL, 64}; /* Fill value for compound+vl datatype tests */
-    char             filename[1024];
+    comp_vl_datatype fillval_c = { 32, NULL, NULL, 64 }; /* Fill value for compound+vl datatype tests */
+    char filename[1024];
 
     /* Print testing message */
-    if (H5D_CHUNKED == layout)
+    if (H5D_CHUNKED == layout) {
         TESTING("chunked dataset extend");
-    else
+    }
+    else {
         TESTING("contiguous dataset extend");
+    }
 
     /* Set vl datatype fill value strings */
     fillval_c.a = strdup("foo");
     fillval_c.b = strdup("bar");
 
     /* Create dataset creation property list */
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         TEST_ERROR;
-    if (H5D_CHUNKED == layout)
-        if (H5Pset_chunk(dcpl, 5, ch_size) < 0)
+    }
+    if (H5D_CHUNKED == layout) {
+        if (H5Pset_chunk(dcpl, 5, ch_size) < 0) {
             TEST_ERROR;
+        }
+    }
 
 #if 1
     /*
@@ -2074,8 +2412,7 @@ test_extend(hid_t fapl, const char *base_name, H5D_layout_t layout)
      * below.
      */
     if (H5D_CONTIGUOUS == layout) {
-        max_size[0] = (max_size[0] * max_size[1] * max_size[2] * max_size[3] * max_size[4]) /
-                      (start_size[1] * start_size[2] * start_size[3] * start_size[4]);
+        max_size[0] = (max_size[0] * max_size[1] * max_size[2] * max_size[3] * max_size[4]) / (start_size[1] * start_size[2] * start_size[3] * start_size[4]);
         max_size[1] = start_size[1];
         max_size[2] = start_size[2];
         max_size[3] = start_size[3];
@@ -2091,15 +2428,16 @@ test_extend(hid_t fapl, const char *base_name, H5D_layout_t layout)
      * skipped below.
      */
     if (H5D_CONTIGUOUS == layout) {
-        int     fd;
+        int fd;
         hsize_t nelmts;
 
         nelmts = max_size[0] * max_size[1] * max_size[2] * max_size[3] * max_size[4];
-        if ((fd = HDopen(FILE_NAME_RAW, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0 ||
-            HDclose(fd) < 0)
+        if ((fd = HDopen(FILE_NAME_RAW, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0 || HDclose(fd) < 0) {
             goto error;
-        if (H5Pset_external(dcpl, FILE_NAME_RAW, 0, (hsize_t)nelmts * sizeof(int)) < 0)
+        }
+        if (H5Pset_external(dcpl, FILE_NAME_RAW, 0, (hsize_t)nelmts * sizeof(int)) < 0) {
             goto error;
+        }
     }
 #endif
 
@@ -2119,28 +2457,35 @@ test_extend(hid_t fapl, const char *base_name, H5D_layout_t layout)
 
     /* Create a file and dataset */
     h5_fixname(base_name, fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Get the compound+vl datatype */
-    if ((cmpd_vl_tid = create_compound_vl_type()) < 0)
+    if ((cmpd_vl_tid = create_compound_vl_type()) < 0) {
         TEST_ERROR;
+    }
 
     /* Test integer datatype case */
-    if (test_extend_cases(file, dcpl, "dset1", ch_size, start_size, max_size, H5T_NATIVE_INT, &fillval_i) < 0)
+    if (test_extend_cases(file, dcpl, "dset1", ch_size, start_size, max_size, H5T_NATIVE_INT, &fillval_i) < 0) {
         TEST_ERROR;
+    }
 
     /* Test compound+vl datatype datatype case */
-    if (test_extend_cases(file, dcpl, "dset2", ch_size, start_size, max_size, cmpd_vl_tid, &fillval_c) < 0)
+    if (test_extend_cases(file, dcpl, "dset2", ch_size, start_size, max_size, cmpd_vl_tid, &fillval_c) < 0) {
         TEST_ERROR;
+    }
 
     /* Cleanup */
-    if (H5Tclose(cmpd_vl_tid) < 0)
+    if (H5Tclose(cmpd_vl_tid) < 0) {
         TEST_ERROR;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         TEST_ERROR;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         TEST_ERROR;
+    }
 
     free(fillval_c.a);
     free(fillval_c.b);
@@ -2187,84 +2532,99 @@ skip:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_compatible(void)
+static int test_compatible(void)
 {
     hid_t file = H5I_INVALID_HID, dset1 = H5I_INVALID_HID, dset2 = H5I_INVALID_HID;
-    hid_t dcpl1 = H5I_INVALID_HID, dcpl2 = H5I_INVALID_HID, fspace = H5I_INVALID_HID,
-          mspace             = H5I_INVALID_HID;
-    int              rd_fill = 0, fill_val = 4444, val_rd = 0;
-    hsize_t          dims[2], one[2] = {1, 1};
-    hsize_t          hs_offset[2] = {3, 4};
+    hid_t dcpl1 = H5I_INVALID_HID, dcpl2 = H5I_INVALID_HID, fspace = H5I_INVALID_HID, mspace = H5I_INVALID_HID;
+    int rd_fill = 0, fill_val = 4444, val_rd = 0;
+    hsize_t dims[2], one[2] = { 1, 1 };
+    hsize_t hs_offset[2] = { 3, 4 };
     H5D_fill_value_t status;
-    const char      *testfile = H5_get_srcdir_filename(FILE_COMPATIBLE); /* Corrected test file name */
+    const char* testfile = H5_get_srcdir_filename(FILE_COMPATIBLE); /* Corrected test file name */
 
     TESTING("contiguous dataset compatibility with v. 1.4");
 
     if ((file = H5Fopen(testfile, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) {
-        printf("    Could not open file %s. Try set $srcdir to point at the "
-               "source directory of test\n",
-               testfile);
+        printf(
+            "    Could not open file %s. Try set $srcdir to point at the "
+            "source directory of test\n",
+            testfile);
         goto error;
     }
 
-    if ((dset1 = H5Dopen2(file, "dset1", H5P_DEFAULT)) < 0)
+    if ((dset1 = H5Dopen2(file, "dset1", H5P_DEFAULT)) < 0) {
         goto error;
-    if ((dcpl1 = H5Dget_create_plist(dset1)) < 0)
+    }
+    if ((dcpl1 = H5Dget_create_plist(dset1)) < 0) {
         goto error;
-    if (H5Pfill_value_defined(dcpl1, &status) < 0)
+    }
+    if (H5Pfill_value_defined(dcpl1, &status) < 0) {
         goto error;
+    }
     if (status != H5D_FILL_VALUE_UNDEFINED) {
         H5_FAILED();
         printf("    %d: Got a different fill value than what was set.", __LINE__);
         printf("    Got status=%ld, suppose to be H5D_FILL_VALUE_UNDEFINED\n", (long)status);
         goto error;
     }
-    if ((fspace = H5Dget_space(dset1)) < 0)
+    if ((fspace = H5Dget_space(dset1)) < 0) {
         goto error;
-    if (H5Sget_simple_extent_dims(fspace, dims, NULL) < 0)
+    }
+    if (H5Sget_simple_extent_dims(fspace, dims, NULL) < 0) {
         goto error;
+    }
     if (dims[0] != 8 || dims[1] != 8) {
         H5_FAILED();
         puts("    Got a different dimension size than what was set.");
         printf("    Got dims[0]=%ld, dims[1]=%ld, set 8x8\n", (long)dims[0], (long)dims[1]);
         goto error;
     }
-    if ((mspace = H5Screate_simple(2, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(2, one, NULL)) < 0) {
         goto error;
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+    }
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
         goto error;
-    if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0)
+    }
+    if (H5Dread(dset1, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0) {
         goto error;
+    }
     if (val_rd != 0) {
         H5_FAILED();
         puts("    Got a different value than what was set.");
         printf("    Got %ld, set 0\n", (long)val_rd);
         goto error;
     }
-    if (H5Pclose(dcpl1) < 0)
+    if (H5Pclose(dcpl1) < 0) {
         goto error;
-    if (H5Sclose(fspace) < 0)
+    }
+    if (H5Sclose(fspace) < 0) {
         goto error;
-    if (H5Sclose(mspace) < 0)
+    }
+    if (H5Sclose(mspace) < 0) {
         goto error;
-    if (H5Dclose(dset1) < 0)
+    }
+    if (H5Dclose(dset1) < 0) {
         goto error;
+    }
 
-    if ((dset2 = H5Dopen2(file, "dset2", H5P_DEFAULT)) < 0)
+    if ((dset2 = H5Dopen2(file, "dset2", H5P_DEFAULT)) < 0) {
         goto error;
-    if ((dcpl2 = H5Dget_create_plist(dset2)) < 0)
+    }
+    if ((dcpl2 = H5Dget_create_plist(dset2)) < 0) {
         goto error;
-    if (H5Pfill_value_defined(dcpl2, &status) < 0)
+    }
+    if (H5Pfill_value_defined(dcpl2, &status) < 0) {
         goto error;
+    }
     if (status != H5D_FILL_VALUE_USER_DEFINED) {
         H5_FAILED();
         printf("    %d: Got a different fill value than what was set.", __LINE__);
         printf("    Got status=%ld, suppose to be H5D_FILL_VALUE_USER_DEFINED\n", (long)status);
         goto error;
     }
-    if (H5Pget_fill_value(dcpl2, H5T_NATIVE_INT, &rd_fill) < 0)
+    if (H5Pget_fill_value(dcpl2, H5T_NATIVE_INT, &rd_fill) < 0) {
         goto error;
+    }
     if (rd_fill != fill_val) {
         H5_FAILED();
         printf("    %d: Got a different fill value than what was set.", __LINE__);
@@ -2272,40 +2632,50 @@ test_compatible(void)
         goto error;
     }
     fspace = -1;
-    if ((fspace = H5Dget_space(dset2)) < 0)
+    if ((fspace = H5Dget_space(dset2)) < 0) {
         goto error;
+    }
     dims[0] = dims[1] = (hsize_t)-1;
-    if (H5Sget_simple_extent_dims(fspace, dims, NULL) < 0)
+    if (H5Sget_simple_extent_dims(fspace, dims, NULL) < 0) {
         goto error;
+    }
     if (dims[0] != 8 || dims[1] != 8) {
         H5_FAILED();
         puts("    Got a different dimension size than what was set.");
         printf("    Got dims[0]=%ld, dims[1]=%ld, set 8x8\n", (long)dims[0], (long)dims[1]);
         goto error;
     }
-    if ((mspace = H5Screate_simple(2, one, NULL)) < 0)
+    if ((mspace = H5Screate_simple(2, one, NULL)) < 0) {
         goto error;
-    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0)
+    }
+    if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, hs_offset, NULL, one, NULL) < 0) {
         goto error;
-    if (H5Dread(dset2, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0)
+    }
+    if (H5Dread(dset2, H5T_NATIVE_INT, mspace, fspace, H5P_DEFAULT, &val_rd) < 0) {
         goto error;
+    }
     if (val_rd != fill_val) {
         H5_FAILED();
         puts("    Got a different value than what was set.");
         printf("    Got %ld, set %ld\n", (long)val_rd, (long)fill_val);
         goto error;
     }
-    if (H5Pclose(dcpl2) < 0)
+    if (H5Pclose(dcpl2) < 0) {
         goto error;
-    if (H5Sclose(fspace) < 0)
+    }
+    if (H5Sclose(fspace) < 0) {
         goto error;
-    if (H5Sclose(mspace) < 0)
+    }
+    if (H5Sclose(mspace) < 0) {
         goto error;
-    if (H5Dclose(dset2) < 0)
+    }
+    if (H5Dclose(dset2) < 0) {
         goto error;
+    }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     PASSED();
 
@@ -2339,36 +2709,38 @@ error:
  *-------------------------------------------------------------------------
  */
 
-static int
-test_partalloc_cases(hid_t file, hid_t dcpl, const char *dname, H5D_fill_time_t fill_time)
+static int test_partalloc_cases(hid_t file, hid_t dcpl, const char* dname, H5D_fill_time_t fill_time)
 {
-    hid_t   fspace = H5I_INVALID_HID, dset1 = H5I_INVALID_HID, rspace = H5I_INVALID_HID;
-    herr_t  ret;
-    hsize_t ds_size[2]    = {4, 4};
-    hsize_t max_size[2]   = {H5S_UNLIMITED, 4};
-    hsize_t chunk_size[2] = {1, 4};
-    int     fillval       = (-1);
-    int     w_values[]    = {42};             /* New value to be written */
-    int     f_values[4]   = {88, 88, 88, 88}; /* pre-seed read buffer with known values */
-    int     r_values[4]   = {88, 88, 88, 88}; /* pre-seed read buffer with known values */
-    hsize_t coord[1][2];                      /* coordinate(s) of point to write */
+    hid_t fspace = H5I_INVALID_HID, dset1 = H5I_INVALID_HID, rspace = H5I_INVALID_HID;
+    herr_t ret;
+    hsize_t ds_size[2] = { 4, 4 };
+    hsize_t max_size[2] = { H5S_UNLIMITED, 4 };
+    hsize_t chunk_size[2] = { 1, 4 };
+    int fillval = (-1);
+    int w_values[] = { 42 };              /* New value to be written */
+    int f_values[4] = { 88, 88, 88, 88 }; /* pre-seed read buffer with known values */
+    int r_values[4] = { 88, 88, 88, 88 }; /* pre-seed read buffer with known values */
+    hsize_t coord[1][2];                  /* coordinate(s) of point to write */
     hsize_t start[2], count[2];
 
     fillval = 0; /* default fill value is zero */
 
     /* Create dataset with 4x4 integer dataset */
-    if ((fspace = H5Screate_simple(2, ds_size, max_size)) < 0)
+    if ((fspace = H5Screate_simple(2, ds_size, max_size)) < 0) {
         goto error;
-    if ((dset1 = H5Dcreate2(file, dname, H5T_NATIVE_INT, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0)
+    }
+    if ((dset1 = H5Dcreate2(file, dname, H5T_NATIVE_INT, fspace, H5P_DEFAULT, dcpl, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /*
      * Select a point in the file dataspace.
      */
     coord[0][0] = 0;
     coord[0][1] = 0;
-    if (H5Sselect_elements(fspace, H5S_SELECT_SET, (size_t)1, (const hsize_t *)coord))
+    if (H5Sselect_elements(fspace, H5S_SELECT_SET, (size_t)1, (const hsize_t*)coord)) {
         goto error;
+    }
 
     /*
      * Write single data point to the dataset.
@@ -2385,42 +2757,57 @@ test_partalloc_cases(hid_t file, hid_t dcpl, const char *dname, H5D_fill_time_t 
     start[1] = 0;
     count[0] = 1;
     count[1] = 4;
-    if ((ret = H5Sselect_hyperslab(fspace, H5S_SELECT_SET, start, NULL, count, NULL)) < 0)
+    if ((ret = H5Sselect_hyperslab(fspace, H5S_SELECT_SET, start, NULL, count, NULL)) < 0) {
         goto error;
-    if ((ret = H5Sselect_all(rspace)) < 0)
+    }
+    if ((ret = H5Sselect_all(rspace)) < 0) {
         goto error;
-    if (H5Dread(dset1, H5T_NATIVE_INT, rspace, fspace, H5P_DEFAULT, &r_values) < 0)
+    }
+    if (H5Dread(dset1, H5T_NATIVE_INT, rspace, fspace, H5P_DEFAULT, &r_values) < 0) {
         goto error;
+    }
 
     /* Read the third row of elements: all fill */
     start[0] = 2;
     start[1] = 0;
     count[0] = 1;
     count[1] = 4;
-    if ((ret = H5Sselect_hyperslab(fspace, H5S_SELECT_SET, start, NULL, count, NULL)) < 0)
+    if ((ret = H5Sselect_hyperslab(fspace, H5S_SELECT_SET, start, NULL, count, NULL)) < 0) {
         goto error;
-    if (H5Dread(dset1, H5T_NATIVE_INT, rspace, fspace, H5P_DEFAULT, &f_values) < 0)
+    }
+    if (H5Dread(dset1, H5T_NATIVE_INT, rspace, fspace, H5P_DEFAULT, &f_values) < 0) {
         goto error;
+    }
 
     if (fill_time != H5D_FILL_TIME_NEVER) {
         /* check allocated chunk */
-        if ((r_values[0] != w_values[0]) || (r_values[1] != fillval) || (r_values[2] != fillval) ||
-            (r_values[3] != fillval)) {
+        if ((r_values[0] != w_values[0]) || (r_values[1] != fillval) || (r_values[2] != fillval) || (r_values[3] != fillval)) {
             H5_FAILED();
             fprintf(stdout, "%u: Allocated chunk value read was not correct.\n", (unsigned)__LINE__);
-            printf("    {%ld,%ld,%ld,%ld} should be {%ld,%ld,%ld,%ld}\n", (long)r_values[0],
-                   (long)r_values[1], (long)r_values[2], (long)r_values[3], (long)w_values[0], (long)fillval,
-                   (long)fillval, (long)fillval);
+            printf("    {%ld,%ld,%ld,%ld} should be {%ld,%ld,%ld,%ld}\n",
+                   (long)r_values[0],
+                   (long)r_values[1],
+                   (long)r_values[2],
+                   (long)r_values[3],
+                   (long)w_values[0],
+                   (long)fillval,
+                   (long)fillval,
+                   (long)fillval);
             goto error;
         }
         /* check unallocated chunk */
-        if ((f_values[0] != fillval) || (f_values[1] != fillval) || (f_values[2] != fillval) ||
-            (f_values[3] != fillval)) {
+        if ((f_values[0] != fillval) || (f_values[1] != fillval) || (f_values[2] != fillval) || (f_values[3] != fillval)) {
             H5_FAILED();
             fprintf(stdout, "%u: Unallocated chunk value read was not correct.\n", (unsigned)__LINE__);
-            printf("    {%ld,%ld,%ld,%ld} should be {%ld,%ld,%ld,%ld}\n", (long)f_values[0],
-                   (long)f_values[1], (long)f_values[2], (long)f_values[3], (long)fillval, (long)fillval,
-                   (long)fillval, (long)fillval);
+            printf("    {%ld,%ld,%ld,%ld} should be {%ld,%ld,%ld,%ld}\n",
+                   (long)f_values[0],
+                   (long)f_values[1],
+                   (long)f_values[2],
+                   (long)f_values[3],
+                   (long)fillval,
+                   (long)fillval,
+                   (long)fillval,
+                   (long)fillval);
             goto error;
         }
         /* for the "never fill" case expect to get trash values, so skip */
@@ -2428,12 +2815,15 @@ test_partalloc_cases(hid_t file, hid_t dcpl, const char *dname, H5D_fill_time_t 
     else if (fill_time == H5D_FILL_TIME_NEVER) {
     }
 
-    if (H5Sclose(rspace) < 0)
+    if (H5Sclose(rspace) < 0) {
         goto error;
-    if (H5Dclose(dset1) < 0)
+    }
+    if (H5Dclose(dset1) < 0) {
         goto error;
-    if (H5Sclose(fspace) < 0)
+    }
+    if (H5Sclose(fspace) < 0) {
         goto error;
+    }
     return 0;
 
 error:
@@ -2460,124 +2850,141 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_partalloc(hid_t fapl, const char *base_name)
+static int test_partalloc(hid_t fapl, const char* base_name)
 {
-    char    filename[1024];
-    hid_t   file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID;
-    hsize_t ch_size[2] = {1, 4};
-    int     nerrors    = 0;
+    char filename[1024];
+    hid_t file = H5I_INVALID_HID, dcpl = H5I_INVALID_HID;
+    hsize_t ch_size[2] = { 1, 4 };
+    int nerrors = 0;
 
     TESTING("chunked dataset partially allocated I/O");
 
     h5_fixname(base_name, fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
+    }
 
-    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0)
+    if ((dcpl = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
         goto error;
-    if (H5Pset_chunk(dcpl, 2, ch_size) < 0)
+    }
+    if (H5Pset_chunk(dcpl, 2, ch_size) < 0) {
         goto error;
+    }
 
     /* I. Test H5D_ALLOC_TIME_LATE space allocation cases */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_LATE) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "\nALLOC_TIME_LATE\n");
 #endif
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_ALLOC\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset1", H5D_FILL_TIME_ALLOC);
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_NEVER\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset2", H5D_FILL_TIME_NEVER);
 
     /* case for H5D_FILL_TIME_IFSET as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_IFSET\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset3", H5D_FILL_TIME_IFSET);
 
     /* II.  Test H5D_ALLOC_TIME_INCR space allocation cases */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_INCR) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_INCR) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "\nALLOC_TIME_INCR\n");
 #endif
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_ALLOC\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset4", H5D_FILL_TIME_ALLOC);
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_NEVER\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset5", H5D_FILL_TIME_NEVER);
 
     /* case for H5D_FILL_TIME_IFSET as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_IFSET\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset6", H5D_FILL_TIME_IFSET);
 
     /* III.  Test H5D_ALLOC_TIME_EARLY space allocation cases */
-    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0)
+    if (H5Pset_alloc_time(dcpl, H5D_ALLOC_TIME_EARLY) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "\nALLOC_TIME_EARLY\n");
 #endif
 
     /* case for H5D_FILL_TIME_ALLOC as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_ALLOC) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_ALLOC\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset7", H5D_FILL_TIME_ALLOC);
 
     /* case for H5D_FILL_TIME_NEVER as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_NEVER) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_NEVER\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset8", H5D_FILL_TIME_NEVER);
 
     /* case for H5D_FILL_TIME_IFSET as fill write time and fill value to be default */
-    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0)
+    if (H5Pset_fill_time(dcpl, H5D_FILL_TIME_IFSET) < 0) {
         goto error;
+    }
 #ifdef DEBUG
     fprintf(stdout, "   FILL_TIME_IFSET\n");
 #endif
     nerrors += test_partalloc_cases(file, dcpl, "dset9", H5D_FILL_TIME_IFSET);
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
-    if (H5Pclose(dcpl) < 0)
+    }
+    if (H5Pclose(dcpl) < 0) {
         goto error;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
     PASSED();
     return 0;
 
@@ -2602,47 +3009,52 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    int      nerrors = 0, argno, test_contig = 1, test_chunk = 1, test_compact = 1;
-    hid_t    fapl = (H5I_INVALID_HID), fapl2 = (H5I_INVALID_HID); /* File access property lists */
-    unsigned new_format;                                          /* Whether to use the new format or not */
-    bool     driver_is_default_compatible;
+    int nerrors = 0, argno, test_contig = 1, test_chunk = 1, test_compact = 1;
+    hid_t fapl = (H5I_INVALID_HID), fapl2 = (H5I_INVALID_HID); /* File access property lists */
+    unsigned new_format;                                       /* Whether to use the new format or not */
+    bool driver_is_default_compatible;
 
     if (argc >= 2) {
         test_contig = test_chunk = test_compact = 0;
         for (argno = 1; argno < argc; argno++) {
-            if (!strcmp(argv[argno], "contiguous"))
+            if (!strcmp(argv[argno], "contiguous")) {
                 test_contig = 1;
-            else if (!strcmp(argv[argno], "chunked"))
+            }
+            else if (!strcmp(argv[argno], "chunked")) {
                 test_chunk = 1;
-            else if (!strcmp(argv[argno], "compact"))
+            }
+            else if (!strcmp(argv[argno], "compact")) {
                 test_compact = 1;
+            }
             else {
                 fprintf(stderr, "usage: %s [contiguous] [chunked] [compact]\n", argv[0]);
                 exit(EXIT_FAILURE);
             }
         } /* end for */
-    }     /* end if */
+    } /* end if */
 
     h5_test_init();
     fapl = h5_fileaccess();
 
-    if (h5_driver_is_default_vfd_compatible(fapl, &driver_is_default_compatible) < 0)
+    if (h5_driver_is_default_vfd_compatible(fapl, &driver_is_default_compatible) < 0) {
         TEST_ERROR;
+    }
 
     /* Property list tests */
     nerrors += test_getset();
     nerrors += test_getset_vl(fapl);
 
     /* Copy the file access property list */
-    if ((fapl2 = H5Pcopy(fapl)) < 0)
+    if ((fapl2 = H5Pcopy(fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Set the "use the latest version of the format" bounds for creating objects in the file */
-    if (H5Pset_libver_bounds(fapl2, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl2, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         TEST_ERROR;
+    }
 
     /* Loop over using new group format */
     for (new_format = false; new_format <= true; new_format++) {
@@ -2682,7 +3094,7 @@ main(int argc, char *argv[])
             nerrors += test_create(my_fapl, FILENAME[6], H5D_COMPACT);
             nerrors += test_rdwr(my_fapl, FILENAME[7], H5D_COMPACT);
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
     /* Close 2nd FAPL */
     H5Pclose(fapl2);
@@ -2690,12 +3102,14 @@ main(int argc, char *argv[])
     /* Verify symbol table messages are cached */
     nerrors += (h5_verify_cached_stabs(FILENAME, fapl) < 0 ? 1 : 0);
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
     puts("All fill value tests passed.");
 
-    if (h5_cleanup(FILENAME, fapl))
+    if (h5_cleanup(FILENAME, fapl)) {
         HDremove(FILE_NAME_RAW);
+    }
 
     exit(EXIT_SUCCESS);
 

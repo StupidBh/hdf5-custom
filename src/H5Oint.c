@@ -28,19 +28,19 @@
 /***********/
 /* Headers */
 /***********/
-#include "H5private.h"   /* Generic Functions                        */
-#include "H5CXprivate.h" /* API Contexts                             */
-#include "H5Eprivate.h"  /* Error handling                           */
-#include "H5Fprivate.h"  /* File access                              */
-#include "H5FLprivate.h" /* Free lists                               */
-#include "H5FOprivate.h" /* File objects                             */
-#include "H5Iprivate.h"  /* IDs                                      */
-#include "H5Lprivate.h"  /* Links                                    */
-#include "H5MFprivate.h" /* File memory management                   */
-#include "H5MMprivate.h" /* Memory management                        */
-#include "H5Opkg.h"      /* Object headers                           */
-#include "H5SLprivate.h" /* Skip Lists                               */
-#include "H5VLprivate.h" /* Virtual Object Layer                     */
+#include "H5private.h"          /* Generic Functions                        */
+#include "H5CXprivate.h"        /* API Contexts                             */
+#include "H5Eprivate.h"         /* Error handling                           */
+#include "H5Fprivate.h"         /* File access                              */
+#include "H5FLprivate.h"        /* Free lists                               */
+#include "H5FOprivate.h"        /* File objects                             */
+#include "H5Iprivate.h"         /* IDs                                      */
+#include "H5Lprivate.h"         /* Links                                    */
+#include "H5MFprivate.h"        /* File memory management                   */
+#include "H5MMprivate.h"        /* Memory management                        */
+#include "H5Opkg.h"             /* Object headers                           */
+#include "H5SLprivate.h"        /* Skip Lists                               */
+#include "H5VLprivate.h"        /* Virtual Object Layer                     */
 
 #include "H5VLnative_private.h" /* Native VOL connector                     */
 
@@ -53,11 +53,12 @@
 /******************/
 
 /* User data for recursive traversal over objects from a group */
-typedef struct {
-    hid_t          obj_id;  /* The ID for the starting group */
-    H5O_iterate2_t op;      /* Application callback */
-    void          *op_data; /* Application's op data */
-    unsigned       fields;  /* Selection of object info */
+typedef struct
+{
+    hid_t obj_id;      /* The ID for the starting group */
+    H5O_iterate2_t op; /* Application callback */
+    void* op_data;     /* Application's op data */
+    unsigned fields;   /* Selection of object info */
 } H5O_iter_visit_ud_t;
 
 /********************/
@@ -68,12 +69,12 @@ typedef struct {
 /* Local Prototypes */
 /********************/
 
-static herr_t H5O__delete_oh(H5F_t *f, H5O_t *oh);
-static herr_t H5O__obj_type_real(const H5O_t *oh, H5O_type_t *obj_type);
-static herr_t H5O__get_hdr_info_real(const H5O_t *oh, H5O_hdr_info_t *hdr);
-static herr_t H5O__visit_cb(hid_t group, const char *name, const H5O_loc_t *obj_oloc, void *_udata);
-static herr_t H5O__obj_class_real(const H5O_t *oh, const H5O_obj_class_t **cls);
-static herr_t H5O__reset_info2(H5O_info2_t *oinfo);
+static herr_t H5O__delete_oh(H5F_t* f, H5O_t* oh);
+static herr_t H5O__obj_type_real(const H5O_t* oh, H5O_type_t* obj_type);
+static herr_t H5O__get_hdr_info_real(const H5O_t* oh, H5O_hdr_info_t* hdr);
+static herr_t H5O__visit_cb(hid_t group, const char* name, const H5O_loc_t* obj_oloc, void* _udata);
+static herr_t H5O__obj_class_real(const H5O_t* oh, const H5O_obj_class_t** cls);
+static herr_t H5O__reset_info2(H5O_info2_t* oinfo);
 
 /*********************/
 /* Package Variables */
@@ -87,7 +88,7 @@ bool H5_PKG_INIT_VAR = false;
  * Remember to increment H5O_MSG_TYPES in H5Opkg.h when adding a new
  * message.
  */
-const H5O_msg_class_t *const H5O_msg_class_g[] = {
+const H5O_msg_class_t* const H5O_msg_class_g[] = {
     H5O_MSG_NULL,     /*0x0000 Null                            */
     H5O_MSG_SDSPACE,  /*0x0001 Dataspace                       */
     H5O_MSG_LINFO,    /*0x0002 Link information                */
@@ -99,26 +100,26 @@ const H5O_msg_class_t *const H5O_msg_class_g[] = {
     H5O_MSG_LAYOUT,   /*0x0008 Data Layout                     */
 #ifdef H5O_ENABLE_BOGUS
     H5O_MSG_BOGUS_VALID, /*0x0009 "Bogus valid" (for testing)     */
-#else                    /* H5O_ENABLE_BOGUS */
+#else  /* H5O_ENABLE_BOGUS */
     NULL, /*0x0009 "Bogus valid" (for testing)     */
-#endif                   /* H5O_ENABLE_BOGUS */
-    H5O_MSG_GINFO,       /*0x000A Group information               */
-    H5O_MSG_PLINE,       /*0x000B Data storage -- filter pipeline */
-    H5O_MSG_ATTR,        /*0x000C Attribute                       */
-    H5O_MSG_NAME,        /*0x000D Object name                     */
-    H5O_MSG_MTIME,       /*0x000E Object modification date and time */
-    H5O_MSG_SHMESG,      /*0x000F File-wide shared message table  */
-    H5O_MSG_CONT,        /*0x0010 Object header continuation      */
-    H5O_MSG_STAB,        /*0x0011 Symbol table                    */
-    H5O_MSG_MTIME_NEW,   /*0x0012 New Object modification date and time */
-    H5O_MSG_BTREEK,      /*0x0013 Non-default v1 B-tree 'K' values */
-    H5O_MSG_DRVINFO,     /*0x0014 Driver info settings            */
-    H5O_MSG_AINFO,       /*0x0015 Attribute information           */
-    H5O_MSG_REFCOUNT,    /*0x0016 Object's ref. count             */
-    H5O_MSG_FSINFO,      /*0x0017 Free-space manager info         */
-    H5O_MSG_MDCI,        /*0x0018 Metadata cache image            */
-    H5O_MSG_UNKNOWN,     /*0x0019 Placeholder for unknown message */
-    H5O_MSG_DELETED      /*0x001a Placeholder for deleted message */
+#endif /* H5O_ENABLE_BOGUS */
+    H5O_MSG_GINFO,     /*0x000A Group information               */
+    H5O_MSG_PLINE,     /*0x000B Data storage -- filter pipeline */
+    H5O_MSG_ATTR,      /*0x000C Attribute                       */
+    H5O_MSG_NAME,      /*0x000D Object name                     */
+    H5O_MSG_MTIME,     /*0x000E Object modification date and time */
+    H5O_MSG_SHMESG,    /*0x000F File-wide shared message table  */
+    H5O_MSG_CONT,      /*0x0010 Object header continuation      */
+    H5O_MSG_STAB,      /*0x0011 Symbol table                    */
+    H5O_MSG_MTIME_NEW, /*0x0012 New Object modification date and time */
+    H5O_MSG_BTREEK,    /*0x0013 Non-default v1 B-tree 'K' values */
+    H5O_MSG_DRVINFO,   /*0x0014 Driver info settings            */
+    H5O_MSG_AINFO,     /*0x0015 Attribute information           */
+    H5O_MSG_REFCOUNT,  /*0x0016 Object's ref. count             */
+    H5O_MSG_FSINFO,    /*0x0017 Free-space manager info         */
+    H5O_MSG_MDCI,      /*0x0018 Metadata cache image            */
+    H5O_MSG_UNKNOWN,   /*0x0019 Placeholder for unknown message */
+    H5O_MSG_DELETED    /*0x001a Placeholder for deleted message */
 };
 
 /* Format version bounds for object header */
@@ -148,8 +149,7 @@ H5FL_BLK_DEFINE(chunk_image);
 H5FL_SEQ_EXTERN(H5O_cont_t);
 
 /* The canonical 'undefined' token */
-const H5O_token_t H5O_TOKEN_UNDEF_g = {
-    {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}};
+const H5O_token_t H5O_TOKEN_UNDEF_g = { { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 } };
 
 /*****************************/
 /* Library Private Variables */
@@ -171,7 +171,7 @@ H5FL_EXTERN(H5_obj_t);
  * and end with the most specific. For instance, any object that has a
  * datatype message is a datatype but only some of them are datasets.
  */
-static const H5O_obj_class_t *const H5O_obj_class_g[] = {
+static const H5O_obj_class_t* const H5O_obj_class_g[] = {
     H5O_OBJ_DATATYPE, /* Datatype object (H5O_TYPE_NAMED_DATATYPE - 2) */
     H5O_OBJ_DATASET,  /* Dataset object (H5O_TYPE_DATASET - 1) */
     H5O_OBJ_GROUP,    /* Group object (H5O_TYPE_GROUP - 0) */
@@ -187,8 +187,7 @@ static const H5O_obj_class_t *const H5O_obj_class_g[] = {
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_CONST herr_t
-H5O_init(void)
+H5_ATTR_CONST herr_t H5O_init(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -209,8 +208,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O__init_package(void)
+herr_t H5O__init_package(void)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -235,11 +233,10 @@ H5O__init_package(void)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__set_version(H5F_t *f, H5O_t *oh, uint8_t oh_flags, bool store_msg_crt_idx)
+static herr_t H5O__set_version(H5F_t* f, H5O_t* oh, uint8_t oh_flags, bool store_msg_crt_idx)
 {
-    uint8_t version;             /* Message version */
-    herr_t  ret_value = SUCCEED; /* Return value */
+    uint8_t version;            /* Message version */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -248,17 +245,20 @@ H5O__set_version(H5F_t *f, H5O_t *oh, uint8_t oh_flags, bool store_msg_crt_idx)
     assert(oh);
 
     /* Set the correct version to encode object header with */
-    if (store_msg_crt_idx || (oh_flags & H5O_HDR_ATTR_CRT_ORDER_TRACKED))
+    if (store_msg_crt_idx || (oh_flags & H5O_HDR_ATTR_CRT_ORDER_TRACKED)) {
         version = H5O_VERSION_LATEST;
-    else
+    }
+    else {
         version = H5O_VERSION_1;
+    }
 
     /* Upgrade to the version indicated by the file's low bound if higher */
     version = (uint8_t)MAX(version, (uint8_t)H5O_obj_ver_bounds[H5F_LOW_BOUND(f)]);
 
     /* Version bounds check */
-    if (version > H5O_obj_ver_bounds[H5F_HIGH_BOUND(f)])
+    if (version > H5O_obj_ver_bounds[H5F_HIGH_BOUND(f)]) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADRANGE, FAIL, "object header version out of bounds");
+    }
 
     /* Set the message version */
     oh->version = version;
@@ -283,10 +283,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_create(H5F_t *f, size_t size_hint, size_t initial_rc, hid_t ocpl_id, H5O_loc_t *loc /*out*/)
+herr_t H5O_create(H5F_t* f, size_t size_hint, size_t initial_rc, hid_t ocpl_id, H5O_loc_t* loc /*out*/)
 {
-    H5O_t *oh        = NULL;
+    H5O_t* oh = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -299,17 +298,20 @@ H5O_create(H5F_t *f, size_t size_hint, size_t initial_rc, hid_t ocpl_id, H5O_loc
      * header version is set internally
      */
     oh = H5O_create_ohdr(f, ocpl_id);
-    if (NULL == oh)
+    if (NULL == oh) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, FAIL, "Can't instantiate object header");
+    }
 
     /* apply object header information to file
      */
-    if (H5O_apply_ohdr(f, oh, ocpl_id, size_hint, initial_rc, loc) < 0)
+    if (H5O_apply_ohdr(f, oh, ocpl_id, size_hint, initial_rc, loc) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, FAIL, "Can't apply object header to file");
+    }
 
 done:
-    if ((FAIL == ret_value) && (NULL != oh) && (H5O__free(oh, true) < 0))
+    if ((FAIL == ret_value) && (NULL != oh) && (H5O__free(oh, true) < 0)) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTFREE, FAIL, "can't delete object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_create() */
@@ -324,13 +326,12 @@ done:
  *
  *-----------------------------------------------------------------------------
  */
-H5O_t *
-H5O_create_ohdr(H5F_t *f, hid_t ocpl_id)
+H5O_t* H5O_create_ohdr(H5F_t* f, hid_t ocpl_id)
 {
-    H5P_genplist_t *oc_plist;
-    H5O_t          *oh = NULL; /* Object header in Freelist */
-    uint8_t         oh_flags;  /* Initial status flags */
-    H5O_t          *ret_value = NULL;
+    H5P_genplist_t* oc_plist;
+    H5O_t* oh = NULL; /* Object header in Freelist */
+    uint8_t oh_flags; /* Initial status flags */
+    H5O_t* ret_value = NULL;
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -338,39 +339,46 @@ H5O_create_ohdr(H5F_t *f, hid_t ocpl_id)
     assert(true == H5P_isa_class(ocpl_id, H5P_OBJECT_CREATE));
 
     /* Check for invalid access request */
-    if (0 == (H5F_INTENT(f) & H5F_ACC_RDWR))
+    if (0 == (H5F_INTENT(f) & H5F_ACC_RDWR)) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "no write intent on file");
+    }
 
     oh = H5FL_CALLOC(H5O_t);
-    if (NULL == oh)
+    if (NULL == oh) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
-    oc_plist = (H5P_genplist_t *)H5I_object(ocpl_id);
-    if (NULL == oc_plist)
+    oc_plist = (H5P_genplist_t*)H5I_object(ocpl_id);
+    if (NULL == oc_plist) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADTYPE, NULL, "not a property list");
+    }
 
     /* Get any object header status flags set by properties */
     if (H5P_DATASET_CREATE_DEFAULT == ocpl_id) {
         /* If the OCPL is the default DCPL, we can get the header flags from the
          * API context. Otherwise we have to call H5P_get */
-        if (H5CX_get_ohdr_flags(&oh_flags) < 0)
+        if (H5CX_get_ohdr_flags(&oh_flags) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, NULL, "can't get object header flags");
+        }
     }
     else {
-        if (H5P_get(oc_plist, H5O_CRT_OHDR_FLAGS_NAME, &oh_flags) < 0)
+        if (H5P_get(oc_plist, H5O_CRT_OHDR_FLAGS_NAME, &oh_flags) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, NULL, "can't get object header flags");
+        }
     }
 
-    if (H5O__set_version(f, oh, oh_flags, H5F_STORE_MSG_CRT_IDX(f)) < 0)
+    if (H5O__set_version(f, oh, oh_flags, H5F_STORE_MSG_CRT_IDX(f)) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, NULL, "can't set version of object header");
+    }
 
     oh->flags = oh_flags;
 
     ret_value = oh;
 
 done:
-    if ((NULL == ret_value) && (NULL != oh) && (H5O__free(oh, true) < 0))
+    if ((NULL == ret_value) && (NULL != oh) && (H5O__free(oh, true) < 0)) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTFREE, NULL, "can't delete object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5O_create_ohdr() */
@@ -386,14 +394,13 @@ done:
  *
  *-----------------------------------------------------------------------------
  */
-herr_t
-H5O_apply_ohdr(H5F_t *f, H5O_t *oh, hid_t ocpl_id, size_t size_hint, size_t initial_rc, H5O_loc_t *loc_out)
+herr_t H5O_apply_ohdr(H5F_t* f, H5O_t* oh, hid_t ocpl_id, size_t size_hint, size_t initial_rc, H5O_loc_t* loc_out)
 {
-    haddr_t         oh_addr;
-    size_t          oh_size;
-    H5P_genplist_t *oc_plist     = NULL;
-    unsigned        insert_flags = H5AC__NO_FLAGS_SET;
-    herr_t          ret_value    = SUCCEED;
+    haddr_t oh_addr;
+    size_t oh_size;
+    H5P_genplist_t* oc_plist = NULL;
+    unsigned insert_flags = H5AC__NO_FLAGS_SET;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -407,66 +414,81 @@ H5O_apply_ohdr(H5F_t *f, H5O_t *oh, hid_t ocpl_id, size_t size_hint, size_t init
 
     oh->sizeof_size = H5F_SIZEOF_SIZE(f);
     oh->sizeof_addr = H5F_SIZEOF_ADDR(f);
-    oh->swmr_write  = !!(H5F_INTENT(f) & H5F_ACC_SWMR_WRITE); /* funky cast */
+    oh->swmr_write = !!(H5F_INTENT(f) & H5F_ACC_SWMR_WRITE); /* funky cast */
 
 #ifdef H5O_ENABLE_BAD_MESG_COUNT
     /* Check whether the "bad message count" property is set */
-    if (0 < H5P_exist_plist(oc_plist, H5O_BAD_MESG_COUNT_NAME))
+    if (0 < H5P_exist_plist(oc_plist, H5O_BAD_MESG_COUNT_NAME)) {
         /* Get bad message count flag -- from property list */
-        if (H5P_get(oc_plist, H5O_BAD_MESG_COUNT_NAME, &oh->store_bad_mesg_count) < 0)
+        if (H5P_get(oc_plist, H5O_BAD_MESG_COUNT_NAME, &oh->store_bad_mesg_count) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't get bad message count flag");
+        }
+    }
 #endif /* H5O_ENABLE_BAD_MESG_COUNT */
 
     /* Create object header proxy if doing SWMR writes */
     if (oh->swmr_write) {
         oh->proxy = H5AC_proxy_entry_create();
-        if (NULL == oh->proxy)
+        if (NULL == oh->proxy) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTCREATE, FAIL, "can't create object header proxy");
+        }
     }
     else {
         oh->proxy = NULL;
     }
 
-    oc_plist = (H5P_genplist_t *)H5I_object(ocpl_id);
-    if (NULL == oc_plist)
+    oc_plist = (H5P_genplist_t*)H5I_object(ocpl_id);
+    if (NULL == oc_plist) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADTYPE, FAIL, "not a property list");
+    }
 
     /* Initialize version-specific fields */
     if (oh->version > H5O_VERSION_1) {
         /* Initialize all time fields */
-        if (oh->flags & H5O_HDR_STORE_TIMES)
+        if (oh->flags & H5O_HDR_STORE_TIMES) {
             oh->atime = oh->mtime = oh->ctime = oh->btime = H5_now();
-        else
+        }
+        else {
             oh->atime = oh->mtime = oh->ctime = oh->btime = 0;
+        }
 
-        if (H5F_STORE_MSG_CRT_IDX(f))
+        if (H5F_STORE_MSG_CRT_IDX(f)) {
             /* flag to record message creation indices */
             oh->flags |= H5O_HDR_ATTR_CRT_ORDER_TRACKED;
+        }
 
         /* Get attribute storage phase change values -- from property list */
-        if (H5P_get(oc_plist, H5O_CRT_ATTR_MAX_COMPACT_NAME, &oh->max_compact) < 0)
+        if (H5P_get(oc_plist, H5O_CRT_ATTR_MAX_COMPACT_NAME, &oh->max_compact) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get max. # of compact attributes");
-        if (H5P_get(oc_plist, H5O_CRT_ATTR_MIN_DENSE_NAME, &oh->min_dense) < 0)
+        }
+        if (H5P_get(oc_plist, H5O_CRT_ATTR_MIN_DENSE_NAME, &oh->min_dense) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get min. # of dense attributes");
+        }
 
         /* Check for non-default attribute storage phase change values */
-        if (H5O_CRT_ATTR_MAX_COMPACT_DEF != oh->max_compact || H5O_CRT_ATTR_MIN_DENSE_DEF != oh->min_dense)
+        if (H5O_CRT_ATTR_MAX_COMPACT_DEF != oh->max_compact || H5O_CRT_ATTR_MIN_DENSE_DEF != oh->min_dense) {
             oh->flags |= H5O_HDR_ATTR_STORE_PHASE_CHANGE;
+        }
 
-            /* Determine correct value for chunk #0 size bits */
+        /* Determine correct value for chunk #0 size bits */
 /* Avoid compiler warning on 32-bit machines */
 #if H5_SIZEOF_SIZE_T > H5_SIZEOF_INT32_T
-        if (size_hint > 4294967295UL)
+        if (size_hint > 4'294'967'295UL) {
             oh->flags |= H5O_HDR_CHUNK0_8;
-        else if (size_hint > 65535)
+        }
+        else if (size_hint > 65535) {
             oh->flags |= H5O_HDR_CHUNK0_4;
-        else if (size_hint > 255)
+        }
+        else if (size_hint > 255) {
             oh->flags |= H5O_HDR_CHUNK0_2;
+        }
 #else
-        if (size_hint > 65535)
+        if (size_hint > 65535) {
             oh->flags |= H5O_HDR_CHUNK0_4;
-        else if (size_hint > 255)
+        }
+        else if (size_hint > 255) {
             oh->flags |= H5O_HDR_CHUNK0_2;
+        }
 #endif
     }
     else {
@@ -480,47 +502,51 @@ H5O_apply_ohdr(H5F_t *f, H5O_t *oh, hid_t ocpl_id, size_t size_hint, size_t init
 
     /* Allocate disk space for header and first chunk */
     oh_addr = H5MF_alloc(f, H5FD_MEM_OHDR, (hsize_t)oh_size);
-    if (HADDR_UNDEF == oh_addr)
+    if (HADDR_UNDEF == oh_addr) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "file allocation failed for object header");
+    }
 
     /* Create the chunk list */
-    oh->nchunks       = 1;
+    oh->nchunks = 1;
     oh->alloc_nchunks = 1;
-    oh->chunk         = H5FL_SEQ_MALLOC(H5O_chunk_t, (size_t)oh->alloc_nchunks);
-    if (NULL == oh->chunk)
+    oh->chunk = H5FL_SEQ_MALLOC(H5O_chunk_t, (size_t)oh->alloc_nchunks);
+    if (NULL == oh->chunk) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+    }
 
     /* Initialize the first chunk */
     oh->chunk[0].addr = oh_addr;
     oh->chunk[0].size = oh_size;
-    oh->chunk[0].gap  = 0;
+    oh->chunk[0].gap = 0;
 
     /* Allocate enough space for the first chunk */
     /* (including space for serializing the object header prefix */
     oh->chunk[0].image = H5FL_BLK_CALLOC(chunk_image, oh_size);
-    if (NULL == oh->chunk[0].image)
+    if (NULL == oh->chunk[0].image) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+    }
     oh->chunk[0].chunk_proxy = NULL;
 
     /* Put magic # for object header in first chunk */
-    if (H5O_VERSION_1 < oh->version)
+    if (H5O_VERSION_1 < oh->version) {
         H5MM_memcpy(oh->chunk[0].image, H5O_HDR_MAGIC, (size_t)H5_SIZEOF_MAGIC);
+    }
 
     /* Create the message list */
-    oh->nmesgs       = 1;
+    oh->nmesgs = 1;
     oh->alloc_nmesgs = H5O_NMESGS;
-    oh->mesg         = H5FL_SEQ_CALLOC(H5O_mesg_t, oh->alloc_nmesgs);
-    if (NULL == oh->mesg)
+    oh->mesg = H5FL_SEQ_CALLOC(H5O_mesg_t, oh->alloc_nmesgs);
+    if (NULL == oh->mesg) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+    }
 
     /* Initialize the initial "null" message; covers the entire first chunk */
-    oh->mesg[0].type   = H5O_MSG_NULL;
-    oh->mesg[0].dirty  = true;
+    oh->mesg[0].type = H5O_MSG_NULL;
+    oh->mesg[0].dirty = true;
     oh->mesg[0].native = NULL;
-    oh->mesg[0].raw =
-        oh->chunk[0].image + H5O_SIZEOF_HDR(oh) - H5O_SIZEOF_CHKSUM_OH(oh) + H5O_SIZEOF_MSGHDR_OH(oh);
+    oh->mesg[0].raw = oh->chunk[0].image + H5O_SIZEOF_HDR(oh) - H5O_SIZEOF_CHKSUM_OH(oh) + H5O_SIZEOF_MSGHDR_OH(oh);
     oh->mesg[0].raw_size = size_hint - (size_t)H5O_SIZEOF_MSGHDR_OH(oh);
-    oh->mesg[0].chunkno  = 0;
+    oh->mesg[0].chunkno = 0;
 
     /* Check for non-zero initial refcount on the object header */
     if (initial_rc > 0) {
@@ -533,8 +559,9 @@ H5O_apply_ohdr(H5F_t *f, H5O_t *oh, hid_t ocpl_id, size_t size_hint, size_t init
     H5_BEGIN_TAG(oh_addr)
 
     /* Cache object header */
-    if (H5AC_insert_entry(f, H5AC_OHDR, oh_addr, oh, insert_flags) < 0)
+    if (H5AC_insert_entry(f, H5AC_OHDR, oh_addr, oh, insert_flags) < 0) {
         HGOTO_ERROR_TAG(H5E_OHDR, H5E_CANTINSERT, FAIL, "unable to cache object header");
+    }
 
     /* Reset object header pointer, now that it's been inserted into the cache */
     oh = NULL;
@@ -546,8 +573,9 @@ H5O_apply_ohdr(H5F_t *f, H5O_t *oh, hid_t ocpl_id, size_t size_hint, size_t init
     loc_out->file = f;
     loc_out->addr = oh_addr;
 
-    if (H5O_open(loc_out) < 0)
+    if (H5O_open(loc_out) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, FAIL, "unable to open object header");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -562,8 +590,7 @@ done:
  * Return:    Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_open(H5O_loc_t *loc)
+herr_t H5O_open(H5O_loc_t* loc)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -574,10 +601,12 @@ H5O_open(H5O_loc_t *loc)
     assert(loc->file);
 
     /* Turn off the variable for holding file or increment open-lock counters */
-    if (loc->holding_file)
+    if (loc->holding_file) {
         loc->holding_file = false;
-    else
+    }
+    else {
         H5F_INCR_NOPEN_OBJS(loc->file);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -593,14 +622,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5O_open_name(const H5G_loc_t *loc, const char *name, H5I_type_t *opened_type)
+void* H5O_open_name(const H5G_loc_t* loc, const char* name, H5I_type_t* opened_type)
 {
-    H5G_loc_t  obj_loc;           /* Location used to open group */
-    H5G_name_t obj_path;          /* Opened object group hier. path */
-    H5O_loc_t  obj_oloc;          /* Opened object object location */
-    bool       loc_found = false; /* Entry at 'name' found */
-    void      *ret_value = NULL;  /* Return value */
+    H5G_loc_t obj_loc;      /* Location used to open group */
+    H5G_name_t obj_path;    /* Opened object group hier. path */
+    H5O_loc_t obj_oloc;     /* Opened object object location */
+    bool loc_found = false; /* Entry at 'name' found */
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -614,18 +642,22 @@ H5O_open_name(const H5G_loc_t *loc, const char *name, H5I_type_t *opened_type)
     H5G_loc_reset(&obj_loc);
 
     /* Find the object's location */
-    if (H5G_loc_find(loc, name, &obj_loc /*out*/) < 0)
+    if (H5G_loc_find(loc, name, &obj_loc /*out*/) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_NOTFOUND, NULL, "object not found");
+    }
     loc_found = true;
 
     /* Open the object */
-    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type)))
+    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, NULL, "unable to open object");
+    }
 
 done:
-    if (NULL == ret_value)
-        if (loc_found && H5G_loc_free(&obj_loc) < 0)
+    if (NULL == ret_value) {
+        if (loc_found && H5G_loc_free(&obj_loc) < 0) {
             HDONE_ERROR(H5E_OHDR, H5E_CANTRELEASE, NULL, "can't free location");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_open_name() */
@@ -640,15 +672,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5O__open_by_idx(const H5G_loc_t *loc, const char *name, H5_index_t idx_type, H5_iter_order_t order,
-                 hsize_t n, H5I_type_t *opened_type)
+void* H5O__open_by_idx(const H5G_loc_t* loc, const char* name, H5_index_t idx_type, H5_iter_order_t order, hsize_t n, H5I_type_t* opened_type)
 {
-    H5G_loc_t  obj_loc;           /* Location used to open group */
-    H5G_name_t obj_path;          /* Opened object group hier. path */
-    H5O_loc_t  obj_oloc;          /* Opened object object location */
-    bool       loc_found = false; /* Entry at 'name' found */
-    void      *ret_value = NULL;  /* Return value */
+    H5G_loc_t obj_loc;      /* Location used to open group */
+    H5G_name_t obj_path;    /* Opened object group hier. path */
+    H5O_loc_t obj_oloc;     /* Opened object object location */
+    bool loc_found = false; /* Entry at 'name' found */
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -661,19 +691,23 @@ H5O__open_by_idx(const H5G_loc_t *loc, const char *name, H5_index_t idx_type, H5
     H5G_loc_reset(&obj_loc);
 
     /* Find the object's location, according to the order in the index */
-    if (H5G_loc_find_by_idx(loc, name, idx_type, order, n, &obj_loc /*out*/) < 0)
+    if (H5G_loc_find_by_idx(loc, name, idx_type, order, n, &obj_loc /*out*/) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_NOTFOUND, NULL, "group not found");
+    }
     loc_found = true;
 
     /* Open the object */
-    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type)))
+    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, NULL, "unable to open object");
+    }
 
 done:
     /* Release the object location if we failed after copying it */
-    if (NULL == ret_value)
-        if (loc_found && H5G_loc_free(&obj_loc) < 0)
+    if (NULL == ret_value) {
+        if (loc_found && H5G_loc_free(&obj_loc) < 0) {
             HDONE_ERROR(H5E_OHDR, H5E_CANTRELEASE, NULL, "can't free location");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O__open_by_idx() */
@@ -688,13 +722,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5O__open_by_addr(const H5G_loc_t *loc, haddr_t addr, H5I_type_t *opened_type)
+void* H5O__open_by_addr(const H5G_loc_t* loc, haddr_t addr, H5I_type_t* opened_type)
 {
-    H5G_loc_t  obj_loc;          /* Location used to open group */
-    H5G_name_t obj_path;         /* Opened object group hier. path */
-    H5O_loc_t  obj_oloc;         /* Opened object object location */
-    void      *ret_value = NULL; /* Return value */
+    H5G_loc_t obj_loc;      /* Location used to open group */
+    H5G_name_t obj_path;    /* Opened object group hier. path */
+    H5O_loc_t obj_oloc;     /* Opened object object location */
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -710,8 +743,9 @@ H5O__open_by_addr(const H5G_loc_t *loc, haddr_t addr, H5I_type_t *opened_type)
     H5G_name_reset(obj_loc.path); /* objects opened through this routine don't have a path name */
 
     /* Open the object */
-    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type)))
+    if (NULL == (ret_value = H5O_open_by_loc(&obj_loc, opened_type))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, NULL, "unable to open object");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -727,24 +761,25 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5O_open_by_loc(const H5G_loc_t *obj_loc, H5I_type_t *opened_type)
+void* H5O_open_by_loc(const H5G_loc_t* obj_loc, H5I_type_t* opened_type)
 {
-    const H5O_obj_class_t *obj_class;        /* Class of object for location */
-    void                  *ret_value = NULL; /* Return value */
+    const H5O_obj_class_t* obj_class; /* Class of object for location */
+    void* ret_value = NULL;           /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
     assert(obj_loc);
 
     /* Get the object class for this location */
-    if (NULL == (obj_class = H5O__obj_class(obj_loc->oloc)))
+    if (NULL == (obj_class = H5O__obj_class(obj_loc->oloc))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to determine object class");
+    }
 
     /* Call the object class's 'open' routine */
     assert(obj_class->open);
-    if (NULL == (ret_value = obj_class->open(obj_loc, opened_type)))
+    if (NULL == (ret_value = obj_class->open(obj_loc, opened_type))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, NULL, "unable to open object");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -759,8 +794,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_close(H5O_loc_t *loc, bool *file_closed /*out*/)
+herr_t H5O_close(H5O_loc_t* loc, bool* file_closed /*out*/)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -777,8 +811,9 @@ H5O_close(H5O_loc_t *loc, bool *file_closed /*out*/)
      * It's needed by the evict-on-close code. Clients can ignore
      * this value by passing in NULL.
      */
-    if (file_closed)
+    if (file_closed) {
         *file_closed = false;
+    }
 
     /* Decrement open-lock counters */
     H5F_DECR_NOPEN_OBJS(loc->file);
@@ -787,14 +822,17 @@ H5O_close(H5O_loc_t *loc, bool *file_closed /*out*/)
      * If the file open object count has reached the number of open mount points
      * (each of which has a group open in the file) attempt to close the file.
      */
-    if (H5F_NOPEN_OBJS(loc->file) == H5F_NMOUNTS(loc->file))
+    if (H5F_NOPEN_OBJS(loc->file) == H5F_NMOUNTS(loc->file)) {
         /* Attempt to close down the file hierarchy */
-        if (H5F_try_close(loc->file, file_closed) < 0)
+        if (H5F_try_close(loc->file, file_closed) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTCLOSEFILE, FAIL, "problem attempting file close");
+        }
+    }
 
     /* Release location information */
-    if (H5O_loc_free(loc) < 0)
+    if (H5O_loc_free(loc) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTRELEASE, FAIL, "problem attempting to free location");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -812,11 +850,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5O__link_oh(H5F_t *f, int adjust, H5O_t *oh, bool *deleted)
+int H5O__link_oh(H5F_t* f, int adjust, H5O_t* oh, bool* deleted)
 {
-    haddr_t addr      = H5O_OH_GET_ADDR(oh); /* Object header address */
-    int     ret_value = -1;                  /* Return value */
+    haddr_t addr = H5O_OH_GET_ADDR(oh); /* Object header address */
+    int ret_value = -1;                 /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -829,47 +866,52 @@ H5O__link_oh(H5F_t *f, int adjust, H5O_t *oh, bool *deleted)
     if (adjust) {
         if (adjust < 0) {
             /* Check for too large of an adjustment */
-            if ((unsigned)(-adjust) > oh->nlink)
+            if ((unsigned)(-adjust) > oh->nlink) {
                 HGOTO_ERROR(H5E_OHDR, H5E_LINKCOUNT, (-1), "link count would be negative");
+            }
 
             /* Adjust the link count for the object header */
             oh->nlink = (unsigned)((int)oh->nlink + adjust);
 
             /* Mark object header as dirty in cache */
-            if (H5AC_mark_entry_dirty(oh) < 0)
+            if (H5AC_mark_entry_dirty(oh) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTMARKDIRTY, (-1), "unable to mark object header as dirty");
+            }
 
             /* Check if the object should be deleted */
             if (oh->nlink == 0) {
                 /* Check if the object is still open by the user */
                 if (H5FO_opened(f, addr) != NULL) {
                     /* Flag the object to be deleted when it's closed */
-                    if (H5FO_mark(f, addr, true) < 0)
+                    if (H5FO_mark(f, addr, true) < 0) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, (-1), "can't mark object for deletion");
+                    }
                 } /* end if */
                 else {
                     /* Mark the object header for deletion */
                     *deleted = true;
                 } /* end else */
-            }     /* end if */
-        }         /* end if */
+            } /* end if */
+        } /* end if */
         else {
             /* A new object, or one that will be deleted */
             if (0 == oh->nlink) {
                 /* Check if the object is currently open, but marked for deletion */
                 if (H5FO_marked(f, addr)) {
                     /* Remove "delete me" flag on the object */
-                    if (H5FO_mark(f, addr, false) < 0)
+                    if (H5FO_mark(f, addr, false) < 0) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, (-1), "can't mark object for deletion");
+                    }
                 } /* end if */
-            }     /* end if */
+            } /* end if */
 
             /* Adjust the link count for the object header */
             oh->nlink = (unsigned)((int)oh->nlink + adjust);
 
             /* Mark object header as dirty in cache */
-            if (H5AC_mark_entry_dirty(oh) < 0)
+            if (H5AC_mark_entry_dirty(oh) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTMARKDIRTY, (-1), "unable to mark object header as dirty");
+            }
         } /* end if */
 
         /* Check for operations on refcount message */
@@ -878,32 +920,33 @@ H5O__link_oh(H5F_t *f, int adjust, H5O_t *oh, bool *deleted)
             if (oh->has_refcount_msg) {
                 /* Check for removing refcount message */
                 if (oh->nlink <= 1) {
-                    if (H5O__msg_remove_real(f, oh, H5O_MSG_REFCOUNT, H5O_ALL, NULL, NULL, true) < 0)
+                    if (H5O__msg_remove_real(f, oh, H5O_MSG_REFCOUNT, H5O_ALL, NULL, NULL, true) < 0) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, (-1), "unable to delete refcount message");
+                    }
                     oh->has_refcount_msg = false;
                 } /* end if */
                 /* Update refcount message with new link count */
                 else {
                     H5O_refcount_t refcount = oh->nlink;
 
-                    if (H5O__msg_write_real(f, oh, H5O_MSG_REFCOUNT, H5O_MSG_FLAG_DONTSHARE, 0, &refcount) <
-                        0)
+                    if (H5O__msg_write_real(f, oh, H5O_MSG_REFCOUNT, H5O_MSG_FLAG_DONTSHARE, 0, &refcount) < 0) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTUPDATE, (-1), "unable to update refcount message");
+                    }
                 } /* end else */
-            }     /* end if */
+            } /* end if */
             else {
                 /* Check for adding refcount message to object */
                 if (oh->nlink > 1) {
                     H5O_refcount_t refcount = oh->nlink;
 
-                    if (H5O__msg_append_real(f, oh, H5O_MSG_REFCOUNT, H5O_MSG_FLAG_DONTSHARE, 0, &refcount) <
-                        0)
+                    if (H5O__msg_append_real(f, oh, H5O_MSG_REFCOUNT, H5O_MSG_FLAG_DONTSHARE, 0, &refcount) < 0) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTINSERT, (-1), "unable to create new refcount message");
+                    }
                     oh->has_refcount_msg = true;
                 } /* end if */
-            }     /* end else */
-        }         /* end if */
-    }             /* end if */
+            } /* end else */
+        } /* end if */
+    } /* end if */
 
     /* Set return value */
     ret_value = (int)oh->nlink;
@@ -924,12 +967,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5O_link(const H5O_loc_t *loc, int adjust)
+int H5O_link(const H5O_loc_t* loc, int adjust)
 {
-    H5O_t *oh        = NULL;
-    bool   deleted   = false; /* Whether the object was deleted */
-    int    ret_value = -1;    /* Return value */
+    H5O_t* oh = NULL;
+    bool deleted = false; /* Whether the object was deleted */
+    int ret_value = -1;   /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(loc->addr, FAIL)
 
@@ -939,18 +981,22 @@ H5O_link(const H5O_loc_t *loc, int adjust)
     assert(H5_addr_defined(loc->addr));
 
     /* Pin the object header */
-    if (NULL == (oh = H5O_pin(loc)))
+    if (NULL == (oh = H5O_pin(loc))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPIN, FAIL, "unable to pin object header");
+    }
 
     /* Call the "real" link routine */
-    if ((ret_value = H5O__link_oh(loc->file, adjust, oh, &deleted)) < 0)
+    if ((ret_value = H5O__link_oh(loc->file, adjust, oh, &deleted)) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_LINKCOUNT, FAIL, "unable to adjust object link count");
+    }
 
 done:
-    if (oh && H5O_unpin(oh) < 0)
+    if (oh && H5O_unpin(oh) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPIN, FAIL, "unable to unpin object header");
-    if (ret_value >= 0 && deleted && H5O_delete(loc->file, loc->addr) < 0)
+    }
+    if (ret_value >= 0 && deleted && H5O_delete(loc->file, loc->addr) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTDELETE, FAIL, "can't delete object from file");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O_link() */
@@ -968,14 +1014,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5O_t *
-H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
+H5O_t* H5O_protect(const H5O_loc_t* loc, unsigned prot_flags, bool pin_all_chunks)
 {
-    H5O_t          *oh = NULL;        /* Object header protected */
-    H5O_cache_ud_t  udata;            /* User data for protecting object header */
-    H5O_cont_msgs_t cont_msg_info;    /* Continuation message info */
-    unsigned        file_intent;      /* R/W intent on file */
-    H5O_t          *ret_value = NULL; /* Return value */
+    H5O_t* oh = NULL;              /* Object header protected */
+    H5O_cache_ud_t udata;          /* User data for protecting object header */
+    H5O_cont_msgs_t cont_msg_info; /* Continuation message info */
+    unsigned file_intent;          /* R/W intent on file */
+    H5O_t* ret_value = NULL;       /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(loc->addr, NULL)
 
@@ -987,34 +1032,37 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
     assert((prot_flags & (unsigned)(~H5AC__READ_ONLY_FLAG)) == 0);
 
     /* Check for valid address */
-    if (!H5_addr_defined(loc->addr))
+    if (!H5_addr_defined(loc->addr)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "address undefined");
+    }
 
     /* Check for write access on the file */
     file_intent = H5F_INTENT(loc->file);
-    if ((0 == (prot_flags & H5AC__READ_ONLY_FLAG)) && (0 == (file_intent & H5F_ACC_RDWR)))
+    if ((0 == (prot_flags & H5AC__READ_ONLY_FLAG)) && (0 == (file_intent & H5F_ACC_RDWR))) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "no write intent on file");
+    }
 
     /* Construct the user data for protect callback */
-    udata.made_attempt            = false;
-    udata.v1_pfx_nmesgs           = 0;
-    udata.chunk0_size             = 0;
-    udata.oh                      = NULL;
-    udata.oh_version              = 0;
-    udata.common.f                = loc->file;
-    udata.common.file_intent      = file_intent;
+    udata.made_attempt = false;
+    udata.v1_pfx_nmesgs = 0;
+    udata.chunk0_size = 0;
+    udata.oh = NULL;
+    udata.oh_version = 0;
+    udata.common.f = loc->file;
+    udata.common.file_intent = file_intent;
     udata.common.merged_null_msgs = 0;
     memset(&cont_msg_info, 0, sizeof(cont_msg_info));
     udata.common.cont_msg_info = &cont_msg_info;
-    udata.common.addr          = loc->addr;
+    udata.common.addr = loc->addr;
 
     /* Lock the object header into the cache */
-    if (NULL == (oh = (H5O_t *)H5AC_protect(loc->file, H5AC_OHDR, loc->addr, &udata, prot_flags)))
+    if (NULL == (oh = (H5O_t*)H5AC_protect(loc->file, H5AC_OHDR, loc->addr, &udata, prot_flags))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, NULL, "unable to load object header");
+    }
 
     /* Check if there are any continuation messages to process */
     if (cont_msg_info.nmsgs > 0) {
-        size_t             curr_msg;  /* Current continuation message to process */
+        size_t curr_msg;              /* Current continuation message to process */
         H5O_chk_cache_ud_t chk_udata; /* User data for loading chunk */
 
         /* Sanity check - we should only have continuation messages to process
@@ -1024,13 +1072,13 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
         assert(cont_msg_info.msgs);
 
         /* Construct the user data for protecting chunks */
-        chk_udata.decoding                = true;
-        chk_udata.oh                      = oh;
-        chk_udata.chunkno                 = UINT_MAX; /* Set to invalid value, for better error detection */
-        chk_udata.common.f                = loc->file;
-        chk_udata.common.file_intent      = file_intent;
+        chk_udata.decoding = true;
+        chk_udata.oh = oh;
+        chk_udata.chunkno = UINT_MAX; /* Set to invalid value, for better error detection */
+        chk_udata.common.f = loc->file;
+        chk_udata.common.file_intent = file_intent;
         chk_udata.common.merged_null_msgs = udata.common.merged_null_msgs;
-        chk_udata.common.cont_msg_info    = &cont_msg_info;
+        chk_udata.common.cont_msg_info = &cont_msg_info;
 
         /* Read in continuation messages, until there are no more */
         /* (Note that loading chunks could increase the # of continuation
@@ -1038,18 +1086,17 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
          */
         curr_msg = 0;
         while (curr_msg < cont_msg_info.nmsgs) {
-            H5O_chunk_proxy_t *chk_proxy;            /* Proxy for chunk, to bring it into memory */
-            unsigned           chunkno;              /* Chunk number for chunk proxy */
-            size_t             chkcnt = oh->nchunks; /* Count of chunks (for sanity checking) */
+            H5O_chunk_proxy_t* chk_proxy; /* Proxy for chunk, to bring it into memory */
+            unsigned chunkno;             /* Chunk number for chunk proxy */
+            size_t chkcnt = oh->nchunks;  /* Count of chunks (for sanity checking) */
 
             /* Bring the chunk into the cache */
             /* (which adds to the object header) */
             chk_udata.common.addr = cont_msg_info.msgs[curr_msg].addr;
-            chk_udata.size        = cont_msg_info.msgs[curr_msg].size;
-            if (NULL == (chk_proxy = (H5O_chunk_proxy_t *)H5AC_protect(loc->file, H5AC_OHDR_CHK,
-                                                                       cont_msg_info.msgs[curr_msg].addr,
-                                                                       &chk_udata, prot_flags)))
+            chk_udata.size = cont_msg_info.msgs[curr_msg].size;
+            if (NULL == (chk_proxy = (H5O_chunk_proxy_t*)H5AC_protect(loc->file, H5AC_OHDR_CHK, cont_msg_info.msgs[curr_msg].addr, &chk_udata, prot_flags))) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, NULL, "unable to load object header chunk");
+            }
 
             /* Sanity check */
             assert(chk_proxy->oh == oh);
@@ -1057,22 +1104,23 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
             chunkno = chk_proxy->chunkno;
 
             /* Release the chunk from the cache */
-            if (H5AC_unprotect(loc->file, H5AC_OHDR_CHK, cont_msg_info.msgs[curr_msg].addr, chk_proxy,
-                               H5AC__NO_FLAGS_SET) < 0)
+            if (H5AC_unprotect(loc->file, H5AC_OHDR_CHK, cont_msg_info.msgs[curr_msg].addr, chk_proxy, H5AC__NO_FLAGS_SET) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, NULL, "unable to release object header chunk");
+            }
 
-            if (chunkno != chkcnt)
+            if (chunkno != chkcnt) {
                 HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "incorrect chunk number for object header chunk");
-            if (oh->nchunks != (chkcnt + 1))
-                HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL,
-                            "incorrect number of chunks after deserializing object header chunk");
+            }
+            if (oh->nchunks != (chkcnt + 1)) {
+                HGOTO_ERROR(H5E_OHDR, H5E_BADVALUE, NULL, "incorrect number of chunks after deserializing object header chunk");
+            }
 
             /* Advance to next continuation message */
             curr_msg++;
         } /* end while */
 
         /* Release any continuation messages built up */
-        cont_msg_info.msgs = (H5O_cont_t *)H5FL_SEQ_FREE(H5O_cont_t, cont_msg_info.msgs);
+        cont_msg_info.msgs = (H5O_cont_t*)H5FL_SEQ_FREE(H5O_cont_t, cont_msg_info.msgs);
 
         /* Pass back out some of the chunk's user data */
         udata.common.merged_null_msgs = chk_udata.common.merged_null_msgs;
@@ -1090,11 +1138,11 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
  */
 #ifdef H5_STRICT_FORMAT_CHECKS
         /* Check for incorrect # of messages in v1 object header */
-        if (oh->version == H5O_VERSION_1 &&
-            (oh->nmesgs + udata.common.merged_null_msgs) != udata.v1_pfx_nmesgs)
+        if (oh->version == H5O_VERSION_1 && (oh->nmesgs + udata.common.merged_null_msgs) != udata.v1_pfx_nmesgs) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTLOAD, NULL, "corrupt object header - incorrect # of messages");
+        }
 #endif /* H5_STRICT_FORMAT_CHECKS */
-    }  /* end if */
+    } /* end if */
 
 #ifdef H5O_DEBUG
     H5O__assert(oh);
@@ -1111,19 +1159,22 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
 
         /* Iterate over chunks > 0 */
         for (u = 1; u < oh->nchunks; u++) {
-            H5O_chunk_proxy_t *chk_proxy; /* Chunk proxy */
+            H5O_chunk_proxy_t* chk_proxy; /* Chunk proxy */
 
             /* Protect chunk */
-            if (NULL == (chk_proxy = H5O__chunk_protect(loc->file, oh, u)))
+            if (NULL == (chk_proxy = H5O__chunk_protect(loc->file, oh, u))) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, NULL, "unable to protect object header chunk");
+            }
 
             /* Pin chunk proxy*/
-            if (H5AC_pin_protected_entry(chk_proxy) < 0)
+            if (H5AC_pin_protected_entry(chk_proxy) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTPIN, NULL, "unable to pin object header chunk");
+            }
 
             /* Unprotect chunk */
-            if (H5O__chunk_unprotect(loc->file, chk_proxy, false) < 0)
+            if (H5O__chunk_unprotect(loc->file, chk_proxy, false) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, NULL, "unable to unprotect object header chunk");
+            }
 
             /* Preserve chunk proxy pointer for later */
             oh->chunk[u].chunk_proxy = chk_proxy;
@@ -1139,13 +1190,15 @@ H5O_protect(const H5O_loc_t *loc, unsigned prot_flags, bool pin_all_chunks)
 done:
     if (ret_value == NULL && oh) {
         /* Release any continuation messages built up */
-        if (cont_msg_info.msgs)
-            cont_msg_info.msgs = (H5O_cont_t *)H5FL_SEQ_FREE(H5O_cont_t, cont_msg_info.msgs);
+        if (cont_msg_info.msgs) {
+            cont_msg_info.msgs = (H5O_cont_t*)H5FL_SEQ_FREE(H5O_cont_t, cont_msg_info.msgs);
+        }
 
         /* Unprotect the ohdr and delete it from cache since if we failed to load it it's in an inconsistent
          * state */
-        if (H5O_unprotect(loc, oh, H5AC__DELETED_FLAG) < 0)
+        if (H5O_unprotect(loc, oh, H5AC__DELETED_FLAG) < 0) {
             HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, NULL, "unable to release object header");
+        }
     }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
@@ -1164,11 +1217,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5O_t *
-H5O_pin(const H5O_loc_t *loc)
+H5O_t* H5O_pin(const H5O_loc_t* loc)
 {
-    H5O_t *oh        = NULL; /* Object header */
-    H5O_t *ret_value = NULL; /* Return value */
+    H5O_t* oh = NULL;        /* Object header */
+    H5O_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -1176,21 +1228,24 @@ H5O_pin(const H5O_loc_t *loc)
     assert(loc);
 
     /* Get header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__NO_FLAGS_SET, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__NO_FLAGS_SET, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, NULL, "unable to protect object header");
+    }
 
     /* Increment the reference count on the object header */
     /* (which will pin it, if appropriate) */
-    if (H5O__inc_rc(oh) < 0)
+    if (H5O__inc_rc(oh) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTINC, NULL, "unable to increment reference count on object header");
+    }
 
     /* Set the return value */
     ret_value = oh;
 
 done:
     /* Release the object header from the cache */
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, NULL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_pin() */
@@ -1206,8 +1261,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_unpin(H5O_t *oh)
+herr_t H5O_unpin(H5O_t* oh)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1218,8 +1272,9 @@ H5O_unpin(H5O_t *oh)
 
     /* Decrement the reference count on the object header */
     /* (which will unpin it, if appropriate) */
-    if (H5O__dec_rc(oh) < 0)
+    if (H5O__dec_rc(oh) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTDEC, FAIL, "unable to decrement reference count on object header");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1237,8 +1292,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_unprotect(const H5O_loc_t *loc, H5O_t *oh, unsigned oh_flags)
+herr_t H5O_unprotect(const H5O_loc_t* loc, H5O_t* oh, unsigned oh_flags)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1259,11 +1313,12 @@ H5O_unprotect(const H5O_loc_t *loc, H5O_t *oh, unsigned oh_flags)
         for (u = 1; u < oh->nchunks; u++) {
             if (NULL != oh->chunk[u].chunk_proxy) {
                 /* Release chunk proxy */
-                if (H5AC_unpin_entry(oh->chunk[u].chunk_proxy) < 0)
+                if (H5AC_unpin_entry(oh->chunk[u].chunk_proxy) < 0) {
                     HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPIN, FAIL, "unable to unpin object header chunk");
+                }
                 oh->chunk[u].chunk_proxy = NULL;
             } /* end if */
-        }     /* end for */
+        } /* end for */
 
         /* Reset the flag from the unprotect */
         oh->chunks_pinned = false;
@@ -1274,15 +1329,18 @@ H5O_unprotect(const H5O_loc_t *loc, H5O_t *oh, unsigned oh_flags)
         unsigned u; /* Local index variable */
 
         /* Iterate over chunks > 0 */
-        for (u = 1; u < oh->nchunks; u++)
+        for (u = 1; u < oh->nchunks; u++) {
             /* Expunge chunk proxy from cache */
-            if (H5AC_expunge_entry(loc->file, H5AC_OHDR_CHK, oh->chunk[u].addr, H5AC__NO_FLAGS_SET) < 0)
+            if (H5AC_expunge_entry(loc->file, H5AC_OHDR_CHK, oh->chunk[u].addr, H5AC__NO_FLAGS_SET) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPIN, FAIL, "unable to expunge object header chunk");
+            }
+        }
     } /* end if */
 
     /* Unprotect the object header */
-    if (H5AC_unprotect(loc->file, H5AC_OHDR, oh->chunk[0].addr, oh, oh_flags) < 0)
+    if (H5AC_unprotect(loc->file, H5AC_OHDR, oh->chunk[0].addr, oh, oh_flags) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1299,13 +1357,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_touch_oh(H5F_t *f, H5O_t *oh, bool force)
+herr_t H5O_touch_oh(H5F_t* f, H5O_t* oh, bool force)
 {
-    H5O_chunk_proxy_t *chk_proxy   = NULL;  /* Chunk that message is in */
-    bool               chk_dirtied = false; /* Flag for unprotecting chunk */
-    time_t             now;                 /* Current time */
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5O_chunk_proxy_t* chk_proxy = NULL; /* Chunk that message is in */
+    bool chk_dirtied = false;            /* Flag for unprotecting chunk */
+    time_t now;                          /* Current time */
+    herr_t ret_value = SUCCEED;          /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -1322,44 +1379,48 @@ H5O_touch_oh(H5F_t *f, H5O_t *oh, bool force)
             size_t idx; /* Index of modification time message to update */
 
             /* Look for existing message */
-            for (idx = 0; idx < oh->nmesgs; idx++)
-                if (H5O_MSG_MTIME == oh->mesg[idx].type || H5O_MSG_MTIME_NEW == oh->mesg[idx].type)
+            for (idx = 0; idx < oh->nmesgs; idx++) {
+                if (H5O_MSG_MTIME == oh->mesg[idx].type || H5O_MSG_MTIME_NEW == oh->mesg[idx].type) {
                     break;
+                }
+            }
 
             /* Create a new message, if necessary */
             if (idx == oh->nmesgs) {
                 unsigned mesg_flags = 0; /* Flags for message in object header */
 
                 /* If we would have to create a new message, but we aren't 'forcing' it, get out now */
-                if (!force)
+                if (!force) {
                     HGOTO_DONE(SUCCEED); /*nothing to do*/
+                }
 
                 /* Allocate space for the modification time message */
-                if (H5O__msg_alloc(f, oh, H5O_MSG_MTIME_NEW, &mesg_flags, &now, &idx) < 0)
-                    HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL,
-                                "unable to allocate space for modification time message");
+                if (H5O__msg_alloc(f, oh, H5O_MSG_MTIME_NEW, &mesg_flags, &now, &idx) < 0) {
+                    HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "unable to allocate space for modification time message");
+                }
 
                 /* Set the message's flags if appropriate */
                 oh->mesg[idx].flags = (uint8_t)mesg_flags;
             } /* end if */
 
             /* Protect chunk */
-            if (NULL == (chk_proxy = H5O__chunk_protect(f, oh, oh->mesg[idx].chunkno)))
+            if (NULL == (chk_proxy = H5O__chunk_protect(f, oh, oh->mesg[idx].chunkno))) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header chunk");
+            }
 
             /* Allocate 'native' space, if necessary */
             if (NULL == oh->mesg[idx].native) {
-                if (NULL == (oh->mesg[idx].native = H5FL_MALLOC(time_t)))
-                    HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL,
-                                "memory allocation failed for modification time message");
+                if (NULL == (oh->mesg[idx].native = H5FL_MALLOC(time_t))) {
+                    HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "memory allocation failed for modification time message");
+                }
             } /* end if */
 
             /* Update the message */
-            *((time_t *)(oh->mesg[idx].native)) = now;
+            *((time_t*)(oh->mesg[idx].native)) = now;
 
             /* Mark the message as dirty */
             oh->mesg[idx].dirty = true;
-            chk_dirtied         = true;
+            chk_dirtied = true;
         } /* end if */
         else {
             /* XXX: For now, update access time & change fields in the object header
@@ -1368,15 +1429,17 @@ H5O_touch_oh(H5F_t *f, H5O_t *oh, bool force)
             oh->atime = oh->ctime = now;
 
             /* Mark object header as dirty in cache */
-            if (H5AC_mark_entry_dirty(oh) < 0)
+            if (H5AC_mark_entry_dirty(oh) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTMARKDIRTY, FAIL, "unable to mark object header as dirty");
+            }
         } /* end else */
-    }     /* end if */
+    } /* end if */
 
 done:
     /* Release chunk */
-    if (chk_proxy && H5O__chunk_unprotect(f, chk_proxy, chk_dirtied) < 0)
+    if (chk_proxy && H5O__chunk_unprotect(f, chk_proxy, chk_dirtied) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to unprotect object header chunk");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_touch_oh() */
@@ -1393,12 +1456,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_touch(const H5O_loc_t *loc, bool force)
+herr_t H5O_touch(const H5O_loc_t* loc, bool force)
 {
-    H5O_t   *oh        = NULL;               /* Object header to modify */
-    unsigned oh_flags  = H5AC__NO_FLAGS_SET; /* Flags for unprotecting object header */
-    herr_t   ret_value = SUCCEED;            /* Return value */
+    H5O_t* oh = NULL;                       /* Object header to modify */
+    unsigned oh_flags = H5AC__NO_FLAGS_SET; /* Flags for unprotecting object header */
+    herr_t ret_value = SUCCEED;             /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1406,19 +1468,22 @@ H5O_touch(const H5O_loc_t *loc, bool force)
     assert(loc);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__NO_FLAGS_SET, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__NO_FLAGS_SET, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Create/Update the modification time message */
-    if (H5O_touch_oh(loc->file, oh, force) < 0)
+    if (H5O_touch_oh(loc->file, oh, force) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, FAIL, "unable to update object modification time");
+    }
 
     /* Mark object header as changed */
     oh_flags |= H5AC__DIRTIED_FLAG;
 
 done:
-    if (oh && H5O_unprotect(loc, oh, oh_flags) < 0)
+    if (oh && H5O_unprotect(loc, oh, oh_flags) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_touch() */
@@ -1434,12 +1499,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_bogus_oh(H5F_t *f, H5O_t *oh, unsigned bogus_id, unsigned mesg_flags)
+herr_t H5O_bogus_oh(H5F_t* f, H5O_t* oh, unsigned bogus_id, unsigned mesg_flags)
 {
-    size_t           idx;                 /* Local index variable */
-    H5O_msg_class_t *type;                /* Message class type */
-    herr_t           ret_value = SUCCEED; /* Return value */
+    size_t idx;                 /* Local index variable */
+    H5O_msg_class_t* type;      /* Message class type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1447,31 +1511,38 @@ H5O_bogus_oh(H5F_t *f, H5O_t *oh, unsigned bogus_id, unsigned mesg_flags)
     assert(oh);
 
     /* Look for existing message */
-    for (idx = 0; idx < oh->nmesgs; idx++)
-        if (H5O_MSG_BOGUS_VALID == oh->mesg[idx].type || H5O_MSG_BOGUS_INVALID == oh->mesg[idx].type)
+    for (idx = 0; idx < oh->nmesgs; idx++) {
+        if (H5O_MSG_BOGUS_VALID == oh->mesg[idx].type || H5O_MSG_BOGUS_INVALID == oh->mesg[idx].type) {
             break;
+        }
+    }
 
     /* Create a new message */
     if (idx == oh->nmesgs) {
-        H5O_bogus_t *bogus; /* Pointer to the bogus information */
+        H5O_bogus_t* bogus; /* Pointer to the bogus information */
 
         /* Allocate the native message in memory */
-        if (NULL == (bogus = H5MM_malloc(sizeof(H5O_bogus_t))))
+        if (NULL == (bogus = H5MM_malloc(sizeof(H5O_bogus_t)))) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "memory allocation failed for 'bogus' message");
+        }
 
         /* Update the native value */
         bogus->u = H5O_BOGUS_VALUE;
 
-        if (bogus_id == H5O_BOGUS_VALID_ID)
+        if (bogus_id == H5O_BOGUS_VALID_ID) {
             type = H5O_MSG_BOGUS_VALID;
-        else if (bogus_id == H5O_BOGUS_INVALID_ID)
+        }
+        else if (bogus_id == H5O_BOGUS_INVALID_ID) {
             type = H5O_MSG_BOGUS_INVALID;
-        else
+        }
+        else {
             HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "invalid ID for 'bogus' message");
+        }
 
         /* Allocate space in the object header for bogus message */
-        if (H5O__msg_alloc(f, oh, type, &mesg_flags, bogus, &idx) < 0)
+        if (H5O__msg_alloc(f, oh, type, &mesg_flags, bogus, &idx) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "unable to allocate space for 'bogus' message");
+        }
 
         /* Point to "bogus" information (take it over) */
         oh->mesg[idx].native = bogus;
@@ -1480,7 +1551,7 @@ H5O_bogus_oh(H5F_t *f, H5O_t *oh, unsigned bogus_id, unsigned mesg_flags)
         oh->mesg[idx].flags = mesg_flags;
 
         /* Mark the message and object header as dirty */
-        oh->mesg[idx].dirty     = true;
+        oh->mesg[idx].dirty = true;
         oh->cache_info.is_dirty = true;
     } /* end if */
 
@@ -1501,14 +1572,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_delete(H5F_t *f, haddr_t addr)
+herr_t H5O_delete(H5F_t* f, haddr_t addr)
 {
-    H5O_t    *oh = NULL;                     /* Object header information */
-    H5O_loc_t loc;                           /* Object location for object to delete */
-    unsigned  oh_flags = H5AC__NO_FLAGS_SET; /* Flags for unprotecting object header */
-    bool      corked;
-    herr_t    ret_value = SUCCEED; /* Return value */
+    H5O_t* oh = NULL;                       /* Object header information */
+    H5O_loc_t loc;                          /* Object location for object to delete */
+    unsigned oh_flags = H5AC__NO_FLAGS_SET; /* Flags for unprotecting object header */
+    bool corked;
+    herr_t ret_value = SUCCEED;             /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(addr, FAIL)
 
@@ -1517,31 +1587,37 @@ H5O_delete(H5F_t *f, haddr_t addr)
     assert(H5_addr_defined(addr));
 
     /* Set up the object location */
-    loc.file         = f;
-    loc.addr         = addr;
+    loc.file = f;
+    loc.addr = addr;
     loc.holding_file = false;
 
     /* Get the object header information */
-    if (NULL == (oh = H5O_protect(&loc, H5AC__NO_FLAGS_SET, false)))
+    if (NULL == (oh = H5O_protect(&loc, H5AC__NO_FLAGS_SET, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Delete object */
-    if (H5O__delete_oh(f, oh) < 0)
+    if (H5O__delete_oh(f, oh) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, FAIL, "can't delete object from file");
+    }
 
     /* Uncork cache entries with tag: addr */
-    if (H5AC_cork(f, addr, H5AC__GET_CORKED, &corked) < 0)
+    if (H5AC_cork(f, addr, H5AC__GET_CORKED, &corked) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to retrieve an object's cork status");
-    if (corked)
-        if (H5AC_cork(f, addr, H5AC__UNCORK, NULL) < 0)
+    }
+    if (corked) {
+        if (H5AC_cork(f, addr, H5AC__UNCORK, NULL) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTUNCORK, FAIL, "unable to uncork an object");
+        }
+    }
 
     /* Mark object header as deleted */
     oh_flags = H5AC__DIRTIED_FLAG | H5AC__DELETED_FLAG | H5AC__FREE_FILE_SPACE_FLAG;
 
 done:
-    if (oh && H5O_unprotect(&loc, oh, oh_flags) < 0)
+    if (oh && H5O_unprotect(&loc, oh, oh_flags) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_PROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O_delete() */
@@ -1559,12 +1635,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__delete_oh(H5F_t *f, H5O_t *oh)
+static herr_t H5O__delete_oh(H5F_t* f, H5O_t* oh)
 {
-    H5O_mesg_t *curr_msg; /* Pointer to current message being operated on */
-    unsigned    u;
-    herr_t      ret_value = SUCCEED; /* Return value */
+    H5O_mesg_t* curr_msg;       /* Pointer to current message being operated on */
+    unsigned u;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -1577,9 +1652,9 @@ H5O__delete_oh(H5F_t *f, H5O_t *oh)
      */
     for (u = 0, curr_msg = &oh->mesg[0]; u < oh->nmesgs; u++, curr_msg++) {
         /* Free any space referred to in the file from this message */
-        if (H5O__delete_mesg(f, oh, curr_msg) < 0)
-            HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, FAIL,
-                        "unable to delete file space for object header message");
+        if (H5O__delete_mesg(f, oh, curr_msg) < 0) {
+            HGOTO_ERROR(H5E_OHDR, H5E_CANTDELETE, FAIL, "unable to delete file space for object header message");
+        }
     } /* end for */
 
 done:
@@ -1596,25 +1671,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_obj_type(const H5O_loc_t *loc, H5O_type_t *obj_type)
+herr_t H5O_obj_type(const H5O_loc_t* loc, H5O_type_t* obj_type)
 {
-    H5O_t *oh        = NULL;    /* Object header for location */
+    H5O_t* oh = NULL;           /* Object header for location */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(loc->addr, FAIL)
 
     /* Load the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Retrieve the type of the object */
-    if (H5O__obj_type_real(oh, obj_type) < 0)
+    if (H5O__obj_type_real(oh, obj_type) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "unable to determine object type");
+    }
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O_obj_type() */
@@ -1630,11 +1707,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__obj_type_real(const H5O_t *oh, H5O_type_t *obj_type)
+static herr_t H5O__obj_type_real(const H5O_t* oh, H5O_type_t* obj_type)
 {
-    const H5O_obj_class_t *obj_class = NULL; /* Class of object for header */
-    herr_t                 ret_value = SUCCEED;
+    const H5O_obj_class_t* obj_class = NULL; /* Class of object for header */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -1643,8 +1719,9 @@ H5O__obj_type_real(const H5O_t *oh, H5O_type_t *obj_type)
     assert(obj_type);
 
     /* Look up class for object header */
-    if (H5O__obj_class_real(oh, &obj_class) < 0)
+    if (H5O__obj_class_real(oh, &obj_class) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to determine object class");
+    }
     assert(obj_class);
 
     /* Set object type */
@@ -1664,25 +1741,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-const H5O_obj_class_t *
-H5O__obj_class(const H5O_loc_t *loc)
+const H5O_obj_class_t* H5O__obj_class(const H5O_loc_t* loc)
 {
-    H5O_t                 *oh        = NULL; /* Object header for location */
-    const H5O_obj_class_t *ret_value = NULL; /* Return value */
+    H5O_t* oh = NULL;                        /* Object header for location */
+    const H5O_obj_class_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE_TAG(loc->addr)
 
     /* Load the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, NULL, "unable to load object header");
+    }
 
     /* Test whether entry qualifies as a particular type of object */
-    if (H5O__obj_class_real(oh, &ret_value) < 0)
+    if (H5O__obj_class_real(oh, &ret_value) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to determine object type");
+    }
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, NULL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O__obj_class() */
@@ -1698,8 +1777,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__obj_class_real(const H5O_t *oh, const H5O_obj_class_t **cls)
+static herr_t H5O__obj_class_real(const H5O_t* oh, const H5O_obj_class_t** cls)
 {
     size_t i; /* Local index variable */
     herr_t ret_value = SUCCEED;
@@ -1715,16 +1793,18 @@ H5O__obj_class_real(const H5O_t *oh, const H5O_obj_class_t **cls)
     for (i = NELMTS(H5O_obj_class_g); i > 0; --i) {
         htri_t isa; /* Is entry a particular type? */
 
-        if ((isa = (H5O_obj_class_g[i - 1]->isa)(oh)) < 0)
+        if ((isa = (H5O_obj_class_g[i - 1]->isa)(oh)) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to determine object type");
+        }
         else if (isa) {
             *cls = H5O_obj_class_g[i - 1];
             break;
         }
     }
 
-    if (0 == i)
+    if (0 == i) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to determine object type");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1740,49 +1820,49 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5O_loc_t *
-H5O_get_loc(hid_t object_id)
+H5O_loc_t* H5O_get_loc(hid_t object_id)
 {
-    H5O_loc_t *ret_value = NULL; /* Return value */
+    H5O_loc_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
     switch (H5I_get_type(object_id)) {
-        case H5I_GROUP:
-            if (NULL == (ret_value = H5O_OBJ_GROUP->get_oloc(object_id)))
-                HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from group ID");
-            break;
+    case H5I_GROUP:
+        if (NULL == (ret_value = H5O_OBJ_GROUP->get_oloc(object_id))) {
+            HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from group ID");
+        }
+        break;
 
-        case H5I_DATASET:
-            if (NULL == (ret_value = H5O_OBJ_DATASET->get_oloc(object_id)))
-                HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from dataset ID");
-            break;
+    case H5I_DATASET:
+        if (NULL == (ret_value = H5O_OBJ_DATASET->get_oloc(object_id))) {
+            HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from dataset ID");
+        }
+        break;
 
-        case H5I_DATATYPE:
-            if (NULL == (ret_value = H5O_OBJ_DATATYPE->get_oloc(object_id)))
-                HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from datatype ID");
-            break;
+    case H5I_DATATYPE:
+        if (NULL == (ret_value = H5O_OBJ_DATATYPE->get_oloc(object_id))) {
+            HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, NULL, "unable to get object location from datatype ID");
+        }
+        break;
 
-        case H5I_MAP:
-            HGOTO_ERROR(H5E_OHDR, H5E_BADTYPE, NULL, "maps not supported in native VOL connector");
+    case H5I_MAP: HGOTO_ERROR(H5E_OHDR, H5E_BADTYPE, NULL, "maps not supported in native VOL connector");
 
-        case H5I_UNINIT:
-        case H5I_BADID:
-        case H5I_FILE:
-        case H5I_DATASPACE:
-        case H5I_ATTR:
-        case H5I_VFL:
-        case H5I_VOL:
-        case H5I_GENPROP_CLS:
-        case H5I_GENPROP_LST:
-        case H5I_ERROR_CLASS:
-        case H5I_ERROR_MSG:
-        case H5I_ERROR_STACK:
-        case H5I_SPACE_SEL_ITER:
-        case H5I_EVENTSET:
-        case H5I_NTYPES:
-        default:
-            HGOTO_ERROR(H5E_OHDR, H5E_BADTYPE, NULL, "invalid object type");
+    case H5I_UNINIT:
+    case H5I_BADID:
+    case H5I_FILE:
+    case H5I_DATASPACE:
+    case H5I_ATTR:
+    case H5I_VFL:
+    case H5I_VOL:
+    case H5I_GENPROP_CLS:
+    case H5I_GENPROP_LST:
+    case H5I_ERROR_CLASS:
+    case H5I_ERROR_MSG:
+    case H5I_ERROR_STACK:
+    case H5I_SPACE_SEL_ITER:
+    case H5I_EVENTSET:
+    case H5I_NTYPES:
+    default                : HGOTO_ERROR(H5E_OHDR, H5E_BADTYPE, NULL, "invalid object type");
     } /* end switch */
 
 done:
@@ -1799,8 +1879,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_reset(H5O_loc_t *loc)
+herr_t H5O_loc_reset(H5O_loc_t* loc)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1824,8 +1903,7 @@ H5O_loc_reset(H5O_loc_t *loc)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_copy(H5O_loc_t *dst, H5O_loc_t *src, H5_copy_depth_t depth)
+herr_t H5O_loc_copy(H5O_loc_t* dst, H5O_loc_t* src, H5_copy_depth_t depth)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1835,10 +1913,12 @@ H5O_loc_copy(H5O_loc_t *dst, H5O_loc_t *src, H5_copy_depth_t depth)
     assert(depth == H5_COPY_SHALLOW || depth == H5_COPY_DEEP);
 
     /* Invoke correct routine */
-    if (depth == H5_COPY_SHALLOW)
+    if (depth == H5_COPY_SHALLOW) {
         H5O_loc_copy_shallow(dst, src);
-    else
+    }
+    else {
         H5O_loc_copy_deep(dst, src);
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5O_loc_copy() */
@@ -1856,8 +1936,7 @@ H5O_loc_copy(H5O_loc_t *dst, H5O_loc_t *src, H5_copy_depth_t depth)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_copy_shallow(H5O_loc_t *dst, H5O_loc_t *src)
+herr_t H5O_loc_copy_shallow(H5O_loc_t* dst, H5O_loc_t* src)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1886,8 +1965,7 @@ H5O_loc_copy_shallow(H5O_loc_t *dst, H5O_loc_t *src)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_copy_deep(H5O_loc_t *dst, const H5O_loc_t *src)
+herr_t H5O_loc_copy_deep(H5O_loc_t* dst, const H5O_loc_t* src)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1901,8 +1979,9 @@ H5O_loc_copy_deep(H5O_loc_t *dst, const H5O_loc_t *src)
     /* If the original entry was holding open the file, this one should
      * hold it open, too.
      */
-    if (src->holding_file)
+    if (src->holding_file) {
         H5F_INCR_NOPEN_OBJS(dst->file);
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5O_loc_copy_deep() */
@@ -1918,8 +1997,7 @@ H5O_loc_copy_deep(H5O_loc_t *dst, const H5O_loc_t *src)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_hold_file(H5O_loc_t *loc)
+herr_t H5O_loc_hold_file(H5O_loc_t* loc)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1948,8 +2026,7 @@ H5O_loc_hold_file(H5O_loc_t *loc)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_loc_free(H5O_loc_t *loc)
+herr_t H5O_loc_free(H5O_loc_t* loc)
 {
     herr_t ret_value = SUCCEED;
 
@@ -1963,8 +2040,9 @@ H5O_loc_free(H5O_loc_t *loc)
         H5F_DECR_NOPEN_OBJS(loc->file);
         loc->holding_file = false;
         if (H5F_NOPEN_OBJS(loc->file) <= 0) {
-            if (H5F_try_close(loc->file, NULL) < 0)
+            if (H5F_try_close(loc->file, NULL) < 0) {
                 HGOTO_ERROR(H5E_FILE, H5E_CANTCLOSEFILE, FAIL, "can't close file");
+            }
         }
     }
 
@@ -1982,10 +2060,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_hdr_info(const H5O_loc_t *loc, H5O_hdr_info_t *hdr)
+herr_t H5O_get_hdr_info(const H5O_loc_t* loc, H5O_hdr_info_t* hdr)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -1998,16 +2075,19 @@ H5O_get_hdr_info(const H5O_loc_t *loc, H5O_hdr_info_t *hdr)
     memset(hdr, 0, sizeof(*hdr));
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTLOAD, FAIL, "unable to load object header");
+    }
 
     /* Get the information for the object header */
-    if (H5O__get_hdr_info_real(oh, hdr) < 0)
+    if (H5O__get_hdr_info_real(oh, hdr) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't retrieve object header info");
+    }
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_PROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_get_hdr_info() */
@@ -2022,12 +2102,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__get_hdr_info_real(const H5O_t *oh, H5O_hdr_info_t *hdr)
+static herr_t H5O__get_hdr_info_real(const H5O_t* oh, H5O_hdr_info_t* hdr)
 {
-    const H5O_mesg_t  *curr_msg;   /* Pointer to current message being operated on */
-    const H5O_chunk_t *curr_chunk; /* Pointer to current message being operated on */
-    unsigned           u;          /* Local index variable */
+    const H5O_mesg_t* curr_msg;    /* Pointer to current message being operated on */
+    const H5O_chunk_t* curr_chunk; /* Pointer to current message being operated on */
+    unsigned u;                    /* Local index variable */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -2046,19 +2125,21 @@ H5O__get_hdr_info_real(const H5O_t *oh, H5O_hdr_info_t *hdr)
     hdr->flags = oh->flags;
 
     /* Iterate over all the messages, accumulating message size & type information */
-    hdr->space.meta   = (hsize_t)H5O_SIZEOF_HDR(oh) + (hsize_t)(H5O_SIZEOF_CHKHDR_OH(oh) * (oh->nchunks - 1));
-    hdr->space.mesg   = 0;
-    hdr->space.free   = 0;
+    hdr->space.meta = (hsize_t)H5O_SIZEOF_HDR(oh) + (hsize_t)(H5O_SIZEOF_CHKHDR_OH(oh) * (oh->nchunks - 1));
+    hdr->space.mesg = 0;
+    hdr->space.free = 0;
     hdr->mesg.present = 0;
-    hdr->mesg.shared  = 0;
+    hdr->mesg.shared = 0;
     for (u = 0, curr_msg = &oh->mesg[0]; u < oh->nmesgs; u++, curr_msg++) {
         uint64_t type_flag; /* Flag for message type */
 
         /* Accumulate space usage information, based on the type of message */
-        if (H5O_NULL_ID == curr_msg->type->id)
+        if (H5O_NULL_ID == curr_msg->type->id) {
             hdr->space.free += (hsize_t)((size_t)H5O_SIZEOF_MSGHDR_OH(oh) + curr_msg->raw_size);
-        else if (H5O_CONT_ID == curr_msg->type->id)
+        }
+        else if (H5O_CONT_ID == curr_msg->type->id) {
             hdr->space.meta += (hsize_t)((size_t)H5O_SIZEOF_MSGHDR_OH(oh) + curr_msg->raw_size);
+        }
         else {
             hdr->space.meta += (hsize_t)H5O_SIZEOF_MSGHDR_OH(oh);
             hdr->space.mesg += curr_msg->raw_size;
@@ -2069,8 +2150,9 @@ H5O__get_hdr_info_real(const H5O_t *oh, H5O_hdr_info_t *hdr)
         hdr->mesg.present |= type_flag;
 
         /* Set flag if the message is shared in some way */
-        if (curr_msg->flags & H5O_MSG_FLAG_SHARED)
+        if (curr_msg->flags & H5O_MSG_FLAG_SHARED) {
             hdr->mesg.shared |= type_flag;
+        }
     } /* end for */
 
     /* Iterate over all the chunks, adding any gaps to the free space */
@@ -2099,10 +2181,9 @@ H5O__get_hdr_info_real(const H5O_t *oh, H5O_hdr_info_t *hdr)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_info(const H5O_loc_t *loc, H5O_info2_t *oinfo, unsigned fields)
+herr_t H5O_get_info(const H5O_loc_t* loc, H5O_info2_t* oinfo, unsigned fields)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(loc->addr, FAIL)
@@ -2112,12 +2193,14 @@ H5O_get_info(const H5O_loc_t *loc, H5O_info2_t *oinfo, unsigned fields)
     assert(oinfo);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Reset the object info structure */
-    if (H5O__reset_info2(oinfo) < 0)
+    if (H5O__reset_info2(oinfo) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, FAIL, "can't reset object data struct");
+    }
 
     /* Get basic information, if requested */
     if (fields & H5O_INFO_BASIC) {
@@ -2127,12 +2210,14 @@ H5O_get_info(const H5O_loc_t *loc, H5O_info2_t *oinfo, unsigned fields)
         H5F_GET_FILENO(loc->file, oinfo->fileno);
 
         /* Set the object's address into the token */
-        if (H5VL_native_addr_to_token(loc->file, H5I_FILE, loc->addr, &oinfo->token) < 0)
+        if (H5VL_native_addr_to_token(loc->file, H5I_FILE, loc->addr, &oinfo->token) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTSERIALIZE, FAIL, "can't serialize address into object token");
+        }
 
         /* Get type of object */
-        if (H5O__obj_type_real(oh, &obj_type) < 0)
+        if (H5O__obj_type_real(oh, &obj_type) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to determine object type");
+        }
 
         /* Set the type of the object */
         oinfo->type = obj_type;
@@ -2162,36 +2247,44 @@ H5O_get_info(const H5O_loc_t *loc, H5O_info2_t *oinfo, unsigned fields)
             oinfo->btime = 0;
 
             /* Might be information for modification time */
-            if ((exists = H5O_msg_exists_oh(oh, H5O_MTIME_ID)) < 0)
+            if ((exists = H5O_msg_exists_oh(oh, H5O_MTIME_ID)) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_NOTFOUND, FAIL, "unable to check for MTIME message");
+            }
             if (exists > 0) {
                 /* Get "old style" modification time info */
-                if (NULL == H5O_msg_read_oh(loc->file, oh, H5O_MTIME_ID, &oinfo->ctime))
+                if (NULL == H5O_msg_read_oh(loc->file, oh, H5O_MTIME_ID, &oinfo->ctime)) {
                     HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't read MTIME message");
+                }
             } /* end if */
             else {
                 /* Check for "new style" modification time info */
-                if ((exists = H5O_msg_exists_oh(oh, H5O_MTIME_NEW_ID)) < 0)
+                if ((exists = H5O_msg_exists_oh(oh, H5O_MTIME_NEW_ID)) < 0) {
                     HGOTO_ERROR(H5E_OHDR, H5E_NOTFOUND, FAIL, "unable to check for MTIME_NEW message");
+                }
                 if (exists > 0) {
                     /* Get "new style" modification time info */
-                    if (NULL == H5O_msg_read_oh(loc->file, oh, H5O_MTIME_NEW_ID, &oinfo->ctime))
+                    if (NULL == H5O_msg_read_oh(loc->file, oh, H5O_MTIME_NEW_ID, &oinfo->ctime)) {
                         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't read MTIME_NEW message");
+                    }
                 } /* end if */
-                else
+                else {
                     oinfo->ctime = 0;
+                }
             } /* end else */
-        }     /* end else */
-    }         /* end if */
+        } /* end else */
+    } /* end if */
 
     /* Retrieve # of attributes */
-    if (fields & H5O_INFO_NUM_ATTRS)
-        if (H5O__attr_count_real(loc->file, oh, &oinfo->num_attrs) < 0)
+    if (fields & H5O_INFO_NUM_ATTRS) {
+        if (H5O__attr_count_real(loc->file, oh, &oinfo->num_attrs) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't retrieve attribute count");
+        }
+    }
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O_get_info() */
@@ -2206,10 +2299,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_native_info(const H5O_loc_t *loc, H5O_native_info_t *oinfo, unsigned fields)
+herr_t H5O_get_native_info(const H5O_loc_t* loc, H5O_native_info_t* oinfo, unsigned fields)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_TAG(loc->addr, FAIL)
@@ -2219,39 +2311,47 @@ H5O_get_native_info(const H5O_loc_t *loc, H5O_native_info_t *oinfo, unsigned fie
     assert(oinfo);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Reset the object info structure */
     memset(oinfo, 0, sizeof(*oinfo));
 
     /* Get the information for the object header, if requested */
-    if (fields & H5O_NATIVE_INFO_HDR)
-        if (H5O__get_hdr_info_real(oh, &oinfo->hdr) < 0)
+    if (fields & H5O_NATIVE_INFO_HDR) {
+        if (H5O__get_hdr_info_real(oh, &oinfo->hdr) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't retrieve object header info");
+        }
+    }
 
     /* Get B-tree & heap metadata storage size, if requested */
     if (fields & H5O_NATIVE_INFO_META_SIZE) {
-        const H5O_obj_class_t *obj_class = NULL; /* Class of object for header */
+        const H5O_obj_class_t* obj_class = NULL; /* Class of object for header */
 
         /* Get class for object */
-        if (H5O__obj_class_real(oh, &obj_class) < 0)
+        if (H5O__obj_class_real(oh, &obj_class) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to determine object class");
+        }
 
         /* Check for 'bh_info' callback for this type of object */
-        if (obj_class->bh_info)
+        if (obj_class->bh_info) {
             /* Call the object's class 'bh_info' routine */
-            if ((obj_class->bh_info)(loc, oh, &oinfo->meta_size.obj) < 0)
+            if ((obj_class->bh_info)(loc, oh, &oinfo->meta_size.obj) < 0) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't retrieve object's btree & heap info");
+            }
+        }
 
         /* Get B-tree & heap info for any attributes */
-        if (H5O__attr_bh_info(loc->file, oh, &oinfo->meta_size.attr) < 0)
+        if (H5O__attr_bh_info(loc->file, oh, &oinfo->meta_size.attr) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "can't retrieve attribute btree & heap info");
+        }
     } /* end if */
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5O_get_native_info() */
@@ -2266,10 +2366,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_create_plist(const H5O_loc_t *loc, H5P_genplist_t *oc_plist)
+herr_t H5O_get_create_plist(const H5O_loc_t* loc, H5P_genplist_t* oc_plist)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -2279,34 +2378,35 @@ H5O_get_create_plist(const H5O_loc_t *loc, H5P_genplist_t *oc_plist)
     assert(oc_plist);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Set property values, if they were used for the object */
     if (oh->version > H5O_VERSION_1) {
         uint8_t ohdr_flags; /* "User-visible" object header status flags */
 
         /* Set attribute storage values */
-        if (H5P_set(oc_plist, H5O_CRT_ATTR_MAX_COMPACT_NAME, &oh->max_compact) < 0)
-            HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, FAIL,
-                        "can't set max. # of compact attributes in property list");
-        if (H5P_set(oc_plist, H5O_CRT_ATTR_MIN_DENSE_NAME, &oh->min_dense) < 0)
+        if (H5P_set(oc_plist, H5O_CRT_ATTR_MAX_COMPACT_NAME, &oh->max_compact) < 0) {
+            HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, FAIL, "can't set max. # of compact attributes in property list");
+        }
+        if (H5P_set(oc_plist, H5O_CRT_ATTR_MIN_DENSE_NAME, &oh->min_dense) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTSET, FAIL, "can't set min. # of dense attributes in property list");
+        }
 
         /* Mask off non-"user visible" flags */
-        H5_CHECKED_ASSIGN(ohdr_flags, uint8_t,
-                          oh->flags & (H5O_HDR_ATTR_CRT_ORDER_TRACKED | H5O_HDR_ATTR_CRT_ORDER_INDEXED |
-                                       H5O_HDR_STORE_TIMES),
-                          int);
+        H5_CHECKED_ASSIGN(ohdr_flags, uint8_t, oh->flags&(H5O_HDR_ATTR_CRT_ORDER_TRACKED | H5O_HDR_ATTR_CRT_ORDER_INDEXED | H5O_HDR_STORE_TIMES), int);
 
         /* Set object header flags */
-        if (H5P_set(oc_plist, H5O_CRT_OHDR_FLAGS_NAME, &ohdr_flags) < 0)
+        if (H5P_set(oc_plist, H5O_CRT_OHDR_FLAGS_NAME, &ohdr_flags) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "can't set object header flags");
+        }
     } /* end if */
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_get_create_plist() */
@@ -2321,10 +2421,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_nlinks(const H5O_loc_t *loc, hsize_t *nlinks)
+herr_t H5O_get_nlinks(const H5O_loc_t* loc, hsize_t* nlinks)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -2334,15 +2433,17 @@ H5O_get_nlinks(const H5O_loc_t *loc, hsize_t *nlinks)
     assert(nlinks);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Retrieve the # of link messages seen when the object header was loaded */
     *nlinks = oh->link_msgs_seen;
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_get_nlinks() */
@@ -2357,11 +2458,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5O_obj_create(H5F_t *f, H5O_type_t obj_type, void *crt_info, H5G_loc_t *obj_loc)
+void* H5O_obj_create(H5F_t* f, H5O_type_t obj_type, void* crt_info, H5G_loc_t* obj_loc)
 {
-    size_t u;                /* Local index variable */
-    void  *ret_value = NULL; /* Return value */
+    size_t u;               /* Local index variable */
+    void* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI(NULL)
 
@@ -2377,13 +2477,14 @@ H5O_obj_create(H5F_t *f, H5O_type_t obj_type, void *crt_info, H5G_loc_t *obj_loc
         if (H5O_obj_class_g[u]->type == obj_type) {
             /* Call the object class's 'create' routine */
             assert(H5O_obj_class_g[u]->create);
-            if (NULL == (ret_value = H5O_obj_class_g[u]->create(f, crt_info, obj_loc)))
+            if (NULL == (ret_value = H5O_obj_class_g[u]->create(f, crt_info, obj_loc))) {
                 HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, NULL, "unable to open object");
+            }
 
             /* Break out of loop */
             break;
         } /* end if */
-    }     /* end for */
+    } /* end for */
     assert(ret_value);
 
 done:
@@ -2404,8 +2505,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE haddr_t
-H5O_get_oh_addr(const H5O_t *oh)
+H5_ATTR_PURE haddr_t H5O_get_oh_addr(const H5O_t* oh)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -2421,8 +2521,7 @@ H5O_get_oh_addr(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE uint8_t
-H5O_get_oh_flags(const H5O_t *oh)
+H5_ATTR_PURE uint8_t H5O_get_oh_flags(const H5O_t* oh)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
     assert(oh);
@@ -2438,8 +2537,7 @@ H5O_get_oh_flags(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE time_t
-H5O_get_oh_mtime(const H5O_t *oh)
+H5_ATTR_PURE time_t H5O_get_oh_mtime(const H5O_t* oh)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
     assert(oh);
@@ -2452,8 +2550,7 @@ H5O_get_oh_mtime(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE uint8_t
-H5O_get_oh_version(const H5O_t *oh)
+H5_ATTR_PURE uint8_t H5O_get_oh_version(const H5O_t* oh)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
     assert(oh);
@@ -2471,10 +2568,9 @@ H5O_get_oh_version(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_rc_and_type(const H5O_loc_t *loc, unsigned *rc, H5O_type_t *otype)
+herr_t H5O_get_rc_and_type(const H5O_loc_t* loc, unsigned* rc, H5O_type_t* otype)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -2483,21 +2579,26 @@ H5O_get_rc_and_type(const H5O_loc_t *loc, unsigned *rc, H5O_type_t *otype)
     assert(loc);
 
     /* Get the object header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to load object header");
+    }
 
     /* Set the object's reference count */
-    if (rc)
+    if (rc) {
         *rc = oh->nlink;
+    }
 
     /* Retrieve the type of the object */
-    if (otype)
-        if (H5O__obj_type_real(oh, otype) < 0)
+    if (otype) {
+        if (H5O__obj_type_real(oh, otype) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTINIT, FAIL, "unable to determine object type");
+        }
+    }
 
 done:
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_get_rc_and_type() */
@@ -2512,12 +2613,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__visit_cb(hid_t H5_ATTR_UNUSED group, const char *name, const H5O_loc_t *obj_oloc, void *_udata)
+static herr_t H5O__visit_cb(hid_t H5_ATTR_UNUSED group, const char* name, const H5O_loc_t* obj_oloc, void* _udata)
 {
-    H5O_iter_visit_ud_t *udata = (H5O_iter_visit_ud_t *)_udata; /* User data for callback */
-    H5O_info2_t          oinfo;                                 /* Object info */
-    herr_t               ret_value = H5_ITER_CONT;              /* Return value */
+    H5O_iter_visit_ud_t* udata = (H5O_iter_visit_ud_t*)_udata; /* User data for callback */
+    H5O_info2_t oinfo;                                         /* Object info */
+    herr_t ret_value = H5_ITER_CONT;                           /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -2527,15 +2627,16 @@ H5O__visit_cb(hid_t H5_ATTR_UNUSED group, const char *name, const H5O_loc_t *obj
     assert(udata);
 
     /* Get the object's info */
-    if (H5O_get_info(obj_oloc, &oinfo, udata->fields) < 0)
+    if (H5O_get_info(obj_oloc, &oinfo, udata->fields) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, H5_ITER_ERROR, "unable to get object info");
+    }
 
     /* Prepare & restore library for user callback */
     H5_BEFORE_USER_CB(FAIL)
-        {
-            /* Make the application callback */
-            ret_value = (udata->op)(udata->obj_id, name, &oinfo, udata->op_data);
-        }
+    {
+        /* Make the application callback */
+        ret_value = (udata->op)(udata->obj_id, name, &oinfo, udata->op_data);
+    }
     H5_AFTER_USER_CB(FAIL)
 
 done:
@@ -2573,22 +2674,20 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O__visit(H5G_loc_t *loc, const char *obj_name, H5_index_t idx_type, H5_iter_order_t order,
-           H5O_iterate2_t op, void *op_data, unsigned fields)
+herr_t H5O__visit(H5G_loc_t* loc, const char* obj_name, H5_index_t idx_type, H5_iter_order_t order, H5O_iterate2_t op, void* op_data, unsigned fields)
 {
-    H5O_iter_visit_ud_t udata;                       /* User data for callback */
-    H5G_loc_t           obj_loc;                     /* Location used to open object */
-    H5G_name_t          obj_path;                    /* Opened object group hier. path */
-    H5O_loc_t           obj_oloc;                    /* Opened object object location */
-    bool                loc_found = false;           /* Entry at 'name' found */
-    H5O_info2_t         oinfo;                       /* Object info struct */
-    H5O_info2_t         int_oinfo;                   /* Internal object info */
-    H5O_info2_t        *oinfop = &oinfo;             /* Object info pointer */
-    void               *obj    = NULL;               /* Object */
-    H5I_type_t          opened_type;                 /* ID type of object */
-    hid_t               obj_id    = H5I_INVALID_HID; /* ID of object */
-    herr_t              ret_value = FAIL;            /* Return value */
+    H5O_iter_visit_ud_t udata;      /* User data for callback */
+    H5G_loc_t obj_loc;              /* Location used to open object */
+    H5G_name_t obj_path;            /* Opened object group hier. path */
+    H5O_loc_t obj_oloc;             /* Opened object object location */
+    bool loc_found = false;         /* Entry at 'name' found */
+    H5O_info2_t oinfo;              /* Object info struct */
+    H5O_info2_t int_oinfo;          /* Internal object info */
+    H5O_info2_t* oinfop = &oinfo;   /* Object info pointer */
+    void* obj = NULL;               /* Object */
+    H5I_type_t opened_type;         /* ID type of object */
+    hid_t obj_id = H5I_INVALID_HID; /* ID of object */
+    herr_t ret_value = FAIL;        /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -2604,66 +2703,77 @@ H5O__visit(H5G_loc_t *loc, const char *obj_name, H5_index_t idx_type, H5_iter_or
     H5G_loc_reset(&obj_loc);
 
     /* Find the object's location */
-    if (H5G_loc_find(loc, obj_name, &obj_loc /*out*/) < 0)
+    if (H5G_loc_find(loc, obj_name, &obj_loc /*out*/) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_NOTFOUND, FAIL, "object not found");
+    }
     loc_found = true;
 
     /* Get the object's info */
-    if (H5O_get_info(&obj_oloc, &oinfo, fields) < 0)
+    if (H5O_get_info(&obj_oloc, &oinfo, fields) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to get object info");
+    }
 
     /* If basic fields are not requested, get object basic info to use here */
     if (!(fields & H5O_INFO_BASIC)) {
         oinfop = &int_oinfo;
         /* Get the object's basic info for local use */
-        if (H5O_get_info(&obj_oloc, &int_oinfo, H5O_INFO_BASIC) < 0)
+        if (H5O_get_info(&obj_oloc, &int_oinfo, H5O_INFO_BASIC) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTGET, FAIL, "unable to get object's basic info");
+        }
     }
 
     /* Open the object */
     /* (Takes ownership of the obj_loc information) */
-    if (NULL == (obj = H5O_open_by_loc(&obj_loc, &opened_type)))
+    if (NULL == (obj = H5O_open_by_loc(&obj_loc, &opened_type))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTOPENOBJ, FAIL, "unable to open object");
+    }
 
     /* Get an ID for the visited object */
-    if ((obj_id = H5VL_wrap_register(opened_type, obj, true)) < 0)
+    if ((obj_id = H5VL_wrap_register(opened_type, obj, true)) < 0) {
         HGOTO_ERROR(H5E_ID, H5E_CANTREGISTER, FAIL, "unable to register visited object");
+    }
 
     /* Make callback for starting object */
-    if ((ret_value = op(obj_id, ".", &oinfo, op_data)) < 0)
+    if ((ret_value = op(obj_id, ".", &oinfo, op_data)) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_BADITER, FAIL, "can't visit objects");
+    }
 
     /* Check return value of first callback */
-    if (ret_value != H5_ITER_CONT)
+    if (ret_value != H5_ITER_CONT) {
         HGOTO_DONE(ret_value);
+    }
 
     /* Check for object being a group */
     if (oinfop->type == H5O_TYPE_GROUP) {
         H5G_loc_t start_loc; /* Location of starting group */
 
         /* Get the location of the starting group */
-        if (H5G_loc(obj_id, &start_loc) < 0)
+        if (H5G_loc(obj_id, &start_loc) < 0) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a location");
+        }
 
         /* Set up user data for visiting links */
-        udata.obj_id  = obj_id;
-        udata.op      = op;
+        udata.obj_id = obj_id;
+        udata.op = op;
         udata.op_data = op_data;
-        udata.fields  = fields;
+        udata.fields = fields;
 
         /* Call internal group visitation routine */
-        if ((ret_value = H5G_visit(&start_loc, ".", idx_type, order, NULL, H5O__visit_cb, &udata)) < 0)
+        if ((ret_value = H5G_visit(&start_loc, ".", idx_type, order, NULL, H5O__visit_cb, &udata)) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_BADITER, FAIL, "object visitation failed");
+        }
     } /* end if */
 
 done:
     /* XXX (VOL MERGE): Probably also want to consider closing obj here on failures */
     if (obj_id != H5I_INVALID_HID) {
-        if (H5I_dec_app_ref(obj_id) < 0)
+        if (H5I_dec_app_ref(obj_id) < 0) {
             HDONE_ERROR(H5E_OHDR, H5E_CANTRELEASE, FAIL, "unable to close object");
+        }
     }
-    else if (loc_found && H5G_loc_free(&obj_loc) < 0)
+    else if (loc_found && H5G_loc_free(&obj_loc) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTRELEASE, FAIL, "can't free location");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O__visit() */
@@ -2677,8 +2787,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O__inc_rc(H5O_t *oh)
+herr_t H5O__inc_rc(H5O_t* oh)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -2688,9 +2797,11 @@ H5O__inc_rc(H5O_t *oh)
     assert(oh);
 
     /* Pin the object header when the reference count goes above 0 */
-    if (oh->rc == 0)
-        if (H5AC_pin_protected_entry(oh) < 0)
+    if (oh->rc == 0) {
+        if (H5AC_pin_protected_entry(oh) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTPIN, FAIL, "unable to pin object header");
+        }
+    }
 
     /* Increment reference count */
     oh->rc++;
@@ -2708,24 +2819,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O__dec_rc(H5O_t *oh)
+herr_t H5O__dec_rc(H5O_t* oh)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* check args */
-    if (!oh)
+    if (!oh) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid object header");
+    }
 
     /* Decrement reference count */
     oh->rc--;
 
     /* Unpin the object header when the reference count goes back to 0 */
-    if (oh->rc == 0)
-        if (H5AC_unpin_entry(oh) < 0)
+    if (oh->rc == 0) {
+        if (H5AC_unpin_entry(oh) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTUNPIN, FAIL, "unable to unpin object header");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -2741,10 +2854,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_dec_rc_by_loc(const H5O_loc_t *loc)
+herr_t H5O_dec_rc_by_loc(const H5O_loc_t* loc)
 {
-    H5O_t *oh        = NULL;    /* Object header */
+    H5O_t* oh = NULL;           /* Object header */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -2753,18 +2865,21 @@ H5O_dec_rc_by_loc(const H5O_loc_t *loc)
     assert(loc);
 
     /* Get header */
-    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false)))
+    if (NULL == (oh = H5O_protect(loc, H5AC__READ_ONLY_FLAG, false))) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTPROTECT, FAIL, "unable to protect object header");
+    }
 
     /* Decrement the reference count on the object header */
     /* (which will unpin it, if appropriate) */
-    if (H5O__dec_rc(oh) < 0)
+    if (H5O__dec_rc(oh) < 0) {
         HGOTO_ERROR(H5E_OHDR, H5E_CANTDEC, FAIL, "unable to decrement reference count on object header");
+    }
 
 done:
     /* Release the object header from the cache */
-    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0)
+    if (oh && H5O_unprotect(loc, oh, H5AC__NO_FLAGS_SET) < 0) {
         HDONE_ERROR(H5E_OHDR, H5E_CANTUNPROTECT, FAIL, "unable to release object header");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5O_dec_rc_by_loc() */
@@ -2778,8 +2893,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE H5AC_proxy_entry_t *
-H5O_get_proxy(const H5O_t *oh)
+H5_ATTR_PURE H5AC_proxy_entry_t* H5O_get_proxy(const H5O_t* oh)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2798,11 +2912,10 @@ H5O_get_proxy(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O__free(H5O_t *oh, bool H5_ATTR_NDEBUG_UNUSED force)
+herr_t H5O__free(H5O_t* oh, bool H5_ATTR_NDEBUG_UNUSED force)
 {
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -2814,10 +2927,11 @@ H5O__free(H5O_t *oh, bool H5_ATTR_NDEBUG_UNUSED force)
 
     /* Destroy chunks */
     if (oh->chunk) {
-        for (u = 0; u < oh->nchunks; u++)
+        for (u = 0; u < oh->nchunks; u++) {
             oh->chunk[u].image = H5FL_BLK_FREE(chunk_image, oh->chunk[u].image);
+        }
 
-        oh->chunk = (H5O_chunk_t *)H5FL_SEQ_FREE(H5O_chunk_t, oh->chunk);
+        oh->chunk = (H5O_chunk_t*)H5FL_SEQ_FREE(H5O_chunk_t, oh->chunk);
     } /* end if */
 
     /* Destroy messages */
@@ -2828,10 +2942,12 @@ H5O__free(H5O_t *oh, bool H5_ATTR_NDEBUG_UNUSED force)
              * dirty by decoding, or if this is a forced free (in case of
              * failure during creation of the object some messages may be dirty)
              */
-            if (oh->ndecode_dirtied && oh->mesg[u].dirty)
+            if (oh->ndecode_dirtied && oh->mesg[u].dirty) {
                 oh->ndecode_dirtied--;
-            else if (!force)
+            }
+            else if (!force) {
                 assert(oh->mesg[u].dirty == 0);
+            }
 #endif /* NDEBUG */
 
             H5O__msg_free_mesg(&oh->mesg[u]);
@@ -2840,13 +2956,15 @@ H5O__free(H5O_t *oh, bool H5_ATTR_NDEBUG_UNUSED force)
         /* Make sure we accounted for all the messages dirtied by decoding */
         assert(!oh->ndecode_dirtied);
 
-        oh->mesg = (H5O_mesg_t *)H5FL_SEQ_FREE(H5O_mesg_t, oh->mesg);
+        oh->mesg = (H5O_mesg_t*)H5FL_SEQ_FREE(H5O_mesg_t, oh->mesg);
     } /* end if */
 
     /* Destroy the proxy */
-    if (oh->proxy)
-        if (H5AC_proxy_entry_dest(oh->proxy) < 0)
+    if (oh->proxy) {
+        if (H5AC_proxy_entry_dest(oh->proxy) < 0) {
             HGOTO_ERROR(H5E_OHDR, H5E_CANTFREE, FAIL, "unable to destroy virtual entry used for proxy");
+        }
+    }
 
     /* destroy object header */
     oh = H5FL_FREE(H5O_t, oh);
@@ -2864,14 +2982,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5O__reset_info2(H5O_info2_t *oinfo)
+static herr_t H5O__reset_info2(H5O_info2_t* oinfo)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     /* Reset the passed-in info struct */
     memset(oinfo, 0, sizeof(H5O_info2_t));
-    oinfo->type  = H5O_TYPE_UNKNOWN;
+    oinfo->type = H5O_TYPE_UNKNOWN;
     oinfo->token = H5O_TOKEN_UNDEF;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -2886,8 +3003,7 @@ H5O__reset_info2(H5O_info2_t *oinfo)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE bool
-H5O_has_chksum(const H5O_t *oh)
+H5_ATTR_PURE bool H5O_has_chksum(const H5O_t* oh)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2904,8 +3020,7 @@ H5O_has_chksum(const H5O_t *oh)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5O_get_version_bound(H5F_libver_t bound, uint8_t *version)
+herr_t H5O_get_version_bound(H5F_libver_t bound, uint8_t* version)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 

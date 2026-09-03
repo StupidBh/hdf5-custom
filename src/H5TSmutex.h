@@ -54,11 +54,11 @@
 
 #ifdef H5_HAVE_C11_THREADS
 
-#define H5TS_mutex_lock(mutex)   (H5_UNLIKELY(mtx_lock(mutex) != thrd_success) ? FAIL : SUCCEED)
-#define H5TS_mutex_unlock(mutex) (H5_UNLIKELY(mtx_unlock(mutex) != thrd_success) ? FAIL : SUCCEED)
+    #define H5TS_mutex_lock(mutex)   (H5_UNLIKELY(mtx_lock(mutex) != thrd_success) ? FAIL : SUCCEED)
+    #define H5TS_mutex_unlock(mutex) (H5_UNLIKELY(mtx_unlock(mutex) != thrd_success) ? FAIL : SUCCEED)
 
 #else
-#ifdef H5_HAVE_WIN_THREADS
+    #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_mutex_lock
  *
@@ -68,8 +68,7 @@
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_mutex_lock(H5TS_mutex_t *mutex)
+static inline herr_t H5TS_mutex_lock(H5TS_mutex_t* mutex)
 {
     EnterCriticalSection(mutex);
 
@@ -85,17 +84,16 @@ H5TS_mutex_lock(H5TS_mutex_t *mutex)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_mutex_unlock(H5TS_mutex_t *mutex)
+static inline herr_t H5TS_mutex_unlock(H5TS_mutex_t* mutex)
 {
     LeaveCriticalSection(mutex);
 
     return SUCCEED;
 } /* end H5TS_mutex_unlock() */
-#else
+    #else
 
-#define H5TS_mutex_lock(mutex)   (H5_UNLIKELY(0 != pthread_mutex_lock(mutex)) ? FAIL : SUCCEED)
-#define H5TS_mutex_unlock(mutex) (H5_UNLIKELY(0 != pthread_mutex_unlock(mutex)) ? FAIL : SUCCEED)
+        #define H5TS_mutex_lock(mutex)   (H5_UNLIKELY(0 != pthread_mutex_lock(mutex)) ? FAIL : SUCCEED)
+        #define H5TS_mutex_unlock(mutex) (H5_UNLIKELY(0 != pthread_mutex_unlock(mutex)) ? FAIL : SUCCEED)
 
-#endif
+    #endif
 #endif

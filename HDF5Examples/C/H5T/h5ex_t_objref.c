@@ -24,30 +24,29 @@ Note: This example includes older cases from previous versions
 #define DIM0     2
 #define RANK     1
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file  = H5I_INVALID_HID; /* File Handle */
-    hid_t   space = H5I_INVALID_HID; /* Dataspace Handle */
-    hid_t   dset  = H5I_INVALID_HID; /* Dataset Handle */
-    hid_t   obj   = H5I_INVALID_HID; /* Object Handle */
-    herr_t  status;
-    hsize_t dims[1] = {DIM0};
+    hid_t file = H5I_INVALID_HID;  /* File Handle */
+    hid_t space = H5I_INVALID_HID; /* Dataspace Handle */
+    hid_t dset = H5I_INVALID_HID;  /* Dataset Handle */
+    hid_t obj = H5I_INVALID_HID;   /* Object Handle */
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
     ssize_t size;
-    char   *name = NULL;
-    int     ndims;
+    char* name = NULL;
+    int ndims;
     hsize_t i;
 
 #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-    hid_t      ref_type = H5T_STD_REF; /* Reference datatype */
-    H5R_ref_t  wdata[DIM0];            /* buffer to write to disk */
-    H5R_ref_t *rdata = NULL;           /* buffer to read into*/
-    H5O_type_t objtype;                /* Reference type */
+    hid_t ref_type = H5T_STD_REF; /* Reference datatype */
+    H5R_ref_t wdata[DIM0];        /* buffer to write to disk */
+    H5R_ref_t* rdata = NULL;      /* buffer to read into*/
+    H5O_type_t objtype;           /* Reference type */
 #else
-    hid_t       ref_type = H5T_STD_REF_OBJ; /* Reference datatype */
-    hobj_ref_t  wdata[DIM0];                /* Write buffer */
-    hobj_ref_t *rdata = NULL;               /* Read buffer */
-    H5O_type_t  objtype;
+    hid_t ref_type = H5T_STD_REF_OBJ; /* Reference datatype */
+    hobj_ref_t wdata[DIM0];           /* Write buffer */
+    hobj_ref_t* rdata = NULL;         /* Read buffer */
+    H5O_type_t objtype;
 #endif
 
     /*
@@ -58,15 +57,15 @@ main(void)
     /*
      * Create a dataset with a null dataspace.
      */
-    space  = H5Screate(H5S_NULL);
-    obj    = H5Dcreate(file, "DS2", H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    obj = H5Dcreate(file, "DS2", H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Dclose(obj);
     status = H5Sclose(space);
 
     /*
      * Create a group.
      */
-    obj    = H5Gcreate(file, "G1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    obj = H5Gcreate(file, "G1", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Gclose(obj);
 
     /*
@@ -94,7 +93,7 @@ main(void)
     /*
      * Create the dataset and write the object references to it.
      */
-    dset   = H5Dcreate(file, DATASET, ref_type, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset = H5Dcreate(file, DATASET, ref_type, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Dwrite(dset, ref_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
 
     /*
@@ -128,9 +127,9 @@ main(void)
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
 
 #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-    rdata = (H5R_ref_t *)malloc(dims[0] * sizeof(H5R_ref_t));
+    rdata = (H5R_ref_t*)malloc(dims[0] * sizeof(H5R_ref_t));
 #else
-    rdata = (hobj_ref_t *)malloc(dims[0] * sizeof(hobj_ref_t));
+    rdata = (hobj_ref_t*)malloc(dims[0] * sizeof(hobj_ref_t));
 #endif
     /*
      * Read the data.
@@ -147,15 +146,15 @@ main(void)
          * Open the referenced object, get its name and type.
          */
 #if H5_VERSION_GE(1, 10, 0) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-#if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
-        obj    = H5Ropen_object(&rdata[i], H5P_DEFAULT, H5P_DEFAULT);
+    #if H5_VERSION_GE(1, 12, 0) && !defined(H5_USE_110_API) && !defined(H5_USE_18_API) && !defined(H5_USE_16_API)
+        obj = H5Ropen_object(&rdata[i], H5P_DEFAULT, H5P_DEFAULT);
         status = H5Rget_obj_type3(&rdata[i], H5P_DEFAULT, &objtype);
-#else
-        obj    = H5Rdereference(dset, H5P_DEFAULT, H5R_OBJECT, &rdata[i]);
+    #else
+        obj = H5Rdereference(dset, H5P_DEFAULT, H5R_OBJECT, &rdata[i]);
         status = H5Rget_obj_type(dset, H5R_OBJECT, &rdata[i], &objtype);
-#endif
+    #endif
 #else
-        obj    = H5Rdereference(dset, H5R_OBJECT, &rdata[i]);
+        obj = H5Rdereference(dset, H5R_OBJECT, &rdata[i]);
         status = H5Rget_obj_type(dset, H5R_OBJECT, &rdata[i], &objtype);
 #endif
 
@@ -164,28 +163,19 @@ main(void)
          * the name.
          */
         size = 1 + H5Iget_name(obj, NULL, 0);
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
         size = H5Iget_name(obj, name, size);
 
         /*
          * Print the object type and close the object.
          */
         switch (objtype) {
-            case H5O_TYPE_GROUP:
-                printf("Group");
-                break;
-            case H5O_TYPE_DATASET:
-                printf("Dataset");
-                break;
-            case H5O_TYPE_NAMED_DATATYPE:
-                printf("Named Datatype");
-                break;
-            case H5O_TYPE_MAP:
-                printf("Map Object");
-                break;
-            case H5O_TYPE_UNKNOWN:
-            case H5O_TYPE_NTYPES:
-                printf("Unknown");
+        case H5O_TYPE_GROUP         : printf("Group"); break;
+        case H5O_TYPE_DATASET       : printf("Dataset"); break;
+        case H5O_TYPE_NAMED_DATATYPE: printf("Named Datatype"); break;
+        case H5O_TYPE_MAP           : printf("Map Object"); break;
+        case H5O_TYPE_UNKNOWN       :
+        case H5O_TYPE_NTYPES        : printf("Unknown");
         }
         status = H5Oclose(obj);
 

@@ -21,8 +21,7 @@ using namespace std;
 #define TEST_FILE "packettest.h5"
 
 /* Main test function */
-int
-main(void)
+int main(void)
 {
     herr_t err;
     herr_t num_errors = 0;
@@ -34,7 +33,6 @@ main(void)
         num_errors = 1;
     }
     else {
-
         num_errors += BasicTest();
 
         num_errors += TestCompoundDatatype();
@@ -63,41 +61,46 @@ main(void)
         remove(TEST_FILE);
     }
 
-    if (num_errors == 0)
+    if (num_errors == 0) {
         /* ALL TESTS PASSED */
         return 0;
-    else
+    }
+    else {
         /* ERRORS */
         return -1;
+    }
 }
 
-const char *BASICTEST_PT("/basicTest");
-int
-BasicTest()
+const char* BASICTEST_PT("/basicTest");
+
+int BasicTest()
 {
-    herr_t  err;
-    int     myRecord;
+    herr_t err;
+    int myRecord;
     hsize_t count;
-    int     error;
+    int error;
 
     printf("Testing %-62s", "basic functionality");
     fflush(stdout);
 
     FL_PacketTable wrapper(fileID, H5P_DEFAULT, BASICTEST_PT, H5T_NATIVE_INT, 1);
-    if (!wrapper.IsValid())
+    if (!wrapper.IsValid()) {
         goto error;
+    }
 
     /* Ensure initial count is zero */
     count = wrapper.GetPacketCount(error);
-    if (count != 0 || error != 0)
+    if (count != 0 || error != 0) {
         goto error;
+    }
 
     myRecord = 1;
 
     /* add some records test */
     err = wrapper.AppendPacket(&myRecord);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
 
     myRecord = 2;
 
@@ -105,22 +108,27 @@ BasicTest()
 
     /* get number of records test */
     count = wrapper.GetPacketCount();
-    if (count != 2)
+    if (count != 2) {
         goto error;
+    }
 
     /* get records test */
     err = wrapper.GetPacket(0, &myRecord);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
 
-    if (myRecord != 1)
+    if (myRecord != 1) {
         goto error;
+    }
 
     err = wrapper.GetPacket(1, &myRecord);
-    if (err < 0)
+    if (err < 0) {
         goto error;
-    if (myRecord != 2)
+    }
+    if (myRecord != 2) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -130,21 +138,22 @@ error:
     return 1;
 }
 
-const char *CMPDTEST_PT("/compoundTest");
-int
-TestCompoundDatatype()
+const char* CMPDTEST_PT("/compoundTest");
+
+int TestCompoundDatatype()
 {
-    hid_t   dtypeID;
+    hid_t dtypeID;
     hsize_t count;
-    int     error;
+    int error;
 
     printf("Testing %-62s", "compound datatypes");
     fflush(stdout);
 
     /* Create compound datatype */
-    typedef struct {
+    typedef struct
+    {
         short a, b, c;
-        int   e;
+        int e;
     } compoundType;
 
     dtypeID = H5Tcreate(H5T_COMPOUND, sizeof(compoundType));
@@ -157,31 +166,35 @@ TestCompoundDatatype()
     /* Create packet table using default property list. */
     FL_PacketTable wrapper(fileID, H5P_DEFAULT, CMPDTEST_PT, dtypeID, 1);
 
-    if (!wrapper.IsValid())
+    if (!wrapper.IsValid()) {
         goto error;
+    }
 
     compoundType first;
     first.a = 1;
     first.b = first.c = 3;
-    first.e           = 5;
+    first.e = 5;
 
     /* Write packet */
     wrapper.AppendPacket(&first);
 
     count = wrapper.GetPacketCount(error);
-    if (count != 1)
+    if (count != 1) {
         goto error;
+    }
 
     first.a = first.b = first.c = 0;
-    first.e                     = 0;
+    first.e = 0;
 
     /* Read packet back */
     wrapper.GetPacket(0, &first);
 
-    if (first.a != 1)
+    if (first.a != 1) {
         goto error;
-    if (first.e != 5)
+    }
+    if (first.e != 5) {
         goto error;
+    }
 
     PASSED();
 
@@ -200,9 +213,9 @@ error:
     return 1;
 }
 
-const char *GETNEXT_PT("/TestGetNext");
-int
-TestGetNext()
+const char* GETNEXT_PT("/TestGetNext");
+
+int TestGetNext()
 {
     int error;
     int record;
@@ -215,49 +228,59 @@ TestGetNext()
     /* Create a dataset */
     FL_PacketTable wrapper(fileID, H5P_DEFAULT, GETNEXT_PT, H5T_NATIVE_INT, 500);
 
-    if (!wrapper.IsValid())
+    if (!wrapper.IsValid()) {
         goto error;
+    }
 
     /* Append 5 records to the dataset */
-    for (record = 1; record < 6; record++)
+    for (record = 1; record < 6; record++) {
         wrapper.AppendPacket(&record);
+    }
 
     /* Ensure that we can iterate through the records and get the right ones */
     for (i = 1; i < 6; i++) {
         wrapper.GetNextPacket(&record);
-        if (record != i)
+        if (record != i) {
             goto error;
+        }
     }
 
     /* Reset the index and check that it worked */
     wrapper.ResetIndex();
-    if (wrapper.GetIndex(error) != 0)
+    if (wrapper.GetIndex(error) != 0) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
 
     /* Ensure that we can iterate through the records and get the right ones */
     for (i = 1; i < 6; i++) {
         error = wrapper.GetNextPacket(&record);
-        if (record != i || error < 0)
+        if (record != i || error < 0) {
             goto error;
+        }
     }
 
     wrapper.SetIndex(1);
-    if (wrapper.GetIndex(error) != 1)
+    if (wrapper.GetIndex(error) != 1) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
 
     /* Ensure we can get multiple records with our index pointer */
     wrapper.GetNextPackets(2, records);
-    if (records[0] != 2 || records[1] != 3)
+    if (records[0] != 2 || records[1] != 3) {
         goto error;
+    }
 
     /* Ensure our pointer was updated correctly */
     wrapper.GetNextPacket(&record);
-    if (record != 4)
+    if (record != 4) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -267,14 +290,14 @@ error:
     return 1;
 }
 
-const char *COMPRESS_PT("/compressTest");
-int
-TestCompress()
+const char* COMPRESS_PT("/compressTest");
+
+int TestCompress()
 {
 #ifdef H5_HAVE_FILTER_DEFLATE
-    unsigned int flags      = 0;
-    unsigned int config     = 0;
-    size_t       cd_nelemts = 0;
+    unsigned int flags = 0;
+    unsigned int config = 0;
+    size_t cd_nelemts = 0;
 
     printf("Testing %-62s", "compression");
     fflush(stdout);
@@ -303,10 +326,11 @@ TestCompress()
 
         char filter_name[8];
         dcpl.getFilterById(H5Z_FILTER_DEFLATE, flags, cd_nelemts, NULL, 8, filter_name, config);
-        if (strncmp(filter_name, "deflate", 7) != 0)
+        if (strncmp(filter_name, "deflate", 7) != 0) {
             H5_FAILED();
+        }
     }
-    catch (Exception const &) {
+    catch (Exception const&) {
         H5_FAILED();
         return 1;
     }
@@ -318,9 +342,9 @@ TestCompress()
     return 0;
 }
 
-const char *PT_TESTGETPT = "/TestGetPacket";
-int
-TestGetPacket()
+const char* PT_TESTGETPT = "/TestGetPacket";
+
+int TestGetPacket()
 {
     int record;
     int theRecs[3];
@@ -332,23 +356,27 @@ TestGetPacket()
        there is no compression. */
     FL_PacketTable wrapper(fileID, PT_TESTGETPT, H5T_NATIVE_INT, 1);
 
-    if (!wrapper.IsValid())
+    if (!wrapper.IsValid()) {
         goto error;
+    }
 
     /* Append 5 records to the dataset */
-    for (record = 1; record < 6; record++)
+    for (record = 1; record < 6; record++) {
         wrapper.AppendPacket(&record);
+    }
 
     /* Ensure that the records were written properly */
     wrapper.GetPacket(1, &record);
-    if (record != 2)
+    if (record != 2) {
         goto error;
+    }
 
     /* Ensure that we can retrieve multiple records */
     wrapper.GetPackets(1, 3, theRecs);
     for (i = 0; i < 3; i++) {
-        if (theRecs[i] != i + 2)
+        if (theRecs[i] != i + 2) {
             goto error;
+        }
     }
 
     PASSED();
@@ -359,10 +387,9 @@ error:
     return 1;
 }
 
-const char *PT_TESTERROR = "/TestErrors";
+const char* PT_TESTERROR = "/TestErrors";
 
-int
-TestErrors()
+int TestErrors()
 {
     printf("Testing %-62s", "error conditions");
     fflush(stdout);
@@ -370,105 +397,137 @@ TestErrors()
     /* Create a dataset */
     FL_PacketTable wrapper(fileID, PT_TESTERROR, H5T_NATIVE_INT, 1);
 
-    if (!wrapper.IsValid())
+    if (!wrapper.IsValid()) {
         goto error;
+    }
 
     int record;
     int records[3];
     int error;
 
     /* Append 4 records to the dataset */
-    for (record = 1; record < 5; record++)
+    for (record = 1; record < 5; record++) {
         wrapper.AppendPacket(&record);
+    }
 
     /* Try to confuse functions with bad indexes */
     error = wrapper.GetPacket(static_cast<unsigned>(-1), &record);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPacket(4, &record);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPacket(static_cast<unsigned>(-250), &record);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPacket(3000, &record);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPacket(1, &record);
-    if (error < 0)
+    if (error < 0) {
         goto error;
+    }
 
     error = wrapper.GetPackets(static_cast<unsigned>(-1), 1, records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPackets(2, 4, records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPackets(static_cast<unsigned>(-60), static_cast<unsigned>(-62), records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPackets(10, 12, records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPackets(0, 2, records);
-    if (error < 0)
+    if (error < 0) {
         goto error;
+    }
     error = wrapper.GetPackets(2, 0, records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetPackets(1, 1, records);
-    if (error < 0)
+    if (error < 0) {
         goto error;
+    }
     error = wrapper.GetPackets(1, 3, records);
-    if (error < 0)
+    if (error < 0) {
         goto error;
+    }
 
     wrapper.ResetIndex();
     error = wrapper.SetIndex(static_cast<unsigned>(-1));
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
-    if (wrapper.GetIndex(error) != 0)
+    }
+    if (wrapper.GetIndex(error) != 0) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
     error = wrapper.GetNextPacket(&record);
-    if (error < 0)
+    if (error < 0) {
         goto error;
-    if (record != 1)
+    }
+    if (record != 1) {
         goto error;
-    if (wrapper.GetIndex(error) != 1)
+    }
+    if (wrapper.GetIndex(error) != 1) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
     error = wrapper.SetIndex(20);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetNextPacket(&record);
-    if (error < 0)
+    if (error < 0) {
         goto error;
-    if (record != 2)
+    }
+    if (record != 2) {
         goto error;
+    }
     wrapper.SetIndex(3);
     error = wrapper.GetNextPacket(&record);
-    if (error < 0)
+    if (error < 0) {
         goto error;
-    if (record != 4)
+    }
+    if (record != 4) {
         goto error;
-    if (wrapper.GetIndex(error) != 4)
+    }
+    if (wrapper.GetIndex(error) != 4) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
     error = wrapper.GetNextPacket(&record);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
 
     wrapper.ResetIndex();
     error = wrapper.GetNextPackets(10, records);
-    if (error >= 0)
+    if (error >= 0) {
         goto error;
+    }
     error = wrapper.GetNextPackets(0, records);
-    if (error < 0)
+    if (error < 0) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -478,23 +537,24 @@ error:
     return 1;
 }
 
-const char *PT_SYSTEMTST1 = "/SystemTest1";
-const char *PT_SYSTEMTST2 = "/SystemTest2";
-int
-SystemTest()
+const char* PT_SYSTEMTST1 = "/SystemTest1";
+const char* PT_SYSTEMTST2 = "/SystemTest2";
+
+int SystemTest()
 {
     printf("Testing %-62s", "multiple datatypes");
     fflush(stdout);
 
-    hid_t   dtypeID1, dtypeID2;
+    hid_t dtypeID1, dtypeID2;
     hsize_t count;
-    int     error;
+    int error;
 
     /* Creating two inter-related datatypes.  Create two datasets and put
      * one datatype in each. */
-    typedef struct {
+    typedef struct
+    {
         short a, b, c;
-        int   e;
+        int e;
     } compoundType;
 
     dtypeID1 = H5Tcreate(H5T_COMPOUND, sizeof(compoundType));
@@ -504,8 +564,9 @@ SystemTest()
     H5Tinsert(dtypeID1, "charlie", HOFFSET(compoundType, c), H5T_NATIVE_SHORT);
     H5Tinsert(dtypeID1, "ebert", HOFFSET(compoundType, e), H5T_NATIVE_INT);
 
-    typedef struct {
-        char         f;
+    typedef struct
+    {
+        char f;
         compoundType g;
     } cType2;
 
@@ -515,7 +576,7 @@ SystemTest()
     H5Tinsert(dtypeID2, "g", HOFFSET(cType2, g), dtypeID1);
 
     cType2 ct2[10];
-    ct2[0].f   = 'h';
+    ct2[0].f = 'h';
     ct2[0].g.a = 9;
     ct2[0].g.b = -13;
     ct2[0].g.c = 0;
@@ -525,17 +586,20 @@ SystemTest()
     FL_PacketTable wrapper1(fileID, PT_SYSTEMTST1, dtypeID1, 1);
     FL_PacketTable wrapper2(fileID, H5P_DEFAULT, PT_SYSTEMTST2, dtypeID2, 1);
 
-    if (!wrapper1.IsValid())
+    if (!wrapper1.IsValid()) {
         goto error;
-    if (!wrapper2.IsValid())
+    }
+    if (!wrapper2.IsValid()) {
         goto error;
+    }
 
     /* Write and read packets, ensure that nothing is unusual */
     wrapper2.AppendPacket(ct2);
 
     count = wrapper1.GetPacketCount();
-    if (count != 0)
+    if (count != 0) {
         goto error;
+    }
 
     compoundType ct1[10];
     ct1[0].a = 31;
@@ -552,17 +616,22 @@ SystemTest()
     wrapper1.ResetIndex();
     wrapper1.GetNextPacket(&ct1[1]);
     wrapper2.GetPacket(1, &ct2[2]);
-    if (wrapper1.GetIndex(error) != 1)
+    if (wrapper1.GetIndex(error) != 1) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
-    if (wrapper2.GetIndex(error) != 0)
+    }
+    if (wrapper2.GetIndex(error) != 0) {
         goto error;
-    if (error < 0)
+    }
+    if (error < 0) {
         goto error;
+    }
 
-    if (ct1[1].b != ct2[2].g.b)
+    if (ct1[1].b != ct2[2].g.b) {
         goto error;
+    }
 
     H5Tclose(dtypeID1);
     H5Tclose(dtypeID2);
@@ -598,21 +667,23 @@ error:
  *-------------------------------------------------------------------------
  */
 #pragma pack() // default alignment
-const char   *ABHI_PT("/abhiTest");
-const hsize_t NUM_PACKETS   = 5;
-const int     STRING_LENGTH = 19; // including terminating NULL
-int
-TestHDFFV_9758()
+const char* ABHI_PT("/abhiTest");
+const hsize_t NUM_PACKETS = 5;
+const int STRING_LENGTH = 19; // including terminating NULL
+
+int TestHDFFV_9758()
 {
-    hid_t  strtype       = H5I_INVALID_HID;
-    hid_t  compound_type = H5I_INVALID_HID;
+    hid_t strtype = H5I_INVALID_HID;
+    hid_t compound_type = H5I_INVALID_HID;
     herr_t err;
-    struct s1_t {
-        int    a;
-        float  b;
+
+    struct s1_t
+    {
+        int a;
+        float b;
         double c;
-        char   d[STRING_LENGTH]; // null terminated string
-        int    e;
+        char d[STRING_LENGTH]; // null terminated string
+        int e;
     };
 
     s1_t s1[NUM_PACKETS];
@@ -630,55 +701,65 @@ TestHDFFV_9758()
 
     // Build a compound datatype
     compound_type = H5Tcreate(H5T_COMPOUND, sizeof(s1_t));
-    if (compound_type < 0)
+    if (compound_type < 0) {
         goto error;
+    }
 
     err = H5Tinsert(compound_type, "a_name", HOFFSET(s1_t, a), H5T_NATIVE_INT);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
     err = H5Tinsert(compound_type, "b_name", HOFFSET(s1_t, b), H5T_NATIVE_FLOAT);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
     err = H5Tinsert(compound_type, "c_name", HOFFSET(s1_t, c), H5T_NATIVE_DOUBLE);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
 
     strtype = H5Tcopy(H5T_C_S1);
-    if (compound_type < 0)
+    if (compound_type < 0) {
         goto error;
+    }
     err = H5Tset_size(strtype, STRING_LENGTH); /* create string */
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
     err = H5Tinsert(compound_type, "d_name", HOFFSET(s1_t, d), strtype);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
     err = H5Tinsert(compound_type, "e_name", HOFFSET(s1_t, e), H5T_NATIVE_INT);
-    if (err < 0)
+    if (err < 0) {
         goto error;
+    }
 
     { // so ptable will go out of scope before PASSED
 
         // Create a packet table
         FL_PacketTable ptable(fileID, "/examplePacketTable", compound_type, 1);
-        if (!ptable.IsValid())
+        if (!ptable.IsValid()) {
             goto error;
+        }
 
         // Add packets to the table
         for (size_t i = 0; i < NUM_PACKETS; i++) {
             /* Appends one packet at the current position */
             err = ptable.AppendPacket(s1 + i);
-            if (err < 0)
+            if (err < 0) {
                 goto error;
+            }
         }
 
         // Check packet count
         const hsize_t count = ptable.GetPacketCount(err);
-        if (err < 0)
+        if (err < 0) {
             goto error;
+        }
 
         if (count != NUM_PACKETS) {
-            std::cerr << "Number of packets in packet table should be " << NUM_PACKETS << " but is " << count
-                      << endl;
+            std::cerr << "Number of packets in packet table should be " << NUM_PACKETS << " but is " << count << endl;
         }
 
         // Read and verify the data
@@ -687,13 +768,16 @@ TestHDFFV_9758()
             s1_t s2;
             memset(&s2, 0, sizeof(s1_t));
             err = ptable.GetNextPacket(&s2);
-            if (err < 0)
+            if (err < 0) {
                 goto error;
+            }
 
-            if (s2.a != s1[i].a || s2.e != s1[i].e)
+            if (s2.a != s1[i].a || s2.e != s1[i].e) {
                 goto error;
-            else if (strcmp(s2.d, s1[i].d) != 0)
+            }
+            else if (strcmp(s2.d, s1[i].d) != 0) {
                 goto error;
+            }
         }
     } // end of ptable block
 

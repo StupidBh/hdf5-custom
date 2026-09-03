@@ -39,21 +39,22 @@
  *
  *-------------------------------------------------------------------------
  */
-static unsigned
-init_full(uint8_t *array, size_t nx, size_t ny, size_t nz)
+static unsigned init_full(uint8_t* array, size_t nx, size_t ny, size_t nz)
 {
-    uint8_t  acc   = 128;
+    uint8_t acc = 128;
     unsigned total = 0;
-    size_t   i, j, k;
+    size_t i, j, k;
 
-    for (i = 0; i < nx; i++)
-        for (j = 0; j < ny; j++)
+    for (i = 0; i < nx; i++) {
+        for (j = 0; j < ny; j++) {
             for (k = 0; k < nz; k++) {
                 total += acc;
                 *array = acc;
                 acc++;
                 array++;
             } /* end for */
+        }
+    }
 
     return total;
 } /* end init_full() */
@@ -67,24 +68,28 @@ init_full(uint8_t *array, size_t nx, size_t ny, size_t nz)
  *
  *-------------------------------------------------------------------------
  */
-static void
-print_array(uint8_t *array, size_t nx, size_t ny, size_t nz)
+static void print_array(uint8_t* array, size_t nx, size_t ny, size_t nz)
 {
     size_t i, j, k;
 
     for (i = 0; i < nx; i++) {
-        if (nz > 1)
+        if (nz > 1) {
             printf("i=%lu:\n", (unsigned long)i);
-        else
+        }
+        else {
             printf("%03lu:", (unsigned long)i);
+        }
 
         for (j = 0; j < ny; j++) {
-            if (nz > 1)
+            if (nz > 1) {
                 printf("%03lu:", (unsigned long)j);
-            for (k = 0; k < nz; k++)
+            }
+            for (k = 0; k < nz; k++) {
                 printf(" %3d", *array++);
-            if (nz > 1)
+            }
+            if (nz > 1) {
                 printf("\n");
+            }
         } /* end for */
         printf("\n");
     } /* end for */
@@ -101,12 +106,11 @@ print_array(uint8_t *array, size_t nx, size_t ny, size_t nz)
  *
  *-------------------------------------------------------------------------
  */
-static void
-print_ref(size_t nx, size_t ny, size_t nz)
+static void print_ref(size_t nx, size_t ny, size_t nz)
 {
-    uint8_t *array;
+    uint8_t* array;
 
-    if (NULL != (array = (uint8_t *)malloc(nx * ny * nz))) {
+    if (NULL != (array = (uint8_t*)malloc(nx * ny * nz))) {
         printf("Reference array:\n");
         init_full(array, nx, ny, nz);
         print_array(array, nx, ny, nz);
@@ -125,21 +129,19 @@ print_ref(size_t nx, size_t ny, size_t nz)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size_t ddx, size_t ddy,
-          size_t ddz)
+static herr_t test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size_t ddx, size_t ddy, size_t ddz)
 {
-    uint8_t *dst = NULL;          /*destination array        */
-    hsize_t  hs_size[3];          /*hyperslab size        */
-    hsize_t  dst_size[3];         /*destination total size    */
-    hsize_t  dst_offset[3];       /*offset of hyperslab in dest   */
-    unsigned ref_value;           /*reference value        */
-    unsigned acc;                 /*accumulator                */
-    size_t   i, j, k, dx, dy, dz; /*counters               */
-    size_t   u, v, w;
-    unsigned ndims;           /*hyperslab dimensionality    */
-    char     dim[64], s[256]; /*temp string                */
-    unsigned fill_value;      /*fill value                */
+    uint8_t* dst = NULL;        /*destination array        */
+    hsize_t hs_size[3];         /*hyperslab size        */
+    hsize_t dst_size[3];        /*destination total size    */
+    hsize_t dst_offset[3];      /*offset of hyperslab in dest   */
+    unsigned ref_value;         /*reference value        */
+    unsigned acc;               /*accumulator                */
+    size_t i, j, k, dx, dy, dz; /*counters               */
+    size_t u, v, w;
+    unsigned ndims;             /*hyperslab dimensionality    */
+    char dim[64], s[256];       /*temp string                */
+    unsigned fill_value;        /*fill value                */
 
     /*
      * Dimensionality.
@@ -152,10 +154,10 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
         } /* end if */
         else {
             ndims = 2;
-            nz    = 1;
+            nz = 1;
             snprintf(dim, sizeof(dim), "%lux%lu", (unsigned long)nx, (unsigned long)ny);
         } /* end else */
-    }     /* end if */
+    } /* end if */
     else {
         ndims = 3;
         snprintf(dim, sizeof(dim), "%lux%lux%lu", (unsigned long)nx, (unsigned long)ny, (unsigned long)nz);
@@ -165,8 +167,9 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
     fflush(stdout);
 
     /* Allocate array */
-    if (NULL == (dst = (uint8_t *)calloc((size_t)1, nx * ny * nz)))
+    if (NULL == (dst = (uint8_t*)calloc((size_t)1, nx * ny * nz))) {
         TEST_ERROR;
+    }
 
     init_full(dst, nx, ny, nz);
 
@@ -176,17 +179,16 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
                 for (dx = 1; dx <= nx - i; dx += ddx) {
                     for (dy = 1; dy <= ny - j; dy += ddy) {
                         for (dz = 1; dz <= nz - k; dz += ddz) {
-
                             /* Describe the hyperslab */
-                            dst_size[0]   = nx;
-                            dst_size[1]   = ny;
-                            dst_size[2]   = nz;
+                            dst_size[0] = nx;
+                            dst_size[1] = ny;
+                            dst_size[2] = nz;
                             dst_offset[0] = i;
                             dst_offset[1] = j;
                             dst_offset[2] = k;
-                            hs_size[0]    = dx;
-                            hs_size[1]    = dy;
-                            hs_size[2]    = dz;
+                            hs_size[0] = dx;
+                            hs_size[1] = dy;
+                            hs_size[2] = dz;
 
                             for (fill_value = 0; fill_value < 256; fill_value += 64) {
                                 /*
@@ -194,10 +196,13 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
                                  * original * fill values and add the new ones.
                                  */
                                 ref_value = init_full(dst, nx, ny, nz);
-                                for (u = (size_t)dst_offset[0]; u < dst_offset[0] + dx; u++)
-                                    for (v = (size_t)dst_offset[1]; v < dst_offset[1] + dy; v++)
-                                        for (w = (size_t)dst_offset[2]; w < dst_offset[2] + dz; w++)
+                                for (u = (size_t)dst_offset[0]; u < dst_offset[0] + dx; u++) {
+                                    for (v = (size_t)dst_offset[1]; v < dst_offset[1] + dy; v++) {
+                                        for (w = (size_t)dst_offset[2]; w < dst_offset[2] + dz; w++) {
                                             ref_value -= dst[u * ny * nz + v * nz + w];
+                                        }
+                                    }
+                                }
                                 ref_value += fill_value * (unsigned)dx * (unsigned)dy * (unsigned)dz;
 
                                 /* Fill the hyperslab with some value */
@@ -208,10 +213,13 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
                                  * reference value.
                                  */
                                 acc = 0;
-                                for (u = 0; u < nx; u++)
-                                    for (v = 0; v < ny; v++)
-                                        for (w = 0; w < nz; w++)
+                                for (u = 0; u < nx; u++) {
+                                    for (v = 0; v < ny; v++) {
+                                        for (w = 0; w < nz; w++) {
                                             acc += dst[u * ny * nz + v * nz + w];
+                                        }
+                                    }
+                                }
 
                                 if (acc != ref_value) {
                                     H5_FAILED();
@@ -222,25 +230,30 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
                                          */
                                         AT();
                                         printf("   acc != ref_value\n");
-                                        printf("   i=%lu, j=%lu, k=%lu, "
-                                               "dx=%lu, dy=%lu, dz=%lu, "
-                                               "fill=%d\n",
-                                               (unsigned long)i, (unsigned long)j, (unsigned long)k,
-                                               (unsigned long)dx, (unsigned long)dy, (unsigned long)dz,
-                                               fill_value);
+                                        printf(
+                                            "   i=%lu, j=%lu, k=%lu, "
+                                            "dx=%lu, dy=%lu, dz=%lu, "
+                                            "fill=%d\n",
+                                            (unsigned long)i,
+                                            (unsigned long)j,
+                                            (unsigned long)k,
+                                            (unsigned long)dx,
+                                            (unsigned long)dy,
+                                            (unsigned long)dz,
+                                            fill_value);
                                         print_ref(nx, ny, nz);
                                         printf("\n   Result is:\n");
                                         print_array(dst, nx, ny, nz);
                                     } /* end if */
                                     goto error;
                                 } /* end if */
-                            }     /* end for */
-                        }         /* end for */
-                    }             /* end for */
-                }                 /* end for */
-            }                     /* end for */
-        }                         /* end for */
-    }                             /* end for */
+                            } /* end for */
+                        } /* end for */
+                    } /* end for */
+                } /* end for */
+            } /* end for */
+        } /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -249,8 +262,9 @@ test_fill(size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size
     return SUCCEED;
 
 error:
-    if (dst)
+    if (dst) {
         free(dst);
+    }
     return FAIL;
 } /* end test_fill() */
 
@@ -277,24 +291,22 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size_t ddx, size_t ddy,
-          size_t ddz)
+static herr_t test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_t dk, size_t ddx, size_t ddy, size_t ddz)
 {
-    uint8_t    *src = NULL;          /*source array            */
-    uint8_t    *dst = NULL;          /*destination array        */
-    hsize_t     hs_size[3];          /*hyperslab size        */
-    hsize_t     dst_size[3];         /*destination total size    */
-    hsize_t     src_size[3];         /*source total size        */
-    hsize_t     dst_offset[3];       /*offset of hyperslab in dest    */
-    hsize_t     src_offset[3];       /*offset of hyperslab in source */
-    unsigned    ref_value;           /*reference value        */
-    unsigned    acc;                 /*accumulator            */
-    hsize_t     i, j, k, dx, dy, dz; /*counters                 */
-    hsize_t     u, v, w;
-    unsigned    ndims;           /*hyperslab dimensionality    */
-    char        dim[64], s[256]; /*temp string            */
-    const char *sub;
+    uint8_t* src = NULL;         /*source array            */
+    uint8_t* dst = NULL;         /*destination array        */
+    hsize_t hs_size[3];          /*hyperslab size        */
+    hsize_t dst_size[3];         /*destination total size    */
+    hsize_t src_size[3];         /*source total size        */
+    hsize_t dst_offset[3];       /*offset of hyperslab in dest    */
+    hsize_t src_offset[3];       /*offset of hyperslab in source */
+    unsigned ref_value;          /*reference value        */
+    unsigned acc;                /*accumulator            */
+    hsize_t i, j, k, dx, dy, dz; /*counters                 */
+    hsize_t u, v, w;
+    unsigned ndims;              /*hyperslab dimensionality    */
+    char dim[64], s[256];        /*temp string            */
+    const char* sub;
 
     /*
      * Dimensionality.
@@ -307,43 +319,42 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
         } /* end if */
         else {
             ndims = 2;
-            nz    = 1;
+            nz = 1;
             snprintf(dim, sizeof(dim), "%lux%lu", (unsigned long)nx, (unsigned long)ny);
         } /* end else */
-    }     /* end if */
+    } /* end if */
     else {
         ndims = 3;
         snprintf(dim, sizeof(dim), "%lux%lux%lu", (unsigned long)nx, (unsigned long)ny, (unsigned long)nz);
     } /* end else */
 
     switch (mode) {
-        case VARIABLE_SRC:
-            /*
-             * The hyperslab "travels" through the source array but the
-             * destination hyperslab is always at the origin of the destination
-             * array.
-             */
-            sub = "variable source";
-            break;
+    case VARIABLE_SRC:
+        /*
+         * The hyperslab "travels" through the source array but the
+         * destination hyperslab is always at the origin of the destination
+         * array.
+         */
+        sub = "variable source";
+        break;
 
-        case VARIABLE_DST:
-            /*
-             * We always read a hyperslab from the origin of the source and copy it
-             * to a hyperslab at various locations in the destination.
-             */
-            sub = "variable destination";
-            break;
+    case VARIABLE_DST:
+        /*
+         * We always read a hyperslab from the origin of the source and copy it
+         * to a hyperslab at various locations in the destination.
+         */
+        sub = "variable destination";
+        break;
 
-        case VARIABLE_BOTH:
-            /*
-             * We read the hyperslab from various locations in the source and copy
-             * it to the same location in the destination.
-             */
-            sub = "sync source & dest  ";
-            break;
+    case VARIABLE_BOTH:
+        /*
+         * We read the hyperslab from various locations in the source and copy
+         * it to the same location in the destination.
+         */
+        sub = "sync source & dest  ";
+        break;
 
-        default:
-            FAIL_PUTS_ERROR("Unhandled case");
+    default: FAIL_PUTS_ERROR("Unhandled case");
     } /* end switch */
 
     snprintf(s, sizeof(s), "Testing hyperslab copy %-11s %s", dim, sub);
@@ -353,10 +364,12 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
     /*
      * Allocate arrays
      */
-    if (NULL == (src = (uint8_t *)calloc((size_t)1, nx * ny * nz)))
+    if (NULL == (src = (uint8_t*)calloc((size_t)1, nx * ny * nz))) {
         TEST_ERROR;
-    if (NULL == (dst = (uint8_t *)calloc((size_t)1, nx * ny * nz)))
+    }
+    if (NULL == (dst = (uint8_t*)calloc((size_t)1, nx * ny * nz))) {
         TEST_ERROR;
+    }
 
     init_full(src, nx, ny, nz);
 
@@ -366,47 +379,45 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
                 for (dx = 1; dx <= nx - i; dx += ddx) {
                     for (dy = 1; dy <= ny - j; dy += ddy) {
                         for (dz = 1; dz <= nz - k; dz += ddz) {
-
                             /*
                              * Describe the source and destination hyperslabs
                              * and the arrays to which they belong.
                              */
-                            hs_size[0]  = dx;
-                            hs_size[1]  = dy;
-                            hs_size[2]  = dz;
+                            hs_size[0] = dx;
+                            hs_size[1] = dy;
+                            hs_size[2] = dz;
                             dst_size[0] = src_size[0] = nx;
                             dst_size[1] = src_size[1] = ny;
                             dst_size[2] = src_size[2] = nz;
                             switch (mode) {
-                                case VARIABLE_SRC:
-                                    dst_offset[0] = 0;
-                                    dst_offset[1] = 0;
-                                    dst_offset[2] = 0;
-                                    src_offset[0] = i;
-                                    src_offset[1] = j;
-                                    src_offset[2] = k;
-                                    break;
+                            case VARIABLE_SRC:
+                                dst_offset[0] = 0;
+                                dst_offset[1] = 0;
+                                dst_offset[2] = 0;
+                                src_offset[0] = i;
+                                src_offset[1] = j;
+                                src_offset[2] = k;
+                                break;
 
-                                case VARIABLE_DST:
-                                    dst_offset[0] = i;
-                                    dst_offset[1] = j;
-                                    dst_offset[2] = k;
-                                    src_offset[0] = 0;
-                                    src_offset[1] = 0;
-                                    src_offset[2] = 0;
-                                    break;
+                            case VARIABLE_DST:
+                                dst_offset[0] = i;
+                                dst_offset[1] = j;
+                                dst_offset[2] = k;
+                                src_offset[0] = 0;
+                                src_offset[1] = 0;
+                                src_offset[2] = 0;
+                                break;
 
-                                case VARIABLE_BOTH:
-                                    dst_offset[0] = i;
-                                    dst_offset[1] = j;
-                                    dst_offset[2] = k;
-                                    src_offset[0] = i;
-                                    src_offset[1] = j;
-                                    src_offset[2] = k;
-                                    break;
+                            case VARIABLE_BOTH:
+                                dst_offset[0] = i;
+                                dst_offset[1] = j;
+                                dst_offset[2] = k;
+                                src_offset[0] = i;
+                                src_offset[1] = j;
+                                src_offset[2] = k;
+                                break;
 
-                                default:
-                                    FAIL_PUTS_ERROR("Unhandled case");
+                            default: FAIL_PUTS_ERROR("Unhandled case");
                             } /* end switch */
 
                             /*
@@ -414,36 +425,44 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
                              * value to compare against later.
                              */
                             ref_value = 0;
-                            for (u = src_offset[0]; u < src_offset[0] + dx; u++)
-                                for (v = src_offset[1]; v < src_offset[1] + dy; v++)
-                                    for (w = src_offset[2]; w < src_offset[2] + dz; w++)
+                            for (u = src_offset[0]; u < src_offset[0] + dx; u++) {
+                                for (v = src_offset[1]; v < src_offset[1] + dy; v++) {
+                                    for (w = src_offset[2]; w < src_offset[2] + dz; w++) {
                                         ref_value += src[u * ny * nz + v * nz + w];
+                                    }
+                                }
+                            }
 
                             /*
                              * Set all loc values to 1 so we can detect writing
                              * outside the hyperslab.
                              */
-                            for (u = 0; u < nx; u++)
-                                for (v = 0; v < ny; v++)
-                                    for (w = 0; w < nz; w++)
+                            for (u = 0; u < nx; u++) {
+                                for (v = 0; v < ny; v++) {
+                                    for (w = 0; w < nz; w++) {
                                         dst[u * ny * nz + v * nz + w] = 1;
+                                    }
+                                }
+                            }
 
                             /*
                              * Copy a hyperslab from the global array to the
                              * local array.
                              */
-                            H5VM_hyper_copy(ndims, hs_size, dst_size, dst_offset, dst, src_size, src_offset,
-                                            src);
+                            H5VM_hyper_copy(ndims, hs_size, dst_size, dst_offset, dst, src_size, src_offset, src);
 
                             /*
                              * Sum the destination hyperslab.  It should be
                              * the same as the reference value.
                              */
                             acc = 0;
-                            for (u = dst_offset[0]; u < dst_offset[0] + dx; u++)
-                                for (v = dst_offset[1]; v < dst_offset[1] + dy; v++)
-                                    for (w = dst_offset[2]; w < dst_offset[2] + dz; w++)
+                            for (u = dst_offset[0]; u < dst_offset[0] + dx; u++) {
+                                for (v = dst_offset[1]; v < dst_offset[1] + dy; v++) {
+                                    for (w = dst_offset[2]; w < dst_offset[2] + dz; w++) {
                                         acc += dst[u * ny * nz + v * nz + w];
+                                    }
+                                }
+                            }
                             if (acc != ref_value) {
                                 H5_FAILED();
                                 if (!HDisatty(1)) {
@@ -453,10 +472,15 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
                                      */
                                     AT();
                                     printf("   acc != ref_value\n");
-                                    printf("   i=%lu, j=%lu, k=%lu, "
-                                           "dx=%lu, dy=%lu, dz=%lu\n",
-                                           (unsigned long)i, (unsigned long)j, (unsigned long)k,
-                                           (unsigned long)dx, (unsigned long)dy, (unsigned long)dz);
+                                    printf(
+                                        "   i=%lu, j=%lu, k=%lu, "
+                                        "dx=%lu, dy=%lu, dz=%lu\n",
+                                        (unsigned long)i,
+                                        (unsigned long)j,
+                                        (unsigned long)k,
+                                        (unsigned long)dx,
+                                        (unsigned long)dy,
+                                        (unsigned long)dz);
                                     print_ref(nx, ny, nz);
                                     printf("\n     Destination array is:\n");
                                     print_array(dst, nx, ny, nz);
@@ -470,18 +494,20 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
                              * we added the border of 1's to the hyperslab.
                              */
                             acc = 0;
-                            for (u = 0; u < nx; u++)
-                                for (v = 0; v < ny; v++)
-                                    for (w = 0; w < nz; w++)
+                            for (u = 0; u < nx; u++) {
+                                for (v = 0; v < ny; v++) {
+                                    for (w = 0; w < nz; w++) {
                                         acc += dst[u * ny * nz + v * nz + w];
+                                    }
+                                }
+                            }
 
                             /*
                              * The following casts are to work around an
                              * optimization bug in the Mongoose 7.20 Irix64
                              * compiler.
                              */
-                            if (acc + (unsigned)dx * (unsigned)dy * (unsigned)dz !=
-                                ref_value + nx * ny * nz) {
+                            if (acc + (unsigned)dx * (unsigned)dy * (unsigned)dz != ref_value + nx * ny * nz) {
                                 H5_FAILED();
                                 if (!HDisatty(1)) {
                                     /*
@@ -489,24 +515,30 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
                                      * going directly to a terminal.
                                      */
                                     AT();
-                                    printf("   acc != ref_value + nx*ny*nz - "
-                                           "dx*dy*dz\n");
-                                    printf("   i=%lu, j=%lu, k=%lu, "
-                                           "dx=%lu, dy=%lu, dz=%lu\n",
-                                           (unsigned long)i, (unsigned long)j, (unsigned long)k,
-                                           (unsigned long)dx, (unsigned long)dy, (unsigned long)dz);
+                                    printf(
+                                        "   acc != ref_value + nx*ny*nz - "
+                                        "dx*dy*dz\n");
+                                    printf(
+                                        "   i=%lu, j=%lu, k=%lu, "
+                                        "dx=%lu, dy=%lu, dz=%lu\n",
+                                        (unsigned long)i,
+                                        (unsigned long)j,
+                                        (unsigned long)k,
+                                        (unsigned long)dx,
+                                        (unsigned long)dy,
+                                        (unsigned long)dz);
                                     print_ref(nx, ny, nz);
                                     printf("\n     Destination array is:\n");
                                     print_array(dst, nx, ny, nz);
                                 } /* end if */
                                 goto error;
                             } /* end if */
-                        }     /* end for */
-                    }         /* end for */
-                }             /* end for */
-            }                 /* end for */
-        }                     /* end for */
-    }                         /* end for */
+                        } /* end for */
+                    } /* end for */
+                } /* end for */
+            } /* end for */
+        } /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -516,10 +548,12 @@ test_copy(int mode, size_t nx, size_t ny, size_t nz, size_t di, size_t dj, size_
     return SUCCEED;
 
 error:
-    if (src)
+    if (src) {
         free(src);
-    if (dst)
+    }
+    if (dst) {
         free(dst);
+    }
 
     return FAIL;
 } /* end test_copy() */
@@ -539,45 +573,49 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_multifill(size_t nx)
+static herr_t test_multifill(size_t nx)
 {
     hsize_t size;
     hsize_t src_stride;
     hsize_t dst_stride;
-    char    s[64];
-    struct a_struct {
-        int    left;
+    char s[64];
+
+    struct a_struct
+    {
+        int left;
         double mid;
-        int    right;
+        int right;
     } fill, *src = NULL, *dst = NULL;
+
     hsize_t i, j;
 
     printf("%-70s", "Testing multi-byte fill value");
     fflush(stdout);
 
     /* Initialize the source and destination */
-    if (NULL == (src = (struct a_struct *)malloc(nx * sizeof(*src))))
+    if (NULL == (src = (struct a_struct*)malloc(nx * sizeof(*src)))) {
         TEST_ERROR;
-    if (NULL == (dst = (struct a_struct *)malloc(nx * sizeof(*dst))))
+    }
+    if (NULL == (dst = (struct a_struct*)malloc(nx * sizeof(*dst)))) {
         TEST_ERROR;
+    }
 
     for (i = 0; i < nx; i++) {
-        src[i].left  = 1111111;
-        src[i].mid   = 12345.6789;
-        src[i].right = 2222222;
-        dst[i].left  = 3333333;
-        dst[i].mid   = 98765.4321;
-        dst[i].right = 4444444;
+        src[i].left = 1'111'111;
+        src[i].mid = 12345.6789;
+        src[i].right = 2'222'222;
+        dst[i].left = 3'333'333;
+        dst[i].mid = 98765.4321;
+        dst[i].right = 4'444'444;
     } /* end for */
 
     /*
      * Describe the fill value.     The zero stride says to read the same thing
      * over and over again.
      */
-    fill.left  = 55555555;
-    fill.mid   = 3.1415927;
-    fill.right = 66666666;
+    fill.left = 55'555'555;
+    fill.mid = 3.1415927;
+    fill.right = 66'666'666;
     src_stride = 0;
 
     /*
@@ -596,32 +634,36 @@ test_multifill(size_t nx)
      */
     s[0] = '\0';
     for (i = 0; i < nx; i++) {
-        if (dst[i].left != 3333333)
+        if (dst[i].left != 3'333'333) {
             snprintf(s, sizeof(s), "bad dst[%lu].left", (unsigned long)i);
-        else if (!H5_DBL_ABS_EQUAL(dst[i].mid, fill.mid))
+        }
+        else if (!H5_DBL_ABS_EQUAL(dst[i].mid, fill.mid)) {
             /* Check if two DOUBLE values are equal.  If their difference
              * is smaller than the EPSILON value for double, they are
              * considered equal. See the definition in h5test.h.
              */
             snprintf(s, sizeof(s), "bad dst[%lu].mid", (unsigned long)i);
-        else if (dst[i].right != 4444444)
+        }
+        else if (dst[i].right != 4'444'444) {
             snprintf(s, sizeof(s), "bad dst[%lu].right", (unsigned long)i);
+        }
         if (s[0]) {
             H5_FAILED();
             if (!HDisatty(1)) {
                 AT();
                 printf("   fill={%d,%g,%d}\n   ", fill.left, fill.mid, fill.right);
-                for (j = 0; j < sizeof(fill); j++)
-                    printf(" %02x", ((uint8_t *)&fill)[j]);
-                printf("\n   dst[%lu]={%d,%g,%d}\n   ", (unsigned long)i, dst[i].left, dst[i].mid,
-                       dst[i].right);
-                for (j = 0; j < sizeof(dst[i]); j++)
-                    printf(" %02x", ((uint8_t *)(dst + i))[j]);
+                for (j = 0; j < sizeof(fill); j++) {
+                    printf(" %02x", ((uint8_t*)&fill)[j]);
+                }
+                printf("\n   dst[%lu]={%d,%g,%d}\n   ", (unsigned long)i, dst[i].left, dst[i].mid, dst[i].right);
+                for (j = 0; j < sizeof(dst[i]); j++) {
+                    printf(" %02x", ((uint8_t*)(dst + i))[j]);
+                }
                 printf("\n");
             } /* end if */
             goto error;
         } /* end if */
-    }     /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -631,10 +673,12 @@ test_multifill(size_t nx)
     return SUCCEED;
 
 error:
-    if (src)
+    if (src) {
         free(src);
-    if (dst)
+    }
+    if (dst) {
         free(dst);
+    }
 
     return FAIL;
 } /* end test_multifill() */
@@ -652,24 +696,25 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_endian(size_t nx)
+static herr_t test_endian(size_t nx)
 {
-    uint8_t *src = NULL;    /*source array            */
-    uint8_t *dst = NULL;    /*destination array        */
+    uint8_t* src = NULL;    /*source array            */
+    uint8_t* dst = NULL;    /*destination array        */
     hssize_t src_stride[2]; /*source strides        */
     hssize_t dst_stride[2]; /*destination strides        */
-    hsize_t  size[2];       /*size vector            */
-    hsize_t  i, j;
+    hsize_t size[2];        /*size vector            */
+    hsize_t i, j;
 
     printf("%-70s", "Testing endian conversion by stride");
     fflush(stdout);
 
     /* Initialize arrays */
-    if (NULL == (src = (uint8_t *)malloc(nx * 4)))
+    if (NULL == (src = (uint8_t*)malloc(nx * 4))) {
         TEST_ERROR;
-    if (NULL == (dst = (uint8_t *)calloc(nx, (size_t)4)))
+    }
+    if (NULL == (dst = (uint8_t*)calloc(nx, (size_t)4))) {
         TEST_ERROR;
+    }
 
     init_full(src, nx, (size_t)4, (size_t)1);
 
@@ -678,8 +723,8 @@ test_endian(size_t nx)
     src_stride[1] = 1;
     dst_stride[0] = 8;
     dst_stride[1] = -1;
-    size[0]       = nx;
-    size[1]       = 4;
+    size[0] = nx;
+    size[1] = 4;
 
     /* Copy the array */
     H5VM_stride_copy_s(2, (hsize_t)1, size, dst_stride, dst + 3, src_stride, src);
@@ -703,8 +748,8 @@ test_endian(size_t nx)
                 } /* end if */
                 goto error;
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -714,10 +759,12 @@ test_endian(size_t nx)
     return SUCCEED;
 
 error:
-    if (src)
+    if (src) {
         free(src);
-    if (dst)
+    }
+    if (dst) {
         free(dst);
+    }
 
     return FAIL;
 } /* end test_endian() */
@@ -734,33 +781,36 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_transpose(size_t nx, size_t ny)
+static herr_t test_transpose(size_t nx, size_t ny)
 {
     hssize_t src_stride[2], dst_stride[2];
-    int     *src = NULL;
-    int     *dst = NULL;
-    hsize_t  size[2];
-    char     s[256];
-    hsize_t  i, j;
+    int* src = NULL;
+    int* dst = NULL;
+    hsize_t size[2];
+    char s[256];
+    hsize_t i, j;
 
     snprintf(s, sizeof(s), "Testing 2d transpose by stride %4lux%-lud", (unsigned long)nx, (unsigned long)ny);
     printf("%-70s", s);
     fflush(stdout);
 
     /* Initialize */
-    if (NULL == (src = (int *)malloc(nx * ny * sizeof(*src))))
+    if (NULL == (src = (int*)malloc(nx * ny * sizeof(*src)))) {
         TEST_ERROR;
-    if (NULL == (dst = (int *)calloc(nx * ny, sizeof(*dst))))
+    }
+    if (NULL == (dst = (int*)calloc(nx * ny, sizeof(*dst)))) {
         TEST_ERROR;
+    }
 
-    for (i = 0; i < nx; i++)
-        for (j = 0; j < ny; j++)
+    for (i = 0; i < nx; i++) {
+        for (j = 0; j < ny; j++) {
             src[i * ny + j] = (int)(i * ny + j);
+        }
+    }
 
     /* Build stride info */
-    size[0]       = nx;
-    size[1]       = ny;
+    size[0] = nx;
+    size[1] = ny;
     src_stride[0] = 0;
     src_stride[1] = (hssize_t)sizeof(*src);
     dst_stride[0] = (hssize_t)((1 - nx * ny) * sizeof(*src));
@@ -780,22 +830,24 @@ test_transpose(size_t nx, size_t ny)
                     printf("   Source is:\n");
                     for (i = 0; i < nx; i++) {
                         printf("%3lu:", (unsigned long)i);
-                        for (j = 0; j < ny; j++)
+                        for (j = 0; j < ny; j++) {
                             printf(" %6d", src[i * ny + j]);
+                        }
                         printf("\n");
                     } /* end for */
                     printf("\n     Destination is:\n");
                     for (i = 0; i < ny; i++) {
                         printf("%3lu:", (unsigned long)i);
-                        for (j = 0; j < nx; j++)
+                        for (j = 0; j < nx; j++) {
                             printf(" %6d", dst[i * nx + j]);
+                        }
                         printf("\n");
                     } /* end for */
-                }     /* end if */
+                } /* end if */
                 goto error;
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -805,10 +857,12 @@ test_transpose(size_t nx, size_t ny)
     return SUCCEED;
 
 error:
-    if (src)
+    if (src) {
         free(src);
-    if (dst)
+    }
+    if (dst) {
         free(dst);
+    }
 
     return FAIL;
 } /* end test_transpose() */
@@ -827,38 +881,45 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_sub_super(size_t nx, size_t ny)
+static herr_t test_sub_super(size_t nx, size_t ny)
 {
     hssize_t src_stride_s[4]; /*signed source stride info        */
     hssize_t dst_stride_s[4]; /*signed destination stride info    */
-    uint8_t *full  = NULL;    /*original image        */
-    uint8_t *half  = NULL;    /*image at 1/2 resolution    */
-    uint8_t *twice = NULL;    /*2x2 pixels            */
-    hsize_t  src_stride[4];   /*source stride info        */
-    hsize_t  dst_stride[4];   /*destination stride info    */
-    hsize_t  size[4];         /*number of sample points    */
-    hsize_t  i, j;
-    char     s[256];
+    uint8_t* full = NULL;     /*original image        */
+    uint8_t* half = NULL;     /*image at 1/2 resolution    */
+    uint8_t* twice = NULL;    /*2x2 pixels            */
+    hsize_t src_stride[4];    /*source stride info        */
+    hsize_t dst_stride[4];    /*destination stride info    */
+    hsize_t size[4];          /*number of sample points    */
+    hsize_t i, j;
+    char s[256];
 
-    snprintf(s, sizeof(s), "Testing image sampling %4lux%-4lu to %4lux%-4lu ", (unsigned long)(2 * nx),
-             (unsigned long)(2 * ny), (unsigned long)nx, (unsigned long)ny);
+    snprintf(s,
+             sizeof(s),
+             "Testing image sampling %4lux%-4lu to %4lux%-4lu ",
+             (unsigned long)(2 * nx),
+             (unsigned long)(2 * ny),
+             (unsigned long)nx,
+             (unsigned long)ny);
     printf("%-70s", s);
     fflush(stdout);
 
     /* Initialize */
-    if (NULL == (full = (uint8_t *)malloc(4 * nx * ny)))
+    if (NULL == (full = (uint8_t*)malloc(4 * nx * ny))) {
         TEST_ERROR;
-    if (NULL == (half = (uint8_t *)calloc((size_t)1, nx * ny)))
+    }
+    if (NULL == (half = (uint8_t*)calloc((size_t)1, nx * ny))) {
         TEST_ERROR;
-    if (NULL == (twice = (uint8_t *)calloc((size_t)4, nx * ny)))
+    }
+    if (NULL == (twice = (uint8_t*)calloc((size_t)4, nx * ny))) {
         TEST_ERROR;
+    }
 
     init_full(full, 2 * nx, 2 * ny, (size_t)1);
 
     /* Setup */
-    size[0]       = nx;
-    size[1]       = ny;
+    size[0] = nx;
+    size[1] = ny;
     src_stride[0] = (hsize_t)(2 * ny);
     src_stride[1] = 2;
     dst_stride[0] = 0;
@@ -874,8 +935,7 @@ test_sub_super(size_t nx, size_t ny)
                 H5_FAILED();
                 if (!HDisatty(1)) {
                     AT();
-                    printf("   full[%lu][%lu] != half[%lu][%lu]\n", (unsigned long)i * 2,
-                           (unsigned long)j * 2, (unsigned long)i, (unsigned long)j);
+                    printf("   full[%lu][%lu] != half[%lu][%lu]\n", (unsigned long)i * 2, (unsigned long)j * 2, (unsigned long)i, (unsigned long)j);
                     printf("   full is:\n");
                     print_array(full, 2 * nx, 2 * ny, (size_t)1);
                     printf("\n     half is:\n");
@@ -883,24 +943,29 @@ test_sub_super(size_t nx, size_t ny)
                 } /* end if */
                 goto error;
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
     PASSED();
 
     /*
      * Test replicating pixels to produce an image twice as large in each
      * dimension.
      */
-    snprintf(s, sizeof(s), "Testing image sampling %4lux%-4lu to %4lux%-4lu ", (unsigned long)nx,
-             (unsigned long)ny, (unsigned long)(2 * nx), (unsigned long)(2 * ny));
+    snprintf(s,
+             sizeof(s),
+             "Testing image sampling %4lux%-4lu to %4lux%-4lu ",
+             (unsigned long)nx,
+             (unsigned long)ny,
+             (unsigned long)(2 * nx),
+             (unsigned long)(2 * ny));
     printf("%-70s", s);
     fflush(stdout);
 
     /* Setup stride */
-    size[0]         = nx;
-    size[1]         = ny;
-    size[2]         = 2;
-    size[3]         = 2;
+    size[0] = nx;
+    size[1] = ny;
+    size[2] = 2;
+    size[3] = 2;
     src_stride_s[0] = 0;
     src_stride_s[1] = 1;
     src_stride_s[2] = 0;
@@ -917,18 +982,18 @@ test_sub_super(size_t nx, size_t ny)
     s[0] = '\0';
     for (i = 0; i < nx; i++) {
         for (j = 0; j < ny; j++) {
-            if (half[i * ny + j] != twice[4 * i * ny + 2 * j])
-                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i,
-                         (unsigned long)j, (unsigned long)i * 2, (unsigned long)j * 2);
-            else if (half[i * ny + j] != twice[4 * i * ny + 2 * j + 1])
-                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i,
-                         (unsigned long)j, (unsigned long)i * 2, (unsigned long)j * 2 + 1);
-            else if (half[i * ny + j] != twice[(2 * i + 1) * 2 * ny + 2 * j])
-                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i,
-                         (unsigned long)j, (unsigned long)i * 2 + 1, (unsigned long)j * 2);
-            else if (half[i * ny + j] != twice[(2 * i + 1) * 2 * ny + 2 * j + 1])
-                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i,
-                         (unsigned long)j, (unsigned long)i * 2 + 1, (unsigned long)j * 2 + 1);
+            if (half[i * ny + j] != twice[4 * i * ny + 2 * j]) {
+                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i, (unsigned long)j, (unsigned long)i * 2, (unsigned long)j * 2);
+            }
+            else if (half[i * ny + j] != twice[4 * i * ny + 2 * j + 1]) {
+                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i, (unsigned long)j, (unsigned long)i * 2, (unsigned long)j * 2 + 1);
+            }
+            else if (half[i * ny + j] != twice[(2 * i + 1) * 2 * ny + 2 * j]) {
+                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i, (unsigned long)j, (unsigned long)i * 2 + 1, (unsigned long)j * 2);
+            }
+            else if (half[i * ny + j] != twice[(2 * i + 1) * 2 * ny + 2 * j + 1]) {
+                snprintf(s, sizeof(s), "half[%lu][%lu] != twice[%lu][%lu]", (unsigned long)i, (unsigned long)j, (unsigned long)i * 2 + 1, (unsigned long)j * 2 + 1);
+            }
             if (s[0]) {
                 H5_FAILED();
                 if (!HDisatty(1)) {
@@ -940,8 +1005,8 @@ test_sub_super(size_t nx, size_t ny)
                 } /* end if */
                 goto error;
             } /* end if */
-        }     /* end for */
-    }         /* end for */
+        } /* end for */
+    } /* end for */
 
     PASSED();
 
@@ -952,12 +1017,15 @@ test_sub_super(size_t nx, size_t ny)
     return SUCCEED;
 
 error:
-    if (full)
+    if (full) {
         free(full);
-    if (half)
+    }
+    if (half) {
         free(half);
-    if (twice)
+    }
+    if (twice) {
         free(twice);
+    }
 
     return FAIL;
 } /* test_sub_super() */
@@ -975,34 +1043,38 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_array_fill(size_t lo, size_t hi)
+static herr_t test_array_fill(size_t lo, size_t hi)
 {
-    int   *dst = NULL;           /* Destination                  */
-    int    src[ARRAY_FILL_SIZE]; /* Source to duplicate    */
-    size_t u, v, w;              /* Local index variables        */
-    char   s[256];
+    int* dst = NULL;          /* Destination                  */
+    int src[ARRAY_FILL_SIZE]; /* Source to duplicate    */
+    size_t u, v, w;           /* Local index variables        */
+    char s[256];
 
     snprintf(s, sizeof(s), "array filling %4lu-%-4lu elements", (unsigned long)lo, (unsigned long)hi);
     TESTING(s);
 
     /* Initialize */
-    if (NULL == (dst = (int *)calloc((ARRAY_FILL_SIZE * hi), sizeof(int))))
+    if (NULL == (dst = (int*)calloc((ARRAY_FILL_SIZE * hi), sizeof(int)))) {
         TEST_ERROR;
+    }
 
     /* Setup */
-    for (u = 0; u < ARRAY_FILL_SIZE; u++)
+    for (u = 0; u < ARRAY_FILL_SIZE; u++) {
         src[u] = (char)u;
+    }
 
     /* Fill */
     for (w = lo; w <= hi; w++) {
         H5VM_array_fill(dst, src, sizeof(src), w);
 
         /* Check */
-        for (u = 0; u < w; u++)
-            for (v = 0; v < ARRAY_FILL_SIZE; v++)
-                if (dst[(u * ARRAY_FILL_SIZE) + v] != src[v])
+        for (u = 0; u < w; u++) {
+            for (v = 0; v < ARRAY_FILL_SIZE; v++) {
+                if (dst[(u * ARRAY_FILL_SIZE) + v] != src[v]) {
                     TEST_ERROR;
+                }
+            }
+        }
 
         memset(dst, 0, sizeof(int) * ARRAY_FILL_SIZE * w);
     } /* end for */
@@ -1014,8 +1086,9 @@ test_array_fill(size_t lo, size_t hi)
     return SUCCEED;
 
 error:
-    if (dst)
+    if (dst) {
         free(dst);
+    }
     return FAIL;
 } /* end test_array_fill() */
 
@@ -1032,35 +1105,37 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_array_offset_n_calc(size_t n, size_t x, size_t y, size_t z)
+static herr_t test_array_offset_n_calc(size_t n, size_t x, size_t y, size_t z)
 {
-    hsize_t *a = NULL;
-    hsize_t *temp_a;                         /* Array for stored calculated offsets */
-    hsize_t  off;                            /* Offset in array */
-    size_t   u, v, w;                        /* Local index variables        */
-    hsize_t  dims[ARRAY_OFFSET_NDIMS];       /* X, Y & X coordinates of array to check */
-    hsize_t  coords[ARRAY_OFFSET_NDIMS];     /* X, Y & X coordinates to check offset of */
-    hsize_t  new_coords[ARRAY_OFFSET_NDIMS]; /* X, Y & X coordinates of offset */
-    char     s[256];
+    hsize_t* a = NULL;
+    hsize_t* temp_a;                        /* Array for stored calculated offsets */
+    hsize_t off;                            /* Offset in array */
+    size_t u, v, w;                         /* Local index variables        */
+    hsize_t dims[ARRAY_OFFSET_NDIMS];       /* X, Y & X coordinates of array to check */
+    hsize_t coords[ARRAY_OFFSET_NDIMS];     /* X, Y & X coordinates to check offset of */
+    hsize_t new_coords[ARRAY_OFFSET_NDIMS]; /* X, Y & X coordinates of offset */
+    char s[256];
 
-    snprintf(s, sizeof(s), "array offset %4lux%4lux%4lu elements", (unsigned long)z, (unsigned long)y,
-             (unsigned long)x);
+    snprintf(s, sizeof(s), "array offset %4lux%4lux%4lu elements", (unsigned long)z, (unsigned long)y, (unsigned long)x);
     TESTING(s);
 
     /* Initialize */
-    if (NULL == (a = (hsize_t *)malloc(sizeof(hsize_t) * x * y * z)))
+    if (NULL == (a = (hsize_t*)malloc(sizeof(hsize_t) * x * y * z))) {
         TEST_ERROR;
+    }
 
     dims[0] = z;
     dims[1] = y;
     dims[2] = x;
 
     /* Setup */
-    for (u = 0, temp_a = a, off = 0; u < z; u++)
-        for (v = 0; v < y; v++)
-            for (w = 0; w < x; w++)
+    for (u = 0, temp_a = a, off = 0; u < z; u++) {
+        for (v = 0; v < y; v++) {
+            for (w = 0; w < x; w++) {
                 *temp_a++ = off++;
+            }
+        }
+    }
 
     /* Check offsets */
     for (u = 0; u < n; u++) {
@@ -1075,24 +1150,30 @@ test_array_offset_n_calc(size_t n, size_t x, size_t y, size_t z)
         /* Check offset of coordinate */
         if (a[off] != off) {
             fprintf(stderr,
-                    "incorrect offset for coordinate (%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ")."
+                    "incorrect offset for coordinate (%" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
+                    ")."
                     " expected %" PRIuHSIZE ", got %" PRIuHSIZE "\n",
-                    coords[0], coords[1], coords[2], off, a[off]);
+                    coords[0],
+                    coords[1],
+                    coords[2],
+                    off,
+                    a[off]);
             TEST_ERROR;
         }
 
         /* Get coordinates of offset */
-        if (H5VM_array_calc(off, ARRAY_OFFSET_NDIMS, dims, new_coords) < 0)
+        if (H5VM_array_calc(off, ARRAY_OFFSET_NDIMS, dims, new_coords) < 0) {
             TEST_ERROR;
+        }
 
         /* Check computed coordinates */
-        for (v = 0; v < ARRAY_OFFSET_NDIMS; v++)
+        for (v = 0; v < ARRAY_OFFSET_NDIMS; v++) {
             if (coords[v] != new_coords[v]) {
-                fprintf(stderr, "coords[%zu]=%" PRIuHSIZE ", new_coords[%zu]=%" PRIuHSIZE "\n", v, coords[v],
-                        v, new_coords[v]);
+                fprintf(stderr, "coords[%zu]=%" PRIuHSIZE ", new_coords[%zu]=%" PRIuHSIZE "\n", v, coords[v], v, new_coords[v]);
                 TEST_ERROR;
             } /* end if */
-    }         /* end for */
+        }
+    } /* end for */
 
     PASSED();
 
@@ -1101,8 +1182,9 @@ test_array_offset_n_calc(size_t n, size_t x, size_t y, size_t z)
     return SUCCEED;
 
 error:
-    if (a)
+    if (a) {
         free(a);
+    }
 
     return FAIL;
 } /* end test_array_offset_n_calc() */
@@ -1118,36 +1200,40 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    herr_t   status;
-    int      nerrors = 0;
+    herr_t status;
+    int nerrors = 0;
     unsigned size_of_test;
 
     /* Parse arguments or assume `small' & `medium' */
-    if (1 == argc)
+    if (1 == argc) {
         size_of_test = TEST_SMALL | TEST_MEDIUM;
+    }
     else {
         int i;
 
         for (i = 1, size_of_test = 0; i < argc; i++) {
-            if (!strcmp(argv[i], "small"))
+            if (!strcmp(argv[i], "small")) {
                 size_of_test |= TEST_SMALL;
-            else if (!strcmp(argv[i], "medium"))
+            }
+            else if (!strcmp(argv[i], "medium")) {
                 size_of_test |= TEST_MEDIUM;
+            }
             else {
                 printf("unrecognized argument: %s\n", argv[i]);
                 exit(EXIT_FAILURE);
             } /* end else */
-        }     /* end for */
-    }         /* end else */
+        } /* end for */
+    } /* end else */
 
     printf("Test sizes: ");
-    if (size_of_test & TEST_SMALL)
+    if (size_of_test & TEST_SMALL) {
         printf(" SMALL");
-    if (size_of_test & TEST_MEDIUM)
+    }
+    if (size_of_test & TEST_MEDIUM) {
         printf(" MEDIUM");
+    }
     printf("\n");
 
     /* Set the random # seed */
@@ -1167,25 +1253,19 @@ main(int argc, char *argv[])
      *------------------------------
      */
     if (size_of_test & TEST_SMALL) {
-        status = test_fill((size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_fill((size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_fill((size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     if (size_of_test & TEST_MEDIUM) {
-        status = test_fill((size_t)113, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)113, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_fill((size_t)15, (size_t)11, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)15, (size_t)11, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_fill((size_t)5, (size_t)7, (size_t)7, (size_t)1, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1);
+        status = test_fill((size_t)5, (size_t)7, (size_t)7, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
 
@@ -1196,83 +1276,62 @@ main(int argc, char *argv[])
 
     /* exhaustive, one-dimensional test */
     if (size_of_test & TEST_SMALL) {
-        status = test_copy(VARIABLE_SRC, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)11, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     if (size_of_test & TEST_MEDIUM) {
-        status = test_copy(VARIABLE_SRC, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)179, (size_t)0, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     /* exhaustive, two-dimensional test */
     if (size_of_test & TEST_SMALL) {
-        status = test_copy(VARIABLE_SRC, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)11, (size_t)10, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     if (size_of_test & TEST_MEDIUM) {
-        status = test_copy(VARIABLE_SRC, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)13, (size_t)19, (size_t)0, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     /* sparse, two-dimensional test */
     if (size_of_test & TEST_MEDIUM) {
-        status = test_copy(VARIABLE_SRC, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1,
-                           (size_t)13, (size_t)11, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1, (size_t)13, (size_t)11, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1,
-                           (size_t)13, (size_t)11, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1, (size_t)13, (size_t)11, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1,
-                           (size_t)13, (size_t)11, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)73, (size_t)67, (size_t)0, (size_t)7, (size_t)11, (size_t)1, (size_t)13, (size_t)11, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     /* exhaustive, three-dimensional test */
     if (size_of_test & TEST_SMALL) {
-        status = test_copy(VARIABLE_SRC, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)3, (size_t)5, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
     if (size_of_test & TEST_MEDIUM) {
-        status = test_copy(VARIABLE_SRC, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_SRC, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_DST, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_DST, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
-        status = test_copy(VARIABLE_BOTH, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1,
-                           (size_t)1, (size_t)1, (size_t)1);
+        status = test_copy(VARIABLE_BOTH, (size_t)7, (size_t)9, (size_t)5, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1, (size_t)1);
         nerrors += status < 0 ? 1 : 0;
     } /* end if */
 
@@ -1353,8 +1412,9 @@ main(int argc, char *argv[])
 
     if (nerrors) {
         printf("***** %d HYPERSLAB TEST%s FAILED! *****\n", nerrors, 1 == nerrors ? "" : "S");
-        if (HDisatty(1))
+        if (HDisatty(1)) {
             printf("(Redirect output to a pager or a file to see debug output)\n");
+        }
         exit(EXIT_FAILURE);
     } /* end if */
 

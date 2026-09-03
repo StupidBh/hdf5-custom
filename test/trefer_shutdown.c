@@ -1,13 +1,12 @@
 #include "h5test.h"
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     H5R_ref_t write_ref, read_ref;
-    hid_t     fid;
-    hid_t     did;
-    hid_t     sid;
-    int       i;
+    hid_t fid;
+    hid_t did;
+    hid_t sid;
+    int i;
 
     if ((fid = H5Fcreate("HDFFV-10992.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         fprintf(stderr, "H5Fcreate failed\n");

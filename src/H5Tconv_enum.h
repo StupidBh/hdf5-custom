@@ -25,14 +25,26 @@
 /****************************************/
 
 /* Conversion functions between enum datatypes */
-H5_DLL herr_t H5T__conv_enum(const H5T_t *src, const H5T_t *dst, H5T_cdata_t *cdata,
-                             const H5T_conv_ctx_t *conv_ctx, size_t nelmts, size_t buf_stride,
-                             size_t bkg_stride, void *buf, void *bkg);
+H5_DLL herr_t H5T__conv_enum(const H5T_t* src,
+                             const H5T_t* dst,
+                             H5T_cdata_t* cdata,
+                             const H5T_conv_ctx_t* conv_ctx,
+                             size_t nelmts,
+                             size_t buf_stride,
+                             size_t bkg_stride,
+                             void* buf,
+                             void* bkg);
 
 /* Conversion functions from enum datatype to another datatype class */
-H5_DLL herr_t H5T__conv_enum_numeric(const H5T_t *src, const H5T_t *dst, H5T_cdata_t *cdata,
-                                     const H5T_conv_ctx_t *conv_ctx, size_t nelmts, size_t buf_stride,
-                                     size_t bkg_stride, void *buf, void *bkg);
+H5_DLL herr_t H5T__conv_enum_numeric(const H5T_t* src,
+                                     const H5T_t* dst,
+                                     H5T_cdata_t* cdata,
+                                     const H5T_conv_ctx_t* conv_ctx,
+                                     size_t nelmts,
+                                     size_t buf_stride,
+                                     size_t bkg_stride,
+                                     void* buf,
+                                     void* bkg);
 
 /*********************************************/
 /* Hard (compiler cast) conversion functions */

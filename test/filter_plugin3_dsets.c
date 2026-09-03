@@ -22,14 +22,12 @@
 
 #define FILTER3_ID 259
 
-#define PUSH_ERR(func, minor, str)                                                                           \
-    H5Epush2(H5E_DEFAULT, __FILE__, func, __LINE__, H5E_ERR_CLS, H5E_PLUGIN, minor, str)
+#define PUSH_ERR(func, minor, str) H5Epush2(H5E_DEFAULT, __FILE__, func, __LINE__, H5E_ERR_CLS, H5E_PLUGIN, minor, str)
 
-static size_t add_sub_value_hdf5(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values,
-                                 size_t nbytes, size_t *buf_size, void **buf);
+static size_t add_sub_value_hdf5(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf);
 
 /* Filter class struct */
-const H5Z_class2_t FILTER_INFO[1] = {{
+const H5Z_class2_t FILTER_INFO[1] = { {
     H5Z_CLASS_T_VERS,       /* H5Z_class_t version              */
     FILTER3_ID,             /* Filter ID number                 */
     1,                      /* Encoding enabled                 */
@@ -38,15 +36,14 @@ const H5Z_class2_t FILTER_INFO[1] = {{
     NULL,                   /* The "can apply" callback         */
     NULL,                   /* The "set local" callback         */
     add_sub_value_hdf5,     /* The actual filter function       */
-}};
+} };
 
-H5PL_type_t
-H5PLget_plugin_type(void)
+H5PL_type_t H5PLget_plugin_type(void)
 {
     return H5PL_TYPE_FILTER;
 }
-const void *
-H5PLget_plugin_info(void)
+
+const void* H5PLget_plugin_info(void)
 {
     return FILTER_INFO;
 }
@@ -68,16 +65,14 @@ H5PLget_plugin_info(void)
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-add_sub_value_hdf5(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_values, size_t nbytes,
-                   size_t *buf_size, void **buf)
+static size_t add_sub_value_hdf5(unsigned int flags, size_t cd_nelmts, const unsigned int* cd_values, size_t nbytes, size_t* buf_size, void** buf)
 {
-    int     *int_ptr  = (int *)*buf; /* Pointer to the data values               */
-    size_t   buf_left = *buf_size;   /* Amount of data buffer left to process    */
-    int      value    = 0;           /* Data value to add/subtract               */
-    unsigned majnum   = 0;           /* Output data from the HDF5 library call   */
-    unsigned minnum   = 0;
-    unsigned relnum   = 0;
+    int* int_ptr = (int*)*buf;   /* Pointer to the data values               */
+    size_t buf_left = *buf_size; /* Amount of data buffer left to process    */
+    int value = 0;               /* Data value to add/subtract               */
+    unsigned majnum = 0;         /* Output data from the HDF5 library call   */
+    unsigned minnum = 0;
+    unsigned relnum = 0;
 
     /* Check for the library version.
      * We don't do anything with this information - it's just to ensure that
@@ -89,12 +84,14 @@ add_sub_value_hdf5(unsigned int flags, size_t cd_nelmts, const unsigned int *cd_
     }
 
     /* Check for the correct number of parameters */
-    if (cd_nelmts == 0)
+    if (cd_nelmts == 0) {
         return 0;
+    }
 
     /* Check that permanent parameters are set correctly */
-    if (cd_values[0] > 9)
+    if (cd_values[0] > 9) {
         return 0;
+    }
 
     /* Ensure that the version numbers match what was passed in.
      * Again, this is trivial work, just to ensure that the library calls are

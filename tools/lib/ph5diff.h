@@ -27,16 +27,18 @@
 #define MPI_TAG_END      7
 #define MPI_TAG_PARALLEL 8
 
-struct diff_mpi_args {
-    char        name1[256];
-    char        name2[256];
-    diff_opt_t  opts;
+struct diff_mpi_args
+{
+    char name1[256];
+    char name2[256];
+    diff_opt_t opts;
     diff_args_t argdata; /* rest args */
 };
 
-struct diffs_found {
+struct diffs_found
+{
     hsize_t nfound;
-    int     not_cmp;
+    int not_cmp;
 };
 
 #endif /* PH5DIFF_H */

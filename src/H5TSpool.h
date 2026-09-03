@@ -37,25 +37,27 @@
 /******************/
 
 /* Thread pool task */
-typedef struct H5TS_pool_task_t {
+typedef struct H5TS_pool_task_t
+{
     H5TS_thread_start_func_t func; /* Function to invoke with thread */
-    void                    *ctx;  /* Context for task's function */
-    struct H5TS_pool_task_t *next; /* Pointer to next task */
+    void* ctx;                     /* Context for task's function */
+    struct H5TS_pool_task_t* next; /* Pointer to next task */
 } H5TS_pool_task_t;
 
 /* Thread pool */
-struct H5TS_pool_t {
+struct H5TS_pool_t
+{
     /* Semaphore */
     H5TS_semaphore_t sem;
 
     /* Task queue */
-    H5TS_mutex_t      queue_mutex; /* Mutex to control access to task queue */
-    bool              shutdown;    /* Pool is shutting down */
+    H5TS_mutex_t queue_mutex;      /* Mutex to control access to task queue */
+    bool shutdown;                 /* Pool is shutting down */
     H5TS_pool_task_t *head, *tail; /* Task queue */
 
     /* Threads */
-    unsigned       num_threads; /* # of threads in pool */
-    H5TS_thread_t *threads;     /* Array of worker threads in pool */
+    unsigned num_threads;   /* # of threads in pool */
+    H5TS_thread_t* threads; /* Array of worker threads in pool */
 };
 
 /********************/
@@ -83,22 +85,23 @@ struct H5TS_pool_t {
  *
  *--------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_pool_add_task(H5TS_pool_t *pool, H5TS_thread_start_func_t func, void *ctx)
+static inline herr_t H5TS_pool_add_task(H5TS_pool_t* pool, H5TS_thread_start_func_t func, void* ctx)
 {
-    H5TS_pool_task_t *task             = NULL;  /* Task for function to invoke */
-    bool              have_queue_mutex = false; /* Whether we're holding the task queue mutex */
-    herr_t            ret_value        = SUCCEED;
+    H5TS_pool_task_t* task = NULL; /* Task for function to invoke */
+    bool have_queue_mutex = false; /* Whether we're holding the task queue mutex */
+    herr_t ret_value = SUCCEED;
 
     /* Sanity checks */
-    if (H5_UNLIKELY(NULL == pool || NULL == func))
+    if (H5_UNLIKELY(NULL == pool || NULL == func)) {
         return FAIL;
+    }
 
     /* Allocate & initialize new task */
-    if (H5_UNLIKELY(NULL == (task = (H5TS_pool_task_t *)malloc(sizeof(H5TS_pool_task_t)))))
+    if (H5_UNLIKELY(NULL == (task = (H5TS_pool_task_t*)malloc(sizeof(H5TS_pool_task_t))))) {
         return FAIL;
+    }
     task->func = func;
-    task->ctx  = ctx;
+    task->ctx = ctx;
     task->next = NULL;
 
     /* Acquire the mutex for the task queue */
@@ -117,10 +120,11 @@ H5TS_pool_add_task(H5TS_pool_t *pool, H5TS_thread_start_func_t func, void *ctx)
     /* Add task to pool's queue */
     if (NULL != pool->tail) {
         pool->tail->next = task;
-        pool->tail       = task;
+        pool->tail = task;
     }
-    else
+    else {
         pool->head = pool->tail = task;
+    }
 
     /* Avoid freeing the task on error, now */
     task = NULL;
@@ -133,18 +137,21 @@ H5TS_pool_add_task(H5TS_pool_t *pool, H5TS_thread_start_func_t func, void *ctx)
     have_queue_mutex = false;
 
     /* Signal the semaphore */
-    if (H5_UNLIKELY(H5TS_semaphore_signal(&pool->sem) < 0))
+    if (H5_UNLIKELY(H5TS_semaphore_signal(&pool->sem) < 0)) {
         ret_value = FAIL;
+    }
 
 done:
     /* Free the task, on failure */
     if (H5_UNLIKELY(ret_value < 0)) {
         /* Release the task queue's mutex, if we're still holding it */
         /* (Can only happen on failure) */
-        if (H5_UNLIKELY(have_queue_mutex))
+        if (H5_UNLIKELY(have_queue_mutex)) {
             H5TS_mutex_unlock(&pool->queue_mutex);
-        if (task)
+        }
+        if (task) {
             free(task);
+        }
     }
 
     return (ret_value);

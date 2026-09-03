@@ -97,87 +97,82 @@ static hid_t generate_random_datatype_complex(H5T_class_t parent_class, bool is_
  * recursive generation of datatypes. In most cases, this function should be
  * called with H5T_NO_CLASS for the parent_class parameter.
  */
-hid_t
-generate_random_datatype(H5T_class_t parent_class, bool is_compact)
+hid_t generate_random_datatype(H5T_class_t parent_class, bool is_compact)
 {
     generate_datatype_func gen_func;
-    static int             depth = 0;
-    size_t                 type_size;
-    hid_t                  datatype  = H5I_INVALID_HID;
-    hid_t                  ret_value = H5I_INVALID_HID;
+    static int depth = 0;
+    size_t type_size;
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
     depth++;
 
 roll_datatype:
     switch (rand() % H5T_NCLASSES) {
-        case H5T_INTEGER:
-            gen_func = generate_random_datatype_integer;
-            break;
-        case H5T_FLOAT:
-            gen_func = generate_random_datatype_float;
-            break;
-        case H5T_TIME:
-            /* Time datatype is unsupported, try again */
+    case H5T_INTEGER: gen_func = generate_random_datatype_integer; break;
+    case H5T_FLOAT  : gen_func = generate_random_datatype_float; break;
+    case H5T_TIME:
+        /* Time datatype is unsupported, try again */
+        goto roll_datatype;
+        break;
+    case H5T_STRING: gen_func = generate_random_datatype_string; break;
+    case H5T_BITFIELD:
+        /* Bitfield datatype is unsupported, try again */
+        goto roll_datatype;
+        break;
+    case H5T_OPAQUE:
+        /* Opaque datatype is unsupported, try again */
+        goto roll_datatype;
+        break;
+    case H5T_COMPOUND:
+        /* Currently only allows arrays of integer, float or string. Pick another type if we
+         * are creating an array of something other than these. Also don't allow recursion
+         * to go too deep. Pick another type that doesn't recursively call this function. */
+        if ((H5T_ARRAY == parent_class) || ((depth + 1) > TYPE_GEN_RECURSION_MAX_DEPTH)) {
             goto roll_datatype;
-            break;
-        case H5T_STRING:
-            gen_func = generate_random_datatype_string;
-            break;
-        case H5T_BITFIELD:
-            /* Bitfield datatype is unsupported, try again */
+        }
+
+        gen_func = generate_random_datatype_compound;
+        break;
+    case H5T_REFERENCE:
+        /* Temporarily disable generation of reference datatypes */
+        goto roll_datatype;
+
+        /* Currently only allows arrays of integer, float or string. Pick another type if we
+         * are creating an array of something other than these. */
+        if (H5T_ARRAY == parent_class) {
             goto roll_datatype;
-            break;
-        case H5T_OPAQUE:
-            /* Opaque datatype is unsupported, try again */
+        }
+
+        gen_func = generate_random_datatype_reference;
+        break;
+    case H5T_ENUM:
+        /* Currently doesn't currently support ARRAY of ENUM, so try another type
+         * if this happens. */
+        if (H5T_ARRAY == parent_class) {
             goto roll_datatype;
-            break;
-        case H5T_COMPOUND:
-            /* Currently only allows arrays of integer, float or string. Pick another type if we
-             * are creating an array of something other than these. Also don't allow recursion
-             * to go too deep. Pick another type that doesn't recursively call this function. */
-            if ((H5T_ARRAY == parent_class) || ((depth + 1) > TYPE_GEN_RECURSION_MAX_DEPTH))
-                goto roll_datatype;
+        }
 
-            gen_func = generate_random_datatype_compound;
-            break;
-        case H5T_REFERENCE:
-            /* Temporarily disable generation of reference datatypes */
+        gen_func = generate_random_datatype_enum;
+        break;
+    case H5T_VLEN:
+        /* Variable-length datatypes are unsupported, try again */
+        goto roll_datatype;
+        break;
+    case H5T_ARRAY:
+        /* Currently doesn't currently support ARRAY of ARRAY, so try another type
+         * if this happens. Also check for too much recursion. */
+        if ((H5T_ARRAY == parent_class) || ((depth + 1) > TYPE_GEN_RECURSION_MAX_DEPTH)) {
             goto roll_datatype;
+        }
 
-            /* Currently only allows arrays of integer, float or string. Pick another type if we
-             * are creating an array of something other than these. */
-            if (H5T_ARRAY == parent_class)
-                goto roll_datatype;
-
-            gen_func = generate_random_datatype_reference;
-            break;
-        case H5T_ENUM:
-            /* Currently doesn't currently support ARRAY of ENUM, so try another type
-             * if this happens. */
-            if (H5T_ARRAY == parent_class)
-                goto roll_datatype;
-
-            gen_func = generate_random_datatype_enum;
-            break;
-        case H5T_VLEN:
-            /* Variable-length datatypes are unsupported, try again */
-            goto roll_datatype;
-            break;
-        case H5T_ARRAY:
-            /* Currently doesn't currently support ARRAY of ARRAY, so try another type
-             * if this happens. Also check for too much recursion. */
-            if ((H5T_ARRAY == parent_class) || ((depth + 1) > TYPE_GEN_RECURSION_MAX_DEPTH))
-                goto roll_datatype;
-
-            gen_func = generate_random_datatype_array;
-            break;
-        case H5T_COMPLEX:
-            gen_func = generate_random_datatype_complex;
-            break;
-        default:
-            printf("    invalid datatype class\n");
-            goto done;
-            break;
+        gen_func = generate_random_datatype_array;
+        break;
+    case H5T_COMPLEX: gen_func = generate_random_datatype_complex; break;
+    default:
+        printf("    invalid datatype class\n");
+        goto done;
+        break;
     }
 
     if ((datatype = (gen_func)(parent_class, is_compact)) < 0) {
@@ -199,8 +194,7 @@ roll_datatype:
             goto done;
         }
 
-        if ((type_size > GENERATED_DATATYPE_MAX_SIZE) ||
-            (is_compact && (type_size > COMPACT_DATATYPE_MAX_SIZE))) {
+        if ((type_size > GENERATED_DATATYPE_MAX_SIZE) || (is_compact && (type_size > COMPACT_DATATYPE_MAX_SIZE))) {
             /*
              * Generate a new datatype.
              */
@@ -218,65 +212,30 @@ done:
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_integer(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_integer(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
     hid_t type_to_copy = H5I_INVALID_HID;
-    hid_t datatype     = H5I_INVALID_HID;
-    hid_t ret_value    = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
     switch (rand() % NUM_PREDEFINED_INT_TYPES) {
-        case 0:
-            type_to_copy = H5T_STD_I8BE;
-            break;
-        case 1:
-            type_to_copy = H5T_STD_I8LE;
-            break;
-        case 2:
-            type_to_copy = H5T_STD_I16BE;
-            break;
-        case 3:
-            type_to_copy = H5T_STD_I16LE;
-            break;
-        case 4:
-            type_to_copy = H5T_STD_I32BE;
-            break;
-        case 5:
-            type_to_copy = H5T_STD_I32LE;
-            break;
-        case 6:
-            type_to_copy = H5T_STD_I64BE;
-            break;
-        case 7:
-            type_to_copy = H5T_STD_I64LE;
-            break;
-        case 8:
-            type_to_copy = H5T_STD_U8BE;
-            break;
-        case 9:
-            type_to_copy = H5T_STD_U8LE;
-            break;
-        case 10:
-            type_to_copy = H5T_STD_U16BE;
-            break;
-        case 11:
-            type_to_copy = H5T_STD_U16LE;
-            break;
-        case 12:
-            type_to_copy = H5T_STD_U32BE;
-            break;
-        case 13:
-            type_to_copy = H5T_STD_U32LE;
-            break;
-        case 14:
-            type_to_copy = H5T_STD_U64BE;
-            break;
-        case 15:
-            type_to_copy = H5T_STD_U64LE;
-            break;
-        default:
-            printf("    invalid value for predefined integer type; should not happen\n");
-            goto done;
+    case 0 : type_to_copy = H5T_STD_I8BE; break;
+    case 1 : type_to_copy = H5T_STD_I8LE; break;
+    case 2 : type_to_copy = H5T_STD_I16BE; break;
+    case 3 : type_to_copy = H5T_STD_I16LE; break;
+    case 4 : type_to_copy = H5T_STD_I32BE; break;
+    case 5 : type_to_copy = H5T_STD_I32LE; break;
+    case 6 : type_to_copy = H5T_STD_I64BE; break;
+    case 7 : type_to_copy = H5T_STD_I64LE; break;
+    case 8 : type_to_copy = H5T_STD_U8BE; break;
+    case 9 : type_to_copy = H5T_STD_U8LE; break;
+    case 10: type_to_copy = H5T_STD_U16BE; break;
+    case 11: type_to_copy = H5T_STD_U16LE; break;
+    case 12: type_to_copy = H5T_STD_U32BE; break;
+    case 13: type_to_copy = H5T_STD_U32LE; break;
+    case 14: type_to_copy = H5T_STD_U64BE; break;
+    case 15: type_to_copy = H5T_STD_U64LE; break;
+    default: printf("    invalid value for predefined integer type; should not happen\n"); goto done;
     }
 
     if ((datatype = H5Tcopy(type_to_copy)) < 0) {
@@ -288,64 +247,36 @@ generate_random_datatype_integer(H5T_class_t H5_ATTR_UNUSED parent_class, bool H
 
 done:
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_float(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_float(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
     hid_t type_to_copy = H5I_INVALID_HID;
-    hid_t datatype     = H5I_INVALID_HID;
-    hid_t ret_value    = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
     switch (rand() % NUM_PREDEFINED_FLOAT_TYPES) {
-        case 0:
-            type_to_copy = H5T_IEEE_F16BE;
-            break;
-        case 1:
-            type_to_copy = H5T_IEEE_F16LE;
-            break;
-        case 2:
-            type_to_copy = H5T_IEEE_F32BE;
-            break;
-        case 3:
-            type_to_copy = H5T_IEEE_F32LE;
-            break;
-        case 4:
-            type_to_copy = H5T_IEEE_F64BE;
-            break;
-        case 5:
-            type_to_copy = H5T_IEEE_F64LE;
-            break;
-        case 6:
-            type_to_copy = H5T_FLOAT_BFLOAT16BE;
-            break;
-        case 7:
-            type_to_copy = H5T_FLOAT_BFLOAT16LE;
-            break;
-        case 8:
-            type_to_copy = H5T_FLOAT_F8E4M3;
-            break;
-        case 9:
-            type_to_copy = H5T_FLOAT_F8E5M2;
-            break;
-        case 10:
-            type_to_copy = H5T_FLOAT_F6E2M3;
-            break;
-        case 11:
-            type_to_copy = H5T_FLOAT_F6E3M2;
-            break;
-        case 12:
-            type_to_copy = H5T_FLOAT_F4E2M1;
-            break;
+    case 0 : type_to_copy = H5T_IEEE_F16BE; break;
+    case 1 : type_to_copy = H5T_IEEE_F16LE; break;
+    case 2 : type_to_copy = H5T_IEEE_F32BE; break;
+    case 3 : type_to_copy = H5T_IEEE_F32LE; break;
+    case 4 : type_to_copy = H5T_IEEE_F64BE; break;
+    case 5 : type_to_copy = H5T_IEEE_F64LE; break;
+    case 6 : type_to_copy = H5T_FLOAT_BFLOAT16BE; break;
+    case 7 : type_to_copy = H5T_FLOAT_BFLOAT16LE; break;
+    case 8 : type_to_copy = H5T_FLOAT_F8E4M3; break;
+    case 9 : type_to_copy = H5T_FLOAT_F8E5M2; break;
+    case 10: type_to_copy = H5T_FLOAT_F6E2M3; break;
+    case 11: type_to_copy = H5T_FLOAT_F6E3M2; break;
+    case 12: type_to_copy = H5T_FLOAT_F4E2M1; break;
 
-        default:
-            printf("    invalid value for floating point type; should not happen\n");
-            goto done;
+    default: printf("    invalid value for floating point type; should not happen\n"); goto done;
     }
 
     if ((datatype = H5Tcopy(type_to_copy)) < 0) {
@@ -357,17 +288,17 @@ generate_random_datatype_float(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_
 
 done:
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_string(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_string(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
-    hid_t datatype  = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
     hid_t ret_value = H5I_INVALID_HID;
 
     /* Note: currently only H5T_CSET_ASCII is supported for the character set and
@@ -414,25 +345,26 @@ generate_random_datatype_string(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5
 
 done:
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_compound(H5T_class_t H5_ATTR_UNUSED parent_class, bool is_compact)
+static hid_t generate_random_datatype_compound(H5T_class_t H5_ATTR_UNUSED parent_class, bool is_compact)
 {
-    size_t num_members   = 0;
-    size_t next_offset   = 0;
+    size_t num_members = 0;
+    size_t next_offset = 0;
     size_t compound_size = 0;
-    hid_t  compound_members[COMPOUND_TYPE_MAX_MEMBERS];
-    hid_t  datatype  = H5I_INVALID_HID;
-    hid_t  ret_value = H5I_INVALID_HID;
+    hid_t compound_members[COMPOUND_TYPE_MAX_MEMBERS];
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
-    for (size_t i = 0; i < COMPOUND_TYPE_MAX_MEMBERS; i++)
+    for (size_t i = 0; i < COMPOUND_TYPE_MAX_MEMBERS; i++) {
         compound_members[i] = H5I_INVALID_HID;
+    }
 
     if ((datatype = H5Tcreate(H5T_COMPOUND, 1)) < 0) {
         printf("    couldn't create compound datatype\n");
@@ -443,7 +375,7 @@ generate_random_datatype_compound(H5T_class_t H5_ATTR_UNUSED parent_class, bool 
 
     for (size_t i = 0; i < num_members; i++) {
         size_t member_size;
-        char   member_name[256];
+        char member_name[256];
 
         snprintf(member_name, 256, "compound_member%zu", i);
 
@@ -482,17 +414,17 @@ done:
     }
 
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_reference(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_reference(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
-    hid_t datatype  = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
     hid_t ret_value = H5I_INVALID_HID;
 
 #if 0 /* Region references are currently unsupported */
@@ -517,20 +449,20 @@ generate_random_datatype_reference(H5T_class_t H5_ATTR_UNUSED parent_class, bool
 
 done:
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_enum(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_enum(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
-    size_t num_members      = 0;
-    hid_t  datatype         = H5I_INVALID_HID;
-    int   *enum_member_vals = NULL;
-    hid_t  ret_value        = H5I_INVALID_HID;
+    size_t num_members = 0;
+    hid_t datatype = H5I_INVALID_HID;
+    int* enum_member_vals = NULL;
+    hid_t ret_value = H5I_INVALID_HID;
 
     if ((datatype = H5Tenum_create(H5T_NATIVE_INT)) < 0) {
         printf("    couldn't create enum datatype\n");
@@ -547,7 +479,7 @@ generate_random_datatype_enum(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_A
     for (size_t i = 0; i < num_members; i++) {
         bool unique;
         char name[ENUM_TYPE_MAX_MEMBER_NAME_LENGTH];
-        int  enum_val;
+        int enum_val;
 
         snprintf(name, ENUM_TYPE_MAX_MEMBER_NAME_LENGTH, "enum_val%zu", i);
 
@@ -556,9 +488,11 @@ generate_random_datatype_enum(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_A
 
             /* Check for uniqueness of enum member */
             unique = true;
-            for (size_t j = 0; j < i; j++)
-                if (enum_val == enum_member_vals[j])
+            for (size_t j = 0; j < i; j++) {
+                if (enum_val == enum_member_vals[j]) {
                     unique = false;
+                }
+            }
         } while (!unique);
 
         enum_member_vals[i] = enum_val;
@@ -575,21 +509,21 @@ done:
     free(enum_member_vals);
 
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_array(H5T_class_t H5_ATTR_UNUSED parent_class, bool is_compact)
+static hid_t generate_random_datatype_array(H5T_class_t H5_ATTR_UNUSED parent_class, bool is_compact)
 {
-    unsigned ndims         = 0;
-    hsize_t *array_dims    = NULL;
-    hid_t    base_datatype = H5I_INVALID_HID;
-    hid_t    datatype      = H5I_INVALID_HID;
-    hid_t    ret_value     = H5I_INVALID_HID;
+    unsigned ndims = 0;
+    hsize_t* array_dims = NULL;
+    hid_t base_datatype = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
     ndims = (unsigned)(rand() % ARRAY_TYPE_MAX_DIMS + 1);
 
@@ -598,8 +532,9 @@ generate_random_datatype_array(H5T_class_t H5_ATTR_UNUSED parent_class, bool is_
         goto done;
     }
 
-    for (size_t i = 0; i < ndims; i++)
+    for (size_t i = 0; i < ndims; i++) {
         array_dims[i] = (hsize_t)(rand() % MAX_DIM_SIZE + 1);
+    }
 
     if ((base_datatype = generate_random_datatype(H5T_ARRAY, is_compact)) < 0) {
         printf("    couldn't create array base datatype\n");
@@ -617,47 +552,34 @@ done:
     free(array_dims);
 
     if (base_datatype >= 0) {
-        if (H5Tclose(base_datatype) < 0)
+        if (H5Tclose(base_datatype) < 0) {
             printf("    couldn't close array base datatype\n");
+        }
     }
 
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
 }
 
-static hid_t
-generate_random_datatype_complex(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
+static hid_t generate_random_datatype_complex(H5T_class_t H5_ATTR_UNUSED parent_class, bool H5_ATTR_UNUSED is_compact)
 {
     hid_t type_to_copy = H5I_INVALID_HID;
-    hid_t datatype     = H5I_INVALID_HID;
-    hid_t ret_value    = H5I_INVALID_HID;
+    hid_t datatype = H5I_INVALID_HID;
+    hid_t ret_value = H5I_INVALID_HID;
 
     switch (rand() % NUM_PREDEFINED_COMPLEX_TYPES) {
-        case 0:
-            type_to_copy = H5T_COMPLEX_IEEE_F16BE;
-            break;
-        case 1:
-            type_to_copy = H5T_COMPLEX_IEEE_F16LE;
-            break;
-        case 2:
-            type_to_copy = H5T_COMPLEX_IEEE_F32BE;
-            break;
-        case 3:
-            type_to_copy = H5T_COMPLEX_IEEE_F32LE;
-            break;
-        case 4:
-            type_to_copy = H5T_COMPLEX_IEEE_F64BE;
-            break;
-        case 5:
-            type_to_copy = H5T_COMPLEX_IEEE_F64LE;
-            break;
-        default:
-            printf("    invalid value for complex number type; should not happen\n");
-            goto done;
+    case 0 : type_to_copy = H5T_COMPLEX_IEEE_F16BE; break;
+    case 1 : type_to_copy = H5T_COMPLEX_IEEE_F16LE; break;
+    case 2 : type_to_copy = H5T_COMPLEX_IEEE_F32BE; break;
+    case 3 : type_to_copy = H5T_COMPLEX_IEEE_F32LE; break;
+    case 4 : type_to_copy = H5T_COMPLEX_IEEE_F64BE; break;
+    case 5 : type_to_copy = H5T_COMPLEX_IEEE_F64LE; break;
+    default: printf("    invalid value for complex number type; should not happen\n"); goto done;
     }
 
     if ((datatype = H5Tcopy(type_to_copy)) < 0) {
@@ -669,8 +591,9 @@ generate_random_datatype_complex(H5T_class_t H5_ATTR_UNUSED parent_class, bool H
 
 done:
     if ((ret_value == H5I_INVALID_HID) && (datatype >= 0)) {
-        if (H5Tclose(datatype) < 0)
+        if (H5Tclose(datatype) < 0) {
             printf("    couldn't close datatype\n");
+        }
     }
 
     return ret_value;
@@ -680,18 +603,17 @@ done:
  * Helper function to generate a random HDF5 dataspace in order to thoroughly
  * test support for dataspaces.
  */
-hid_t
-generate_random_dataspace(int rank, const hsize_t *max_dims, hsize_t *dims_out, bool is_compact)
+hid_t generate_random_dataspace(int rank, const hsize_t* max_dims, hsize_t* dims_out, bool is_compact)
 {
     hsize_t dataspace_dims[H5S_MAX_RANK];
-    size_t  i;
-    hid_t   dataspace_id = H5I_INVALID_HID;
+    size_t i;
+    hid_t dataspace_id = H5I_INVALID_HID;
 
-    if (rank < 0)
+    if (rank < 0) {
         TEST_ERROR;
+    }
     if (is_compact && (rank > COMPACT_SPACE_MAX_DIMS)) {
-        printf("    current rank of compact dataspace (%lld) exceeds maximum dimensionality (%lld)\n",
-               (long long)rank, (long long)COMPACT_SPACE_MAX_DIMS);
+        printf("    current rank of compact dataspace (%lld) exceeds maximum dimensionality (%lld)\n", (long long)rank, (long long)COMPACT_SPACE_MAX_DIMS);
         TEST_ERROR;
     }
 
@@ -700,17 +622,21 @@ generate_random_dataspace(int rank, const hsize_t *max_dims, hsize_t *dims_out, 
      * are not larger than this.
      */
     for (i = 0; i < (size_t)rank; i++) {
-        if (is_compact)
+        if (is_compact) {
             dataspace_dims[i] = (hsize_t)(rand() % COMPACT_SPACE_MAX_DIM_SIZE + 1);
-        else
+        }
+        else {
             dataspace_dims[i] = (hsize_t)(rand() % MAX_DIM_SIZE + 1);
+        }
 
-        if (dims_out)
+        if (dims_out) {
             dims_out[i] = dataspace_dims[i];
+        }
     }
 
-    if ((dataspace_id = H5Screate_simple(rank, dataspace_dims, max_dims)) < 0)
+    if ((dataspace_id = H5Screate_simple(rank, dataspace_dims, max_dims)) < 0) {
         TEST_ERROR;
+    }
 
     return dataspace_id;
 
@@ -718,10 +644,9 @@ error:
     return H5I_INVALID_HID;
 }
 
-int
-create_test_container(char *filename, uint64_t vol_cap_flags)
+int create_test_container(char* filename, uint64_t vol_cap_flags)
 {
-    hid_t file_id  = H5I_INVALID_HID;
+    hid_t file_id = H5I_INVALID_HID;
     hid_t group_id = H5I_INVALID_HID;
 
     printf("Creating container file for tests\n");
@@ -742,44 +667,37 @@ create_test_container(char *filename, uint64_t vol_cap_flags)
         /* Create container groups for each of the test interfaces
          * (group, attribute, dataset, etc.).
          */
-        if ((group_id = H5Gcreate2(file_id, GROUP_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >=
-            0) {
+        if ((group_id = H5Gcreate2(file_id, GROUP_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Group tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id = H5Gcreate2(file_id, ATTRIBUTE_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT,
-                                   H5P_DEFAULT)) >= 0) {
+        if ((group_id = H5Gcreate2(file_id, ATTRIBUTE_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Attribute tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id =
-                 H5Gcreate2(file_id, DATASET_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
+        if ((group_id = H5Gcreate2(file_id, DATASET_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Dataset tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id =
-                 H5Gcreate2(file_id, DATATYPE_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
+        if ((group_id = H5Gcreate2(file_id, DATATYPE_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Datatype tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id = H5Gcreate2(file_id, LINK_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >=
-            0) {
+        if ((group_id = H5Gcreate2(file_id, LINK_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Link tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id = H5Gcreate2(file_id, OBJECT_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >=
-            0) {
+        if ((group_id = H5Gcreate2(file_id, OBJECT_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Object tests\n");
             H5Gclose(group_id);
         }
 
-        if ((group_id = H5Gcreate2(file_id, MISCELLANEOUS_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT,
-                                   H5P_DEFAULT)) >= 0) {
+        if ((group_id = H5Gcreate2(file_id, MISCELLANEOUS_TEST_GROUP_NAME, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0) {
             printf("    created container group for Miscellaneous tests\n");
             H5Gclose(group_id);
         }
@@ -808,10 +726,9 @@ error:
  * is responsible for freeing the returned filename
  * pointer with free().
  */
-herr_t
-prefix_filename(const char *prefix, const char *filename, char **filename_out)
+herr_t prefix_filename(const char* prefix, const char* filename, char** filename_out)
 {
-    char  *out_buf   = NULL;
+    char* out_buf = NULL;
     herr_t ret_value = SUCCEED;
 
     if (!prefix) {
@@ -849,15 +766,15 @@ done:
  * is given, adds that prefix string to the filename before
  * calling H5Fdelete
  */
-herr_t
-remove_test_file(const char *prefix, const char *filename)
+herr_t remove_test_file(const char* prefix, const char* filename)
 {
-    const char *test_file;
-    char       *prefixed_filename = NULL;
-    herr_t      ret_value         = SUCCEED;
+    const char* test_file;
+    char* prefixed_filename = NULL;
+    herr_t ret_value = SUCCEED;
 
-    if (!GetTestCleanup())
+    if (!GetTestCleanup()) {
         goto done;
+    }
 
     if (prefix) {
         if (prefix_filename(prefix, filename, &prefixed_filename) < 0) {
@@ -868,8 +785,9 @@ remove_test_file(const char *prefix, const char *filename)
 
         test_file = prefixed_filename;
     }
-    else
+    else {
         test_file = filename;
+    }
 
     H5E_BEGIN_TRY
     {

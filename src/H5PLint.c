@@ -76,8 +76,7 @@ static bool H5PL_allow_plugins_g = true;
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__get_plugin_control_mask(unsigned int *mask /*out*/)
+herr_t H5PL__get_plugin_control_mask(unsigned int* mask /*out*/)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -102,8 +101,7 @@ H5PL__get_plugin_control_mask(unsigned int *mask /*out*/)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__set_plugin_control_mask(unsigned int mask)
+herr_t H5PL__set_plugin_control_mask(unsigned int mask)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -114,8 +112,9 @@ H5PL__set_plugin_control_mask(unsigned int mask)
      *      silently ignore it. We may want to consider this behavior
      *      more carefully.
      */
-    if (H5PL_allow_plugins_g)
+    if (H5PL_allow_plugins_g) {
         H5PL_plugin_control_mask_g = mask;
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 
@@ -131,10 +130,9 @@ H5PL__set_plugin_control_mask(unsigned int mask)
  *              Failure:        negative
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__init_package(void)
+herr_t H5PL__init_package(void)
 {
-    char  *env_var   = NULL;
+    char* env_var = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
@@ -143,19 +141,22 @@ H5PL__init_package(void)
      * to ignore plugins. The special symbol H5PL_NO_PLUGIN (defined in
      * H5PLpublic.h) means we don't want to load plugins.
      */
-    if (NULL != (env_var = getenv(HDF5_PLUGIN_PRELOAD)))
+    if (NULL != (env_var = getenv(HDF5_PLUGIN_PRELOAD))) {
         if (!strcmp(env_var, H5PL_NO_PLUGIN)) {
             H5PL_plugin_control_mask_g = 0;
-            H5PL_allow_plugins_g       = false;
+            H5PL_allow_plugins_g = false;
         }
+    }
 
     /* Create the table of previously-loaded plugins */
-    if (H5PL__create_plugin_cache() < 0)
+    if (H5PL__create_plugin_cache() < 0) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTINIT, FAIL, "can't create plugin cache");
+    }
 
     /* Create the table of search paths for dynamic libraries */
-    if (H5PL__create_path_table() < 0)
+    if (H5PL__create_path_table() < 0) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTINIT, FAIL, "can't create plugin search path table");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -174,11 +175,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5PL_term_package(void)
+int H5PL_term_package(void)
 {
     bool already_closed = false;
-    int  ret_value      = 0;
+    int ret_value = 0;
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -186,24 +186,29 @@ H5PL_term_package(void)
         /* Close the plugin cache.
          * We need to bump the return value if we did any real work here.
          */
-        if (H5PL__close_plugin_cache(&already_closed) < 0)
+        if (H5PL__close_plugin_cache(&already_closed) < 0) {
             HGOTO_ERROR(H5E_PLUGIN, H5E_CANTFREE, (-1), "problem closing plugin cache");
-        if (!already_closed)
+        }
+        if (!already_closed) {
             ret_value++;
+        }
 
         /* Close the search path table and free the paths */
-        if (H5PL__close_path_table() < 0)
+        if (H5PL__close_path_table() < 0) {
             HGOTO_ERROR(H5E_PLUGIN, H5E_CANTFREE, (-1), "problem closing search path table");
+        }
 
 #ifdef H5_REQUIRE_DIGITAL_SIGNATURE
         /* Clean up signature verification resources */
-        if (H5PL__cleanup_signature_resources() < 0)
+        if (H5PL__cleanup_signature_resources() < 0) {
             HGOTO_ERROR(H5E_PLUGIN, H5E_CANTFREE, (-1), "problem cleaning up signature resources");
+        }
 #endif
 
         /* Mark the interface as uninitialized */
-        if (0 == ret_value)
+        if (0 == ret_value) {
             H5_PKG_INIT_VAR = false;
+        }
     } /* end if */
 
 done:
@@ -224,62 +229,71 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-const void *
-H5PL_load(H5PL_type_t type, const H5PL_key_t *key)
+const void* H5PL_load(H5PL_type_t type, const H5PL_key_t* key)
 {
-    H5PL_search_params_t search_params;       /* Plugin search parameters     */
-    bool                 found       = false; /* Whether the plugin was found */
-    const void          *plugin_info = NULL;  /* Information from the plugin  */
-    const void          *ret_value   = NULL;
+    H5PL_search_params_t search_params; /* Plugin search parameters     */
+    bool found = false;                 /* Whether the plugin was found */
+    const void* plugin_info = NULL;     /* Information from the plugin  */
+    const void* ret_value = NULL;
 
     FUNC_ENTER_NOAPI(NULL)
 
     /* Check if plugins can be loaded for this plugin type */
     switch (type) {
-        case H5PL_TYPE_FILTER:
-            if ((H5PL_plugin_control_mask_g & H5PL_FILTER_PLUGIN) == 0)
-                HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "filter plugins disabled");
-            break;
+    case H5PL_TYPE_FILTER:
+        if ((H5PL_plugin_control_mask_g & H5PL_FILTER_PLUGIN) == 0) {
+            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "filter plugins disabled");
+        }
+        break;
 
-        case H5PL_TYPE_VOL:
-            if ((H5PL_plugin_control_mask_g & H5PL_VOL_PLUGIN) == 0)
-                HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL,
-                            "Virtual Object Layer (VOL) driver plugins disabled");
-            break;
+    case H5PL_TYPE_VOL:
+        if ((H5PL_plugin_control_mask_g & H5PL_VOL_PLUGIN) == 0) {
+            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "Virtual Object Layer (VOL) driver plugins disabled");
+        }
+        break;
 
-        case H5PL_TYPE_VFD:
-            if ((H5PL_plugin_control_mask_g & H5PL_VFD_PLUGIN) == 0)
-                HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "Virtual File Driver (VFD) plugins disabled");
-            break;
+    case H5PL_TYPE_VFD:
+        if ((H5PL_plugin_control_mask_g & H5PL_VFD_PLUGIN) == 0) {
+            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "Virtual File Driver (VFD) plugins disabled");
+        }
+        break;
 
-        case H5PL_TYPE_ERROR:
-        case H5PL_TYPE_NONE:
-        default:
-            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "Invalid plugin type specified");
+    case H5PL_TYPE_ERROR:
+    case H5PL_TYPE_NONE:
+    default             : HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, NULL, "Invalid plugin type specified");
     }
 
     /* Set up the search parameters */
     search_params.type = type;
-    search_params.key  = key;
+    search_params.key = key;
 
     /* Search in the table of already loaded plugin libraries */
-    if (H5PL__find_plugin_in_cache(&search_params, &found, &plugin_info) < 0)
+    if (H5PL__find_plugin_in_cache(&search_params, &found, &plugin_info) < 0) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, NULL, "search in plugin cache failed");
+    }
 
     /* If not found, try iterating through the path table to find an appropriate plugin */
-    if (!found)
-        if (H5PL__find_plugin_in_path_table(&search_params, &found, &plugin_info) < 0)
-            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, NULL,
+    if (!found) {
+        if (H5PL__find_plugin_in_path_table(&search_params, &found, &plugin_info) < 0) {
+            HGOTO_ERROR(H5E_PLUGIN,
+                        H5E_CANTGET,
+                        NULL,
                         "can't find plugin in the paths either set by HDF5_PLUGIN_PATH, or default location, "
                         "or set by H5PLxxx functions");
+        }
+    }
 
     /* Set the return value we found the plugin */
-    if (found)
+    if (found) {
         ret_value = plugin_info;
-    else
-        HGOTO_ERROR(H5E_PLUGIN, H5E_NOTFOUND, NULL,
+    }
+    else {
+        HGOTO_ERROR(H5E_PLUGIN,
+                    H5E_NOTFOUND,
+                    NULL,
                     "can't find plugin. Check either HDF5_VOL_CONNECTOR, HDF5_PLUGIN_PATH, default location, "
                     "or path set by H5PLxxx functions");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -320,36 +334,37 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__open(const char *path, H5PL_type_t type, const H5PL_key_t *key, bool *success, H5PL_type_t *plugin_type,
-           const void **plugin_info)
+herr_t H5PL__open(const char* path, H5PL_type_t type, const H5PL_key_t* key, bool* success, H5PL_type_t* plugin_type, const void** plugin_info)
 {
-    H5PL_HANDLE            handle          = NULL;
+    H5PL_HANDLE handle = NULL;
     H5PL_get_plugin_info_t get_plugin_info = NULL;
     H5PL_get_plugin_type_t get_plugin_type = NULL;
-    H5PL_type_t            loaded_plugin_type;
-    H5PL_key_t             tmp_key;
-    herr_t                 ret_value = SUCCEED;
+    H5PL_type_t loaded_plugin_type;
+    H5PL_key_t tmp_key;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     /* Check args - Just assert on package functions */
     assert(path);
-    if (type == H5PL_TYPE_NONE)
+    if (type == H5PL_TYPE_NONE) {
         assert(!key);
+    }
     assert(success);
     assert(plugin_info);
 
     /* Initialize out parameters */
-    *success     = false;
+    *success = false;
     *plugin_info = NULL;
-    if (plugin_type)
+    if (plugin_type) {
         *plugin_type = H5PL_TYPE_ERROR;
+    }
 
 #ifdef H5_REQUIRE_DIGITAL_SIGNATURE
     /* Verify plugin signature before loading */
-    if (H5PL__verify_signature_appended(path) < 0)
+    if (H5PL__verify_signature_appended(path) < 0) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "plugin signature verification failed for: %s", path);
+    }
 #endif
 
     /* There are different reasons why a library can't be open, e.g. wrong architecture.
@@ -370,120 +385,137 @@ H5PL__open(const char *path, H5PL_type_t type, const H5PL_key_t *key, bool *succ
      * The plugin library is supposed to define this function.
      */
     H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
-    if (NULL == (get_plugin_type = (H5PL_get_plugin_type_t)H5PL_GET_LIB_FUNC(handle, "H5PLget_plugin_type")))
+    if (NULL == (get_plugin_type = (H5PL_get_plugin_type_t)H5PL_GET_LIB_FUNC(handle, "H5PLget_plugin_type"))) {
         HGOTO_DONE(SUCCEED);
+    }
     H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
 
     /* Return a handle for the function H5PLget_plugin_info in the dynamic library.
      * The plugin library is supposed to define this function.
      */
     H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
-    if (NULL == (get_plugin_info = (H5PL_get_plugin_info_t)H5PL_GET_LIB_FUNC(handle, "H5PLget_plugin_info")))
+    if (NULL == (get_plugin_info = (H5PL_get_plugin_info_t)H5PL_GET_LIB_FUNC(handle, "H5PLget_plugin_info"))) {
         HGOTO_DONE(SUCCEED);
+    }
     H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
 
     /* Check the plugin type and return if it doesn't match the one passed in */
     loaded_plugin_type = (H5PL_type_t)(*get_plugin_type)();
-    if ((type != H5PL_TYPE_NONE) && (type != loaded_plugin_type))
+    if ((type != H5PL_TYPE_NONE) && (type != loaded_plugin_type)) {
         HGOTO_DONE(SUCCEED);
+    }
 
     /* Get the plugin information */
     switch (loaded_plugin_type) {
-        case H5PL_TYPE_FILTER: {
-            const H5Z_class2_t *filter_info;
+    case H5PL_TYPE_FILTER:
+        {
+            const H5Z_class2_t* filter_info;
 
             /* Get the plugin info */
-            if (NULL == (filter_info = (const H5Z_class2_t *)(*get_plugin_info)()))
+            if (NULL == (filter_info = (const H5Z_class2_t*)(*get_plugin_info)())) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "can't get filter info from plugin");
+            }
 
             /* Setup temporary plugin key if one wasn't supplied */
             if (!key) {
                 tmp_key.id = filter_info->id;
-                key        = &tmp_key;
+                key = &tmp_key;
             }
 
             /* If the filter IDs match, we're done. Set the output parameters. */
             if (filter_info->id == key->id) {
-                if (plugin_type)
+                if (plugin_type) {
                     *plugin_type = H5PL_TYPE_FILTER;
-                *plugin_info = (const void *)filter_info;
-                *success     = true;
+                }
+                *plugin_info = (const void*)filter_info;
+                *success = true;
             }
 
             break;
         }
 
-        case H5PL_TYPE_VOL: {
-            const void *cls;
+    case H5PL_TYPE_VOL:
+        {
+            const void* cls;
 
             /* Get the plugin info */
-            if (NULL == (cls = (const void *)(*get_plugin_info)()))
+            if (NULL == (cls = (const void*)(*get_plugin_info)())) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "can't get VOL connector info from plugin");
+            }
 
             /* Setup temporary plugin key if one wasn't supplied */
             if (!key) {
-                tmp_key.vol.kind   = H5VL_GET_CONNECTOR_BY_NAME;
-                tmp_key.vol.u.name = ((const H5VL_class_t *)cls)->name;
-                key                = &tmp_key;
+                tmp_key.vol.kind = H5VL_GET_CONNECTOR_BY_NAME;
+                tmp_key.vol.u.name = ((const H5VL_class_t*)cls)->name;
+                key = &tmp_key;
             }
 
             /* Ask VOL interface if this class is the one we are looking for and is compatible, etc */
-            if (H5VL_check_plugin_load(cls, key, success) < 0)
+            if (H5VL_check_plugin_load(cls, key, success) < 0) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, FAIL, "VOL connector compatibility check failed");
+            }
 
             /* Check for finding the correct plugin */
             if (*success) {
-                if (plugin_type)
+                if (plugin_type) {
                     *plugin_type = H5PL_TYPE_VOL;
+                }
                 *plugin_info = cls;
             }
 
             break;
         }
 
-        case H5PL_TYPE_VFD: {
-            const void *cls;
+    case H5PL_TYPE_VFD:
+        {
+            const void* cls;
 
             /* Get the plugin info */
-            if (NULL == (cls = (const void *)(*get_plugin_info)()))
+            if (NULL == (cls = (const void*)(*get_plugin_info)())) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "can't get VFD info from plugin");
+            }
 
             /* Setup temporary plugin key if one wasn't supplied */
             if (!key) {
-                tmp_key.vfd.kind   = H5FD_GET_DRIVER_BY_NAME;
-                tmp_key.vfd.u.name = ((const H5FD_class_t *)cls)->name;
-                key                = &tmp_key;
+                tmp_key.vfd.kind = H5FD_GET_DRIVER_BY_NAME;
+                tmp_key.vfd.u.name = ((const H5FD_class_t*)cls)->name;
+                key = &tmp_key;
             }
 
             /* Ask VFD interface if this class is the one we are looking for and is compatible, etc */
-            if (H5FD_check_plugin_load(cls, key, success) < 0)
+            if (H5FD_check_plugin_load(cls, key, success) < 0) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTLOAD, FAIL, "VFD compatibility check failed");
+            }
 
             /* Check for finding the correct plugin */
             if (*success) {
-                if (plugin_type)
+                if (plugin_type) {
                     *plugin_type = H5PL_TYPE_VFD;
+                }
                 *plugin_info = cls;
             }
 
             break;
         }
 
-        case H5PL_TYPE_ERROR:
-        case H5PL_TYPE_NONE:
-        default:
-            HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "Invalid plugin type specified");
+    case H5PL_TYPE_ERROR:
+    case H5PL_TYPE_NONE:
+    default             : HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "Invalid plugin type specified");
     } /* end switch */
 
     /* If we found the correct plugin, store it in the cache */
-    if (*success)
-        if (H5PL__add_plugin(loaded_plugin_type, key, handle))
+    if (*success) {
+        if (H5PL__add_plugin(loaded_plugin_type, key, handle)) {
             HGOTO_ERROR(H5E_PLUGIN, H5E_CANTINSERT, FAIL, "unable to add new plugin to plugin cache");
+        }
+    }
 
 done:
-    if (!(*success) && handle)
-        if (H5PL__close(handle) < 0)
+    if (!(*success) && handle) {
+        if (H5PL__close(handle) < 0) {
             HDONE_ERROR(H5E_PLUGIN, H5E_CLOSEERROR, FAIL, "can't close dynamic library");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5PL__open() */
@@ -497,8 +529,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__close(H5PL_HANDLE handle)
+herr_t H5PL__close(H5PL_HANDLE handle)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -520,8 +551,7 @@ H5PL__close(H5PL_HANDLE handle)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL_iterate(H5PL_iterate_type_t iter_type, H5PL_iterate_t iter_op, void *op_data)
+herr_t H5PL_iterate(H5PL_iterate_type_t iter_type, H5PL_iterate_t iter_op, void* op_data)
 {
     herr_t ret_value = H5_ITER_CONT;
 

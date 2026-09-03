@@ -33,12 +33,13 @@
 /************/
 
 /* Typedef for function to release object when reference count drops to zero */
-typedef herr_t (*H5UC_free_func_t)(void *o);
+typedef herr_t (*H5UC_free_func_t)(void* o);
 
 /* Typedef for reference counted objects */
-typedef struct H5UC_t {
-    void            *o;         /* Object to be reference counted */
-    size_t           n;         /* Reference count of number of pointers sharing object */
+typedef struct H5UC_t
+{
+    void* o;                    /* Object to be reference counted */
+    size_t n;                   /* Reference count of number of pointers sharing object */
     H5UC_free_func_t free_func; /* Function to free object */
 } H5UC_t;
 
@@ -52,7 +53,7 @@ typedef struct H5UC_t {
 /********************/
 /* Private routines */
 /********************/
-H5_DLL H5UC_t *H5UC_create(void *s, H5UC_free_func_t free_func);
-H5_DLL herr_t  H5UC_decr(H5UC_t *rc);
+H5_DLL H5UC_t* H5UC_create(void* s, H5UC_free_func_t free_func);
+H5_DLL herr_t H5UC_decr(H5UC_t* rc);
 
 #endif /* H5UCprivate_H */

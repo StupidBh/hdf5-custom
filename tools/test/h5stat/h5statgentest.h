@@ -20,9 +20,9 @@
 #define THRESHOLD_FILE    "h5stat_threshold.h5"
 #define ERR_REFCOUNT_FILE "h5stat_err_refcount.h5"
 
-herr_t gen_newgrat_file(const char *fname);
-herr_t gen_threshold_file(const char *fname);
-herr_t gen_idx_file(const char *fname);
-herr_t gen_err_refcount(const char *fname);
+herr_t gen_newgrat_file(const char* fname);
+herr_t gen_threshold_file(const char* fname);
+herr_t gen_idx_file(const char* fname);
+herr_t gen_err_refcount(const char* fname);
 
 #endif /* H5STAT_GENTEST_H */

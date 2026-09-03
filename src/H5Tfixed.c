@@ -15,7 +15,7 @@
  *      integer) datatypes in the H5T interface.
  */
 
-#include "H5Tmodule.h" /* This source code file is part of the H5T module */
+#include "H5Tmodule.h"  /* This source code file is part of the H5T module */
 
 #include "H5private.h"  /*generic functions			  */
 #include "H5Eprivate.h" /*error handling			  */
@@ -32,17 +32,17 @@
  *
  *-------------------------------------------------------------------------
  */
-H5T_sign_t
-H5Tget_sign(hid_t type_id)
+H5T_sign_t H5Tget_sign(hid_t type_id)
 {
-    H5T_t     *dt = NULL;
+    H5T_t* dt = NULL;
     H5T_sign_t ret_value;
 
     FUNC_ENTER_API(H5T_SGN_ERROR)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type_id, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type_id, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, H5T_SGN_ERROR, "not an integer datatype");
+    }
 
     ret_value = H5T_get_sign(dt);
 
@@ -61,8 +61,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5T_sign_t
-H5T_get_sign(H5T_t const *dt)
+H5T_sign_t H5T_get_sign(H5T_t const* dt)
 {
     H5T_sign_t ret_value = H5T_SGN_ERROR; /* Return value */
 
@@ -71,12 +70,14 @@ H5T_get_sign(H5T_t const *dt)
     assert(dt);
 
     /* Defer to parent */
-    while (dt->shared->parent)
+    while (dt->shared->parent) {
         dt = dt->shared->parent;
+    }
 
     /* Check args */
-    if (H5T_INTEGER != dt->shared->type)
+    if (H5T_INTEGER != dt->shared->type) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, H5T_SGN_ERROR, "operation not defined for datatype class");
+    }
 
     /* Sign */
     ret_value = dt->shared->u.atomic.u.i.sign;
@@ -94,27 +95,32 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tset_sign(hid_t type_id, H5T_sign_t sign)
+herr_t H5Tset_sign(hid_t type_id, H5T_sign_t sign)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type_id, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type_id, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an integer datatype");
-    if (H5T_STATE_TRANSIENT != dt->shared->state)
+    }
+    if (H5T_STATE_TRANSIENT != dt->shared->state) {
         HGOTO_ERROR(H5E_ARGS, H5E_CANTINIT, FAIL, "datatype is read-only");
-    if (sign < H5T_SGN_NONE || sign >= H5T_NSGN)
+    }
+    if (sign < H5T_SGN_NONE || sign >= H5T_NSGN) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "illegal sign type");
-    if (H5T_ENUM == dt->shared->type && dt->shared->u.enumer.nmembs > 0)
+    }
+    if (H5T_ENUM == dt->shared->type && dt->shared->u.enumer.nmembs > 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "operation not allowed after members are defined");
-    while (dt->shared->parent)
+    }
+    while (dt->shared->parent) {
         dt = dt->shared->parent; /*defer to parent*/
-    if (H5T_INTEGER != dt->shared->type)
+    }
+    if (H5T_INTEGER != dt->shared->type) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "operation not defined for datatype class");
+    }
 
     /* Commit */
     dt->shared->u.atomic.u.i.sign = sign;

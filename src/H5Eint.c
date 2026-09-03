@@ -48,8 +48,9 @@
 /******************/
 
 /* Printing information */
-typedef struct H5E_print_t {
-    FILE     *stream;
+typedef struct H5E_print_t
+{
+    FILE* stream;
     H5E_cls_t cls;
 } H5E_print_t;
 
@@ -61,18 +62,25 @@ typedef struct H5E_print_t {
 /* Local Prototypes */
 /********************/
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-static herr_t H5E__walk1_cb(int n, H5E_error1_t *err_desc, void *client_data);
+static herr_t H5E__walk1_cb(int n, H5E_error1_t* err_desc, void* client_data);
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
-static herr_t H5E__walk2_cb(unsigned n, const H5E_error2_t *err_desc, void *client_data);
-static herr_t H5E__copy_stack_entry(H5E_entry_t *dst_entry, const H5E_entry_t *src_entry);
-static herr_t H5E__set_stack_entry(H5E_error2_t *err_entry, const char *file, const char *func, unsigned line,
-                                   hid_t cls_id, hid_t maj_id, hid_t min_id, const char *desc, va_list *ap);
-static herr_t H5E__clear_entries(H5E_stack_t *estack, size_t nentries);
-static herr_t H5E__unregister_class(void *cls, void **request);
-static int    H5E__close_msg_cb(void *obj_ptr, hid_t obj_id, void *udata);
-static void   H5E__free_msg(H5E_msg_t *msg);
-static herr_t H5E__close_msg(void *err, void **request);
-static herr_t H5E__close_stack(void *err_stack, void **request);
+static herr_t H5E__walk2_cb(unsigned n, const H5E_error2_t* err_desc, void* client_data);
+static herr_t H5E__copy_stack_entry(H5E_entry_t* dst_entry, const H5E_entry_t* src_entry);
+static herr_t H5E__set_stack_entry(H5E_error2_t* err_entry,
+                                   const char* file,
+                                   const char* func,
+                                   unsigned line,
+                                   hid_t cls_id,
+                                   hid_t maj_id,
+                                   hid_t min_id,
+                                   const char* desc,
+                                   va_list* ap);
+static herr_t H5E__clear_entries(H5E_stack_t* estack, size_t nentries);
+static herr_t H5E__unregister_class(void* cls, void** request);
+static int H5E__close_msg_cb(void* obj_ptr, hid_t obj_id, void* udata);
+static void H5E__free_msg(H5E_msg_t* msg);
+static herr_t H5E__close_msg(void* err, void** request);
+static herr_t H5E__close_stack(void* err_stack, void** request);
 
 /*********************/
 /* Package Variables */
@@ -116,49 +124,49 @@ hid_t H5E_ERR_CLS_g = FAIL;
 static const H5E_stack_t H5E_err_stack_def = {
     0, /* nused */
     {  /*entries[] */
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}},
-     {false, {H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL}}},
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } },
+      { false, { H5I_INVALID_HID, H5I_INVALID_HID, H5I_INVALID_HID, 0, NULL, NULL, NULL } } },
 
 /* H5E_auto_op_t */
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-#ifdef H5_USE_16_API_DEFAULT
-    {1, true, (H5E_auto1_t)H5Eprint1, H5E__print2, (H5E_auto1_t)H5Eprint1, H5E__print2},
-#else  /* H5_USE_16_API */
-    {2, true, (H5E_auto1_t)H5Eprint1, H5E__print2, (H5E_auto1_t)H5Eprint1, H5E__print2},
-#endif /* H5_USE_16_API_DEFAULT */
-#else  /* H5_NO_DEPRECATED_SYMBOLS */
-    {H5E__print2},
-#endif /* H5_NO_DEPRECATED_SYMBOLS */
+    #ifdef H5_USE_16_API_DEFAULT
+    { 1, true, (H5E_auto1_t)H5Eprint1, H5E__print2, (H5E_auto1_t)H5Eprint1, H5E__print2 },
+    #else  /* H5_USE_16_API */
+    { 2, true, (H5E_auto1_t)H5Eprint1, H5E__print2, (H5E_auto1_t)H5Eprint1, H5E__print2 },
+    #endif /* H5_USE_16_API_DEFAULT */
+#else      /* H5_NO_DEPRECATED_SYMBOLS */
+    { H5E__print2 },
+#endif     /* H5_NO_DEPRECATED_SYMBOLS */
 
     NULL, /* auto_data */
     0     /* paused */
@@ -166,36 +174,36 @@ static const H5E_stack_t H5E_err_stack_def = {
 
 /* First & last major and minor error codes registered by the library */
 hid_t H5E_first_maj_id_g = H5I_INVALID_HID;
-hid_t H5E_last_maj_id_g  = H5I_INVALID_HID;
+hid_t H5E_last_maj_id_g = H5I_INVALID_HID;
 hid_t H5E_first_min_id_g = H5I_INVALID_HID;
-hid_t H5E_last_min_id_g  = H5I_INVALID_HID;
+hid_t H5E_last_min_id_g = H5I_INVALID_HID;
 
 /* Error class ID class */
-static const H5I_class_t H5I_ERRCLS_CLS[1] = {{
+static const H5I_class_t H5I_ERRCLS_CLS[1] = { {
     H5I_ERROR_CLASS,      /* ID class value */
     0,                    /* Class flags */
     0,                    /* # of reserved IDs for class */
     H5E__unregister_class /* Callback routine for closing objects of this class */
-}};
+} };
 
 /* Error message ID class */
-static const H5I_class_t H5I_ERRMSG_CLS[1] = {{
+static const H5I_class_t H5I_ERRMSG_CLS[1] = { {
     H5I_ERROR_MSG, /* ID class value */
     0,             /* Class flags */
     0,             /* # of reserved IDs for class */
     H5E__close_msg /* Callback routine for closing objects of this class */
-}};
+} };
 
 /* Error stack ID class */
-static const H5I_class_t H5I_ERRSTK_CLS[1] = {{
+static const H5I_class_t H5I_ERRSTK_CLS[1] = { {
     H5I_ERROR_STACK, /* ID class value */
     0,               /* Class flags */
     0,               /* # of reserved IDs for class */
     H5E__close_stack /* Callback routine for closing objects of this class */
-}};
+} };
 
 /* Library's error class */
-static const H5E_cls_t H5E_err_cls_s = {false, H5E_CLS_NAME, H5E_CLS_LIB_NAME, H5_VERS_STR};
+static const H5E_cls_t H5E_err_cls_s = { false, H5E_CLS_NAME, H5E_CLS_LIB_NAME, H5_VERS_STR };
 
 /* Include the automatically generated major error message definitions */
 #include "H5Emajdef.h"
@@ -212,8 +220,7 @@ static const H5E_cls_t H5E_err_cls_s = {false, H5E_CLS_NAME, H5E_CLS_LIB_NAME, H
  *              Failure:        negative
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_init(void)
+herr_t H5E_init(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -236,32 +243,35 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5E__init_package(void)
+herr_t H5E__init_package(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Initialize the ID group for the error class IDs */
-    if (H5I_register_type(H5I_ERRCLS_CLS) < 0)
+    if (H5I_register_type(H5I_ERRCLS_CLS) < 0) {
         HGOTO_ERROR(H5E_ID, H5E_CANTINIT, FAIL, "unable to initialize ID group");
+    }
 
     /* Initialize the ID group for the major error IDs */
-    if (H5I_register_type(H5I_ERRMSG_CLS) < 0)
+    if (H5I_register_type(H5I_ERRMSG_CLS) < 0) {
         HGOTO_ERROR(H5E_ID, H5E_CANTINIT, FAIL, "unable to initialize ID group");
+    }
 
     /* Initialize the ID group for the error stacks */
-    if (H5I_register_type(H5I_ERRSTK_CLS) < 0)
+    if (H5I_register_type(H5I_ERRSTK_CLS) < 0) {
         HGOTO_ERROR(H5E_ID, H5E_CANTINIT, FAIL, "unable to initialize ID group");
+    }
 
 #ifndef H5_HAVE_THREADSAFE_API
     H5E__set_default_auto(H5E_stack_g);
 #endif /* H5_HAVE_THREADSAFE_API */
 
     /* Register the HDF5 error class */
-    if ((H5E_ERR_CLS_g = H5I_register(H5I_ERROR_CLASS, &H5E_err_cls_s, false)) < 0)
+    if ((H5E_ERR_CLS_g = H5I_register(H5I_ERROR_CLASS, &H5E_err_cls_s, false)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTREGISTER, FAIL, "can't register error class");
+    }
 
 /* Include the automatically generated error code initialization */
 #include "H5Einit.h"
@@ -282,8 +292,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5E_term_package(void)
+int H5E_term_package(void)
 {
     int n = 0;
 
@@ -313,16 +322,18 @@ H5E_term_package(void)
             H5E_clear_stack();
 
             /* Clear any outstanding error stacks */
-            if (nstk > 0)
+            if (nstk > 0) {
                 (void)H5I_clear_type(H5I_ERROR_STACK, false, false);
+            }
 
             /* Clear all the error classes */
             if (ncls > 0) {
                 (void)H5I_clear_type(H5I_ERROR_CLASS, false, false);
 
                 /* Reset the HDF5 error class, if its been closed */
-                if (H5I_nmembers(H5I_ERROR_CLASS) == 0)
+                if (H5I_nmembers(H5I_ERROR_CLASS) == 0) {
                     H5E_ERR_CLS_g = H5I_INVALID_HID;
+                }
             } /* end if */
 
             /* Clear all the error messages */
@@ -334,10 +345,10 @@ H5E_term_package(void)
 /* Include the automatically generated error code termination */
 #include "H5Eterm.h"
                 } /* end if */
-            }     /* end if */
+            } /* end if */
 
             n++; /*H5I*/
-        }        /* end if */
+        } /* end if */
         else {
             /* Destroy the error class, message, and stack id groups */
             n += (H5I_dec_type_ref(H5I_ERROR_STACK) > 0);
@@ -345,10 +356,11 @@ H5E_term_package(void)
             n += (H5I_dec_type_ref(H5I_ERROR_MSG) > 0);
 
             /* Mark closed */
-            if (0 == n)
+            if (0 == n) {
                 H5_PKG_INIT_VAR = false;
+            }
         } /* end else */
-    }     /* end if */
+    } /* end if */
 
     FUNC_LEAVE_NOAPI(n)
 } /* end H5E_term_package() */
@@ -362,27 +374,29 @@ H5E_term_package(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_user_cb_prepare(H5E_user_cb_state_t *state)
+herr_t H5E_user_cb_prepare(H5E_user_cb_state_t* state)
 {
-    H5E_stack_t *stack;               /* Pointer to the current error stack */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* stack;         /* Pointer to the current error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Get a pointer to the current error stack */
-    if (NULL == (stack = H5E__get_my_stack()))
+    if (NULL == (stack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+    }
 
-        /* Save state for current error stack */
+    /* Save state for current error stack */
 #ifndef H5_NO_DEPRECATED_SYMBOLS
     assert(1 == stack->auto_op.vers || 2 == stack->auto_op.vers);
 
     state->vers = stack->auto_op.vers;
-    if (1 == stack->auto_op.vers)
+    if (1 == stack->auto_op.vers) {
         state->u.func1 = stack->auto_op.func1;
-    else
+    }
+    else {
         state->u.func2 = stack->auto_op.func2;
+    }
 #else  /* H5_NO_DEPRECATED_SYMBOLS */
     state->func2 = stack->auto_op.func2;
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
@@ -401,25 +415,27 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_user_cb_restore(const H5E_user_cb_state_t *state)
+herr_t H5E_user_cb_restore(const H5E_user_cb_state_t* state)
 {
-    H5E_stack_t *stack;               /* Pointer to the current error stack */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* stack;         /* Pointer to the current error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Get a pointer to the current error stack */
-    if (NULL == (stack = H5E__get_my_stack()))
+    if (NULL == (stack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+    }
 
-        /* Restore state for current error stack */
+    /* Restore state for current error stack */
 #ifndef H5_NO_DEPRECATED_SYMBOLS
     stack->auto_op.vers = state->vers;
-    if (1 == state->vers)
+    if (1 == state->vers) {
         stack->auto_op.func1 = state->u.func1;
-    else
+    }
+    else {
         stack->auto_op.func2 = state->u.func2;
+    }
 #else  /* H5_NO_DEPRECATED_SYMBOLS */
     stack->auto_op.func2 = state->func2;
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
@@ -438,8 +454,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__free_class(H5E_cls_t *cls)
+static herr_t H5E__free_class(H5E_cls_t* cls)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -452,7 +467,7 @@ H5E__free_class(H5E_cls_t *cls)
         cls->cls_name = H5MM_xfree_const(cls->cls_name);
         cls->lib_name = H5MM_xfree_const(cls->lib_name);
         cls->lib_vers = H5MM_xfree_const(cls->lib_vers);
-        cls           = H5FL_FREE(H5E_cls_t, cls);
+        cls = H5FL_FREE(H5E_cls_t, cls);
     }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -468,11 +483,10 @@ H5E__free_class(H5E_cls_t *cls)
  *
  *-------------------------------------------------------------------------
  */
-H5E_cls_t *
-H5E__register_class(const char *cls_name, const char *lib_name, const char *version)
+H5E_cls_t* H5E__register_class(const char* cls_name, const char* lib_name, const char* version)
 {
-    H5E_cls_t *cls       = NULL; /* Pointer to error class */
-    H5E_cls_t *ret_value = NULL; /* Return value */
+    H5E_cls_t* cls = NULL;       /* Pointer to error class */
+    H5E_cls_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -482,27 +496,33 @@ H5E__register_class(const char *cls_name, const char *lib_name, const char *vers
     assert(version);
 
     /* Allocate space for new error class */
-    if (NULL == (cls = H5FL_CALLOC(H5E_cls_t)))
+    if (NULL == (cls = H5FL_CALLOC(H5E_cls_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Application registered class */
     cls->app_cls = true;
 
     /* Duplicate string information */
-    if (NULL == (cls->cls_name = strdup(cls_name)))
+    if (NULL == (cls->cls_name = strdup(cls_name))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
-    if (NULL == (cls->lib_name = strdup(lib_name)))
+    }
+    if (NULL == (cls->lib_name = strdup(lib_name))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
-    if (NULL == (cls->lib_vers = strdup(version)))
+    }
+    if (NULL == (cls->lib_vers = strdup(version))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Set the return value */
     ret_value = cls;
 
 done:
-    if (!ret_value)
-        if (cls && H5E__free_class(cls) < 0)
+    if (!ret_value) {
+        if (cls && H5E__free_class(cls) < 0) {
             HDONE_ERROR(H5E_ERROR, H5E_CANTRELEASE, NULL, "unable to free error class");
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5E__register_class() */
@@ -516,11 +536,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__unregister_class(void *cls, void H5_ATTR_UNUSED **request)
+static herr_t H5E__unregister_class(void* cls, void H5_ATTR_UNUSED** request)
 {
-    H5E_cls_t *cls_p     = (H5E_cls_t *)cls;
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5E_cls_t* cls_p = (H5E_cls_t*)cls;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -528,12 +547,14 @@ H5E__unregister_class(void *cls, void H5_ATTR_UNUSED **request)
     assert(cls_p);
 
     /* Iterate over all the messages and delete those in this error class */
-    if (H5I_iterate(H5I_ERROR_MSG, H5E__close_msg_cb, cls_p, false) < 0)
+    if (H5I_iterate(H5I_ERROR_MSG, H5E__close_msg_cb, cls_p, false) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_BADITER, FAIL, "unable to free all messages in this error class");
+    }
 
     /* Free error class structure */
-    if (H5E__free_class(cls_p) < 0)
+    if (H5E__free_class(cls_p) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTRELEASE, FAIL, "unable to free error class");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -549,8 +570,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5E__get_class_name(const H5E_cls_t *cls, char *name, size_t size)
+ssize_t H5E__get_class_name(const H5E_cls_t* cls, char* name, size_t size)
 {
     ssize_t len = -1; /* Length of error class's name */
 
@@ -565,8 +585,9 @@ H5E__get_class_name(const H5E_cls_t *cls, char *name, size_t size)
     /* Set the user's buffer, if provided */
     if (name) {
         strncpy(name, cls->cls_name, size);
-        if ((size_t)len >= size)
+        if ((size_t)len >= size) {
             name[size - 1] = '\0';
+        }
     } /* end if */
 
     /* Return the full length */
@@ -584,12 +605,11 @@ H5E__get_class_name(const H5E_cls_t *cls, char *name, size_t size)
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5E__close_msg_cb(void *obj_ptr, hid_t obj_id, void *udata)
+static int H5E__close_msg_cb(void* obj_ptr, hid_t obj_id, void* udata)
 {
-    H5E_msg_t *err_msg   = (H5E_msg_t *)obj_ptr;
-    H5E_cls_t *cls       = (H5E_cls_t *)udata;
-    int        ret_value = H5_ITER_CONT; /* Return value */
+    H5E_msg_t* err_msg = (H5E_msg_t*)obj_ptr;
+    H5E_cls_t* cls = (H5E_cls_t*)udata;
+    int ret_value = H5_ITER_CONT; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -598,10 +618,12 @@ H5E__close_msg_cb(void *obj_ptr, hid_t obj_id, void *udata)
 
     /* Close the message if it is in the class being closed */
     if (err_msg->cls == cls) {
-        if (H5E__close_msg(err_msg, NULL) < 0)
+        if (H5E__close_msg(err_msg, NULL) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTCLOSEOBJ, H5_ITER_ERROR, "unable to close error message");
-        if (NULL == H5I_remove(obj_id))
+        }
+        if (NULL == H5I_remove(obj_id)) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTREMOVE, H5_ITER_ERROR, "unable to remove error message");
+        }
     } /* end if */
 
 done:
@@ -617,8 +639,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static void
-H5E__free_msg(H5E_msg_t *msg)
+static void H5E__free_msg(H5E_msg_t* msg)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -628,7 +649,7 @@ H5E__free_msg(H5E_msg_t *msg)
 
     /* Free resources */
     msg->msg = H5MM_xfree_const(msg->msg);
-    msg      = H5FL_FREE(H5E_msg_t, msg);
+    msg = H5FL_FREE(H5E_msg_t, msg);
 
     FUNC_LEAVE_NOAPI_VOID
 } /* end H5E__free_msg() */
@@ -642,10 +663,9 @@ H5E__free_msg(H5E_msg_t *msg)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__close_msg(void *err, void H5_ATTR_UNUSED **request)
+static herr_t H5E__close_msg(void* err, void H5_ATTR_UNUSED** request)
 {
-    H5E_msg_t *err_p = (H5E_msg_t *)err;
+    H5E_msg_t* err_p = (H5E_msg_t*)err;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -653,9 +673,10 @@ H5E__close_msg(void *err, void H5_ATTR_UNUSED **request)
     assert(err_p);
 
     /* Free resources, if application registered this message */
-    if (err_p->app_msg)
+    if (err_p->app_msg) {
         /* Free message */
         H5E__free_msg(err_p);
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5E__close_msg() */
@@ -670,11 +691,10 @@ H5E__close_msg(void *err, void H5_ATTR_UNUSED **request)
  *
  *-------------------------------------------------------------------------
  */
-H5E_msg_t *
-H5E__create_msg(H5E_cls_t *cls, H5E_type_t msg_type, const char *msg_str)
+H5E_msg_t* H5E__create_msg(H5E_cls_t* cls, H5E_type_t msg_type, const char* msg_str)
 {
-    H5E_msg_t *msg       = NULL; /* Pointer to new error message */
-    H5E_msg_t *ret_value = NULL; /* Return value */
+    H5E_msg_t* msg = NULL;       /* Pointer to new error message */
+    H5E_msg_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -684,23 +704,27 @@ H5E__create_msg(H5E_cls_t *cls, H5E_type_t msg_type, const char *msg_str)
     assert(msg_str);
 
     /* Allocate new message object */
-    if (NULL == (msg = H5FL_CALLOC(H5E_msg_t)))
+    if (NULL == (msg = H5FL_CALLOC(H5E_msg_t))) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTALLOC, NULL, "memory allocation failed");
+    }
 
     /* Fill new message object */
     msg->app_msg = true;
-    msg->cls     = cls;
-    msg->type    = msg_type;
-    if (NULL == (msg->msg = strdup(msg_str)))
+    msg->cls = cls;
+    msg->type = msg_type;
+    if (NULL == (msg->msg = strdup(msg_str))) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTALLOC, NULL, "memory allocation failed");
+    }
 
     /* Set return value */
     ret_value = msg;
 
 done:
-    if (!ret_value)
-        if (msg)
+    if (!ret_value) {
+        if (msg) {
             H5E__free_msg(msg);
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5E__create_msg() */
@@ -715,32 +739,35 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5E_stack_t *
-H5E__get_current_stack(void)
+H5E_stack_t* H5E__get_current_stack(void)
 {
-    H5E_stack_t *current_stack;      /* Pointer to the current error stack */
-    H5E_stack_t *estack_copy = NULL; /* Pointer to new error stack to return */
-    unsigned     u;                  /* Local index variable */
-    H5E_stack_t *ret_value = NULL;   /* Return value */
+    H5E_stack_t* current_stack;      /* Pointer to the current error stack */
+    H5E_stack_t* estack_copy = NULL; /* Pointer to new error stack to return */
+    unsigned u;                      /* Local index variable */
+    H5E_stack_t* ret_value = NULL;   /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Get a pointer to the current error stack */
-    if (NULL == (current_stack = H5E__get_my_stack()))
+    if (NULL == (current_stack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, NULL, "can't get current error stack");
+    }
 
     /* Allocate a new error stack */
-    if (NULL == (estack_copy = H5FL_CALLOC(H5E_stack_t)))
+    if (NULL == (estack_copy = H5FL_CALLOC(H5E_stack_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, NULL, "memory allocation failed");
+    }
 
     /* Make a copy of current error stack */
     estack_copy->nused = current_stack->nused;
-    for (u = 0; u < current_stack->nused; u++)
-        if (H5E__copy_stack_entry(&estack_copy->entries[u], &current_stack->entries[u]) < 0)
+    for (u = 0; u < current_stack->nused; u++) {
+        if (H5E__copy_stack_entry(&estack_copy->entries[u], &current_stack->entries[u]) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, NULL, "can't set error entry");
+        }
+    }
 
     /* Copy the "automatic" error reporting information */
-    estack_copy->auto_op   = current_stack->auto_op;
+    estack_copy->auto_op = current_stack->auto_op;
     estack_copy->auto_data = current_stack->auto_data;
 
     /* Empty current error stack */
@@ -750,9 +777,11 @@ H5E__get_current_stack(void)
     ret_value = estack_copy;
 
 done:
-    if (ret_value == NULL)
-        if (estack_copy)
+    if (ret_value == NULL) {
+        if (estack_copy) {
             estack_copy = H5FL_FREE(H5E_stack_t, estack_copy);
+        }
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5E__get_current_stack() */
@@ -766,12 +795,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__set_current_stack(H5E_stack_t *estack)
+herr_t H5E__set_current_stack(H5E_stack_t* estack)
 {
-    H5E_stack_t *current_stack;       /* Default error stack */
-    unsigned     u;                   /* Local index variable */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* current_stack; /* Default error stack */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -779,17 +807,20 @@ H5E__set_current_stack(H5E_stack_t *estack)
     assert(estack);
 
     /* Get a pointer to the current error stack */
-    if (NULL == (current_stack = H5E__get_my_stack()))
+    if (NULL == (current_stack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+    }
 
     /* Empty current error stack */
     H5E__destroy_stack(current_stack);
 
     /* Copy new stack to current error stack */
     current_stack->nused = estack->nused;
-    for (u = 0; u < current_stack->nused; u++)
-        if (H5E__copy_stack_entry(&current_stack->entries[u], &estack->entries[u]) < 0)
+    for (u = 0; u < current_stack->nused; u++) {
+        if (H5E__copy_stack_entry(&current_stack->entries[u], &estack->entries[u]) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't set error entry");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -804,10 +835,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__close_stack(void *estack, void H5_ATTR_UNUSED **request)
+static herr_t H5E__close_stack(void* estack, void H5_ATTR_UNUSED** request)
 {
-    H5E_stack_t *estack_p = (H5E_stack_t *)estack;
+    H5E_stack_t* estack_p = (H5E_stack_t*)estack;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -833,8 +863,7 @@ H5E__close_stack(void *estack, void H5_ATTR_UNUSED **request)
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5E__get_num(const H5E_stack_t *estack)
+ssize_t H5E__get_num(const H5E_stack_t* estack)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -852,31 +881,33 @@ H5E__get_num(const H5E_stack_t *estack)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__print2(hid_t err_stack, void *_stream)
+herr_t H5E__print2(hid_t err_stack, void* _stream)
 {
-    H5E_stack_t *estack; /* Error stack to operate on */
-    FILE        *stream    = (FILE *)_stream;
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    FILE* stream = (FILE*)_stream;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Need to check for errors */
     if (err_stack == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Print error stack */
-    if (H5E__print(estack, stream, false) < 0)
+    if (H5E__print(estack, stream, false) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTLIST, FAIL, "can't display error stack");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -891,11 +922,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__append_stack(H5E_stack_t *dst_stack, const H5E_stack_t *src_stack)
+herr_t H5E__append_stack(H5E_stack_t* dst_stack, const H5E_stack_t* src_stack)
 {
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -906,15 +936,17 @@ H5E__append_stack(H5E_stack_t *dst_stack, const H5E_stack_t *src_stack)
     /* Copy the errors from the source stack to the destination stack */
     for (u = 0; u < src_stack->nused; u++) {
         /* Copy error stack entry */
-        if (H5E__copy_stack_entry(&dst_stack->entries[dst_stack->nused], &src_stack->entries[u]) < 0)
+        if (H5E__copy_stack_entry(&dst_stack->entries[dst_stack->nused], &src_stack->entries[u]) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't set error entry");
+        }
 
         /* Increment # of errors in destination stack */
         dst_stack->nused++;
 
         /* Check for destination stack full */
-        if (dst_stack->nused >= H5E_MAX_ENTRIES)
+        if (dst_stack->nused >= H5E_MAX_ENTRIES) {
             break;
+        }
     } /* end for */
 
 done:
@@ -930,8 +962,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-void
-H5E__set_default_auto(H5E_stack_t *stk)
+void H5E__set_default_auto(H5E_stack_t* stk)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -951,8 +982,7 @@ H5E__set_default_auto(H5E_stack_t *stk)
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5E__get_msg(const H5E_msg_t *msg, H5E_type_t *type, char *msg_str, size_t size)
+ssize_t H5E__get_msg(const H5E_msg_t* msg, H5E_type_t* type, char* msg_str, size_t size)
 {
     ssize_t len = -1; /* Length of error message */
 
@@ -967,13 +997,15 @@ H5E__get_msg(const H5E_msg_t *msg, H5E_type_t *type, char *msg_str, size_t size)
     /* Copy the message into the user's buffer, if given */
     if (msg_str) {
         strncpy(msg_str, msg->msg, size);
-        if ((size_t)len >= size)
+        if ((size_t)len >= size) {
             msg_str[size - 1] = '\0';
+        }
     } /* end if */
 
     /* Give the message type, if asked */
-    if (type)
+    if (type) {
         *type = msg->type;
+    }
 
     /* Set the return value to the full length of the message */
     FUNC_LEAVE_NOAPI(len)
@@ -1011,20 +1043,19 @@ H5E__get_msg(const H5E_msg_t *msg, H5E_type_t *type, char *msg_str, size_t size)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__walk1_cb(int n, H5E_error1_t *err_desc, void *client_data)
+static herr_t H5E__walk1_cb(int n, H5E_error1_t* err_desc, void* client_data)
 {
-    H5E_print_t     *eprint = (H5E_print_t *)client_data;
-    FILE            *stream;                             /* I/O stream to print output to */
-    const H5E_cls_t *cls_ptr;                            /* Pointer to error class */
-    H5E_msg_t       *maj_ptr;                            /* Pointer to major error info */
-    H5E_msg_t       *min_ptr;                            /* Pointer to minor error info */
-    const char      *maj_str   = "No major description"; /* Major error description */
-    const char      *min_str   = "No minor description"; /* Minor error description */
-    bool             have_desc = true; /* Flag to indicate whether the error has a "real" description */
-#ifdef H5_HAVE_THREADSAFE_API
+    H5E_print_t* eprint = (H5E_print_t*)client_data;
+    FILE* stream;                                 /* I/O stream to print output to */
+    const H5E_cls_t* cls_ptr;                     /* Pointer to error class */
+    H5E_msg_t* maj_ptr;                           /* Pointer to major error info */
+    H5E_msg_t* min_ptr;                           /* Pointer to minor error info */
+    const char* maj_str = "No major description"; /* Major error description */
+    const char* min_str = "No minor description"; /* Minor error description */
+    bool have_desc = true;                        /* Flag to indicate whether the error has a "real" description */
+    #ifdef H5_HAVE_THREADSAFE_API
     uint64_t thread_id = 0; /* ID of thread */
-#endif
+    #endif
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NOERR
@@ -1033,49 +1064,59 @@ H5E__walk1_cb(int n, H5E_error1_t *err_desc, void *client_data)
     assert(err_desc);
 
     /* If no client data was passed, output to stderr */
-    if (!client_data)
+    if (!client_data) {
         stream = stderr;
-    else
+    }
+    else {
         stream = eprint->stream;
+    }
 
     /* Get descriptions for the major and minor error numbers */
-    maj_ptr = (H5E_msg_t *)H5I_object_verify(err_desc->maj_num, H5I_ERROR_MSG);
-    min_ptr = (H5E_msg_t *)H5I_object_verify(err_desc->min_num, H5I_ERROR_MSG);
+    maj_ptr = (H5E_msg_t*)H5I_object_verify(err_desc->maj_num, H5I_ERROR_MSG);
+    min_ptr = (H5E_msg_t*)H5I_object_verify(err_desc->min_num, H5I_ERROR_MSG);
 
     /* Check for bad pointer(s), but can't issue error, just leave */
-    if (!maj_ptr || !min_ptr)
+    if (!maj_ptr || !min_ptr) {
         HGOTO_DONE(FAIL);
+    }
 
-    if (maj_ptr->msg)
+    if (maj_ptr->msg) {
         maj_str = maj_ptr->msg;
-    if (min_ptr->msg)
+    }
+    if (min_ptr->msg) {
         min_str = min_ptr->msg;
+    }
 
     /* Get error class info */
     cls_ptr = maj_ptr->cls;
 
-#ifdef H5_HAVE_THREADSAFE_API
-    if (H5TS_thread_id(&thread_id) < 0)
+    #ifdef H5_HAVE_THREADSAFE_API
+    if (H5TS_thread_id(&thread_id) < 0) {
         HGOTO_DONE(FAIL);
-#endif
+    }
+    #endif
 
     /* Print error class header if new class */
     if (eprint->cls.lib_name == NULL || strcmp(cls_ptr->lib_name, eprint->cls.lib_name) != 0) {
         /* update to the new class information */
-        if (cls_ptr->cls_name)
+        if (cls_ptr->cls_name) {
             eprint->cls.cls_name = cls_ptr->cls_name;
-        if (cls_ptr->lib_name)
+        }
+        if (cls_ptr->lib_name) {
             eprint->cls.lib_name = cls_ptr->lib_name;
-        if (cls_ptr->lib_vers)
+        }
+        if (cls_ptr->lib_vers) {
             eprint->cls.lib_vers = cls_ptr->lib_vers;
+        }
 
-        fprintf(stream, "%s-DIAG: Error detected in %s (%s)",
+        fprintf(stream,
+                "%s-DIAG: Error detected in %s (%s)",
                 (cls_ptr->cls_name ? cls_ptr->cls_name : "(null)"),
                 (cls_ptr->lib_name ? cls_ptr->lib_name : "(null)"),
                 (cls_ptr->lib_vers ? cls_ptr->lib_vers : "(null)"));
 
         /* try show the process or thread id in multiple processes cases*/
-#ifdef H5_HAVE_PARALLEL
+    #ifdef H5_HAVE_PARALLEL
         {
             int mpi_rank, mpi_initialized, mpi_finalized;
 
@@ -1086,26 +1127,36 @@ H5E__walk1_cb(int n, H5E_error1_t *err_desc, void *client_data)
                 MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
                 fprintf(stream, " MPI-process %d", mpi_rank);
             } /* end if */
-#ifdef H5_HAVE_THREADSAFE_API
-            else
+        #ifdef H5_HAVE_THREADSAFE_API
+            else {
                 fprintf(stream, " thread %" PRIu64, thread_id);
-#endif
+            }
+        #endif
         } /* end block */
-#else
-#ifdef H5_HAVE_THREADSAFE_API
+    #else
+        #ifdef H5_HAVE_THREADSAFE_API
         fprintf(stream, " thread %" PRIu64, thread_id);
-#endif
-#endif
+        #endif
+    #endif
         fprintf(stream, ":\n");
     } /* end if */
 
     /* Check for "real" error description - used to format output more nicely */
-    if (err_desc->desc == NULL || strlen(err_desc->desc) == 0)
+    if (err_desc->desc == NULL || strlen(err_desc->desc) == 0) {
         have_desc = false;
+    }
 
     /* Print error message */
-    fprintf(stream, "%*s#%03d: %s line %u in %s()%s%s\n", H5E_INDENT, "", n, err_desc->file_name,
-            err_desc->line, err_desc->func_name, (have_desc ? ": " : ""), (have_desc ? err_desc->desc : ""));
+    fprintf(stream,
+            "%*s#%03d: %s line %u in %s()%s%s\n",
+            H5E_INDENT,
+            "",
+            n,
+            err_desc->file_name,
+            err_desc->line,
+            err_desc->func_name,
+            (have_desc ? ": " : ""),
+            (have_desc ? err_desc->desc : ""));
     fprintf(stream, "%*smajor: %s\n", (H5E_INDENT * 2), "", maj_str);
     fprintf(stream, "%*sminor: %s\n", (H5E_INDENT * 2), "", min_str);
 
@@ -1142,17 +1193,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__walk2_cb(unsigned n, const H5E_error2_t *err_desc, void *client_data)
+static herr_t H5E__walk2_cb(unsigned n, const H5E_error2_t* err_desc, void* client_data)
 {
-    H5E_print_t *eprint = (H5E_print_t *)client_data;
-    FILE        *stream;                             /* I/O stream to print output to */
-    H5E_cls_t   *cls_ptr;                            /* Pointer to error class */
-    H5E_msg_t   *maj_ptr;                            /* Pointer to major error info */
-    H5E_msg_t   *min_ptr;                            /* Pointer to minor error info */
-    const char  *maj_str   = "No major description"; /* Major error description */
-    const char  *min_str   = "No minor description"; /* Minor error description */
-    bool         have_desc = true; /* Flag to indicate whether the error has a "real" description */
+    H5E_print_t* eprint = (H5E_print_t*)client_data;
+    FILE* stream;                                 /* I/O stream to print output to */
+    H5E_cls_t* cls_ptr;                           /* Pointer to error class */
+    H5E_msg_t* maj_ptr;                           /* Pointer to major error info */
+    H5E_msg_t* min_ptr;                           /* Pointer to minor error info */
+    const char* maj_str = "No major description"; /* Major error description */
+    const char* min_str = "No minor description"; /* Minor error description */
+    bool have_desc = true;                        /* Flag to indicate whether the error has a "real" description */
 #ifdef H5_HAVE_THREADSAFE_API
     uint64_t thread_id = 0; /* ID of thread */
 #endif
@@ -1164,48 +1214,59 @@ H5E__walk2_cb(unsigned n, const H5E_error2_t *err_desc, void *client_data)
     assert(err_desc);
 
     /* If no client data was passed, output to stderr */
-    if (!client_data)
+    if (!client_data) {
         stream = stderr;
-    else
+    }
+    else {
         stream = eprint->stream;
+    }
 
     /* Get descriptions for the major and minor error numbers */
-    maj_ptr = (H5E_msg_t *)H5I_object_verify(err_desc->maj_num, H5I_ERROR_MSG);
-    min_ptr = (H5E_msg_t *)H5I_object_verify(err_desc->min_num, H5I_ERROR_MSG);
+    maj_ptr = (H5E_msg_t*)H5I_object_verify(err_desc->maj_num, H5I_ERROR_MSG);
+    min_ptr = (H5E_msg_t*)H5I_object_verify(err_desc->min_num, H5I_ERROR_MSG);
 
     /* Check for bad pointer(s), but can't issue error, just leave */
-    if (!maj_ptr || !min_ptr)
+    if (!maj_ptr || !min_ptr) {
         HGOTO_DONE(FAIL);
+    }
 
-    if (maj_ptr->msg)
+    if (maj_ptr->msg) {
         maj_str = maj_ptr->msg;
-    if (min_ptr->msg)
+    }
+    if (min_ptr->msg) {
         min_str = min_ptr->msg;
+    }
 
     /* Get error class info.  Don't use the class of the major or minor error because
      * they might be different. */
-    cls_ptr = (H5E_cls_t *)H5I_object_verify(err_desc->cls_id, H5I_ERROR_CLASS);
+    cls_ptr = (H5E_cls_t*)H5I_object_verify(err_desc->cls_id, H5I_ERROR_CLASS);
 
     /* Check for bad pointer(s), but can't issue error, just leave */
-    if (!cls_ptr)
+    if (!cls_ptr) {
         HGOTO_DONE(FAIL);
+    }
 
 #ifdef H5_HAVE_THREADSAFE_API
-    if (H5TS_thread_id(&thread_id) < 0)
+    if (H5TS_thread_id(&thread_id) < 0) {
         HGOTO_DONE(FAIL);
+    }
 #endif
 
     /* Print error class header if new class */
     if (eprint->cls.lib_name == NULL || strcmp(cls_ptr->lib_name, eprint->cls.lib_name) != 0) {
         /* update to the new class information */
-        if (cls_ptr->cls_name)
+        if (cls_ptr->cls_name) {
             eprint->cls.cls_name = cls_ptr->cls_name;
-        if (cls_ptr->lib_name)
+        }
+        if (cls_ptr->lib_name) {
             eprint->cls.lib_name = cls_ptr->lib_name;
-        if (cls_ptr->lib_vers)
+        }
+        if (cls_ptr->lib_vers) {
             eprint->cls.lib_vers = cls_ptr->lib_vers;
+        }
 
-        fprintf(stream, "%s-DIAG: Error detected in %s (%s)",
+        fprintf(stream,
+                "%s-DIAG: Error detected in %s (%s)",
                 (cls_ptr->cls_name ? cls_ptr->cls_name : "(null)"),
                 (cls_ptr->lib_name ? cls_ptr->lib_name : "(null)"),
                 (cls_ptr->lib_vers ? cls_ptr->lib_vers : "(null)"));
@@ -1222,26 +1283,36 @@ H5E__walk2_cb(unsigned n, const H5E_error2_t *err_desc, void *client_data)
                 MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
                 fprintf(stream, " MPI-process %d", mpi_rank);
             } /* end if */
-#ifdef H5_HAVE_THREADSAFE_API
-            else
+    #ifdef H5_HAVE_THREADSAFE_API
+            else {
                 fprintf(stream, " thread %" PRIu64, thread_id);
-#endif
+            }
+    #endif
         } /* end block */
 #else
-#ifdef H5_HAVE_THREADSAFE_API
+    #ifdef H5_HAVE_THREADSAFE_API
         fprintf(stream, " thread %" PRIu64, thread_id);
-#endif
+    #endif
 #endif
         fprintf(stream, ":\n");
     } /* end if */
 
     /* Check for "real" error description - used to format output more nicely */
-    if (err_desc->desc == NULL || strlen(err_desc->desc) == 0)
+    if (err_desc->desc == NULL || strlen(err_desc->desc) == 0) {
         have_desc = false;
+    }
 
     /* Print error message */
-    fprintf(stream, "%*s#%03u: %s line %u in %s()%s%s\n", H5E_INDENT, "", n, err_desc->file_name,
-            err_desc->line, err_desc->func_name, (have_desc ? ": " : ""), (have_desc ? err_desc->desc : ""));
+    fprintf(stream,
+            "%*s#%03u: %s line %u in %s()%s%s\n",
+            H5E_INDENT,
+            "",
+            n,
+            err_desc->file_name,
+            err_desc->line,
+            err_desc->func_name,
+            (have_desc ? ": " : ""),
+            (have_desc ? err_desc->desc : ""));
     fprintf(stream, "%*smajor: %s\n", (H5E_INDENT * 2), "", maj_str);
     fprintf(stream, "%*sminor: %s\n", (H5E_INDENT * 2), "", min_str);
 
@@ -1262,12 +1333,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__print(const H5E_stack_t *estack, FILE *stream, bool bk_compatible)
+herr_t H5E__print(const H5E_stack_t* estack, FILE* stream, bool bk_compatible)
 {
-    H5E_print_t   eprint;  /* Callback information to pass to H5E_walk() */
+    H5E_print_t eprint;    /* Callback information to pass to H5E_walk() */
     H5E_walk_op_t walk_op; /* Error stack walking callback */
-    herr_t        ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -1275,10 +1345,12 @@ H5E__print(const H5E_stack_t *estack, FILE *stream, bool bk_compatible)
     assert(estack);
 
     /* If no stream was given, use stderr */
-    if (!stream)
+    if (!stream) {
         eprint.stream = stderr;
-    else
+    }
+    else {
         eprint.stream = stream;
+    }
 
     /* Reset the original error class information */
     memset(&eprint.cls, 0, sizeof(H5E_cls_t));
@@ -1286,19 +1358,21 @@ H5E__print(const H5E_stack_t *estack, FILE *stream, bool bk_compatible)
     /* Walk the error stack */
     if (bk_compatible) {
 #ifndef H5_NO_DEPRECATED_SYMBOLS
-        walk_op.vers    = 1;
+        walk_op.vers = 1;
         walk_op.u.func1 = H5E__walk1_cb;
-        if (H5E__walk(estack, H5E_WALK_DOWNWARD, &walk_op, (void *)&eprint) < 0)
+        if (H5E__walk(estack, H5E_WALK_DOWNWARD, &walk_op, (void*)&eprint) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTLIST, FAIL, "can't walk error stack");
+        }
 #else  /* H5_NO_DEPRECATED_SYMBOLS */
         assert(0 && "version 1 error stack print without deprecated symbols!");
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
-    }  /* end if */
+    } /* end if */
     else {
-        walk_op.vers    = 2;
+        walk_op.vers = 2;
         walk_op.u.func2 = H5E__walk2_cb;
-        if (H5E__walk(estack, H5E_WALK_DOWNWARD, &walk_op, (void *)&eprint) < 0)
+        if (H5E__walk(estack, H5E_WALK_DOWNWARD, &walk_op, (void*)&eprint) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTLIST, FAIL, "can't walk error stack");
+        }
     } /* end else */
 
 done:
@@ -1332,10 +1406,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_op_t *op, void *client_data)
+herr_t H5E__walk(const H5E_stack_t* estack, H5E_direction_t direction, const H5E_walk_op_t* op, void* client_data)
 {
-    int    i;                        /* Local index variable */
+    int i;                           /* Local index variable */
     herr_t ret_value = H5_ITER_CONT; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
@@ -1345,8 +1418,9 @@ H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_o
     assert(op);
 
     /* check args, but rather than failing use some default value */
-    if (direction != H5E_WALK_UPWARD && direction != H5E_WALK_DOWNWARD)
+    if (direction != H5E_WALK_UPWARD && direction != H5E_WALK_DOWNWARD) {
         direction = H5E_WALK_UPWARD;
+    }
 
     /* Walk the stack if a callback function was given */
     if (op->vers == 1) {
@@ -1358,49 +1432,49 @@ H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_o
             if (H5E_WALK_UPWARD == direction) {
                 for (i = 0; i < (int)estack->nused && ret_value == H5_ITER_CONT; i++) {
                     /* Point to each error record on the stack and pass it to callback function.*/
-                    old_err.maj_num   = estack->entries[i].err.maj_num;
-                    old_err.min_num   = estack->entries[i].err.min_num;
+                    old_err.maj_num = estack->entries[i].err.maj_num;
+                    old_err.min_num = estack->entries[i].err.min_num;
                     old_err.file_name = estack->entries[i].err.file_name;
                     old_err.func_name = estack->entries[i].err.func_name;
-                    old_err.line      = estack->entries[i].err.line;
-                    old_err.desc      = estack->entries[i].err.desc;
+                    old_err.line = estack->entries[i].err.line;
+                    old_err.desc = estack->entries[i].err.desc;
 
                     /* Prepare & restore library for user callback */
                     H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                        {
-                            ret_value = (op->u.func1)(i, &old_err, client_data);
-                        }
+                    {
+                        ret_value = (op->u.func1)(i, &old_err, client_data);
+                    }
                     H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
                 } /* end for */
-            }     /* end if */
+            } /* end if */
             else {
                 H5_CHECK_OVERFLOW(estack->nused - 1, size_t, int);
                 for (i = (int)(estack->nused - 1); i >= 0 && ret_value == H5_ITER_CONT; i--) {
                     /* Point to each error record on the stack and pass it to callback function.*/
-                    old_err.maj_num   = estack->entries[i].err.maj_num;
-                    old_err.min_num   = estack->entries[i].err.min_num;
+                    old_err.maj_num = estack->entries[i].err.maj_num;
+                    old_err.min_num = estack->entries[i].err.min_num;
                     old_err.file_name = estack->entries[i].err.file_name;
                     old_err.func_name = estack->entries[i].err.func_name;
-                    old_err.line      = estack->entries[i].err.line;
-                    old_err.desc      = estack->entries[i].err.desc;
+                    old_err.line = estack->entries[i].err.line;
+                    old_err.desc = estack->entries[i].err.desc;
 
                     /* Prepare & restore library for user callback */
                     H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                        {
-                            ret_value =
-                                (op->u.func1)((int)(estack->nused - (size_t)(i + 1)), &old_err, client_data);
-                        }
+                    {
+                        ret_value = (op->u.func1)((int)(estack->nused - (size_t)(i + 1)), &old_err, client_data);
+                    }
                     H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
                 } /* end for */
-            }     /* end else */
+            } /* end else */
 
-            if (ret_value < 0)
+            if (ret_value < 0) {
                 HERROR(H5E_ERROR, H5E_CANTLIST, "can't walk error stack");
+            }
         } /* end if */
-#else     /* H5_NO_DEPRECATED_SYMBOLS */
+#else  /* H5_NO_DEPRECATED_SYMBOLS */
         assert(0 && "version 1 error stack walk without deprecated symbols!");
-#endif    /* H5_NO_DEPRECATED_SYMBOLS */
-    }     /* end if */
+#endif /* H5_NO_DEPRECATED_SYMBOLS */
+    } /* end if */
     else {
         assert(op->vers == 2);
         if (op->u.func2) {
@@ -1409,9 +1483,9 @@ H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_o
                 for (i = 0; i < (int)estack->nused && ret_value == H5_ITER_CONT; i++) {
                     /* Prepare & restore library for user callback */
                     H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                        {
-                            ret_value = (op->u.func2)((unsigned)i, &estack->entries[i].err, client_data);
-                        }
+                    {
+                        ret_value = (op->u.func2)((unsigned)i, &estack->entries[i].err, client_data);
+                    }
                     H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
                 }
             } /* end if */
@@ -1420,18 +1494,18 @@ H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_o
                 for (i = (int)(estack->nused - 1); i >= 0 && ret_value == H5_ITER_CONT; i--) {
                     /* Prepare & restore library for user callback */
                     H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                        {
-                            ret_value = (op->u.func2)((unsigned)(estack->nused - (size_t)(i + 1)),
-                                                      &estack->entries[i].err, client_data);
-                        }
+                    {
+                        ret_value = (op->u.func2)((unsigned)(estack->nused - (size_t)(i + 1)), &estack->entries[i].err, client_data);
+                    }
                     H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
                 }
             } /* end else */
 
-            if (ret_value < 0)
+            if (ret_value < 0) {
                 HERROR(H5E_ERROR, H5E_CANTLIST, "can't walk error stack");
+            }
         } /* end if */
-    }     /* end else */
+    } /* end else */
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5E__walk() */
@@ -1448,18 +1522,19 @@ H5E__walk(const H5E_stack_t *estack, H5E_direction_t direction, const H5E_walk_o
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__get_auto(const H5E_stack_t *estack, H5E_auto_op_t *op, void **client_data)
+herr_t H5E__get_auto(const H5E_stack_t* estack, H5E_auto_op_t* op, void** client_data)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     assert(estack);
 
     /* Retrieve the requested information */
-    if (op)
+    if (op) {
         *op = estack->auto_op;
-    if (client_data)
+    }
+    if (client_data) {
         *client_data = estack->auto_data;
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5E__get_auto() */
@@ -1474,22 +1549,23 @@ H5E__get_auto(const H5E_stack_t *estack, H5E_auto_op_t *op, void **client_data)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_get_default_auto_func(H5E_auto2_t *func)
+herr_t H5E_get_default_auto_func(H5E_auto2_t* func)
 {
-    H5E_stack_t  *estack;              /* Error stack to operate on */
-    H5E_auto_op_t op;                  /* Error stack function */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    H5E_auto_op_t op;           /* Error stack function */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Retrieve default error stack */
-    if (NULL == (estack = H5E__get_my_stack()))
+    if (NULL == (estack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+    }
 
     /* Get the automatic error reporting information */
-    if (H5E__get_auto(estack, &op, NULL) < 0)
+    if (H5E__get_auto(estack, &op, NULL) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get automatic error info");
+    }
 
     /* Retrieve error output function */
     *func = op.func2;
@@ -1518,15 +1594,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__set_auto(H5E_stack_t *estack, const H5E_auto_op_t *op, void *client_data)
+herr_t H5E__set_auto(H5E_stack_t* estack, const H5E_auto_op_t* op, void* client_data)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     assert(estack);
 
     /* Set the automatic error reporting info */
-    estack->auto_op   = *op;
+    estack->auto_op = *op;
     estack->auto_data = client_data;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
@@ -1541,14 +1616,12 @@ H5E__set_auto(H5E_stack_t *estack, const H5E_auto_op_t *op, void *client_data)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_printf_stack(const char *file, const char *func, unsigned line, hid_t maj_id, hid_t min_id,
-                 const char *fmt, ...)
+herr_t H5E_printf_stack(const char* file, const char* func, unsigned line, hid_t maj_id, hid_t min_id, const char* fmt, ...)
 {
-    H5E_stack_t *estack;               /* Pointer to error stack to modify */
-    va_list      ap;                   /* Varargs info */
-    bool         va_started = false;   /* Whether the variable argument list is open */
-    herr_t       ret_value  = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Pointer to error stack to modify */
+    va_list ap;                 /* Varargs info */
+    bool va_started = false;    /* Whether the variable argument list is open */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /*
      * WARNING: We cannot call HERROR() from within this function or else we
@@ -1565,8 +1638,9 @@ H5E_printf_stack(const char *file, const char *func, unsigned line, hid_t maj_id
     assert(fmt);
 
     /* Get the 'default' error stack */
-    if (NULL == (estack = H5E__get_my_stack()))
+    if (NULL == (estack = H5E__get_my_stack())) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Check if error reporting is paused for this stack */
     if (!estack->paused) {
@@ -1575,13 +1649,15 @@ H5E_printf_stack(const char *file, const char *func, unsigned line, hid_t maj_id
         va_started = true;
 
         /* Push the error on the stack */
-        if (H5E__push_stack(estack, false, file, func, line, H5E_ERR_CLS_g, maj_id, min_id, fmt, &ap) < 0)
+        if (H5E__push_stack(estack, false, file, func, line, H5E_ERR_CLS_g, maj_id, min_id, fmt, &ap) < 0) {
             HGOTO_DONE(FAIL);
+        }
     }
 
 done:
-    if (va_started)
+    if (va_started) {
         va_end(ap);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5E_printf_stack() */
@@ -1605,9 +1681,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5E__push_stack(H5E_stack_t *estack, bool app_entry, const char *file, const char *func, unsigned line,
-                hid_t cls_id, hid_t maj_id, hid_t min_id, const char *fmt, va_list *ap)
+htri_t H5E__push_stack(H5E_stack_t* estack,
+                       bool app_entry,
+                       const char* file,
+                       const char* func,
+                       unsigned line,
+                       hid_t cls_id,
+                       hid_t maj_id,
+                       hid_t min_id,
+                       const char* fmt,
+                       va_list* ap)
 {
     htri_t ret_value = true;
 
@@ -1630,13 +1713,14 @@ H5E__push_stack(H5E_stack_t *estack, bool app_entry, const char *file, const cha
      */
     if (estack->nused < H5E_MAX_ENTRIES) {
         estack->entries[estack->nused].app_entry = app_entry;
-        if (H5E__set_stack_entry(&estack->entries[estack->nused].err, file, func, line, cls_id, maj_id,
-                                 min_id, fmt, ap) < 0)
+        if (H5E__set_stack_entry(&estack->entries[estack->nused].err, file, func, line, cls_id, maj_id, min_id, fmt, ap) < 0) {
             HGOTO_DONE(FAIL);
+        }
         estack->nused++;
     } /* end if */
-    else
+    else {
         HGOTO_DONE(false);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1651,8 +1735,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__copy_stack_entry(H5E_entry_t *dst_entry, const H5E_entry_t *src_entry)
+static herr_t H5E__copy_stack_entry(H5E_entry_t* dst_entry, const H5E_entry_t* src_entry)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1668,25 +1751,34 @@ H5E__copy_stack_entry(H5E_entry_t *dst_entry, const H5E_entry_t *src_entry)
     /* Deep copy application entries */
     if (dst_entry->app_entry) {
         /* Note: don't waste time incrementing library internal error IDs */
-        if (dst_entry->err.cls_id != H5E_ERR_CLS_g)
-            if (H5I_inc_ref(dst_entry->err.cls_id, false) < 0)
+        if (dst_entry->err.cls_id != H5E_ERR_CLS_g) {
+            if (H5I_inc_ref(dst_entry->err.cls_id, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "unable to increment ref count on error class");
-        if (dst_entry->err.maj_num < H5E_first_maj_id_g || dst_entry->err.maj_num > H5E_last_maj_id_g)
-            if (H5I_inc_ref(dst_entry->err.maj_num, false) < 0)
+            }
+        }
+        if (dst_entry->err.maj_num < H5E_first_maj_id_g || dst_entry->err.maj_num > H5E_last_maj_id_g) {
+            if (H5I_inc_ref(dst_entry->err.maj_num, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "unable to increment ref count on error message");
-        if (dst_entry->err.min_num < H5E_first_min_id_g || dst_entry->err.min_num > H5E_last_min_id_g)
-            if (H5I_inc_ref(dst_entry->err.min_num, false) < 0)
+            }
+        }
+        if (dst_entry->err.min_num < H5E_first_min_id_g || dst_entry->err.min_num > H5E_last_min_id_g) {
+            if (H5I_inc_ref(dst_entry->err.min_num, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "unable to increment ref count on error message");
+            }
+        }
         /* The library's 'func' & 'file' strings are statically allocated (by the compiler)
          * there's no need to duplicate them.
          */
-        if (NULL == (dst_entry->err.file_name = strdup(src_entry->err.file_name)))
+        if (NULL == (dst_entry->err.file_name = strdup(src_entry->err.file_name))) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTCOPY, FAIL, "unable to duplicate file name");
-        if (NULL == (dst_entry->err.func_name = strdup(src_entry->err.func_name)))
+        }
+        if (NULL == (dst_entry->err.func_name = strdup(src_entry->err.func_name))) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTCOPY, FAIL, "unable to duplicate function name");
+        }
     }
-    if (NULL == (dst_entry->err.desc = strdup(src_entry->err.desc)))
+    if (NULL == (dst_entry->err.desc = strdup(src_entry->err.desc))) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTCOPY, FAIL, "unable to duplicate error description");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1701,9 +1793,15 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__set_stack_entry(H5E_error2_t *err_entry, const char *file, const char *func, unsigned line, hid_t cls_id,
-                     hid_t maj_id, hid_t min_id, const char *fmt, va_list *ap)
+static herr_t H5E__set_stack_entry(H5E_error2_t* err_entry,
+                                   const char* file,
+                                   const char* func,
+                                   unsigned line,
+                                   hid_t cls_id,
+                                   hid_t maj_id,
+                                   hid_t min_id,
+                                   const char* fmt,
+                                   va_list* ap)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1726,16 +1824,19 @@ H5E__set_stack_entry(H5E_error2_t *err_entry, const char *file, const char *func
      * Don't fail if arguments are bad.  Instead, substitute some default
      * value.
      */
-    if (!func)
+    if (!func) {
         func = "Unknown_Function";
-    if (!file)
+    }
+    if (!file) {
         file = "Unknown_File";
-    if (!fmt)
+    }
+    if (!fmt) {
         fmt = "No description given";
+    }
 
     /* Set the entry fields */
     /* NOTE: non-library IDs have already been incremented */
-    err_entry->cls_id  = cls_id;
+    err_entry->cls_id = cls_id;
     err_entry->maj_num = maj_id;
     err_entry->min_num = min_id;
     /* The 'func' & 'file' strings are either statically allocated (by the
@@ -1744,20 +1845,22 @@ H5E__set_stack_entry(H5E_error2_t *err_entry, const char *file, const char *func
      */
     err_entry->func_name = func;
     err_entry->file_name = file;
-    err_entry->line      = line;
+    err_entry->line = line;
     if (ap) {
-        char *desc = NULL;
+        char* desc = NULL;
 
         H5_WARN_FORMAT_NONLITERAL_OFF
-        if (HDvasprintf(&desc, fmt, *ap) < 0)
+        if (HDvasprintf(&desc, fmt, *ap) < 0) {
             HGOTO_DONE(FAIL);
+        }
         H5_WARN_FORMAT_NONLITERAL_ON
 
         err_entry->desc = desc;
     }
     else {
-        if (NULL == (err_entry->desc = strdup(fmt)))
+        if (NULL == (err_entry->desc = strdup(fmt))) {
             HGOTO_DONE(FAIL);
+        }
     }
 
 done:
@@ -1774,11 +1877,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5E__clear_entries(H5E_stack_t *estack, size_t nentries)
+static herr_t H5E__clear_entries(H5E_stack_t* estack, size_t nentries)
 {
-    unsigned u;                   /* Local index variable */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    unsigned u;                 /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -1788,22 +1890,28 @@ H5E__clear_entries(H5E_stack_t *estack, size_t nentries)
 
     /* Empty the error stack from the top down */
     for (u = 0; nentries > 0; nentries--, u++) {
-        H5E_entry_t *error; /* Pointer to error stack entry to clear */
+        H5E_entry_t* error; /* Pointer to error stack entry to clear */
 
         error = &(estack->entries[estack->nused - (u + 1)]);
 
         /* Decrement the IDs to indicate that they are no longer used by this stack */
         /* (In reverse order that they were incremented, so that reference counts work well) */
         /* Note: don't decrement library internal error IDs, since they weren't incremented */
-        if (error->err.min_num < H5E_first_min_id_g || error->err.min_num > H5E_last_min_id_g)
-            if (H5I_dec_ref(error->err.min_num) < 0)
+        if (error->err.min_num < H5E_first_min_id_g || error->err.min_num > H5E_last_min_id_g) {
+            if (H5I_dec_ref(error->err.min_num) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error message");
-        if (error->err.maj_num < H5E_first_maj_id_g || error->err.maj_num > H5E_last_maj_id_g)
-            if (H5I_dec_ref(error->err.maj_num) < 0)
+            }
+        }
+        if (error->err.maj_num < H5E_first_maj_id_g || error->err.maj_num > H5E_last_maj_id_g) {
+            if (H5I_dec_ref(error->err.maj_num) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error message");
-        if (error->err.cls_id != H5E_ERR_CLS_g)
-            if (H5I_dec_ref(error->err.cls_id) < 0)
+            }
+        }
+        if (error->err.cls_id != H5E_ERR_CLS_g) {
+            if (H5I_dec_ref(error->err.cls_id) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error class");
+            }
+        }
 
         /* Release strings */
         /* The library's 'func' & 'file' strings are statically allocated (by the
@@ -1815,7 +1923,7 @@ H5E__clear_entries(H5E_stack_t *estack, size_t nentries)
         }
         error->err.file_name = NULL;
         error->err.func_name = NULL;
-        error->err.desc      = (const char *)H5MM_xfree_const(error->err.desc);
+        error->err.desc = (const char*)H5MM_xfree_const(error->err.desc);
     }
 
     /* Decrement number of errors on stack */
@@ -1843,22 +1951,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_clear_stack(void)
+herr_t H5E_clear_stack(void)
 {
-    H5E_stack_t *estack;              /* Error stack to clear */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to clear */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Get 'default' error stack */
-    if (NULL == (estack = H5E__get_my_stack()))
+    if (NULL == (estack = H5E__get_my_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+    }
 
     /* Empty the error stack */
-    if (estack->nused)
-        if (H5E__clear_entries(estack, estack->nused) < 0)
+    if (estack->nused) {
+        if (H5E__clear_entries(estack, estack->nused) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't clear error stack");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1877,22 +1987,25 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__destroy_stack(H5E_stack_t *estack)
+herr_t H5E__destroy_stack(H5E_stack_t* estack)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check for 'default' error stack */
-    if (estack == NULL)
-        if (NULL == (estack = H5E__get_my_stack()))
+    if (estack == NULL) {
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
+    }
 
     /* Empty the error stack */
-    if (estack->nused)
-        if (H5E__clear_entries(estack, estack->nused) < 0)
+    if (estack->nused) {
+        if (H5E__clear_entries(estack, estack->nused) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't clear error stack");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1908,8 +2021,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E__pop(H5E_stack_t *estack, size_t count)
+herr_t H5E__pop(H5E_stack_t* estack, size_t count)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1920,8 +2032,9 @@ H5E__pop(H5E_stack_t *estack, size_t count)
     assert(estack->nused >= count);
 
     /* Remove the entries from the error stack */
-    if (H5E__clear_entries(estack, count) < 0)
+    if (H5E__clear_entries(estack, count) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTRELEASE, FAIL, "can't remove errors from stack");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1938,11 +2051,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5E_dump_api_stack(void)
+herr_t H5E_dump_api_stack(void)
 {
-    H5E_stack_t *estack    = H5E__get_my_stack();
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack = H5E__get_my_stack();
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1952,9 +2064,9 @@ H5E_dump_api_stack(void)
     if (estack->auto_op.func2) {
         /* Prepare & restore library for user callback */
         H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-            {
-                (void)((estack->auto_op.func2)(H5E_DEFAULT, estack->auto_data));
-            }
+        {
+            (void)((estack->auto_op.func2)(H5E_DEFAULT, estack->auto_data));
+        }
         H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
     }
 #else  /* H5_NO_DEPRECATED_SYMBOLS */
@@ -1962,9 +2074,9 @@ H5E_dump_api_stack(void)
         if (estack->auto_op.func1) {
             /* Prepare & restore library for user callback */
             H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                {
-                    (void)((estack->auto_op.func1)(estack->auto_data));
-                }
+            {
+                (void)((estack->auto_op.func1)(estack->auto_data));
+            }
             H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
         }
     } /* end if */
@@ -1972,9 +2084,9 @@ H5E_dump_api_stack(void)
         if (estack->auto_op.func2) {
             /* Prepare & restore library for user callback */
             H5_BEFORE_USER_CB_NOERR(H5_ITER_ERROR)
-                {
-                    (void)((estack->auto_op.func2)(H5E_DEFAULT, estack->auto_data));
-                }
+            {
+                (void)((estack->auto_op.func2)(H5E_DEFAULT, estack->auto_data));
+            }
             H5_AFTER_USER_CB_NOERR(H5_ITER_ERROR)
         }
     } /* end else */
@@ -2007,10 +2119,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5E_pause_stack(void)
+void H5E_pause_stack(void)
 {
-    H5E_stack_t *estack = H5E__get_my_stack();
+    H5E_stack_t* estack = H5E__get_my_stack();
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2045,10 +2156,9 @@ H5E_pause_stack(void)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5E_resume_stack(void)
+void H5E_resume_stack(void)
 {
-    H5E_stack_t *estack = H5E__get_my_stack();
+    H5E_stack_t* estack = H5E__get_my_stack();
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 

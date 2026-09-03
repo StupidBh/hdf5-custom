@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -58,12 +57,11 @@ fail_file:;
         }
 
         switch (H5Tget_class(dtype)) { // this time we are only interested in compounds
-            case H5T_COMPOUND:
-                printf("Record size: %lu bytes\n", H5Tget_size(dtype));
-                printf("Record has %d field(s).\n", H5Tget_nmembers(dtype));
-                break;
-            default:
-                break;
+        case H5T_COMPOUND:
+            printf("Record size: %lu bytes\n", H5Tget_size(dtype));
+            printf("Record has %d field(s).\n", H5Tget_nmembers(dtype));
+            break;
+        default: break;
         }
 
         H5Tclose(dtype);

@@ -23,7 +23,7 @@
 #include "H5VLprivate.h" /* Virtual Object Layer                     */
 
 /* Filename: this is the same as the define in accum.c used by test_swmr_write_big() */
-static const char *FILENAME[] = {"accum", "accum_swmr_big", NULL};
+static const char* FILENAME[] = { "accum", "accum_swmr_big", NULL };
 
 /*-------------------------------------------------------------------------
  * Function:    main
@@ -37,19 +37,18 @@ static const char *FILENAME[] = {"accum", "accum_swmr_big", NULL};
  *              Failure: EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    const char *driver_name = NULL;            /* VFD string (from env variable) */
-    hid_t       fid         = H5I_INVALID_HID; /* File ID */
-    hid_t       fapl        = H5I_INVALID_HID; /* file access property list ID */
-    H5F_t      *f           = NULL;            /* File pointer */
-    char        filename[1024];
-    unsigned    u;                            /* Local index variable */
-    uint8_t     rbuf[1024];                   /* Buffer for reading */
-    uint8_t     buf[1024];                    /* Buffer for holding the expected data */
-    H5CX_node_t api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool        api_ctx_pushed = false;       /* Whether API context pushed */
+    const char* driver_name = NULL;        /* VFD string (from env variable) */
+    hid_t fid = H5I_INVALID_HID;           /* File ID */
+    hid_t fapl = H5I_INVALID_HID;          /* file access property list ID */
+    H5F_t* f = NULL;                       /* File pointer */
+    char filename[1024];
+    unsigned u;                            /* Local index variable */
+    uint8_t rbuf[1024];                    /* Buffer for reading */
+    uint8_t buf[1024];                     /* Buffer for holding the expected data */
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
 
     /* Testing setup */
     h5_test_init();
@@ -58,49 +57,59 @@ main(void)
      * by the environment variable.
      */
     driver_name = h5_get_test_driver_name();
-    if (!H5FD__supports_swmr_test(driver_name))
+    if (!H5FD__supports_swmr_test(driver_name)) {
         return EXIT_SUCCESS;
+    }
 
     /* Initialize buffers */
     for (u = 0; u < 1024; u++) {
         rbuf[u] = 0; /* The buffer for reading */
-        buf[u]  = 1; /* The expected data should be all 1s */
+        buf[u] = 1;  /* The expected data should be all 1s */
     }
 
-    if ((fapl = h5_fileaccess()) < 0)
+    if ((fapl = h5_fileaccess()) < 0) {
         FAIL_STACK_ERROR;
+    }
     h5_fixname(FILENAME[1], fapl, filename, sizeof filename);
 
     /* Open the file with SWMR_READ */
-    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Push API context */
-    if (H5CX_push(&api_ctx) < 0)
+    if (H5CX_push(&api_ctx) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = true;
 
     /* Get H5F_t * to internal file structure */
-    if (NULL == (f = (H5F_t *)H5VL_object(fid)))
+    if (NULL == (f = (H5F_t*)H5VL_object(fid))) {
         FAIL_STACK_ERROR;
+    }
 
     /* Should read in [1024, 2024] with buf data */
-    if (H5F_block_read(f, H5FD_MEM_DEFAULT, (haddr_t)1024, (size_t)1024, rbuf) < 0)
+    if (H5F_block_read(f, H5FD_MEM_DEFAULT, (haddr_t)1024, (size_t)1024, rbuf) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Verify the data read is correct */
-    if (memcmp(buf, rbuf, (size_t)1024) != 0)
+    if (memcmp(buf, rbuf, (size_t)1024) != 0) {
         TEST_ERROR;
+    }
 
     /* CLose the file */
-    if (H5Pclose(fapl) < 0)
+    if (H5Pclose(fapl) < 0) {
         FAIL_STACK_ERROR;
-    if (H5Fclose(fid) < 0)
+    }
+    if (H5Fclose(fid) < 0) {
         FAIL_STACK_ERROR;
+    }
 
     /* Pop API context */
-    if (api_ctx_pushed && H5CX_pop(false) < 0)
+    if (api_ctx_pushed && H5CX_pop(false) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = false;
 
     return EXIT_SUCCESS;
@@ -113,8 +122,9 @@ error:
     }
     H5E_END_TRY
 
-    if (api_ctx_pushed)
+    if (api_ctx_pushed) {
         H5CX_pop(false);
+    }
 
     return EXIT_FAILURE;
 } /* end main() */

@@ -93,48 +93,49 @@
  */
 #ifdef H5_HAVE_UNISTD_H
 
-#ifdef H5_HAVE_MIRROR_VFD
+    #ifdef H5_HAVE_MIRROR_VFD
 
-#define THIS_PROGNAME "use_append_chunk_mirror"
+        #define THIS_PROGNAME "use_append_chunk_mirror"
 
-#define CONNECT_WITH_JELLY 0
+        #define CONNECT_WITH_JELLY 0
 
-#if CONNECT_WITH_JELLY
-#define SERVER_IP "10.10.10.248" /* hard-coded IP address */
-#else
-#define SERVER_IP "127.0.0.1"         /* localhost */
-#endif                                /* CONNECT_WITH_JELLY */
-#define SERVER_PORT      3000         /* hard-coded port number */
-#define MIRROR_FILE_NAME "shinano.h5" /* hard-coded duplicate/mirror filename */
+        #if CONNECT_WITH_JELLY
+            #define SERVER_IP "10.10.10.248"  /* hard-coded IP address */
+        #else
+            #define SERVER_IP "127.0.0.1"     /* localhost */
+        #endif                                /* CONNECT_WITH_JELLY */
+        #define SERVER_PORT      3000         /* hard-coded port number */
+        #define MIRROR_FILE_NAME "shinano.h5" /* hard-coded duplicate/mirror filename */
 
 static options_t UC_opts; /* Use Case Options */
 
 /* Setup parameters for the use case.
  * Return: 0 succeed; -1 fail.
  */
-int
-setup_parameters(int argc, char *const argv[], options_t *opts)
+int setup_parameters(int argc, char* const argv[], options_t* opts)
 {
     /* use case defaults */
     memset(opts, 0, sizeof(options_t));
-    opts->chunksize   = Chunksize_DFT;
-    opts->use_swmr    = true;
-    opts->iterations  = 1;
+    opts->chunksize = Chunksize_DFT;
+    opts->use_swmr = true;
+    opts->iterations = 1;
     opts->chunkplanes = 1;
-    opts->progname    = THIS_PROGNAME;
+    opts->progname = THIS_PROGNAME;
 
-    if (parse_option(argc, argv, opts) < 0)
+    if (parse_option(argc, argv, opts) < 0) {
         return (-1);
+    }
 
     opts->chunkdims[0] = opts->chunkplanes;
     opts->chunkdims[1] = opts->chunkdims[2] = opts->chunksize;
 
-    opts->dims[0]     = 0;
+    opts->dims[0] = 0;
     opts->max_dims[0] = H5S_UNLIMITED;
     opts->dims[1] = opts->dims[2] = opts->max_dims[1] = opts->max_dims[2] = opts->chunksize;
 
-    if (opts->nplanes == 0)
+    if (opts->nplanes == 0) {
         opts->nplanes = (hsize_t)opts->chunksize;
+    }
 
     show_parameters(opts);
     return 0;
@@ -147,27 +148,26 @@ setup_parameters(int argc, char *const argv[], options_t *opts)
  *       while parent process continues as the writer process;
  * both run till ending conditions are met.
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    pid_t                       childpid = 0;
-    pid_t                       mypid, tmppid;
-    int                         child_status;
-    int                         child_wait_option = 0;
-    int                         ret_value         = 0;
-    int                         child_ret_value;
-    bool                        send_wait = false;
-    hid_t                       fid       = H5I_INVALID_HID;
-    H5FD_mirror_fapl_t          mirr_fa;
-    H5FD_splitter_vfd_config_t *split_fa     = NULL;
-    hid_t                       mirr_fapl_id = H5I_INVALID_HID;
+    pid_t childpid = 0;
+    pid_t mypid, tmppid;
+    int child_status;
+    int child_wait_option = 0;
+    int ret_value = 0;
+    int child_ret_value;
+    bool send_wait = false;
+    hid_t fid = H5I_INVALID_HID;
+    H5FD_mirror_fapl_t mirr_fa;
+    H5FD_splitter_vfd_config_t* split_fa = NULL;
+    hid_t mirr_fapl_id = H5I_INVALID_HID;
 
     if (setup_parameters(argc, argv, &UC_opts) < 0) {
         Hgoto_error(1);
     }
 
-    mirr_fa.magic          = H5FD_MIRROR_FAPL_MAGIC;
-    mirr_fa.version        = H5FD_MIRROR_CURR_FAPL_T_VERSION;
+    mirr_fa.magic = H5FD_MIRROR_FAPL_MAGIC;
+    mirr_fa.version = H5FD_MIRROR_CURR_FAPL_T_VERSION;
     mirr_fa.handshake_port = SERVER_PORT;
     strncpy(mirr_fa.remote_ip, SERVER_IP, H5FD_MIRROR_MAX_IP_LEN);
 
@@ -176,12 +176,12 @@ main(int argc, char *argv[])
         Hgoto_error(1);
     }
 
-    split_fa->wo_fapl_id       = H5I_INVALID_HID;
-    split_fa->rw_fapl_id       = H5I_INVALID_HID;
-    split_fa->magic            = H5FD_SPLITTER_MAGIC;
-    split_fa->version          = H5FD_CURR_SPLITTER_VFD_CONFIG_VERSION;
+    split_fa->wo_fapl_id = H5I_INVALID_HID;
+    split_fa->rw_fapl_id = H5I_INVALID_HID;
+    split_fa->magic = H5FD_SPLITTER_MAGIC;
+    split_fa->version = H5FD_CURR_SPLITTER_VFD_CONFIG_VERSION;
     split_fa->log_file_path[0] = '\0'; /* none */
-    split_fa->ignore_wo_errs   = false;
+    split_fa->ignore_wo_errs = false;
     strncpy(split_fa->wo_path, MIRROR_FILE_NAME, H5FD_SPLITTER_PATH_MAX);
 
     /* Determine the need to send/wait message file*/
@@ -216,7 +216,7 @@ main(int argc, char *argv[])
         /* Prepare parent "splitter" driver in UC_opts */
         split_fa->wo_fapl_id = mirr_fapl_id;
         split_fa->rw_fapl_id = H5P_DEFAULT;
-        UC_opts.fapl_id      = H5Pcreate(H5P_FILE_ACCESS);
+        UC_opts.fapl_id = H5Pcreate(H5P_FILE_ACCESS);
         if (UC_opts.fapl_id == H5I_INVALID_HID) {
             fprintf(stderr, "can't create creation FAPL\n");
             Hgoto_error(1);
@@ -305,7 +305,7 @@ main(int argc, char *argv[])
     /* Prepare parent "splitter" driver in UC_opts */
     split_fa->wo_fapl_id = mirr_fapl_id;
     split_fa->rw_fapl_id = H5P_DEFAULT;
-    UC_opts.fapl_id      = H5Pcreate(H5P_FILE_ACCESS);
+    UC_opts.fapl_id = H5Pcreate(H5P_FILE_ACCESS);
     if (UC_opts.fapl_id == H5I_INVALID_HID) {
         fprintf(stderr, "can't create creation FAPL\n");
         Hgoto_error(1);
@@ -323,8 +323,7 @@ main(int argc, char *argv[])
         }
     }
 
-    if ((fid = H5Fopen(UC_opts.filename, H5F_ACC_RDWR | (UC_opts.use_swmr ? H5F_ACC_SWMR_WRITE : 0),
-                       UC_opts.fapl_id)) < 0) {
+    if ((fid = H5Fopen(UC_opts.filename, H5F_ACC_RDWR | (UC_opts.use_swmr ? H5F_ACC_SWMR_WRITE : 0), UC_opts.fapl_id)) < 0) {
         fprintf(stderr, "H5Fopen failed\n");
         Hgoto_error(1);
     }
@@ -383,24 +382,22 @@ done:
     return ret_value;
 }
 
-#else /* H5_HAVE_MIRROR_VFD */
+    #else  /* H5_HAVE_MIRROR_VFD */
 
-int
-main(void)
+int main(void)
 {
     fprintf(stderr, "Mirror VFD is not built. Skipping.\n");
     return EXIT_SUCCESS;
 } /* end main() */
 
-#endif /* H5_HAVE_MIRROR_VFD */
+    #endif /* H5_HAVE_MIRROR_VFD */
 
-#else /* H5_HAVE_UNISTD_H */
+#else      /* H5_HAVE_UNISTD_H */
 
-int
-main(void)
+int main(void)
 {
     fprintf(stderr, "Non-POSIX platform. Skipping.\n");
     return EXIT_SUCCESS;
 } /* end main() */
 
-#endif /* H5_HAVE_UNISTD_H */
+#endif     /* H5_HAVE_UNISTD_H */

@@ -28,33 +28,33 @@
 /* In-memory representation of the on-store revision record.
  * Used in the history.
  */
-typedef struct H5FD_onion_record_loc_t {
-    haddr_t  phys_addr;
-    hsize_t  record_size;
+typedef struct H5FD_onion_record_loc_t
+{
+    haddr_t phys_addr;
+    hsize_t record_size;
     uint32_t checksum;
 } H5FD_onion_record_loc_t;
 
 /* In-memory representation of the on-store history record/summary.
  */
-typedef struct H5FD_onion_history_t {
-    uint8_t                  version;
-    uint64_t                 n_revisions;
-    H5FD_onion_record_loc_t *record_locs;
-    uint32_t                 checksum;
+typedef struct H5FD_onion_history_t
+{
+    uint8_t version;
+    uint64_t n_revisions;
+    H5FD_onion_record_loc_t* record_locs;
+    uint32_t checksum;
 } H5FD_onion_history_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-H5_DLL herr_t H5FD__onion_ingest_history(H5FD_onion_history_t *history_out, H5FD_t *raw_file, haddr_t addr,
-                                         haddr_t size);
+    H5_DLL herr_t H5FD__onion_ingest_history(H5FD_onion_history_t* history_out, H5FD_t* raw_file, haddr_t addr, haddr_t size);
 
-H5_DLL uint64_t H5FD__onion_write_history(H5FD_onion_history_t *history, H5FD_t *file, haddr_t off_start,
-                                          haddr_t filesize_curr);
+    H5_DLL uint64_t H5FD__onion_write_history(H5FD_onion_history_t* history, H5FD_t* file, haddr_t off_start, haddr_t filesize_curr);
 
-H5_DLL size_t H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history);
-H5_DLL size_t H5FD__onion_history_encode(H5FD_onion_history_t *history, unsigned char *buf,
-                                         uint32_t *checksum);
+    H5_DLL size_t H5FD__onion_history_decode(unsigned char* buf, H5FD_onion_history_t* history);
+    H5_DLL size_t H5FD__onion_history_encode(H5FD_onion_history_t* history, unsigned char* buf, uint32_t* checksum);
 
 #ifdef __cplusplus
 }

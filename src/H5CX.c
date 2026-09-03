@@ -41,96 +41,93 @@
 /****************/
 
 #ifdef H5_HAVE_THREADSAFE_API
-/*
- * The per-thread API context.
- *
- * In order for this macro to work, H5CX_get_my_context() must be preceded
- * by "H5CX_node_t **ctx =".
- */
-#define H5CX_get_my_context() H5TS_get_api_ctx_ptr()
-#else /* H5_HAVE_THREADSAFE_API */
-/*
- * The current API context.
- */
-#define H5CX_get_my_context() (&H5CX_head_g)
+    /*
+     * The per-thread API context.
+     *
+     * In order for this macro to work, H5CX_get_my_context() must be preceded
+     * by "H5CX_node_t **ctx =".
+     */
+    #define H5CX_get_my_context() H5TS_get_api_ctx_ptr()
+#else  /* H5_HAVE_THREADSAFE_API */
+    /*
+     * The current API context.
+     */
+    #define H5CX_get_my_context() (&H5CX_head_g)
 #endif /* H5_HAVE_THREADSAFE_API */
 
 /* Common macro for the retrieving the pointer to a property list */
-#define H5CX_RETRIEVE_PLIST(PL, FAILVAL)                                                                     \
-    /* Check if the property list is already available */                                                    \
-    if (NULL == (*head)->ctx.PL)                                                                             \
-        /* Get the property list pointer */                                                                  \
-        if (H5_UNLIKELY(NULL ==                                                                              \
-                        ((*head)->ctx.PL = (H5P_genplist_t *)H5I_object((*head)->ctx.H5_GLUE(PL, _id)))))    \
+#define H5CX_RETRIEVE_PLIST(PL, FAILVAL)                                                                         \
+    /* Check if the property list is already available */                                                        \
+    if (NULL == (*head)->ctx.PL)                                                                                 \
+        /* Get the property list pointer */                                                                      \
+        if (H5_UNLIKELY(NULL == ((*head)->ctx.PL = (H5P_genplist_t*)H5I_object((*head)->ctx.H5_GLUE(PL, _id))))) \
             HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, (FAILVAL), "can't get property list");
 
 /* Common macro for the duplicated code to retrieve properties from a property list */
-#define H5CX_RETRIEVE_PROP_COMMON(PL, DEF_PL, PROP_NAME, PROP_FIELD)                                         \
-    {                                                                                                        \
-                                                                                                             \
-        /* Check for default property list */                                                                \
-        if ((*head)->ctx.H5_GLUE(PL, _id) == (DEF_PL))                                                       \
-            H5MM_memcpy(&(*head)->ctx.PROP_FIELD, &H5_GLUE3(H5CX_def_, PL, _cache).PROP_FIELD,               \
-                        sizeof(H5_GLUE3(H5CX_def_, PL, _cache).PROP_FIELD));                                 \
-        else {                                                                                               \
-            /* Retrieve the property list */                                                                 \
-            H5CX_RETRIEVE_PLIST(PL, FAIL)                                                                    \
-                                                                                                             \
-            /* Get the property */                                                                           \
-            if (H5_UNLIKELY(H5P_get((*head)->ctx.PL, (PROP_NAME), &(*head)->ctx.PROP_FIELD) < 0))            \
-                HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't retrieve value from API context");        \
-        } /* end else */                                                                                     \
-                                                                                                             \
-        /* Mark the field as valid */                                                                        \
-        (*head)->ctx.H5_GLUE(PROP_FIELD, _valid) = true;                                                     \
+#define H5CX_RETRIEVE_PROP_COMMON(PL, DEF_PL, PROP_NAME, PROP_FIELD)                                                                                \
+    {                                                                                                                                               \
+        /* Check for default property list */                                                                                                       \
+        if ((*head)->ctx.H5_GLUE(PL, _id) == (DEF_PL))                                                                                              \
+            H5MM_memcpy(&(*head)->ctx.PROP_FIELD, &H5_GLUE3(H5CX_def_, PL, _cache).PROP_FIELD, sizeof(H5_GLUE3(H5CX_def_, PL, _cache).PROP_FIELD)); \
+        else {                                                                                                                                      \
+            /* Retrieve the property list */                                                                                                        \
+            H5CX_RETRIEVE_PLIST(PL, FAIL)                                                                                                           \
+                                                                                                                                                    \
+            /* Get the property */                                                                                                                  \
+            if (H5_UNLIKELY(H5P_get((*head)->ctx.PL, (PROP_NAME), &(*head)->ctx.PROP_FIELD) < 0))                                                   \
+                HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't retrieve value from API context");                                               \
+        } /* end else */                                                                                                                            \
+                                                                                                                                                    \
+        /* Mark the field as valid */                                                                                                               \
+        (*head)->ctx.H5_GLUE(PROP_FIELD, _valid) = true;                                                                                            \
     }
 
 /* Macro for the duplicated code to retrieve a value from a plist if the context value is invalid */
-#define H5CX_RETRIEVE_PROP_VALID(PL, DEF_PL, PROP_NAME, PROP_FIELD)                                          \
-    /* Check if the value has been retrieved already */                                                      \
-    if (!(*head)->ctx.H5_GLUE(PROP_FIELD, _valid))                                                           \
+#define H5CX_RETRIEVE_PROP_VALID(PL, DEF_PL, PROP_NAME, PROP_FIELD) \
+    /* Check if the value has been retrieved already */             \
+    if (!(*head)->ctx.H5_GLUE(PROP_FIELD, _valid))                  \
     H5CX_RETRIEVE_PROP_COMMON(PL, DEF_PL, PROP_NAME, PROP_FIELD)
 
 /* Macro for the duplicated code to retrieve a value from a plist if the context value is invalid, or the
  * library has previously modified the context value for return */
-#define H5CX_RETRIEVE_PROP_VALID_SET(PL, DEF_PL, PROP_NAME, PROP_FIELD)                                      \
-    /* Check if the value has been retrieved already */                                                      \
-    if (!((*head)->ctx.H5_GLUE(PROP_FIELD, _valid) || (*head)->ctx.H5_GLUE(PROP_FIELD, _set)))               \
+#define H5CX_RETRIEVE_PROP_VALID_SET(PL, DEF_PL, PROP_NAME, PROP_FIELD)                        \
+    /* Check if the value has been retrieved already */                                        \
+    if (!((*head)->ctx.H5_GLUE(PROP_FIELD, _valid) || (*head)->ctx.H5_GLUE(PROP_FIELD, _set))) \
     H5CX_RETRIEVE_PROP_COMMON(PL, DEF_PL, PROP_NAME, PROP_FIELD)
 
 #if defined(H5_HAVE_PARALLEL) && defined(H5_HAVE_INSTRUMENTED_LIBRARY)
-/* Macro for the duplicated code to set a context field that may not exist as a property */
-#define H5CX_TEST_SET_PROP(PROP_NAME, PROP_FIELD)                                                            \
-    {                                                                                                        \
-        htri_t check_prop = 0; /* Whether the property exists in the API context's DXPL */                   \
-                                                                                                             \
-        /* Check if property exists in DXPL */                                                               \
-        if (!(*head)->ctx.H5_GLUE(PROP_FIELD, _set)) {                                                       \
-            /* Retrieve the dataset transfer property list */                                                \
-            H5CX_RETRIEVE_PLIST(dxpl, FAIL)                                                                  \
-                                                                                                             \
-            if (H5_UNLIKELY((check_prop = H5P_exist_plist((*head)->ctx.dxpl, PROP_NAME)) < 0))               \
-                HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "error checking for property");                  \
-        } /* end if */                                                                                       \
-                                                                                                             \
-        /* If property was already set or exists (for first set), update it */                               \
-        if ((*head)->ctx.H5_GLUE(PROP_FIELD, _set) || check_prop > 0) {                                      \
-            /* Cache the value for later, marking it to set in DXPL when context popped */                   \
-            (*head)->ctx.PROP_FIELD                = PROP_FIELD;                                             \
-            (*head)->ctx.H5_GLUE(PROP_FIELD, _set) = true;                                                   \
-        } /* end if */                                                                                       \
-    }
+    /* Macro for the duplicated code to set a context field that may not exist as a property */
+    #define H5CX_TEST_SET_PROP(PROP_NAME, PROP_FIELD)                                              \
+        {                                                                                          \
+            htri_t check_prop = 0; /* Whether the property exists in the API context's DXPL */     \
+                                                                                                   \
+            /* Check if property exists in DXPL */                                                 \
+            if (!(*head)->ctx.H5_GLUE(PROP_FIELD, _set)) {                                         \
+                /* Retrieve the dataset transfer property list */                                  \
+                H5CX_RETRIEVE_PLIST(dxpl, FAIL)                                                    \
+                                                                                                   \
+                if (H5_UNLIKELY((check_prop = H5P_exist_plist((*head)->ctx.dxpl, PROP_NAME)) < 0)) \
+                    HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "error checking for property");    \
+            } /* end if */                                                                         \
+                                                                                                   \
+            /* If property was already set or exists (for first set), update it */                 \
+            if ((*head)->ctx.H5_GLUE(PROP_FIELD, _set) || check_prop > 0) {                        \
+                /* Cache the value for later, marking it to set in DXPL when context popped */     \
+                (*head)->ctx.PROP_FIELD = PROP_FIELD;                                              \
+                (*head)->ctx.H5_GLUE(PROP_FIELD, _set) = true;                                     \
+            } /* end if */                                                                         \
+        }
 #endif /* defined(H5_HAVE_PARALLEL) && defined(H5_HAVE_INSTRUMENTED_LIBRARY) */
 
 /* Macro for the duplicated code to test and set properties for a property list from the context */
-#define H5CX_SET_PROP(PROP_NAME, PROP_FIELD)                                                                 \
-    if ((*head)->ctx.H5_GLUE(PROP_FIELD, _set)) {                                                            \
-        /* Retrieve the dataset transfer property list */                                                    \
-        H5CX_RETRIEVE_PLIST(dxpl, FAIL)                                                                      \
-                                                                                                             \
-        /* Set the property */                                                                               \
-        if (H5_UNLIKELY(H5P_set((*head)->ctx.dxpl, PROP_NAME, &(*head)->ctx.PROP_FIELD) < 0))                \
-            HGOTO_ERROR(H5E_CONTEXT, H5E_CANTSET, FAIL, "error setting data xfer property");                 \
+#define H5CX_SET_PROP(PROP_NAME, PROP_FIELD)                                                  \
+    if ((*head)->ctx.H5_GLUE(PROP_FIELD, _set)) {                                             \
+        /* Retrieve the dataset transfer property list */                                     \
+        H5CX_RETRIEVE_PLIST(dxpl, FAIL)                                                       \
+                                                                                              \
+        /* Set the property */                                                                \
+        if (H5_UNLIKELY(H5P_set((*head)->ctx.dxpl, PROP_NAME, &(*head)->ctx.PROP_FIELD) < 0)) \
+            HGOTO_ERROR(H5E_CONTEXT, H5E_CANTSET, FAIL, "error setting data xfer property");  \
     } /* end if */
 
 /******************/
@@ -144,69 +141,74 @@
  * uses a default DXPL, this value is copied instead of spending time looking
  * up the property in the DXPL.
  */
-typedef struct H5CX_dxpl_cache_t {
-    size_t    max_temp_buf;         /* Maximum temporary buffer size (H5D_XFER_MAX_TEMP_BUF_NAME) */
-    void     *tconv_buf;            /* Temporary conversion buffer (H5D_XFER_TCONV_BUF_NAME) */
-    void     *bkgr_buf;             /* Background conversion buffer (H5D_XFER_BKGR_BUF_NAME) */
-    H5T_bkg_t bkgr_buf_type;        /* Background buffer type (H5D_XFER_BKGR_BUF_NAME) */
-    double    btree_split_ratio[3]; /* B-tree split ratios (H5D_XFER_BTREE_SPLIT_RATIO_NAME) */
-    size_t    vec_size;             /* Size of hyperslab vector (H5D_XFER_HYPER_VECTOR_SIZE_NAME) */
+typedef struct H5CX_dxpl_cache_t
+{
+    size_t max_temp_buf;         /* Maximum temporary buffer size (H5D_XFER_MAX_TEMP_BUF_NAME) */
+    void* tconv_buf;             /* Temporary conversion buffer (H5D_XFER_TCONV_BUF_NAME) */
+    void* bkgr_buf;              /* Background conversion buffer (H5D_XFER_BKGR_BUF_NAME) */
+    H5T_bkg_t bkgr_buf_type;     /* Background buffer type (H5D_XFER_BKGR_BUF_NAME) */
+    double btree_split_ratio[3]; /* B-tree split ratios (H5D_XFER_BTREE_SPLIT_RATIO_NAME) */
+    size_t vec_size;             /* Size of hyperslab vector (H5D_XFER_HYPER_VECTOR_SIZE_NAME) */
 #ifdef H5_HAVE_PARALLEL
-    H5FD_mpio_xfer_t io_xfer_mode; /* Parallel transfer mode for this request (H5D_XFER_IO_XFER_MODE_NAME) */
-    H5FD_mpio_collective_opt_t mpio_coll_opt; /* Parallel transfer with independent IO or collective IO with
-                                                 this mode (H5D_XFER_MPIO_COLLECTIVE_OPT_NAME) */
-    uint32_t mpio_local_no_coll_cause;        /* Local reason for breaking collective I/O
-                                                 (H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME) */
-    uint32_t mpio_global_no_coll_cause;       /* Global reason for breaking collective I/O
-                                                 (H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME) */
-    H5FD_mpio_chunk_opt_t
-             mpio_chunk_opt_mode;       /* Collective chunk option (H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME) */
-    unsigned mpio_chunk_opt_num;        /* Collective chunk threshold (H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME) */
-    unsigned mpio_chunk_opt_ratio;      /* Collective chunk ratio (H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME) */
-#endif                                  /* H5_HAVE_PARALLEL */
-    H5Z_EDC_t               err_detect; /* Error detection info (H5D_XFER_EDC_NAME) */
-    H5Z_cb_t                filter_cb;  /* Filter callback function (H5D_XFER_FILTER_CB_NAME) */
-    H5Z_data_xform_t       *data_transform;        /* Data transform info (H5D_XFER_XFORM_NAME) */
-    H5T_vlen_alloc_info_t   vl_alloc_info;         /* VL datatype alloc info (H5D_XFER_VLEN_*_NAME) */
-    H5T_conv_cb_t           dt_conv_cb;            /* Datatype conversion struct (H5D_XFER_CONV_CB_NAME) */
-    H5D_selection_io_mode_t selection_io_mode;     /* Selection I/O mode (H5D_XFER_SELECTION_IO_MODE_NAME) */
-    uint32_t                no_selection_io_cause; /* Reasons for not performing selection I/O
-                                                            (H5D_XFER_NO_SELECTION_IO_CAUSE_NAME) */
-    uint32_t actual_selection_io_mode;             /* Actual selection I/O mode
-                                                         (H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME) */
-    bool modify_write_buf;                         /* Whether the library can modify write buffers */
+    H5FD_mpio_xfer_t io_xfer_mode;             /* Parallel transfer mode for this request (H5D_XFER_IO_XFER_MODE_NAME) */
+    H5FD_mpio_collective_opt_t mpio_coll_opt;  /* Parallel transfer with independent IO or collective IO with
+                                                  this mode (H5D_XFER_MPIO_COLLECTIVE_OPT_NAME) */
+    uint32_t mpio_local_no_coll_cause;         /* Local reason for breaking collective I/O
+                                                  (H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME) */
+    uint32_t mpio_global_no_coll_cause;        /* Global reason for breaking collective I/O
+                                                  (H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME) */
+    H5FD_mpio_chunk_opt_t mpio_chunk_opt_mode; /* Collective chunk option (H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME) */
+    unsigned mpio_chunk_opt_num;               /* Collective chunk threshold (H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME) */
+    unsigned mpio_chunk_opt_ratio;             /* Collective chunk ratio (H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME) */
+#endif /* H5_HAVE_PARALLEL */
+    H5Z_EDC_t err_detect;                      /* Error detection info (H5D_XFER_EDC_NAME) */
+    H5Z_cb_t filter_cb;                        /* Filter callback function (H5D_XFER_FILTER_CB_NAME) */
+    H5Z_data_xform_t* data_transform;          /* Data transform info (H5D_XFER_XFORM_NAME) */
+    H5T_vlen_alloc_info_t vl_alloc_info;       /* VL datatype alloc info (H5D_XFER_VLEN_*_NAME) */
+    H5T_conv_cb_t dt_conv_cb;                  /* Datatype conversion struct (H5D_XFER_CONV_CB_NAME) */
+    H5D_selection_io_mode_t selection_io_mode; /* Selection I/O mode (H5D_XFER_SELECTION_IO_MODE_NAME) */
+    uint32_t no_selection_io_cause;            /* Reasons for not performing selection I/O
+                                                        (H5D_XFER_NO_SELECTION_IO_CAUSE_NAME) */
+    uint32_t actual_selection_io_mode;         /* Actual selection I/O mode
+                                                     (H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME) */
+    bool modify_write_buf;                     /* Whether the library can modify write buffers */
 } H5CX_dxpl_cache_t;
 
 /* Typedef for cached default link creation property list information */
 /* (Same as the cached DXPL struct, above, except for the default LCPL) */
-typedef struct H5CX_lcpl_cache_t {
-    H5T_cset_t encoding;           /* Link name character encoding */
-    unsigned   intermediate_group; /* Whether to create intermediate groups  */
+typedef struct H5CX_lcpl_cache_t
+{
+    H5T_cset_t encoding;         /* Link name character encoding */
+    unsigned intermediate_group; /* Whether to create intermediate groups  */
 } H5CX_lcpl_cache_t;
 
 /* Typedef for cached default link access property list information */
 /* (Same as the cached DXPL struct, above, except for the default LAPL) */
-typedef struct H5CX_lapl_cache_t {
+typedef struct H5CX_lapl_cache_t
+{
     size_t nlinks; /* Number of soft / UD links to traverse (H5L_ACS_NLINKS_NAME) */
 } H5CX_lapl_cache_t;
 
 /* Typedef for cached default dataset creation property list information */
 /* (Same as the cached DXPL struct, above, except for the default DCPL) */
-typedef struct H5CX_dcpl_cache_t {
-    bool    do_min_dset_ohdr; /* Whether to minimize dataset object header */
-    uint8_t ohdr_flags;       /* Object header flags */
+typedef struct H5CX_dcpl_cache_t
+{
+    bool do_min_dset_ohdr; /* Whether to minimize dataset object header */
+    uint8_t ohdr_flags;    /* Object header flags */
 } H5CX_dcpl_cache_t;
 
 /* Typedef for cached default dataset access property list information */
 /* (Same as the cached DXPL struct, above, except for the default DXPL) */
-typedef struct H5CX_dapl_cache_t {
-    const char *extfile_prefix; /* Prefix for external file */
-    const char *vds_prefix;     /* Prefix for VDS           */
+typedef struct H5CX_dapl_cache_t
+{
+    const char* extfile_prefix; /* Prefix for external file */
+    const char* vds_prefix;     /* Prefix for VDS           */
 } H5CX_dapl_cache_t;
 
 /* Typedef for cached default file access property list information */
 /* (Same as the cached DXPL struct, above, except for the default DCPL) */
-typedef struct H5CX_fapl_cache_t {
+typedef struct H5CX_fapl_cache_t
+{
     H5F_libver_t low_bound;  /* low_bound property for H5Pset_libver_bounds() */
     H5F_libver_t high_bound; /* high_bound property for H5Pset_libver_bounds */
 } H5CX_fapl_cache_t;
@@ -227,8 +229,8 @@ bool H5_PKG_INIT_VAR = false;
 /*******************/
 
 #ifndef H5_HAVE_THREADSAFE_API
-static H5CX_node_t *H5CX_head_g = NULL; /* Pointer to head of context stack */
-#endif                                  /* H5_HAVE_THREADSAFE_API */
+static H5CX_node_t* H5CX_head_g = NULL; /* Pointer to head of context stack */
+#endif /* H5_HAVE_THREADSAFE_API */
 
 /* Define a "default" dataset transfer property list cache structure to use for default DXPLs */
 static H5CX_dxpl_cache_t H5CX_def_dxpl_cache;
@@ -261,16 +263,15 @@ RETURNS
 DESCRIPTION
     Initializes any interface-specific data or routines.
 --------------------------------------------------------------------------*/
-herr_t
-H5CX__init_package(void)
+herr_t H5CX__init_package(void)
 {
-    H5P_genplist_t *dx_plist;            /* Data transfer property list */
-    H5P_genplist_t *lc_plist;            /* Link creation property list */
-    H5P_genplist_t *la_plist;            /* Link access property list */
-    H5P_genplist_t *dc_plist;            /* Dataset creation property list */
-    H5P_genplist_t *da_plist;            /* Dataset access property list */
-    H5P_genplist_t *fa_plist;            /* File access property list */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5P_genplist_t* dx_plist;   /* Data transfer property list */
+    H5P_genplist_t* lc_plist;   /* Link creation property list */
+    H5P_genplist_t* la_plist;   /* Link access property list */
+    H5P_genplist_t* dc_plist;   /* Dataset creation property list */
+    H5P_genplist_t* da_plist;   /* Dataset access property list */
+    H5P_genplist_t* fa_plist;   /* File access property list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -280,102 +281,123 @@ H5CX__init_package(void)
     /* Get the default DXPL cache information */
 
     /* Get the default dataset transfer property list */
-    if (NULL == (dx_plist = (H5P_genplist_t *)H5I_object(H5P_DATASET_XFER_DEFAULT)))
+    if (NULL == (dx_plist = (H5P_genplist_t*)H5I_object(H5P_DATASET_XFER_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a dataset transfer property list");
+    }
 
     /* Get B-tree split ratios */
-    if (H5P_get(dx_plist, H5D_XFER_BTREE_SPLIT_RATIO_NAME, &H5CX_def_dxpl_cache.btree_split_ratio) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_BTREE_SPLIT_RATIO_NAME, &H5CX_def_dxpl_cache.btree_split_ratio) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve B-tree split ratios");
+    }
 
     /* Get maximum temporary buffer size value */
-    if (H5P_get(dx_plist, H5D_XFER_MAX_TEMP_BUF_NAME, &H5CX_def_dxpl_cache.max_temp_buf) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_MAX_TEMP_BUF_NAME, &H5CX_def_dxpl_cache.max_temp_buf) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve maximum temporary buffer size");
+    }
 
     /* Get temporary buffer pointer */
-    if (H5P_get(dx_plist, H5D_XFER_TCONV_BUF_NAME, &H5CX_def_dxpl_cache.tconv_buf) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_TCONV_BUF_NAME, &H5CX_def_dxpl_cache.tconv_buf) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve temporary buffer pointer");
+    }
 
     /* Get background buffer pointer */
-    if (H5P_get(dx_plist, H5D_XFER_BKGR_BUF_NAME, &H5CX_def_dxpl_cache.bkgr_buf) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_BKGR_BUF_NAME, &H5CX_def_dxpl_cache.bkgr_buf) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve background buffer pointer");
+    }
 
     /* Get background buffer type */
-    if (H5P_get(dx_plist, H5D_XFER_BKGR_BUF_TYPE_NAME, &H5CX_def_dxpl_cache.bkgr_buf_type) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_BKGR_BUF_TYPE_NAME, &H5CX_def_dxpl_cache.bkgr_buf_type) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve background buffer type");
+    }
 
     /* Get I/O vector size */
-    if (H5P_get(dx_plist, H5D_XFER_HYPER_VECTOR_SIZE_NAME, &H5CX_def_dxpl_cache.vec_size) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_HYPER_VECTOR_SIZE_NAME, &H5CX_def_dxpl_cache.vec_size) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve I/O vector size");
+    }
 
 #ifdef H5_HAVE_PARALLEL
     /* Collect Parallel I/O information for possible later use */
-    if (H5P_get(dx_plist, H5D_XFER_IO_XFER_MODE_NAME, &H5CX_def_dxpl_cache.io_xfer_mode) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_IO_XFER_MODE_NAME, &H5CX_def_dxpl_cache.io_xfer_mode) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve parallel transfer method");
-    if (H5P_get(dx_plist, H5D_XFER_MPIO_COLLECTIVE_OPT_NAME, &H5CX_def_dxpl_cache.mpio_coll_opt) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_MPIO_COLLECTIVE_OPT_NAME, &H5CX_def_dxpl_cache.mpio_coll_opt) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve collective transfer option");
-    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_mode) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_mode) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve chunk optimization option");
-    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_num) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_num) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve chunk optimization threshold");
-    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_ratio) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME, &H5CX_def_dxpl_cache.mpio_chunk_opt_ratio) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve chunk optimization ratio");
+    }
 
     /* Get the local & global reasons for breaking collective I/O values */
-    if (H5P_get(dx_plist, H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME,
-                &H5CX_def_dxpl_cache.mpio_local_no_coll_cause) < 0)
+    if (H5P_get(dx_plist, H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME, &H5CX_def_dxpl_cache.mpio_local_no_coll_cause) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve local cause for breaking collective I/O");
-    if (H5P_get(dx_plist, H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME,
-                &H5CX_def_dxpl_cache.mpio_global_no_coll_cause) < 0)
-        HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL,
-                    "Can't retrieve global cause for breaking collective I/O");
+    }
+    if (H5P_get(dx_plist, H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME, &H5CX_def_dxpl_cache.mpio_global_no_coll_cause) < 0) {
+        HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve global cause for breaking collective I/O");
+    }
 #endif /* H5_HAVE_PARALLEL */
 
     /* Get error detection properties */
-    if (H5P_get(dx_plist, H5D_XFER_EDC_NAME, &H5CX_def_dxpl_cache.err_detect) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_EDC_NAME, &H5CX_def_dxpl_cache.err_detect) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve error detection info");
+    }
 
     /* Get filter callback function */
-    if (H5P_get(dx_plist, H5D_XFER_FILTER_CB_NAME, &H5CX_def_dxpl_cache.filter_cb) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_FILTER_CB_NAME, &H5CX_def_dxpl_cache.filter_cb) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve filter callback function");
+    }
 
     /* Look at the data transform property */
     /* (Note: 'peek', not 'get' - if this turns out to be a problem, we may need
      *          to copy it and free this in the H5CX terminate routine. -QAK)
      */
-    if (H5P_peek(dx_plist, H5D_XFER_XFORM_NAME, &H5CX_def_dxpl_cache.data_transform) < 0)
+    if (H5P_peek(dx_plist, H5D_XFER_XFORM_NAME, &H5CX_def_dxpl_cache.data_transform) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve data transform info");
+    }
 
     /* Get VL datatype alloc info */
-    if (H5P_get(dx_plist, H5D_XFER_VLEN_ALLOC_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.alloc_func) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_VLEN_ALLOC_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.alloc_func) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-    if (H5P_get(dx_plist, H5D_XFER_VLEN_ALLOC_INFO_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.alloc_info) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_VLEN_ALLOC_INFO_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.alloc_info) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-    if (H5P_get(dx_plist, H5D_XFER_VLEN_FREE_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.free_func) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_VLEN_FREE_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.free_func) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-    if (H5P_get(dx_plist, H5D_XFER_VLEN_FREE_INFO_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.free_info) < 0)
+    }
+    if (H5P_get(dx_plist, H5D_XFER_VLEN_FREE_INFO_NAME, &H5CX_def_dxpl_cache.vl_alloc_info.free_info) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
+    }
 
     /* Get datatype conversion struct */
-    if (H5P_get(dx_plist, H5D_XFER_CONV_CB_NAME, &H5CX_def_dxpl_cache.dt_conv_cb) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_CONV_CB_NAME, &H5CX_def_dxpl_cache.dt_conv_cb) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve datatype conversion exception callback");
+    }
 
     /* Get the selection I/O mode */
-    if (H5P_get(dx_plist, H5D_XFER_SELECTION_IO_MODE_NAME, &H5CX_def_dxpl_cache.selection_io_mode) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_SELECTION_IO_MODE_NAME, &H5CX_def_dxpl_cache.selection_io_mode) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve selection I/O mode");
+    }
 
     /* Get the local & global reasons for breaking selection I/O values */
-    if (H5P_get(dx_plist, H5D_XFER_NO_SELECTION_IO_CAUSE_NAME, &H5CX_def_dxpl_cache.no_selection_io_cause) <
-        0)
+    if (H5P_get(dx_plist, H5D_XFER_NO_SELECTION_IO_CAUSE_NAME, &H5CX_def_dxpl_cache.no_selection_io_cause) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve cause for no selection I/O");
+    }
 
     /* Get the actual selection I/O mode */
-    if (H5P_get(dx_plist, H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME,
-                &H5CX_def_dxpl_cache.actual_selection_io_mode) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME, &H5CX_def_dxpl_cache.actual_selection_io_mode) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve actual selection I/O mode");
+    }
 
     /* Get the modify write buffer property */
-    if (H5P_get(dx_plist, H5D_XFER_MODIFY_WRITE_BUF_NAME, &H5CX_def_dxpl_cache.modify_write_buf) < 0)
+    if (H5P_get(dx_plist, H5D_XFER_MODIFY_WRITE_BUF_NAME, &H5CX_def_dxpl_cache.modify_write_buf) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve modify write buffer property");
+    }
 
     /* Reset the "default LCPL cache" information */
     memset(&H5CX_def_lcpl_cache, 0, sizeof(H5CX_lcpl_cache_t));
@@ -383,16 +405,19 @@ H5CX__init_package(void)
     /* Get the default LCPL cache information */
 
     /* Get the default link creation property list */
-    if (NULL == (lc_plist = (H5P_genplist_t *)H5I_object(H5P_LINK_CREATE_DEFAULT)))
+    if (NULL == (lc_plist = (H5P_genplist_t*)H5I_object(H5P_LINK_CREATE_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a link creation property list");
+    }
 
     /* Get link name character encoding */
-    if (H5P_get(lc_plist, H5P_STRCRT_CHAR_ENCODING_NAME, &H5CX_def_lcpl_cache.encoding) < 0)
+    if (H5P_get(lc_plist, H5P_STRCRT_CHAR_ENCODING_NAME, &H5CX_def_lcpl_cache.encoding) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve link name encoding");
+    }
 
     /* Get flag whether to create intermediate groups */
-    if (H5P_get(lc_plist, H5L_CRT_INTERMEDIATE_GROUP_NAME, &H5CX_def_lcpl_cache.intermediate_group) < 0)
+    if (H5P_get(lc_plist, H5L_CRT_INTERMEDIATE_GROUP_NAME, &H5CX_def_lcpl_cache.intermediate_group) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve intermediate group creation flag");
+    }
 
     /* Reset the "default LAPL cache" information */
     memset(&H5CX_def_lapl_cache, 0, sizeof(H5CX_lapl_cache_t));
@@ -400,12 +425,14 @@ H5CX__init_package(void)
     /* Get the default LAPL cache information */
 
     /* Get the default link access property list */
-    if (NULL == (la_plist = (H5P_genplist_t *)H5I_object(H5P_LINK_ACCESS_DEFAULT)))
+    if (NULL == (la_plist = (H5P_genplist_t*)H5I_object(H5P_LINK_ACCESS_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a link access property list");
+    }
 
     /* Get number of soft / UD links to traverse */
-    if (H5P_get(la_plist, H5L_ACS_NLINKS_NAME, &H5CX_def_lapl_cache.nlinks) < 0)
+    if (H5P_get(la_plist, H5L_ACS_NLINKS_NAME, &H5CX_def_lapl_cache.nlinks) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve number of soft / UD links to traverse");
+    }
 
     /* Reset the "default DCPL cache" information */
     memset(&H5CX_def_dcpl_cache, 0, sizeof(H5CX_dcpl_cache_t));
@@ -413,16 +440,19 @@ H5CX__init_package(void)
     /* Get the default DCPL cache information */
 
     /* Get the default dataset creation property list */
-    if (NULL == (dc_plist = (H5P_genplist_t *)H5I_object(H5P_DATASET_CREATE_DEFAULT)))
+    if (NULL == (dc_plist = (H5P_genplist_t*)H5I_object(H5P_DATASET_CREATE_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a dataset create property list");
+    }
 
     /* Get flag to indicate whether to minimize dataset object header */
-    if (H5P_get(dc_plist, H5D_CRT_MIN_DSET_HDR_SIZE_NAME, &H5CX_def_dcpl_cache.do_min_dset_ohdr) < 0)
+    if (H5P_get(dc_plist, H5D_CRT_MIN_DSET_HDR_SIZE_NAME, &H5CX_def_dcpl_cache.do_min_dset_ohdr) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve dataset minimize flag");
+    }
 
     /* Get object header flags */
-    if (H5P_get(dc_plist, H5O_CRT_OHDR_FLAGS_NAME, &H5CX_def_dcpl_cache.ohdr_flags) < 0)
+    if (H5P_get(dc_plist, H5O_CRT_OHDR_FLAGS_NAME, &H5CX_def_dcpl_cache.ohdr_flags) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve object header flags");
+    }
 
     /* Reset the "default DAPL cache" information */
     memset(&H5CX_def_dapl_cache, 0, sizeof(H5CX_dapl_cache_t));
@@ -430,16 +460,19 @@ H5CX__init_package(void)
     /* Get the default DAPL cache information */
 
     /* Get the default dataset access property list */
-    if (NULL == (da_plist = (H5P_genplist_t *)H5I_object(H5P_DATASET_ACCESS_DEFAULT)))
+    if (NULL == (da_plist = (H5P_genplist_t*)H5I_object(H5P_DATASET_ACCESS_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a dataset create property list");
+    }
 
     /* Get the prefix for the external file */
-    if (H5P_peek(da_plist, H5D_ACS_EFILE_PREFIX_NAME, &H5CX_def_dapl_cache.extfile_prefix) < 0)
+    if (H5P_peek(da_plist, H5D_ACS_EFILE_PREFIX_NAME, &H5CX_def_dapl_cache.extfile_prefix) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve prefix for external file");
+    }
 
     /* Get the prefix for the VDS file */
-    if (H5P_peek(da_plist, H5D_ACS_VDS_PREFIX_NAME, &H5CX_def_dapl_cache.vds_prefix) < 0)
+    if (H5P_peek(da_plist, H5D_ACS_VDS_PREFIX_NAME, &H5CX_def_dapl_cache.vds_prefix) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve prefix for VDS");
+    }
 
     /* Reset the "default FAPL cache" information */
     memset(&H5CX_def_fapl_cache, 0, sizeof(H5CX_fapl_cache_t));
@@ -447,15 +480,18 @@ H5CX__init_package(void)
     /* Get the default FAPL cache information */
 
     /* Get the default file access property list */
-    if (NULL == (fa_plist = (H5P_genplist_t *)H5I_object(H5P_FILE_ACCESS_DEFAULT)))
+    if (NULL == (fa_plist = (H5P_genplist_t*)H5I_object(H5P_FILE_ACCESS_DEFAULT))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not a dataset create property list");
+    }
 
     /* Get low_bound */
-    if (H5P_get(fa_plist, H5F_ACS_LIBVER_LOW_BOUND_NAME, &H5CX_def_fapl_cache.low_bound) < 0)
+    if (H5P_get(fa_plist, H5F_ACS_LIBVER_LOW_BOUND_NAME, &H5CX_def_fapl_cache.low_bound) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve dataset minimize flag");
+    }
 
-    if (H5P_get(fa_plist, H5F_ACS_LIBVER_HIGH_BOUND_NAME, &H5CX_def_fapl_cache.high_bound) < 0)
+    if (H5P_get(fa_plist, H5F_ACS_LIBVER_HIGH_BOUND_NAME, &H5CX_def_fapl_cache.high_bound) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve dataset minimize flag");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -472,13 +508,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-int
-H5CX_term_package(void)
+int H5CX_term_package(void)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
     if (H5_PKG_INIT_VAR) {
-        H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+        H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
         /* Get the pointer to the head of the API context, for this thread */
         head = H5CX_get_my_context();
@@ -502,11 +537,10 @@ H5CX_term_package(void)
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5CX_pushed(void)
+bool H5CX_pushed(void)
 {
-    H5CX_node_t **head      = NULL;  /* Pointer to head of API context list */
-    bool          is_pushed = false; /* Flag to indicate context is pushed */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    bool is_pushed = false;    /* Flag to indicate context is pushed */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -528,11 +562,10 @@ H5CX_pushed(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_push(H5CX_node_t *cnode)
+herr_t H5CX_push(H5CX_node_t* cnode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -548,8 +581,8 @@ H5CX_push(H5CX_node_t *cnode)
     cnode->ctx.lcpl_id = H5P_LINK_CREATE_DEFAULT;
     cnode->ctx.lapl_id = H5P_LINK_ACCESS_DEFAULT;
     cnode->ctx.fapl_id = H5P_FILE_ACCESS_DEFAULT;
-    cnode->ctx.tag     = H5AC__INVALID_TAG;
-    cnode->ctx.ring    = H5AC_RING_USER;
+    cnode->ctx.tag = H5AC__INVALID_TAG;
+    cnode->ctx.ring = H5AC_RING_USER;
 
 #ifdef H5_HAVE_PARALLEL
     cnode->ctx.btype = MPI_BYTE;
@@ -558,7 +591,7 @@ H5CX_push(H5CX_node_t *cnode)
 
     /* Push context node onto stack */
     cnode->next = *head;
-    *head       = cnode;
+    *head = cnode;
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -578,11 +611,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_retrieve_state(H5CX_state_t **api_state)
+herr_t H5CX_retrieve_state(H5CX_state_t** api_state)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -592,8 +624,9 @@ H5CX_retrieve_state(H5CX_state_t **api_state)
     assert(api_state);
 
     /* Allocate & clear API context state */
-    if (NULL == (*api_state = H5FL_CALLOC(H5CX_state_t)))
+    if (NULL == (*api_state = H5FL_CALLOC(H5CX_state_t))) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTALLOC, FAIL, "unable to allocate new API context state");
+    }
 
     /* Check for non-default DCPL */
     if (H5P_DATASET_CREATE_DEFAULT != (*head)->ctx.dcpl_id) {
@@ -601,11 +634,13 @@ H5CX_retrieve_state(H5CX_state_t **api_state)
         H5CX_RETRIEVE_PLIST(dcpl, FAIL)
 
         /* Copy the DCPL ID */
-        if (((*api_state)->dcpl_id = H5P_copy_plist((H5P_genplist_t *)(*head)->ctx.dcpl, false)) < 0)
+        if (((*api_state)->dcpl_id = H5P_copy_plist((H5P_genplist_t*)(*head)->ctx.dcpl, false)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTCOPY, FAIL, "can't copy property list");
+        }
     } /* end if */
-    else
+    else {
         (*api_state)->dcpl_id = H5P_DATASET_CREATE_DEFAULT;
+    }
 
     /* Check for non-default DXPL */
     if (H5P_DATASET_XFER_DEFAULT != (*head)->ctx.dxpl_id) {
@@ -613,11 +648,13 @@ H5CX_retrieve_state(H5CX_state_t **api_state)
         H5CX_RETRIEVE_PLIST(dxpl, FAIL)
 
         /* Copy the DXPL ID */
-        if (((*api_state)->dxpl_id = H5P_copy_plist((H5P_genplist_t *)(*head)->ctx.dxpl, false)) < 0)
+        if (((*api_state)->dxpl_id = H5P_copy_plist((H5P_genplist_t*)(*head)->ctx.dxpl, false)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTCOPY, FAIL, "can't copy property list");
+        }
     } /* end if */
-    else
+    else {
         (*api_state)->dxpl_id = H5P_DATASET_XFER_DEFAULT;
+    }
 
     /* Check for non-default LAPL */
     if (H5P_LINK_ACCESS_DEFAULT != (*head)->ctx.lapl_id) {
@@ -625,11 +662,13 @@ H5CX_retrieve_state(H5CX_state_t **api_state)
         H5CX_RETRIEVE_PLIST(lapl, FAIL)
 
         /* Copy the LAPL ID */
-        if (((*api_state)->lapl_id = H5P_copy_plist((H5P_genplist_t *)(*head)->ctx.lapl, false)) < 0)
+        if (((*api_state)->lapl_id = H5P_copy_plist((H5P_genplist_t*)(*head)->ctx.lapl, false)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTCOPY, FAIL, "can't copy property list");
+        }
     } /* end if */
-    else
+    else {
         (*api_state)->lapl_id = H5P_LINK_ACCESS_DEFAULT;
+    }
 
     /* Check for non-default LCPL */
     if (H5P_LINK_CREATE_DEFAULT != (*head)->ctx.lcpl_id) {
@@ -637,44 +676,47 @@ H5CX_retrieve_state(H5CX_state_t **api_state)
         H5CX_RETRIEVE_PLIST(lcpl, FAIL)
 
         /* Copy the LCPL ID */
-        if (((*api_state)->lcpl_id = H5P_copy_plist((H5P_genplist_t *)(*head)->ctx.lcpl, false)) < 0)
+        if (((*api_state)->lcpl_id = H5P_copy_plist((H5P_genplist_t*)(*head)->ctx.lcpl, false)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTCOPY, FAIL, "can't copy property list");
+        }
     } /* end if */
-    else
+    else {
         (*api_state)->lcpl_id = H5P_LINK_CREATE_DEFAULT;
+    }
 
     /* Keep a reference to the current VOL wrapping context */
     (*api_state)->vol_wrap_ctx = (*head)->ctx.vol_wrap_ctx;
     if (NULL != (*api_state)->vol_wrap_ctx) {
         assert((*head)->ctx.vol_wrap_ctx_valid);
-        if (H5VL_inc_vol_wrapper((*api_state)->vol_wrap_ctx) < 0)
+        if (H5VL_inc_vol_wrapper((*api_state)->vol_wrap_ctx) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTINC, FAIL, "can't increment refcount on VOL wrapping context");
+        }
     } /* end if */
 
     /* Keep a copy of the VOL connector property, if there is one */
     if ((*head)->ctx.vol_connector_prop_valid && (*head)->ctx.vol_connector_prop.connector) {
         /* Get the connector property */
-        H5MM_memcpy(&(*api_state)->vol_connector_prop, &(*head)->ctx.vol_connector_prop,
-                    sizeof(H5VL_connector_prop_t));
+        H5MM_memcpy(&(*api_state)->vol_connector_prop, &(*head)->ctx.vol_connector_prop, sizeof(H5VL_connector_prop_t));
 
         /* Check for actual VOL connector property */
         if ((*api_state)->vol_connector_prop.connector) {
             /* Copy connector info, if it exists */
             if ((*api_state)->vol_connector_prop.connector_info) {
-                void *new_connector_info = NULL; /* Copy of connector info */
+                void* new_connector_info = NULL; /* Copy of connector info */
 
                 /* Allocate and copy connector info */
-                if (H5VL_copy_connector_info((*api_state)->vol_connector_prop.connector, &new_connector_info,
-                                             (*api_state)->vol_connector_prop.connector_info) < 0)
+                if (H5VL_copy_connector_info((*api_state)->vol_connector_prop.connector, &new_connector_info, (*api_state)->vol_connector_prop.connector_info) < 0) {
                     HGOTO_ERROR(H5E_CONTEXT, H5E_CANTCOPY, FAIL, "connector info copy failed");
+                }
                 (*api_state)->vol_connector_prop.connector_info = new_connector_info;
             } /* end if */
 
             /* Increment the refcount on the connector */
-            if (H5VL_conn_inc_rc((*api_state)->vol_connector_prop.connector) < 0)
+            if (H5VL_conn_inc_rc((*api_state)->vol_connector_prop.connector) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTINC, FAIL, "incrementing VOL connector refcount failed");
+            }
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
 #ifdef H5_HAVE_PARALLEL
     /* Save parallel I/O settings */
@@ -686,11 +728,12 @@ done:
     if (ret_value < 0) {
         if (*api_state) {
             /* Release the (possibly partially allocated) API state struct */
-            if (H5CX_free_state(*api_state) < 0)
+            if (H5CX_free_state(*api_state) < 0) {
                 HDONE_ERROR(H5E_CONTEXT, H5E_CANTRELEASE, FAIL, "unable to release API state");
+            }
             *api_state = NULL;
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5CX_retrieve_state() */
@@ -709,10 +752,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_restore_state(const H5CX_state_t *api_state)
+herr_t H5CX_restore_state(const H5CX_state_t* api_state)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -723,29 +765,29 @@ H5CX_restore_state(const H5CX_state_t *api_state)
 
     /* Restore the DCPL info */
     (*head)->ctx.dcpl_id = api_state->dcpl_id;
-    (*head)->ctx.dcpl    = NULL;
+    (*head)->ctx.dcpl = NULL;
 
     /* Restore the DXPL info */
     (*head)->ctx.dxpl_id = api_state->dxpl_id;
-    (*head)->ctx.dxpl    = NULL;
+    (*head)->ctx.dxpl = NULL;
 
     /* Restore the LAPL info */
     (*head)->ctx.lapl_id = api_state->lapl_id;
-    (*head)->ctx.lapl    = NULL;
+    (*head)->ctx.lapl = NULL;
 
     /* Restore the LCPL info */
     (*head)->ctx.lcpl_id = api_state->lcpl_id;
-    (*head)->ctx.lcpl    = NULL;
+    (*head)->ctx.lcpl = NULL;
 
     /* Restore the VOL wrapper context */
     (*head)->ctx.vol_wrap_ctx = api_state->vol_wrap_ctx;
-    if (NULL != (*head)->ctx.vol_wrap_ctx)
+    if (NULL != (*head)->ctx.vol_wrap_ctx) {
         (*head)->ctx.vol_wrap_ctx_valid = true;
+    }
 
     /* Restore the VOL connector info */
     if (api_state->vol_connector_prop.connector) {
-        H5MM_memcpy(&(*head)->ctx.vol_connector_prop, &api_state->vol_connector_prop,
-                    sizeof(H5VL_connector_prop_t));
+        H5MM_memcpy(&(*head)->ctx.vol_connector_prop, &api_state->vol_connector_prop, sizeof(H5VL_connector_prop_t));
         (*head)->ctx.vol_connector_prop_valid = true;
     } /* end if */
 
@@ -766,8 +808,7 @@ H5CX_restore_state(const H5CX_state_t *api_state)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_free_state(H5CX_state_t *api_state)
+herr_t H5CX_free_state(H5CX_state_t* api_state)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -777,42 +818,53 @@ H5CX_free_state(H5CX_state_t *api_state)
     assert(api_state);
 
     /* Release the DCPL */
-    if (0 != api_state->dcpl_id && H5P_DATASET_CREATE_DEFAULT != api_state->dcpl_id)
-        if (H5I_dec_ref(api_state->dcpl_id) < 0)
+    if (0 != api_state->dcpl_id && H5P_DATASET_CREATE_DEFAULT != api_state->dcpl_id) {
+        if (H5I_dec_ref(api_state->dcpl_id) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't decrement refcount on DCPL");
+        }
+    }
 
     /* Release the DXPL */
-    if (0 != api_state->dxpl_id && H5P_DATASET_XFER_DEFAULT != api_state->dxpl_id)
-        if (H5I_dec_ref(api_state->dxpl_id) < 0)
+    if (0 != api_state->dxpl_id && H5P_DATASET_XFER_DEFAULT != api_state->dxpl_id) {
+        if (H5I_dec_ref(api_state->dxpl_id) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't decrement refcount on DXPL");
+        }
+    }
 
     /* Release the LAPL */
-    if (0 != api_state->lapl_id && H5P_LINK_ACCESS_DEFAULT != api_state->lapl_id)
-        if (H5I_dec_ref(api_state->lapl_id) < 0)
+    if (0 != api_state->lapl_id && H5P_LINK_ACCESS_DEFAULT != api_state->lapl_id) {
+        if (H5I_dec_ref(api_state->lapl_id) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't decrement refcount on LAPL");
+        }
+    }
 
     /* Release the LCPL */
-    if (0 != api_state->lcpl_id && H5P_LINK_CREATE_DEFAULT != api_state->lcpl_id)
-        if (H5I_dec_ref(api_state->lcpl_id) < 0)
+    if (0 != api_state->lcpl_id && H5P_LINK_CREATE_DEFAULT != api_state->lcpl_id) {
+        if (H5I_dec_ref(api_state->lcpl_id) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't decrement refcount on LCPL");
+        }
+    }
 
     /* Release the VOL wrapper context */
-    if (api_state->vol_wrap_ctx)
-        if (H5VL_dec_vol_wrapper(api_state->vol_wrap_ctx) < 0)
+    if (api_state->vol_wrap_ctx) {
+        if (H5VL_dec_vol_wrapper(api_state->vol_wrap_ctx) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't decrement refcount on VOL wrapping context");
+        }
+    }
 
     /* Release the VOL connector property, if it was set */
     if (api_state->vol_connector_prop.connector) {
         /* Clean up any VOL connector info */
-        if (api_state->vol_connector_prop.connector_info)
-            if (H5VL_free_connector_info(api_state->vol_connector_prop.connector,
-                                         api_state->vol_connector_prop.connector_info) < 0)
-                HGOTO_ERROR(H5E_CONTEXT, H5E_CANTRELEASE, FAIL,
-                            "unable to release VOL connector info object");
+        if (api_state->vol_connector_prop.connector_info) {
+            if (H5VL_free_connector_info(api_state->vol_connector_prop.connector, api_state->vol_connector_prop.connector_info) < 0) {
+                HGOTO_ERROR(H5E_CONTEXT, H5E_CANTRELEASE, FAIL, "unable to release VOL connector info object");
+            }
+        }
 
         /* Decrement connector refcount */
-        if (H5VL_conn_dec_rc(api_state->vol_connector_prop.connector) < 0)
+        if (H5VL_conn_dec_rc(api_state->vol_connector_prop.connector) < 0) {
             HDONE_ERROR(H5E_CONTEXT, H5E_CANTDEC, FAIL, "can't close VOL connector");
+        }
     } /* end if */
 
     /* Free the state */
@@ -831,11 +883,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5CX_is_def_dxpl(void)
+bool H5CX_is_def_dxpl(void)
 {
-    H5CX_node_t **head        = NULL;  /* Pointer to head of API context list */
-    bool          is_def_dxpl = false; /* Flag to indicate DXPL is default */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    bool is_def_dxpl = false;  /* Flag to indicate DXPL is default */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -858,10 +909,9 @@ H5CX_is_def_dxpl(void)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_dxpl(hid_t dxpl_id)
+void H5CX_set_dxpl(hid_t dxpl_id)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -884,10 +934,9 @@ H5CX_set_dxpl(hid_t dxpl_id)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_dcpl(hid_t dcpl_id)
+void H5CX_set_dcpl(hid_t dcpl_id)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -911,11 +960,10 @@ H5CX_set_dcpl(hid_t dcpl_id)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_libver_bounds(H5F_t *f)
+herr_t H5CX_set_libver_bounds(H5F_t* f)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -924,11 +972,11 @@ H5CX_set_libver_bounds(H5F_t *f)
     assert(head && *head);
 
     /* Set the API context value */
-    (*head)->ctx.low_bound  = (f == NULL) ? H5F_LIBVER_LATEST : H5F_LOW_BOUND(f);
+    (*head)->ctx.low_bound = (f == NULL) ? H5F_LIBVER_LATEST : H5F_LOW_BOUND(f);
     (*head)->ctx.high_bound = (f == NULL) ? H5F_LIBVER_LATEST : H5F_HIGH_BOUND(f);
 
     /* Mark the values as valid */
-    (*head)->ctx.low_bound_valid  = true;
+    (*head)->ctx.low_bound_valid = true;
     (*head)->ctx.high_bound_valid = true;
 
 done:
@@ -944,10 +992,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_lcpl(hid_t lcpl_id)
+void H5CX_set_lcpl(hid_t lcpl_id)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -970,10 +1017,9 @@ H5CX_set_lcpl(hid_t lcpl_id)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_lapl(hid_t lapl_id)
+void H5CX_set_lapl(hid_t lapl_id)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -997,21 +1043,21 @@ H5CX_set_lapl(hid_t lapl_id)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_apl(hid_t *acspl_id, const H5P_libclass_t *libclass,
-             hid_t
+herr_t H5CX_set_apl(hid_t* acspl_id,
+                    const H5P_libclass_t* libclass,
+                    hid_t
 #ifndef H5_HAVE_PARALLEL
-                 H5_ATTR_UNUSED
+                        H5_ATTR_UNUSED
 #endif /* H5_HAVE_PARALLEL */
-                     loc_id,
-             bool
+                            loc_id,
+                    bool
 #ifndef H5_HAVE_PARALLEL
-                 H5_ATTR_UNUSED
+                        H5_ATTR_UNUSED
 #endif /* H5_HAVE_PARALLEL */
-                     is_collective)
+                            is_collective)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1022,8 +1068,9 @@ H5CX_set_apl(hid_t *acspl_id, const H5P_libclass_t *libclass,
     assert(head && *head);
 
     /* Set access plist to the default property list of the appropriate class if it's the generic default */
-    if (H5P_DEFAULT == *acspl_id)
+    if (H5P_DEFAULT == *acspl_id) {
         *acspl_id = *libclass->def_plist_id;
+    }
     else {
         htri_t is_lapl; /* Whether the access property list is (or is derived from) a link access property
                            list */
@@ -1034,27 +1081,34 @@ H5CX_set_apl(hid_t *acspl_id, const H5P_libclass_t *libclass,
 
 #ifdef H5CX_DEBUG
         /* Sanity check the access property list class */
-        if (true != H5P_isa_class(*acspl_id, *libclass->class_id))
+        if (true != H5P_isa_class(*acspl_id, *libclass->class_id)) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "not the required access property list");
+        }
 #endif /* H5CX_DEBUG*/
 
         /* Check for link access property and set API context if so */
-        if ((is_lapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_LACC->pclass)) < 0)
+        if ((is_lapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_LACC->pclass)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't check for link access class");
-        else if (is_lapl)
+        }
+        else if (is_lapl) {
             (*head)->ctx.lapl_id = *acspl_id;
+        }
 
         /* Check for dataset access property and set API context if so */
-        if ((is_dapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_DACC->pclass)) < 0)
+        if ((is_dapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_DACC->pclass)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't check for dataset access class");
-        else if (is_dapl)
+        }
+        else if (is_dapl) {
             (*head)->ctx.dapl_id = *acspl_id;
+        }
 
         /* Check for file access property and set API context if so */
-        if ((is_fapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_FACC->pclass)) < 0)
+        if ((is_fapl = H5P_class_isa(*libclass->pclass, *H5P_CLS_FACC->pclass)) < 0) {
             HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't check for file access class");
-        else if (is_fapl)
+        }
+        else if (is_fapl) {
             (*head)->ctx.fapl_id = *acspl_id;
+        }
 
 #ifdef H5_HAVE_PARALLEL
         /* If this routine is not guaranteed to be collective (i.e. it doesn't
@@ -1062,23 +1116,26 @@ H5CX_set_apl(hid_t *acspl_id, const H5P_libclass_t *libclass,
          * specified a collective metadata read for just this operation.
          */
         if (!is_collective) {
-            H5P_genplist_t         *plist;        /* Property list pointer */
+            H5P_genplist_t* plist;                /* Property list pointer */
             H5P_coll_md_read_flag_t md_coll_read; /* Collective metadata read flag */
 
             /* Get the plist structure for the access property list */
-            if (NULL == (plist = (H5P_genplist_t *)H5I_object(*acspl_id)))
+            if (NULL == (plist = (H5P_genplist_t*)H5I_object(*acspl_id))) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_BADID, FAIL, "can't find object for ID");
+            }
 
             /* Get the collective metadata read flag */
-            if (H5P_peek(plist, H5_COLL_MD_READ_FLAG_NAME, &md_coll_read) < 0)
+            if (H5P_peek(plist, H5_COLL_MD_READ_FLAG_NAME, &md_coll_read) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "can't get core collective metadata read flag");
+            }
 
             /* If collective metadata read requested, set collective metadata read flag */
-            if (H5P_USER_TRUE == md_coll_read)
+            if (H5P_USER_TRUE == md_coll_read) {
                 is_collective = true;
+            }
         } /* end if */
-#endif    /* H5_HAVE_PARALLEL */
-    }     /* end else */
+#endif /* H5_HAVE_PARALLEL */
+    } /* end else */
 
 #ifdef H5_HAVE_PARALLEL
     /* Check for collective operation */
@@ -1094,15 +1151,17 @@ H5CX_set_apl(hid_t *acspl_id, const H5P_libclass_t *libclass,
             MPI_Comm mpi_comm; /* File communicator */
 
             /* Retrieve the MPI communicator from the loc_id or the fapl_id */
-            if (H5F_mpi_retrieve_comm(loc_id, *acspl_id, &mpi_comm) < 0)
+            if (H5F_mpi_retrieve_comm(loc_id, *acspl_id, &mpi_comm) < 0) {
                 HGOTO_ERROR(H5E_FILE, H5E_CANTGET, FAIL, "can't get MPI communicator");
+            }
 
             /* issue the barrier */
-            if (mpi_comm != MPI_COMM_NULL)
+            if (mpi_comm != MPI_COMM_NULL) {
                 MPI_Barrier(mpi_comm);
+            }
         } /* end if */
-    }     /* end if */
-#endif    /* H5_HAVE_PARALLEL */
+    } /* end if */
+#endif /* H5_HAVE_PARALLEL */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1120,16 +1179,15 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_loc(hid_t
+herr_t H5CX_set_loc(hid_t
 #ifndef H5_HAVE_PARALLEL
-                 H5_ATTR_UNUSED
+                        H5_ATTR_UNUSED
 #endif /* H5_HAVE_PARALLEL */
-                     loc_id)
+                            loc_id)
 {
 #ifdef H5_HAVE_PARALLEL
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1148,12 +1206,14 @@ H5CX_set_loc(hid_t
         MPI_Comm mpi_comm; /* File communicator */
 
         /* Retrieve the MPI communicator from the loc_id or the fapl_id */
-        if (H5F_mpi_retrieve_comm(loc_id, H5P_DEFAULT, &mpi_comm) < 0)
+        if (H5F_mpi_retrieve_comm(loc_id, H5P_DEFAULT, &mpi_comm) < 0) {
             HGOTO_ERROR(H5E_FILE, H5E_CANTGET, FAIL, "can't get MPI communicator");
+        }
 
         /* issue the barrier */
-        if (mpi_comm != MPI_COMM_NULL)
+        if (mpi_comm != MPI_COMM_NULL) {
             MPI_Barrier(mpi_comm);
+        }
     } /* end if */
 
 done:
@@ -1174,11 +1234,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_vol_wrap_ctx(void *vol_wrap_ctx)
+herr_t H5CX_set_vol_wrap_ctx(void* vol_wrap_ctx)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1205,11 +1264,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_vol_connector_prop(const H5VL_connector_prop_t *vol_connector_prop)
+herr_t H5CX_set_vol_connector_prop(const H5VL_connector_prop_t* vol_connector_prop)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1236,11 +1294,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5CX_get_dxpl(void)
+hid_t H5CX_get_dxpl(void)
 {
-    H5CX_node_t **head    = NULL;            /* Pointer to head of API context list */
-    hid_t         dxpl_id = H5I_INVALID_HID; /* DXPL ID for API operation */
+    H5CX_node_t** head = NULL;       /* Pointer to head of API context list */
+    hid_t dxpl_id = H5I_INVALID_HID; /* DXPL ID for API operation */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1263,11 +1320,10 @@ H5CX_get_dxpl(void)
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5CX_get_lapl(void)
+hid_t H5CX_get_lapl(void)
 {
-    H5CX_node_t **head    = NULL;            /* Pointer to head of API context list */
-    hid_t         lapl_id = H5I_INVALID_HID; /* LAPL ID for API operation */
+    H5CX_node_t** head = NULL;       /* Pointer to head of API context list */
+    hid_t lapl_id = H5I_INVALID_HID; /* LAPL ID for API operation */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1290,11 +1346,10 @@ H5CX_get_lapl(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_vol_wrap_ctx(void **vol_wrap_ctx)
+herr_t H5CX_get_vol_wrap_ctx(void** vol_wrap_ctx)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1305,18 +1360,22 @@ H5CX_get_vol_wrap_ctx(void **vol_wrap_ctx)
     /* No error is expected at this point.  But in case an application calls H5VLwrap_register
      * which doesn't reset the API context and there is no context, returns a relevant error here
      */
-    if (!head)
+    if (!head) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_UNINITIALIZED, FAIL, "the API context isn't available");
+    }
 
-    if (!(*head))
+    if (!(*head)) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "unable to get the current API context");
+    }
 
     /* Check for value that was set */
-    if ((*head)->ctx.vol_wrap_ctx_valid)
+    if ((*head)->ctx.vol_wrap_ctx_valid) {
         /* Get the value */
         *vol_wrap_ctx = (*head)->ctx.vol_wrap_ctx;
-    else
+    }
+    else {
         *vol_wrap_ctx = NULL;
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1331,11 +1390,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_vol_connector_prop(H5VL_connector_prop_t *vol_connector_prop)
+herr_t H5CX_get_vol_connector_prop(H5VL_connector_prop_t* vol_connector_prop)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1345,11 +1403,13 @@ H5CX_get_vol_connector_prop(H5VL_connector_prop_t *vol_connector_prop)
     assert(head && *head);
 
     /* Check for value that was set */
-    if ((*head)->ctx.vol_connector_prop_valid)
+    if ((*head)->ctx.vol_connector_prop_valid) {
         /* Get the value */
         H5MM_memcpy(vol_connector_prop, &(*head)->ctx.vol_connector_prop, sizeof(H5VL_connector_prop_t));
-    else
+    }
+    else {
         memset(vol_connector_prop, 0, sizeof(H5VL_connector_prop_t));
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1364,11 +1424,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-haddr_t
-H5CX_get_tag(void)
+haddr_t H5CX_get_tag(void)
 {
-    H5CX_node_t **head = NULL;        /* Pointer to head of API context list */
-    haddr_t       tag  = HADDR_UNDEF; /* Current object's tag (ohdr chunk #0 address) */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    haddr_t tag = HADDR_UNDEF; /* Current object's tag (ohdr chunk #0 address) */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1391,11 +1450,10 @@ H5CX_get_tag(void)
  *
  *-------------------------------------------------------------------------
  */
-H5AC_ring_t
-H5CX_get_ring(void)
+H5AC_ring_t H5CX_get_ring(void)
 {
-    H5CX_node_t **head = NULL;          /* Pointer to head of API context list */
-    H5AC_ring_t   ring = H5AC_RING_INV; /* Current metadata cache ring for entries */
+    H5CX_node_t** head = NULL;        /* Pointer to head of API context list */
+    H5AC_ring_t ring = H5AC_RING_INV; /* Current metadata cache ring for entries */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1419,11 +1477,10 @@ H5CX_get_ring(void)
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5CX_get_coll_metadata_read(void)
+bool H5CX_get_coll_metadata_read(void)
 {
-    H5CX_node_t **head         = NULL; /* Pointer to head of API context list */
-    bool          coll_md_read = false;
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    bool coll_md_read = false;
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1448,11 +1505,10 @@ H5CX_get_coll_metadata_read(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpi_coll_datatypes(MPI_Datatype *btype, MPI_Datatype *ftype)
+herr_t H5CX_get_mpi_coll_datatypes(MPI_Datatype* btype, MPI_Datatype* ftype)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1479,11 +1535,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5CX_get_mpi_file_flushing(void)
+bool H5CX_get_mpi_file_flushing(void)
 {
-    H5CX_node_t **head     = NULL; /* Pointer to head of API context list */
-    bool          flushing = false;
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    bool flushing = false;
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1507,11 +1562,10 @@ H5CX_get_mpi_file_flushing(void)
  *
  *-------------------------------------------------------------------------
  */
-bool
-H5CX_get_mpio_rank0_bcast(void)
+bool H5CX_get_mpio_rank0_bcast(void)
 {
-    H5CX_node_t **head           = NULL; /* Pointer to head of API context list */
-    bool          do_rank0_bcast = false;
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
+    bool do_rank0_bcast = false;
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -1535,11 +1589,10 @@ H5CX_get_mpio_rank0_bcast(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_btree_split_ratios(double split_ratio[3])
+herr_t H5CX_get_btree_split_ratios(double split_ratio[3])
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1549,8 +1602,7 @@ H5CX_get_btree_split_ratios(double split_ratio[3])
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_BTREE_SPLIT_RATIO_NAME,
-                             btree_split_ratio)
+    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_BTREE_SPLIT_RATIO_NAME, btree_split_ratio)
 
     /* Get the B-tree split ratio values */
     H5MM_memcpy(split_ratio, &(*head)->ctx.btree_split_ratio, sizeof((*head)->ctx.btree_split_ratio));
@@ -1568,11 +1620,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_max_temp_buf(size_t *max_temp_buf)
+herr_t H5CX_get_max_temp_buf(size_t* max_temp_buf)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1600,11 +1651,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_tconv_buf(void **tconv_buf)
+herr_t H5CX_get_tconv_buf(void** tconv_buf)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1632,11 +1682,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_bkgr_buf(void **bkgr_buf)
+herr_t H5CX_get_bkgr_buf(void** bkgr_buf)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1664,11 +1713,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_bkgr_buf_type(H5T_bkg_t *bkgr_buf_type)
+herr_t H5CX_get_bkgr_buf_type(H5T_bkg_t* bkgr_buf_type)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1696,11 +1744,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_vec_size(size_t *vec_size)
+herr_t H5CX_get_vec_size(size_t* vec_size)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1730,11 +1777,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_io_xfer_mode(H5FD_mpio_xfer_t *io_xfer_mode)
+herr_t H5CX_get_io_xfer_mode(H5FD_mpio_xfer_t* io_xfer_mode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1762,11 +1808,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_coll_opt(H5FD_mpio_collective_opt_t *mpio_coll_opt)
+herr_t H5CX_get_mpio_coll_opt(H5FD_mpio_collective_opt_t* mpio_coll_opt)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1794,11 +1839,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_local_no_coll_cause(uint32_t *mpio_local_no_coll_cause)
+herr_t H5CX_get_mpio_local_no_coll_cause(uint32_t* mpio_local_no_coll_cause)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1808,8 +1852,7 @@ H5CX_get_mpio_local_no_coll_cause(uint32_t *mpio_local_no_coll_cause)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME,
-                                 mpio_local_no_coll_cause)
+    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME, mpio_local_no_coll_cause)
 
     /* Get the value */
     *mpio_local_no_coll_cause = (*head)->ctx.mpio_local_no_coll_cause;
@@ -1827,11 +1870,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_global_no_coll_cause(uint32_t *mpio_global_no_coll_cause)
+herr_t H5CX_get_mpio_global_no_coll_cause(uint32_t* mpio_global_no_coll_cause)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1841,8 +1883,7 @@ H5CX_get_mpio_global_no_coll_cause(uint32_t *mpio_global_no_coll_cause)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME,
-                                 mpio_global_no_coll_cause)
+    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME, mpio_global_no_coll_cause)
 
     /* Get the value */
     *mpio_global_no_coll_cause = (*head)->ctx.mpio_global_no_coll_cause;
@@ -1860,11 +1901,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_chunk_opt_mode(H5FD_mpio_chunk_opt_t *mpio_chunk_opt_mode)
+herr_t H5CX_get_mpio_chunk_opt_mode(H5FD_mpio_chunk_opt_t* mpio_chunk_opt_mode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1874,8 +1914,7 @@ H5CX_get_mpio_chunk_opt_mode(H5FD_mpio_chunk_opt_t *mpio_chunk_opt_mode)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME,
-                             mpio_chunk_opt_mode)
+    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_HARD_NAME, mpio_chunk_opt_mode)
 
     /* Get the value */
     *mpio_chunk_opt_mode = (*head)->ctx.mpio_chunk_opt_mode;
@@ -1893,11 +1932,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_chunk_opt_num(unsigned *mpio_chunk_opt_num)
+herr_t H5CX_get_mpio_chunk_opt_num(unsigned* mpio_chunk_opt_num)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1907,8 +1945,7 @@ H5CX_get_mpio_chunk_opt_num(unsigned *mpio_chunk_opt_num)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME,
-                             mpio_chunk_opt_num)
+    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_NUM_NAME, mpio_chunk_opt_num)
 
     /* Get the value */
     *mpio_chunk_opt_num = (*head)->ctx.mpio_chunk_opt_num;
@@ -1926,11 +1963,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_mpio_chunk_opt_ratio(unsigned *mpio_chunk_opt_ratio)
+herr_t H5CX_get_mpio_chunk_opt_ratio(unsigned* mpio_chunk_opt_ratio)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1940,8 +1976,7 @@ H5CX_get_mpio_chunk_opt_ratio(unsigned *mpio_chunk_opt_ratio)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME,
-                             mpio_chunk_opt_ratio)
+    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_MPIO_CHUNK_OPT_RATIO_NAME, mpio_chunk_opt_ratio)
 
     /* Get the value */
     *mpio_chunk_opt_ratio = (*head)->ctx.mpio_chunk_opt_ratio;
@@ -1960,11 +1995,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_err_detect(H5Z_EDC_t *err_detect)
+herr_t H5CX_get_err_detect(H5Z_EDC_t* err_detect)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -1992,11 +2026,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_filter_cb(H5Z_cb_t *filter_cb)
+herr_t H5CX_get_filter_cb(H5Z_cb_t* filter_cb)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2024,11 +2057,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_data_transform(H5Z_data_xform_t **data_transform)
+herr_t H5CX_get_data_transform(H5Z_data_xform_t** data_transform)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2044,22 +2076,25 @@ H5CX_get_data_transform(H5Z_data_xform_t **data_transform)
     /* Check if the value has been retrieved already */
     if (!(*head)->ctx.data_transform_valid) {
         /* Check for default DXPL */
-        if ((*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT)
+        if ((*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT) {
             (*head)->ctx.data_transform = H5CX_def_dxpl_cache.data_transform;
+        }
         else {
             /* Check if the property list is already available */
-            if (NULL == (*head)->ctx.dxpl)
+            if (NULL == (*head)->ctx.dxpl) {
                 /* Get the dataset transfer property list pointer */
-                if (NULL == ((*head)->ctx.dxpl = (H5P_genplist_t *)H5I_object((*head)->ctx.dxpl_id)))
-                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL,
-                                "can't get default dataset transfer property list");
+                if (NULL == ((*head)->ctx.dxpl = (H5P_genplist_t*)H5I_object((*head)->ctx.dxpl_id))) {
+                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "can't get default dataset transfer property list");
+                }
+            }
 
             /* Get data transform info value */
             /* (Note: 'peek', not 'get' - if this turns out to be a problem, we may need
              *          to copy it and free this in the H5CX pop routine. -QAK)
              */
-            if (H5P_peek((*head)->ctx.dxpl, H5D_XFER_XFORM_NAME, &(*head)->ctx.data_transform) < 0)
+            if (H5P_peek((*head)->ctx.dxpl, H5D_XFER_XFORM_NAME, &(*head)->ctx.data_transform) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve data transform info");
+            }
         } /* end else */
 
         /* Mark the value as valid */
@@ -2082,11 +2117,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_vlen_alloc_info(H5T_vlen_alloc_info_t *vl_alloc_info)
+herr_t H5CX_get_vlen_alloc_info(H5T_vlen_alloc_info_t* vl_alloc_info)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2099,29 +2133,31 @@ H5CX_get_vlen_alloc_info(H5T_vlen_alloc_info_t *vl_alloc_info)
     /* Check if the value has been retrieved already */
     if (!(*head)->ctx.vl_alloc_info_valid) {
         /* Check for default DXPL */
-        if ((*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT)
+        if ((*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT) {
             (*head)->ctx.vl_alloc_info = H5CX_def_dxpl_cache.vl_alloc_info;
+        }
         else {
             /* Check if the property list is already available */
-            if (NULL == (*head)->ctx.dxpl)
+            if (NULL == (*head)->ctx.dxpl) {
                 /* Get the dataset transfer property list pointer */
-                if (NULL == ((*head)->ctx.dxpl = (H5P_genplist_t *)H5I_object((*head)->ctx.dxpl_id)))
-                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL,
-                                "can't get default dataset transfer property list");
+                if (NULL == ((*head)->ctx.dxpl = (H5P_genplist_t*)H5I_object((*head)->ctx.dxpl_id))) {
+                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "can't get default dataset transfer property list");
+                }
+            }
 
             /* Get VL datatype alloc info values */
-            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_ALLOC_NAME, &(*head)->ctx.vl_alloc_info.alloc_func) <
-                0)
+            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_ALLOC_NAME, &(*head)->ctx.vl_alloc_info.alloc_func) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_ALLOC_INFO_NAME,
-                        &(*head)->ctx.vl_alloc_info.alloc_info) < 0)
+            }
+            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_ALLOC_INFO_NAME, &(*head)->ctx.vl_alloc_info.alloc_info) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_FREE_NAME, &(*head)->ctx.vl_alloc_info.free_func) <
-                0)
+            }
+            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_FREE_NAME, &(*head)->ctx.vl_alloc_info.free_func) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
-            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_FREE_INFO_NAME,
-                        &(*head)->ctx.vl_alloc_info.free_info) < 0)
+            }
+            if (H5P_get((*head)->ctx.dxpl, H5D_XFER_VLEN_FREE_INFO_NAME, &(*head)->ctx.vl_alloc_info.free_info) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VL datatype alloc info");
+            }
         } /* end else */
 
         /* Mark the value as valid */
@@ -2144,11 +2180,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_dt_conv_cb(H5T_conv_cb_t *dt_conv_cb)
+herr_t H5CX_get_dt_conv_cb(H5T_conv_cb_t* dt_conv_cb)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2176,11 +2211,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_selection_io_mode(H5D_selection_io_mode_t *selection_io_mode)
+herr_t H5CX_get_selection_io_mode(H5D_selection_io_mode_t* selection_io_mode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2190,8 +2224,7 @@ H5CX_get_selection_io_mode(H5D_selection_io_mode_t *selection_io_mode)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_SELECTION_IO_MODE_NAME,
-                             selection_io_mode)
+    H5CX_RETRIEVE_PROP_VALID(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_SELECTION_IO_MODE_NAME, selection_io_mode)
 
     /* Get the value */
     *selection_io_mode = (*head)->ctx.selection_io_mode;
@@ -2210,11 +2243,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_no_selection_io_cause(uint32_t *no_selection_io_cause)
+herr_t H5CX_get_no_selection_io_cause(uint32_t* no_selection_io_cause)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2224,8 +2256,7 @@ H5CX_get_no_selection_io_cause(uint32_t *no_selection_io_cause)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dxpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_NO_SELECTION_IO_CAUSE_NAME,
-                                 no_selection_io_cause)
+    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_NO_SELECTION_IO_CAUSE_NAME, no_selection_io_cause)
 
     /* Get the value */
     *no_selection_io_cause = (*head)->ctx.no_selection_io_cause;
@@ -2244,11 +2275,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_actual_selection_io_mode(uint32_t *actual_selection_io_mode)
+herr_t H5CX_get_actual_selection_io_mode(uint32_t* actual_selection_io_mode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2260,13 +2290,11 @@ H5CX_get_actual_selection_io_mode(uint32_t *actual_selection_io_mode)
 
     /* This property is a special case - we want to wipe out any previous setting.  Copy the default setting
      * if it has not been set yet. */
-    if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT && !(*head)->ctx.actual_selection_io_mode_set &&
-        !(*head)->ctx.actual_selection_io_mode_valid) {
-        (*head)->ctx.actual_selection_io_mode     = H5CX_def_dxpl_cache.actual_selection_io_mode;
+    if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT && !(*head)->ctx.actual_selection_io_mode_set && !(*head)->ctx.actual_selection_io_mode_valid) {
+        (*head)->ctx.actual_selection_io_mode = H5CX_def_dxpl_cache.actual_selection_io_mode;
         (*head)->ctx.actual_selection_io_mode_set = true;
     }
-    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME,
-                                 actual_selection_io_mode)
+    H5CX_RETRIEVE_PROP_VALID_SET(dxpl, H5P_DATASET_XFER_DEFAULT, H5D_XFER_ACTUAL_SELECTION_IO_MODE_NAME, actual_selection_io_mode)
 
     /* Get the value */
     *actual_selection_io_mode = (*head)->ctx.actual_selection_io_mode;
@@ -2284,11 +2312,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_modify_write_buf(bool *modify_write_buf)
+herr_t H5CX_get_modify_write_buf(bool* modify_write_buf)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2316,11 +2343,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_encoding(H5T_cset_t *encoding)
+herr_t H5CX_get_encoding(H5T_cset_t* encoding)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2348,11 +2374,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_intermediate_group(unsigned *crt_intermed_group)
+herr_t H5CX_get_intermediate_group(unsigned* crt_intermed_group)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2362,8 +2387,7 @@ H5CX_get_intermediate_group(unsigned *crt_intermed_group)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.lcpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(lcpl, H5P_LINK_CREATE_DEFAULT, H5L_CRT_INTERMEDIATE_GROUP_NAME,
-                             intermediate_group)
+    H5CX_RETRIEVE_PROP_VALID(lcpl, H5P_LINK_CREATE_DEFAULT, H5L_CRT_INTERMEDIATE_GROUP_NAME, intermediate_group)
 
     /* Get the value */
     *crt_intermed_group = (*head)->ctx.intermediate_group;
@@ -2381,11 +2405,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_nlinks(size_t *nlinks)
+herr_t H5CX_get_nlinks(size_t* nlinks)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2413,11 +2436,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_libver_bounds(H5F_libver_t *low_bound, H5F_libver_t *high_bound)
+herr_t H5CX_get_libver_bounds(H5F_libver_t* low_bound, H5F_libver_t* high_bound)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2432,7 +2454,7 @@ H5CX_get_libver_bounds(H5F_libver_t *low_bound, H5F_libver_t *high_bound)
     H5CX_RETRIEVE_PROP_VALID(fapl, H5P_FILE_ACCESS_DEFAULT, H5F_ACS_LIBVER_HIGH_BOUND_NAME, high_bound)
 
     /* Get the values */
-    *low_bound  = (*head)->ctx.low_bound;
+    *low_bound = (*head)->ctx.low_bound;
     *high_bound = (*head)->ctx.high_bound;
 
 done:
@@ -2449,11 +2471,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_dset_min_ohdr_flag(bool *dset_min_ohdr_flag)
+herr_t H5CX_get_dset_min_ohdr_flag(bool* dset_min_ohdr_flag)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2463,8 +2484,7 @@ H5CX_get_dset_min_ohdr_flag(bool *dset_min_ohdr_flag)
     assert(head && *head);
     assert(H5P_DEFAULT != (*head)->ctx.dcpl_id);
 
-    H5CX_RETRIEVE_PROP_VALID(dcpl, H5P_DATASET_CREATE_DEFAULT, H5D_CRT_MIN_DSET_HDR_SIZE_NAME,
-                             do_min_dset_ohdr)
+    H5CX_RETRIEVE_PROP_VALID(dcpl, H5P_DATASET_CREATE_DEFAULT, H5D_CRT_MIN_DSET_HDR_SIZE_NAME, do_min_dset_ohdr)
 
     /* Get the value */
     *dset_min_ohdr_flag = (*head)->ctx.do_min_dset_ohdr;
@@ -2482,11 +2502,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_ext_file_prefix(const char **extfile_prefix)
+herr_t H5CX_get_ext_file_prefix(const char** extfile_prefix)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2499,22 +2518,25 @@ H5CX_get_ext_file_prefix(const char **extfile_prefix)
     /* Check if the value has been retrieved already */
     if (!(*head)->ctx.extfile_prefix_valid) {
         /* Check for default DAPL */
-        if ((*head)->ctx.dapl_id == H5P_DATASET_ACCESS_DEFAULT)
+        if ((*head)->ctx.dapl_id == H5P_DATASET_ACCESS_DEFAULT) {
             (*head)->ctx.extfile_prefix = H5CX_def_dapl_cache.extfile_prefix;
+        }
         else {
             /* Check if the property list is already available */
-            if (NULL == (*head)->ctx.dapl)
+            if (NULL == (*head)->ctx.dapl) {
                 /* Get the dataset access property list pointer */
-                if (NULL == ((*head)->ctx.dapl = (H5P_genplist_t *)H5I_object((*head)->ctx.dapl_id)))
-                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL,
-                                "can't get default dataset access property list");
+                if (NULL == ((*head)->ctx.dapl = (H5P_genplist_t*)H5I_object((*head)->ctx.dapl_id))) {
+                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "can't get default dataset access property list");
+                }
+            }
 
             /* Get the prefix for the external file */
             /* (Note: 'peek', not 'get' - if this turns out to be a problem, we may need
              *          to copy it and free this in the H5CX pop routine. -QAK)
              */
-            if (H5P_peek((*head)->ctx.dapl, H5D_ACS_EFILE_PREFIX_NAME, &(*head)->ctx.extfile_prefix) < 0)
+            if (H5P_peek((*head)->ctx.dapl, H5D_ACS_EFILE_PREFIX_NAME, &(*head)->ctx.extfile_prefix) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve external file prefix");
+            }
         } /* end else */
 
         /* Mark the value as valid */
@@ -2537,11 +2559,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_vds_prefix(const char **vds_prefix)
+herr_t H5CX_get_vds_prefix(const char** vds_prefix)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2554,22 +2575,25 @@ H5CX_get_vds_prefix(const char **vds_prefix)
     /* Check if the value has been retrieved already */
     if (!(*head)->ctx.vds_prefix_valid) {
         /* Check for default DAPL */
-        if ((*head)->ctx.dapl_id == H5P_DATASET_ACCESS_DEFAULT)
+        if ((*head)->ctx.dapl_id == H5P_DATASET_ACCESS_DEFAULT) {
             (*head)->ctx.vds_prefix = H5CX_def_dapl_cache.vds_prefix;
+        }
         else {
             /* Check if the property list is already available */
-            if (NULL == (*head)->ctx.dapl)
+            if (NULL == (*head)->ctx.dapl) {
                 /* Get the dataset access property list pointer */
-                if (NULL == ((*head)->ctx.dapl = (H5P_genplist_t *)H5I_object((*head)->ctx.dapl_id)))
-                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL,
-                                "can't get default dataset access property list");
+                if (NULL == ((*head)->ctx.dapl = (H5P_genplist_t*)H5I_object((*head)->ctx.dapl_id))) {
+                    HGOTO_ERROR(H5E_CONTEXT, H5E_BADTYPE, FAIL, "can't get default dataset access property list");
+                }
+            }
 
             /* Get the prefix for the VDS */
             /* (Note: 'peek', not 'get' - if this turns out to be a problem, we may need
              *          to copy it and free this in the H5CX pop routine. -QAK)
              */
-            if (H5P_peek((*head)->ctx.dapl, H5D_ACS_VDS_PREFIX_NAME, &(*head)->ctx.vds_prefix) < 0)
+            if (H5P_peek((*head)->ctx.dapl, H5D_ACS_VDS_PREFIX_NAME, &(*head)->ctx.vds_prefix) < 0) {
                 HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "Can't retrieve VDS prefix");
+            }
         } /* end else */
 
         /* Mark the value as valid */
@@ -2592,10 +2616,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_tag(haddr_t tag)
+void H5CX_set_tag(haddr_t tag)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2617,10 +2640,9 @@ H5CX_set_tag(haddr_t tag)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_ring(H5AC_ring_t ring)
+void H5CX_set_ring(H5AC_ring_t ring)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2644,10 +2666,9 @@ H5CX_set_ring(H5AC_ring_t ring)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_coll_metadata_read(bool cmdr)
+void H5CX_set_coll_metadata_read(bool cmdr)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2671,11 +2692,10 @@ H5CX_set_coll_metadata_read(bool cmdr)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_mpi_coll_datatypes(MPI_Datatype btype, MPI_Datatype ftype)
+herr_t H5CX_set_mpi_coll_datatypes(MPI_Datatype btype, MPI_Datatype ftype)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2700,11 +2720,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_io_xfer_mode(H5FD_mpio_xfer_t io_xfer_mode)
+herr_t H5CX_set_io_xfer_mode(H5FD_mpio_xfer_t io_xfer_mode)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2731,11 +2750,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_mpio_coll_opt(H5FD_mpio_collective_opt_t mpio_coll_opt)
+herr_t H5CX_set_mpio_coll_opt(H5FD_mpio_collective_opt_t mpio_coll_opt)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2762,10 +2780,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpi_file_flushing(bool flushing)
+void H5CX_set_mpi_file_flushing(bool flushing)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2788,10 +2805,9 @@ H5CX_set_mpi_file_flushing(bool flushing)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpio_rank0_bcast(bool rank0_bcast)
+void H5CX_set_mpio_rank0_bcast(bool rank0_bcast)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2814,11 +2830,10 @@ H5CX_set_mpio_rank0_bcast(bool rank0_bcast)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_vlen_alloc_info(H5MM_allocate_t alloc_func, void *alloc_info, H5MM_free_t free_func, void *free_info)
+herr_t H5CX_set_vlen_alloc_info(H5MM_allocate_t alloc_func, void* alloc_info, H5MM_free_t free_func, void* free_info)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2829,8 +2844,8 @@ H5CX_set_vlen_alloc_info(H5MM_allocate_t alloc_func, void *alloc_info, H5MM_free
     /* Set the API context value */
     (*head)->ctx.vl_alloc_info.alloc_func = alloc_func;
     (*head)->ctx.vl_alloc_info.alloc_info = alloc_info;
-    (*head)->ctx.vl_alloc_info.free_func  = free_func;
-    (*head)->ctx.vl_alloc_info.free_info  = free_info;
+    (*head)->ctx.vl_alloc_info.free_func = free_func;
+    (*head)->ctx.vl_alloc_info.free_info = free_info;
 
     /* Mark the value as valid */
     (*head)->ctx.vl_alloc_info_valid = true;
@@ -2848,11 +2863,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_set_nlinks(size_t nlinks)
+herr_t H5CX_set_nlinks(size_t nlinks)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -2881,10 +2895,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpio_actual_chunk_opt(H5D_mpio_actual_chunk_opt_mode_t mpio_actual_chunk_opt)
+void H5CX_set_mpio_actual_chunk_opt(H5D_mpio_actual_chunk_opt_mode_t mpio_actual_chunk_opt)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2894,7 +2907,7 @@ H5CX_set_mpio_actual_chunk_opt(H5D_mpio_actual_chunk_opt_mode_t mpio_actual_chun
     assert(!((*head)->ctx.dxpl_id == H5P_DEFAULT || (*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT));
 
     /* Cache the value for later, marking it to set in DXPL when context popped */
-    (*head)->ctx.mpio_actual_chunk_opt     = mpio_actual_chunk_opt;
+    (*head)->ctx.mpio_actual_chunk_opt = mpio_actual_chunk_opt;
     (*head)->ctx.mpio_actual_chunk_opt_set = true;
 
     FUNC_LEAVE_NOAPI_VOID
@@ -2909,10 +2922,9 @@ H5CX_set_mpio_actual_chunk_opt(H5D_mpio_actual_chunk_opt_mode_t mpio_actual_chun
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpio_actual_io_mode(H5D_mpio_actual_io_mode_t mpio_actual_io_mode)
+void H5CX_set_mpio_actual_io_mode(H5D_mpio_actual_io_mode_t mpio_actual_io_mode)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2922,7 +2934,7 @@ H5CX_set_mpio_actual_io_mode(H5D_mpio_actual_io_mode_t mpio_actual_io_mode)
     assert(!((*head)->ctx.dxpl_id == H5P_DEFAULT || (*head)->ctx.dxpl_id == H5P_DATASET_XFER_DEFAULT));
 
     /* Cache the value for later, marking it to set in DXPL when context popped */
-    (*head)->ctx.mpio_actual_io_mode     = mpio_actual_io_mode;
+    (*head)->ctx.mpio_actual_io_mode = mpio_actual_io_mode;
     (*head)->ctx.mpio_actual_io_mode_set = true;
 
     FUNC_LEAVE_NOAPI_VOID
@@ -2937,10 +2949,9 @@ H5CX_set_mpio_actual_io_mode(H5D_mpio_actual_io_mode_t mpio_actual_io_mode)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpio_local_no_coll_cause(uint32_t mpio_local_no_coll_cause)
+void H5CX_set_mpio_local_no_coll_cause(uint32_t mpio_local_no_coll_cause)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2952,7 +2963,7 @@ H5CX_set_mpio_local_no_coll_cause(uint32_t mpio_local_no_coll_cause)
     /* If we're using the default DXPL, don't modify it */
     if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT) {
         /* Cache the value for later, marking it to set in DXPL when context popped */
-        (*head)->ctx.mpio_local_no_coll_cause     = mpio_local_no_coll_cause;
+        (*head)->ctx.mpio_local_no_coll_cause = mpio_local_no_coll_cause;
         (*head)->ctx.mpio_local_no_coll_cause_set = true;
     } /* end if */
 
@@ -2968,10 +2979,9 @@ H5CX_set_mpio_local_no_coll_cause(uint32_t mpio_local_no_coll_cause)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_mpio_global_no_coll_cause(uint32_t mpio_global_no_coll_cause)
+void H5CX_set_mpio_global_no_coll_cause(uint32_t mpio_global_no_coll_cause)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -2983,14 +2993,14 @@ H5CX_set_mpio_global_no_coll_cause(uint32_t mpio_global_no_coll_cause)
     /* If we're using the default DXPL, don't modify it */
     if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT) {
         /* Cache the value for later, marking it to set in DXPL when context popped */
-        (*head)->ctx.mpio_global_no_coll_cause     = mpio_global_no_coll_cause;
+        (*head)->ctx.mpio_global_no_coll_cause = mpio_global_no_coll_cause;
         (*head)->ctx.mpio_global_no_coll_cause_set = true;
     } /* end if */
 
     FUNC_LEAVE_NOAPI_VOID
 } /* end H5CX_set_mpio_global_no_coll_cause() */
 
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
 
 /*-------------------------------------------------------------------------
  * Function:    H5CX_test_set_mpio_coll_chunk_link_hard
@@ -3003,11 +3013,10 @@ H5CX_set_mpio_global_no_coll_cause(uint32_t mpio_global_no_coll_cause)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_link_hard(int mpio_coll_chunk_link_hard)
+herr_t H5CX_test_set_mpio_coll_chunk_link_hard(int mpio_coll_chunk_link_hard)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3033,11 +3042,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_multi_hard(int mpio_coll_chunk_multi_hard)
+herr_t H5CX_test_set_mpio_coll_chunk_multi_hard(int mpio_coll_chunk_multi_hard)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3063,11 +3071,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_link_num_true(int mpio_coll_chunk_link_num_true)
+herr_t H5CX_test_set_mpio_coll_chunk_link_num_true(int mpio_coll_chunk_link_num_true)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3094,11 +3101,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_link_num_false(int mpio_coll_chunk_link_num_false)
+herr_t H5CX_test_set_mpio_coll_chunk_link_num_false(int mpio_coll_chunk_link_num_false)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3125,11 +3131,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_multi_ratio_coll(int mpio_coll_chunk_multi_ratio_coll)
+herr_t H5CX_test_set_mpio_coll_chunk_multi_ratio_coll(int mpio_coll_chunk_multi_ratio_coll)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3156,11 +3161,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_chunk_multi_ratio_ind(int mpio_coll_chunk_multi_ratio_ind)
+herr_t H5CX_test_set_mpio_coll_chunk_multi_ratio_ind(int mpio_coll_chunk_multi_ratio_ind)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3186,11 +3190,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_test_set_mpio_coll_rank0_bcast(bool mpio_coll_rank0_bcast)
+herr_t H5CX_test_set_mpio_coll_rank0_bcast(bool mpio_coll_rank0_bcast)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -3204,8 +3207,8 @@ H5CX_test_set_mpio_coll_rank0_bcast(bool mpio_coll_rank0_bcast)
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5CX_test_set_mpio_coll_rank0_bcast() */
-#endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
-#endif /* H5_HAVE_PARALLEL */
+    #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
+#endif     /* H5_HAVE_PARALLEL */
 
 /*-------------------------------------------------------------------------
  * Function:    H5CX_set_no_selection_io_cause
@@ -3217,10 +3220,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_no_selection_io_cause(uint32_t no_selection_io_cause)
+void H5CX_set_no_selection_io_cause(uint32_t no_selection_io_cause)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -3232,7 +3234,7 @@ H5CX_set_no_selection_io_cause(uint32_t no_selection_io_cause)
     /* If we're using the default DXPL, don't modify it */
     if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT) {
         /* Cache the value for later, marking it to set in DXPL when context popped */
-        (*head)->ctx.no_selection_io_cause     = no_selection_io_cause;
+        (*head)->ctx.no_selection_io_cause = no_selection_io_cause;
         (*head)->ctx.no_selection_io_cause_set = true;
     } /* end if */
 
@@ -3249,10 +3251,9 @@ H5CX_set_no_selection_io_cause(uint32_t no_selection_io_cause)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5CX_set_actual_selection_io_mode(uint32_t actual_selection_io_mode)
+void H5CX_set_actual_selection_io_mode(uint32_t actual_selection_io_mode)
 {
-    H5CX_node_t **head = NULL; /* Pointer to head of API context list */
+    H5CX_node_t** head = NULL; /* Pointer to head of API context list */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -3264,7 +3265,7 @@ H5CX_set_actual_selection_io_mode(uint32_t actual_selection_io_mode)
     /* If we're using the default DXPL, don't modify it */
     if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT) {
         /* Cache the value for later, marking it to set in DXPL when context popped */
-        (*head)->ctx.actual_selection_io_mode     = actual_selection_io_mode;
+        (*head)->ctx.actual_selection_io_mode = actual_selection_io_mode;
         (*head)->ctx.actual_selection_io_mode_set = true;
     }
 
@@ -3280,11 +3281,10 @@ H5CX_set_actual_selection_io_mode(uint32_t actual_selection_io_mode)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_get_ohdr_flags(uint8_t *ohdr_flags)
+herr_t H5CX_get_ohdr_flags(uint8_t* ohdr_flags)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -3312,11 +3312,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5CX_pop(bool update_dxpl_props)
+herr_t H5CX_pop(bool update_dxpl_props)
 {
-    H5CX_node_t **head      = NULL;    /* Pointer to head of API context list */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5CX_node_t** head = NULL;  /* Pointer to head of API context list */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -3331,7 +3330,7 @@ H5CX_pop(bool update_dxpl_props)
          * to leave the (possibly incorrect) old value in the property list, so set from the default property
          * list */
         if ((*head)->ctx.dxpl_id != H5P_DATASET_XFER_DEFAULT && !(*head)->ctx.actual_selection_io_mode_set) {
-            (*head)->ctx.actual_selection_io_mode     = H5CX_def_dxpl_cache.actual_selection_io_mode;
+            (*head)->ctx.actual_selection_io_mode = H5CX_def_dxpl_cache.actual_selection_io_mode;
             (*head)->ctx.actual_selection_io_mode_set = true;
         }
 
@@ -3342,7 +3341,7 @@ H5CX_pop(bool update_dxpl_props)
         H5CX_SET_PROP(H5D_MPIO_ACTUAL_IO_MODE_NAME, mpio_actual_io_mode)
         H5CX_SET_PROP(H5D_MPIO_LOCAL_NO_COLLECTIVE_CAUSE_NAME, mpio_local_no_coll_cause)
         H5CX_SET_PROP(H5D_MPIO_GLOBAL_NO_COLLECTIVE_CAUSE_NAME, mpio_global_no_coll_cause)
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
         H5CX_SET_PROP(H5D_XFER_COLL_CHUNK_LINK_HARD_NAME, mpio_coll_chunk_link_hard)
         H5CX_SET_PROP(H5D_XFER_COLL_CHUNK_MULTI_HARD_NAME, mpio_coll_chunk_multi_hard)
         H5CX_SET_PROP(H5D_XFER_COLL_CHUNK_LINK_NUM_TRUE_NAME, mpio_coll_chunk_link_num_true)
@@ -3350,9 +3349,9 @@ H5CX_pop(bool update_dxpl_props)
         H5CX_SET_PROP(H5D_XFER_COLL_CHUNK_MULTI_RATIO_COLL_NAME, mpio_coll_chunk_multi_ratio_coll)
         H5CX_SET_PROP(H5D_XFER_COLL_CHUNK_MULTI_RATIO_IND_NAME, mpio_coll_chunk_multi_ratio_ind)
         H5CX_SET_PROP(H5D_XFER_COLL_RANK0_BCAST_NAME, mpio_coll_rank0_bcast)
-#endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
-#endif /* H5_HAVE_PARALLEL */
-    }  /* end if */
+    #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
+#endif     /* H5_HAVE_PARALLEL */
+    } /* end if */
 
     /* Pop the top context node from the stack */
     (*head) = (*head)->next;

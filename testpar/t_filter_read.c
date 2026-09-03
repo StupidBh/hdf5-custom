@@ -37,21 +37,20 @@ static int mpi_size, mpi_rank;
  *              divided evenly among the processors in vertical hyperslabs.
  *-------------------------------------------------------------------------
  */
-static void
-filter_read_internal(const char *filename, hid_t dcpl, hsize_t *dset_size)
+static void filter_read_internal(const char* filename, hid_t dcpl, hsize_t* dset_size)
 {
-    hid_t   file, dataset; /* HDF5 IDs */
-    hid_t   access_plist;  /* Access property list ID */
-    hid_t   sid, memspace; /* Dataspace IDs */
-    hsize_t size[2];       /* Dataspace dimensions */
-    hsize_t hs_offset[2];  /* Hyperslab offset */
-    hsize_t hs_size[2];    /* Hyperslab size */
-    size_t  i, j;          /* Local index variables */
-    char    name[32] = "dataset";
-    herr_t  hrc; /* Error status */
-    bool    vol_is_native;
-    int    *points = NULL; /* Writing buffer for entire dataset */
-    int    *check  = NULL; /* Reading buffer for selected hyperslab */
+    hid_t file, dataset;  /* HDF5 IDs */
+    hid_t access_plist;   /* Access property list ID */
+    hid_t sid, memspace;  /* Dataspace IDs */
+    hsize_t size[2];      /* Dataspace dimensions */
+    hsize_t hs_offset[2]; /* Hyperslab offset */
+    hsize_t hs_size[2];   /* Hyperslab size */
+    size_t i, j;          /* Local index variables */
+    char name[32] = "dataset";
+    herr_t hrc;           /* Error status */
+    bool vol_is_native;
+    int* points = NULL;   /* Writing buffer for entire dataset */
+    int* check = NULL;    /* Reading buffer for selected hyperslab */
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -59,7 +58,7 @@ filter_read_internal(const char *filename, hid_t dcpl, hsize_t *dset_size)
 
     /* set sizes for dataset and hyperslabs */
     hs_size[0] = size[0] = HS_DIM1;
-    hs_size[1]           = HS_DIM2;
+    hs_size[1] = HS_DIM2;
 
     size[1] = hs_size[1] * (hsize_t)mpi_size;
 
@@ -71,22 +70,23 @@ filter_read_internal(const char *filename, hid_t dcpl, hsize_t *dset_size)
     VRFY(sid >= 0, "H5Screate_simple");
 
     /* Create buffers */
-    points = (int *)malloc(size[0] * size[1] * sizeof(int));
+    points = (int*)malloc(size[0] * size[1] * sizeof(int));
     VRFY(points != NULL, "malloc");
 
-    check = (int *)malloc(hs_size[0] * hs_size[1] * sizeof(int));
+    check = (int*)malloc(hs_size[0] * hs_size[1] * sizeof(int));
     VRFY(check != NULL, "malloc");
 
     /* Initialize writing buffer with random data */
-    for (i = 0; i < size[0]; i++)
-        for (j = 0; j < size[1]; j++)
+    for (i = 0; i < size[0]; i++) {
+        for (j = 0; j < size[1]; j++) {
             points[i * size[1] + j] = (int)(i + j + 7);
+        }
+    }
 
     VRFY(H5Pall_filters_avail(dcpl), "Incorrect filter availability");
 
     /* Serial write phase */
     if (MAINPROCESS) {
-
         file = H5Fcreate(h5_rmprefix(filename), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
         VRFY(file >= 0, "H5Fcreate");
 
@@ -146,8 +146,7 @@ filter_read_internal(const char *filename, hid_t dcpl, hsize_t *dset_size)
         for (j = 0; j < hs_size[1]; j++) {
             if (points[i * size[1] + (size_t)hs_offset[1] + j] != check[i * hs_size[1] + j]) {
                 fprintf(stderr, "    Read different values than written.\n");
-                fprintf(stderr, "    At index %lu,%lu\n", (unsigned long)(i),
-                        (unsigned long)(hs_offset[1] + j));
+                fprintf(stderr, "    At index %lu,%lu\n", (unsigned long)(i), (unsigned long)(hs_offset[1] + j));
                 fprintf(stderr, "    At original: %d\n", (int)points[i * size[1] + (size_t)hs_offset[1] + j]);
                 fprintf(stderr, "    At returned: %d\n", (int)check[i * hs_size[1] + j]);
                 VRFY(false, "");
@@ -191,26 +190,25 @@ filter_read_internal(const char *filename, hid_t dcpl, hsize_t *dset_size)
  *-------------------------------------------------------------------------
  */
 
-void
-test_filter_read(void *params)
+void test_filter_read(void* params)
 {
-    hid_t         dc;                                       /* HDF5 IDs */
-    const hsize_t chunk_size[2] = {CHUNK_DIM1, CHUNK_DIM2}; /* Chunk dimensions */
-    hsize_t       null_size;                                /* Size of dataset without filters */
-    unsigned      chunk_opts;                               /* Chunk options */
-    unsigned      disable_partial_chunk_filters; /* Whether filters are disabled on partial chunks */
-    herr_t        hrc;
-    const char   *filename;
-    bool          vol_is_native;
-    hsize_t       fletcher32_size; /* Size of dataset with Fletcher32 checksum */
+    hid_t dc;                                                 /* HDF5 IDs */
+    const hsize_t chunk_size[2] = { CHUNK_DIM1, CHUNK_DIM2 }; /* Chunk dimensions */
+    hsize_t null_size;                                        /* Size of dataset without filters */
+    unsigned chunk_opts;                                      /* Chunk options */
+    unsigned disable_partial_chunk_filters;                   /* Whether filters are disabled on partial chunks */
+    herr_t hrc;
+    const char* filename;
+    bool vol_is_native;
+    hsize_t fletcher32_size; /* Size of dataset with Fletcher32 checksum */
 
 #ifdef H5_HAVE_FILTER_DEFLATE
     hsize_t deflate_size; /* Size of dataset with deflate filter */
-#endif                    /* H5_HAVE_FILTER_DEFLATE */
+#endif /* H5_HAVE_FILTER_DEFLATE */
 
 #ifdef H5_HAVE_FILTER_SZIP
-    hsize_t  szip_size; /* Size of dataset with szip filter */
-    unsigned szip_options_mask     = H5_SZIP_NN_OPTION_MASK;
+    hsize_t szip_size; /* Size of dataset with szip filter */
+    unsigned szip_options_mask = H5_SZIP_NN_OPTION_MASK;
     unsigned szip_pixels_per_block = 4;
 #endif /* H5_HAVE_FILTER_SZIP */
 
@@ -218,22 +216,21 @@ test_filter_read(void *params)
 
 #if (defined H5_HAVE_FILTER_DEFLATE || defined H5_HAVE_FILTER_SZIP)
     hsize_t combo_size; /* Size of dataset with multiple filters */
-#endif                  /* H5_HAVE_FILTER_DEFLATE || H5_HAVE_FILTER_SZIP */
+#endif /* H5_HAVE_FILTER_DEFLATE || H5_HAVE_FILTER_SZIP */
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
-    if (VERBOSE_MED)
+    if (VERBOSE_MED) {
         printf("Parallel reading of dataset written with filters %s\n", filename);
+    }
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_FILTERS)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_FILTERS)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf(
-                "    API functions for basic file, dataset or filter aren't supported with this connector\n");
+            printf("    API functions for basic file, dataset or filter aren't supported with this connector\n");
             fflush(stdout);
         }
 
@@ -260,8 +257,7 @@ test_filter_read(void *params)
     VRFY(hrc >= 0, "H5Pclose");
 
     /* Run steps 1-3 both with and without filters disabled on partial chunks */
-    for (disable_partial_chunk_filters = 0; disable_partial_chunk_filters <= 1;
-         disable_partial_chunk_filters++) {
+    for (disable_partial_chunk_filters = 0; disable_partial_chunk_filters <= 1; disable_partial_chunk_filters++) {
         /* Set chunk options appropriately */
         dc = H5Pcreate(H5P_DATASET_CREATE);
         VRFY(dc >= 0, "H5Pcreate");
@@ -272,8 +268,9 @@ test_filter_read(void *params)
         hrc = H5Pget_chunk_opts(dc, &chunk_opts);
         VRFY(hrc >= 0, "H5Pget_chunk_opts");
 
-        if (disable_partial_chunk_filters)
+        if (disable_partial_chunk_filters) {
             chunk_opts |= H5D_CHUNK_DONT_FILTER_PARTIAL_CHUNKS;
+        }
 
         hrc = H5Pclose(dc);
         VRFY(hrc >= 0, "H5Pclose");
@@ -297,8 +294,9 @@ test_filter_read(void *params)
 
         filter_read_internal(filename, dc, &fletcher32_size);
 
-        if (vol_is_native)
+        if (vol_is_native) {
             VRFY(fletcher32_size > null_size, "Size after checksumming is incorrect.");
+        }
 
         /* Clean up objects used for this test */
         hrc = H5Pclose(dc);
@@ -328,7 +326,7 @@ test_filter_read(void *params)
         hrc = H5Pclose(dc);
         VRFY(hrc >= 0, "H5Pclose");
 
-#endif /* H5_HAVE_FILTER_DEFLATE */
+#endif  /* H5_HAVE_FILTER_DEFLATE */
 
         /*----------------------------------------------------------
          * STEP 3: Test szip compression by itself.
@@ -355,7 +353,7 @@ test_filter_read(void *params)
             VRFY(hrc >= 0, "H5Pclose");
         }
 #endif /* H5_HAVE_FILTER_SZIP */
-    }  /* end for */
+    } /* end for */
 
     /*----------------------------------------------------------
      * STEP 4: Test shuffling by itself.
@@ -373,8 +371,9 @@ test_filter_read(void *params)
 
     filter_read_internal(filename, dc, &shuffle_size);
 
-    if (vol_is_native)
+    if (vol_is_native) {
         VRFY(shuffle_size == null_size, "Shuffled size not the same as uncompressed size.");
+    }
 
     /* Clean up objects used for this test */
     hrc = H5Pclose(dc);

@@ -63,141 +63,142 @@
 
 #ifdef H5_HAVE_PARALLEL
 
-/* library header files */
-#include <mpi.h>
+    /* library header files */
+    #include <mpi.h>
 
-/* our header files */
-#include "pio_perf.h"
+    /* our header files */
+    #include "pio_perf.h"
 
-/* useful macros */
-#define TAB_SPACE 4
+    /* useful macros */
+    #define TAB_SPACE 4
 
-#define ONE_KB 1024
-#define ONE_MB (ONE_KB * ONE_KB)
-#define ONE_GB (ONE_MB * ONE_KB)
+    #define ONE_KB 1024
+    #define ONE_MB (ONE_KB * ONE_KB)
+    #define ONE_GB (ONE_MB * ONE_KB)
 
-#define PIO_POSIX 0x1
-#define PIO_MPI   0x2
-#define PIO_HDF5  0x4
+    #define PIO_POSIX 0x1
+    #define PIO_MPI   0x2
+    #define PIO_HDF5  0x4
 
-/* report 0.0 in case t is zero too */
-#define MB_PER_SEC(bytes, t) (H5_DBL_ABS_EQUAL((t), 0.0) ? 0.0 : ((((double)bytes) / ONE_MB) / (t)))
+    /* report 0.0 in case t is zero too */
+    #define MB_PER_SEC(bytes, t) (H5_DBL_ABS_EQUAL((t), 0.0) ? 0.0 : ((((double)bytes) / ONE_MB) / (t)))
 
-#ifndef true
-#define true 1
-#endif /* true */
-#ifndef false
-#define false (!true)
-#endif /* false */
+    #ifndef true
+        #define true 1
+    #endif /* true */
+    #ifndef false
+        #define false (!true)
+    #endif /* false */
 
 /* global variables */
-FILE    *output;              /* output file                          */
-int      comm_world_rank_g;   /* my rank in MPI_COMM_RANK             */
-int      comm_world_nprocs_g; /* num. of processes of MPI_COMM_WORLD  */
-MPI_Comm pio_comm_g;          /* Communicator to run the PIO          */
-int      pio_mpi_rank_g;      /* MPI rank of pio_comm_g               */
-int      pio_mpi_nprocs_g;    /* Number of processes of pio_comm_g    */
-int      pio_debug_level = 0; /* The debug level:
-                               *   0 - Off
-                               *   1 - Minimal
-                               *   2 - Some more
-                               *   3 - Maximal
-                               *   4 - Maximal & then some
-                               */
+FILE* output;            /* output file                          */
+int comm_world_rank_g;   /* my rank in MPI_COMM_RANK             */
+int comm_world_nprocs_g; /* num. of processes of MPI_COMM_WORLD  */
+MPI_Comm pio_comm_g;     /* Communicator to run the PIO          */
+int pio_mpi_rank_g;      /* MPI rank of pio_comm_g               */
+int pio_mpi_nprocs_g;    /* Number of processes of pio_comm_g    */
+int pio_debug_level = 0; /* The debug level:
+                          *   0 - Off
+                          *   1 - Minimal
+                          *   2 - Some more
+                          *   3 - Maximal
+                          *   4 - Maximal & then some
+                          */
 
 /* local variables */
-static const char *progname = "h5perf";
+static const char* progname = "h5perf";
 
-#ifndef HDF5_PARAPREFIX
-#define HDF5_PARAPREFIX ""
-#endif
-char    *paraprefix   = NULL;          /* for command line option para-prefix */
+    #ifndef HDF5_PARAPREFIX
+        #define HDF5_PARAPREFIX ""
+    #endif
+char* paraprefix = NULL;               /* for command line option para-prefix */
 MPI_Info h5_io_info_g = MPI_INFO_NULL; /* MPI INFO object for IO */
 
-/*
- * Command-line options: The user can specify short or long-named
- * parameters. The long-named ones can be partially spelled. When
- * adding more, make sure that they don't clash with each other.
- */
-#if 1
-static const char *s_opts = "a:A:B:cCd:D:e:F:ghi:Imno:p:P:stT:wx:X:";
-#else
-static const char *s_opts = "a:A:bB:cCd:D:e:F:ghi:Imno:p:P:stT:wx:X:";
-#endif /* 1 */
-static struct h5_long_options l_opts[] = {{"align", require_arg, 'a'},
-                                          {"api", require_arg, 'A'},
-#if 0
+    /*
+     * Command-line options: The user can specify short or long-named
+     * parameters. The long-named ones can be partially spelled. When
+     * adding more, make sure that they don't clash with each other.
+     */
+    #if 1
+static const char* s_opts = "a:A:B:cCd:D:e:F:ghi:Imno:p:P:stT:wx:X:";
+    #else
+static const char* s_opts = "a:A:bB:cCd:D:e:F:ghi:Imno:p:P:stT:wx:X:";
+    #endif /* 1 */
+static struct h5_long_options l_opts[] = { { "align", require_arg, 'a' },
+                                           { "api", require_arg, 'A' },
+    #if 0
     /* a sighting of the elusive binary option */
     { "binary", no_arg, 'b' },
-#endif /* 0 */
-                                          {"block-size", require_arg, 'B'},
-                                          {"chunk", no_arg, 'c'},
-                                          {"collective", no_arg, 'C'},
-                                          {"debug", require_arg, 'D'},
-                                          {"geometry", no_arg, 'g'},
-                                          {"help", no_arg, 'h'},
-                                          {"interleaved", require_arg, 'I'},
-                                          {"max-num-processes", require_arg, 'P'},
-                                          {"min-num-processes", require_arg, 'p'},
-                                          {"max-xfer-size", require_arg, 'X'},
-                                          {"min-xfer-size", require_arg, 'x'},
-                                          {"num-bytes", require_arg, 'e'},
-                                          {"num-dsets", require_arg, 'd'},
-                                          {"num-files", require_arg, 'F'},
-                                          {"num-iterations", require_arg, 'i'},
-                                          {"output", require_arg, 'o'},
-                                          {"threshold", require_arg, 'T'},
-                                          {"write-only", require_arg, 'w'},
-                                          {NULL, 0, '\0'}};
+    #endif /* 0 */
+                                           { "block-size", require_arg, 'B' },
+                                           { "chunk", no_arg, 'c' },
+                                           { "collective", no_arg, 'C' },
+                                           { "debug", require_arg, 'D' },
+                                           { "geometry", no_arg, 'g' },
+                                           { "help", no_arg, 'h' },
+                                           { "interleaved", require_arg, 'I' },
+                                           { "max-num-processes", require_arg, 'P' },
+                                           { "min-num-processes", require_arg, 'p' },
+                                           { "max-xfer-size", require_arg, 'X' },
+                                           { "min-xfer-size", require_arg, 'x' },
+                                           { "num-bytes", require_arg, 'e' },
+                                           { "num-dsets", require_arg, 'd' },
+                                           { "num-files", require_arg, 'F' },
+                                           { "num-iterations", require_arg, 'i' },
+                                           { "output", require_arg, 'o' },
+                                           { "threshold", require_arg, 'T' },
+                                           { "write-only", require_arg, 'w' },
+                                           { NULL, 0, '\0' } };
 
-struct options {
-    long        io_types;      /* bitmask of which I/O types to test   */
-    const char *output_file;   /* file to print report to              */
-    long        num_dsets;     /* number of datasets                   */
-    long        num_files;     /* number of files                      */
-    off_t       num_bpp;       /* number of bytes per proc per dset    */
-    int         num_iters;     /* number of iterations                 */
-    int         max_num_procs; /* maximum number of processes to use   */
-    int         min_num_procs; /* minimum number of processes to use   */
-    size_t      max_xfer_size; /* maximum transfer buffer size         */
-    size_t      min_xfer_size; /* minimum transfer buffer size         */
-    size_t      blk_size;      /* Block size                           */
-    unsigned    interleaved;   /* Interleaved vs. contiguous blocks    */
-    unsigned    collective;    /* Collective vs. independent I/O       */
-    unsigned    dim2d;         /* 1D vs. 2D geometry                   */
-    int         print_times;   /* print times as well as throughputs   */
-    int         print_raw;     /* print raw data throughput info       */
-    off_t       h5_alignment;  /* alignment in HDF5 file               */
-    off_t       h5_threshold;  /* threshold for alignment in HDF5 file */
-    int         h5_use_chunks; /* Make HDF5 dataset chunked            */
-    int         h5_write_only; /* Perform the write tests only         */
-    int         verify;        /* Verify data correctness              */
+struct options
+{
+    long io_types;           /* bitmask of which I/O types to test   */
+    const char* output_file; /* file to print report to              */
+    long num_dsets;          /* number of datasets                   */
+    long num_files;          /* number of files                      */
+    off_t num_bpp;           /* number of bytes per proc per dset    */
+    int num_iters;           /* number of iterations                 */
+    int max_num_procs;       /* maximum number of processes to use   */
+    int min_num_procs;       /* minimum number of processes to use   */
+    size_t max_xfer_size;    /* maximum transfer buffer size         */
+    size_t min_xfer_size;    /* minimum transfer buffer size         */
+    size_t blk_size;         /* Block size                           */
+    unsigned interleaved;    /* Interleaved vs. contiguous blocks    */
+    unsigned collective;     /* Collective vs. independent I/O       */
+    unsigned dim2d;          /* 1D vs. 2D geometry                   */
+    int print_times;         /* print times as well as throughputs   */
+    int print_raw;           /* print raw data throughput info       */
+    off_t h5_alignment;      /* alignment in HDF5 file               */
+    off_t h5_threshold;      /* threshold for alignment in HDF5 file */
+    int h5_use_chunks;       /* Make HDF5 dataset chunked            */
+    int h5_write_only;       /* Perform the write tests only         */
+    int verify;              /* Verify data correctness              */
 };
 
-typedef struct _minmax {
+typedef struct _minmax
+{
     double min;
     double max;
     double sum;
-    int    num;
+    int num;
 } minmax;
 
 /* local functions */
-static off_t           parse_size_directive(const char *size);
-static struct options *parse_command_line(int argc, const char *const *argv);
-static void            run_test_loop(struct options *options);
-static int             run_test(iotype iot, parameters parms, struct options *opts);
-static void            output_all_info(minmax *mm, int count, int indent_level);
-static void            get_minmax(minmax *mm, double val);
-static minmax          accumulate_minmax_stuff(minmax *mm, int count);
-static int             create_comm_world(int num_procs, int *doing_pio);
-static int             destroy_comm_world(void);
-static void  output_results(const struct options *options, const char *name, minmax *table, int table_size,
-                            off_t data_size);
-static void  output_times(const struct options *options, const char *name, minmax *table, int table_size);
-static void  output_report(const char *fmt, ...) H5_ATTR_FORMAT(printf, 1, 2);
-static void  print_indent(int indent);
-static void  usage(const char *prog);
-static void  report_parameters(struct options *opts);
+static off_t parse_size_directive(const char* size);
+static struct options* parse_command_line(int argc, const char* const* argv);
+static void run_test_loop(struct options* options);
+static int run_test(iotype iot, parameters parms, struct options* opts);
+static void output_all_info(minmax* mm, int count, int indent_level);
+static void get_minmax(minmax* mm, double val);
+static minmax accumulate_minmax_stuff(minmax* mm, int count);
+static int create_comm_world(int num_procs, int* doing_pio);
+static int destroy_comm_world(void);
+static void output_results(const struct options* options, const char* name, minmax* table, int table_size, off_t data_size);
+static void output_times(const struct options* options, const char* name, minmax* table, int table_size);
+static void output_report(const char* fmt, ...) H5_ATTR_FORMAT(printf, 1, 2);
+static void print_indent(int indent);
+static void usage(const char* prog);
+static void report_parameters(struct options* opts);
 static off_t squareo(off_t);
 
 /*
@@ -206,12 +207,11 @@ static off_t squareo(off_t);
  *              function.
  * Return:      EXIT_SUCCESS or EXIT_FAILURE
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    int             ret;
-    int             exit_value = EXIT_SUCCESS;
-    struct options *opts       = NULL;
+    int ret;
+    int exit_value = EXIT_SUCCESS;
+    struct options* opts = NULL;
 
     /* Initialize h5tools lib */
     h5tools_init();
@@ -225,10 +225,12 @@ main(int argc, char *argv[])
     if (ret != MPI_SUCCESS) {
         fprintf(stderr, "%s: MPI_Comm_size call failed\n", progname);
 
-        if (ret == MPI_ERR_COMM)
+        if (ret == MPI_ERR_COMM) {
             fprintf(stderr, "invalid MPI communicator\n");
-        else
+        }
+        else {
             fprintf(stderr, "invalid argument\n");
+        }
 
         exit_value = EXIT_FAILURE;
         goto finish;
@@ -239,10 +241,12 @@ main(int argc, char *argv[])
     if (ret != MPI_SUCCESS) {
         fprintf(stderr, "%s: MPI_Comm_rank call failed\n", progname);
 
-        if (ret == MPI_ERR_COMM)
+        if (ret == MPI_ERR_COMM) {
             fprintf(stderr, "invalid MPI communicator\n");
-        else
+        }
+        else {
             fprintf(stderr, "invalid argument\n");
+        }
 
         exit_value = EXIT_FAILURE;
         goto finish;
@@ -251,7 +255,7 @@ main(int argc, char *argv[])
     pio_comm_g = MPI_COMM_WORLD;
 
     h5_set_info_object();
-    opts = parse_command_line(argc, (const char *const *)argv);
+    opts = parse_command_line(argc, (const char* const*)argv);
 
     if (!opts) {
         exit_value = EXIT_FAILURE;
@@ -266,8 +270,9 @@ main(int argc, char *argv[])
         }
     }
 
-    if ((pio_debug_level == 0 && comm_world_rank_g == 0) || pio_debug_level > 0)
+    if ((pio_debug_level == 0 && comm_world_rank_g == 0) || pio_debug_level > 0) {
         report_parameters(opts);
+    }
 
     run_test_loop(opts);
 
@@ -277,8 +282,7 @@ finish:
     return exit_value;
 }
 
-off_t
-squareo(off_t x)
+off_t squareo(off_t x)
 {
     return x * x;
 }
@@ -301,25 +305,24 @@ squareo(off_t x)
  *
  * Return:      Nothing
  */
-static void
-run_test_loop(struct options *opts)
+static void run_test_loop(struct options* opts)
 {
     parameters parms;
-    int        num_procs;
-    int        doing_pio = 0; /* if this process is doing parallel IO */
+    int num_procs;
+    int doing_pio = 0; /* if this process is doing parallel IO */
 
-    parms.num_files     = opts->num_files;
-    parms.num_dsets     = opts->num_dsets;
-    parms.num_iters     = opts->num_iters;
-    parms.blk_size      = opts->blk_size;
-    parms.interleaved   = opts->interleaved;
-    parms.collective    = opts->collective;
-    parms.dim2d         = opts->dim2d;
-    parms.h5_align      = (hsize_t)opts->h5_alignment;
-    parms.h5_thresh     = (hsize_t)opts->h5_threshold;
+    parms.num_files = opts->num_files;
+    parms.num_dsets = opts->num_dsets;
+    parms.num_iters = opts->num_iters;
+    parms.blk_size = opts->blk_size;
+    parms.interleaved = opts->interleaved;
+    parms.collective = opts->collective;
+    parms.dim2d = opts->dim2d;
+    parms.h5_align = (hsize_t)opts->h5_alignment;
+    parms.h5_thresh = (hsize_t)opts->h5_threshold;
     parms.h5_use_chunks = opts->h5_use_chunks;
     parms.h5_write_only = opts->h5_write_only;
-    parms.verify        = opts->verify;
+    parms.verify = opts->verify;
 
     /* start with max_num_procs and decrement it by half for each loop. */
     /* if performance needs restart, fewer processes may be needed. */
@@ -342,44 +345,53 @@ run_test_loop(struct options *opts)
 
                 if (parms.dim2d) {
                     parms.num_bytes = squareo(opts->num_bpp * parms.num_procs);
-                    if (parms.interleaved)
-                        output_report("Transfer Buffer Size: %ldx%ld bytes, File size: %.2f MB\n", buf_size,
+                    if (parms.interleaved) {
+                        output_report("Transfer Buffer Size: %ldx%ld bytes, File size: %.2f MB\n",
+                                      buf_size,
                                       opts->blk_size,
                                       ((double)parms.num_dsets * (double)parms.num_bytes) / ONE_MB);
-                    else
+                    }
+                    else {
                         output_report("Transfer Buffer Size: %ldx%ld bytes, File size: %.2f MB\n",
-                                      opts->blk_size, buf_size,
+                                      opts->blk_size,
+                                      buf_size,
                                       ((double)parms.num_dsets * (double)parms.num_bytes) / ONE_MB);
+                    }
 
                     print_indent(1);
                     output_report("  # of files: %ld, # of datasets: %ld, dataset size: %.2fx%.2f KB\n",
-                                  parms.num_files, parms.num_dsets,
+                                  parms.num_files,
+                                  parms.num_dsets,
                                   (double)(opts->num_bpp * parms.num_procs) / ONE_KB,
                                   (double)(opts->num_bpp * parms.num_procs) / ONE_KB);
                 }
                 else {
                     parms.num_bytes = (off_t)opts->num_bpp * parms.num_procs;
-                    output_report("Transfer Buffer Size: %ld bytes, File size: %.2f MB\n", buf_size,
-                                  ((double)parms.num_dsets * (double)parms.num_bytes) / ONE_MB);
+                    output_report("Transfer Buffer Size: %ld bytes, File size: %.2f MB\n", buf_size, ((double)parms.num_dsets * (double)parms.num_bytes) / ONE_MB);
 
                     print_indent(1);
                     output_report("  # of files: %ld, # of datasets: %ld, dataset size: %.2f MB\n",
-                                  parms.num_files, parms.num_dsets,
+                                  parms.num_files,
+                                  parms.num_dsets,
                                   (double)(opts->num_bpp * parms.num_procs) / ONE_MB);
                 }
 
-                if (opts->io_types & PIO_POSIX)
+                if (opts->io_types & PIO_POSIX) {
                     run_test(POSIXIO, parms, opts);
+                }
 
-                if (opts->io_types & PIO_MPI)
+                if (opts->io_types & PIO_MPI) {
                     run_test(MPIO, parms, opts);
+                }
 
-                if (opts->io_types & PIO_HDF5)
+                if (opts->io_types & PIO_HDF5) {
                     run_test(PHDF5, parms, opts);
+                }
 
                 /* Run the tests once if buf_size==0, but then break out */
-                if (buf_size == 0)
+                if (buf_size == 0) {
                     break;
+                }
             }
 
             if (destroy_comm_world() != SUCCESS) {
@@ -394,73 +406,65 @@ run_test_loop(struct options *opts)
  * Purpose:     Inner loop call to actually run the I/O test.
  * Return:      Nothing
  */
-static int
-run_test(iotype iot, parameters parms, struct options *opts)
+static int run_test(iotype iot, parameters parms, struct options* opts)
 {
     results res;
-    int     i, ret_value = SUCCESS;
-    int     comm_size;
-    off_t   raw_size;
-    minmax *write_mpi_mm_table   = NULL;
-    minmax *write_mm_table       = NULL;
-    minmax *write_gross_mm_table = NULL;
-    minmax *write_raw_mm_table   = NULL;
-    minmax *read_mpi_mm_table    = NULL;
-    minmax *read_mm_table        = NULL;
-    minmax *read_gross_mm_table  = NULL;
-    minmax *read_raw_mm_table    = NULL;
-    minmax *read_open_mm_table   = NULL;
-    minmax *read_close_mm_table  = NULL;
-    minmax *write_open_mm_table  = NULL;
-    minmax *write_close_mm_table = NULL;
-    minmax  write_mpi_mm         = {0.0, 0.0, 0.0, 0};
-    minmax  write_mm             = {0.0, 0.0, 0.0, 0};
-    minmax  write_gross_mm       = {0.0, 0.0, 0.0, 0};
-    minmax  write_raw_mm         = {0.0, 0.0, 0.0, 0};
-    minmax  read_mpi_mm          = {0.0, 0.0, 0.0, 0};
-    minmax  read_mm              = {0.0, 0.0, 0.0, 0};
-    minmax  read_gross_mm        = {0.0, 0.0, 0.0, 0};
-    minmax  read_raw_mm          = {0.0, 0.0, 0.0, 0};
-    minmax  read_open_mm         = {0.0, 0.0, 0.0, 0};
-    minmax  read_close_mm        = {0.0, 0.0, 0.0, 0};
-    minmax  write_open_mm        = {0.0, 0.0, 0.0, 0};
-    minmax  write_close_mm       = {0.0, 0.0, 0.0, 0};
+    int i, ret_value = SUCCESS;
+    int comm_size;
+    off_t raw_size;
+    minmax* write_mpi_mm_table = NULL;
+    minmax* write_mm_table = NULL;
+    minmax* write_gross_mm_table = NULL;
+    minmax* write_raw_mm_table = NULL;
+    minmax* read_mpi_mm_table = NULL;
+    minmax* read_mm_table = NULL;
+    minmax* read_gross_mm_table = NULL;
+    minmax* read_raw_mm_table = NULL;
+    minmax* read_open_mm_table = NULL;
+    minmax* read_close_mm_table = NULL;
+    minmax* write_open_mm_table = NULL;
+    minmax* write_close_mm_table = NULL;
+    minmax write_mpi_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax write_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax write_gross_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax write_raw_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_mpi_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_gross_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_raw_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_open_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax read_close_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax write_open_mm = { 0.0, 0.0, 0.0, 0 };
+    minmax write_close_mm = { 0.0, 0.0, 0.0, 0 };
 
-    raw_size      = parms.num_files * (off_t)parms.num_dsets * (off_t)parms.num_bytes;
+    raw_size = parms.num_files * (off_t)parms.num_dsets * (off_t)parms.num_bytes;
     parms.io_type = iot;
     print_indent(2);
     output_report("IO API = ");
 
     switch (iot) {
-        case POSIXIO:
-            output_report("POSIX\n");
-            break;
-        case MPIO:
-            output_report("MPIO\n");
-            break;
-        case PHDF5:
-            output_report("PHDF5 (w/MPI-IO driver)\n");
-            break;
-        default:
-            break;
+    case POSIXIO: output_report("POSIX\n"); break;
+    case MPIO   : output_report("MPIO\n"); break;
+    case PHDF5  : output_report("PHDF5 (w/MPI-IO driver)\n"); break;
+    default     : break;
     }
 
     MPI_Comm_size(pio_comm_g, &comm_size);
 
     /* allocate space for tables minmax and that it is sufficient */
     /* to initialize all elements to zeros by calloc.             */
-    write_mpi_mm_table   = calloc((size_t)parms.num_iters, sizeof(minmax));
-    write_mm_table       = calloc((size_t)parms.num_iters, sizeof(minmax));
+    write_mpi_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
+    write_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
     write_gross_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
-    write_raw_mm_table   = calloc((size_t)parms.num_iters, sizeof(minmax));
-    write_open_mm_table  = calloc((size_t)parms.num_iters, sizeof(minmax));
+    write_raw_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
+    write_open_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
     write_close_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
     if (!parms.h5_write_only) {
-        read_mpi_mm_table   = calloc((size_t)parms.num_iters, sizeof(minmax));
-        read_mm_table       = calloc((size_t)parms.num_iters, sizeof(minmax));
+        read_mpi_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
+        read_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
         read_gross_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
-        read_raw_mm_table   = calloc((size_t)parms.num_iters, sizeof(minmax));
-        read_open_mm_table  = calloc((size_t)parms.num_iters, sizeof(minmax));
+        read_raw_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
+        read_open_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
         read_close_mm_table = calloc((size_t)parms.num_iters, sizeof(minmax));
     }
 
@@ -708,8 +712,7 @@ run_test(iotype iot, parameters parms, struct options *opts)
  * Purpose:
  * Return:      Nothing
  */
-static void
-output_all_info(minmax *mm, int count, int indent_level)
+static void output_all_info(minmax* mm, int count, int indent_level)
 {
     int i;
 
@@ -729,11 +732,10 @@ output_all_info(minmax *mm, int count, int indent_level)
  *              object.
  * Return:      0 if all is fine; otherwise non-zero.
  */
-int
-h5_set_info_object(void)
+int h5_set_info_object(void)
 {
-    char *envp; /* environment pointer */
-    int   ret_value = 0;
+    char* envp; /* environment pointer */
+    int ret_value = 0;
 
     /* handle any MPI INFO hints via $HDF5_MPI_INFO */
     if ((envp = getenv("HDF5_MPI_INFO")) != NULL) {
@@ -741,62 +743,71 @@ h5_set_info_object(void)
 
         valp = envp = next = strdup(envp);
 
-        if (!valp)
+        if (!valp) {
             return 0;
+        }
 
         /* create an INFO object if not created yet */
-        if (h5_io_info_g == MPI_INFO_NULL)
+        if (h5_io_info_g == MPI_INFO_NULL) {
             MPI_Info_create(&h5_io_info_g);
+        }
 
         do {
             size_t len;
-            char  *key_val, *endp, *namep;
+            char *key_val, *endp, *namep;
 
-            if (*valp == ';')
+            if (*valp == ';') {
                 valp++;
+            }
 
             /* copy key/value pair into temporary buffer */
-            len     = strcspn(valp, ";");
-            next    = &valp[len];
-            key_val = (char *)calloc(1, len + 1);
+            len = strcspn(valp, ";");
+            next = &valp[len];
+            key_val = (char*)calloc(1, len + 1);
 
             /* increment the next pointer past the terminating semicolon */
-            if (*next == ';')
+            if (*next == ';') {
                 ++next;
+            }
 
             namep = strncpy(key_val, valp, len);
 
             /* pass up any beginning whitespaces */
-            while (*namep && (*namep == ' ' || *namep == '\t'))
+            while (*namep && (*namep == ' ' || *namep == '\t')) {
                 namep++;
+            }
 
-            if (!*namep)
+            if (!*namep) {
                 continue; /* was all white space, so move to next k/v pair */
+            }
 
             /* eat up any ending white spaces */
             endp = &namep[strlen(namep) - 1];
 
-            while (endp && (*endp == ' ' || *endp == '\t'))
+            while (endp && (*endp == ' ' || *endp == '\t')) {
                 *endp-- = '\0';
+            }
 
             /* find the '=' */
             valp = strchr(namep, '=');
 
             if (valp != NULL) { /* it's a valid key/value pairing */
-                char *tmp_val = valp + 1;
+                char* tmp_val = valp + 1;
 
                 /* change '=' to \0, move valp down one */
                 *valp-- = '\0';
 
                 /* eat up ending whitespace on the "key" part */
-                while (*valp == ' ' || *valp == '\t')
+                while (*valp == ' ' || *valp == '\t') {
                     *valp-- = '\0';
+                }
 
                 valp = tmp_val;
 
                 /* eat up beginning whitespace on the "value" part */
-                while (*valp == ' ' || *valp == '\t')
+                while (*valp == ' ' || *valp == '\t') {
                     *valp++ = '\0';
+                }
 
                 /* actually set the darned thing */
                 if (MPI_SUCCESS != MPI_Info_set(h5_io_info_g, namep, valp)) {
@@ -820,13 +831,12 @@ h5_set_info_object(void)
  * Purpose:     Display content of an MPI Info object
  * Return:      void
  */
-void
-h5_dump_info_object(MPI_Info info)
+void h5_dump_info_object(MPI_Info info)
 {
     char key[MPI_MAX_INFO_KEY + 1];
     char value[MPI_MAX_INFO_VAL + 1];
-    int  flag;
-    int  i, nkeys;
+    int flag;
+    int i, nkeys;
 
     printf("Dumping MPI Info Object (up to %d bytes per item):\n", MPI_MAX_INFO_VAL);
     if (info == MPI_INFO_NULL) {
@@ -848,8 +858,7 @@ h5_dump_info_object(MPI_Info info)
  * Purpose:     Gather all the min, max and total of val.
  * Return:      Nothing
  */
-static void
-get_minmax(minmax *mm, double val)
+static void get_minmax(minmax* mm, double val)
 {
     int myrank;
 
@@ -867,10 +876,9 @@ get_minmax(minmax *mm, double val)
  *              across all processes.
  * Return:      TOTAL_MM - the total of all of these.
  */
-static minmax
-accumulate_minmax_stuff(minmax *mm, int count)
+static minmax accumulate_minmax_stuff(minmax* mm, int count)
 {
-    int    i;
+    int i;
     minmax total_mm;
 
     total_mm.sum = 0.0;
@@ -883,11 +891,13 @@ accumulate_minmax_stuff(minmax *mm, int count)
 
         total_mm.sum += m;
 
-        if (m < total_mm.min)
+        if (m < total_mm.min) {
             total_mm.min = m;
+        }
 
-        if (m > total_mm.max)
+        if (m > total_mm.max) {
             total_mm.max = m;
+        }
     }
 
     return total_mm;
@@ -900,8 +910,7 @@ accumulate_minmax_stuff(minmax *mm, int count)
  * Return:      SUCCESS on success.
  *              FAIL otherwise.
  */
-static int
-create_comm_world(int num_procs, int *doing_pio)
+static int create_comm_world(int num_procs, int* doing_pio)
 {
     /* MPI variables */
     int mrc;   /* return values                */
@@ -917,14 +926,13 @@ create_comm_world(int num_procs, int *doing_pio)
     MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 
     if (num_procs > nprocs) {
-        fprintf(stderr, "number of process(%d) must be <= number of processes in MPI_COMM_WORLD(%d)\n",
-                num_procs, nprocs);
+        fprintf(stderr, "number of process(%d) must be <= number of processes in MPI_COMM_WORLD(%d)\n", num_procs, nprocs);
         goto error_done;
     }
 
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     color = (myrank < num_procs);
-    mrc   = MPI_Comm_split(MPI_COMM_WORLD, color, myrank, &pio_comm_g);
+    mrc = MPI_Comm_split(MPI_COMM_WORLD, color, myrank, &pio_comm_g);
 
     if (mrc != MPI_SUCCESS) {
         fprintf(stderr, "MPI_Comm_split failed\n");
@@ -957,14 +965,14 @@ error_done:
  * Return:      SUCCESS on success.
  *              FAIL otherwise.
  */
-static int
-destroy_comm_world(void)
+static int destroy_comm_world(void)
 {
     int mrc = SUCCESS; /* return code      */
 
     /* release MPI resources */
-    if (pio_comm_g != MPI_COMM_NULL)
+    if (pio_comm_g != MPI_COMM_NULL) {
         mrc = (MPI_Comm_free(&pio_comm_g) == MPI_SUCCESS ? SUCCESS : FAIL);
+    }
 
     return mrc;
 }
@@ -975,8 +983,7 @@ destroy_comm_world(void)
  *                  minmax & # of iterations.
  * Return:      Nothing
  */
-static void
-output_results(const struct options *opts, const char *name, minmax *table, int table_size, off_t data_size)
+static void output_results(const struct options* opts, const char* name, minmax* table, int table_size, off_t data_size)
 {
     minmax total_mm;
 
@@ -989,28 +996,33 @@ output_results(const struct options *opts, const char *name, minmax *table, int 
 
     print_indent(4);
     output_report("Maximum Throughput: %6.2f MB/s", MB_PER_SEC(data_size, total_mm.min));
-    if (opts->print_times)
+    if (opts->print_times) {
         output_report(" (%7.3f s)\n", total_mm.min);
-    else
+    }
+    else {
         output_report("\n");
+    }
 
     print_indent(4);
     output_report("Average Throughput: %6.2f MB/s", MB_PER_SEC(data_size, total_mm.sum / total_mm.num));
-    if (opts->print_times)
+    if (opts->print_times) {
         output_report(" (%7.3f s)\n", (total_mm.sum / total_mm.num));
-    else
+    }
+    else {
         output_report("\n");
+    }
 
     print_indent(4);
     output_report("Minimum Throughput: %6.2f MB/s", MB_PER_SEC(data_size, total_mm.max));
-    if (opts->print_times)
+    if (opts->print_times) {
         output_report(" (%7.3f s)\n", total_mm.max);
-    else
+    }
+    else {
         output_report("\n");
+    }
 }
 
-static void
-output_times(const struct options *opts, const char *name, minmax *table, int table_size)
+static void output_times(const struct options* opts, const char* name, minmax* table, int table_size)
 {
     minmax total_mm;
 
@@ -1025,8 +1037,7 @@ output_times(const struct options *opts, const char *name, minmax *table, int ta
     output_report("Minimum Accumulated Time using %ld file(s): %7.5f s\n", opts->num_files, (total_mm.min));
 
     print_indent(4);
-    output_report("Average Accumulated Time using %ld file(s): %7.5f s\n", opts->num_files,
-                  (total_mm.sum / total_mm.num));
+    output_report("Average Accumulated Time using %ld file(s): %7.5f s\n", opts->num_files, (total_mm.sum / total_mm.num));
 
     print_indent(4);
     output_report("Maximum Accumulated Time using %ld file(s): %7.5f s\n", opts->num_files, (total_mm.max));
@@ -1037,8 +1048,7 @@ output_times(const struct options *opts, const char *name, minmax *table, int ta
  * Purpose:     Print a line of the report. Only do so if I'm the 0 process.
  * Return:      Nothing
  */
-static void
-output_report(const char *fmt, ...)
+static void output_report(const char* fmt, ...)
 {
     int myrank;
 
@@ -1059,8 +1069,7 @@ output_report(const char *fmt, ...)
  *              things.
  * Return:      Nothing
  */
-static void
-print_indent(int indent)
+static void print_indent(int indent)
 {
     int myrank;
 
@@ -1069,56 +1078,63 @@ print_indent(int indent)
     if (myrank == 0) {
         indent *= TAB_SPACE;
 
-        for (; indent > 0; --indent)
+        for (; indent > 0; --indent) {
             fputc(' ', output);
+        }
     }
 }
 
-static void
-recover_size_and_print(long long val, const char *end)
+static void recover_size_and_print(long long val, const char* end)
 {
     if (val >= ONE_KB && (val % ONE_KB) == 0) {
         if (val >= ONE_MB && (val % ONE_MB) == 0) {
-            if (val >= ONE_GB && (val % ONE_GB) == 0)
+            if (val >= ONE_GB && (val % ONE_GB) == 0) {
                 fprintf(output,
                         "%lld"
                         "GB%s",
-                        val / ONE_GB, end);
-            else
+                        val / ONE_GB,
+                        end);
+            }
+            else {
                 fprintf(output,
                         "%lld"
                         "MB%s",
-                        val / ONE_MB, end);
+                        val / ONE_MB,
+                        end);
+            }
         }
         else {
             fprintf(output,
                     "%lld"
                     "KB%s",
-                    val / ONE_KB, end);
+                    val / ONE_KB,
+                    end);
         }
     }
     else {
         fprintf(output,
                 "%lld"
                 "%s",
-                val, end);
+                val,
+                end);
     }
 }
 
-static void
-print_io_api(long io_types)
+static void print_io_api(long io_types)
 {
-    if (io_types & PIO_POSIX)
+    if (io_types & PIO_POSIX) {
         fprintf(output, "posix ");
-    if (io_types & PIO_MPI)
+    }
+    if (io_types & PIO_MPI) {
         fprintf(output, "mpiio ");
-    if (io_types & PIO_HDF5)
+    }
+    if (io_types & PIO_HDF5) {
         fprintf(output, "phdf5 ");
+    }
     fprintf(output, "\n");
 }
 
-static void
-report_parameters(struct options *opts)
+static void report_parameters(struct options* opts)
 {
     int rank = comm_world_rank_g;
 
@@ -1145,10 +1161,8 @@ report_parameters(struct options *opts)
         recover_size_and_print((long long)(opts->num_bpp * opts->max_num_procs), "\n");
 
         fprintf(output, "rank %d: File size=", rank);
-        recover_size_and_print((long long)(squareo(opts->num_bpp * opts->min_num_procs) * opts->num_dsets),
-                               ":");
-        recover_size_and_print((long long)(squareo(opts->num_bpp * opts->max_num_procs) * opts->num_dsets),
-                               "\n");
+        recover_size_and_print((long long)(squareo(opts->num_bpp * opts->min_num_procs) * opts->num_dsets), ":");
+        recover_size_and_print((long long)(squareo(opts->num_bpp * opts->max_num_procs) * opts->num_dsets), "\n");
 
         fprintf(output, "rank %d: Transfer buffer size=", rank);
         if (opts->interleaved) {
@@ -1187,33 +1201,41 @@ report_parameters(struct options *opts)
     }
 
     fprintf(output, "rank %d: Block Pattern in Dataset=", rank);
-    if (opts->interleaved)
+    if (opts->interleaved) {
         fprintf(output, "Interleaved\n");
-    else
+    }
+    else {
         fprintf(output, "Contiguous\n");
+    }
 
     fprintf(output, "rank %d: I/O Method for MPI and HDF5=", rank);
-    if (opts->collective)
+    if (opts->collective) {
         fprintf(output, "Collective\n");
-    else
+    }
+    else {
         fprintf(output, "Independent\n");
+    }
 
     fprintf(output, "rank %d: Geometry=", rank);
-    if (opts->dim2d)
+    if (opts->dim2d) {
         fprintf(output, "2D\n");
-    else
+    }
+    else {
         fprintf(output, "1D\n");
+    }
 
     fprintf(output, "rank %d: VFL used for HDF5 I/O=%s\n", rank, "MPI-IO driver");
 
     fprintf(output, "rank %d: Data storage method in HDF5=", rank);
-    if (opts->h5_use_chunks)
+    if (opts->h5_use_chunks) {
         fprintf(output, "Chunked\n");
-    else
+    }
+    else {
         fprintf(output, "Contiguous\n");
+    }
 
     {
-        char *prefix = getenv("HDF5_PARAPREFIX");
+        char* prefix = getenv("HDF5_PARAPREFIX");
 
         fprintf(output, "rank %d: Env HDF5_PARAPREFIX=%s\n", rank, (prefix ? prefix : "not set"));
     }
@@ -1231,53 +1253,53 @@ report_parameters(struct options *opts)
  *              structure which will need to be freed by the calling function.
  * Return:      Pointer to an OPTIONS structure
  */
-static struct options *
-parse_command_line(int argc, const char *const *argv)
+static struct options* parse_command_line(int argc, const char* const* argv)
 {
-    int             opt;
-    struct options *cl_opts;
+    int opt;
+    struct options* cl_opts;
 
-    cl_opts = (struct options *)malloc(sizeof(struct options));
+    cl_opts = (struct options*)malloc(sizeof(struct options));
 
-    cl_opts->output_file   = NULL;
-    cl_opts->io_types      = 0; /* will set default after parsing options */
-    cl_opts->num_dsets     = 1;
-    cl_opts->num_files     = 1;
-    cl_opts->num_bpp       = 0;
-    cl_opts->num_iters     = 1;
+    cl_opts->output_file = NULL;
+    cl_opts->io_types = 0; /* will set default after parsing options */
+    cl_opts->num_dsets = 1;
+    cl_opts->num_files = 1;
+    cl_opts->num_bpp = 0;
+    cl_opts->num_iters = 1;
     cl_opts->max_num_procs = comm_world_nprocs_g;
     cl_opts->min_num_procs = 1;
     cl_opts->max_xfer_size = 0;
     cl_opts->min_xfer_size = 0;
-    cl_opts->blk_size      = 0;
-    cl_opts->interleaved   = 0;     /* Default to contiguous blocks in dataset */
-    cl_opts->collective    = 0;     /* Default to independent I/O access */
-    cl_opts->dim2d         = 0;     /* Default to 1D */
-    cl_opts->print_times   = false; /* Printing times is off by default */
-    cl_opts->print_raw     = false; /* Printing raw data throughput is off by default */
-    cl_opts->h5_alignment  = 1;     /* No alignment for HDF5 objects by default */
-    cl_opts->h5_threshold  = 1;     /* No threshold for aligning HDF5 objects by default */
+    cl_opts->blk_size = 0;
+    cl_opts->interleaved = 0;       /* Default to contiguous blocks in dataset */
+    cl_opts->collective = 0;        /* Default to independent I/O access */
+    cl_opts->dim2d = 0;             /* Default to 1D */
+    cl_opts->print_times = false;   /* Printing times is off by default */
+    cl_opts->print_raw = false;     /* Printing raw data throughput is off by default */
+    cl_opts->h5_alignment = 1;      /* No alignment for HDF5 objects by default */
+    cl_opts->h5_threshold = 1;      /* No threshold for aligning HDF5 objects by default */
     cl_opts->h5_use_chunks = false; /* Don't chunk the HDF5 dataset by default */
     cl_opts->h5_write_only = false; /* Do both read and write by default */
-    cl_opts->verify        = false; /* No Verify data correctness by default */
+    cl_opts->verify = false;        /* No Verify data correctness by default */
 
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'a':
-                cl_opts->h5_alignment = parse_size_directive(H5_optarg);
-                break;
-            case 'A': {
-                const char *end = H5_optarg;
+        case 'a': cl_opts->h5_alignment = parse_size_directive(H5_optarg); break;
+        case 'A':
+            {
+                const char* end = H5_optarg;
 
                 while (end && *end != '\0') {
                     char buf[10];
-                    int  i;
+                    int i;
 
                     memset(buf, '\0', sizeof(buf));
 
-                    for (i = 0; *end != '\0' && *end != ','; ++end)
-                        if (isalnum(*end) && i < 10)
+                    for (i = 0; *end != '\0' && *end != ','; ++end) {
+                        if (isalnum(*end) && i < 10) {
                             buf[i++] = *end;
+                        }
+                    }
 
                     if (!HDstrcasecmp(buf, "phdf5")) {
                         cl_opts->io_types |= PIO_HDF5;
@@ -1293,176 +1315,166 @@ parse_command_line(int argc, const char *const *argv)
                         exit(EXIT_FAILURE);
                     }
 
-                    if (*end == '\0')
+                    if (*end == '\0') {
                         break;
+                    }
 
                     end++;
                 }
             }
 
             break;
-#if 0
+    #if 0
         case 'b':
             /* the future "binary" option */
             break;
-#endif /* 0 */
-            case 'B':
-                cl_opts->blk_size = (size_t)parse_size_directive(H5_optarg);
-                break;
-            case 'c':
-                /* Turn on chunked HDF5 dataset creation */
-                cl_opts->h5_use_chunks = true;
-                break;
-            case 'C':
-                cl_opts->collective = 1;
-                break;
-            case 'd':
-                cl_opts->num_dsets = atoi(H5_optarg);
-                break;
-            case 'D': {
-                const char *end = H5_optarg;
+    #endif /* 0 */
+        case 'B': cl_opts->blk_size = (size_t)parse_size_directive(H5_optarg); break;
+        case 'c':
+            /* Turn on chunked HDF5 dataset creation */
+            cl_opts->h5_use_chunks = true;
+            break;
+        case 'C': cl_opts->collective = 1; break;
+        case 'd': cl_opts->num_dsets = atoi(H5_optarg); break;
+        case 'D':
+            {
+                const char* end = H5_optarg;
 
                 while (end && *end != '\0') {
                     char buf[10];
-                    int  i;
+                    int i;
 
                     memset(buf, '\0', sizeof(buf));
 
-                    for (i = 0; *end != '\0' && *end != ','; ++end)
-                        if (isalnum(*end) && i < 10)
+                    for (i = 0; *end != '\0' && *end != ','; ++end) {
+                        if (isalnum(*end) && i < 10) {
                             buf[i++] = *end;
+                        }
+                    }
 
                     if (strlen(buf) > 1 || isdigit(buf[0])) {
                         size_t j;
 
-                        for (j = 0; j < 10 && buf[j] != '\0'; ++j)
+                        for (j = 0; j < 10 && buf[j] != '\0'; ++j) {
                             if (!isdigit(buf[j])) {
                                 fprintf(stderr, "pio_perf: invalid --debug option %s\n", buf);
                                 exit(EXIT_FAILURE);
                             }
+                        }
 
                         pio_debug_level = atoi(buf);
 
-                        if (pio_debug_level > 4)
+                        if (pio_debug_level > 4) {
                             pio_debug_level = 4;
-                        else if (pio_debug_level < 0)
+                        }
+                        else if (pio_debug_level < 0) {
                             pio_debug_level = 0;
+                        }
                     }
                     else {
                         switch (*buf) {
-                            case 'r':
-                                /* Turn on raw data throughput info */
-                                cl_opts->print_raw = true;
-                                break;
-                            case 't':
-                                /* Turn on time printing */
-                                cl_opts->print_times = true;
-                                break;
-                            case 'v':
-                                /* Turn on verify data correctness*/
-                                cl_opts->verify = true;
-                                break;
-                            default:
-                                fprintf(stderr, "pio_perf: invalid --debug option %s\n", buf);
-                                exit(EXIT_FAILURE);
+                        case 'r':
+                            /* Turn on raw data throughput info */
+                            cl_opts->print_raw = true;
+                            break;
+                        case 't':
+                            /* Turn on time printing */
+                            cl_opts->print_times = true;
+                            break;
+                        case 'v':
+                            /* Turn on verify data correctness*/
+                            cl_opts->verify = true;
+                            break;
+                        default: fprintf(stderr, "pio_perf: invalid --debug option %s\n", buf); exit(EXIT_FAILURE);
                         }
                     }
 
-                    if (*end == '\0')
+                    if (*end == '\0') {
                         break;
+                    }
 
                     end++;
                 }
             }
 
             break;
-            case 'e':
-                cl_opts->num_bpp = parse_size_directive(H5_optarg);
-                break;
-            case 'F':
-                cl_opts->num_files = atoi(H5_optarg);
-                break;
-            case 'g':
-                cl_opts->dim2d = 1;
-                break;
-            case 'i':
-                cl_opts->num_iters = atoi(H5_optarg);
-                break;
-            case 'I':
-                cl_opts->interleaved = 1;
-                break;
-            case 'o':
-                cl_opts->output_file = H5_optarg;
-                break;
-            case 'p':
-                cl_opts->min_num_procs = atoi(H5_optarg);
-                break;
-            case 'P':
-                cl_opts->max_num_procs = atoi(H5_optarg);
-                break;
-            case 'T':
-                cl_opts->h5_threshold = parse_size_directive(H5_optarg);
-                break;
-            case 'w':
-                cl_opts->h5_write_only = true;
-                break;
-            case 'x':
-                cl_opts->min_xfer_size = (size_t)parse_size_directive(H5_optarg);
-                break;
-            case 'X':
-                cl_opts->max_xfer_size = (size_t)parse_size_directive(H5_optarg);
-                break;
-            case 'h':
-            case '?':
-            default:
-                usage(progname);
-                free(cl_opts);
-                return NULL;
+        case 'e': cl_opts->num_bpp = parse_size_directive(H5_optarg); break;
+        case 'F': cl_opts->num_files = atoi(H5_optarg); break;
+        case 'g': cl_opts->dim2d = 1; break;
+        case 'i': cl_opts->num_iters = atoi(H5_optarg); break;
+        case 'I': cl_opts->interleaved = 1; break;
+        case 'o': cl_opts->output_file = H5_optarg; break;
+        case 'p': cl_opts->min_num_procs = atoi(H5_optarg); break;
+        case 'P': cl_opts->max_num_procs = atoi(H5_optarg); break;
+        case 'T': cl_opts->h5_threshold = parse_size_directive(H5_optarg); break;
+        case 'w': cl_opts->h5_write_only = true; break;
+        case 'x': cl_opts->min_xfer_size = (size_t)parse_size_directive(H5_optarg); break;
+        case 'X': cl_opts->max_xfer_size = (size_t)parse_size_directive(H5_optarg); break;
+        case 'h':
+        case '?':
+        default:
+            usage(progname);
+            free(cl_opts);
+            return NULL;
         }
     }
 
     if (cl_opts->num_bpp == 0) {
-        if (cl_opts->dim2d == 0)
+        if (cl_opts->dim2d == 0) {
             cl_opts->num_bpp = 256 * ONE_KB;
-        else
+        }
+        else {
             cl_opts->num_bpp = 8 * ONE_KB;
+        }
     }
 
-    if (cl_opts->max_xfer_size == 0)
+    if (cl_opts->max_xfer_size == 0) {
         cl_opts->max_xfer_size = (size_t)cl_opts->num_bpp;
+    }
 
-    if (cl_opts->min_xfer_size == 0)
+    if (cl_opts->min_xfer_size == 0) {
         cl_opts->min_xfer_size = (size_t)(cl_opts->num_bpp) / 2;
+    }
 
-    if (cl_opts->blk_size == 0)
+    if (cl_opts->blk_size == 0) {
         cl_opts->blk_size = (size_t)(cl_opts->num_bpp) / 2;
+    }
 
     /* set default if none specified yet */
-    if (!cl_opts->io_types)
+    if (!cl_opts->io_types) {
         cl_opts->io_types = PIO_HDF5 | PIO_MPI | PIO_POSIX; /* run all API */
+    }
 
     /* verify parameters sanity.  Adjust if needed. */
     /* cap xfer_size with bytes per process */
     if (!cl_opts->dim2d) {
-        if (cl_opts->min_xfer_size > (size_t)cl_opts->num_bpp)
+        if (cl_opts->min_xfer_size > (size_t)cl_opts->num_bpp) {
             cl_opts->min_xfer_size = (size_t)cl_opts->num_bpp;
-        if (cl_opts->max_xfer_size > (size_t)cl_opts->num_bpp)
+        }
+        if (cl_opts->max_xfer_size > (size_t)cl_opts->num_bpp) {
             cl_opts->max_xfer_size = (size_t)cl_opts->num_bpp;
+        }
     }
-    if (cl_opts->min_xfer_size > cl_opts->max_xfer_size)
+    if (cl_opts->min_xfer_size > cl_opts->max_xfer_size) {
         cl_opts->min_xfer_size = cl_opts->max_xfer_size;
-    if (cl_opts->blk_size > (size_t)cl_opts->num_bpp)
+    }
+    if (cl_opts->blk_size > (size_t)cl_opts->num_bpp) {
         cl_opts->blk_size = (size_t)cl_opts->num_bpp;
+    }
     /* check range of number of processes */
-    if (cl_opts->min_num_procs <= 0)
+    if (cl_opts->min_num_procs <= 0) {
         cl_opts->min_num_procs = 1;
-    if (cl_opts->max_num_procs <= 0)
+    }
+    if (cl_opts->max_num_procs <= 0) {
         cl_opts->max_num_procs = 1;
-    if (cl_opts->min_num_procs > cl_opts->max_num_procs)
+    }
+    if (cl_opts->min_num_procs > cl_opts->max_num_procs) {
         cl_opts->min_num_procs = cl_opts->max_num_procs;
+    }
     /* check iteration */
-    if (cl_opts->num_iters <= 0)
+    if (cl_opts->num_iters <= 0) {
         cl_opts->num_iters = 1;
+    }
 
     return cl_opts;
 }
@@ -1480,34 +1492,26 @@ parse_command_line(int argc, const char *const *argv)
  *              If an unknown size indicator is used, then the program will
  *              exit with EXIT_FAILURE as the return value.
  */
-static off_t
-parse_size_directive(const char *size)
+static off_t parse_size_directive(const char* size)
 {
     off_t s;
-    char *endptr;
+    char* endptr;
 
     s = strtol(size, &endptr, 10);
 
     if (endptr && *endptr) {
-        while (*endptr != '\0' && (*endptr == ' ' || *endptr == '\t'))
+        while (*endptr != '\0' && (*endptr == ' ' || *endptr == '\t')) {
             ++endptr;
+        }
 
         switch (*endptr) {
-            case 'K':
-            case 'k':
-                s *= ONE_KB;
-                break;
-            case 'M':
-            case 'm':
-                s *= ONE_MB;
-                break;
-            case 'G':
-            case 'g':
-                s *= ONE_GB;
-                break;
-            default:
-                fprintf(stderr, "Illegal size specifier '%c'\n", *endptr);
-                exit(EXIT_FAILURE);
+        case 'K':
+        case 'k': s *= ONE_KB; break;
+        case 'M':
+        case 'm': s *= ONE_MB; break;
+        case 'G':
+        case 'g': s *= ONE_GB; break;
+        default : fprintf(stderr, "Illegal size specifier '%c'\n", *endptr); exit(EXIT_FAILURE);
         }
     }
 
@@ -1519,8 +1523,7 @@ parse_size_directive(const char *size)
  * Purpose:     Print a usage message and then exit.
  * Return:      Nothing
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     int myrank;
 
@@ -1533,9 +1536,9 @@ usage(const char *prog)
         printf("     -h, --help                  Print a usage message and exit\n");
         printf("     -a S, --align=S             Alignment of objects in HDF5 file [default: 1]\n");
         printf("     -A AL, --api=AL             Which APIs to test [default: all of them]\n");
-#if 0
+    #if 0
         printf("     -b, --binary                The elusive binary option\n");
-#endif /* 0 */
+    #endif /* 0 */
         printf("     -B S, --block-size=S        Block size within transfer buffer\n");
         printf("                                 (see below for description)\n");
         printf("                                 [default: half the number of bytes per process\n");
@@ -1650,7 +1653,7 @@ usage(const char *prog)
     } /* end if */
 } /* end usage() */
 
-#else /* H5_HAVE_PARALLEL */
+#else  /* H5_HAVE_PARALLEL */
 
 /*
  * Function:    main
@@ -1658,8 +1661,7 @@ usage(const char *prog)
  *              parallel stuff.
  * Return:      EXIT_SUCCESS
  */
-int
-main(void)
+int main(void)
 {
     printf("No parallel IO performance because parallel is not configured\n");
     return EXIT_SUCCESS;

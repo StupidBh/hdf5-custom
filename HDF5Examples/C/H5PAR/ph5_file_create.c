@@ -6,20 +6,19 @@
 
 #define H5FILE_NAME "SDS_row.h5"
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     /*
      * HDF5 APIs definitions
      */
-    hid_t  file_id;  /* file and dataset identifiers */
-    hid_t  plist_id; /* property list identifier( access template) */
+    hid_t file_id;  /* file and dataset identifiers */
+    hid_t plist_id; /* property list identifier( access template) */
     herr_t status;
 
     /*
      * MPI variables
      */
-    int      mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
@@ -69,8 +68,9 @@ main(int argc, char **argv)
      */
     H5Fclose(file_id);
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         printf("PHDF5 example finished with no errors\n");
+    }
 
     MPI_Finalize();
 

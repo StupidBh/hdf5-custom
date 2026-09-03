@@ -27,18 +27,18 @@
 
 #ifdef H5_REQUIRE_DIGITAL_SIGNATURE
 
-#include <sys/stat.h>
-#include <time.h>
+    #include <sys/stat.h>
+    #include <time.h>
 
-#include <openssl/evp.h> /* For SHA-256 hash in revocation test */
-#include "H5encode.h"    /* For UINT32DECODE in footer decode */
+    #include <openssl/evp.h> /* For SHA-256 hash in revocation test */
+    #include "H5encode.h"    /* For UINT32DECODE in footer decode */
 
-/* Test file names */
-#define TEST_PLUGIN_SIGNED   "plugin_signed.so"
-#define TEST_PLUGIN_UNSIGNED "plugin_unsigned.so"
-#define TEST_PLUGIN_TAMPERED "plugin_tampered.so"
-#define TEST_PUBLIC_KEY      "test_public.pem"
-#define TEST_KEYSTORE_DIR    "test_keystore"
+    /* Test file names */
+    #define TEST_PLUGIN_SIGNED   "plugin_signed.so"
+    #define TEST_PLUGIN_UNSIGNED "plugin_unsigned.so"
+    #define TEST_PLUGIN_TAMPERED "plugin_tampered.so"
+    #define TEST_PUBLIC_KEY      "test_public.pem"
+    #define TEST_KEYSTORE_DIR    "test_keystore"
 
 /* Test counters */
 static int tests_passed = 0;
@@ -52,8 +52,7 @@ static int tests_failed = 0;
  * Return:      0 on success, 1 on failure
  *-------------------------------------------------------------------------
  */
-static int
-test_verify_signed_plugin(void)
+static int test_verify_signed_plugin(void)
 {
     herr_t ret;
 
@@ -83,8 +82,7 @@ test_verify_signed_plugin(void)
  * Return:      0 on success, 1 on failure
  *-------------------------------------------------------------------------
  */
-static int
-test_verify_unsigned_plugin(void)
+static int test_verify_unsigned_plugin(void)
 {
     herr_t ret;
 
@@ -114,8 +112,7 @@ test_verify_unsigned_plugin(void)
  * Return:      0 on success, 1 on failure
  *-------------------------------------------------------------------------
  */
-static int
-test_verify_tampered_plugin(void)
+static int test_verify_tampered_plugin(void)
 {
     herr_t ret;
 
@@ -147,80 +144,96 @@ test_verify_tampered_plugin(void)
  * Return:      0 on success, 1 on failure
  *-------------------------------------------------------------------------
  */
-static int
-create_revocation_file(const char *signed_plugin, const char *keystore_dir)
+static int create_revocation_file(const char* signed_plugin, const char* keystore_dir)
 {
-    int               fd = -1;
-    h5_stat_t         st;
-    uint8_t           footer_buf[H5PL_SIG_FOOTER_SIZE];
+    int fd = -1;
+    h5_stat_t st;
+    uint8_t footer_buf[H5PL_SIG_FOOTER_SIZE];
     H5PL_sig_footer_t footer;
-    unsigned char    *signature = NULL;
-    size_t            binary_size;
-    unsigned char     hash[EVP_MAX_MD_SIZE];
-    unsigned int      hash_len = 0;
-    EVP_MD_CTX       *mdctx    = NULL;
-    FILE             *fp       = NULL;
-    char              filepath[512];
-    unsigned int      i;
-    int               ret = 1; /* assume failure */
+    unsigned char* signature = NULL;
+    size_t binary_size;
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hash_len = 0;
+    EVP_MD_CTX* mdctx = NULL;
+    FILE* fp = NULL;
+    char filepath[512];
+    unsigned int i;
+    int ret = 1; /* assume failure */
 
     fd = HDopen(signed_plugin, O_RDONLY, 0);
-    if (fd < 0)
+    if (fd < 0) {
         goto cleanup;
-    if (HDfstat(fd, &st) < 0)
+    }
+    if (HDfstat(fd, &st) < 0) {
         goto cleanup;
+    }
 
     /* Read footer from end of file */
-    if (HDlseek(fd, (HDoff_t)(st.st_size - H5PL_SIG_FOOTER_SIZE), SEEK_SET) < 0)
+    if (HDlseek(fd, (HDoff_t)(st.st_size - H5PL_SIG_FOOTER_SIZE), SEEK_SET) < 0) {
         goto cleanup;
-    if (HDread(fd, footer_buf, H5PL_SIG_FOOTER_SIZE) != (h5_posix_io_ret_t)H5PL_SIG_FOOTER_SIZE)
+    }
+    if (HDread(fd, footer_buf, H5PL_SIG_FOOTER_SIZE) != (h5_posix_io_ret_t)H5PL_SIG_FOOTER_SIZE) {
         goto cleanup;
-    if (!H5PL_sig_decode_footer(footer_buf, sizeof(footer_buf), &footer))
+    }
+    if (!H5PL_sig_decode_footer(footer_buf, sizeof(footer_buf), &footer)) {
         goto cleanup;
+    }
 
     /* Read signature bytes */
-    signature = (unsigned char *)malloc(footer.signature_length);
-    if (!signature)
+    signature = (unsigned char*)malloc(footer.signature_length);
+    if (!signature) {
         goto cleanup;
+    }
 
     binary_size = (size_t)st.st_size - footer.signature_length - H5PL_SIG_FOOTER_SIZE;
-    if (HDlseek(fd, (HDoff_t)binary_size, SEEK_SET) < 0)
+    if (HDlseek(fd, (HDoff_t)binary_size, SEEK_SET) < 0) {
         goto cleanup;
-    if (HDread(fd, signature, footer.signature_length) != (h5_posix_io_ret_t)footer.signature_length)
+    }
+    if (HDread(fd, signature, footer.signature_length) != (h5_posix_io_ret_t)footer.signature_length) {
         goto cleanup;
+    }
 
     /* Compute SHA-256 hash of signature */
     mdctx = EVP_MD_CTX_new();
-    if (!mdctx)
+    if (!mdctx) {
         goto cleanup;
-    if (1 != EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL))
+    }
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL)) {
         goto cleanup;
-    if (1 != EVP_DigestUpdate(mdctx, signature, footer.signature_length))
+    }
+    if (1 != EVP_DigestUpdate(mdctx, signature, footer.signature_length)) {
         goto cleanup;
-    if (1 != EVP_DigestFinal_ex(mdctx, hash, &hash_len))
+    }
+    if (1 != EVP_DigestFinal_ex(mdctx, hash, &hash_len)) {
         goto cleanup;
+    }
 
     /* Write hex hash to revoked_signatures.txt */
     snprintf(filepath, sizeof(filepath), "%s/revoked_signatures.txt", keystore_dir);
     fp = fopen(filepath, "w");
-    if (!fp)
+    if (!fp) {
         goto cleanup;
+    }
 
     fprintf(fp, "# Revoked signature hash for testing\n");
-    for (i = 0; i < hash_len; i++)
+    for (i = 0; i < hash_len; i++) {
         fprintf(fp, "%02x", hash[i]);
+    }
     fprintf(fp, "\n");
 
     ret = 0; /* success */
 
 cleanup:
-    if (fp)
+    if (fp) {
         fclose(fp);
-    if (mdctx)
+    }
+    if (mdctx) {
         EVP_MD_CTX_free(mdctx);
+    }
     free(signature);
-    if (fd >= 0)
+    if (fd >= 0) {
         HDclose(fd);
+    }
     return ret;
 }
 
@@ -232,8 +245,7 @@ cleanup:
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-remove_revocation_file(const char *keystore_dir)
+static void remove_revocation_file(const char* keystore_dir)
 {
     char filepath[512];
     snprintf(filepath, sizeof(filepath), "%s/revoked_signatures.txt", keystore_dir);
@@ -252,8 +264,7 @@ remove_revocation_file(const char *keystore_dir)
  * Return:      0 on success, 1 on failure
  *-------------------------------------------------------------------------
  */
-static int
-test_verify_revoked_plugin(void)
+static int test_verify_revoked_plugin(void)
 {
     herr_t ret;
 
@@ -282,8 +293,7 @@ test_verify_revoked_plugin(void)
  * Return:      EXIT_SUCCESS or EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     printf("\n");
     printf("========================================\n");
@@ -375,10 +385,9 @@ main(void)
     }
 }
 
-#else /* H5_REQUIRE_DIGITAL_SIGNATURE */
+#else  /* H5_REQUIRE_DIGITAL_SIGNATURE */
 
-int
-main(void)
+int main(void)
 {
     printf("Digital signature support not enabled (H5_REQUIRE_DIGITAL_SIGNATURE not defined)\n");
     printf("Skipping signature verification tests\n");

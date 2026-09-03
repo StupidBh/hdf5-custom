@@ -81,15 +81,15 @@
  *
  *-------------------------------------------------------------------------
  */
-H5I_type_t
-H5Iregister_type1(size_t H5_ATTR_UNUSED hash_size, unsigned reserved, H5I_free_t free_func)
+H5I_type_t H5Iregister_type1(size_t H5_ATTR_UNUSED hash_size, unsigned reserved, H5I_free_t free_func)
 {
     H5I_type_t ret_value = H5I_BADID;
 
     FUNC_ENTER_API(H5I_BADID)
 
-    if (H5I_BADID == (ret_value = H5I__register_type_common(reserved, free_func)))
+    if (H5I_BADID == (ret_value = H5I__register_type_common(reserved, free_func))) {
         HGOTO_ERROR(H5E_ID, H5E_CANTINIT, H5I_BADID, "can't initialize ID class");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)

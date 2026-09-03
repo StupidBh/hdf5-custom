@@ -1,4 +1,3 @@
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright by The HDF Group.                                               *
  * All rights reserved.                                                      *
@@ -36,8 +35,8 @@
 
 #define LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG 0
 
-static void coll_write_test(const void *params, int chunk_factor);
-static void coll_read_test(const void *params);
+static void coll_write_test(const void* params, int chunk_factor);
+static void coll_read_test(const void* params);
 
 /*-------------------------------------------------------------------------
  * Function:    coll_irregular_cont_write
@@ -51,20 +50,19 @@ static void coll_read_test(const void *params);
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_cont_write(void *params)
+void coll_irregular_cont_write(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -86,20 +84,19 @@ coll_irregular_cont_write(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_cont_read(void *params)
+void coll_irregular_cont_read(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -121,20 +118,19 @@ coll_irregular_cont_read(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_simple_chunk_write(void *params)
+void coll_irregular_simple_chunk_write(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -156,20 +152,19 @@ coll_irregular_simple_chunk_write(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_simple_chunk_read(void *params)
+void coll_irregular_simple_chunk_read(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -191,20 +186,19 @@ coll_irregular_simple_chunk_read(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_complex_chunk_write(void *params)
+void coll_irregular_complex_chunk_write(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -226,20 +220,19 @@ coll_irregular_complex_chunk_write(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_irregular_complex_chunk_read(void *params)
+void coll_irregular_complex_chunk_read(void* params)
 {
     int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file dataset, or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file dataset, or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -262,34 +255,32 @@ coll_irregular_complex_chunk_read(void *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-coll_write_test(const void *params, int chunk_factor)
+void coll_write_test(const void* params, int chunk_factor)
 {
+    const char* filename;
+    hid_t facc_plist, dxfer_plist, dcrt_plist;
+    hid_t file, datasetc, dataseti;                 /* File and dataset identifiers */
+    hid_t mspaceid1, mspaceid, fspaceid, fspaceid1; /* Dataspace identifiers */
 
-    const char *filename;
-    hid_t       facc_plist, dxfer_plist, dcrt_plist;
-    hid_t       file, datasetc, dataseti;                 /* File and dataset identifiers */
-    hid_t       mspaceid1, mspaceid, fspaceid, fspaceid1; /* Dataspace identifiers */
+    hsize_t mdim1[1];                               /* Dimension size of the first dataset (in memory) */
+    hsize_t fsdim[2];                               /* Dimension sizes of the dataset (on disk) */
+    hsize_t mdim[2];                                /* Dimension sizes of the dataset in memory when we
+                                                     * read selection from the dataset on the disk
+                                                     */
 
-    hsize_t mdim1[1]; /* Dimension size of the first dataset (in memory) */
-    hsize_t fsdim[2]; /* Dimension sizes of the dataset (on disk) */
-    hsize_t mdim[2];  /* Dimension sizes of the dataset in memory when we
-                       * read selection from the dataset on the disk
-                       */
-
-    hsize_t start[2];  /* Start of hyperslab */
-    hsize_t stride[2]; /* Stride of hyperslab */
-    hsize_t count[2];  /* Block count */
-    hsize_t block[2];  /* Block sizes */
+    hsize_t start[2];                               /* Start of hyperslab */
+    hsize_t stride[2];                              /* Stride of hyperslab */
+    hsize_t count[2];                               /* Block count */
+    hsize_t block[2];                               /* Block sizes */
     hsize_t chunk_dims[2];
 
     herr_t ret;
-    int    i;
-    int    fillvalue = 0; /* Fill value for the dataset */
+    int i;
+    int fillvalue = 0; /* Fill value for the dataset */
 
-    int *matrix_out  = NULL;
-    int *matrix_out1 = NULL; /* Buffer to read from the dataset */
-    int *vector      = NULL;
+    int* matrix_out = NULL;
+    int* matrix_out1 = NULL; /* Buffer to read from the dataset */
+    int* vector = NULL;
 
     int mpi_size, mpi_rank;
 
@@ -301,26 +292,27 @@ coll_write_test(const void *params, int chunk_factor)
     MPI_Comm_rank(comm, &mpi_rank);
 
     /* Obtain file name */
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /*
      * Buffers' initialization.
      */
 
     mdim1[0] = (hsize_t)(MSPACE1_DIM * mpi_size);
-    mdim[0]  = MSPACE_DIM1;
-    mdim[1]  = (hsize_t)(MSPACE_DIM2 * mpi_size);
+    mdim[0] = MSPACE_DIM1;
+    mdim[1] = (hsize_t)(MSPACE_DIM2 * mpi_size);
     fsdim[0] = FSPACE_DIM1;
     fsdim[1] = (hsize_t)(FSPACE_DIM2 * mpi_size);
 
-    vector      = (int *)malloc(sizeof(int) * (size_t)mdim1[0] * (size_t)mpi_size);
-    matrix_out  = (int *)malloc(sizeof(int) * (size_t)mdim[0] * (size_t)mdim[1] * (size_t)mpi_size);
-    matrix_out1 = (int *)malloc(sizeof(int) * (size_t)mdim[0] * (size_t)mdim[1] * (size_t)mpi_size);
+    vector = (int*)malloc(sizeof(int) * (size_t)mdim1[0] * (size_t)mpi_size);
+    matrix_out = (int*)malloc(sizeof(int) * (size_t)mdim[0] * (size_t)mdim[1] * (size_t)mpi_size);
+    matrix_out1 = (int*)malloc(sizeof(int) * (size_t)mdim[0] * (size_t)mdim[1] * (size_t)mpi_size);
 
     memset(vector, 0, sizeof(int) * (size_t)mdim1[0] * (size_t)mpi_size);
     vector[0] = vector[MSPACE1_DIM * mpi_size - 1] = -1;
-    for (i = 1; i < MSPACE1_DIM * mpi_size - 1; i++)
+    for (i = 1; i < MSPACE1_DIM * mpi_size - 1; i++) {
         H5_CHECKED_ASSIGN(vector[i], int, i, unsigned);
+    }
 
     /* Grab file access property list */
     facc_plist = create_faccess_plist(comm, info, facc_type);
@@ -344,7 +336,7 @@ coll_write_test(const void *params, int chunk_factor)
     if (chunk_factor != 0) {
         chunk_dims[0] = fsdim[0] / (hsize_t)chunk_factor;
         chunk_dims[1] = fsdim[1] / (hsize_t)chunk_factor;
-        ret           = H5Pset_chunk(dcrt_plist, 2, chunk_dims);
+        ret = H5Pset_chunk(dcrt_plist, 2, chunk_dims);
         VRFY((ret >= 0), "chunk creation property list succeeded");
     }
 
@@ -363,12 +355,10 @@ coll_write_test(const void *params, int chunk_factor)
      * Create dataset in the file. Notice that creation
      * property list dcrt_plist is used.
      */
-    datasetc =
-        H5Dcreate2(file, "collect_write", H5T_NATIVE_INT, fspaceid, H5P_DEFAULT, dcrt_plist, H5P_DEFAULT);
+    datasetc = H5Dcreate2(file, "collect_write", H5T_NATIVE_INT, fspaceid, H5P_DEFAULT, dcrt_plist, H5P_DEFAULT);
     VRFY((datasetc >= 0), "dataset created succeeded");
 
-    dataseti =
-        H5Dcreate2(file, "independ_write", H5T_NATIVE_INT, fspaceid, H5P_DEFAULT, dcrt_plist, H5P_DEFAULT);
+    dataseti = H5Dcreate2(file, "independ_write", H5T_NATIVE_INT, fspaceid, H5P_DEFAULT, dcrt_plist, H5P_DEFAULT);
     VRFY((dataseti >= 0), "dataset created succeeded");
 
     /* The First selection for FILE
@@ -380,14 +370,14 @@ coll_write_test(const void *params, int chunk_factor)
      *
      */
 
-    start[0]  = FHSTART0;
-    start[1]  = (hsize_t)(FHSTART1 + mpi_rank * FHSTRIDE1 * FHCOUNT1);
+    start[0] = FHSTART0;
+    start[1] = (hsize_t)(FHSTART1 + mpi_rank * FHSTRIDE1 * FHCOUNT1);
     stride[0] = FHSTRIDE0;
     stride[1] = FHSTRIDE1;
-    count[0]  = FHCOUNT0;
-    count[1]  = FHCOUNT1;
-    block[0]  = FHBLOCK0;
-    block[1]  = FHBLOCK1;
+    count[0] = FHCOUNT0;
+    count[1] = FHCOUNT1;
+    block[0] = FHBLOCK0;
+    block[1] = FHBLOCK1;
 
     ret = H5Sselect_hyperslab(fspaceid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -401,14 +391,14 @@ coll_write_test(const void *params, int chunk_factor)
      *
      */
 
-    start[0]  = SHSTART0;
-    start[1]  = (hsize_t)(SHSTART1 + SHCOUNT1 * SHBLOCK1 * mpi_rank);
+    start[0] = SHSTART0;
+    start[1] = (hsize_t)(SHSTART1 + SHCOUNT1 * SHBLOCK1 * mpi_rank);
     stride[0] = SHSTRIDE0;
     stride[1] = SHSTRIDE1;
-    count[0]  = SHCOUNT0;
-    count[1]  = SHCOUNT1;
-    block[0]  = SHBLOCK0;
-    block[1]  = SHBLOCK1;
+    count[0] = SHCOUNT0;
+    count[1] = SHCOUNT1;
+    block[0] = SHBLOCK0;
+    block[1] = SHBLOCK1;
 
     ret = H5Sselect_hyperslab(fspaceid, H5S_SELECT_OR, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -430,10 +420,10 @@ coll_write_test(const void *params, int chunk_factor)
      * start  1
      *
      */
-    start[0]  = MHSTART0;
+    start[0] = MHSTART0;
     stride[0] = MHSTRIDE0;
-    count[0]  = MHCOUNT0;
-    block[0]  = MHBLOCK0;
+    count[0] = MHCOUNT0;
+    block[0] = MHBLOCK0;
 
     ret = H5Sselect_hyperslab(mspaceid1, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -537,14 +527,14 @@ coll_write_test(const void *params, int chunk_factor)
      *  start (1,2+768*mpi_rank/mpi_size)
      *
      */
-    start[0]  = RFFHSTART0;
-    start[1]  = (hsize_t)(RFFHSTART1 + mpi_rank * RFFHCOUNT1);
-    block[0]  = RFFHBLOCK0;
-    block[1]  = RFFHBLOCK1;
+    start[0] = RFFHSTART0;
+    start[1] = (hsize_t)(RFFHSTART1 + mpi_rank * RFFHCOUNT1);
+    block[0] = RFFHBLOCK0;
+    block[1] = RFFHBLOCK1;
     stride[0] = RFFHSTRIDE0;
     stride[1] = RFFHSTRIDE1;
-    count[0]  = RFFHCOUNT0;
-    count[1]  = RFFHCOUNT1;
+    count[0] = RFFHCOUNT0;
+    count[1] = RFFHCOUNT1;
 
     /* The first selection of the dataset generated by collective write */
     ret = H5Sselect_hyperslab(fspaceid, H5S_SELECT_SET, start, stride, count, block);
@@ -563,14 +553,14 @@ coll_write_test(const void *params, int chunk_factor)
      *
      */
 
-    start[0]  = RFSHSTART0;
-    start[1]  = (hsize_t)(RFSHSTART1 + RFSHCOUNT1 * mpi_rank);
-    block[0]  = RFSHBLOCK0;
-    block[1]  = RFSHBLOCK1;
+    start[0] = RFSHSTART0;
+    start[1] = (hsize_t)(RFSHSTART1 + RFSHCOUNT1 * mpi_rank);
+    block[0] = RFSHBLOCK0;
+    block[1] = RFSHBLOCK1;
     stride[0] = RFSHSTRIDE0;
     stride[1] = RFSHSTRIDE0;
-    count[0]  = RFSHCOUNT0;
-    count[1]  = RFSHCOUNT1;
+    count[0] = RFSHCOUNT0;
+    count[1] = RFSHCOUNT1;
 
     /* The second selection of the dataset generated by collective write */
     ret = H5Sselect_hyperslab(fspaceid, H5S_SELECT_OR, start, stride, count, block);
@@ -601,14 +591,14 @@ coll_write_test(const void *params, int chunk_factor)
      *
      */
 
-    start[0]  = RMFHSTART0;
-    start[1]  = (hsize_t)(RMFHSTART1 + mpi_rank * RMFHCOUNT1);
-    block[0]  = RMFHBLOCK0;
-    block[1]  = RMFHBLOCK1;
+    start[0] = RMFHSTART0;
+    start[1] = (hsize_t)(RMFHSTART1 + mpi_rank * RMFHCOUNT1);
+    block[0] = RMFHBLOCK0;
+    block[1] = RMFHBLOCK1;
     stride[0] = RMFHSTRIDE0;
     stride[1] = RMFHSTRIDE1;
-    count[0]  = RMFHCOUNT0;
-    count[1]  = RMFHCOUNT1;
+    count[0] = RMFHCOUNT0;
+    count[1] = RMFHCOUNT1;
 
     ret = H5Sselect_hyperslab(mspaceid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -624,14 +614,14 @@ coll_write_test(const void *params, int chunk_factor)
      *  start (1,2+1536*mpi_rank/mpi_size)
      *
      */
-    start[0]  = RMSHSTART0;
-    start[1]  = (hsize_t)(RMSHSTART1 + mpi_rank * RMSHCOUNT1);
-    block[0]  = RMSHBLOCK0;
-    block[1]  = RMSHBLOCK1;
+    start[0] = RMSHSTART0;
+    start[1] = (hsize_t)(RMSHSTART1 + mpi_rank * RMSHCOUNT1);
+    block[0] = RMSHBLOCK0;
+    block[1] = RMSHBLOCK1;
     stride[0] = RMSHSTRIDE0;
     stride[1] = RMSHSTRIDE1;
-    count[0]  = RMSHCOUNT0;
-    count[1]  = RMSHCOUNT1;
+    count[0] = RMSHCOUNT0;
+    count[1] = RMSHCOUNT1;
 
     ret = H5Sselect_hyperslab(mspaceid, H5S_SELECT_OR, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -655,10 +645,12 @@ coll_write_test(const void *params, int chunk_factor)
     ret = 0;
 
     for (i = 0; i < MSPACE_DIM1 * MSPACE_DIM2 * mpi_size; i++) {
-        if (matrix_out[i] != matrix_out1[i])
+        if (matrix_out[i] != matrix_out1[i]) {
             ret = -1;
-        if (ret < 0)
+        }
+        if (ret < 0) {
             break;
+        }
     }
 
     VRFY((ret >= 0), "H5D irregular collective write succeed");
@@ -693,12 +685,15 @@ coll_write_test(const void *params, int chunk_factor)
     ret = H5Fclose(file);
     VRFY((ret >= 0), "");
 
-    if (vector)
+    if (vector) {
         free(vector);
-    if (matrix_out)
+    }
+    if (matrix_out) {
         free(matrix_out);
-    if (matrix_out1)
+    }
+    if (matrix_out1) {
         free(matrix_out1);
+    }
 
     return;
 }
@@ -716,30 +711,28 @@ coll_write_test(const void *params, int chunk_factor)
  *
  *-------------------------------------------------------------------------
  */
-static void
-coll_read_test(const void *params)
+static void coll_read_test(const void* params)
 {
-
-    const char *filename;
-    hid_t       facc_plist, dxfer_plist;
-    hid_t       file, dataseti;      /* File and dataset identifiers */
-    hid_t       mspaceid, fspaceid1; /* Dataspace identifiers */
+    const char* filename;
+    hid_t facc_plist, dxfer_plist;
+    hid_t file, dataseti;      /* File and dataset identifiers */
+    hid_t mspaceid, fspaceid1; /* Dataspace identifiers */
 
     /* Dimension sizes of the dataset (on disk) */
-    hsize_t mdim[2]; /* Dimension sizes of the dataset in memory when we
-                      * read selection from the dataset on the disk
-                      */
+    hsize_t mdim[2];   /* Dimension sizes of the dataset in memory when we
+                        * read selection from the dataset on the disk
+                        */
 
     hsize_t start[2];  /* Start of hyperslab */
     hsize_t stride[2]; /* Stride of hyperslab */
     hsize_t count[2];  /* Block count */
     hsize_t block[2];  /* Block sizes */
-    herr_t  ret;
+    herr_t ret;
 
     int i;
 
-    int *matrix_out;
-    int *matrix_out1; /* Buffer to read from the dataset */
+    int* matrix_out;
+    int* matrix_out1; /* Buffer to read from the dataset */
 
     int mpi_size, mpi_rank;
 
@@ -751,14 +744,14 @@ coll_read_test(const void *params)
     MPI_Comm_rank(comm, &mpi_rank);
 
     /* Obtain file name */
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     /* Initialize the buffer */
 
-    mdim[0]     = MSPACE_DIM1;
-    mdim[1]     = (hsize_t)(MSPACE_DIM2 * mpi_size);
-    matrix_out  = (int *)malloc(sizeof(int) * (size_t)MSPACE_DIM1 * (size_t)MSPACE_DIM2 * (size_t)mpi_size);
-    matrix_out1 = (int *)malloc(sizeof(int) * (size_t)MSPACE_DIM1 * (size_t)MSPACE_DIM2 * (size_t)mpi_size);
+    mdim[0] = MSPACE_DIM1;
+    mdim[1] = (hsize_t)(MSPACE_DIM2 * mpi_size);
+    matrix_out = (int*)malloc(sizeof(int) * (size_t)MSPACE_DIM1 * (size_t)MSPACE_DIM2 * (size_t)mpi_size);
+    matrix_out1 = (int*)malloc(sizeof(int) * (size_t)MSPACE_DIM1 * (size_t)MSPACE_DIM2 * (size_t)mpi_size);
 
     /*** For testing collective hyperslab selection read ***/
 
@@ -792,14 +785,14 @@ coll_read_test(const void *params)
      *  start (1,2+768*mpi_rank/mpi_size)
      *
      */
-    start[0]  = RFFHSTART0;
-    start[1]  = (hsize_t)(RFFHSTART1 + mpi_rank * RFFHCOUNT1);
-    block[0]  = RFFHBLOCK0;
-    block[1]  = RFFHBLOCK1;
+    start[0] = RFFHSTART0;
+    start[1] = (hsize_t)(RFFHSTART1 + mpi_rank * RFFHCOUNT1);
+    block[0] = RFFHBLOCK0;
+    block[1] = RFFHBLOCK1;
     stride[0] = RFFHSTRIDE0;
     stride[1] = RFFHSTRIDE1;
-    count[0]  = RFFHCOUNT0;
-    count[1]  = RFFHCOUNT1;
+    count[0] = RFFHCOUNT0;
+    count[1] = RFFHCOUNT1;
 
     ret = H5Sselect_hyperslab(fspaceid1, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -812,14 +805,14 @@ coll_read_test(const void *params)
      *  start (2,4+1536*mpi_rank/mpi_size)
      *
      */
-    start[0]  = RFSHSTART0;
-    start[1]  = (hsize_t)(RFSHSTART1 + RFSHCOUNT1 * mpi_rank);
-    block[0]  = RFSHBLOCK0;
-    block[1]  = RFSHBLOCK1;
+    start[0] = RFSHSTART0;
+    start[1] = (hsize_t)(RFSHSTART1 + RFSHCOUNT1 * mpi_rank);
+    block[0] = RFSHBLOCK0;
+    block[1] = RFSHBLOCK1;
     stride[0] = RFSHSTRIDE0;
     stride[1] = RFSHSTRIDE0;
-    count[0]  = RFSHCOUNT0;
-    count[1]  = RFSHCOUNT1;
+    count[0] = RFSHCOUNT0;
+    count[1] = RFSHCOUNT1;
 
     ret = H5Sselect_hyperslab(fspaceid1, H5S_SELECT_OR, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
@@ -841,15 +834,15 @@ coll_read_test(const void *params)
      *
      */
 
-    start[0]  = RMFHSTART0;
-    start[1]  = (hsize_t)(RMFHSTART1 + mpi_rank * RMFHCOUNT1);
-    block[0]  = RMFHBLOCK0;
-    block[1]  = RMFHBLOCK1;
+    start[0] = RMFHSTART0;
+    start[1] = (hsize_t)(RMFHSTART1 + mpi_rank * RMFHCOUNT1);
+    block[0] = RMFHBLOCK0;
+    block[1] = RMFHBLOCK1;
     stride[0] = RMFHSTRIDE0;
     stride[1] = RMFHSTRIDE1;
-    count[0]  = RMFHCOUNT0;
-    count[1]  = RMFHCOUNT1;
-    ret       = H5Sselect_hyperslab(mspaceid, H5S_SELECT_SET, start, stride, count, block);
+    count[0] = RMFHCOUNT0;
+    count[1] = RMFHCOUNT1;
+    ret = H5Sselect_hyperslab(mspaceid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
 
     /*
@@ -863,15 +856,15 @@ coll_read_test(const void *params)
      *  start (1,2+1536*mpi_rank/mpi_size)
      *
      */
-    start[0]  = RMSHSTART0;
-    start[1]  = (hsize_t)(RMSHSTART1 + mpi_rank * RMSHCOUNT1);
-    block[0]  = RMSHBLOCK0;
-    block[1]  = RMSHBLOCK1;
+    start[0] = RMSHSTART0;
+    start[1] = (hsize_t)(RMSHSTART1 + mpi_rank * RMSHCOUNT1);
+    block[0] = RMSHBLOCK0;
+    block[1] = RMSHBLOCK1;
     stride[0] = RMSHSTRIDE0;
     stride[1] = RMSHSTRIDE1;
-    count[0]  = RMSHCOUNT0;
-    count[1]  = RMSHCOUNT1;
-    ret       = H5Sselect_hyperslab(mspaceid, H5S_SELECT_OR, start, stride, count, block);
+    count[0] = RMSHCOUNT0;
+    count[1] = RMSHCOUNT1;
+    ret = H5Sselect_hyperslab(mspaceid, H5S_SELECT_OR, start, stride, count, block);
     VRFY((ret >= 0), "hyperslab selection succeeded");
 
     /*
@@ -908,10 +901,12 @@ coll_read_test(const void *params)
 
     ret = 0;
     for (i = 0; i < MSPACE_DIM1 * MSPACE_DIM2 * mpi_size; i++) {
-        if (matrix_out[i] != matrix_out1[i])
+        if (matrix_out[i] != matrix_out1[i]) {
             ret = -1;
-        if (ret < 0)
+        }
+        if (ret < 0) {
             break;
+        }
     }
     VRFY((ret >= 0), "H5D contiguous irregular collective read succeed");
 
@@ -977,23 +972,26 @@ coll_read_test(const void *params)
 
 #define LDSCT_DS_RANK 5
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
-#define LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK 0
+    #define LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK 0
 #endif
 
 #define LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG 0
 
-static void
-lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t tgt_sid, const int tgt_rank,
-                                               const hsize_t dims[LDSCT_DS_RANK], const int checker_edge_size,
-                                               const int sel_rank, hsize_t sel_start[])
+static void lower_dim_size_comp_test__select_checker_board(const int mpi_rank,
+                                                           const hid_t tgt_sid,
+                                                           const int tgt_rank,
+                                                           const hsize_t dims[LDSCT_DS_RANK],
+                                                           const int checker_edge_size,
+                                                           const int sel_rank,
+                                                           hsize_t sel_start[])
 {
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
-    const char *fcnName = "lower_dim_size_comp_test__select_checker_board():";
+    const char* fcnName = "lower_dim_size_comp_test__select_checker_board():";
 #endif
-    bool      first_selection = true;
-    int       i, j, k, l, m;
-    int       ds_offset;
-    int       sel_offset;
+    bool first_selection = true;
+    int i, j, k, l, m;
+    int ds_offset;
+    int sel_offset;
     const int test_max_rank = LDSCT_DS_RANK; /* must update code if */
                                              /* this changes        */
     hsize_t base_count;
@@ -1002,12 +1000,20 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
     hsize_t stride[LDSCT_DS_RANK];
     hsize_t count[LDSCT_DS_RANK];
     hsize_t block[LDSCT_DS_RANK];
-    herr_t  ret; /* Generic return value */
+    herr_t ret; /* Generic return value */
 
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s:%d: dims/checker_edge_size = %d %d %d %d %d / %d\n", fcnName, mpi_rank,
-                (int)dims[0], (int)dims[1], (int)dims[2], (int)dims[3], (int)dims[4], checker_edge_size);
+        fprintf(stdout,
+                "%s:%d: dims/checker_edge_size = %d %d %d %d %d / %d\n",
+                fcnName,
+                mpi_rank,
+                (int)dims[0],
+                (int)dims[1],
+                (int)dims[2],
+                (int)dims[3],
+                (int)dims[4],
+                checker_edge_size);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG */
 
@@ -1050,22 +1056,18 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
     base_count = dims[sel_offset] / (hsize_t)(checker_edge_size * 2);
 
     if ((dims[sel_rank] % (hsize_t)(checker_edge_size * 2)) > 0) {
-
         base_count++;
     }
 
-    offset_count =
-        (hsize_t)((dims[sel_offset] - (hsize_t)checker_edge_size) / ((hsize_t)(checker_edge_size * 2)));
+    offset_count = (hsize_t)((dims[sel_offset] - (hsize_t)checker_edge_size) / ((hsize_t)(checker_edge_size * 2)));
 
     if (((dims[sel_rank] - (hsize_t)checker_edge_size) % ((hsize_t)(checker_edge_size * 2))) > 0) {
-
         offset_count++;
     }
 
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s:%d: base_count/offset_count = %d/%d.\n", fcnName, mpi_rank, base_count,
-                offset_count);
+        fprintf(stdout, "%s:%d: base_count/offset_count = %d/%d.\n", fcnName, mpi_rank, base_count, offset_count);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG */
 
@@ -1075,30 +1077,27 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
      */
     i = 0;
     while (i < ds_offset) {
-
         /* these values should never be used */
-        start[i]  = 0;
+        start[i] = 0;
         stride[i] = 0;
-        count[i]  = 0;
-        block[i]  = 0;
+        count[i] = 0;
+        block[i] = 0;
 
         i++;
     }
 
     while (i < sel_offset) {
-
-        start[i]  = sel_start[i];
+        start[i] = sel_start[i];
         stride[i] = 2 * dims[i];
-        count[i]  = 1;
-        block[i]  = 1;
+        count[i] = 1;
+        block[i] = 1;
 
         i++;
     }
 
     while (i < test_max_rank) {
-
         stride[i] = (hsize_t)(2 * checker_edge_size);
-        block[i]  = (hsize_t)checker_edge_size;
+        block[i] = (hsize_t)checker_edge_size;
 
         i++;
     }
@@ -1106,14 +1105,11 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
     i = 0;
     do {
         if (0 >= sel_offset) {
-
             if (i == 0) {
-
                 start[0] = 0;
                 count[0] = base_count;
             }
             else {
-
                 start[0] = (hsize_t)checker_edge_size;
                 count[0] = offset_count;
             }
@@ -1122,14 +1118,11 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
         j = 0;
         do {
             if (1 >= sel_offset) {
-
                 if (j == 0) {
-
                     start[1] = 0;
                     count[1] = base_count;
                 }
                 else {
-
                     start[1] = (hsize_t)checker_edge_size;
                     count[1] = offset_count;
                 }
@@ -1138,14 +1131,11 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
             k = 0;
             do {
                 if (2 >= sel_offset) {
-
                     if (k == 0) {
-
                         start[2] = 0;
                         count[2] = base_count;
                     }
                     else {
-
                         start[2] = (hsize_t)checker_edge_size;
                         count[2] = offset_count;
                     }
@@ -1154,14 +1144,11 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
                 l = 0;
                 do {
                     if (3 >= sel_offset) {
-
                         if (l == 0) {
-
                             start[3] = 0;
                             count[3] = base_count;
                         }
                         else {
-
                             start[3] = (hsize_t)checker_edge_size;
                             count[3] = offset_count;
                         }
@@ -1170,61 +1157,77 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
                     m = 0;
                     do {
                         if (4 >= sel_offset) {
-
                             if (m == 0) {
-
                                 start[4] = 0;
                                 count[4] = base_count;
                             }
                             else {
-
                                 start[4] = (hsize_t)checker_edge_size;
                                 count[4] = offset_count;
                             }
                         }
 
                         if (((i + j + k + l + m) % 2) == 0) {
-
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
                             if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-
-                                fprintf(stdout, "%s%d: *** first_selection = %d ***\n", fcnName, mpi_rank,
-                                        (int)first_selection);
-                                fprintf(stdout, "%s:%d: i/j/k/l/m = %d/%d/%d/%d/%d\n", fcnName, mpi_rank, i,
-                                        j, k, l, m);
-                                fprintf(stdout, "%s:%d: start = %d %d %d %d %d.\n", fcnName, mpi_rank,
-                                        (int)start[0], (int)start[1], (int)start[2], (int)start[3],
+                                fprintf(stdout, "%s%d: *** first_selection = %d ***\n", fcnName, mpi_rank, (int)first_selection);
+                                fprintf(stdout, "%s:%d: i/j/k/l/m = %d/%d/%d/%d/%d\n", fcnName, mpi_rank, i, j, k, l, m);
+                                fprintf(stdout,
+                                        "%s:%d: start = %d %d %d %d %d.\n",
+                                        fcnName,
+                                        mpi_rank,
+                                        (int)start[0],
+                                        (int)start[1],
+                                        (int)start[2],
+                                        (int)start[3],
                                         (int)start[4]);
-                                fprintf(stdout, "%s:%d: stride = %d %d %d %d %d.\n", fcnName, mpi_rank,
-                                        (int)stride[0], (int)stride[1], (int)stride[2], (int)stride[3],
+                                fprintf(stdout,
+                                        "%s:%d: stride = %d %d %d %d %d.\n",
+                                        fcnName,
+                                        mpi_rank,
+                                        (int)stride[0],
+                                        (int)stride[1],
+                                        (int)stride[2],
+                                        (int)stride[3],
                                         (int)stride[4]);
-                                fprintf(stdout, "%s:%d: count = %d %d %d %d %d.\n", fcnName, mpi_rank,
-                                        (int)count[0], (int)count[1], (int)count[2], (int)count[3],
+                                fprintf(stdout,
+                                        "%s:%d: count = %d %d %d %d %d.\n",
+                                        fcnName,
+                                        mpi_rank,
+                                        (int)count[0],
+                                        (int)count[1],
+                                        (int)count[2],
+                                        (int)count[3],
                                         (int)count[4]);
-                                fprintf(stdout, "%s:%d: block = %d %d %d %d %d.\n", fcnName, mpi_rank,
-                                        (int)block[0], (int)block[1], (int)block[2], (int)block[3],
+                                fprintf(stdout,
+                                        "%s:%d: block = %d %d %d %d %d.\n",
+                                        fcnName,
+                                        mpi_rank,
+                                        (int)block[0],
+                                        (int)block[1],
+                                        (int)block[2],
+                                        (int)block[3],
                                         (int)block[4]);
-                                fprintf(stdout, "%s:%d: n-cube extent dims = %d.\n", fcnName, mpi_rank,
-                                        H5Sget_simple_extent_ndims(tgt_sid));
+                                fprintf(stdout, "%s:%d: n-cube extent dims = %d.\n", fcnName, mpi_rank, H5Sget_simple_extent_ndims(tgt_sid));
                                 fprintf(stdout, "%s:%d: selection rank = %d.\n", fcnName, mpi_rank, sel_rank);
                             }
 #endif
 
                             if (first_selection) {
-
                                 first_selection = false;
 
-                                ret = H5Sselect_hyperslab(tgt_sid, H5S_SELECT_SET, &(start[ds_offset]),
-                                                          &(stride[ds_offset]), &(count[ds_offset]),
+                                ret = H5Sselect_hyperslab(tgt_sid,
+                                                          H5S_SELECT_SET,
+                                                          &(start[ds_offset]),
+                                                          &(stride[ds_offset]),
+                                                          &(count[ds_offset]),
                                                           &(block[ds_offset]));
 
                                 VRFY((ret != FAIL), "H5Sselect_hyperslab(SET) succeeded");
                             }
                             else {
-
-                                ret = H5Sselect_hyperslab(tgt_sid, H5S_SELECT_OR, &(start[ds_offset]),
-                                                          &(stride[ds_offset]), &(count[ds_offset]),
-                                                          &(block[ds_offset]));
+                                ret =
+                                    H5Sselect_hyperslab(tgt_sid, H5S_SELECT_OR, &(start[ds_offset]), &(stride[ds_offset]), &(count[ds_offset]), &(block[ds_offset]));
 
                                 VRFY((ret != FAIL), "H5Sselect_hyperslab(OR) succeeded");
                             }
@@ -1252,19 +1255,17 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
 
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s%d: H5Sget_select_npoints(tgt_sid) = %d.\n", fcnName, mpi_rank,
-                (int)H5Sget_select_npoints(tgt_sid));
+        fprintf(stdout, "%s%d: H5Sget_select_npoints(tgt_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(tgt_sid));
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG */
 
     /* Clip the selection back to the dataspace proper. */
 
     for (i = 0; i < test_max_rank; i++) {
-
-        start[i]  = 0;
+        start[i] = 0;
         stride[i] = dims[i];
-        count[i]  = 1;
-        block[i]  = dims[i];
+        count[i] = 1;
+        block[i] = dims[i];
     }
 
     ret = H5Sselect_hyperslab(tgt_sid, H5S_SELECT_AND, start, stride, count, block);
@@ -1273,8 +1274,7 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
 
 #if LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s%d: H5Sget_select_npoints(tgt_sid) = %d.\n", fcnName, mpi_rank,
-                (int)H5Sget_select_npoints(tgt_sid));
+        fprintf(stdout, "%s%d: H5Sget_select_npoints(tgt_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(tgt_sid));
         fprintf(stdout, "%s%d: done.\n", fcnName, mpi_rank);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__SELECT_CHECKER_BOARD__DEBUG */
@@ -1341,24 +1341,26 @@ lower_dim_size_comp_test__select_checker_board(const int mpi_rank, const hid_t t
 
 #define LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG 0
 
-static bool
-lower_dim_size_comp_test__verify_data(uint32_t *buf_ptr,
+static bool lower_dim_size_comp_test__verify_data(uint32_t* buf_ptr,
 #if LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG
-                                      const int mpi_rank,
+                                                  const int mpi_rank,
 #endif /* LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG */
-                                      const int rank, const int edge_size, const int checker_edge_size,
-                                      uint32_t first_expected_val, bool buf_starts_in_checker)
+                                                  const int rank,
+                                                  const int edge_size,
+                                                  const int checker_edge_size,
+                                                  uint32_t first_expected_val,
+                                                  bool buf_starts_in_checker)
 {
 #if LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG
-    const char *fcnName = "lower_dim_size_comp_test__verify_data():";
+    const char* fcnName = "lower_dim_size_comp_test__verify_data():";
 #endif
-    bool      good_data = true;
-    bool      in_checker;
-    bool      start_in_checker[5];
-    uint32_t  expected_value;
-    uint32_t *val_ptr;
-    int       i, j, k, l, m;     /* to track position in n-cube */
-    int       v, w, x, y, z;     /* to track position in checker */
+    bool good_data = true;
+    bool in_checker;
+    bool start_in_checker[5];
+    uint32_t expected_value;
+    uint32_t* val_ptr;
+    int i, j, k, l, m;           /* to track position in n-cube */
+    int v, w, x, y, z;           /* to track position in checker */
     const int test_max_rank = 5; /* code changes needed if this is increased */
 
     assert(buf_ptr != NULL);
@@ -1380,47 +1382,43 @@ lower_dim_size_comp_test__verify_data(uint32_t *buf_ptr,
     }
 #endif
 
-    val_ptr        = buf_ptr;
+    val_ptr = buf_ptr;
     expected_value = first_expected_val;
 
-    i                   = 0;
-    v                   = 0;
+    i = 0;
+    v = 0;
     start_in_checker[0] = buf_starts_in_checker;
     do {
         if (v >= checker_edge_size) {
-
             start_in_checker[0] = !start_in_checker[0];
-            v                   = 0;
+            v = 0;
         }
 
-        j                   = 0;
-        w                   = 0;
+        j = 0;
+        w = 0;
         start_in_checker[1] = start_in_checker[0];
         do {
             if (w >= checker_edge_size) {
-
                 start_in_checker[1] = !start_in_checker[1];
-                w                   = 0;
+                w = 0;
             }
 
-            k                   = 0;
-            x                   = 0;
+            k = 0;
+            x = 0;
             start_in_checker[2] = start_in_checker[1];
             do {
                 if (x >= checker_edge_size) {
-
                     start_in_checker[2] = !start_in_checker[2];
-                    x                   = 0;
+                    x = 0;
                 }
 
-                l                   = 0;
-                y                   = 0;
+                l = 0;
+                y = 0;
                 start_in_checker[3] = start_in_checker[2];
                 do {
                     if (y >= checker_edge_size) {
-
                         start_in_checker[3] = !start_in_checker[3];
-                        y                   = 0;
+                        y = 0;
                     }
 
                     m = 0;
@@ -1438,15 +1436,12 @@ lower_dim_size_comp_test__verify_data(uint32_t *buf_ptr,
                         }
 #endif
                         if (z >= checker_edge_size) {
-
                             in_checker = !in_checker;
-                            z          = 0;
+                            z = 0;
                         }
 
                         if (in_checker) {
-
                             if (*val_ptr != expected_value) {
-
                                 good_data = false;
                             }
 
@@ -1454,7 +1449,6 @@ lower_dim_size_comp_test__verify_data(uint32_t *buf_ptr,
                             *val_ptr = 0;
                         }
                         else if (*val_ptr != 0) {
-
                             good_data = false;
 
                             /* zero out buffer for reuse */
@@ -1503,67 +1497,65 @@ lower_dim_size_comp_test__verify_data(uint32_t *buf_ptr,
 
 #define LDSCT_DS_RANK 5
 
-static void
-lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size,
-                                   const bool use_collective_io, const hid_t dset_type)
+static void lower_dim_size_comp_test__run_test(const void* params, const int chunk_edge_size, const bool use_collective_io, const hid_t dset_type)
 {
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
-    const char *fcnName = "lower_dim_size_comp_test__run_test()";
-    int         rank;
-    hsize_t     dims[32];
-    hsize_t     max_dims[32];
+    const char* fcnName = "lower_dim_size_comp_test__run_test()";
+    int rank;
+    hsize_t dims[32];
+    hsize_t max_dims[32];
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
-    const char *filename;
-    bool        data_ok   = false;
-    bool        mis_match = false;
-    int         i;
-    int         start_index;
-    int         stop_index;
-    int         mrc;
-    int         mpi_rank;
-    int         mpi_size;
-    MPI_Comm    mpi_comm = MPI_COMM_NULL;
-    MPI_Info    mpi_info = MPI_INFO_NULL;
-    hid_t       fid;     /* HDF5 file ID */
-    hid_t       acc_tpl; /* File access templates */
-    hid_t       xfer_plist = H5P_DEFAULT;
-    size_t      small_ds_size;
-    size_t      small_ds_slice_size;
-    size_t      large_ds_size;
+    const char* filename;
+    bool data_ok = false;
+    bool mis_match = false;
+    int i;
+    int start_index;
+    int stop_index;
+    int mrc;
+    int mpi_rank;
+    int mpi_size;
+    MPI_Comm mpi_comm = MPI_COMM_NULL;
+    MPI_Info mpi_info = MPI_INFO_NULL;
+    hid_t fid;     /* HDF5 file ID */
+    hid_t acc_tpl; /* File access templates */
+    hid_t xfer_plist = H5P_DEFAULT;
+    size_t small_ds_size;
+    size_t small_ds_slice_size;
+    size_t large_ds_size;
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     size_t large_ds_slice_size;
 #endif
-    uint32_t  expected_value;
-    uint32_t *small_ds_buf_0 = NULL;
-    uint32_t *small_ds_buf_1 = NULL;
-    uint32_t *large_ds_buf_0 = NULL;
-    uint32_t *large_ds_buf_1 = NULL;
-    uint32_t *ptr_0;
-    uint32_t *ptr_1;
-    hsize_t   small_chunk_dims[LDSCT_DS_RANK];
-    hsize_t   large_chunk_dims[LDSCT_DS_RANK];
-    hsize_t   small_dims[LDSCT_DS_RANK];
-    hsize_t   large_dims[LDSCT_DS_RANK];
-    hsize_t   start[LDSCT_DS_RANK];
-    hsize_t   stride[LDSCT_DS_RANK];
-    hsize_t   count[LDSCT_DS_RANK];
-    hsize_t   block[LDSCT_DS_RANK];
-    hsize_t   small_sel_start[LDSCT_DS_RANK];
-    hsize_t   large_sel_start[LDSCT_DS_RANK];
-    hid_t     full_mem_small_ds_sid;
-    hid_t     full_file_small_ds_sid;
-    hid_t     mem_small_ds_sid;
-    hid_t     file_small_ds_sid;
-    hid_t     full_mem_large_ds_sid;
-    hid_t     full_file_large_ds_sid;
-    hid_t     mem_large_ds_sid;
-    hid_t     file_large_ds_sid;
-    hid_t     small_ds_dcpl_id = H5P_DEFAULT;
-    hid_t     large_ds_dcpl_id = H5P_DEFAULT;
-    hid_t     small_dataset; /* Dataset ID                   */
-    hid_t     large_dataset; /* Dataset ID                   */
-    htri_t    check;         /* Shape comparison return value */
-    herr_t    ret;           /* Generic return value */
+    uint32_t expected_value;
+    uint32_t* small_ds_buf_0 = NULL;
+    uint32_t* small_ds_buf_1 = NULL;
+    uint32_t* large_ds_buf_0 = NULL;
+    uint32_t* large_ds_buf_1 = NULL;
+    uint32_t* ptr_0;
+    uint32_t* ptr_1;
+    hsize_t small_chunk_dims[LDSCT_DS_RANK];
+    hsize_t large_chunk_dims[LDSCT_DS_RANK];
+    hsize_t small_dims[LDSCT_DS_RANK];
+    hsize_t large_dims[LDSCT_DS_RANK];
+    hsize_t start[LDSCT_DS_RANK];
+    hsize_t stride[LDSCT_DS_RANK];
+    hsize_t count[LDSCT_DS_RANK];
+    hsize_t block[LDSCT_DS_RANK];
+    hsize_t small_sel_start[LDSCT_DS_RANK];
+    hsize_t large_sel_start[LDSCT_DS_RANK];
+    hid_t full_mem_small_ds_sid;
+    hid_t full_file_small_ds_sid;
+    hid_t mem_small_ds_sid;
+    hid_t file_small_ds_sid;
+    hid_t full_mem_large_ds_sid;
+    hid_t full_file_large_ds_sid;
+    hid_t mem_large_ds_sid;
+    hid_t file_large_ds_sid;
+    hid_t small_ds_dcpl_id = H5P_DEFAULT;
+    hid_t large_ds_dcpl_id = H5P_DEFAULT;
+    hid_t small_dataset; /* Dataset ID                   */
+    hid_t large_dataset; /* Dataset ID                   */
+    htri_t check;        /* Shape comparison return value */
+    herr_t ret;          /* Generic return value */
 
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
@@ -1580,32 +1572,30 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
-    small_ds_size       = (size_t)((mpi_size + 1) * 1 * 1 * 10 * 10);
+    small_ds_size = (size_t)((mpi_size + 1) * 1 * 1 * 10 * 10);
     small_ds_slice_size = (size_t)(1 * 1 * 10 * 10);
-    large_ds_size       = (size_t)((mpi_size + 1) * 10 * 10 * 10 * 10);
+    large_ds_size = (size_t)((mpi_size + 1) * 10 * 10 * 10 * 10);
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     large_ds_slice_size = (size_t)(10 * 10 * 10 * 10);
 
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s:%d: small ds size / slice size = %d / %d.\n", fcnName, mpi_rank,
-                (int)small_ds_size, (int)small_ds_slice_size);
-        fprintf(stdout, "%s:%d: large ds size / slice size = %d / %d.\n", fcnName, mpi_rank,
-                (int)large_ds_size, (int)large_ds_slice_size);
+        fprintf(stdout, "%s:%d: small ds size / slice size = %d / %d.\n", fcnName, mpi_rank, (int)small_ds_size, (int)small_ds_slice_size);
+        fprintf(stdout, "%s:%d: large ds size / slice size = %d / %d.\n", fcnName, mpi_rank, (int)large_ds_size, (int)large_ds_slice_size);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
     /* Allocate buffers */
-    small_ds_buf_0 = (uint32_t *)malloc(sizeof(uint32_t) * small_ds_size);
+    small_ds_buf_0 = (uint32_t*)malloc(sizeof(uint32_t) * small_ds_size);
     VRFY((small_ds_buf_0 != NULL), "malloc of small_ds_buf_0 succeeded");
 
-    small_ds_buf_1 = (uint32_t *)malloc(sizeof(uint32_t) * small_ds_size);
+    small_ds_buf_1 = (uint32_t*)malloc(sizeof(uint32_t) * small_ds_size);
     VRFY((small_ds_buf_1 != NULL), "malloc of small_ds_buf_1 succeeded");
 
-    large_ds_buf_0 = (uint32_t *)malloc(sizeof(uint32_t) * large_ds_size);
+    large_ds_buf_0 = (uint32_t*)malloc(sizeof(uint32_t) * large_ds_size);
     VRFY((large_ds_buf_0 != NULL), "malloc of large_ds_buf_0 succeeded");
 
-    large_ds_buf_1 = (uint32_t *)malloc(sizeof(uint32_t) * large_ds_size);
+    large_ds_buf_1 = (uint32_t*)malloc(sizeof(uint32_t) * large_ds_size);
     VRFY((large_ds_buf_1 != NULL), "malloc of large_ds_buf_1 succeeded");
 
     /* initialize the buffers */
@@ -1614,7 +1604,6 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 = small_ds_buf_1;
 
     for (i = 0; i < (int)small_ds_size; i++) {
-
         *ptr_0 = (uint32_t)i;
         *ptr_1 = 0;
 
@@ -1626,7 +1615,6 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 = large_ds_buf_1;
 
     for (i = 0; i < (int)large_ds_size; i++) {
-
         *ptr_0 = (uint32_t)i;
         *ptr_1 = 0;
 
@@ -1636,7 +1624,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
     /* get the file name */
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
     assert(filename != NULL);
 
     /* ----------------------------------------
@@ -1671,10 +1659,24 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s:%d: small_dims[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)small_dims[0],
-                (int)small_dims[1], (int)small_dims[2], (int)small_dims[3], (int)small_dims[4]);
-        fprintf(stdout, "%s:%d: large_dims[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)large_dims[0],
-                (int)large_dims[1], (int)large_dims[2], (int)large_dims[3], (int)large_dims[4]);
+        fprintf(stdout,
+                "%s:%d: small_dims[] = %d %d %d %d %d\n",
+                fcnName,
+                mpi_rank,
+                (int)small_dims[0],
+                (int)small_dims[1],
+                (int)small_dims[2],
+                (int)small_dims[3],
+                (int)small_dims[4]);
+        fprintf(stdout,
+                "%s:%d: large_dims[] = %d %d %d %d %d\n",
+                fcnName,
+                mpi_rank,
+                (int)large_dims[0],
+                (int)large_dims[1],
+                (int)large_dims[2],
+                (int)large_dims[3],
+                (int)large_dims[4]);
     }
 #endif
 
@@ -1723,16 +1725,21 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
      * datasets.
      */
     if (chunk_edge_size > 0) {
-
         small_chunk_dims[0] = (hsize_t)(1);
         small_chunk_dims[1] = small_chunk_dims[2] = (hsize_t)1;
         small_chunk_dims[3] = small_chunk_dims[4] = (hsize_t)chunk_edge_size;
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
         if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-            fprintf(stdout, "%s:%d: small chunk dims[] = %d %d %d %d %d\n", fcnName, mpi_rank,
-                    (int)small_chunk_dims[0], (int)small_chunk_dims[1], (int)small_chunk_dims[2],
-                    (int)small_chunk_dims[3], (int)small_chunk_dims[4]);
+            fprintf(stdout,
+                    "%s:%d: small chunk dims[] = %d %d %d %d %d\n",
+                    fcnName,
+                    mpi_rank,
+                    (int)small_chunk_dims[0],
+                    (int)small_chunk_dims[1],
+                    (int)small_chunk_dims[2],
+                    (int)small_chunk_dims[3],
+                    (int)small_chunk_dims[4]);
         }
 #endif
 
@@ -1746,14 +1753,19 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
         VRFY((ret != FAIL), "H5Pset_chunk() small_ds_dcpl_id succeeded");
 
         large_chunk_dims[0] = (hsize_t)(1);
-        large_chunk_dims[1] = large_chunk_dims[2] = large_chunk_dims[3] = large_chunk_dims[4] =
-            (hsize_t)chunk_edge_size;
+        large_chunk_dims[1] = large_chunk_dims[2] = large_chunk_dims[3] = large_chunk_dims[4] = (hsize_t)chunk_edge_size;
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
         if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-            fprintf(stdout, "%s:%d: large chunk dims[] = %d %d %d %d %d\n", fcnName, mpi_rank,
-                    (int)large_chunk_dims[0], (int)large_chunk_dims[1], (int)large_chunk_dims[2],
-                    (int)large_chunk_dims[3], (int)large_chunk_dims[4]);
+            fprintf(stdout,
+                    "%s:%d: large chunk dims[] = %d %d %d %d %d\n",
+                    fcnName,
+                    mpi_rank,
+                    (int)large_chunk_dims[0],
+                    (int)large_chunk_dims[1],
+                    (int)large_chunk_dims[2],
+                    (int)large_chunk_dims[3],
+                    (int)large_chunk_dims[4]);
         }
 #endif
 
@@ -1768,19 +1780,16 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     }
 
     /* create the small dataset */
-    small_dataset = H5Dcreate2(fid, "small_dataset", dset_type, file_small_ds_sid, H5P_DEFAULT,
-                               small_ds_dcpl_id, H5P_DEFAULT);
+    small_dataset = H5Dcreate2(fid, "small_dataset", dset_type, file_small_ds_sid, H5P_DEFAULT, small_ds_dcpl_id, H5P_DEFAULT);
     VRFY((ret >= 0), "H5Dcreate2() small_dataset succeeded");
 
     /* create the large dataset */
-    large_dataset = H5Dcreate2(fid, "large_dataset", dset_type, file_large_ds_sid, H5P_DEFAULT,
-                               large_ds_dcpl_id, H5P_DEFAULT);
+    large_dataset = H5Dcreate2(fid, "large_dataset", dset_type, file_large_ds_sid, H5P_DEFAULT, large_ds_dcpl_id, H5P_DEFAULT);
     VRFY((ret >= 0), "H5Dcreate2() large_dataset succeeded");
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s:%d: small/large ds id = %d / %d.\n", fcnName, mpi_rank, (int)small_dataset,
-                (int)large_dataset);
+        fprintf(stdout, "%s:%d: small/large ds id = %d / %d.\n", fcnName, mpi_rank, (int)small_dataset, (int)large_dataset);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1792,7 +1801,6 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     VRFY((ret >= 0), "H5Pset_dxpl_mpio succeeded");
 
     if (!use_collective_io) {
-
         ret = H5Pset_dxpl_mpio_collective_opt(xfer_plist, H5FD_MPIO_INDIVIDUAL_IO);
         VRFY((ret >= 0), "H5Pset_dxpl_mpio_collective_opt() succeeded");
     }
@@ -1813,14 +1821,10 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
         fprintf(stdout, "%s:%d: settings for small data set initialization.\n", fcnName, mpi_rank);
-        fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1],
-                (int)start[2], (int)start[3], (int)start[4]);
-        fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0],
-                (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
-        fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1],
-                (int)count[2], (int)count[3], (int)count[4]);
-        fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1],
-                (int)block[2], (int)block[3], (int)block[4]);
+        fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
+        fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0], (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
+        fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
+        fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1838,14 +1842,10 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
         if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
             fprintf(stdout, "%s:%d: added settings for main process.\n", fcnName, mpi_rank);
-            fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0],
-                    (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
-            fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0],
-                    (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
-            fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0],
-                    (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
-            fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0],
-                    (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
+            fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
+            fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0], (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
+            fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
+            fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
         }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1879,8 +1879,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
      * expected data.  Note that each process reads in the entire
      * data set and verifies it.
      */
-    ret = H5Dread(small_dataset, H5T_NATIVE_UINT32, full_mem_small_ds_sid, full_file_small_ds_sid, xfer_plist,
-                  small_ds_buf_1);
+    ret = H5Dread(small_dataset, H5T_NATIVE_UINT32, full_mem_small_ds_sid, full_file_small_ds_sid, xfer_plist, small_ds_buf_1);
     VRFY((ret >= 0), "H5Dread() small_dataset initial read succeeded");
 
     /* sync with the other processes before checking data */
@@ -1891,14 +1890,12 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
      * and reset the buffer to zero in passing.
      */
     expected_value = 0;
-    mis_match      = false;
-    ptr_1          = small_ds_buf_1;
+    mis_match = false;
+    ptr_1 = small_ds_buf_1;
 
     i = 0;
     for (i = 0; i < (int)small_ds_size; i++) {
-
         if (*ptr_1 != expected_value) {
-
             mis_match = true;
         }
 
@@ -1924,14 +1921,10 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
         fprintf(stdout, "%s:%d: settings for large data set initialization.\n", fcnName, mpi_rank);
-        fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1],
-                (int)start[2], (int)start[3], (int)start[4]);
-        fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0],
-                (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
-        fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1],
-                (int)count[2], (int)count[3], (int)count[4]);
-        fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1],
-                (int)block[2], (int)block[3], (int)block[4]);
+        fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
+        fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0], (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
+        fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
+        fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1943,10 +1936,8 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-        fprintf(stdout, "%s%d: H5Sget_select_npoints(mem_large_ds_sid) = %d.\n", fcnName, mpi_rank,
-                (int)H5Sget_select_npoints(mem_large_ds_sid));
-        fprintf(stdout, "%s%d: H5Sget_select_npoints(file_large_ds_sid) = %d.\n", fcnName, mpi_rank,
-                (int)H5Sget_select_npoints(file_large_ds_sid));
+        fprintf(stdout, "%s%d: H5Sget_select_npoints(mem_large_ds_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(mem_large_ds_sid));
+        fprintf(stdout, "%s%d: H5Sget_select_npoints(file_large_ds_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(file_large_ds_sid));
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1957,14 +1948,10 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
         if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
             fprintf(stdout, "%s:%d: added settings for main process.\n", fcnName, mpi_rank);
-            fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0],
-                    (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
-            fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0],
-                    (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
-            fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0],
-                    (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
-            fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0],
-                    (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
+            fprintf(stdout, "%s:%d: start[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)start[0], (int)start[1], (int)start[2], (int)start[3], (int)start[4]);
+            fprintf(stdout, "%s:%d: stride[] = %d %d %d %d %d\n", fcnName, mpi_rank, (int)stride[0], (int)stride[1], (int)stride[2], (int)stride[3], (int)stride[4]);
+            fprintf(stdout, "%s:%d: count[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)count[0], (int)count[1], (int)count[2], (int)count[3], (int)count[4]);
+            fprintf(stdout, "%s:%d: block[]  = %d %d %d %d %d\n", fcnName, mpi_rank, (int)block[0], (int)block[1], (int)block[2], (int)block[3], (int)block[4]);
         }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -1976,10 +1963,8 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
         if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-            fprintf(stdout, "%s%d: H5Sget_select_npoints(mem_large_ds_sid) = %d.\n", fcnName, mpi_rank,
-                    (int)H5Sget_select_npoints(mem_large_ds_sid));
-            fprintf(stdout, "%s%d: H5Sget_select_npoints(file_large_ds_sid) = %d.\n", fcnName, mpi_rank,
-                    (int)H5Sget_select_npoints(file_large_ds_sid));
+            fprintf(stdout, "%s%d: H5Sget_select_npoints(mem_large_ds_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(mem_large_ds_sid));
+            fprintf(stdout, "%s%d: H5Sget_select_npoints(file_large_ds_sid) = %d.\n", fcnName, mpi_rank, (int)H5Sget_select_npoints(file_large_ds_sid));
         }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
     }
@@ -2003,14 +1988,29 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
 #if LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-
         rank = H5Sget_simple_extent_dims(mem_large_ds_sid, dims, max_dims);
-        fprintf(stdout, "%s:%d: mem_large_ds_sid dims[%d] = %d %d %d %d %d\n", fcnName, mpi_rank, rank,
-                (int)dims[0], (int)dims[1], (int)dims[2], (int)dims[3], (int)dims[4]);
+        fprintf(stdout,
+                "%s:%d: mem_large_ds_sid dims[%d] = %d %d %d %d %d\n",
+                fcnName,
+                mpi_rank,
+                rank,
+                (int)dims[0],
+                (int)dims[1],
+                (int)dims[2],
+                (int)dims[3],
+                (int)dims[4]);
 
         rank = H5Sget_simple_extent_dims(file_large_ds_sid, dims, max_dims);
-        fprintf(stdout, "%s:%d: file_large_ds_sid dims[%d] = %d %d %d %d %d\n", fcnName, mpi_rank, rank,
-                (int)dims[0], (int)dims[1], (int)dims[2], (int)dims[3], (int)dims[4]);
+        fprintf(stdout,
+                "%s:%d: file_large_ds_sid dims[%d] = %d %d %d %d %d\n",
+                fcnName,
+                mpi_rank,
+                rank,
+                (int)dims[0],
+                (int)dims[1],
+                (int)dims[2],
+                (int)dims[3],
+                (int)dims[4]);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
@@ -2025,15 +2025,15 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
         fprintf(stdout, "%s:%d: writing init value of large ds to file.\n", fcnName, mpi_rank);
         fprintf(stdout, "%s:%d: large_dataset = %d.\n", fcnName, mpi_rank, (int)large_dataset);
-        fprintf(stdout, "%s:%d: mem_large_ds_sid = %d, file_large_ds_sid = %d.\n", fcnName, mpi_rank,
-                (int)mem_large_ds_sid, (int)file_large_ds_sid);
+        fprintf(stdout, "%s:%d: mem_large_ds_sid = %d, file_large_ds_sid = %d.\n", fcnName, mpi_rank, (int)mem_large_ds_sid, (int)file_large_ds_sid);
     }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__RUN_TEST__DEBUG */
 
     ret = H5Dwrite(large_dataset, dset_type, mem_large_ds_sid, file_large_ds_sid, xfer_plist, large_ds_buf_0);
 
-    if (ret < 0)
+    if (ret < 0) {
         H5Eprint2(H5E_DEFAULT, stderr);
+    }
     VRFY((ret >= 0), "H5Dwrite() large_dataset initial write succeeded");
 
     /* sync with the other processes before checking data */
@@ -2044,22 +2044,19 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
      * expected data.  Note that each process reads in the entire
      * data set.
      */
-    ret = H5Dread(large_dataset, H5T_NATIVE_UINT32, full_mem_large_ds_sid, full_file_large_ds_sid, xfer_plist,
-                  large_ds_buf_1);
+    ret = H5Dread(large_dataset, H5T_NATIVE_UINT32, full_mem_large_ds_sid, full_file_large_ds_sid, xfer_plist, large_ds_buf_1);
     VRFY((ret >= 0), "H5Dread() large_dataset initial read succeeded");
 
     /* verify that the correct data was written to the large data set.
      * in passing, reset the buffer to zeros
      */
     expected_value = 0;
-    mis_match      = false;
-    ptr_1          = large_ds_buf_1;
+    mis_match = false;
+    ptr_1 = large_ds_buf_1;
 
     i = 0;
     for (i = 0; i < (int)large_ds_size; i++) {
-
         if (*ptr_1 != expected_value) {
-
             mis_match = true;
         }
 
@@ -2082,25 +2079,29 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     small_sel_start[0] = (hsize_t)(mpi_rank + 1);
     small_sel_start[1] = small_sel_start[2] = small_sel_start[3] = small_sel_start[4] = 0;
 
-    lower_dim_size_comp_test__select_checker_board(mpi_rank, file_small_ds_sid,
-                                                   /* tgt_rank          = */ 5, small_dims,
+    lower_dim_size_comp_test__select_checker_board(mpi_rank,
+                                                   file_small_ds_sid,
+                                                   /* tgt_rank          = */ 5,
+                                                   small_dims,
                                                    /* checker_edge_size = */ 3,
-                                                   /* sel_rank */ 2, small_sel_start);
+                                                   /* sel_rank */ 2,
+                                                   small_sel_start);
 
-    expected_value =
-        (uint32_t)((small_sel_start[0] * small_dims[1] * small_dims[2] * small_dims[3] * small_dims[4]) +
-                   (small_sel_start[1] * small_dims[2] * small_dims[3] * small_dims[4]) +
-                   (small_sel_start[2] * small_dims[3] * small_dims[4]) +
-                   (small_sel_start[3] * small_dims[4]) + (small_sel_start[4]));
+    expected_value = (uint32_t)((small_sel_start[0] * small_dims[1] * small_dims[2] * small_dims[3] * small_dims[4]) +
+                                (small_sel_start[1] * small_dims[2] * small_dims[3] * small_dims[4]) + (small_sel_start[2] * small_dims[3] * small_dims[4]) +
+                                (small_sel_start[3] * small_dims[4]) + (small_sel_start[4]));
 
     large_sel_start[0] = (hsize_t)(mpi_rank + 1);
     large_sel_start[1] = 5;
     large_sel_start[2] = large_sel_start[3] = large_sel_start[4] = 0;
 
-    lower_dim_size_comp_test__select_checker_board(mpi_rank, mem_large_ds_sid,
-                                                   /* tgt_rank          = */ 5, large_dims,
+    lower_dim_size_comp_test__select_checker_board(mpi_rank,
+                                                   mem_large_ds_sid,
+                                                   /* tgt_rank          = */ 5,
+                                                   large_dims,
                                                    /* checker_edge_size = */ 3,
-                                                   /* sel_rank          = */ 2, large_sel_start);
+                                                   /* sel_rank          = */ 2,
+                                                   large_sel_start);
 
     /* verify that H5Sselect_shape_same() reports the two
      * selections as having the same shape.
@@ -2108,8 +2109,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     check = H5Sselect_shape_same(mem_large_ds_sid, file_small_ds_sid);
     VRFY((check == true), "H5Sselect_shape_same passed (1)");
 
-    ret = H5Dread(small_dataset, H5T_NATIVE_UINT32, mem_large_ds_sid, file_small_ds_sid, xfer_plist,
-                  large_ds_buf_1);
+    ret = H5Dread(small_dataset, H5T_NATIVE_UINT32, mem_large_ds_sid, file_small_ds_sid, xfer_plist, large_ds_buf_1);
 
     VRFY((ret >= 0), "H5Sread() slice from small ds succeeded.");
 
@@ -2124,8 +2124,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     data_ok = true;
 
     start_index = (int)((large_sel_start[0] * large_dims[1] * large_dims[2] * large_dims[3] * large_dims[4]) +
-                        (large_sel_start[1] * large_dims[2] * large_dims[3] * large_dims[4]) +
-                        (large_sel_start[2] * large_dims[3] * large_dims[4]) +
+                        (large_sel_start[1] * large_dims[2] * large_dims[3] * large_dims[4]) + (large_sel_start[2] * large_dims[3] * large_dims[4]) +
                         (large_sel_start[3] * large_dims[4]) + (large_sel_start[4]));
 
     stop_index = start_index + (int)small_ds_slice_size;
@@ -2137,11 +2136,9 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 = large_ds_buf_1;
 
     for (i = 0; i < start_index; i++) {
-
         if (*ptr_1 != (uint32_t)0) {
-
             data_ok = false;
-            *ptr_1  = (uint32_t)0;
+            *ptr_1 = (uint32_t)0;
         }
 
         ptr_1++;
@@ -2155,7 +2152,8 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #endif /* LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG */
                                                     /* rank */ 2,
                                                     /* edge_size */ 10,
-                                                    /*  checker_edge_size */ 3, expected_value,
+                                                    /*  checker_edge_size */ 3,
+                                                    expected_value,
                                                     /* buf_starts_in_checker */ true);
 
     VRFY((data_ok == true), "slice read from small ds data good(2).");
@@ -2165,11 +2163,9 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 += small_ds_slice_size;
 
     for (i = stop_index; i < (int)large_ds_size; i++) {
-
         if (*ptr_1 != (uint32_t)0) {
-
             data_ok = false;
-            *ptr_1  = (uint32_t)0;
+            *ptr_1 = (uint32_t)0;
         }
 
         ptr_1++;
@@ -2185,19 +2181,25 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     small_sel_start[0] = (hsize_t)(mpi_rank + 1);
     small_sel_start[1] = small_sel_start[2] = small_sel_start[3] = small_sel_start[4] = 0;
 
-    lower_dim_size_comp_test__select_checker_board(mpi_rank, mem_small_ds_sid,
-                                                   /* tgt_rank          = */ 5, small_dims,
+    lower_dim_size_comp_test__select_checker_board(mpi_rank,
+                                                   mem_small_ds_sid,
+                                                   /* tgt_rank          = */ 5,
+                                                   small_dims,
                                                    /* checker_edge_size = */ 3,
-                                                   /* sel_rank */ 2, small_sel_start);
+                                                   /* sel_rank */ 2,
+                                                   small_sel_start);
 
     large_sel_start[0] = (hsize_t)(mpi_rank + 1);
     large_sel_start[1] = 5;
     large_sel_start[2] = large_sel_start[3] = large_sel_start[4] = 0;
 
-    lower_dim_size_comp_test__select_checker_board(mpi_rank, file_large_ds_sid,
-                                                   /* tgt_rank          = */ 5, large_dims,
+    lower_dim_size_comp_test__select_checker_board(mpi_rank,
+                                                   file_large_ds_sid,
+                                                   /* tgt_rank          = */ 5,
+                                                   large_dims,
                                                    /* checker_edge_size = */ 3,
-                                                   /* sel_rank          = */ 2, large_sel_start);
+                                                   /* sel_rank          = */ 2,
+                                                   large_sel_start);
 
     /* verify that H5Sselect_shape_same() reports the two
      * selections as having the same shape.
@@ -2205,8 +2207,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     check = H5Sselect_shape_same(mem_small_ds_sid, file_large_ds_sid);
     VRFY((check == true), "H5Sselect_shape_same passed (2)");
 
-    ret = H5Dread(large_dataset, H5T_NATIVE_UINT32, mem_small_ds_sid, file_large_ds_sid, xfer_plist,
-                  small_ds_buf_1);
+    ret = H5Dread(large_dataset, H5T_NATIVE_UINT32, mem_small_ds_sid, file_large_ds_sid, xfer_plist, small_ds_buf_1);
 
     VRFY((ret >= 0), "H5Sread() slice from large ds succeeded.");
 
@@ -2220,11 +2221,9 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 
     data_ok = true;
 
-    expected_value =
-        (uint32_t)((large_sel_start[0] * large_dims[1] * large_dims[2] * large_dims[3] * large_dims[4]) +
-                   (large_sel_start[1] * large_dims[2] * large_dims[3] * large_dims[4]) +
-                   (large_sel_start[2] * large_dims[3] * large_dims[4]) +
-                   (large_sel_start[3] * large_dims[4]) + (large_sel_start[4]));
+    expected_value = (uint32_t)((large_sel_start[0] * large_dims[1] * large_dims[2] * large_dims[3] * large_dims[4]) +
+                                (large_sel_start[1] * large_dims[2] * large_dims[3] * large_dims[4]) + (large_sel_start[2] * large_dims[3] * large_dims[4]) +
+                                (large_sel_start[3] * large_dims[4]) + (large_sel_start[4]));
 
     start_index = (int)(mpi_rank + 1) * (int)small_ds_slice_size;
 
@@ -2237,11 +2236,9 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 = small_ds_buf_1;
 
     for (i = 0; i < start_index; i++) {
-
         if (*ptr_1 != (uint32_t)0) {
-
             data_ok = false;
-            *ptr_1  = (uint32_t)0;
+            *ptr_1 = (uint32_t)0;
         }
 
         ptr_1++;
@@ -2255,7 +2252,8 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
 #endif /* LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG */
                                                     /* rank */ 2,
                                                     /* edge_size */ 10,
-                                                    /*  checker_edge_size */ 3, expected_value,
+                                                    /*  checker_edge_size */ 3,
+                                                    expected_value,
                                                     /* buf_starts_in_checker */ true);
 
     VRFY((data_ok == true), "slice read from large ds data good(2).");
@@ -2265,18 +2263,15 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     ptr_1 += small_ds_slice_size;
 
     for (i = stop_index; i < (int)small_ds_size; i++) {
-
         if (*ptr_1 != (uint32_t)0) {
-
 #if LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG
             if (mpi_rank == LOWER_DIM_SIZE_COMP_TEST_DEBUG_TARGET_RANK) {
-                fprintf(stdout, "%s:%d: unexpected value at index %d: %d.\n", fcnName, mpi_rank, (int)i,
-                        (int)(*ptr_1));
+                fprintf(stdout, "%s:%d: unexpected value at index %d: %d.\n", fcnName, mpi_rank, (int)i, (int)(*ptr_1));
             }
 #endif /* LOWER_DIM_SIZE_COMP_TEST__VERIFY_DATA__DEBUG */
 
             data_ok = false;
-            *ptr_1  = (uint32_t)0;
+            *ptr_1 = (uint32_t)0;
         }
 
         ptr_1++;
@@ -2322,15 +2317,19 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
     VRFY((ret != FAIL), "file close succeeded");
 
     /* Free memory buffers */
-    if (small_ds_buf_0 != NULL)
+    if (small_ds_buf_0 != NULL) {
         free(small_ds_buf_0);
-    if (small_ds_buf_1 != NULL)
+    }
+    if (small_ds_buf_1 != NULL) {
         free(small_ds_buf_1);
+    }
 
-    if (large_ds_buf_0 != NULL)
+    if (large_ds_buf_0 != NULL) {
         free(large_ds_buf_0);
-    if (large_ds_buf_1 != NULL)
+    }
+    if (large_ds_buf_1 != NULL) {
         free(large_ds_buf_1);
+    }
 
     return;
 
@@ -2348,8 +2347,7 @@ lower_dim_size_comp_test__run_test(const void *params, const int chunk_edge_size
  *-------------------------------------------------------------------------
  */
 
-void
-lower_dim_size_comp_test(void *params)
+void lower_dim_size_comp_test(void* params)
 {
     /* const char *fcnName = "lower_dim_size_comp_test()"; */
     int chunk_edge_size = 0;
@@ -2410,37 +2408,36 @@ lower_dim_size_comp_test(void *params)
 
 #define LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE 16
 
-void
-link_chunk_collective_io_test(void *params)
+void link_chunk_collective_io_test(void* params)
 {
     /* const char *fcnName = "link_chunk_collective_io_test()"; */
-    const char *filename;
-    bool        mis_match = false;
-    int         i;
-    int         mrc;
-    int         mpi_rank;
-    int         mpi_size;
-    MPI_Comm    mpi_comm  = MPI_COMM_WORLD;
-    MPI_Info    mpi_info  = MPI_INFO_NULL;
-    hsize_t     count[1]  = {1};
-    hsize_t     stride[1] = {2 * LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE};
-    hsize_t     block[1]  = {LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE};
-    hsize_t     start[1];
-    hsize_t     dims[1];
-    hsize_t     chunk_dims[1] = {LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE};
-    herr_t      ret; /* Generic return value */
-    hid_t       file_id;
-    hid_t       acc_tpl;
-    hid_t       dset_id;
-    hid_t       file_ds_sid;
-    hid_t       write_mem_ds_sid;
-    hid_t       read_mem_ds_sid;
-    hid_t       ds_dcpl_id;
-    hid_t       xfer_plist;
-    double      diff;
-    double      expected_value;
-    double      local_data_written[LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE];
-    double      local_data_read[LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE];
+    const char* filename;
+    bool mis_match = false;
+    int i;
+    int mrc;
+    int mpi_rank;
+    int mpi_size;
+    MPI_Comm mpi_comm = MPI_COMM_WORLD;
+    MPI_Info mpi_info = MPI_INFO_NULL;
+    hsize_t count[1] = { 1 };
+    hsize_t stride[1] = { 2 * LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE };
+    hsize_t block[1] = { LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE };
+    hsize_t start[1];
+    hsize_t dims[1];
+    hsize_t chunk_dims[1] = { LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE };
+    herr_t ret; /* Generic return value */
+    hid_t file_id;
+    hid_t acc_tpl;
+    hid_t dset_id;
+    hid_t file_ds_sid;
+    hid_t write_mem_ds_sid;
+    hid_t read_mem_ds_sid;
+    hid_t ds_dcpl_id;
+    hid_t xfer_plist;
+    double diff;
+    double expected_value;
+    double local_data_written[LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE];
+    double local_data_read[LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE];
 
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
@@ -2459,7 +2456,7 @@ link_chunk_collective_io_test(void *params)
     assert(mpi_size > 0);
 
     /* get the file name */
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
     assert(filename != NULL);
 
     /* setup file access template */
@@ -2500,8 +2497,7 @@ link_chunk_collective_io_test(void *params)
     VRFY((ret != FAIL), "H5Pset_chunk() small_ds_dcpl_id succeeded");
 
     /* create the data set */
-    dset_id =
-        H5Dcreate2(file_id, "dataset", H5T_NATIVE_DOUBLE, file_ds_sid, H5P_DEFAULT, ds_dcpl_id, H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, "dataset", H5T_NATIVE_DOUBLE, file_ds_sid, H5P_DEFAULT, ds_dcpl_id, H5P_DEFAULT);
     VRFY((dset_id >= 0), "H5Dcreate2() dataset succeeded");
 
     /* close the dataset creation property list */
@@ -2511,15 +2507,14 @@ link_chunk_collective_io_test(void *params)
     /* setup local data */
     expected_value = (double)(LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE) * (double)(mpi_rank);
     for (i = 0; i < LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE; i++) {
-
         local_data_written[i] = expected_value;
-        local_data_read[i]    = 0.0;
+        local_data_read[i] = 0.0;
         expected_value += 1.0;
     }
 
     /* select the file and mem spaces */
     start[0] = (hsize_t)(mpi_rank * LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE);
-    ret      = H5Sselect_hyperslab(file_ds_sid, H5S_SELECT_SET, start, stride, count, block);
+    ret = H5Sselect_hyperslab(file_ds_sid, H5S_SELECT_SET, start, stride, count, block);
     VRFY((ret >= 0), "H5Sselect_hyperslab(file_ds_sid, set) succeeded");
 
     ret = H5Sselect_all(write_mem_ds_sid);
@@ -2554,12 +2549,10 @@ link_chunk_collective_io_test(void *params)
     /* verify the data */
     mis_match = false;
     for (i = 0; i < LINK_CHUNK_COLLECTIVE_IO_TEST_CHUNK_SIZE; i++) {
-
         diff = local_data_written[i] - local_data_read[i];
         diff = fabs(diff);
 
         if (diff >= 0.001) {
-
             mis_match = true;
         }
     }

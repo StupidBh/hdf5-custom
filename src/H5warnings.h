@@ -109,31 +109,31 @@
 
 /* Suppress warnings about C11 extensions */
 #if defined(__clang__)
-#define H5_WARN_C11_EXTENSIONS_OFF H5_WARN_OFF("c11-extensions")
-#define H5_WARN_C11_EXTENSIONS_ON  H5_WARN_ON("c11-extensions")
+    #define H5_WARN_C11_EXTENSIONS_OFF H5_WARN_OFF("c11-extensions")
+    #define H5_WARN_C11_EXTENSIONS_ON  H5_WARN_ON("c11-extensions")
 #else
-#define H5_WARN_C11_EXTENSIONS_OFF
-#define H5_WARN_C11_EXTENSIONS_ON
+    #define H5_WARN_C11_EXTENSIONS_OFF
+    #define H5_WARN_C11_EXTENSIONS_ON
 #endif
 
 /* Suppress warnings about bad cast alignment. These should be corrected,
  * not suppressed in the main library, but might appear in test code.
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_CAST_ALIGNMENT_OFF H5_WARN_OFF("cast-align")
-#define H5_WARN_CAST_ALIGNMENT_ON  H5_WARN_ON("cast-align")
+    #define H5_WARN_CAST_ALIGNMENT_OFF H5_WARN_OFF("cast-align")
+    #define H5_WARN_CAST_ALIGNMENT_ON  H5_WARN_ON("cast-align")
 #else
-#define H5_WARN_CAST_ALIGNMENT_OFF
-#define H5_WARN_CAST_ALIGNMENT_ON
+    #define H5_WARN_CAST_ALIGNMENT_OFF
+    #define H5_WARN_CAST_ALIGNMENT_ON
 #endif
 
 /* Suppress warnings about casting away const */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_CAST_AWAY_CONST_OFF H5_WARN_OFF("cast-qual")
-#define H5_WARN_CAST_AWAY_CONST_ON  H5_WARN_ON("cast-qual")
+    #define H5_WARN_CAST_AWAY_CONST_OFF H5_WARN_OFF("cast-qual")
+    #define H5_WARN_CAST_AWAY_CONST_ON  H5_WARN_ON("cast-qual")
 #else
-#define H5_WARN_CAST_AWAY_CONST_OFF
-#define H5_WARN_CAST_AWAY_CONST_ON
+    #define H5_WARN_CAST_AWAY_CONST_OFF
+    #define H5_WARN_CAST_AWAY_CONST_ON
 #endif
 
 /* Suppress warnings about duplicate logic branches. These can
@@ -142,11 +142,11 @@
  * to the warning.
  */
 #if defined(__GNUC__) && !defined(__clang__)
-#define H5_WARN_DUPLICATED_BRANCHES_OFF H5_WARN_OFF("duplicated-branches")
-#define H5_WARN_DUPLICATED_BRANCHES_ON  H5_WARN_ON("duplicated-branches")
+    #define H5_WARN_DUPLICATED_BRANCHES_OFF H5_WARN_OFF("duplicated-branches")
+    #define H5_WARN_DUPLICATED_BRANCHES_ON  H5_WARN_ON("duplicated-branches")
 #else
-#define H5_WARN_DUPLICATED_BRANCHES_OFF
-#define H5_WARN_DUPLICATED_BRANCHES_ON
+    #define H5_WARN_DUPLICATED_BRANCHES_OFF
+    #define H5_WARN_DUPLICATED_BRANCHES_ON
 #endif
 
 /* Suppress warnings about operations that reduce floating-point
@@ -154,11 +154,11 @@
  * where we do some number munging.
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_FLOAT_CONVERSION_OFF H5_WARN_OFF("float-conversion")
-#define H5_WARN_FLOAT_CONVERSION_ON  H5_WARN_ON("float-conversion")
+    #define H5_WARN_FLOAT_CONVERSION_OFF H5_WARN_OFF("float-conversion")
+    #define H5_WARN_FLOAT_CONVERSION_ON  H5_WARN_ON("float-conversion")
 #else
-#define H5_WARN_FLOAT_CONVERSION_OFF
-#define H5_WARN_FLOAT_CONVERSION_ON
+    #define H5_WARN_FLOAT_CONVERSION_OFF
+    #define H5_WARN_FLOAT_CONVERSION_ON
 #endif
 
 /* Suppress warnings about directly comparing floats. This is
@@ -166,42 +166,42 @@
  * an exact value like 0.
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_FLOAT_EQUAL_OFF H5_WARN_OFF("float-equal")
-#define H5_WARN_FLOAT_EQUAL_ON  H5_WARN_ON("float-equal")
+    #define H5_WARN_FLOAT_EQUAL_OFF H5_WARN_OFF("float-equal")
+    #define H5_WARN_FLOAT_EQUAL_ON  H5_WARN_ON("float-equal")
 #else
-#define H5_WARN_FLOAT_EQUAL_OFF
-#define H5_WARN_FLOAT_EQUAL_ON
+    #define H5_WARN_FLOAT_EQUAL_OFF
+    #define H5_WARN_FLOAT_EQUAL_ON
 #endif
 
 /* Suppress warnings about using format strings that aren't string
  * literals
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_FORMAT_NONLITERAL_OFF H5_WARN_OFF("format-nonliteral")
-#define H5_WARN_FORMAT_NONLITERAL_ON  H5_WARN_ON("format-nonliteral")
+    #define H5_WARN_FORMAT_NONLITERAL_OFF H5_WARN_OFF("format-nonliteral")
+    #define H5_WARN_FORMAT_NONLITERAL_ON  H5_WARN_ON("format-nonliteral")
 #else
-#define H5_WARN_FORMAT_NONLITERAL_OFF
-#define H5_WARN_FORMAT_NONLITERAL_ON
+    #define H5_WARN_FORMAT_NONLITERAL_OFF
+    #define H5_WARN_FORMAT_NONLITERAL_ON
 #endif
 
 /* Suppress warnings about possible truncation in format strings */
 #if defined(__GNUC__) && !defined(__clang__)
-#define H5_WARN_FORMAT_TRUNCATION_OFF H5_WARN_OFF("format-truncation")
-#define H5_WARN_FORMAT_TRUNCATION_ON  H5_WARN_ON("format-truncation")
+    #define H5_WARN_FORMAT_TRUNCATION_OFF H5_WARN_OFF("format-truncation")
+    #define H5_WARN_FORMAT_TRUNCATION_ON  H5_WARN_ON("format-truncation")
 #else
-#define H5_WARN_FORMAT_TRUNCATION_OFF
-#define H5_WARN_FORMAT_TRUNCATION_ON
+    #define H5_WARN_FORMAT_TRUNCATION_OFF
+    #define H5_WARN_FORMAT_TRUNCATION_ON
 #endif
 
 /* Suppress warnings about implicit fallthrough. Currently,
  * clang is the only compiler that has trouble with this.
  */
 #if defined(__clang__)
-#define H5_WARN_IMPLICIT_FALLTHROUGH_OFF H5_WARN_OFF("implicit-fallthrough")
-#define H5_WARN_IMPLICIT_FALLTHROUGH_ON  H5_WARN_ON("implicit-fallthrough")
+    #define H5_WARN_IMPLICIT_FALLTHROUGH_OFF H5_WARN_OFF("implicit-fallthrough")
+    #define H5_WARN_IMPLICIT_FALLTHROUGH_ON  H5_WARN_ON("implicit-fallthrough")
 #else
-#define H5_WARN_IMPLICIT_FALLTHROUGH_OFF
-#define H5_WARN_IMPLICIT_FALLTHROUGH_ON
+    #define H5_WARN_IMPLICIT_FALLTHROUGH_OFF
+    #define H5_WARN_IMPLICIT_FALLTHROUGH_ON
 #endif
 
 /* Suppress warnings about large stack and frame objects. We
@@ -209,16 +209,16 @@
  * have been squashed so it's not necessary at this time.
  */
 #if defined(__clang__)
-/* clang can only suppress warnings about oversize strings */
-#define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("overlength-strings")
-#define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("overlength-strings")
+    /* clang can only suppress warnings about oversize strings */
+    #define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("overlength-strings")
+    #define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("overlength-strings")
 #elif defined(__GNUC__)
-/* gcc can suppress warnings about any oversize object */
-#define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("larger-than=")
-#define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("larger-than=")
+    /* gcc can suppress warnings about any oversize object */
+    #define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("larger-than=")
+    #define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("larger-than=")
 #else
-#define H5_WARN_LARGE_STACK_OBJECTS_OFF
-#define H5_WARN_LARGE_STACK_OBJECTS_ON
+    #define H5_WARN_LARGE_STACK_OBJECTS_OFF
+    #define H5_WARN_LARGE_STACK_OBJECTS_ON
 #endif
 
 /* Suppress warnings about possible string overflow.
@@ -229,34 +229,34 @@
  * https://github.com/pmodels/mpich/issues/5687
  */
 #if defined(__GNUC__) && !defined(__clang__)
-#define H5_WARN_MPI_STATUSES_IGNORE_OFF H5_WARN_OFF("stringop-overflow")
-#define H5_WARN_MPI_STATUSES_IGNORE_ON  H5_WARN_ON("stringop-overflow")
+    #define H5_WARN_MPI_STATUSES_IGNORE_OFF H5_WARN_OFF("stringop-overflow")
+    #define H5_WARN_MPI_STATUSES_IGNORE_ON  H5_WARN_ON("stringop-overflow")
 #else
-#define H5_WARN_MPI_STATUSES_IGNORE_OFF
-#define H5_WARN_MPI_STATUSES_IGNORE_ON
+    #define H5_WARN_MPI_STATUSES_IGNORE_OFF
+    #define H5_WARN_MPI_STATUSES_IGNORE_ON
 #endif
 
 /* Disable warnings concerning non-standard extensions, like F16 */
 /* clang */
 #if defined(__clang__)
-#define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("pedantic")
-#define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("pedantic")
+    #define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("pedantic")
+    #define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("pedantic")
 /* gcc 14+ */
 #elif defined(__GNUC__) && __GNUC__ >= 14
-#define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("c11-c23-compat")
-#define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("c11-c23-compat")
+    #define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("c11-c23-compat")
+    #define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("c11-c23-compat")
 /* gcc 9-13 */
 #elif defined(__GNUC__) && __GNUC__ >= 9
-#define H5_WARN_NONSTD_SUFFIX_OFF                                                                            \
-    H5_WARN_OFF("pedantic")                                                                                  \
-    H5_WARN_OFF("c11-c2x-compat")
-#define H5_WARN_NONSTD_SUFFIX_ON                                                                             \
-    H5_WARN_ON("c11-c2x-compat")                                                                             \
-    H5_WARN_ON("pedantic")
+    #define H5_WARN_NONSTD_SUFFIX_OFF \
+        H5_WARN_OFF("pedantic")       \
+        H5_WARN_OFF("c11-c2x-compat")
+    #define H5_WARN_NONSTD_SUFFIX_ON \
+        H5_WARN_ON("c11-c2x-compat") \
+        H5_WARN_ON("pedantic")
 #else
-/* Everything else */
-#define H5_WARN_NONSTD_SUFFIX_OFF
-#define H5_WARN_NONSTD_SUFFIX_ON
+    /* Everything else */
+    #define H5_WARN_NONSTD_SUFFIX_OFF
+    #define H5_WARN_NONSTD_SUFFIX_ON
 #endif
 
 /* Suppress warnings about converting between function and object
@@ -265,11 +265,11 @@
  * this, so it's fine.
  */
 #if defined(__GNUC__) && !defined(__clang__)
-#define H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF H5_WARN_OFF("pedantic")
-#define H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON  H5_WARN_ON("pedantic")
+    #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF H5_WARN_OFF("pedantic")
+    #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON  H5_WARN_ON("pedantic")
 #else
-#define H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
-#define H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
+    #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
+    #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
 #endif
 
 /* Suppress warnings about comparisons that will always be true or
@@ -277,11 +277,11 @@
  * types.
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_USELESS_COMPARISON_OFF H5_WARN_OFF("type-limits")
-#define H5_WARN_USELESS_COMPARISON_ON  H5_WARN_ON("type-limits")
+    #define H5_WARN_USELESS_COMPARISON_OFF H5_WARN_OFF("type-limits")
+    #define H5_WARN_USELESS_COMPARISON_ON  H5_WARN_ON("type-limits")
 #else
-#define H5_WARN_USELESS_COMPARISON_OFF
-#define H5_WARN_USELESS_COMPARISON_ON
+    #define H5_WARN_USELESS_COMPARISON_OFF
+    #define H5_WARN_USELESS_COMPARISON_ON
 #endif
 
 /* Suppress warnings about functions that return structs. This
@@ -289,11 +289,11 @@
  * structures are very small.
  */
 #if defined(__clang__) || defined(__GNUC__)
-#define H5_WARN_AGGREGATE_RETURN_OFF H5_WARN_OFF("aggregate-return")
-#define H5_WARN_AGGREGATE_RETURN_ON  H5_WARN_ON("aggregate-return")
+    #define H5_WARN_AGGREGATE_RETURN_OFF H5_WARN_OFF("aggregate-return")
+    #define H5_WARN_AGGREGATE_RETURN_ON  H5_WARN_ON("aggregate-return")
 #else
-#define H5_WARN_AGGREGATE_RETURN_OFF
-#define H5_WARN_AGGREGATE_RETURN_ON
+    #define H5_WARN_AGGREGATE_RETURN_OFF
+    #define H5_WARN_AGGREGATE_RETURN_ON
 #endif
 
 #endif /* H5warnings_H */

@@ -47,10 +47,8 @@ static hid_t symbol_tid = (H5I_INVALID_HID);
 /* Local Prototypes */
 /********************/
 
-static int  check_dataset(hid_t fid, unsigned verbose, const symbol_info_t *symbol, symbol_t *record,
-                          hid_t rec_sid);
-static int  read_records(const char *filename, unsigned verbose, unsigned long nrecords, unsigned poll_time,
-                         unsigned reopen_count);
+static int check_dataset(hid_t fid, unsigned verbose, const symbol_info_t* symbol, symbol_t* record, hid_t rec_sid);
+static int read_records(const char* filename, unsigned verbose, unsigned long nrecords, unsigned poll_time, unsigned reopen_count);
 static void usage(void);
 
 /*-------------------------------------------------------------------------
@@ -83,13 +81,12 @@ static void usage(void);
  *
  *-------------------------------------------------------------------------
  */
-static int
-check_dataset(hid_t fid, unsigned verbose, const symbol_info_t *symbol, symbol_t *record, hid_t rec_sid)
+static int check_dataset(hid_t fid, unsigned verbose, const symbol_info_t* symbol, symbol_t* record, hid_t rec_sid)
 {
-    hid_t   dsid;              /* Dataset ID */
-    hid_t   file_sid;          /* Dataset's space ID */
-    hsize_t start[2] = {0, 0}; /* Hyperslab selection values */
-    hsize_t count[2] = {1, 1}; /* Hyperslab selection values */
+    hid_t dsid;                  /* Dataset ID */
+    hid_t file_sid;              /* Dataset's space ID */
+    hsize_t start[2] = { 0, 0 }; /* Hyperslab selection values */
+    hsize_t count[2] = { 1, 1 }; /* Hyperslab selection values */
 
     assert(fid >= 0);
     assert(symbol);
@@ -97,45 +94,55 @@ check_dataset(hid_t fid, unsigned verbose, const symbol_info_t *symbol, symbol_t
     assert(rec_sid >= 0);
 
     /* Open dataset for symbol */
-    if ((dsid = H5Dopen2(fid, symbol->name, H5P_DEFAULT)) < 0)
+    if ((dsid = H5Dopen2(fid, symbol->name, H5P_DEFAULT)) < 0) {
         return -1;
+    }
 
     /* Get the dataset's dataspace */
-    if ((file_sid = H5Dget_space(dsid)) < 0)
+    if ((file_sid = H5Dget_space(dsid)) < 0) {
         return -1;
+    }
 
     /* Choose the random record in the dataset (will be the same as chosen by
      * the writer) */
     start[1] = (hsize_t)rand() % symbol->nrecords;
-    if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0)
+    if (H5Sselect_hyperslab(file_sid, H5S_SELECT_SET, start, NULL, count, NULL) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
-        fprintf(stderr, "Symbol = '%s', location = %" PRIuMAX ",%" PRIuMAX "\n", symbol->name,
-                (uintmax_t)start[0], (uintmax_t)start[1]);
+    if (verbose) {
+        fprintf(stderr, "Symbol = '%s', location = %" PRIuMAX ",%" PRIuMAX "\n", symbol->name, (uintmax_t)start[0], (uintmax_t)start[1]);
+    }
 
     /* Read record from dataset */
     record->rec_id = UINT64_MAX;
-    if (H5Dread(dsid, symbol_tid, rec_sid, file_sid, H5P_DEFAULT, record) < 0)
+    if (H5Dread(dsid, symbol_tid, rec_sid, file_sid, H5P_DEFAULT, record) < 0) {
         return -1;
+    }
 
     /* Verify record value */
     if (record->rec_id != start[1]) {
         fprintf(stderr, "*** ERROR ***\n");
         fprintf(stderr, "Incorrect record value!\n");
-        fprintf(stderr, "Symbol = '%s', location = %" PRIuMAX ",%" PRIuMAX ", record->rec_id = %" PRIu64 "\n",
-                symbol->name, (uintmax_t)start[0], (uintmax_t)start[1], record->rec_id);
+        fprintf(stderr,
+                "Symbol = '%s', location = %" PRIuMAX ",%" PRIuMAX ", record->rec_id = %" PRIu64 "\n",
+                symbol->name,
+                (uintmax_t)start[0],
+                (uintmax_t)start[1],
+                record->rec_id);
         return -1;
     } /* end if */
 
     /* Close the dataset's dataspace */
-    if (H5Sclose(file_sid) < 0)
+    if (H5Sclose(file_sid) < 0) {
         return -1;
+    }
 
     /* Close dataset for symbol */
-    if (H5Dclose(dsid) < 0)
+    if (H5Dclose(dsid) < 0) {
         return -1;
+    }
 
     return 0;
 } /* end check_dataset() */
@@ -167,44 +174,48 @@ check_dataset(hid_t fid, unsigned verbose, const symbol_info_t *symbol, symbol_t
  *
  *-------------------------------------------------------------------------
  */
-static int
-read_records(const char *filename, unsigned verbose, unsigned long nrecords, unsigned poll_time,
-             unsigned reopen_count)
+static int read_records(const char* filename, unsigned verbose, unsigned long nrecords, unsigned poll_time, unsigned reopen_count)
 {
-    hid_t         fid;                           /* File ID */
-    hid_t         aid;                           /* Attribute ID */
-    time_t        start_time;                    /* Starting time */
-    hid_t         mem_sid;                       /* Memory dataspace ID */
-    symbol_t      record;                        /* The record to add to the dataset */
-    unsigned      seed;                          /* Seed for random number generator */
-    unsigned      iter_to_reopen = reopen_count; /* # of iterations until reopen */
-    unsigned long u;                             /* Local index variable */
-    hid_t         fapl;
+    hid_t fid;                              /* File ID */
+    hid_t aid;                              /* Attribute ID */
+    time_t start_time;                      /* Starting time */
+    hid_t mem_sid;                          /* Memory dataspace ID */
+    symbol_t record;                        /* The record to add to the dataset */
+    unsigned seed;                          /* Seed for random number generator */
+    unsigned iter_to_reopen = reopen_count; /* # of iterations until reopen */
+    unsigned long u;                        /* Local index variable */
+    hid_t fapl;
 
     assert(filename);
     assert(poll_time != 0);
 
     /* Create file access property list */
-    if ((fapl = h5_fileaccess()) < 0)
+    if ((fapl = h5_fileaccess()) < 0) {
         return -1;
+    }
 
     H5Pset_fclose_degree(fapl, H5F_CLOSE_SEMI);
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Opening file: %s\n", filename);
+    }
 
     /* Open the file */
-    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0) {
         return -1;
+    }
 
     /* Seed the random number generator with the attribute in the file */
-    if ((aid = H5Aopen(fid, "seed", H5P_DEFAULT)) < 0)
+    if ((aid = H5Aopen(fid, "seed", H5P_DEFAULT)) < 0) {
         return -1;
-    if (H5Aread(aid, H5T_NATIVE_UINT, &seed) < 0)
+    }
+    if (H5Aread(aid, H5T_NATIVE_UINT, &seed) < 0) {
         return -1;
-    if (H5Aclose(aid) < 0)
+    }
+    if (H5Aclose(aid) < 0) {
         return -1;
+    }
     srand(seed);
 
     /* Reset the record */
@@ -212,21 +223,23 @@ read_records(const char *filename, unsigned verbose, unsigned long nrecords, uns
     memset(&record, 0, sizeof(record));
 
     /* Create a dataspace for the record to read */
-    if ((mem_sid = H5Screate(H5S_SCALAR)) < 0)
+    if ((mem_sid = H5Screate(H5S_SCALAR)) < 0) {
         return -1;
+    }
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Reading records\n");
+    }
 
     /* Get the starting time */
     start_time = time(NULL);
 
     /* Read records */
     for (u = 0; u < nrecords; u++) {
-        symbol_info_t *symbol = NULL; /* Symbol (dataset) */
-        htri_t         attr_exists;   /* Whether the sequence number attribute exists */
-        unsigned long  file_u;        /* Attribute sequence number (writer's "u") */
+        symbol_info_t* symbol = NULL; /* Symbol (dataset) */
+        htri_t attr_exists;           /* Whether the sequence number attribute exists */
+        unsigned long file_u;         /* Attribute sequence number (writer's "u") */
 
         /* Get a random dataset, according to the symbol distribution */
         symbol = choose_dataset();
@@ -238,22 +251,27 @@ read_records(const char *filename, unsigned verbose, unsigned long nrecords, uns
         /* Wait until we can read the dataset */
         do {
             /* Check if sequence attribute exists */
-            if ((attr_exists = H5Aexists_by_name(fid, symbol->name, "seq", H5P_DEFAULT)) < 0)
+            if ((attr_exists = H5Aexists_by_name(fid, symbol->name, "seq", H5P_DEFAULT)) < 0) {
                 return -1;
+            }
 
             if (attr_exists) {
                 /* Read sequence number attribute */
-                if ((aid = H5Aopen_by_name(fid, symbol->name, "seq", H5P_DEFAULT, H5P_DEFAULT)) < 0)
+                if ((aid = H5Aopen_by_name(fid, symbol->name, "seq", H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                     return -1;
-                if (H5Aread(aid, H5T_NATIVE_ULONG, &file_u) < 0)
+                }
+                if (H5Aread(aid, H5T_NATIVE_ULONG, &file_u) < 0) {
                     return -1;
-                if (H5Aclose(aid) < 0)
+                }
+                if (H5Aclose(aid) < 0) {
                     return -1;
+                }
 
                 /* Check if sequence number is at least u - if so, this should
                  * guarantee that this record has been written */
-                if (file_u >= u)
+                if (file_u >= u) {
                     break;
+                }
             } /* end if */
 
             /* Check for timeout */
@@ -266,63 +284,74 @@ read_records(const char *filename, unsigned verbose, unsigned long nrecords, uns
             HDsleep(poll_time);
 
             /* Retrieve and print the collection of metadata read retries */
-            if (print_metadata_retries_info(fid) < 0)
+            if (print_metadata_retries_info(fid) < 0) {
                 fprintf(stderr, "Warning: could not obtain metadata retries info\n");
+            }
 
             /* Reopen the file */
-            if (H5Fclose(fid) < 0)
+            if (H5Fclose(fid) < 0) {
                 return -1;
-            if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0)
+            }
+            if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0) {
                 return -1;
+            }
             iter_to_reopen = reopen_count;
         } while (1);
 
         /* Emit informational message */
-        if (verbose)
+        if (verbose) {
             fprintf(stderr, "Checking dataset %lu\n", u);
+        }
 
         /* Check dataset */
-        if (check_dataset(fid, verbose, symbol, &record, mem_sid) < 0)
+        if (check_dataset(fid, verbose, symbol, &record, mem_sid) < 0) {
             return -1;
+        }
         memset(&record, 0, sizeof(record));
 
         /* Check for reopen */
         iter_to_reopen--;
         if (iter_to_reopen == 0) {
             /* Emit informational message */
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "Reopening file: %s\n", filename);
+            }
 
             /* Retrieve and print the collection of metadata read retries */
-            if (print_metadata_retries_info(fid) < 0)
+            if (print_metadata_retries_info(fid) < 0) {
                 fprintf(stderr, "Warning: could not obtain metadata retries info\n");
+            }
 
             /* Reopen the file */
-            if (H5Fclose(fid) < 0)
+            if (H5Fclose(fid) < 0) {
                 return -1;
-            if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0)
+            }
+            if ((fid = H5Fopen(filename, H5F_ACC_RDONLY | H5F_ACC_SWMR_READ, fapl)) < 0) {
                 return -1;
+            }
             iter_to_reopen = reopen_count;
         } /* end if */
-    }     /* end while */
+    } /* end while */
 
     /* Retrieve and print the collection of metadata read retries */
-    if (print_metadata_retries_info(fid) < 0)
+    if (print_metadata_retries_info(fid) < 0) {
         fprintf(stderr, "Warning: could not obtain metadata retries info\n");
+    }
 
     /* Close file */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         return -1;
+    }
 
     /* Close the memory dataspace */
-    if (H5Sclose(mem_sid) < 0)
+    if (H5Sclose(mem_sid) < 0) {
         return -1;
+    }
 
     return 0;
 } /* end read_records() */
 
-static void
-usage(void)
+static void usage(void)
 {
     printf("\n");
     printf("Usage error!\n");
@@ -339,60 +368,61 @@ usage(void)
     exit(EXIT_FAILURE);
 } /* end usage() */
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    long     nrecords     = 0; /* # of records to read */
-    int      poll_time    = 1; /* # of seconds to sleep when waiting for writer */
-    int      reopen_count = 1; /* # of reads between reopens */
-    unsigned verbose      = 1; /* Whether to emit some informational messages */
-    unsigned u;                /* Local index variables */
+    long nrecords = 0;    /* # of records to read */
+    int poll_time = 1;    /* # of seconds to sleep when waiting for writer */
+    int reopen_count = 1; /* # of reads between reopens */
+    unsigned verbose = 1; /* Whether to emit some informational messages */
+    unsigned u;           /* Local index variables */
 
     /* Parse command line options */
-    if (argc < 2)
+    if (argc < 2) {
         usage();
+    }
     if (argc > 1) {
         u = 1;
         while (u < (unsigned)argc) {
             if (argv[u][0] == '-') {
                 switch (argv[u][1]) {
-                    /* # of reads between reopens */
-                    case 'n':
-                        reopen_count = atoi(argv[u + 1]);
-                        if (reopen_count < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    /* Be quiet */
-                    case 'q':
-                        verbose = 0;
-                        u++;
-                        break;
-
-                    /* # of seconds between polling */
-                    case 's':
-                        poll_time = atoi(argv[u + 1]);
-                        if (poll_time < 0)
-                            usage();
-                        u += 2;
-                        break;
-
-                    default:
+                /* # of reads between reopens */
+                case 'n':
+                    reopen_count = atoi(argv[u + 1]);
+                    if (reopen_count < 0) {
                         usage();
-                        break;
+                    }
+                    u += 2;
+                    break;
+
+                /* Be quiet */
+                case 'q':
+                    verbose = 0;
+                    u++;
+                    break;
+
+                /* # of seconds between polling */
+                case 's':
+                    poll_time = atoi(argv[u + 1]);
+                    if (poll_time < 0) {
+                        usage();
+                    }
+                    u += 2;
+                    break;
+
+                default: usage(); break;
                 } /* end switch */
-            }     /* end if */
+            } /* end if */
             else {
                 /* Get the number of records to read */
                 nrecords = atol(argv[u]);
-                if (nrecords <= 0)
+                if (nrecords <= 0) {
                     usage();
+                }
 
                 u++;
             } /* end else */
-        }     /* end while */
-    }         /* end if */
+        } /* end while */
+    } /* end if */
 
     /* Emit informational message */
     if (verbose) {
@@ -403,8 +433,9 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Generating symbol names\n");
+    }
 
     /* Generate dataset names */
     if (generate_symbols() < 0) {
@@ -413,19 +444,20 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Create datatype for creating datasets */
-    if ((symbol_tid = create_symbol_datatype()) < 0)
+    if ((symbol_tid = create_symbol_datatype()) < 0) {
         return -1;
+    }
 
     /* Reading records from datasets */
-    if (read_records(FILENAME, verbose, (unsigned long)nrecords, (unsigned)poll_time,
-                     (unsigned)reopen_count) < 0) {
+    if (read_records(FILENAME, verbose, (unsigned long)nrecords, (unsigned)poll_time, (unsigned)reopen_count) < 0) {
         fprintf(stderr, "Error reading records from datasets!\n");
         exit(EXIT_FAILURE);
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Releasing symbols\n");
+    }
 
     /* Clean up the symbols */
     if (shutdown_symbols() < 0) {
@@ -434,8 +466,9 @@ main(int argc, char *argv[])
     } /* end if */
 
     /* Emit informational message */
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "Closing objects\n");
+    }
 
     /* Close objects created */
     if (H5Tclose(symbol_tid) < 0) {

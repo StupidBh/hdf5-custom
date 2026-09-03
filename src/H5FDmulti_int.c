@@ -28,10 +28,10 @@
 /* Headers */
 /***********/
 
-#include "H5private.h"  /* Generic Functions                        */
-#include "H5Eprivate.h" /* Error handling                           */
-#include "H5Iprivate.h" /* IDs                                      */
-#include "H5FDpkg.h"    /* File drivers                             */
+#include "H5private.h"         /* Generic Functions                        */
+#include "H5Eprivate.h"        /* Error handling                           */
+#include "H5Iprivate.h"        /* IDs                                      */
+#include "H5FDpkg.h"           /* File drivers                             */
 
 #include "H5FDmulti_private.h" /* multi VFD */
 
@@ -47,16 +47,17 @@ hid_t H5FD_MULTI_id_g = H5I_INVALID_HID;
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5FD__multi_register(void)
+herr_t H5FD__multi_register(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
-    if (H5I_VFL != H5I_get_type(H5FD_MULTI_id_g))
-        if ((H5FD_MULTI_id_g = H5FD_register(&H5FD_multi_g, sizeof(H5FD_class_t), false)) < 0)
+    if (H5I_VFL != H5I_get_type(H5FD_MULTI_id_g)) {
+        if ((H5FD_MULTI_id_g = H5FD_register(&H5FD_multi_g, sizeof(H5FD_class_t), false)) < 0) {
             HGOTO_ERROR(H5E_VFL, H5E_CANTREGISTER, FAIL, "unable to register multi driver");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -71,8 +72,7 @@ done:
  *
  *---------------------------------------------------------------------------
  */
-herr_t
-H5FD__multi_unregister(void)
+herr_t H5FD__multi_unregister(void)
 {
     FUNC_ENTER_PACKAGE_NOERR
 

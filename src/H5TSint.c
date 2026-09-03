@@ -43,46 +43,48 @@
 /* Local Macros */
 /****************/
 
-#ifdef H5_HAVE_C11_THREADS
-#define H5TS_ONCE_INIT_FUNC H5TS__c11_first_thread_init
-#else
-#ifdef H5_HAVE_WIN_THREADS
-#define H5TS_ONCE_INIT_FUNC H5TS__win32_process_enter
-#else
-#define H5TS_ONCE_INIT_FUNC H5TS__pthread_first_thread_init
-#endif /* H5_HAVE_WIN_THREADS */
-#endif
+    #ifdef H5_HAVE_C11_THREADS
+        #define H5TS_ONCE_INIT_FUNC H5TS__c11_first_thread_init
+    #else
+        #ifdef H5_HAVE_WIN_THREADS
+            #define H5TS_ONCE_INIT_FUNC H5TS__win32_process_enter
+        #else
+            #define H5TS_ONCE_INIT_FUNC H5TS__pthread_first_thread_init
+        #endif /* H5_HAVE_WIN_THREADS */
+    #endif
 
 /******************/
 /* Local Typedefs */
 /******************/
 
 /* Per-thread info */
-typedef struct H5TS_thread_info_t {
-    uint64_t            id;               /* Unique ID for each thread */
-    struct H5CX_node_t *api_ctx_node_ptr; /* Pointer to an API context node */
-    H5E_stack_t         err_stack;        /* Error stack */
-#ifdef H5_HAVE_CONCURRENCY
+typedef struct H5TS_thread_info_t
+{
+    uint64_t id;                          /* Unique ID for each thread */
+    struct H5CX_node_t* api_ctx_node_ptr; /* Pointer to an API context node */
+    H5E_stack_t err_stack;                /* Error stack */
+    #ifdef H5_HAVE_CONCURRENCY
     unsigned dlftt; /* Whether locking is disabled for this thread */
-#endif              /* H5_HAVE_CONCURRENCY */
+    #endif /* H5_HAVE_CONCURRENCY */
 } H5TS_thread_info_t;
 
 /* An H5TS_tinfo_node_t is a thread info that is available for reuse */
-typedef struct H5TS_tinfo_node_t {
-    struct H5TS_tinfo_node_t *next;
-    H5TS_thread_info_t        info;
+typedef struct H5TS_tinfo_node_t
+{
+    struct H5TS_tinfo_node_t* next;
+    H5TS_thread_info_t info;
 } H5TS_tinfo_node_t;
 
 /********************/
 /* Local Prototypes */
 /********************/
-static H5TS_tinfo_node_t *H5TS__tinfo_create(void);
-#ifdef H5_HAVE_CONCURRENCY
-static herr_t H5TS__get_dlftt(unsigned *dlftt);
+static H5TS_tinfo_node_t* H5TS__tinfo_create(void);
+    #ifdef H5_HAVE_CONCURRENCY
+static herr_t H5TS__get_dlftt(unsigned* dlftt);
 static herr_t H5TS__set_dlftt(unsigned dlftt);
 static herr_t H5TS__inc_dlftt(void);
 static herr_t H5TS__dec_dlftt(void);
-#endif /* H5_HAVE_CONCURRENCY */
+    #endif /* H5_HAVE_CONCURRENCY */
 
 /*********************/
 /* Package Variables */
@@ -106,8 +108,8 @@ H5TS_key_t H5TS_thrd_info_key_g;
 static H5TS_once_t H5TS_first_init_s = H5TS_ONCE_INITIALIZER;
 
 /* Pointer to first free thread info record or NULL. */
-static H5TS_tinfo_node_t *H5TS_tinfo_next_free_s = NULL;
-static uint64_t           H5TS_next_thrd_id_s    = 0;
+static H5TS_tinfo_node_t* H5TS_tinfo_next_free_s = NULL;
+static uint64_t H5TS_next_thrd_id_s = 0;
 
 /* Mutex for access to H5TS_tinfo_next_free_s and H5TS_next_thrd_id_s */
 static H5TS_mutex_t H5TS_tinfo_mtx_s;
@@ -123,27 +125,29 @@ DESCRIPTION
     Initializes any interface-specific data or routines.
 
 --------------------------------------------------------------------------*/
-herr_t
-H5TS__init_package(void)
+herr_t H5TS__init_package(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
 
     /* Initialize the global API lock info */
-#ifdef H5_HAVE_THREADSAFE
-    if (H5_UNLIKELY(H5TS_mutex_init(&H5TS_api_info_p.api_mutex, H5TS_MUTEX_TYPE_RECURSIVE) < 0))
+    #ifdef H5_HAVE_THREADSAFE
+    if (H5_UNLIKELY(H5TS_mutex_init(&H5TS_api_info_p.api_mutex, H5TS_MUTEX_TYPE_RECURSIVE) < 0)) {
         HGOTO_DONE(FAIL);
+    }
     H5TS_api_info_p.lock_count = 0;
-#else /* H5_HAVE_CONCURRENCY */
-    if (H5_UNLIKELY(H5TS_rwlock_init(&H5TS_api_info_p.api_lock) < 0))
+    #else /* H5_HAVE_CONCURRENCY */
+    if (H5_UNLIKELY(H5TS_rwlock_init(&H5TS_api_info_p.api_lock) < 0)) {
         HGOTO_DONE(FAIL);
-#endif
+    }
+    #endif
     H5TS_atomic_init_uint(&H5TS_api_info_p.attempt_lock_count, 0);
 
     /* Initialize per-thread library info */
-    if (H5_UNLIKELY(H5TS__tinfo_init() < 0))
+    if (H5_UNLIKELY(H5TS__tinfo_init() < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -163,23 +167,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-void
-H5TS_term_package(void)
+void H5TS_term_package(void)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
     /* Reset global API lock info */
-#ifdef H5_HAVE_THREADSAFE
+    #ifdef H5_HAVE_THREADSAFE
     H5TS_mutex_destroy(&H5TS_api_info_p.api_mutex);
-#else /* H5_HAVE_CONCURRENCY */
+    #else /* H5_HAVE_CONCURRENCY */
     H5TS_rwlock_destroy(&H5TS_api_info_p.api_lock);
-#endif
+    #endif
     H5TS_atomic_destroy_uint(&H5TS_api_info_p.attempt_lock_count);
 
     FUNC_LEAVE_NOAPI_VOID
 } /* end H5TS_term_package() */
 
-#ifdef H5_HAVE_CONCURRENCY
+    #ifdef H5_HAVE_CONCURRENCY
 /*-------------------------------------------------------------------------
  * Function:    H5TS_user_cb_prepare
  *
@@ -189,16 +192,16 @@ H5TS_term_package(void)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_user_cb_prepare(void)
+herr_t H5TS_user_cb_prepare(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Increment the 'disable locking for this thread' (DLFTT) value */
-    if (H5TS__inc_dlftt() < 0)
+    if (H5TS__inc_dlftt() < 0) {
         HGOTO_ERROR(H5E_LIB, H5E_CANTINC, FAIL, "unable to increment DLFTT value");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -213,21 +216,21 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_user_cb_restore(void)
+herr_t H5TS_user_cb_restore(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Decrement the 'disable locking for this thread' (DLFTT) value */
-    if (H5TS__dec_dlftt() < 0)
+    if (H5TS__dec_dlftt() < 0) {
         HGOTO_ERROR(H5E_LIB, H5E_CANTDEC, FAIL, "unable to decrement DLFTT value");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5TS_user_cb_restore() */
-#endif /* H5_HAVE_CONCURRENCY */
+    #endif /* H5_HAVE_CONCURRENCY */
 
 /*--------------------------------------------------------------------------
  * Function:    H5TS__api_mutex_acquire
@@ -241,87 +244,96 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS__api_mutex_acquire(unsigned lock_count, bool *acquired)
+herr_t H5TS__api_mutex_acquire(unsigned lock_count, bool* acquired)
 {
-#ifdef H5_HAVE_CONCURRENCY
+    #ifdef H5_HAVE_CONCURRENCY
     unsigned dlftt = 0;
-#endif
+    #endif
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
-#ifdef H5_HAVE_THREADSAFE
+    #ifdef H5_HAVE_THREADSAFE
     /* Attempt to acquire the lock */
-    if (H5_UNLIKELY(H5TS_mutex_trylock(&H5TS_api_info_p.api_mutex, acquired) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_trylock(&H5TS_api_info_p.api_mutex, acquired) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* If acquired, acquire the mutex ('lock_count' - 1) more times */
     if (*acquired) {
-        for (unsigned u = 0; u < (lock_count - 1); u++)
-            if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_api_info_p.api_mutex) < 0))
+        for (unsigned u = 0; u < (lock_count - 1); u++) {
+            if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_api_info_p.api_mutex) < 0)) {
                 HGOTO_DONE(FAIL);
+            }
+        }
         H5TS_api_info_p.lock_count += lock_count;
     }
-#else /* H5_HAVE_CONCURRENCY */
+    #else /* H5_HAVE_CONCURRENCY */
     /* Query the DLFTT value */
-    if (H5_UNLIKELY(H5TS__get_dlftt(&dlftt) < 0))
+    if (H5_UNLIKELY(H5TS__get_dlftt(&dlftt) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Check if we haven't acquired the lock */
     if (0 == dlftt) {
         /* Attempt to acquire the lock */
-        if (H5_UNLIKELY(H5TS_rwlock_trywrlock(&H5TS_api_info_p.api_lock, acquired) < 0))
+        if (H5_UNLIKELY(H5TS_rwlock_trywrlock(&H5TS_api_info_p.api_lock, acquired) < 0)) {
             HGOTO_DONE(FAIL);
+        }
     }
-    else
+    else {
         *acquired = true;
+    }
 
     /* If acquired, increment the DLFTT count by 'lock_count' */
-    if (*acquired)
+    if (*acquired) {
         /* Set the DLFTT value */
-        if (H5_UNLIKELY(H5TS__set_dlftt(dlftt + lock_count) < 0))
+        if (H5_UNLIKELY(H5TS__set_dlftt(dlftt + lock_count) < 0)) {
             HGOTO_DONE(FAIL);
-#endif
+        }
+    }
+    #endif
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS__api_mutex_acquire() */
 
-/*--------------------------------------------------------------------------
- * Function:    H5TS_api_lock
- *
- * Purpose:     Increment the global "API" lock counter for accessing the HDF5
- *              library, acquiring the lock for the thread if the counter is
- *              initially 0.
- *
- * Note:        Multiple (usually recursive) acquisitions of the "API" lock by
- *              the same thread is permitted with corresponding unlock
- *              operation(s).
- *
- * Return:      Non-negative on success / Negative on failure
- *
- *--------------------------------------------------------------------------
- */
-#ifdef H5_HAVE_THREADSAFE
-herr_t
-H5TS_api_lock(void)
+    /*--------------------------------------------------------------------------
+     * Function:    H5TS_api_lock
+     *
+     * Purpose:     Increment the global "API" lock counter for accessing the HDF5
+     *              library, acquiring the lock for the thread if the counter is
+     *              initially 0.
+     *
+     * Note:        Multiple (usually recursive) acquisitions of the "API" lock by
+     *              the same thread is permitted with corresponding unlock
+     *              operation(s).
+     *
+     * Return:      Non-negative on success / Negative on failure
+     *
+     *--------------------------------------------------------------------------
+     */
+    #ifdef H5_HAVE_THREADSAFE
+herr_t H5TS_api_lock(void)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Initialize the thread-safety code, once */
-    if (H5_UNLIKELY(!H5_INIT_GLOBAL))
-        if (H5_UNLIKELY(H5TS_once(&H5TS_first_init_s, H5TS_ONCE_INIT_FUNC) < 0))
+    if (H5_UNLIKELY(!H5_INIT_GLOBAL)) {
+        if (H5_UNLIKELY(H5TS_once(&H5TS_first_init_s, H5TS_ONCE_INIT_FUNC) < 0)) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Increment the attempt lock count */
     H5TS_atomic_fetch_add_uint(&H5TS_api_info_p.attempt_lock_count, 1);
 
     /* Acquire the library's API lock */
-    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_api_info_p.api_mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_api_info_p.api_mutex) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Increment the lock count for this thread */
     H5TS_api_info_p.lock_count++;
@@ -329,40 +341,44 @@ H5TS_api_lock(void)
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_api_lock() */
-#else
-#ifdef H5_HAVE_CONCURRENCY
-herr_t
-H5TS_api_lock(unsigned *dlftt)
+    #else
+        #ifdef H5_HAVE_CONCURRENCY
+herr_t H5TS_api_lock(unsigned* dlftt)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Initialize the thread-safety code, once */
-    if (H5_UNLIKELY(!H5_INIT_GLOBAL))
-        if (H5_UNLIKELY(H5TS_once(&H5TS_first_init_s, H5TS_ONCE_INIT_FUNC) < 0))
+    if (H5_UNLIKELY(!H5_INIT_GLOBAL)) {
+        if (H5_UNLIKELY(H5TS_once(&H5TS_first_init_s, H5TS_ONCE_INIT_FUNC) < 0)) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Increment the attempt lock count */
     H5TS_atomic_fetch_add_uint(&H5TS_api_info_p.attempt_lock_count, 1);
 
     /* Query the DLFTT value */
-    if (H5_UNLIKELY(H5TS__get_dlftt(dlftt) < 0))
+    if (H5_UNLIKELY(H5TS__get_dlftt(dlftt) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Don't acquire the API lock if locking is disabled */
-    if (0 == *dlftt)
+    if (0 == *dlftt) {
         /* Acquire the library's API lock */
-        if (H5_UNLIKELY(H5TS_rwlock_wrlock(&H5TS_api_info_p.api_lock) < 0))
+        if (H5_UNLIKELY(H5TS_rwlock_wrlock(&H5TS_api_info_p.api_lock) < 0)) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_api_lock() */
-#else
-#error "Unknown multithreading mode"
-#endif
-#endif
+        #else
+            #error "Unknown multithreading mode"
+        #endif
+    #endif
 
 /*--------------------------------------------------------------------------
  * Function:    H5TS__api_mutex_release
@@ -375,14 +391,13 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS__api_mutex_release(unsigned *lock_count)
+herr_t H5TS__api_mutex_release(unsigned* lock_count)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
-#ifdef H5_HAVE_THREADSAFE
+    #ifdef H5_HAVE_THREADSAFE
     /* Return the current lock count */
     *lock_count = H5TS_api_info_p.lock_count;
 
@@ -390,22 +405,27 @@ H5TS__api_mutex_release(unsigned *lock_count)
     H5TS_api_info_p.lock_count = 0;
 
     /* Release the library's API lock 'lock_count' times */
-    for (unsigned u = 0; u < *lock_count; u++)
-        if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_api_info_p.api_mutex) < 0))
+    for (unsigned u = 0; u < *lock_count; u++) {
+        if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_api_info_p.api_mutex) < 0)) {
             HGOTO_DONE(FAIL);
-#else /* H5_HAVE_CONCURRENCY */
+        }
+    }
+    #else /* H5_HAVE_CONCURRENCY */
     /* Query the DLFTT value */
-    if (H5_UNLIKELY(H5TS__get_dlftt(lock_count) < 0))
+    if (H5_UNLIKELY(H5TS__get_dlftt(lock_count) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Reset the DLFTT value */
-    if (H5_UNLIKELY(H5TS__set_dlftt(0) < 0))
+    if (H5_UNLIKELY(H5TS__set_dlftt(0) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Release the library's API lock */
-    if (H5_UNLIKELY(H5TS_rwlock_wrunlock(&H5TS_api_info_p.api_lock) < 0))
+    if (H5_UNLIKELY(H5TS_rwlock_wrunlock(&H5TS_api_info_p.api_lock) < 0)) {
         HGOTO_DONE(FAIL);
-#endif
+    }
+    #endif
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -422,25 +442,26 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_api_unlock(void)
+herr_t H5TS_api_unlock(void)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-#ifdef H5_HAVE_THREADSAFE
+    #ifdef H5_HAVE_THREADSAFE
     /* Decrement the lock count for this thread */
     H5TS_api_info_p.lock_count--;
 
     /* Release the library's API lock */
-    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_api_info_p.api_mutex) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_api_info_p.api_mutex) < 0)) {
         HGOTO_DONE(FAIL);
-#else /* H5_HAVE_CONCURRENCY */
+    }
+    #else /* H5_HAVE_CONCURRENCY */
     /* Release the library's API lock */
-    if (H5_UNLIKELY(H5TS_rwlock_wrunlock(&H5TS_api_info_p.api_lock) < 0))
+    if (H5_UNLIKELY(H5TS_rwlock_wrunlock(&H5TS_api_info_p.api_lock) < 0)) {
         HGOTO_DONE(FAIL);
-#endif
+    }
+    #endif
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -455,25 +476,27 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS__tinfo_init(void)
+herr_t H5TS__tinfo_init(void)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Initialize the critical section for modifying the thread info globals */
-    if (H5_UNLIKELY(H5TS_mutex_init(&H5TS_tinfo_mtx_s, H5TS_MUTEX_TYPE_PLAIN)) < 0)
+    if (H5_UNLIKELY(H5TS_mutex_init(&H5TS_tinfo_mtx_s, H5TS_MUTEX_TYPE_PLAIN)) < 0) {
         ret_value = FAIL;
+    }
 
-        /* Initialize key for thread-specific API contexts */
-#ifdef H5_HAVE_WIN_THREADS
-    if (H5_UNLIKELY(H5TS_key_create(&H5TS_thrd_info_key_g, NULL) < 0))
+    /* Initialize key for thread-specific API contexts */
+    #ifdef H5_HAVE_WIN_THREADS
+    if (H5_UNLIKELY(H5TS_key_create(&H5TS_thrd_info_key_g, NULL) < 0)) {
         ret_value = FAIL;
-#else
-    if (H5_UNLIKELY(H5TS_key_create(&H5TS_thrd_info_key_g, H5TS__tinfo_destroy) < 0))
+    }
+    #else
+    if (H5_UNLIKELY(H5TS_key_create(&H5TS_thrd_info_key_g, H5TS__tinfo_destroy) < 0)) {
         ret_value = FAIL;
-#endif
+    }
+    #endif
 
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS__tinfo_init() */
@@ -487,12 +510,11 @@ H5TS__tinfo_init(void)
  *
  *--------------------------------------------------------------------------
  */
-static H5TS_tinfo_node_t *
-H5TS__tinfo_create(void)
+static H5TS_tinfo_node_t* H5TS__tinfo_create(void)
 {
-    uint64_t           new_id;
-    H5TS_tinfo_node_t *tinfo_node;
-    H5TS_tinfo_node_t *ret_value;
+    uint64_t new_id;
+    H5TS_tinfo_node_t* tinfo_node;
+    H5TS_tinfo_node_t* ret_value;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
@@ -500,12 +522,14 @@ H5TS__tinfo_create(void)
     /* Note: Must use lock here also, since 'destroy' callback can be
      *	invoked asynchronously when a thread is joined.
      */
-    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_tinfo_mtx_s) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_tinfo_mtx_s) < 0)) {
         HGOTO_DONE(NULL);
+    }
 
     /* Reuse an info struct that's on the free list if possible */
-    if (NULL != (tinfo_node = H5TS_tinfo_next_free_s))
+    if (NULL != (tinfo_node = H5TS_tinfo_next_free_s)) {
         H5TS_tinfo_next_free_s = tinfo_node->next;
+    }
 
     /* Always use unique ID value for each thread, even when recycling a
      * H5TS_tinfo_node_t from the free list.
@@ -515,13 +539,15 @@ H5TS__tinfo_create(void)
     new_id = ++H5TS_next_thrd_id_s;
 
     /* Release the lock for modifying the thread info globals */
-    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_tinfo_mtx_s) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_tinfo_mtx_s) < 0)) {
         HGOTO_DONE(NULL);
+    }
 
     /* If a new info record is needed, allocate it */
     if (NULL == tinfo_node) {
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5MM_malloc(sizeof(*tinfo_node)))))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5MM_malloc(sizeof(*tinfo_node))))) {
             HGOTO_DONE(NULL);
+        }
         tinfo_node->next = NULL;
     }
 
@@ -560,25 +586,28 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_id(uint64_t *id)
+herr_t H5TS_thread_id(uint64_t* id)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    herr_t             ret_value = SUCCEED;
+    H5TS_tinfo_node_t* tinfo_node;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == id))
+    if (H5_UNLIKELY(NULL == id)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(FAIL);
-    if (NULL == tinfo_node)
+    }
+    if (NULL == tinfo_node) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Set return value */
     *id = tinfo_node->info.id;
@@ -598,21 +627,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-struct H5CX_node_t **
-H5TS_get_api_ctx_ptr(void)
+struct H5CX_node_t** H5TS_get_api_ctx_ptr(void)
 {
-    H5TS_tinfo_node_t   *tinfo_node;
-    struct H5CX_node_t **ret_value;
+    H5TS_tinfo_node_t* tinfo_node;
+    struct H5CX_node_t** ret_value;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(NULL);
-    if (NULL == tinfo_node)
+    }
+    if (NULL == tinfo_node) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(NULL);
+        }
+    }
 
     /* Set return value */
     ret_value = &tinfo_node->info.api_ctx_node_ptr;
@@ -632,21 +663,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-H5E_stack_t *
-H5TS_get_err_stack(void)
+H5E_stack_t* H5TS_get_err_stack(void)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    H5E_stack_t       *ret_value;
+    H5TS_tinfo_node_t* tinfo_node;
+    H5E_stack_t* ret_value;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(NULL);
-    if (NULL == tinfo_node)
+    }
+    if (NULL == tinfo_node) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(NULL);
+        }
+    }
 
     /* Set return value */
     ret_value = &tinfo_node->info.err_stack;
@@ -655,7 +688,7 @@ done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* H5TS_get_err_stack() */
 
-#ifdef H5_HAVE_CONCURRENCY
+    #ifdef H5_HAVE_CONCURRENCY
 /*--------------------------------------------------------------------------
  * Function:    H5TS__get_dlftt
  *
@@ -665,21 +698,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__get_dlftt(unsigned *dlftt)
+static herr_t H5TS__get_dlftt(unsigned* dlftt)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    herr_t             ret_value = SUCCEED;
+    H5TS_tinfo_node_t* tinfo_node;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(FAIL);
-    if (H5_UNLIKELY(NULL == tinfo_node))
+    }
+    if (H5_UNLIKELY(NULL == tinfo_node)) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Get value */
     *dlftt = tinfo_node->info.dlftt;
@@ -697,21 +732,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__set_dlftt(unsigned dlftt)
+static herr_t H5TS__set_dlftt(unsigned dlftt)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    herr_t             ret_value = SUCCEED;
+    H5TS_tinfo_node_t* tinfo_node;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(FAIL);
-    if (H5_UNLIKELY(NULL == tinfo_node))
+    }
+    if (H5_UNLIKELY(NULL == tinfo_node)) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Set value */
     tinfo_node->info.dlftt = dlftt;
@@ -729,21 +766,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__inc_dlftt(void)
+static herr_t H5TS__inc_dlftt(void)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    herr_t             ret_value = SUCCEED;
+    H5TS_tinfo_node_t* tinfo_node;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(FAIL);
-    if (H5_UNLIKELY(NULL == tinfo_node))
+    }
+    if (H5_UNLIKELY(NULL == tinfo_node)) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Increment value */
     tinfo_node->info.dlftt++;
@@ -761,21 +800,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5TS__dec_dlftt(void)
+static herr_t H5TS__dec_dlftt(void)
 {
-    H5TS_tinfo_node_t *tinfo_node;
-    herr_t             ret_value = SUCCEED;
+    H5TS_tinfo_node_t* tinfo_node;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Check if info for thread has been created */
-    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void **)&tinfo_node) < 0))
+    if (H5_UNLIKELY(H5TS_key_get_value(H5TS_thrd_info_key_g, (void**)&tinfo_node) < 0)) {
         HGOTO_DONE(FAIL);
-    if (H5_UNLIKELY(NULL == tinfo_node))
+    }
+    if (H5_UNLIKELY(NULL == tinfo_node)) {
         /* Create thread info for this thread */
-        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create())))
+        if (H5_UNLIKELY(NULL == (tinfo_node = H5TS__tinfo_create()))) {
             HGOTO_DONE(FAIL);
+        }
+    }
 
     /* Decrement value */
     tinfo_node->info.dlftt--;
@@ -783,7 +824,7 @@ H5TS__dec_dlftt(void)
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* H5TS__dec_dlftt() */
-#endif /* H5_HAVE_CONCURRENCY */
+    #endif /* H5_HAVE_CONCURRENCY */
 
 /*--------------------------------------------------------------------------
  * Function:    H5TS__tinfo_destroy
@@ -798,10 +839,9 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS__tinfo_destroy(void *_tinfo_node)
+void H5TS__tinfo_destroy(void* _tinfo_node)
 {
-    H5TS_tinfo_node_t *tinfo_node = _tinfo_node;
+    H5TS_tinfo_node_t* tinfo_node = _tinfo_node;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
@@ -809,7 +849,7 @@ H5TS__tinfo_destroy(void *_tinfo_node)
         H5TS_mutex_lock(&H5TS_tinfo_mtx_s);
 
         /* Add thread info node to the free list */
-        tinfo_node->next       = H5TS_tinfo_next_free_s;
+        tinfo_node->next = H5TS_tinfo_next_free_s;
         H5TS_tinfo_next_free_s = tinfo_node;
 
         /* Release resources held by error records in thread-local error stack */
@@ -832,8 +872,7 @@ H5TS__tinfo_destroy(void *_tinfo_node)
  *
  *--------------------------------------------------------------------------
  */
-int
-H5TS_top_term_package(void)
+int H5TS_top_term_package(void)
 {
     int n = 0;
 
@@ -854,31 +893,34 @@ H5TS_top_term_package(void)
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS__tinfo_term(void)
+herr_t H5TS__tinfo_term(void)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NAMECHECK_ONLY
 
     /* Release nodes on the free list */
-    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_tinfo_mtx_s) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_lock(&H5TS_tinfo_mtx_s) < 0)) {
         HGOTO_DONE(FAIL);
+    }
     while (H5TS_tinfo_next_free_s) {
-        H5TS_tinfo_node_t *next = H5TS_tinfo_next_free_s->next;
+        H5TS_tinfo_node_t* next = H5TS_tinfo_next_free_s->next;
         H5MM_free(H5TS_tinfo_next_free_s);
         H5TS_tinfo_next_free_s = next;
     }
-    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_tinfo_mtx_s) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_unlock(&H5TS_tinfo_mtx_s) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Release critical section / mutex for modifying the thread info globals */
-    if (H5_UNLIKELY(H5TS_mutex_destroy(&H5TS_tinfo_mtx_s) < 0))
+    if (H5_UNLIKELY(H5TS_mutex_destroy(&H5TS_tinfo_mtx_s) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Release key for thread-specific API contexts */
-    if (H5_UNLIKELY(H5TS_key_delete(H5TS_thrd_info_key_g) < 0))
+    if (H5_UNLIKELY(H5TS_key_delete(H5TS_thrd_info_key_g) < 0)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)

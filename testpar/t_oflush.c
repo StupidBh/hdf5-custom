@@ -24,19 +24,18 @@
 #define NY          6
 #define RANK        2
 
-void
-test_oflush(void *params)
+void test_oflush(void* params)
 {
-    int         mpi_size, mpi_rank;
-    hid_t       file, dataset;
-    hid_t       dataspace;
-    hid_t       fapl_id;
-    const char *filename;
-    hid_t       gid, dtype_flush;
-    hsize_t     dimsf[2];
-    herr_t      ret;
-    int         data[NX][NY];
-    int         i, j;
+    int mpi_size, mpi_rank;
+    hid_t file, dataset;
+    hid_t dataspace;
+    hid_t fapl_id;
+    const char* filename;
+    hid_t gid, dtype_flush;
+    hsize_t dimsf[2];
+    herr_t ret;
+    int data[NX][NY];
+    int i, j;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -46,11 +45,13 @@ test_oflush(void *params)
     VRFY((fapl_id >= 0), "fapl creation succeeded");
 
     /* Data buffer initialization */
-    for (j = 0; j < NX; j++)
-        for (i = 0; i < NY; i++)
+    for (j = 0; j < NX; j++) {
+        for (i = 0; i < NY; i++) {
             data[j][i] = i + j;
+        }
+    }
 
-    filename = ((const H5Ptest_param_t *)params)->name;
+    filename = ((const H5Ptest_param_t*)params)->name;
 
     file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
     VRFY((file >= 0), "file creation succeeded");

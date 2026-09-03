@@ -1,7 +1,7 @@
-hid_t               fapl_id;
-unsigned            counter;
-H5F_object_flush_t *ret_cb;
-unsigned           *ret_counter;
+hid_t fapl_id;
+unsigned counter;
+H5F_object_flush_t* ret_cb;
+unsigned* ret_counter;
 
 /* Create a copy of the file access property list */
 fapl_id = H5Pcreate(H5P_FILE_ACCESS);
@@ -19,6 +19,7 @@ fapl = H5Fget_access_plist(file_id);
 
 /* Retrieve the object flush property values for the file */
 H5Pget_object_flush_cb(fapl, &ret_cb, &ret_counter);
+
 /* ret_cb will point to flush_cb() */
 /* ret_counter will point to counter */
 
@@ -32,10 +33,9 @@ H5Pget_object_flush_cb(fapl, &ret_cb, &ret_counter);
 */
 
 /* The callback function for the object flush property */
-static herr_t
-flush_cb(hid_t obj_id, void *_udata)
+static herr_t flush_cb(hid_t obj_id, void* _udata)
 {
-    unsigned *flush_ct = (unsigned *)_udata;
+    unsigned* flush_ct = (unsigned*)_udata;
     ++(*flush_ct);
     return 0;
 }

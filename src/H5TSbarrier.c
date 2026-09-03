@@ -68,26 +68,27 @@
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_barrier_init(H5TS_barrier_t *barrier, unsigned count)
+herr_t H5TS_barrier_init(H5TS_barrier_t* barrier, unsigned count)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(NULL == barrier || 0 == count))
+    if (H5_UNLIKELY(NULL == barrier || 0 == count)) {
         HGOTO_DONE(FAIL);
+    }
 
-#ifdef H5_HAVE_PTHREAD_BARRIER
+    #ifdef H5_HAVE_PTHREAD_BARRIER
     /* Initialize the barrier */
-    if (H5_UNLIKELY(pthread_barrier_init(barrier, NULL, count)))
+    if (H5_UNLIKELY(pthread_barrier_init(barrier, NULL, count))) {
         HGOTO_DONE(FAIL);
-#else
+    }
+    #else
     /* Initialize fields */
     barrier->count = count;
     H5TS_atomic_init_uint(&barrier->openings, count);
     H5TS_atomic_init_uint(&barrier->generation, 0);
-#endif
+    #endif
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -103,24 +104,25 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_barrier_destroy(H5TS_barrier_t *barrier)
+herr_t H5TS_barrier_destroy(H5TS_barrier_t* barrier)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(NULL == barrier))
+    if (H5_UNLIKELY(NULL == barrier)) {
         HGOTO_DONE(FAIL);
+    }
 
-#ifdef H5_HAVE_PTHREAD_BARRIER
-    if (H5_UNLIKELY(pthread_barrier_destroy(barrier)))
+    #ifdef H5_HAVE_PTHREAD_BARRIER
+    if (H5_UNLIKELY(pthread_barrier_destroy(barrier))) {
         HGOTO_DONE(FAIL);
-#else
+    }
+    #else
     /* Destroy the (emulated) atomic variables */
     H5TS_atomic_destroy_uint(&barrier->openings);
     H5TS_atomic_destroy_uint(&barrier->generation);
-#endif
+    #endif
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)

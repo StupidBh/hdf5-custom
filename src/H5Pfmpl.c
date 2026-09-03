@@ -55,16 +55,16 @@
 /********************/
 
 /* Property class callbacks */
-static herr_t H5P__fmnt_reg_prop(H5P_genclass_t *pclass);
+static herr_t H5P__fmnt_reg_prop(H5P_genclass_t* pclass);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* File mount property list class library initialization object */
-const H5P_libclass_t H5P_CLS_FMNT[1] = {{
-    "file mount",        /* Class name for debugging     */
-    H5P_TYPE_FILE_MOUNT, /* Class type                   */
+const H5P_libclass_t H5P_CLS_FMNT[1] = { {
+    "file mount",             /* Class name for debugging     */
+    H5P_TYPE_FILE_MOUNT,      /* Class type                   */
 
     &H5P_CLS_ROOT_g,          /* Parent class                 */
     &H5P_CLS_FILE_MOUNT_g,    /* Pointer to class             */
@@ -72,13 +72,13 @@ const H5P_libclass_t H5P_CLS_FMNT[1] = {{
     &H5P_LST_FILE_MOUNT_ID_g, /* Pointer to default property list ID */
     H5P__fmnt_reg_prop,       /* Default property registration routine */
 
-    NULL, /* Class creation callback      */
-    NULL, /* Class creation callback info */
-    NULL, /* Class copy callback          */
-    NULL, /* Class copy callback info     */
-    NULL, /* Class close callback         */
-    NULL  /* Class close callback info    */
-}};
+    NULL,                     /* Class creation callback      */
+    NULL,                     /* Class creation callback info */
+    NULL,                     /* Class copy callback          */
+    NULL,                     /* Class copy callback info     */
+    NULL,                     /* Class close callback         */
+    NULL                      /* Class close callback info    */
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -100,17 +100,16 @@ static const bool H5F_def_local_g = H5F_MNT_SYM_LOCAL_DEF; /* Whether symlinks a
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__fmnt_reg_prop(H5P_genclass_t *pclass)
+static herr_t H5P__fmnt_reg_prop(H5P_genclass_t* pclass)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Register property of whether symlinks is local to file */
-    if (H5P__register_real(pclass, H5F_MNT_SYM_LOCAL_NAME, H5F_MNT_SYM_LOCAL_SIZE, &H5F_def_local_g, NULL,
-                           NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) < 0)
+    if (H5P__register_real(pclass, H5F_MNT_SYM_LOCAL_NAME, H5F_MNT_SYM_LOCAL_SIZE, &H5F_def_local_g, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTINSERT, FAIL, "can't insert property into class");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

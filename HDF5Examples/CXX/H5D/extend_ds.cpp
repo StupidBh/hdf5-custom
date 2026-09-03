@@ -29,12 +29,11 @@ using namespace H5;
 
 const H5std_string FILE_NAME("SDSextendible.h5");
 const H5std_string DATASET_NAME("ExtendibleArray");
-const int          NX   = 10;
-const int          NY   = 5;
-const int          RANK = 2;
+const int NX = 10;
+const int NY = 5;
+const int RANK = 2;
 
-int
-main(void)
+int main(void)
 {
     /*
      * Try block to detect exceptions raised by any of the calls inside it
@@ -49,8 +48,8 @@ main(void)
         /*
          * Create the data space with unlimited dimensions.
          */
-        hsize_t   dims[2]    = {3, 3}; // dataset dimensions at creation
-        hsize_t   maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
+        hsize_t dims[2] = { 3, 3 }; // dataset dimensions at creation
+        hsize_t maxdims[2] = { H5S_UNLIMITED, H5S_UNLIMITED };
         DataSpace mspace1(RANK, dims, maxdims);
 
         /*
@@ -63,7 +62,7 @@ main(void)
          */
         DSetCreatPropList cparms;
 
-        hsize_t chunk_dims[2] = {2, 5};
+        hsize_t chunk_dims[2] = { 2, 5 };
         cparms.setChunk(RANK, chunk_dims);
 
         /*
@@ -90,35 +89,35 @@ main(void)
          * Select a hyperslab.
          */
         DataSpace fspace1 = dataset.getSpace();
-        hsize_t   offset[2];
-        offset[0]        = 0;
-        offset[1]        = 0;
-        hsize_t dims1[2] = {3, 3}; /* data1 dimensions */
+        hsize_t offset[2];
+        offset[0] = 0;
+        offset[1] = 0;
+        hsize_t dims1[2] = { 3, 3 }; /* data1 dimensions */
         fspace1.selectHyperslab(H5S_SELECT_SET, dims1, offset);
 
         /*
          * Write the data to the hyperslab.
          */
-        int data1[3][3] = {{1, 1, 1}, /* data to write */
-                           {1, 1, 1},
-                           {1, 1, 1}};
+        int data1[3][3] = { { 1, 1, 1 }, /* data to write */
+                            { 1, 1, 1 },
+                            { 1, 1, 1 } };
         dataset.write(data1, PredType::NATIVE_INT, mspace1, fspace1);
 
         /*
          * Extend the dataset. Dataset becomes 10 x 3.
          */
-        hsize_t dims2[2] = {7, 1}; /* data2 dimensions */
-        dims[0]          = dims1[0] + dims2[0];
-        size[0]          = dims[0];
-        size[1]          = dims[1];
+        hsize_t dims2[2] = { 7, 1 }; /* data2 dimensions */
+        dims[0] = dims1[0] + dims2[0];
+        size[0] = dims[0];
+        size[1] = dims[1];
         dataset.extend(size);
 
         /*
          * Select a hyperslab.
          */
         DataSpace fspace2 = dataset.getSpace();
-        offset[0]         = 3;
-        offset[1]         = 0;
+        offset[0] = 3;
+        offset[1] = 0;
         fspace2.selectHyperslab(H5S_SELECT_SET, dims2, offset);
 
         /*
@@ -129,24 +128,24 @@ main(void)
         /*
          * Write the data to the hyperslab.
          */
-        int data2[7] = {2, 2, 2, 2, 2, 2, 2};
+        int data2[7] = { 2, 2, 2, 2, 2, 2, 2 };
         dataset.write(data2, PredType::NATIVE_INT, mspace2, fspace2);
 
         /*
          * Extend the dataset. Dataset becomes 10 x 5.
          */
-        hsize_t dims3[2] = {2, 2}; /* data3 dimensions */
-        dims[1]          = dims1[1] + dims3[1];
-        size[0]          = dims[0];
-        size[1]          = dims[1];
+        hsize_t dims3[2] = { 2, 2 }; /* data3 dimensions */
+        dims[1] = dims1[1] + dims3[1];
+        size[0] = dims[0];
+        size[1] = dims[1];
         dataset.extend(size);
 
         /*
          * Select a hyperslab
          */
         DataSpace fspace3 = dataset.getSpace();
-        offset[0]         = 0;
-        offset[1]         = 3;
+        offset[0] = 0;
+        offset[1] = 3;
         fspace3.selectHyperslab(H5S_SELECT_SET, dims3, offset);
 
         /*
@@ -157,7 +156,7 @@ main(void)
         /*
          * Write the data to the hyperslab.
          */
-        int data3[2][2] = {{3, 3}, {3, 3}};
+        int data3[2][2] = { { 3, 3 }, { 3, 3 } };
         dataset.write(data3, PredType::NATIVE_INT, mspace3, fspace3);
 
         /*
@@ -166,8 +165,9 @@ main(void)
         int i, j;
         int data_out[NX][NY];
         for (i = 0; i < NX; i++) {
-            for (j = 0; j < NY; j++)
+            for (j = 0; j < NY; j++) {
                 data_out[i][j] = 0;
+            }
         }
         dataset.read(data_out, PredType::NATIVE_INT);
         /*
@@ -188,8 +188,9 @@ main(void)
          * Display the result.
          */
         for (i = 0; i < NX; i++) {
-            for (j = 0; j < NY; j++)
+            for (j = 0; j < NY; j++) {
                 cout << data_out[i][j] << "  ";
+            }
             cout << endl;
         }
     } // end of try block

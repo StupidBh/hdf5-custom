@@ -59,7 +59,7 @@
 /* Local Variables */
 /*******************/
 
-#ifdef H5_HAVE_C11_THREADS
+    #ifdef H5_HAVE_C11_THREADS
 /*--------------------------------------------------------------------------
  * Function: H5TS_thread_create
  *
@@ -69,15 +69,15 @@
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_create(H5TS_thread_t *thread, H5TS_thread_start_func_t func, void *udata)
+herr_t H5TS_thread_create(H5TS_thread_t* thread, H5TS_thread_start_func_t func, void* udata)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(thrd_create(thread, func, udata) != thrd_success))
+    if (H5_UNLIKELY(thrd_create(thread, func, udata) != thrd_success)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -92,15 +92,15 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t *ret_val)
+herr_t H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t* ret_val)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(thrd_join(thread, ret_val) != thrd_success))
+    if (H5_UNLIKELY(thrd_join(thread, ret_val) != thrd_success)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -115,15 +115,15 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_detach(H5TS_thread_t thread)
+herr_t H5TS_thread_detach(H5TS_thread_t thread)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(thrd_detach(thread) != thrd_success))
+    if (H5_UNLIKELY(thrd_detach(thread) != thrd_success)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -138,8 +138,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_thread_yield(void)
+void H5TS_thread_yield(void)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -147,8 +146,8 @@ H5TS_thread_yield(void)
 
     FUNC_LEAVE_NOAPI_VOID_NAMECHECK_ONLY
 } /* H5TS_thread_yield() */
-#else
-#ifdef H5_HAVE_WIN_THREADS
+    #else
+        #ifdef H5_HAVE_WIN_THREADS
 /*--------------------------------------------------------------------------
  * Function: H5TS_thread_create
  *
@@ -158,8 +157,7 @@ H5TS_thread_yield(void)
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_create(H5TS_thread_t *thread, H5TS_thread_start_func_t func, void *udata)
+herr_t H5TS_thread_create(H5TS_thread_t* thread, H5TS_thread_start_func_t func, void* udata)
 {
     herr_t ret_value = SUCCEED;
 
@@ -174,8 +172,9 @@ H5TS_thread_create(H5TS_thread_t *thread, H5TS_thread_start_func_t func, void *u
      *       so you can't wait on it, making it unsuitable for the existing
      *       test code.
      */
-    if (H5_UNLIKELY(NULL == (*thread = CreateThread(NULL, 0, func, udata, 0, NULL))))
+    if (H5_UNLIKELY(NULL == (*thread = CreateThread(NULL, 0, func, udata, 0, NULL)))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -190,20 +189,23 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t *ret_val)
+herr_t H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t* ret_val)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE)))
+    if (H5_UNLIKELY(WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE))) {
         HGOTO_DONE(FAIL);
-    if (ret_val)
-        if (H5_UNLIKELY(0 == GetExitCodeThread(thread, ret_val)))
+    }
+    if (ret_val) {
+        if (H5_UNLIKELY(0 == GetExitCodeThread(thread, ret_val))) {
             HGOTO_DONE(FAIL);
-    if (H5_UNLIKELY(0 == CloseHandle(thread)))
+        }
+    }
+    if (H5_UNLIKELY(0 == CloseHandle(thread))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -218,15 +220,15 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_detach(H5TS_thread_t thread)
+herr_t H5TS_thread_detach(H5TS_thread_t thread)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(0 == CloseHandle(thread)))
+    if (H5_UNLIKELY(0 == CloseHandle(thread))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -241,8 +243,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_thread_yield(void)
+void H5TS_thread_yield(void)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -250,7 +251,7 @@ H5TS_thread_yield(void)
 
     FUNC_LEAVE_NOAPI_VOID_NAMECHECK_ONLY
 } /* H5TS_thread_yield() */
-#else
+        #else
 /*--------------------------------------------------------------------------
  * Function: H5TS_thread_create
  *
@@ -260,15 +261,15 @@ H5TS_thread_yield(void)
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_create(H5TS_thread_t *thread, H5TS_thread_start_func_t func, void *udata)
+herr_t H5TS_thread_create(H5TS_thread_t* thread, H5TS_thread_start_func_t func, void* udata)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(pthread_create(thread, NULL, func, udata)))
+    if (H5_UNLIKELY(pthread_create(thread, NULL, func, udata))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -283,15 +284,15 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t *ret_val)
+herr_t H5TS_thread_join(H5TS_thread_t thread, H5TS_thread_ret_t* ret_val)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(pthread_join(thread, ret_val)))
+    if (H5_UNLIKELY(pthread_join(thread, ret_val))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -306,15 +307,15 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5TS_thread_detach(H5TS_thread_t thread)
+herr_t H5TS_thread_detach(H5TS_thread_t thread)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(pthread_detach(thread)))
+    if (H5_UNLIKELY(pthread_detach(thread))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -329,8 +330,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-void
-H5TS_thread_yield(void)
+void H5TS_thread_yield(void)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -338,6 +338,6 @@ H5TS_thread_yield(void)
 
     FUNC_LEAVE_NOAPI_VOID_NAMECHECK_ONLY
 } /* H5TS_thread_yield() */
-#endif
-#endif
+        #endif
+    #endif
 #endif /* H5_HAVE_THREADS */

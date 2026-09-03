@@ -20,28 +20,29 @@
 #define DIM0     6
 #define DIM1     8
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file  = H5I_INVALID_HID;
-    hid_t   space = H5I_INVALID_HID;
-    hid_t   dset  = H5I_INVALID_HID;
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
     hsize_t start[2];
     hsize_t stride[2];
     hsize_t count[2];
     hsize_t block[2];
-    int     wdata[DIM0][DIM1]; /* Write buffer */
-    int     rdata[DIM0][DIM1]; /* Read buffer */
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    int rdata[DIM0][DIM1]; /* Read buffer */
     hsize_t i, j;
 
     /*
      * Initialize data to "1", to make it easier to see the selections.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = 1;
+        }
+    }
 
     /*
      * Print the data to the screen.
@@ -49,8 +50,9 @@ main(void)
     printf("Original Data:\n");
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", wdata[i][j]);
+        }
         printf("]\n");
     }
 
@@ -74,15 +76,15 @@ main(void)
     /*
      * Define and select the first part of the hyperslab selection.
      */
-    start[0]  = 0;
-    start[1]  = 0;
+    start[0] = 0;
+    start[1] = 0;
     stride[0] = 3;
     stride[1] = 3;
-    count[0]  = 2;
-    count[1]  = 3;
-    block[0]  = 2;
-    block[1]  = 2;
-    status    = H5Sselect_hyperslab(space, H5S_SELECT_SET, start, stride, count, block);
+    count[0] = 2;
+    count[1] = 3;
+    block[0] = 2;
+    block[1] = 2;
+    status = H5Sselect_hyperslab(space, H5S_SELECT_SET, start, stride, count, block);
 
     /*
      * Define and select the second part of the hyperslab selection,
@@ -91,7 +93,7 @@ main(void)
      */
     block[0] = 1;
     block[1] = 1;
-    status   = H5Sselect_hyperslab(space, H5S_SELECT_NOTB, start, stride, count, block);
+    status = H5Sselect_hyperslab(space, H5S_SELECT_NOTB, start, stride, count, block);
 
     /*
      * Write the data to the dataset.
@@ -126,31 +128,34 @@ main(void)
     printf("\nData as written to disk by hyberslabs:\n");
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 
     /*
      * Initialize the read array.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             rdata[i][j] = 0;
+        }
+    }
 
     /*
      * Define and select the hyperslab to use for reading.
      */
-    space     = H5Dget_space(dset);
-    start[0]  = 0;
-    start[1]  = 1;
+    space = H5Dget_space(dset);
+    start[0] = 0;
+    start[1] = 1;
     stride[0] = 4;
     stride[1] = 4;
-    count[0]  = 2;
-    count[1]  = 2;
-    block[0]  = 2;
-    block[1]  = 3;
-    status    = H5Sselect_hyperslab(space, H5S_SELECT_SET, start, stride, count, block);
+    count[0] = 2;
+    count[1] = 2;
+    block[0] = 2;
+    block[1] = 3;
+    status = H5Sselect_hyperslab(space, H5S_SELECT_SET, start, stride, count, block);
 
     /*
      * Read the data using the previously defined hyperslab.
@@ -163,8 +168,9 @@ main(void)
     printf("\nData as read from disk by hyperslab:\n");
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

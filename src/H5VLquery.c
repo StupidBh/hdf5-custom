@@ -69,8 +69,7 @@
  *
  *-------------------------------------------------------------------------
  */
-size_t
-H5VL_obj_get_rc(const H5VL_object_t *vol_obj)
+size_t H5VL_obj_get_rc(const H5VL_object_t* vol_obj)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -91,8 +90,7 @@ H5VL_obj_get_rc(const H5VL_object_t *vol_obj)
  *
  *-------------------------------------------------------------------------
  */
-H5VL_connector_t *
-H5VL_obj_get_connector(const H5VL_object_t *vol_obj)
+H5VL_connector_t* H5VL_obj_get_connector(const H5VL_object_t* vol_obj)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -113,8 +111,7 @@ H5VL_obj_get_connector(const H5VL_object_t *vol_obj)
  *
  *-------------------------------------------------------------------------
  */
-void *
-H5VL_obj_get_data(const H5VL_object_t *vol_obj)
+void* H5VL_obj_get_data(const H5VL_object_t* vol_obj)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR
@@ -135,8 +132,7 @@ H5VL_obj_get_data(const H5VL_object_t *vol_obj)
  *
  *-------------------------------------------------------------------------
  */
-void
-H5VL_obj_reset_data(H5VL_object_t *vol_obj)
+void H5VL_obj_reset_data(H5VL_object_t* vol_obj)
 {
     /* Use FUNC_ENTER_NOAPI_NOINIT_NOERR here to avoid performance issues */
     FUNC_ENTER_NOAPI_NOINIT_NOERR

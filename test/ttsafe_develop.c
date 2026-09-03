@@ -24,8 +24,9 @@
 
 #ifdef H5_HAVE_THREADSAFE_API
 
-typedef struct {
-    H5TS_barrier_t *barrier;
+typedef struct
+{
+    H5TS_barrier_t* barrier;
 } tts_develop_api_udata_t;
 
 /*
@@ -34,13 +35,12 @@ typedef struct {
  *
  **********************************************************************
  */
-static H5TS_THREAD_RETURN_TYPE
-tts_develop_api_thr_1(void *_udata)
+static H5TS_THREAD_RETURN_TYPE tts_develop_api_thr_1(void* _udata)
 {
-    tts_develop_api_udata_t *udata      = (tts_develop_api_udata_t *)_udata;
-    unsigned                 lock_count = UINT_MAX;
-    bool                     acquired   = false;
-    herr_t                   result;
+    tts_develop_api_udata_t* udata = (tts_develop_api_udata_t*)_udata;
+    unsigned lock_count = UINT_MAX;
+    bool acquired = false;
+    herr_t result;
 
     /* Acquire the API lock - should acquire it */
     result = H5TSmutex_acquire(1, &acquired);
@@ -69,12 +69,11 @@ tts_develop_api_thr_1(void *_udata)
  *
  **********************************************************************
  */
-static H5TS_THREAD_RETURN_TYPE
-tts_develop_api_thr_2(void *_udata)
+static H5TS_THREAD_RETURN_TYPE tts_develop_api_thr_2(void* _udata)
 {
-    tts_develop_api_udata_t *udata    = (tts_develop_api_udata_t *)_udata;
-    bool                     acquired = false;
-    herr_t                   result;
+    tts_develop_api_udata_t* udata = (tts_develop_api_udata_t*)_udata;
+    bool acquired = false;
+    herr_t result;
 
     /* Thread #1 will acquire the API lock */
 
@@ -100,19 +99,18 @@ tts_develop_api_thr_2(void *_udata)
  *
  **********************************************************************
  */
-void
-tts_develop_api(void H5_ATTR_UNUSED *params)
+void tts_develop_api(void H5_ATTR_UNUSED* params)
 {
-    hid_t                   def_fapl = H5I_INVALID_HID;
-    hid_t                   vol_id   = H5I_INVALID_HID;
-    H5TS_thread_t           thread_1, thread_2;
-    H5TS_barrier_t          barrier;
-    unsigned                lock_count = UINT_MAX;
-    bool                    acquired   = false;
+    hid_t def_fapl = H5I_INVALID_HID;
+    hid_t vol_id = H5I_INVALID_HID;
+    H5TS_thread_t thread_1, thread_2;
+    H5TS_barrier_t barrier;
+    unsigned lock_count = UINT_MAX;
+    bool acquired = false;
     tts_develop_api_udata_t udata;
-    unsigned                api_count_1 = 0, api_count_2 = 0;
-    int                     is_native;
-    herr_t                  result;
+    unsigned api_count_1 = 0, api_count_2 = 0;
+    int is_native;
+    herr_t result;
 
     def_fapl = H5Pcreate(H5P_FILE_ACCESS);
     CHECK(def_fapl, H5I_INVALID_HID, "H5Pcreate");
@@ -137,8 +135,9 @@ tts_develop_api(void H5_ATTR_UNUSED *params)
 
         VERIFY(api_count_2, (api_count_1 + 1), "H5TSmutex_get_attempt_count");
     } /* end if */
-    else
+    else {
         printf("Non-native VOL connector used, skipping mutex attempt count test\n");
+    }
 
     /* Check H5TSmutex_acquire & H5TSmutex_release in thread callbacks */
 
@@ -148,7 +147,7 @@ tts_develop_api(void H5_ATTR_UNUSED *params)
 
     /* Create the threads */
     udata.barrier = &barrier;
-    result        = H5TS_thread_create(&thread_1, tts_develop_api_thr_1, &udata);
+    result = H5TS_thread_create(&thread_1, tts_develop_api_thr_1, &udata);
     CHECK_I(result, "H5TS_thread_create");
     result = H5TS_thread_create(&thread_2, tts_develop_api_thr_2, &udata);
     CHECK_I(result, "H5TS_thread_create");
@@ -171,7 +170,7 @@ tts_develop_api(void H5_ATTR_UNUSED *params)
 
     /* Acquire the API lock again - should acquire it, since it's the same thread  */
     acquired = false;
-    result   = H5TSmutex_acquire(1, &acquired);
+    result = H5TSmutex_acquire(1, &acquired);
     CHECK_I(result, "H5TSmutex_acquire");
     VERIFY(acquired, true, "H5TSmutex_acquire");
 

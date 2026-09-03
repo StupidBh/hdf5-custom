@@ -67,14 +67,13 @@ static bool H5_ntzset = false;
 /* HDvasprintf provides vasprintf-like function on targets where it is
  * unavailable.
  */
-int
-HDvasprintf(char **bufp, const char *fmt, va_list _ap)
+int HDvasprintf(char** bufp, const char* fmt, va_list _ap)
 {
-    char  *buf;   /* buffer to receive formatted string */
+    char* buf;    /* buffer to receive formatted string */
     size_t bufsz; /* size of buffer to allocate */
 
     for (bufsz = 32; (buf = malloc(bufsz)) != NULL;) {
-        int     ret;
+        int ret;
         va_list ap;
 
         va_copy(ap, _ap);
@@ -85,8 +84,9 @@ HDvasprintf(char **bufp, const char *fmt, va_list _ap)
             return ret;
         }
         free(buf);
-        if (ret < 0)
+        if (ret < 0) {
             return ret;
+        }
         bufsz = (size_t)ret + 1;
     }
     return -1;
@@ -108,29 +108,31 @@ HDvasprintf(char **bufp, const char *fmt, va_list _ap)
  *       present so that it's less likely to become dead code.
  */
 #ifdef H5_HAVE_FCNTL
-int
-Pflock(int fd, int operation)
+int Pflock(int fd, int operation)
 {
-
     struct flock flk;
 
     /* Set the lock type */
-    if (operation & LOCK_UN)
+    if (operation & LOCK_UN) {
         flk.l_type = F_UNLCK;
-    else if (operation & LOCK_SH)
+    }
+    else if (operation & LOCK_SH) {
         flk.l_type = F_RDLCK;
-    else
+    }
+    else {
         flk.l_type = F_WRLCK;
+    }
 
     /* Set the other flock struct values */
     flk.l_whence = SEEK_SET;
-    flk.l_start  = 0;
-    flk.l_len    = 0; /* to EOF */
-    flk.l_pid    = 0; /* not used with set */
+    flk.l_start = 0;
+    flk.l_len = 0; /* to EOF */
+    flk.l_pid = 0; /* not used with set */
 
     /* Lock or unlock */
-    if (fcntl(fd, F_SETLK, &flk) < 0)
+    if (fcntl(fd, F_SETLK, &flk) < 0) {
         return -1;
+    }
 
     return 0;
 
@@ -147,8 +149,7 @@ Pflock(int fd, int operation)
  *
  *-------------------------------------------------------------------------
  */
-int H5_ATTR_CONST
-Nflock(int H5_ATTR_UNUSED fd, int H5_ATTR_UNUSED operation)
+int H5_ATTR_CONST Nflock(int H5_ATTR_UNUSED fd, int H5_ATTR_UNUSED operation)
 {
     /* just succeed */
     return 0;
@@ -170,8 +171,7 @@ Nflock(int H5_ATTR_UNUSED fd, int H5_ATTR_UNUSED operation)
  *
  *-------------------------------------------------------------------------
  */
-time_t
-H5_make_time(struct tm *tm)
+time_t H5_make_time(struct tm* tm)
 {
     time_t the_time; /* The converted time */
 #if defined(H5_HAVE_VISUAL_STUDIO)
@@ -191,17 +191,18 @@ H5_make_time(struct tm *tm)
     }
 
     /* Perform base conversion */
-    if ((time_t)-1 == (the_time = mktime(tm)))
+    if ((time_t)-1 == (the_time = mktime(tm))) {
         HGOTO_ERROR(H5E_INTERNAL, H5E_CANTCONVERT, FAIL, "badly formatted modification time message");
+    }
 
-        /* Adjust for timezones */
+    /* Adjust for timezones */
 #if defined(H5_HAVE_TM_GMTOFF)
     /* BSD-like systems */
     the_time += tm->tm_gmtoff;
 #elif defined(H5_HAVE_TIMEZONE)
-#if defined(H5_HAVE_VISUAL_STUDIO)
+    #if defined(H5_HAVE_VISUAL_STUDIO)
     _get_timezone(&timezone);
-#endif
+    #endif
 
     the_time -= timezone - (tm->tm_isdst ? 3600 : 0);
 #else
@@ -232,23 +233,24 @@ done:
  * Return:      void
  *-------------------------------------------------------------------------
  */
-void
-H5_get_localtime_str(char *buf, size_t buf_size)
+void H5_get_localtime_str(char* buf, size_t buf_size)
 {
-    time_t    now;
+    time_t now;
     struct tm tm_buf;
 
     time(&now);
-    if (HDlocaltime_r(&now, &tm_buf) != NULL)
+    if (HDlocaltime_r(&now, &tm_buf) != NULL) {
         strftime(buf, buf_size, "%c", &tm_buf); /* %c is locale-dependent; fine for diagnostics */
-    else
+    }
+    else {
         snprintf(buf, buf_size, "(unknown)");
+    }
 } /* end H5_get_localtime_str() */
 
 #ifdef H5_HAVE_WIN32_API
 
-/* Offset between 1/1/1601 and 1/1/1970 in 100 nanosecond units */
-#define _W32_FT_OFFSET (116444736000000000ULL)
+    /* Offset between 1/1/1601 and 1/1/1970 in 100 nanosecond units */
+    #define _W32_FT_OFFSET (116'444'736'000'000'000ULL)
 
 /*-------------------------------------------------------------------------
  * Function:  Wgettimeofday
@@ -268,20 +270,20 @@ H5_get_localtime_str(char *buf, size_t buf_size)
  *
  *-------------------------------------------------------------------------
  */
-int
-Wgettimeofday(struct timeval *tv, struct timezone *tz)
+int Wgettimeofday(struct timeval* tv, struct timezone* tz)
 {
-    union {
+    union
+    {
         unsigned long long ns100; /*time since 1 Jan 1601 in 100ns units */
-        FILETIME           ft;
+        FILETIME ft;
     } _now;
 
     static int tzsetflag;
 
     if (tv) {
         GetSystemTimeAsFileTime(&_now.ft);
-        tv->tv_usec = (long)((_now.ns100 / 10ULL) % 1000000ULL);
-        tv->tv_sec  = (long)((_now.ns100 - _W32_FT_OFFSET) / 10000000ULL);
+        tv->tv_usec = (long)((_now.ns100 / 10ULL) % 1'000'000ULL);
+        tv->tv_sec = (long)((_now.ns100 - _W32_FT_OFFSET) / 10'000'000ULL);
     }
 
     if (tz) {
@@ -290,7 +292,7 @@ Wgettimeofday(struct timeval *tv, struct timezone *tz)
             tzsetflag = 1;
         }
         tz->tz_minuteswest = _timezone / 60;
-        tz->tz_dsttime     = _daylight;
+        tz->tz_dsttime = _daylight;
     }
 
     /* Always return 0 as per Open Group Base Specifications Issue 6.
@@ -313,71 +315,72 @@ Wgettimeofday(struct timeval *tv, struct timezone *tz)
  *
  *-------------------------------------------------------------------------
  */
-int
-Wsetenv(const char *name, const char *value, int overwrite)
+int Wsetenv(const char* name, const char* value, int overwrite)
 {
     /* If we're not overwriting, check if the environment variable exists.
      * If it does (i.e.: the required buffer size to store the variable's
      * value is non-zero), then return an error code.
      */
     if (!overwrite) {
-#ifndef H5_HAVE_MINGW
-        size_t  bufsize;
+    #ifndef H5_HAVE_MINGW
+        size_t bufsize;
         errno_t err;
 
         err = getenv_s(&bufsize, NULL, 0, name);
-        if (err || bufsize)
+        if (err || bufsize) {
             return (int)err;
-#else
+        }
+    #else
         /* MinGW doesn't have getenv_s() */
-        char *test = getenv(name);
-        if (*test)
+        char* test = getenv(name);
+        if (*test) {
             return FAIL;
-#endif
+        }
+    #endif
     }
 
     return (int)_putenv_s(name, value);
 } /* end Wsetenv() */
 
-#ifdef H5_HAVE_WIN32_API
-#pragma comment(lib, "advapi32.lib")
-#endif
+    #ifdef H5_HAVE_WIN32_API
+        #pragma comment(lib, "advapi32.lib")
+    #endif
 
-/*-------------------------------------------------------------------------
- * Function:    H5_get_win32_times
- *
- * Purpose:     Gets the elapsed, system and user times on Windows platforms.
- *              All time values are in seconds.
- *
- * Return:      Success:  0
- *              Failure:  -1
- *
- *-------------------------------------------------------------------------
- */
-#ifdef H5_HAVE_WIN32_API
-int
-H5_get_win32_times(H5_timevals_t *tvs /*in,out*/)
+    /*-------------------------------------------------------------------------
+     * Function:    H5_get_win32_times
+     *
+     * Purpose:     Gets the elapsed, system and user times on Windows platforms.
+     *              All time values are in seconds.
+     *
+     * Return:      Success:  0
+     *              Failure:  -1
+     *
+     *-------------------------------------------------------------------------
+     */
+    #ifdef H5_HAVE_WIN32_API
+int H5_get_win32_times(H5_timevals_t* tvs /*in,out*/)
 {
-    static HANDLE        process_handle;
-    ULARGE_INTEGER       kernel_start;
-    ULARGE_INTEGER       user_start;
-    FILETIME             KernelTime;
-    FILETIME             UserTime;
-    FILETIME             CreationTime;
-    FILETIME             ExitTime;
-    LARGE_INTEGER        counts_start;
+    static HANDLE process_handle;
+    ULARGE_INTEGER kernel_start;
+    ULARGE_INTEGER user_start;
+    FILETIME KernelTime;
+    FILETIME UserTime;
+    FILETIME CreationTime;
+    FILETIME ExitTime;
+    LARGE_INTEGER counts_start;
     static LARGE_INTEGER counts_freq;
-    static bool          is_initialized = false;
-    BOOL                 err;
+    static bool is_initialized = false;
+    BOOL err;
 
     assert(tvs);
 
     if (!is_initialized) {
         /* NOTE: This is just a pseudo handle and does not need to be closed. */
         process_handle = GetCurrentProcess();
-        err            = QueryPerformanceFrequency(&counts_freq);
-        if (0 == err)
+        err = QueryPerformanceFrequency(&counts_freq);
+        if (0 == err) {
             return -1;
+        }
         is_initialized = true;
     } /* end if */
 
@@ -386,33 +389,35 @@ H5_get_win32_times(H5_timevals_t *tvs /*in,out*/)
      *************************/
 
     err = GetProcessTimes(process_handle, &CreationTime, &ExitTime, &KernelTime, &UserTime);
-    if (0 == err)
+    if (0 == err) {
         return -1;
+    }
 
     /* The 1.0E7 factor seems strange but it's due to the clock
      * ticking in 100 ns increments.
      */
     kernel_start.HighPart = KernelTime.dwHighDateTime;
-    kernel_start.LowPart  = KernelTime.dwLowDateTime;
-    tvs->system           = (double)(kernel_start.QuadPart / 1.0E7F);
+    kernel_start.LowPart = KernelTime.dwLowDateTime;
+    tvs->system = (double)(kernel_start.QuadPart / 1.0E7F);
 
     user_start.HighPart = UserTime.dwHighDateTime;
-    user_start.LowPart  = UserTime.dwLowDateTime;
-    tvs->user           = (double)(user_start.QuadPart / 1.0E7F);
+    user_start.LowPart = UserTime.dwLowDateTime;
+    tvs->user = (double)(user_start.QuadPart / 1.0E7F);
 
     /****************
      * Elapsed time *
      ****************/
 
     err = QueryPerformanceCounter(&counts_start);
-    if (0 == err)
+    if (0 == err) {
         return -1;
+    }
 
     tvs->elapsed = (double)(counts_start.QuadPart) / (double)counts_freq.QuadPart;
 
     return 0;
 } /* end H5_get_win32_times() */
-#endif
+    #endif
 
 /*-------------------------------------------------------------------------
  * Function:    Wflock
@@ -424,42 +429,42 @@ H5_get_win32_times(H5_timevals_t *tvs /*in,out*/)
  *
  *-------------------------------------------------------------------------
  */
-int
-Wflock(int fd, int operation)
+int Wflock(int fd, int operation)
 {
-
     HANDLE hFile;
-    DWORD  dwFlags    = LOCKFILE_FAIL_IMMEDIATELY;
-    DWORD  dwReserved = 0;
+    DWORD dwFlags = LOCKFILE_FAIL_IMMEDIATELY;
+    DWORD dwReserved = 0;
     /* MAXDWORD locks the entire file */
-    DWORD nNumberOfBytesToLockLow  = MAXDWORD;
+    DWORD nNumberOfBytesToLockLow = MAXDWORD;
     DWORD nNumberOfBytesToLockHigh = MAXDWORD;
     /* Must initialize OVERLAPPED struct */
-    OVERLAPPED overlapped = {0};
+    OVERLAPPED overlapped = { 0 };
 
     /* Get Windows HANDLE */
-    if (INVALID_HANDLE_VALUE == (hFile = (HANDLE)_get_osfhandle(fd)))
+    if (INVALID_HANDLE_VALUE == (hFile = (HANDLE)_get_osfhandle(fd))) {
         return -1;
+    }
 
     /* Convert to Windows flags */
-    if (operation & LOCK_EX)
+    if (operation & LOCK_EX) {
         dwFlags |= LOCKFILE_EXCLUSIVE_LOCK;
+    }
 
     /* Lock or unlock */
     if (operation & LOCK_UN) {
-        if (0 ==
-            UnlockFileEx(hFile, dwReserved, nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh, &overlapped)) {
+        if (0 == UnlockFileEx(hFile, dwReserved, nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh, &overlapped)) {
             /* Attempting to unlock an already unlocked file will fail and this can happen
              * in H5Fstart_swmr_write(). For now, just ignore the "error" (error code: 0x9e / 158).
              */
-            if (GetLastError() != 158)
+            if (GetLastError() != 158) {
                 return -1;
+            }
         }
     }
     else {
-        if (0 == LockFileEx(hFile, dwFlags, dwReserved, nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh,
-                            &overlapped))
+        if (0 == LockFileEx(hFile, dwFlags, dwReserved, nNumberOfBytesToLockLow, nNumberOfBytesToLockHigh, &overlapped)) {
             return -1;
+        }
     }
 
     return 0;
@@ -481,23 +486,25 @@ Wflock(int fd, int operation)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5_get_utf16_str(const char *s, wchar_t **wstring, uint32_t *win_error)
+herr_t H5_get_utf16_str(const char* s, wchar_t** wstring, uint32_t* win_error)
 {
-    int      nwchars = -1;   /* Length of the UTF-16 buffer */
-    wchar_t *ret_s   = NULL; /* UTF-16 version of the string */
+    int nwchars = -1;      /* Length of the UTF-16 buffer */
+    wchar_t* ret_s = NULL; /* UTF-16 version of the string */
 
     /* Get the number of UTF-16 characters needed */
-    if (0 == (nwchars = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s, -1, NULL, 0)))
+    if (0 == (nwchars = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s, -1, NULL, 0))) {
         goto error;
+    }
 
     /* Allocate a buffer for the UTF-16 string */
-    if (NULL == (ret_s = H5MM_calloc(sizeof(wchar_t) * (size_t)nwchars)))
+    if (NULL == (ret_s = H5MM_calloc(sizeof(wchar_t) * (size_t)nwchars))) {
         goto error;
+    }
 
     /* Convert the input UTF-8 string to UTF-16 */
-    if (0 == MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s, -1, ret_s, nwchars))
+    if (0 == MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, s, -1, ret_s, nwchars)) {
         goto error;
+    }
 
     *wstring = ret_s;
 
@@ -505,11 +512,13 @@ H5_get_utf16_str(const char *s, wchar_t **wstring, uint32_t *win_error)
 
 error:
     /* Store error value first before doing anything else */
-    if (win_error)
+    if (win_error) {
         *win_error = (uint32_t)GetLastError();
+    }
 
-    if (ret_s)
-        H5MM_xfree((void *)ret_s);
+    if (ret_s) {
+        H5MM_xfree((void*)ret_s);
+    }
 
     *wstring = NULL;
 
@@ -526,16 +535,15 @@ error:
  *               Failure:    -1
  *-------------------------------------------------------------------------
  */
-int
-Wopen(const char *path, int oflag, ...)
+int Wopen(const char* path, int oflag, ...)
 {
-    uint32_t win_error        = 0;     /* Windows error code for failures */
-    wchar_t *wpath            = NULL;  /* UTF-16 version of the path */
-    herr_t   h5_ret           = FAIL;  /* HDF5 return code */
-    char    *env              = NULL;  /* Environment variable string */
-    bool     prefer_code_page = false; /* Whether to prefer using the Windows code page */
-    int      fd               = -1;    /* POSIX file descriptor to be returned */
-    int      pmode            = 0;     /* mode (optionally set via variable args) */
+    uint32_t win_error = 0;        /* Windows error code for failures */
+    wchar_t* wpath = NULL;         /* UTF-16 version of the path */
+    herr_t h5_ret = FAIL;          /* HDF5 return code */
+    char* env = NULL;              /* Environment variable string */
+    bool prefer_code_page = false; /* Whether to prefer using the Windows code page */
+    int fd = -1;                   /* POSIX file descriptor to be returned */
+    int pmode = 0;                 /* mode (optionally set via variable args) */
 
     /* _O_BINARY must be set in Windows to avoid CR-LF <-> LF EOL
      * transformations when performing I/O. Note that this will
@@ -558,8 +566,9 @@ Wopen(const char *path, int oflag, ...)
      */
     env = getenv(HDF5_PREFER_WINDOWS_CODE_PAGE);
     if (env && (*env != '\0')) {
-        if (0 == HDstrcasecmp(env, "true") || 0 == strcmp(env, "1"))
+        if (0 == HDstrcasecmp(env, "true") || 0 == strcmp(env, "1")) {
             prefer_code_page = true;
+        }
     }
 
     /*
@@ -574,14 +583,16 @@ Wopen(const char *path, int oflag, ...)
             fd = _wopen(wpath, oflag, pmode);
         }
         else {
-            if (ERROR_NO_UNICODE_TRANSLATION != win_error)
+            if (ERROR_NO_UNICODE_TRANSLATION != win_error) {
                 goto done;
+            }
 
             fd = open(path, oflag, pmode);
         }
     }
-    else
+    else {
         fd = open(path, oflag, pmode);
+    }
 
 done:
     H5MM_xfree(wpath);
@@ -599,15 +610,14 @@ done:
  *               Failure:    -1
  *-------------------------------------------------------------------------
  */
-int
-Wremove(const char *path)
+int Wremove(const char* path)
 {
-    uint32_t win_error        = 0;     /* Windows error code for failures */
-    wchar_t *wpath            = NULL;  /* UTF-16 version of the path */
-    herr_t   h5_ret           = FAIL;  /* HDF5 return code */
-    char    *env              = NULL;  /* Environment variable string */
-    bool     prefer_code_page = false; /* Whether to prefer using the Windows code page */
-    int      ret              = -1;
+    uint32_t win_error = 0;        /* Windows error code for failures */
+    wchar_t* wpath = NULL;         /* UTF-16 version of the path */
+    herr_t h5_ret = FAIL;          /* HDF5 return code */
+    char* env = NULL;              /* Environment variable string */
+    bool prefer_code_page = false; /* Whether to prefer using the Windows code page */
+    int ret = -1;
 
     /*
      * Check HDF5_PREFER_WINDOWS_CODE_PAGE environment variable to
@@ -615,8 +625,9 @@ Wremove(const char *path)
      */
     env = getenv(HDF5_PREFER_WINDOWS_CODE_PAGE);
     if (env && (*env != '\0')) {
-        if (0 == HDstrcasecmp(env, "true") || 0 == strcmp(env, "1"))
+        if (0 == HDstrcasecmp(env, "true") || 0 == strcmp(env, "1")) {
             prefer_code_page = true;
+        }
     }
 
     /*
@@ -631,14 +642,16 @@ Wremove(const char *path)
             ret = _wremove(wpath);
         }
         else {
-            if (ERROR_NO_UNICODE_TRANSLATION != win_error)
+            if (ERROR_NO_UNICODE_TRANSLATION != win_error) {
                 goto done;
+            }
 
             ret = remove(path);
         }
     }
-    else
+    else {
         ret = remove(path);
+    }
 
 done:
     H5MM_xfree(wpath);
@@ -663,12 +676,11 @@ done:
  */
 #define MAX_PATH_LEN 1024
 
-herr_t
-H5_build_extpath(const char *name, char **extpath /*out*/)
+herr_t H5_build_extpath(const char* name, char** extpath /*out*/)
 {
-    char  *full_path = NULL;    /* Pointer to the full path, as built or passed in */
-    char  *cwdpath   = NULL;    /* Pointer to the current working directory path */
-    char  *new_name  = NULL;    /* Pointer to the name of the file */
+    char* full_path = NULL;     /* Pointer to the full path, as built or passed in */
+    char* cwdpath = NULL;       /* Pointer to the current working directory path */
+    char* new_name = NULL;      /* Pointer to the name of the file */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
@@ -684,20 +696,23 @@ H5_build_extpath(const char *name, char **extpath /*out*/)
      * Windows: name[0-2] is "<drive letter>:\" or "<drive-letter>:/"
      */
     if (H5_CHECK_ABSOLUTE(name)) {
-        if (NULL == (full_path = (char *)H5MM_strdup(name)))
+        if (NULL == (full_path = (char*)H5MM_strdup(name))) {
             HGOTO_ERROR(H5E_INTERNAL, H5E_NOSPACE, FAIL, "memory allocation failed");
+        }
     }
     else {
         /* relative pathname */
-        char  *retcwd;
+        char* retcwd;
         size_t name_len;
-        int    drive;
+        int drive;
 
-        if (NULL == (cwdpath = (char *)H5MM_malloc(MAX_PATH_LEN)))
+        if (NULL == (cwdpath = (char*)H5MM_malloc(MAX_PATH_LEN))) {
             HGOTO_ERROR(H5E_INTERNAL, H5E_NOSPACE, FAIL, "memory allocation failed");
+        }
         name_len = strlen(name) + 1;
-        if (NULL == (new_name = (char *)H5MM_malloc(name_len)))
+        if (NULL == (new_name = (char*)H5MM_malloc(name_len))) {
             HGOTO_ERROR(H5E_INTERNAL, H5E_NOSPACE, FAIL, "memory allocation failed");
+        }
 
         /*
          * Windows: name[0-1] is "<drive-letter>:"
@@ -705,7 +720,7 @@ H5_build_extpath(const char *name, char **extpath /*out*/)
          * Unix: does not apply
          */
         if (H5_CHECK_ABS_DRIVE(name)) {
-            drive  = toupper(name[0]) - 'A' + 1;
+            drive = toupper(name[0]) - 'A' + 1;
             retcwd = HDgetdcwd(drive, cwdpath, MAX_PATH_LEN);
             strncpy(new_name, &name[2], name_len);
         }
@@ -730,11 +745,13 @@ H5_build_extpath(const char *name, char **extpath /*out*/)
             size_t path_len;
 
             cwdlen = strlen(cwdpath);
-            if (cwdlen == 0)
+            if (cwdlen == 0) {
                 HGOTO_ERROR(H5E_INTERNAL, H5E_BADVALUE, FAIL, "cwd length is zero");
+            }
             path_len = cwdlen + strlen(new_name) + 2;
-            if (NULL == (full_path = (char *)H5MM_malloc(path_len)))
+            if (NULL == (full_path = (char*)H5MM_malloc(path_len))) {
                 HGOTO_ERROR(H5E_INTERNAL, H5E_NOSPACE, FAIL, "memory allocation failed");
+            }
 
             /* path_len will always be greater than zero, so no check before
              * setting the terminal NUL byte of full_path
@@ -742,27 +759,30 @@ H5_build_extpath(const char *name, char **extpath /*out*/)
             strncpy(full_path, cwdpath, path_len);
             full_path[path_len - 1] = '\0';
 
-            if (!H5_CHECK_DELIMITER(cwdpath[cwdlen - 1]))
+            if (!H5_CHECK_DELIMITER(cwdpath[cwdlen - 1])) {
                 strncat(full_path, H5_DIR_SEPS, path_len - (cwdlen + 1));
+            }
             strncat(full_path, new_name, path_len - (cwdlen + 1) - strlen(H5_DIR_SEPS));
         }
     }
 
     /* Strip out the last component (the file name itself) from the path */
     if (full_path) {
-        char *ptr = NULL;
+        char* ptr = NULL;
 
         H5_GET_LAST_DELIMITER(full_path, ptr)
         assert(ptr);
-        *++ptr   = '\0';
+        *++ptr = '\0';
         *extpath = full_path;
     }
 
 done:
-    if (cwdpath)
+    if (cwdpath) {
         H5MM_xfree(cwdpath);
-    if (new_name)
+    }
+    if (new_name) {
         H5MM_xfree(new_name);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5_build_extpath() */
@@ -778,8 +798,7 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-herr_t
-H5_combine_path(const char *path1, const char *path2, char **full_name /*out*/)
+herr_t H5_combine_path(const char* path1, const char* path2, char** full_name /*out*/)
 {
     size_t path1_len = 0;       /* length of path1 */
     size_t path2_len;           /* length of path2 */
@@ -789,26 +808,27 @@ H5_combine_path(const char *path1, const char *path2, char **full_name /*out*/)
 
     assert(path2);
 
-    if (path1)
+    if (path1) {
         path1_len = strlen(path1);
+    }
     path2_len = strlen(path2);
 
     if (path1 == NULL || *path1 == '\0' || H5_CHECK_ABSOLUTE(path2)) {
-
         /* If path1 is empty or path2 is absolute, simply use path2 */
-        if (NULL == (*full_name = (char *)H5MM_strdup(path2)))
+        if (NULL == (*full_name = (char*)H5MM_strdup(path2))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+        }
 
     } /* end if */
     else if (H5_CHECK_ABS_PATH(path2)) {
-
         /* On windows path2 is a path absolute name */
         if (H5_CHECK_ABSOLUTE(path1) || H5_CHECK_ABS_DRIVE(path1)) {
             /* path1 is absolute or drive absolute and path2 is path absolute.
              * Use the drive letter of path1 + path2
              */
-            if (NULL == (*full_name = (char *)H5MM_malloc(path2_len + 3)))
+            if (NULL == (*full_name = (char*)H5MM_malloc(path2_len + 3))) {
                 HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "unable to allocate path2 buffer");
+            }
             snprintf(*full_name, (path2_len + 3), "%c:%s", path1[0], path2);
         } /* end if */
         else {
@@ -816,26 +836,28 @@ H5_combine_path(const char *path1, const char *path2, char **full_name /*out*/)
              * path1 does not have a drive letter (i.e. is "a\b" or "\a\b").
              * Use path2.
              */
-            if (NULL == (*full_name = (char *)H5MM_strdup(path2)))
+            if (NULL == (*full_name = (char*)H5MM_strdup(path2))) {
                 HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed");
+            }
         } /* end else */
 
     } /* end else if */
     else {
-
         /* Relative path2:
          * Allocate a buffer to hold path1 + path2 + possibly the delimiter
          *      + terminating null byte
          */
-        if (NULL ==
-            (*full_name = (char *)H5MM_malloc(path1_len + path2_len + 2 +
-                                              2))) /* Extra "+2" to quiet GCC warning - 2019/07/05, QAK */
+        if (NULL == (*full_name = (char*)H5MM_malloc(path1_len + path2_len + 2 + 2))) { /* Extra "+2" to quiet GCC warning - 2019/07/05, QAK */
             HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "unable to allocate filename buffer");
+        }
 
         /* Compose the full file name */
-        snprintf(*full_name, (path1_len + path2_len + 2 + 2), "%s%s%s",
+        snprintf(*full_name,
+                 (path1_len + path2_len + 2 + 2),
+                 "%s%s%s",
                  path1, /* Extra "+2" to quiet GCC warning - 2019/07/05, QAK */
-                 (H5_CHECK_DELIMITER(path1[path1_len - 1]) ? "" : H5_DIR_SEPS), path2);
+                 (H5_CHECK_DELIMITER(path1[path1_len - 1]) ? "" : H5_DIR_SEPS),
+                 path2);
     } /* end else */
 
 done:
@@ -853,8 +875,7 @@ done:
  * Return:      void
  *--------------------------------------------------------------------------
  */
-void
-H5_nanosleep(uint64_t nanosec)
+void H5_nanosleep(uint64_t nanosec)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -869,7 +890,7 @@ H5_nanosleep(uint64_t nanosec)
 
 #else
 
-    const uint64_t  nanosec_per_sec = 1000 * 1000L * 1000;
+    const uint64_t nanosec_per_sec = 1000 * 1000L * 1000;
     struct timespec sleeptime; /* Struct to hold time to sleep */
 
     /* Set up time to sleep
@@ -879,7 +900,7 @@ H5_nanosleep(uint64_t nanosec)
      *
      * It's harder to be sure that we don't overflow time_t.
      */
-    sleeptime.tv_sec  = (time_t)(nanosec / nanosec_per_sec);
+    sleeptime.tv_sec = (time_t)(nanosec / nanosec_per_sec);
     sleeptime.tv_nsec = (long)(nanosec % nanosec_per_sec);
 
     /* Sleep for up to `sleeptime` and, in the event of an interruption,
@@ -890,8 +911,9 @@ H5_nanosleep(uint64_t nanosec)
          * Otherwise, the error was essentially impossible, so just stop
          * sleeping.
          */
-        if (errno != EINTR)
+        if (errno != EINTR) {
             break;
+        }
     }
 #endif
 
@@ -900,7 +922,7 @@ H5_nanosleep(uint64_t nanosec)
 
 #ifdef H5_HAVE_WIN32_API
 
-#define H5_WIN32_ENV_VAR_BUFFER_SIZE 32767
+    #define H5_WIN32_ENV_VAR_BUFFER_SIZE 32767
 
 /*-------------------------------------------------------------------------
  * Function:    H5_expand_windows_env_vars()
@@ -912,33 +934,35 @@ H5_nanosleep(uint64_t nanosec)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5_expand_windows_env_vars(char **env_var)
+herr_t H5_expand_windows_env_vars(char** env_var)
 {
-    long   n_chars   = 0;
-    char  *temp_buf  = NULL;
+    long n_chars = 0;
+    char* temp_buf = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
     /* Allocate buffer for expanded environment variable string */
-    if (NULL == (temp_buf = (char *)H5MM_calloc((size_t)H5_WIN32_ENV_VAR_BUFFER_SIZE)))
+    if (NULL == (temp_buf = (char*)H5MM_calloc((size_t)H5_WIN32_ENV_VAR_BUFFER_SIZE))) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTALLOC, FAIL, "can't allocate memory for expanded path");
+    }
 
     /* Expand the environment variable string */
-    if ((n_chars = ExpandEnvironmentStringsA(*env_var, temp_buf, H5_WIN32_ENV_VAR_BUFFER_SIZE)) >
-        H5_WIN32_ENV_VAR_BUFFER_SIZE)
+    if ((n_chars = ExpandEnvironmentStringsA(*env_var, temp_buf, H5_WIN32_ENV_VAR_BUFFER_SIZE)) > H5_WIN32_ENV_VAR_BUFFER_SIZE) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_NOSPACE, FAIL, "expanded path is too long");
+    }
 
-    if (0 == n_chars)
+    if (0 == n_chars) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "failed to expand path");
+    }
 
-    *env_var = (char *)H5MM_xfree(*env_var);
+    *env_var = (char*)H5MM_xfree(*env_var);
     *env_var = temp_buf;
 
 done:
-    if (FAIL == ret_value && temp_buf)
-        temp_buf = (char *)H5MM_xfree(temp_buf);
+    if (FAIL == ret_value && temp_buf) {
+        temp_buf = (char*)H5MM_xfree(temp_buf);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5_expand_windows_env_vars() */
@@ -962,22 +986,23 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-char *
-H5_strndup(const char *s, size_t n)
+char* H5_strndup(const char* s, size_t n)
 {
     size_t len;
-    char  *ret_value = NULL;
+    char* ret_value = NULL;
 
     FUNC_ENTER_NOAPI_NOINIT
 
-    if (!s)
+    if (!s) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "string cannot be NULL");
+    }
 
     for (len = 0; len < n && s[len] != '\0'; len++)
         ;
 
-    if (NULL == (ret_value = H5MM_malloc(len + 1)))
+    if (NULL == (ret_value = H5MM_malloc(len + 1))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, NULL, "can't allocate buffer for string");
+    }
 
     H5MM_memcpy(ret_value, s, len);
     ret_value[len] = '\0';
@@ -999,13 +1024,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-char *
-Wstrcasestr_wrap(const char *haystack, const char *needle)
+char* Wstrcasestr_wrap(const char* haystack, const char* needle)
 {
-    if (needle && !*needle)
-        return (char *)haystack;
-    else
+    if (needle && !*needle) {
+        return (char*)haystack;
+    }
+    else {
         return StrStrIA(haystack, needle);
+    }
 }
 #endif /* H5_HAVE_WIN32_API */
 
@@ -1041,19 +1067,20 @@ Wstrcasestr_wrap(const char *haystack, const char *needle)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5_dirname(const char *path, char **dirname)
+herr_t H5_dirname(const char* path, char** dirname)
 {
-    char  *sep;
-    char  *out       = NULL;
+    char* sep;
+    char* out = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NOINIT
 
-    if (!path)
+    if (!path) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "path can't be NULL");
-    if (!dirname)
+    }
+    if (!dirname) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "dirname can't be NULL");
+    }
 
     if (NULL == (sep = strrchr(path, H5_DIR_SEPC))) {
         /* Pathname with no file separator characters */
@@ -1070,8 +1097,9 @@ H5_dirname(const char *path, char **dirname)
              * pathname. Skip this and any other preceding trailing
              * file separator characters
              */
-            while (sep != path && sep[-1] == H5_DIR_SEPC)
+            while (sep != path && sep[-1] == H5_DIR_SEPC) {
                 sep--;
+            }
 
             if (sep == path) {
                 /* Contrived case: "//", "///" and similar */
@@ -1084,8 +1112,9 @@ H5_dirname(const char *path, char **dirname)
                  * backwards to a previous file separator character,
                  * if any.
                  */
-                while (sep != path && sep[-1] != H5_DIR_SEPC)
+                while (sep != path && sep[-1] != H5_DIR_SEPC) {
                     sep--;
+                }
 
                 if (sep == path) {
                     /* No directory component found, just return "." */
@@ -1099,12 +1128,14 @@ H5_dirname(const char *path, char **dirname)
             ptrdiff_t len;
 
             /* Skip a possible run of duplicate file separator characters */
-            while (sep != path && sep[-1] == H5_DIR_SEPC)
+            while (sep != path && sep[-1] == H5_DIR_SEPC) {
                 sep--;
+            }
 
-            if (sep == path)
+            if (sep == path) {
                 /* Pathname of form "/usr/" */
                 out = H5MM_strdup(H5_DIR_SEPS);
+            }
             else {
                 /* Pathname of form "dir/filename" */
                 len = sep - path;
@@ -1115,16 +1146,18 @@ H5_dirname(const char *path, char **dirname)
         }
     }
 
-    if (NULL == out)
+    if (NULL == out) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "can't allocate buffer for dirname");
+    }
 
     *dirname = out;
 
 done:
     if (FAIL == ret_value) {
         H5MM_free(out);
-        if (dirname)
+        if (dirname) {
             *dirname = NULL;
+        }
     }
 
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1150,40 +1183,46 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5_basename(const char *path, char **basename)
+herr_t H5_basename(const char* path, char** basename)
 {
-    const char *sep;
-    char       *out       = NULL;
-    herr_t      ret_value = SUCCEED;
+    const char* sep;
+    char* out = NULL;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NOINIT
 
-    if (!path)
+    if (!path) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "path can't be NULL");
-    if (!basename)
+    }
+    if (!basename) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "basename can't be NULL");
+    }
 
     if (NULL == (sep = strrchr(path, H5_DIR_SEPC))) {
-        if (*path == '\0')
+        if (*path == '\0') {
             /* Empty pathname */
             out = H5MM_strdup(".");
-        else
+        }
+        else {
             /* Pathname with no file separator characters */
             out = H5MM_strdup(path);
+        }
     }
     else if (sep == path) {
-        if (sep[1] == '\0')
+        if (sep[1] == '\0') {
             /* Pathname of form "/" */
             out = H5MM_strdup(H5_DIR_SEPS);
-        else
+        }
+        else {
             /* Pathname of form "/filename" */
             out = H5MM_strdup(sep + 1);
+        }
     }
     else {
-        if (sep[1] != '\0')
+        if (sep[1] != '\0') {
             /* Pathname of form "dir/filename" */
             out = H5MM_strdup(sep + 1);
+        }
         else {
             /* Pathname of form "filename/", "/dir/filename/", etc. */
 
@@ -1192,22 +1231,25 @@ H5_basename(const char *path, char **basename)
              * pathname. Skip this and any other preceding trailing
              * file separator characters
              */
-            while (sep != path && sep[-1] == H5_DIR_SEPC)
+            while (sep != path && sep[-1] == H5_DIR_SEPC) {
                 sep--;
+            }
 
-            if (sep == path)
+            if (sep == path) {
                 /* Contrived case: "//", "///" and similar */
                 out = H5MM_strdup(H5_DIR_SEPS);
+            }
             else {
-                const char *c_ptr = sep;
-                ptrdiff_t   len;
+                const char* c_ptr = sep;
+                ptrdiff_t len;
 
                 /*
                  * Skip back to a previous file separator character,
                  * if any, and form final filename component
                  */
-                while (c_ptr != path && c_ptr[-1] != H5_DIR_SEPC)
+                while (c_ptr != path && c_ptr[-1] != H5_DIR_SEPC) {
                     c_ptr--;
+                }
 
                 len = sep - c_ptr;
                 assert(len >= 0);
@@ -1217,25 +1259,27 @@ H5_basename(const char *path, char **basename)
         }
     }
 
-    if (NULL == out)
+    if (NULL == out) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "can't allocate buffer for basename");
+    }
 
     *basename = out;
 
 done:
     if (FAIL == ret_value) {
         H5MM_free(out);
-        if (basename)
+        if (basename) {
             *basename = NULL;
+        }
     }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5_basename() */
 
 /* Global variables */
-int         H5_opterr = 1; /* Get_option prints errors if this is on */
-int         H5_optind = 1; /* Token pointer                          */
-const char *H5_optarg;     /* Flag argument (or value)               */
+int H5_opterr = 1;     /* Get_option prints errors if this is on */
+int H5_optind = 1;     /* Token pointer                          */
+const char* H5_optarg; /* Flag argument (or value)               */
 
 /*-------------------------------------------------------------------------
  * Function: H5_get_option
@@ -1250,11 +1294,10 @@ const char *H5_optarg;     /* Flag argument (or value)               */
  *          Failure:    A question mark.
  *-------------------------------------------------------------------------
  */
-int
-H5_get_option(int argc, const char *const *argv, const char *opts, const struct h5_long_options *l_opts)
+int H5_get_option(int argc, const char* const* argv, const char* opts, const struct h5_long_options* l_opts)
 {
-    static int sp      = 1;   /* character index in current token */
-    int        optchar = '?'; /* option character passed back to user */
+    static int sp = 1; /* character index in current token */
+    int optchar = '?'; /* option character passed back to user */
 
     if (sp == 1) {
         /* check for more flag-like tokens */
@@ -1269,13 +1312,13 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
 
     if (sp == 1 && argv[H5_optind][0] == '-' && argv[H5_optind][1] == '-') {
         /* long command line option */
-        int        i;
-        const char ch      = '=';
-        char      *arg     = strdup(&argv[H5_optind][2]);
-        size_t     arg_len = 0;
+        int i;
+        const char ch = '=';
+        char* arg = strdup(&argv[H5_optind][2]);
+        size_t arg_len = 0;
 
         H5_optarg = strchr(&argv[H5_optind][2], ch);
-        arg_len   = strlen(&argv[H5_optind][2]);
+        arg_len = strlen(&argv[H5_optind][2]);
         if (H5_optarg) {
             arg_len -= strlen(H5_optarg);
             H5_optarg++; /* skip the equal sign */
@@ -1290,13 +1333,16 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
                 if (l_opts[i].has_arg != no_arg) {
                     if (H5_optarg == NULL) {
                         if (l_opts[i].has_arg != optional_arg) {
-                            if (H5_optind < (argc - 1))
-                                if (argv[H5_optind + 1][0] != '-')
+                            if (H5_optind < (argc - 1)) {
+                                if (argv[H5_optind + 1][0] != '-') {
                                     H5_optarg = argv[++H5_optind];
+                                }
+                            }
                         }
                         else if (l_opts[i].has_arg == require_arg) {
-                            if (H5_opterr)
+                            if (H5_opterr) {
                                 fprintf(stderr, "%s: option required for \"--%s\" flag\n", argv[0], arg);
+                            }
 
                             optchar = '?';
                         }
@@ -1304,8 +1350,9 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
                 }
                 else {
                     if (H5_optarg) {
-                        if (H5_opterr)
+                        if (H5_opterr) {
                             fprintf(stderr, "%s: no option required for \"%s\" flag\n", argv[0], arg);
+                        }
 
                         optchar = '?';
                     }
@@ -1316,8 +1363,9 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
 
         if (l_opts && l_opts[i].name == NULL) {
             /* exhausted all of the l_opts we have and still didn't match */
-            if (H5_opterr)
+            if (H5_opterr) {
                 fprintf(stderr, "%s: unknown option \"%s\"\n", argv[0], arg);
+            }
 
             optchar = '?';
         }
@@ -1328,14 +1376,15 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
         free(arg);
     }
     else {
-        char *cp; /* pointer into current token */
+        char* cp; /* pointer into current token */
 
         /* short command line option */
         optchar = argv[H5_optind][sp];
 
         if (optchar == ':' || (cp = strchr(opts, optchar)) == 0) {
-            if (H5_opterr)
+            if (H5_opterr) {
                 fprintf(stderr, "%s: unknown option \"%c\"\n", argv[0], optchar);
+            }
 
             /* if no chars left in this token, move to next token */
             if (argv[H5_optind][++sp] == '\0') {
@@ -1352,8 +1401,9 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
                 H5_optarg = &argv[H5_optind++][sp + 1];
             }
             else if (++H5_optind >= argc) {
-                if (H5_opterr)
+                if (H5_opterr) {
                     fprintf(stderr, "%s: value expected for option \"%c\"\n", argv[0], optchar);
+                }
 
                 optchar = '?';
             }
@@ -1408,8 +1458,7 @@ H5_get_option(int argc, const char *const *argv, const char *opts, const struct 
  *
  *-------------------------------------------------------------------------
  */
-char *
-H5_strcasestr(const char *haystack, const char *needle)
+char* H5_strcasestr(const char* haystack, const char* needle)
 {
     /* Check arguments. */
     assert(haystack);
@@ -1417,8 +1466,8 @@ H5_strcasestr(const char *haystack, const char *needle)
 
     /* begin once from each character of haystack, until needle is found */
     do {
-        const char *h = haystack;
-        const char *n = needle;
+        const char* h = haystack;
+        const char* n = needle;
         /* loop while lowercase strings match, or needle ends */
         while (tolower(*h) == tolower(*n) && *n) {
             h++;
@@ -1428,7 +1477,7 @@ H5_strcasestr(const char *haystack, const char *needle)
         if (*n == 0) {
             /* must discard const qualifier here, so turn off the warning */
             H5_WARN_CAST_AWAY_CONST_OFF
-            return (char *)haystack;
+            return (char*)haystack;
             H5_WARN_CAST_AWAY_CONST_ON
         }
     } while (*haystack++);
@@ -1452,31 +1501,29 @@ H5_strcasestr(const char *haystack, const char *needle)
  */
 #if defined(H5_HAVE_WIN32_API) || defined(H5_HAVE_DARWIN) || (defined(__FreeBSD__) && __FreeBSD__ < 14)
 /* Need wrapper for Windows, macOS, and FreeBSD < 14 which expect context-first comparators */
-typedef struct HDqsort_context_wrapper_t {
-    int (*gnu_compar)(const void *, const void *, void *);
-    void *gnu_arg;
+typedef struct HDqsort_context_wrapper_t
+{
+    int (*gnu_compar)(const void*, const void*, void*);
+    void* gnu_arg;
 } HDqsort_context_wrapper_t;
 
-static int
-HDqsort_context_wrapper_func(void *wrapper_arg, const void *a, const void *b)
+static int HDqsort_context_wrapper_func(void* wrapper_arg, const void* a, const void* b)
 {
-    HDqsort_context_wrapper_t *w = (HDqsort_context_wrapper_t *)wrapper_arg;
+    HDqsort_context_wrapper_t* w = (HDqsort_context_wrapper_t*)wrapper_arg;
     return w->gnu_compar(a, b, w->gnu_arg);
 }
 
-herr_t
-HDqsort_context(void *base, size_t nel, size_t size, int (*compar)(const void *, const void *, void *),
-                void *arg)
+herr_t HDqsort_context(void* base, size_t nel, size_t size, int (*compar)(const void*, const void*, void*), void* arg)
 {
     HDqsort_context_wrapper_t wrapper;
     wrapper.gnu_compar = compar;
-    wrapper.gnu_arg    = arg;
-#if defined(H5_HAVE_WIN32_API)
+    wrapper.gnu_arg = arg;
+    #if defined(H5_HAVE_WIN32_API)
     qsort_s(base, nel, size, HDqsort_context_wrapper_func, &wrapper);
-#elif defined(H5_HAVE_DARWIN) || (defined(__FreeBSD__) && __FreeBSD__ < 14)
+    #elif defined(H5_HAVE_DARWIN) || (defined(__FreeBSD__) && __FreeBSD__ < 14)
     /* Old BSD-style: context parameter comes before comparator function */
     qsort_r(base, nel, size, &wrapper, HDqsort_context_wrapper_func);
-#endif
+    #endif
     return SUCCEED;
 }
 #endif
@@ -1491,29 +1538,27 @@ HDqsort_context(void *base, size_t nel, size_t size, int (*compar)(const void *,
  */
 #ifndef H5_HAVE_QSORT_REENTRANT
 
-typedef struct HDqsort_fallback_context_t {
-    int (*gnu_compar)(const void *, const void *, void *);
-    void *gnu_arg;
+typedef struct HDqsort_fallback_context_t
+{
+    int (*gnu_compar)(const void*, const void*, void*);
+    void* gnu_arg;
 } HDqsort_fallback_context_t;
 
 /* Non-threadsafe: use global variable */
-static HDqsort_fallback_context_t *HDqsort_fallback_global_ctx = NULL;
+static HDqsort_fallback_context_t* HDqsort_fallback_global_ctx = NULL;
 
-static int
-HDqsort_fallback_wrapper(const void *a, const void *b)
+static int HDqsort_fallback_wrapper(const void* a, const void* b)
 {
     /* Call the original GNU-style comparator with context from global */
     return HDqsort_fallback_global_ctx->gnu_compar(a, b, HDqsort_fallback_global_ctx->gnu_arg);
 }
 
-herr_t
-HDqsort_fallback(void *base, size_t nel, size_t size, int (*compar)(const void *, const void *, void *),
-                 void *arg)
+herr_t HDqsort_fallback(void* base, size_t nel, size_t size, int (*compar)(const void*, const void*, void*), void* arg)
 {
     HDqsort_fallback_context_t ctx;
 
     ctx.gnu_compar = compar;
-    ctx.gnu_arg    = arg;
+    ctx.gnu_arg = arg;
 
     /* Store context in global variable */
     HDqsort_fallback_global_ctx = &ctx;

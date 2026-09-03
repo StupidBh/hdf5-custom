@@ -51,9 +51,10 @@
 /******************/
 
 /* Type for the list of info for opened plugin libraries */
-typedef struct H5PL_plugin_t {
+typedef struct H5PL_plugin_t
+{
     H5PL_type_t type;   /* Plugin type                          */
-    H5PL_key_t  key;    /* Unique key to identify the plugin    */
+    H5PL_key_t key;     /* Unique key to identify the plugin    */
     H5PL_HANDLE handle; /* Plugin handle                        */
 } H5PL_plugin_t;
 
@@ -76,7 +77,7 @@ static herr_t H5PL__expand_cache(void);
 /*******************/
 
 /* Cache for storing opened plugin libraries */
-static H5PL_plugin_t *H5PL_cache_g = NULL;
+static H5PL_plugin_t* H5PL_cache_g = NULL;
 
 /* The number of stored plugins */
 static unsigned int H5PL_num_plugins_g = 0;
@@ -94,8 +95,7 @@ static unsigned int H5PL_cache_capacity_g = 0;
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__create_plugin_cache(void)
+herr_t H5PL__create_plugin_cache(void)
 {
     herr_t ret_value = SUCCEED;
 
@@ -106,15 +106,16 @@ H5PL__create_plugin_cache(void)
 
     H5PL_cache_capacity_g = H5PL_INITIAL_CACHE_CAPACITY;
 
-    if (NULL ==
-        (H5PL_cache_g = (H5PL_plugin_t *)H5MM_calloc((size_t)H5PL_cache_capacity_g * sizeof(H5PL_plugin_t))))
+    if (NULL == (H5PL_cache_g = (H5PL_plugin_t*)H5MM_calloc((size_t)H5PL_cache_capacity_g * sizeof(H5PL_plugin_t)))) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTALLOC, FAIL, "can't allocate memory for plugin cache");
+    }
 
 done:
     /* Try to clean up on errors */
     if (FAIL == ret_value) {
-        if (H5PL_cache_g)
-            H5PL_cache_g = (H5PL_plugin_t *)H5MM_xfree(H5PL_cache_g);
+        if (H5PL_cache_g) {
+            H5PL_cache_g = (H5PL_plugin_t*)H5MM_xfree(H5PL_cache_g);
+        }
         H5PL_cache_capacity_g = 0;
     }
 
@@ -131,31 +132,31 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__close_plugin_cache(bool *already_closed /*out*/)
+herr_t H5PL__close_plugin_cache(bool* already_closed /*out*/)
 {
     unsigned int u; /* iterator */
-    herr_t       ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NOERR
 
     /* Close opened dynamic libraries */
     if (H5PL_cache_g) {
-
         /* Close any cached plugins */
-        for (u = 0; u < H5PL_num_plugins_g; u++)
+        for (u = 0; u < H5PL_num_plugins_g; u++) {
             H5PL__close((H5PL_cache_g[u]).handle);
+        }
 
         /* Free the cache array */
-        H5PL_cache_g          = (H5PL_plugin_t *)H5MM_xfree(H5PL_cache_g);
-        H5PL_num_plugins_g    = 0;
+        H5PL_cache_g = (H5PL_plugin_t*)H5MM_xfree(H5PL_cache_g);
+        H5PL_num_plugins_g = 0;
         H5PL_cache_capacity_g = 0;
 
         /* Note that actually closed the table (needed by package close call) */
         *already_closed = false;
     }
-    else
+    else {
         *already_closed = true;
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5PL__close_plugin_cache() */
@@ -169,8 +170,7 @@ H5PL__close_plugin_cache(bool *already_closed /*out*/)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5PL__expand_cache(void)
+static herr_t H5PL__expand_cache(void)
 {
     herr_t ret_value = SUCCEED;
 
@@ -180,17 +180,18 @@ H5PL__expand_cache(void)
     H5PL_cache_capacity_g += H5PL_CACHE_CAPACITY_ADD;
 
     /* Resize the array */
-    if (NULL == (H5PL_cache_g = (H5PL_plugin_t *)H5MM_realloc(H5PL_cache_g, (size_t)H5PL_cache_capacity_g *
-                                                                                sizeof(H5PL_plugin_t))))
+    if (NULL == (H5PL_cache_g = (H5PL_plugin_t*)H5MM_realloc(H5PL_cache_g, (size_t)H5PL_cache_capacity_g * sizeof(H5PL_plugin_t)))) {
         HGOTO_ERROR(H5E_PLUGIN, H5E_CANTALLOC, FAIL, "allocating additional memory for plugin cache failed");
+    }
 
     /* Initialize the new memory */
     memset(H5PL_cache_g + H5PL_num_plugins_g, 0, (size_t)H5PL_CACHE_CAPACITY_ADD * sizeof(H5PL_plugin_t));
 
 done:
     /* Set the cache capacity back if there were problems */
-    if (FAIL == ret_value)
+    if (FAIL == ret_value) {
         H5PL_cache_capacity_g -= H5PL_CACHE_CAPACITY_ADD;
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5PL__expand_cache() */
@@ -204,21 +205,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__add_plugin(H5PL_type_t type, const H5PL_key_t *key, H5PL_HANDLE handle)
+herr_t H5PL__add_plugin(H5PL_type_t type, const H5PL_key_t* key, H5PL_HANDLE handle)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     /* Expand the cache if it is too small */
-    if (H5PL_num_plugins_g >= H5PL_cache_capacity_g)
-        if (H5PL__expand_cache() < 0)
+    if (H5PL_num_plugins_g >= H5PL_cache_capacity_g) {
+        if (H5PL__expand_cache() < 0) {
             HGOTO_ERROR(H5E_PLUGIN, H5E_CANTALLOC, FAIL, "can't expand plugin cache");
+        }
+    }
 
     /* Store the plugin info and bump the # of plugins */
-    H5PL_cache_g[H5PL_num_plugins_g].type   = type;
-    H5PL_cache_g[H5PL_num_plugins_g].key    = *key;
+    H5PL_cache_g[H5PL_num_plugins_g].type = type;
+    H5PL_cache_g[H5PL_num_plugins_g].key = *key;
     H5PL_cache_g[H5PL_num_plugins_g].handle = handle;
 
     H5PL_num_plugins_g++;
@@ -238,11 +240,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5PL__find_plugin_in_cache(const H5PL_search_params_t *search_params, bool *found, const void **plugin_info)
+herr_t H5PL__find_plugin_in_cache(const H5PL_search_params_t* search_params, bool* found, const void** plugin_info)
 {
     unsigned int u; /* iterator */
-    herr_t       ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -252,7 +253,7 @@ H5PL__find_plugin_in_cache(const H5PL_search_params_t *search_params, bool *foun
     assert(plugin_info);
 
     /* Initialize output parameters */
-    *found       = false;
+    *found = false;
     *plugin_info = NULL;
 
     /* Loop over all the plugins, looking for one that matches */
@@ -260,70 +261,79 @@ H5PL__find_plugin_in_cache(const H5PL_search_params_t *search_params, bool *foun
         bool matched = false; /* Whether cached plugin info matches */
 
         /* Determine if the plugin types match */
-        if (search_params->type != H5PL_cache_g[u].type)
+        if (search_params->type != H5PL_cache_g[u].type) {
             continue;
+        }
 
         /* Determine if cache entry matches based on type-specific information */
         switch (search_params->type) {
-            case H5PL_TYPE_FILTER:
-                /* Check if specified filter plugin ID matches cache entry's ID */
-                if (search_params->key->id == H5PL_cache_g[u].key.id)
+        case H5PL_TYPE_FILTER:
+            /* Check if specified filter plugin ID matches cache entry's ID */
+            if (search_params->key->id == H5PL_cache_g[u].key.id) {
+                matched = true;
+            }
+
+            break;
+
+        case H5PL_TYPE_VOL:
+            if (search_params->key->vol.kind == H5VL_GET_CONNECTOR_BY_NAME) {
+                /* Make sure the plugin cache entry key type matches our search key type */
+                if (H5PL_cache_g[u].key.vol.kind != H5VL_GET_CONNECTOR_BY_NAME) {
+                    continue;
+                }
+
+                /* Check if specified VOL connector name matches cache entry's name */
+                if (!strcmp(search_params->key->vol.u.name, H5PL_cache_g[u].key.vol.u.name)) {
                     matched = true;
-
-                break;
-
-            case H5PL_TYPE_VOL:
-                if (search_params->key->vol.kind == H5VL_GET_CONNECTOR_BY_NAME) {
-                    /* Make sure the plugin cache entry key type matches our search key type */
-                    if (H5PL_cache_g[u].key.vol.kind != H5VL_GET_CONNECTOR_BY_NAME)
-                        continue;
-
-                    /* Check if specified VOL connector name matches cache entry's name */
-                    if (!strcmp(search_params->key->vol.u.name, H5PL_cache_g[u].key.vol.u.name))
-                        matched = true;
                 }
-                else {
-                    assert(search_params->key->vol.kind == H5VL_GET_CONNECTOR_BY_VALUE);
+            }
+            else {
+                assert(search_params->key->vol.kind == H5VL_GET_CONNECTOR_BY_VALUE);
 
-                    /* Make sure the plugin cache entry key type matches our search key type */
-                    if (H5PL_cache_g[u].key.vol.kind != H5VL_GET_CONNECTOR_BY_VALUE)
-                        continue;
-
-                    /* Check if specified VOL connector ID matches cache entry's ID */
-                    if (search_params->key->vol.u.value == H5PL_cache_g[u].key.vol.u.value)
-                        matched = true;
+                /* Make sure the plugin cache entry key type matches our search key type */
+                if (H5PL_cache_g[u].key.vol.kind != H5VL_GET_CONNECTOR_BY_VALUE) {
+                    continue;
                 }
 
-                break;
-
-            case H5PL_TYPE_VFD:
-                if (search_params->key->vfd.kind == H5FD_GET_DRIVER_BY_NAME) {
-                    /* Make sure the plugin cache entry key type matches our search key type */
-                    if (H5PL_cache_g[u].key.vfd.kind != H5FD_GET_DRIVER_BY_NAME)
-                        continue;
-
-                    /* Check if specified VFD name matches cache entry's name */
-                    if (!strcmp(search_params->key->vfd.u.name, H5PL_cache_g[u].key.vfd.u.name))
-                        matched = true;
+                /* Check if specified VOL connector ID matches cache entry's ID */
+                if (search_params->key->vol.u.value == H5PL_cache_g[u].key.vol.u.value) {
+                    matched = true;
                 }
-                else {
-                    assert(search_params->key->vfd.kind == H5FD_GET_DRIVER_BY_VALUE);
+            }
 
-                    /* Make sure the plugin cache entry key type matches our search key type */
-                    if (H5PL_cache_g[u].key.vfd.kind != H5FD_GET_DRIVER_BY_VALUE)
-                        continue;
+            break;
 
-                    /* Check if specified VFD ID matches cache entry's ID */
-                    if (search_params->key->vfd.u.value == H5PL_cache_g[u].key.vfd.u.value)
-                        matched = true;
+        case H5PL_TYPE_VFD:
+            if (search_params->key->vfd.kind == H5FD_GET_DRIVER_BY_NAME) {
+                /* Make sure the plugin cache entry key type matches our search key type */
+                if (H5PL_cache_g[u].key.vfd.kind != H5FD_GET_DRIVER_BY_NAME) {
+                    continue;
                 }
 
-                break;
+                /* Check if specified VFD name matches cache entry's name */
+                if (!strcmp(search_params->key->vfd.u.name, H5PL_cache_g[u].key.vfd.u.name)) {
+                    matched = true;
+                }
+            }
+            else {
+                assert(search_params->key->vfd.kind == H5FD_GET_DRIVER_BY_VALUE);
 
-            case H5PL_TYPE_ERROR:
-            case H5PL_TYPE_NONE:
-            default:
-                HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "Invalid plugin type specified");
+                /* Make sure the plugin cache entry key type matches our search key type */
+                if (H5PL_cache_g[u].key.vfd.kind != H5FD_GET_DRIVER_BY_VALUE) {
+                    continue;
+                }
+
+                /* Check if specified VFD ID matches cache entry's ID */
+                if (search_params->key->vfd.u.value == H5PL_cache_g[u].key.vfd.u.value) {
+                    matched = true;
+                }
+            }
+
+            break;
+
+        case H5PL_TYPE_ERROR:
+        case H5PL_TYPE_NONE:
+        default             : HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "Invalid plugin type specified");
         }
 
         /* If the plugin type (filter, VOL connector, VFD plugin, etc.) and key match,
@@ -331,21 +341,22 @@ H5PL__find_plugin_in_cache(const H5PL_search_params_t *search_params, bool *foun
          */
         if (matched) {
             H5PL_get_plugin_info_t get_plugin_info_function;
-            const void            *info;
+            const void* info;
 
             /* Get the "get plugin info" function from the plugin. */
             H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF
-            if (NULL == (get_plugin_info_function = (H5PL_get_plugin_info_t)H5PL_GET_LIB_FUNC(
-                             H5PL_cache_g[u].handle, "H5PLget_plugin_info")))
+            if (NULL == (get_plugin_info_function = (H5PL_get_plugin_info_t)H5PL_GET_LIB_FUNC(H5PL_cache_g[u].handle, "H5PLget_plugin_info"))) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "can't get function for H5PLget_plugin_info");
+            }
             H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON
 
             /* Call the "get plugin info" function */
-            if (NULL == (info = (*get_plugin_info_function)()))
+            if (NULL == (info = (*get_plugin_info_function)())) {
                 HGOTO_ERROR(H5E_PLUGIN, H5E_CANTGET, FAIL, "can't get plugin info");
+            }
 
             /* Set output parameters */
-            *found       = true;
+            *found = true;
             *plugin_info = info;
 
             /* No need to continue processing */

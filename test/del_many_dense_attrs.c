@@ -19,7 +19,7 @@
 #include "h5test.h"
 
 /* The test file name */
-static const char *FILENAME[] = {"del_many_dense_attrs", NULL};
+static const char* FILENAME[] = { "del_many_dense_attrs", NULL };
 
 #define ATTR_COUNT 64 /* The number of attributes */
 
@@ -32,8 +32,7 @@ static const char *FILENAME[] = {"del_many_dense_attrs", NULL};
  *
  *-------------------------------------------------------------------------
  */
-static void
-catch_signal(int H5_ATTR_UNUSED signo)
+static void catch_signal(int H5_ATTR_UNUSED signo)
 {
     exit(EXIT_FAILURE);
 } /* catch_signal() */
@@ -50,66 +49,75 @@ catch_signal(int H5_ATTR_UNUSED signo)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hid_t       fid  = H5I_INVALID_HID; /* HDF5 File ID                 */
-    hid_t       gid  = H5I_INVALID_HID; /* Group ID                     */
-    hid_t       sid  = H5I_INVALID_HID; /* Dataspace ID                 */
-    hid_t       aid  = H5I_INVALID_HID; /* Attribute ID                 */
-    hid_t       tid  = H5I_INVALID_HID; /* Datatype ID                  */
-    hid_t       fapl = H5I_INVALID_HID; /* File access property lists   */
-    hid_t       gcpl = H5I_INVALID_HID; /* Group creation property list */
-    char        aname[50];              /* Name of attribute            */
-    const char *basename = "attr";      /* Name prefix for attribute    */
-    char        filename[100];          /* File name                    */
-    int         i;                      /* Local index variable         */
+    hid_t fid = H5I_INVALID_HID;   /* HDF5 File ID                 */
+    hid_t gid = H5I_INVALID_HID;   /* Group ID                     */
+    hid_t sid = H5I_INVALID_HID;   /* Dataspace ID                 */
+    hid_t aid = H5I_INVALID_HID;   /* Attribute ID                 */
+    hid_t tid = H5I_INVALID_HID;   /* Datatype ID                  */
+    hid_t fapl = H5I_INVALID_HID;  /* File access property lists   */
+    hid_t gcpl = H5I_INVALID_HID;  /* Group creation property list */
+    char aname[50];                /* Name of attribute            */
+    const char* basename = "attr"; /* Name prefix for attribute    */
+    char filename[100];            /* File name                    */
+    int i;                         /* Local index variable         */
 
     /* Testing setup */
     h5_test_init();
 
     /* To exit from the file for SIGABRT signal */
-    if (signal(SIGABRT, catch_signal) == SIG_ERR)
+    if (signal(SIGABRT, catch_signal) == SIG_ERR) {
         TEST_ERROR;
+    }
 
     fapl = h5_fileaccess();
     h5_fixname(FILENAME[0], fapl, filename, sizeof(filename));
 
     /* Set to latest format */
-    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+    if (H5Pset_libver_bounds(fapl, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the file  */
-    if ((fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the file */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open the file */
-    if ((fid = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the group creation property list */
-    if ((gcpl = H5Pcreate(H5P_GROUP_CREATE)) < 0)
+    if ((gcpl = H5Pcreate(H5P_GROUP_CREATE)) < 0) {
         TEST_ERROR;
+    }
 
     /* Set to use dense storage for all attributes on the group */
-    if (H5Pset_attr_phase_change(gcpl, 0, 0) < 0)
+    if (H5Pset_attr_phase_change(gcpl, 0, 0) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the group in the file */
-    if ((gid = H5Gcreate2(fid, "group", H5P_DEFAULT, gcpl, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "group", H5P_DEFAULT, gcpl, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create dataspace */
-    if ((sid = H5Screate(H5S_SCALAR)) < 0)
+    if ((sid = H5Screate(H5S_SCALAR)) < 0) {
         TEST_ERROR;
+    }
 
     /* Get a copy of the datatype */
-    if ((tid = H5Tcopy(H5T_NATIVE_FLOAT)) < 0)
+    if ((tid = H5Tcopy(H5T_NATIVE_FLOAT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Create attributes in the group */
     for (i = ATTR_COUNT; i >= 0; i--) {
@@ -117,45 +125,55 @@ main(void)
         snprintf(aname, sizeof(aname), "%s%d", basename, i);
 
         /* Create the attribute */
-        if ((aid = H5Acreate2(gid, aname, tid, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+        if ((aid = H5Acreate2(gid, aname, tid, sid, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             TEST_ERROR;
+        }
 
         /* Write to the attribute */
-        if (H5Awrite(aid, tid, &i) < 0)
+        if (H5Awrite(aid, tid, &i) < 0) {
             TEST_ERROR;
+        }
 
         /* Close the attribute */
-        if (H5Aclose(aid) < 0)
+        if (H5Aclose(aid) < 0) {
             TEST_ERROR;
+        }
     }
 
     /* Close the datatype */
-    if (H5Tclose(tid) < 0)
+    if (H5Tclose(tid) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the dataspace */
-    if (H5Sclose(sid) < 0)
+    if (H5Sclose(sid) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the group */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the group creation property list */
-    if (H5Pclose(gcpl) < 0)
+    if (H5Pclose(gcpl) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the file */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     /* Re-open the file */
-    if ((fid = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0)
+    if ((fid = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0) {
         TEST_ERROR;
+    }
 
     /* Open the group */
-    if ((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0)
+    if ((gid = H5Gopen2(fid, "group", H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
 
     /* Delete the attributes */
     for (i = 0; i <= ATTR_COUNT; i++) {
@@ -163,17 +181,20 @@ main(void)
         snprintf(aname, sizeof(aname), "%s%d", basename, i);
 
         /* Delete the attribute */
-        if (H5Adelete(gid, aname) < 0)
+        if (H5Adelete(gid, aname) < 0) {
             TEST_ERROR;
+        }
     } /* end for */
 
     /* Close the group */
-    if (H5Gclose(gid) < 0)
+    if (H5Gclose(gid) < 0) {
         TEST_ERROR;
+    }
 
     /* Close the file */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         TEST_ERROR;
+    }
 
     h5_cleanup(FILENAME, fapl);
 

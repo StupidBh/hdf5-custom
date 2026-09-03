@@ -20,25 +20,25 @@
 #define COL            3
 
 /* Macros for displaying objects */
-#define begin_obj(obj, name, begin)                                                                          \
-    do {                                                                                                     \
-        if ((name)) {                                                                                        \
-            PRINTSTREAM(rawoutstream, "%s \"%s\" %s", (obj), (name), (begin));                               \
-        }                                                                                                    \
-        else {                                                                                               \
-            PRINTSTREAM(rawoutstream, "%s %s", (obj), (begin));                                              \
-        }                                                                                                    \
+#define begin_obj(obj, name, begin)                                            \
+    do {                                                                       \
+        if ((name)) {                                                          \
+            PRINTSTREAM(rawoutstream, "%s \"%s\" %s", (obj), (name), (begin)); \
+        }                                                                      \
+        else {                                                                 \
+            PRINTSTREAM(rawoutstream, "%s %s", (obj), (begin));                \
+        }                                                                      \
     } while (0)
 
-#define end_obj(obj, end)                                                                                    \
-    do {                                                                                                     \
-        if (strlen(end)) {                                                                                   \
-            PRINTSTREAM(rawoutstream, "%s", end);                                                            \
-            if (strlen(obj))                                                                                 \
-                PRINTVALSTREAM(rawoutstream, " ");                                                           \
-        }                                                                                                    \
-        if (strlen(obj))                                                                                     \
-            PRINTSTREAM(rawoutstream, "%s", obj);                                                            \
+#define end_obj(obj, end)                          \
+    do {                                           \
+        if (strlen(end)) {                         \
+            PRINTSTREAM(rawoutstream, "%s", end);  \
+            if (strlen(obj))                       \
+                PRINTVALSTREAM(rawoutstream, " "); \
+        }                                          \
+        if (strlen(obj))                           \
+            PRINTSTREAM(rawoutstream, "%s", obj);  \
     } while (0)
 
 /* 3 private values: can't be set, but can be read.

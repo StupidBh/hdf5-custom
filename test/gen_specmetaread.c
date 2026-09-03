@@ -24,21 +24,21 @@
 #define FILENAME "specmetaread.h5"
 #define DIM      10
 
-int
-main(void)
+int main(void)
 {
-    hid_t                        fid;
-    hid_t                        fapl;
-    hid_t                        did;
-    hid_t                        space;
-    hsize_t                      dim[1] = {DIM};
-    unsigned                     data[DIM];
-    unsigned                     u;
+    hid_t fid;
+    hid_t fapl;
+    hid_t did;
+    hid_t space;
+    hsize_t dim[1] = { DIM };
+    unsigned data[DIM];
+    unsigned u;
     herr_t H5_ATTR_NDEBUG_UNUSED ret;
 
     /* Initialize the data */
-    for (u = 0; u < DIM; u++)
+    for (u = 0; u < DIM; u++) {
         data[u] = u;
+    }
 
     /* Create a FAPL with the metadata and small data aggregators turned off */
     fapl = H5Pcreate(H5P_FILE_ACCESS);

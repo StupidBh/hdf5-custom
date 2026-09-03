@@ -62,16 +62,17 @@
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     /* Check for writers */
     if (lock->writers || lock->write_waiters) {
@@ -94,8 +95,9 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
     lock->readers++;
 
     /* Release mutex */
-    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdlock() */
@@ -109,30 +111,33 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     /* Decrement # of readers */
     lock->readers--;
 
     /* Check for waiting writers when last readers */
-    if (lock->write_waiters && 0 == lock->readers)
+    if (lock->write_waiters && 0 == lock->readers) {
         if (H5_UNLIKELY(cnd_signal(&lock->write_cv) != thrd_success)) {
             mtx_unlock(&lock->mutex);
             return FAIL;
         }
+    }
 
     /* Release mutex */
-    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdunlock() */
@@ -146,16 +151,17 @@ H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     /* Check for readers or other writers */
     if (lock->readers || lock->writers) {
@@ -178,8 +184,9 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
     lock->writers++;
 
     /* Release mutex */
-    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrlock() */
@@ -193,18 +200,19 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
+static inline herr_t H5TS_rwlock_trywrlock(H5TS_rwlock_t* lock, bool* acquired)
 {
     int ret;
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock || NULL == acquired))
+    if (H5_UNLIKELY(NULL == lock || NULL == acquired)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(thrd_error == (ret = mtx_lock(&lock->mutex))))
+    if (H5_UNLIKELY(thrd_error == (ret = mtx_lock(&lock->mutex)))) {
         return FAIL;
+    }
     if (thrd_busy == ret) {
         /* We did not acquire the lock */
         *acquired = false;
@@ -212,9 +220,10 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
     }
 
     /* Check for readers or other writers */
-    if (lock->readers || lock->writers)
+    if (lock->readers || lock->writers) {
         /* We did not acquire the lock */
         *acquired = false;
+    }
     else {
         /* Increment # of writers */
         lock->writers++;
@@ -224,8 +233,9 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
     }
 
     /* Release mutex */
-    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_trywrlock() */
@@ -239,16 +249,17 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_lock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     /* Decrement # of writers */
     lock->writers--;
@@ -260,21 +271,23 @@ H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
             return FAIL;
         }
     }
-    else if (lock->read_waiters)
+    else if (lock->read_waiters) {
         if (H5_UNLIKELY(cnd_broadcast(&lock->read_cv) != thrd_success)) {
             mtx_unlock(&lock->mutex);
             return FAIL;
         }
+    }
 
     /* Release mutex */
-    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success))
+    if (H5_UNLIKELY(mtx_unlock(&lock->mutex) != thrd_success)) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrunlock() */
 
 #else
-#ifdef H5_HAVE_WIN_THREADS
+    #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_rwlock_rdlock
  *
@@ -284,12 +297,12 @@ H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     AcquireSRWLockShared(lock);
 
@@ -305,12 +318,12 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     ReleaseSRWLockShared(lock);
 
@@ -326,12 +339,12 @@ H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     AcquireSRWLockExclusive(lock);
 
@@ -347,17 +360,19 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
+static inline herr_t H5TS_rwlock_trywrlock(H5TS_rwlock_t* lock, bool* acquired)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock || NULL == acquired))
+    if (H5_UNLIKELY(NULL == lock || NULL == acquired)) {
         return FAIL;
+    }
 
-    if (TryAcquireSRWLockExclusive(lock))
+    if (TryAcquireSRWLockExclusive(lock)) {
         *acquired = true;
-    else
+    }
+    else {
         *acquired = false;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_trywrlock() */
@@ -371,19 +386,19 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     ReleaseSRWLockExclusive(lock);
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrunlock() */
 
-#elif defined(__MACH__)
+    #elif defined(__MACH__)
 /*-------------------------------------------------------------------------
  * Function: H5TS_rwlock_rdlock
  *
@@ -393,16 +408,17 @@ H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex))) {
         return FAIL;
+    }
 
     /* Check for writers */
     if (lock->writers || lock->write_waiters) {
@@ -425,8 +441,9 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
     lock->readers++;
 
     /* Release mutex */
-    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdlock() */
@@ -440,30 +457,33 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex))) {
         return FAIL;
+    }
 
     /* Decrement # of readers */
     lock->readers--;
 
     /* Check for waiting writers when last readers */
-    if (lock->write_waiters && 0 == lock->readers)
+    if (lock->write_waiters && 0 == lock->readers) {
         if (H5_UNLIKELY(pthread_cond_signal(&lock->write_cv))) {
             pthread_mutex_unlock(&lock->mutex);
             return FAIL;
         }
+    }
 
     /* Release mutex */
-    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdunlock() */
@@ -477,16 +497,17 @@ H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex))) {
         return FAIL;
+    }
 
     /* Check for readers or other writers */
     if (lock->readers || lock->writers) {
@@ -509,8 +530,9 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
     lock->writers++;
 
     /* Release mutex */
-    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrlock() */
@@ -524,14 +546,14 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
+static inline herr_t H5TS_rwlock_trywrlock(H5TS_rwlock_t* lock, bool* acquired)
 {
     int rc;
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock || NULL == acquired))
+    if (H5_UNLIKELY(NULL == lock || NULL == acquired)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
     rc = pthread_mutex_trylock(&lock->mutex);
@@ -540,13 +562,15 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
         *acquired = false;
         return SUCCEED;
     }
-    else if (0 != rc)
+    else if (0 != rc) {
         return FAIL;
+    }
 
     /* Check for readers or other writers */
-    if (lock->readers || lock->writers)
+    if (lock->readers || lock->writers) {
         /* We did not acquire the lock */
         *acquired = false;
+    }
     else {
         /* Increment # of writers */
         lock->writers++;
@@ -556,8 +580,9 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
     }
 
     /* Release mutex */
-    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_trywrlock() */
@@ -571,16 +596,17 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
     /* Acquire the lock's mutex */
-    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_lock(&lock->mutex))) {
         return FAIL;
+    }
 
     /* Decrement # of writers */
     lock->writers--;
@@ -592,20 +618,22 @@ H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
             return FAIL;
         }
     }
-    else if (lock->read_waiters)
+    else if (lock->read_waiters) {
         if (H5_UNLIKELY(pthread_cond_broadcast(&lock->read_cv))) {
             pthread_mutex_unlock(&lock->mutex);
             return FAIL;
         }
+    }
 
     /* Release mutex */
-    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex)))
+    if (H5_UNLIKELY(pthread_mutex_unlock(&lock->mutex))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrunlock() */
 
-#else
+    #else
 /*-------------------------------------------------------------------------
  * Function: H5TS_rwlock_rdlock
  *
@@ -615,15 +643,16 @@ H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(pthread_rwlock_rdlock(lock)))
+    if (H5_UNLIKELY(pthread_rwlock_rdlock(lock))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdlock() */
@@ -637,15 +666,16 @@ H5TS_rwlock_rdlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_rdunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(pthread_rwlock_unlock(lock)))
+    if (H5_UNLIKELY(pthread_rwlock_unlock(lock))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_rdunlock() */
@@ -659,15 +689,16 @@ H5TS_rwlock_rdunlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(pthread_rwlock_wrlock(lock)))
+    if (H5_UNLIKELY(pthread_rwlock_wrlock(lock))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrlock() */
@@ -681,22 +712,25 @@ H5TS_rwlock_wrlock(H5TS_rwlock_t *lock)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
+herr_t H5TS_rwlock_trywrlock(H5TS_rwlock_t* lock, bool* acquired)
 {
     int ret;
 
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock || NULL == acquired))
+    if (H5_UNLIKELY(NULL == lock || NULL == acquired)) {
         return FAIL;
+    }
 
     ret = pthread_rwlock_trywrlock(lock);
-    if (EBUSY == ret)
+    if (EBUSY == ret) {
         *acquired = false; /* We did not acquire the lock */
-    else if (H5_UNLIKELY(0 != ret))
+    }
+    else if (H5_UNLIKELY(0 != ret)) {
         return FAIL;
-    else
+    }
+    else {
         *acquired = true; /* We acquired the lock */
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_trywrlock() */
@@ -710,17 +744,18 @@ H5TS_rwlock_trywrlock(H5TS_rwlock_t *lock, bool *acquired)
  *
  *-------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_rwlock_wrunlock(H5TS_rwlock_t *lock)
+static inline herr_t H5TS_rwlock_wrunlock(H5TS_rwlock_t* lock)
 {
     /* Check argument */
-    if (H5_UNLIKELY(NULL == lock))
+    if (H5_UNLIKELY(NULL == lock)) {
         return FAIL;
+    }
 
-    if (H5_UNLIKELY(pthread_rwlock_unlock(lock)))
+    if (H5_UNLIKELY(pthread_rwlock_unlock(lock))) {
         return FAIL;
+    }
 
     return SUCCEED;
 } /* end H5TS_rwlock_wrunlock() */
-#endif
+    #endif
 #endif

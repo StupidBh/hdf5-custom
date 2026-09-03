@@ -16,7 +16,7 @@
  * Purpose:     Code for the onion file's history
  */
 
-#include "H5FDmodule.h" /* This source code file is part of the H5FD module */
+#include "H5FDmodule.h"     /* This source code file is part of the H5FD module */
 
 #include "H5private.h"      /* Generic Functions                        */
 #include "H5Eprivate.h"     /* Error handling                           */
@@ -34,12 +34,11 @@
  * Returns:     SUCCEED/FAIL
  *-----------------------------------------------------------------------------
  */
-herr_t
-H5FD__onion_ingest_history(H5FD_onion_history_t *history_out, H5FD_t *raw_file, haddr_t addr, haddr_t size)
+herr_t H5FD__onion_ingest_history(H5FD_onion_history_t* history_out, H5FD_t* raw_file, haddr_t addr, haddr_t size)
 {
-    unsigned char *buf       = NULL;
-    uint32_t       sum       = 0;
-    herr_t         ret_value = SUCCEED;
+    unsigned char* buf = NULL;
+    uint32_t sum = 0;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -49,37 +48,46 @@ H5FD__onion_ingest_history(H5FD_onion_history_t *history_out, H5FD_t *raw_file, 
     /* Set early so we can clean up properly on errors */
     history_out->record_locs = NULL;
 
-    if (H5FD_get_eof(raw_file, H5FD_MEM_DRAW) < (addr + size))
+    if (H5FD_get_eof(raw_file, H5FD_MEM_DRAW) < (addr + size)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "header indicates history beyond EOF");
+    }
 
-    if (NULL == (buf = H5MM_malloc(sizeof(char) * size)))
+    if (NULL == (buf = H5MM_malloc(sizeof(char) * size))) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, FAIL, "can't allocate buffer space");
+    }
 
-    if (H5FD_set_eoa(raw_file, H5FD_MEM_DRAW, (addr + size)) < 0)
+    if (H5FD_set_eoa(raw_file, H5FD_MEM_DRAW, (addr + size)) < 0) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTSET, FAIL, "can't modify EOA");
+    }
 
-    if (H5FD_read(raw_file, H5FD_MEM_DRAW, addr, size, buf) < 0)
+    if (H5FD_read(raw_file, H5FD_MEM_DRAW, addr, size, buf) < 0) {
         HGOTO_ERROR(H5E_VFL, H5E_READERROR, FAIL, "can't read history from file");
+    }
 
-    if (H5FD__onion_history_decode(buf, history_out) != size)
+    if (H5FD__onion_history_decode(buf, history_out) != size) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTDECODE, FAIL, "can't decode history (initial)");
+    }
 
     sum = H5_checksum_fletcher32(buf, size - 4);
-    if (history_out->checksum != sum)
+    if (history_out->checksum != sum) {
         HGOTO_ERROR(H5E_VFL, H5E_BADVALUE, FAIL, "checksum mismatch between buffer and stored");
+    }
 
-    if (history_out->n_revisions > 0)
-        if (NULL == (history_out->record_locs =
-                         H5MM_calloc(history_out->n_revisions * sizeof(H5FD_onion_record_loc_t))))
+    if (history_out->n_revisions > 0) {
+        if (NULL == (history_out->record_locs = H5MM_calloc(history_out->n_revisions * sizeof(H5FD_onion_record_loc_t)))) {
             HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, FAIL, "can't allocate record pointer list");
+        }
+    }
 
-    if (H5FD__onion_history_decode(buf, history_out) != size)
+    if (H5FD__onion_history_decode(buf, history_out) != size) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTDECODE, FAIL, "can't decode history (final)");
+    }
 
 done:
     H5MM_xfree(buf);
-    if (ret_value < 0)
+    if (ret_value < 0) {
         H5MM_xfree(history_out->record_locs);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5FD__onion_ingest_history() */
@@ -93,29 +101,30 @@ done:
  *              Failure:    0
  *-----------------------------------------------------------------------------
  */
-uint64_t
-H5FD__onion_write_history(H5FD_onion_history_t *history, H5FD_t *file, haddr_t off_start,
-                          haddr_t filesize_curr)
+uint64_t H5FD__onion_write_history(H5FD_onion_history_t* history, H5FD_t* file, haddr_t off_start, haddr_t filesize_curr)
 {
-    uint32_t       _sum      = 0; /* Required by the API call but unused here */
-    uint64_t       size      = 0;
-    unsigned char *buf       = NULL;
-    uint64_t       ret_value = 0;
+    uint32_t _sum = 0; /* Required by the API call but unused here */
+    uint64_t size = 0;
+    unsigned char* buf = NULL;
+    uint64_t ret_value = 0;
 
     FUNC_ENTER_PACKAGE
 
-    if (NULL == (buf = H5MM_malloc(H5FD_ONION_ENCODED_SIZE_HISTORY +
-                                   (H5FD_ONION_ENCODED_SIZE_RECORD_POINTER * history->n_revisions))))
+    if (NULL == (buf = H5MM_malloc(H5FD_ONION_ENCODED_SIZE_HISTORY + (H5FD_ONION_ENCODED_SIZE_RECORD_POINTER * history->n_revisions)))) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, 0, "can't allocate buffer for updated history");
+    }
 
-    if (0 == (size = H5FD__onion_history_encode(history, buf, &_sum)))
+    if (0 == (size = H5FD__onion_history_encode(history, buf, &_sum))) {
         HGOTO_ERROR(H5E_VFL, H5E_BADVALUE, 0, "problem encoding updated history");
+    }
 
-    if ((size + off_start > filesize_curr) && (H5FD_set_eoa(file, H5FD_MEM_DRAW, off_start + size) < 0))
+    if ((size + off_start > filesize_curr) && (H5FD_set_eoa(file, H5FD_MEM_DRAW, off_start + size) < 0)) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTSET, 0, "can't modify EOA for updated history");
+    }
 
-    if (H5FD_write(file, H5FD_MEM_DRAW, off_start, size, buf) < 0)
+    if (H5FD_write(file, H5FD_MEM_DRAW, off_start, size, buf) < 0) {
         HGOTO_ERROR(H5E_VFL, H5E_WRITEERROR, 0, "can't write history as intended");
+    }
 
     ret_value = size;
 
@@ -153,16 +162,15 @@ done:
  *              Failure:    0
  *-----------------------------------------------------------------------------
  */
-size_t H5_ATTR_NO_OPTIMIZE
-H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history)
+size_t H5_ATTR_NO_OPTIMIZE H5FD__onion_history_decode(unsigned char* buf, H5FD_onion_history_t* history)
 {
-    uint32_t       ui32        = 0;
-    uint32_t       sum         = 0;
-    uint64_t       ui64        = 0;
-    uint64_t       n_revisions = 0;
-    uint8_t       *ui8p        = NULL;
-    unsigned char *ptr         = NULL;
-    size_t         ret_value   = 0;
+    uint32_t ui32 = 0;
+    uint32_t sum = 0;
+    uint64_t ui64 = 0;
+    uint64_t n_revisions = 0;
+    uint8_t* ui8p = NULL;
+    unsigned char* ptr = NULL;
+    size_t ret_value = 0;
 
     FUNC_ENTER_PACKAGE
 
@@ -170,16 +178,18 @@ H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history)
     assert(history != NULL);
     assert(H5FD_ONION_HISTORY_VERSION_CURR == history->version);
 
-    if (strncmp((const char *)buf, H5FD_ONION_HISTORY_SIGNATURE, 4))
+    if (strncmp((const char*)buf, H5FD_ONION_HISTORY_SIGNATURE, 4)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "invalid signature");
+    }
 
-    if (H5FD_ONION_HISTORY_VERSION_CURR != buf[4])
+    if (H5FD_ONION_HISTORY_VERSION_CURR != buf[4]) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "invalid version");
+    }
 
     ptr = buf + 8;
 
     H5MM_memcpy(&ui64, ptr, 8);
-    ui8p = (uint8_t *)&ui64;
+    ui8p = (uint8_t*)&ui64;
     UINT64DECODE(ui8p, n_revisions);
     ptr += 8;
 
@@ -188,14 +198,15 @@ H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history)
         ptr += H5FD_ONION_ENCODED_SIZE_RECORD_POINTER * n_revisions;
     }
     else {
-        if (history->n_revisions != n_revisions)
-            HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0,
-                        "history argument suggests different revision count than encoded buffer");
-        if (NULL == history->record_locs)
+        if (history->n_revisions != n_revisions) {
+            HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "history argument suggests different revision count than encoded buffer");
+        }
+        if (NULL == history->record_locs) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "list is NULL -- cannot populate");
+        }
 
         for (uint64_t i = 0; i < n_revisions; i++) {
-            H5FD_onion_record_loc_t *rloc = &history->record_locs[i];
+            H5FD_onion_record_loc_t* rloc = &history->record_locs[i];
 
             /* Decode into appropriately sized types, then do a checked
              * assignment to the struct value. We don't have access to
@@ -206,19 +217,19 @@ H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history)
             uint64_t phys_addr;
 
             H5MM_memcpy(&ui64, ptr, 8);
-            ui8p = (uint8_t *)&ui64;
+            ui8p = (uint8_t*)&ui64;
             UINT64DECODE(ui8p, phys_addr);
             H5_CHECKED_ASSIGN(rloc->phys_addr, haddr_t, phys_addr, uint64_t);
             ptr += 8;
 
             H5MM_memcpy(&ui64, ptr, 8);
-            ui8p = (uint8_t *)&ui64;
+            ui8p = (uint8_t*)&ui64;
             UINT64DECODE(ui8p, record_size);
             H5_CHECKED_ASSIGN(rloc->record_size, hsize_t, record_size, uint64_t);
             ptr += 8;
 
             H5MM_memcpy(&ui32, ptr, 4);
-            ui8p = (uint8_t *)&ui32;
+            ui8p = (uint8_t*)&ui32;
             UINT32DECODE(ui8p, rloc->checksum);
             ptr += 4;
         }
@@ -227,12 +238,13 @@ H5FD__onion_history_decode(unsigned char *buf, H5FD_onion_history_t *history)
     sum = H5_checksum_fletcher32(buf, (size_t)(ptr - buf));
 
     H5MM_memcpy(&ui32, ptr, 4);
-    ui8p = (uint8_t *)&ui32;
+    ui8p = (uint8_t*)&ui32;
     UINT32DECODE(ui8p, history->checksum);
     ptr += 4;
 
-    if (sum != history->checksum)
+    if (sum != history->checksum) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "checksum mismatch");
+    }
 
     ret_value = (size_t)(ptr - buf);
 
@@ -260,11 +272,10 @@ done:
  *              checksum itself) is stored in the pointer `checksum`).
  *-----------------------------------------------------------------------------
  */
-size_t
-H5FD__onion_history_encode(H5FD_onion_history_t *history, unsigned char *buf, uint32_t *checksum)
+size_t H5FD__onion_history_encode(H5FD_onion_history_t* history, unsigned char* buf, uint32_t* checksum)
 {
-    unsigned char *ptr      = buf;
-    size_t         vers_u32 = (uint32_t)history->version; /* pad out unused bytes */
+    unsigned char* ptr = buf;
+    size_t vers_u32 = (uint32_t)history->version; /* pad out unused bytes */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -280,7 +291,7 @@ H5FD__onion_history_encode(H5FD_onion_history_t *history, unsigned char *buf, ui
     if (history->n_revisions > 0) {
         assert(history->record_locs != NULL);
         for (uint64_t i = 0; i < history->n_revisions; i++) {
-            H5FD_onion_record_loc_t *rloc = &history->record_locs[i];
+            H5FD_onion_record_loc_t* rloc = &history->record_locs[i];
 
             /* Do a checked assignment from the struct value into appropriately
              * sized types. We don't have access to the H5F_t struct for this

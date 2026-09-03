@@ -22,7 +22,7 @@
 
 #define DATAFILE "ttime.h5"
 #ifdef NOT_YET
-#define DATASETNAME "Dataset"
+    #define DATASETNAME "Dataset"
 #endif /* NOT_YET */
 
 /****************************************************************
@@ -30,10 +30,9 @@
 **  test_time_commit(): Test committing time datatypes to a file
 **
 ****************************************************************/
-static void
-test_time_commit(void)
+static void test_time_commit(void)
 {
-    hid_t  file_id, tid; /* identifiers */
+    hid_t file_id, tid; /* identifiers */
     herr_t status;
 
     /* Output message about test being performed */
@@ -81,8 +80,9 @@ test_time_commit(void)
     tid = H5Topen2(file_id, "Committed D32LE type", H5P_DEFAULT);
     CHECK(tid, FAIL, "H5Topen2");
 
-    if (!H5Tequal(tid, H5T_UNIX_D32LE))
+    if (!H5Tequal(tid, H5T_UNIX_D32LE)) {
         TestErrPrintf("H5T_UNIX_D32LE datatype not found\n");
+    }
 
     status = H5Tclose(tid);
     CHECK(status, FAIL, "H5Tclose");
@@ -90,8 +90,9 @@ test_time_commit(void)
     tid = H5Topen2(file_id, "Committed D32BE type", H5P_DEFAULT);
     CHECK(tid, FAIL, "H5Topen2");
 
-    if (!H5Tequal(tid, H5T_UNIX_D32BE))
+    if (!H5Tequal(tid, H5T_UNIX_D32BE)) {
         TestErrPrintf("H5T_UNIX_D32BE datatype not found\n");
+    }
 
     status = H5Tclose(tid);
     CHECK(status, FAIL, "H5Tclose");
@@ -99,8 +100,9 @@ test_time_commit(void)
     tid = H5Topen2(file_id, "Committed D64LE type", H5P_DEFAULT);
     CHECK(tid, FAIL, "H5Topen2");
 
-    if (!H5Tequal(tid, H5T_UNIX_D64LE))
+    if (!H5Tequal(tid, H5T_UNIX_D64LE)) {
         TestErrPrintf("H5T_UNIX_D64LE datatype not found");
+    }
 
     status = H5Tclose(tid);
     CHECK(status, FAIL, "H5Tclose");
@@ -108,8 +110,9 @@ test_time_commit(void)
     tid = H5Topen2(file_id, "Committed D64BE type", H5P_DEFAULT);
     CHECK(tid, FAIL, "H5Topen2");
 
-    if (!H5Tequal(tid, H5T_UNIX_D64BE))
+    if (!H5Tequal(tid, H5T_UNIX_D64BE)) {
         TestErrPrintf("H5T_UNIX_D64BE datatype not found");
+    }
 
     status = H5Tclose(tid);
     CHECK(status, FAIL, "H5Tclose");
@@ -124,13 +127,12 @@ test_time_commit(void)
 **  test_time_io(): Test writing time data to a dataset
 **
 ****************************************************************/
-static void
-test_time_io(void)
+static void test_time_io(void)
 {
-    hid_t  fid;               /* File identifier */
-    hid_t  dsid;              /* Dataset identifier */
-    hid_t  tid;               /* Datatype identifier */
-    hid_t  sid;               /* Dataspace identifier */
+    hid_t fid;                /* File identifier */
+    hid_t dsid;               /* Dataset identifier */
+    hid_t tid;                /* Datatype identifier */
+    hid_t sid;                /* Dataspace identifier */
     time_t timenow, timethen; /* Times */
     herr_t status;
 
@@ -175,8 +177,9 @@ test_time_io(void)
 
     tid = H5Dget_type(dsid);
     CHECK(tid, FAIL, "H5Dget_type");
-    if (H5Tget_class(tid) == H5T_TIME)
+    if (H5Tget_class(tid) == H5T_TIME) {
         fprintf(stderr, "datatype class is H5T_TIME\n");
+    }
     status = H5Tclose(tid);
     CHECK(status, FAIL, "H5Tclose");
 
@@ -197,8 +200,7 @@ test_time_io(void)
 **  test_time(): Main time datatype testing routine.
 **
 ****************************************************************/
-void
-test_time(void H5_ATTR_UNUSED *params)
+void test_time(void H5_ATTR_UNUSED* params)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Time Datatypes\n"));
@@ -206,7 +208,7 @@ test_time(void H5_ATTR_UNUSED *params)
     test_time_commit(); /* Test committing time datatypes to a file */
 #ifdef NOT_YET
     test_time_io(); /* Test writing time data to a dataset */
-#endif              /* NOT_YET */
+#endif /* NOT_YET */
 
 } /* test_time() */
 
@@ -219,8 +221,7 @@ test_time(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_time(void H5_ATTR_UNUSED *params)
+void cleanup_time(void H5_ATTR_UNUSED* params)
 {
     if (GetTestCleanup()) {
         H5E_BEGIN_TRY

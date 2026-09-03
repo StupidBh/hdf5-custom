@@ -65,8 +65,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5FS_stat_info(const H5F_t *f, const H5FS_t *frsp, H5FS_stat_t *stats)
+herr_t H5FS_stat_info(const H5F_t* f, const H5FS_t* frsp, H5FS_stat_t* stats)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -75,15 +74,15 @@ H5FS_stat_info(const H5F_t *f, const H5FS_t *frsp, H5FS_stat_t *stats)
     assert(stats);
 
     /* Report statistics for free space */
-    stats->tot_space         = frsp->tot_space;
-    stats->tot_sect_count    = frsp->tot_sect_count;
+    stats->tot_space = frsp->tot_space;
+    stats->tot_sect_count = frsp->tot_sect_count;
     stats->serial_sect_count = frsp->serial_sect_count;
-    stats->ghost_sect_count  = frsp->ghost_sect_count;
-    stats->addr              = frsp->addr;
-    stats->hdr_size          = (hsize_t)H5FS_HEADER_SIZE(f);
-    stats->sect_addr         = frsp->sect_addr;
-    stats->alloc_sect_size   = frsp->alloc_sect_size;
-    stats->sect_size         = frsp->sect_size;
+    stats->ghost_sect_count = frsp->ghost_sect_count;
+    stats->addr = frsp->addr;
+    stats->hdr_size = (hsize_t)H5FS_HEADER_SIZE(f);
+    stats->sect_addr = frsp->sect_addr;
+    stats->alloc_sect_size = frsp->alloc_sect_size;
+    stats->sect_size = frsp->sect_size;
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* H5FS_stat_info() */

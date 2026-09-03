@@ -33,24 +33,24 @@
 
 #ifdef H5_REQUIRE_DIGITAL_SIGNATURE
 
-#include <sys/stat.h>
-#include <fcntl.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
 
-/* Test filter ID */
-#define TEST_SIGNATURE_FILTER_ID 260
+    /* Test filter ID */
+    #define TEST_SIGNATURE_FILTER_ID 260
 
 /* Test files */
-static const char *PLUGIN_DIR           = "test_plugin_signature_dir";
-static const char *SIGNED_PLUGIN        = "libh5test_sig_filter.so";
-static const char *UNSIGNED_PLUGIN      = "libh5test_sig_filter_unsigned.so";
-static const char *TAMPERED_PLUGIN      = "libh5test_sig_filter_tampered.so";
-static const char *BAD_SIG_PLUGIN       = "libh5test_sig_filter_badsig.so";
-static const char *NO_FOOTER_PLUGIN     = "libh5test_sig_filter_nofooter.so";
-static const char *CORRUPT_MAGIC_PLUGIN = "libh5test_sig_filter_badmagic.so";
+static const char* PLUGIN_DIR = "test_plugin_signature_dir";
+static const char* SIGNED_PLUGIN = "libh5test_sig_filter.so";
+static const char* UNSIGNED_PLUGIN = "libh5test_sig_filter_unsigned.so";
+static const char* TAMPERED_PLUGIN = "libh5test_sig_filter_tampered.so";
+static const char* BAD_SIG_PLUGIN = "libh5test_sig_filter_badsig.so";
+static const char* NO_FOOTER_PLUGIN = "libh5test_sig_filter_nofooter.so";
+static const char* CORRUPT_MAGIC_PLUGIN = "libh5test_sig_filter_badmagic.so";
 
 /* Test key paths (set via environment or compile-time) */
 static char test_private_key[1024] = "";
-static char test_public_key[1024]  = "";
+static char test_public_key[1024] = "";
 
 /*-------------------------------------------------------------------------
  * Function:    create_dummy_plugin
@@ -62,19 +62,43 @@ static char test_public_key[1024]  = "";
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_dummy_plugin(const char *path)
+static herr_t create_dummy_plugin(const char* path)
 {
-    int    fd;
+    int fd;
     herr_t ret_value = SUCCEED;
 
     /* Create minimal plugin file - just some dummy binary data */
-    const unsigned char dummy_data[] = {/* ELF header magic for shared library (simplified) */
-                                        0x7f, 'E', 'L', 'F',    /* Magic number */
-                                        0x02, 0x01, 0x01, 0x00, /* 64-bit, little-endian, current version */
-                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* Padding */
-                                        /* Some dummy content to make it a reasonable size */
-                                        'T', 'E', 'S', 'T', ' ', 'P', 'L', 'U', 'G', 'I', 'N', '\0'};
+    const unsigned char dummy_data[] = { /* ELF header magic for shared library (simplified) */
+                                         0x7f,
+                                         'E',
+                                         'L',
+                                         'F', /* Magic number */
+                                         0x02,
+                                         0x01,
+                                         0x01,
+                                         0x00, /* 64-bit, little-endian, current version */
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00,
+                                         0x00, /* Padding */
+                                         /* Some dummy content to make it a reasonable size */
+                                         'T',
+                                         'E',
+                                         'S',
+                                         'T',
+                                         ' ',
+                                         'P',
+                                         'L',
+                                         'U',
+                                         'G',
+                                         'I',
+                                         'N',
+                                         '\0'
+    };
 
     if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
         fprintf(stderr, "Failed to create plugin file: %s\n", path);
@@ -99,11 +123,10 @@ create_dummy_plugin(const char *path)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-sign_plugin_file(const char *plugin_path, const char *private_key_path)
+static herr_t sign_plugin_file(const char* plugin_path, const char* private_key_path)
 {
-    char   cmd[2048];
-    int    result;
+    char cmd[2048];
+    int result;
     herr_t ret_value = SUCCEED;
 
     /* Build command to sign the plugin using h5sign tool (quote paths for safety) */
@@ -128,18 +151,18 @@ sign_plugin_file(const char *plugin_path, const char *private_key_path)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-append_bad_signature(const char *plugin_path)
+static herr_t append_bad_signature(const char* plugin_path)
 {
-    int               fd;
+    int fd;
     H5PL_sig_footer_t footer;
-    unsigned char     bad_signature[256];
-    size_t            i;
-    herr_t            ret_value = SUCCEED;
+    unsigned char bad_signature[256];
+    size_t i;
+    herr_t ret_value = SUCCEED;
 
     /* Create a dummy bad signature (just random bytes) */
-    for (i = 0; i < sizeof(bad_signature); i++)
+    for (i = 0; i < sizeof(bad_signature); i++) {
         bad_signature[i] = (unsigned char)(i * 7 + 13); /* Arbitrary pattern */
+    }
 
     /* Open plugin file in append mode */
     if ((fd = HDopen(plugin_path, O_WRONLY | O_APPEND, 0)) < 0) {
@@ -156,8 +179,8 @@ append_bad_signature(const char *plugin_path)
 
     /* Write footer with correct format but pointing to bad signature */
     footer.signature_length = sizeof(bad_signature);
-    footer.algorithm_id     = H5PL_SIG_ALGO_SHA256;
-    footer.format_version   = 1;
+    footer.algorithm_id = H5PL_SIG_ALGO_SHA256;
+    footer.format_version = 1;
 
     /* Encode footer in little-endian (as expected by verification code) */
     {
@@ -184,12 +207,11 @@ append_bad_signature(const char *plugin_path)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-append_corrupt_footer(const char *plugin_path)
+static herr_t append_corrupt_footer(const char* plugin_path)
 {
-    int           fd;
+    int fd;
     unsigned char footer_bytes[H5PL_SIG_FOOTER_SIZE];
-    herr_t        ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     if ((fd = HDopen(plugin_path, O_WRONLY | O_APPEND, 0)) < 0) {
         fprintf(stderr, "Failed to open plugin for corrupt footer: %s\n", plugin_path);
@@ -201,8 +223,8 @@ append_corrupt_footer(const char *plugin_path)
         H5PL_sig_footer_t footer;
 
         footer.signature_length = 256;
-        footer.algorithm_id     = H5PL_SIG_ALGO_SHA256;
-        footer.format_version   = 1;
+        footer.algorithm_id = H5PL_SIG_ALGO_SHA256;
+        footer.format_version = 1;
 
         H5PL_sig_encode_footer(footer_bytes, sizeof(footer_bytes), &footer);
 
@@ -232,11 +254,10 @@ append_corrupt_footer(const char *plugin_path)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-tamper_with_plugin(const char *plugin_path)
+static herr_t tamper_with_plugin(const char* plugin_path)
 {
-    int    fd;
-    char   byte;
+    int fd;
+    char byte;
     herr_t ret_value = SUCCEED;
 
     /* Open plugin and modify the first byte of content */
@@ -280,18 +301,17 @@ tamper_with_plugin(const char *plugin_path)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-generate_rsa_keypair(int bits, const char *private_path, const char *public_path)
+static herr_t generate_rsa_keypair(int bits, const char* private_path, const char* public_path)
 {
     char cmd[2048];
-    int  result;
+    int result;
 
     /* Generate private key */
-#ifdef H5_HAVE_WIN32_API
+    #ifdef H5_HAVE_WIN32_API
     snprintf(cmd, sizeof(cmd), "openssl genrsa -out %s %d >NUL 2>&1", private_path, bits);
-#else
+    #else
     snprintf(cmd, sizeof(cmd), "openssl genrsa -out %s %d 2>&1 >/dev/null", private_path, bits);
-#endif
+    #endif
     result = system(cmd);
     if (result != 0) {
         fprintf(stderr, "Failed to generate RSA-%d private key: %s\n", bits, private_path);
@@ -299,12 +319,11 @@ generate_rsa_keypair(int bits, const char *private_path, const char *public_path
     }
 
     /* Extract public key */
-#ifdef H5_HAVE_WIN32_API
+    #ifdef H5_HAVE_WIN32_API
     snprintf(cmd, sizeof(cmd), "openssl rsa -in %s -pubout -out %s >NUL 2>&1", private_path, public_path);
-#else
-    snprintf(cmd, sizeof(cmd), "openssl rsa -in %s -pubout -out %s 2>&1 >/dev/null", private_path,
-             public_path);
-#endif
+    #else
+    snprintf(cmd, sizeof(cmd), "openssl rsa -in %s -pubout -out %s 2>&1 >/dev/null", private_path, public_path);
+    #endif
     result = system(cmd);
     if (result != 0) {
         fprintf(stderr, "Failed to extract RSA-%d public key: %s\n", bits, public_path);
@@ -322,11 +341,10 @@ generate_rsa_keypair(int bits, const char *private_path, const char *public_path
  * Return:      Allocated path string (caller must free), NULL on failure
  *-------------------------------------------------------------------------
  */
-static char *
-create_keystore_directory(const char *base_dir, const char *dir_name, unsigned permissions)
+static char* create_keystore_directory(const char* base_dir, const char* dir_name, unsigned permissions)
 {
-    char  full_path[1024];
-    char *ret_value = NULL;
+    char full_path[1024];
+    char* ret_value = NULL;
 
     snprintf(full_path, sizeof(full_path), "%s/%s", base_dir, dir_name);
 
@@ -347,21 +365,20 @@ create_keystore_directory(const char *base_dir, const char *dir_name, unsigned p
  * Return:      Allocated destination path (caller must free), NULL on failure
  *-------------------------------------------------------------------------
  */
-static char *
-add_key_to_keystore(const char *keystore_dir, const char *key_name, const char *key_source)
+static char* add_key_to_keystore(const char* keystore_dir, const char* key_name, const char* key_source)
 {
-    char  dest_path[1024];
-    char  cmd[2048];
-    char *ret_value = NULL;
+    char dest_path[1024];
+    char cmd[2048];
+    char* ret_value = NULL;
 
     snprintf(dest_path, sizeof(dest_path), "%s/%s", keystore_dir, key_name);
 
     /* Copy file using C standard I/O (portable across all platforms) */
     {
-        FILE         *src, *dst;
+        FILE *src, *dst;
         unsigned char buf[4096];
-        size_t        n;
-        int           copy_ok = 1;
+        size_t n;
+        int copy_ok = 1;
 
         if (NULL == (src = fopen(key_source, "rb"))) {
             fprintf(stderr, "Failed to open source key: %s\n", key_source);
@@ -398,81 +415,88 @@ add_key_to_keystore(const char *keystore_dir, const char *key_name, const char *
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-typedef enum {
+typedef enum
+{
     PEM_CORRUPT_TRUNCATED,     /* Cut off mid-key */
     PEM_CORRUPT_GARBAGE,       /* Random binary data */
     PEM_CORRUPT_WRONG_FORMAT,  /* Missing BEGIN/END markers */
     PEM_CORRUPT_WRONG_KEY_TYPE /* ECDSA instead of RSA */
 } corruption_type_t;
 
-static herr_t
-create_corrupted_pem(const char *path, corruption_type_t type)
+static herr_t create_corrupted_pem(const char* path, corruption_type_t type)
 {
-    int    fd;
+    int fd;
     herr_t ret_value = SUCCEED;
 
     switch (type) {
-        case PEM_CORRUPT_TRUNCATED: {
+    case PEM_CORRUPT_TRUNCATED:
+        {
             /* Create truncated PEM - write partial header */
             const char truncated[] = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB";
-            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
                 return FAIL;
+            }
             HDwrite(fd, truncated, strlen(truncated));
             HDclose(fd);
             break;
         }
 
-        case PEM_CORRUPT_GARBAGE: {
+    case PEM_CORRUPT_GARBAGE:
+        {
             /* Write random binary garbage */
             unsigned char garbage[256];
-            size_t        i;
-            for (i = 0; i < sizeof(garbage); i++)
+            size_t i;
+            for (i = 0; i < sizeof(garbage); i++) {
                 garbage[i] = (unsigned char)(i * 13 + 7);
-            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+            }
+            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
                 return FAIL;
+            }
             HDwrite(fd, garbage, sizeof(garbage));
             HDclose(fd);
             break;
         }
 
-        case PEM_CORRUPT_WRONG_FORMAT: {
+    case PEM_CORRUPT_WRONG_FORMAT:
+        {
             /* Write text without PEM markers */
             const char wrong[] = "This is not a PEM file\nJust some random text\nNo markers here\n";
-            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+            if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
                 return FAIL;
+            }
             HDwrite(fd, wrong, strlen(wrong));
             HDclose(fd);
             break;
         }
 
-        case PEM_CORRUPT_WRONG_KEY_TYPE: {
+    case PEM_CORRUPT_WRONG_KEY_TYPE:
+        {
             /* Generate ECDSA key instead of RSA */
             char cmd[2048];
-#ifdef H5_HAVE_WIN32_API
-            snprintf(cmd, sizeof(cmd),
-                     "openssl ecparam -genkey -name prime256v1 -noout | openssl ec -pubout -out %s >NUL 2>&1",
-                     path);
-#else
-            snprintf(cmd, sizeof(cmd),
+    #ifdef H5_HAVE_WIN32_API
+            snprintf(cmd, sizeof(cmd), "openssl ecparam -genkey -name prime256v1 -noout | openssl ec -pubout -out %s >NUL 2>&1", path);
+    #else
+            snprintf(cmd,
+                     sizeof(cmd),
                      "openssl ecparam -genkey -name prime256v1 -noout | openssl ec -pubout -out %s 2>&1 "
                      ">/dev/null",
                      path);
-#endif
+    #endif
             if (system(cmd) != 0) {
                 /* If ECDSA generation fails, just write invalid RSA-like content */
                 const char fake_ecdsa[] =
                     "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE\n-----END PUBLIC "
                     "KEY-----\n";
-                if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+                if ((fd = HDopen(path, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0) {
                     return FAIL;
+                }
                 HDwrite(fd, fake_ecdsa, strlen(fake_ecdsa));
                 HDclose(fd);
             }
             break;
         }
 
-        default:
-            return FAIL;
+    default: return FAIL;
     }
 
     return SUCCEED;
@@ -487,8 +511,7 @@ create_corrupted_pem(const char *path, corruption_type_t type)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-reset_keystore_state(void)
+static herr_t reset_keystore_state(void)
 {
     /* Cleanup keystore to force reinitialization.
      * This allows tests to use different KeyStore directories.
@@ -508,8 +531,7 @@ reset_keystore_state(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-setup_test_environment(void)
+static herr_t setup_test_environment(void)
 {
     char plugin_path[1024];
     char temp_path[1024];
@@ -542,43 +564,54 @@ setup_test_environment(void)
 
     /* 1. Create and sign a valid plugin */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, SIGNED_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
-    if (sign_plugin_file(plugin_path, test_private_key) < 0)
+    }
+    if (sign_plugin_file(plugin_path, test_private_key) < 0) {
         return FAIL;
+    }
 
     /* 2. Create an unsigned plugin */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, UNSIGNED_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
+    }
 
     /* 3. Create a signed plugin then tamper with it */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, TAMPERED_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
-    if (sign_plugin_file(plugin_path, test_private_key) < 0)
+    }
+    if (sign_plugin_file(plugin_path, test_private_key) < 0) {
         return FAIL;
-    if (tamper_with_plugin(plugin_path) < 0)
+    }
+    if (tamper_with_plugin(plugin_path) < 0) {
         return FAIL;
+    }
 
     /* 4. Create plugin with bad signature */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, BAD_SIG_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
-    if (append_bad_signature(plugin_path) < 0)
+    }
+    if (append_bad_signature(plugin_path) < 0) {
         return FAIL;
+    }
 
     /* 5. Create plugin with no footer */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, NO_FOOTER_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
+    }
 
     /* 6. Create plugin with corrupted magic number */
     snprintf(plugin_path, sizeof(plugin_path), "%s/%s", PLUGIN_DIR, CORRUPT_MAGIC_PLUGIN);
-    if (create_dummy_plugin(plugin_path) < 0)
+    if (create_dummy_plugin(plugin_path) < 0) {
         return FAIL;
-    if (append_corrupt_footer(plugin_path) < 0)
+    }
+    if (append_corrupt_footer(plugin_path) < 0) {
         return FAIL;
+    }
 
     return SUCCEED;
 }
@@ -591,21 +624,20 @@ setup_test_environment(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-cleanup_test_environment(void)
+static herr_t cleanup_test_environment(void)
 {
     char cmd[1024];
 
     /* Remove plugin directory (includes all KeyStore subdirectories) */
-#ifdef H5_HAVE_WIN32_API
+    #ifdef H5_HAVE_WIN32_API
     snprintf(cmd, sizeof(cmd), "rmdir /s /q %s >NUL 2>&1", PLUGIN_DIR);
     system(cmd);
     system("del /q org*_*.pem test_*_4096.pem *_private.pem *_public.pem >NUL 2>&1");
-#else
+    #else
     snprintf(cmd, sizeof(cmd), "rm -rf %s", PLUGIN_DIR);
     system(cmd);
     system("rm -f org*_*.pem test_*_4096.pem *_private.pem *_public.pem 2>/dev/null");
-#endif
+    #endif
 
     return SUCCEED;
 }
@@ -618,10 +650,9 @@ cleanup_test_environment(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_valid_signed_plugin(void)
+static herr_t test_valid_signed_plugin(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t ret_value = SUCCEED;
 
     TESTING("valid signed plugin verification");
@@ -647,10 +678,9 @@ test_valid_signed_plugin(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_unsigned_plugin_rejected(void)
+static herr_t test_unsigned_plugin_rejected(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t status;
 
     TESTING("unsigned plugin rejection");
@@ -682,10 +712,9 @@ test_unsigned_plugin_rejected(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_tampered_plugin_rejected(void)
+static herr_t test_tampered_plugin_rejected(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t status;
 
     TESTING("tampered plugin rejection");
@@ -717,10 +746,9 @@ test_tampered_plugin_rejected(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_bad_signature_rejected(void)
+static herr_t test_bad_signature_rejected(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t status;
 
     TESTING("plugin with invalid signature rejection");
@@ -752,10 +780,9 @@ test_bad_signature_rejected(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_no_footer_rejected(void)
+static herr_t test_no_footer_rejected(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t status;
 
     TESTING("plugin without signature footer rejection");
@@ -787,10 +814,9 @@ test_no_footer_rejected(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_corrupt_magic_rejected(void)
+static herr_t test_corrupt_magic_rejected(void)
 {
-    char   plugin_path[1024];
+    char plugin_path[1024];
     herr_t status;
 
     TESTING("plugin with corrupt magic number rejection");
@@ -822,16 +848,15 @@ test_corrupt_magic_rejected(void)
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_keystore_multiple_keys(void)
+static herr_t test_keystore_multiple_keys(void)
 {
-    char  *keystore_dir = NULL;
-    char   keystore_path[1024];
-    char   plugin1_path[1024], plugin2_path[1024], plugin3_path[1024];
-    char   priv1[1024], pub1[1024];
-    char   priv2[1024], pub2[1024];
-    char   priv3[1024], pub3[1024];
-    char  *key_path  = NULL;
+    char* keystore_dir = NULL;
+    char keystore_path[1024];
+    char plugin1_path[1024], plugin2_path[1024], plugin3_path[1024];
+    char priv1[1024], pub1[1024];
+    char priv2[1024], pub2[1024];
+    char priv3[1024], pub3[1024];
+    char* key_path = NULL;
     herr_t ret_value = SUCCEED;
 
     TESTING("multiple keys in keystore verification");
@@ -852,8 +877,7 @@ test_keystore_multiple_keys(void)
     snprintf(priv3, sizeof(priv3), "%s/org3_private.pem", PLUGIN_DIR);
     snprintf(pub3, sizeof(pub3), "%s/org3_public.pem", PLUGIN_DIR);
 
-    if (generate_rsa_keypair(2048, priv1, pub1) < 0 || generate_rsa_keypair(2048, priv2, pub2) < 0 ||
-        generate_rsa_keypair(2048, priv3, pub3) < 0) {
+    if (generate_rsa_keypair(2048, priv1, pub1) < 0 || generate_rsa_keypair(2048, priv2, pub2) < 0 || generate_rsa_keypair(2048, priv3, pub3) < 0) {
         H5_FAILED();
         fprintf(stderr, "Failed to generate key pairs\n");
         goto error;
@@ -861,14 +885,17 @@ test_keystore_multiple_keys(void)
 
     /* Add all 3 public keys to KeyStore */
     key_path = add_key_to_keystore(keystore_dir, "org1.pem", pub1);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
     key_path = add_key_to_keystore(keystore_dir, "org2.pem", pub2);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
     key_path = add_key_to_keystore(keystore_dir, "org3.pem", pub3);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
 
     /* Create and sign 3 plugins with different keys */
     snprintf(plugin1_path, sizeof(plugin1_path), "%s/plugin_org1.so", PLUGIN_DIR);
@@ -928,8 +955,9 @@ test_keystore_multiple_keys(void)
     return SUCCEED;
 
 error:
-    if (keystore_dir)
+    if (keystore_dir) {
         free(keystore_dir);
+    }
     return FAIL;
 }
 
@@ -942,15 +970,14 @@ error:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_invalid_pem_file_handling(void)
+static herr_t test_invalid_pem_file_handling(void)
 {
-    char  *keystore_dir = NULL;
-    char   keystore_path[1024];
-    char   valid_priv[1024], valid_pub[1024];
-    char   plugin_path[1024];
-    char   corrupt_path[1024];
-    char  *key_path  = NULL;
+    char* keystore_dir = NULL;
+    char keystore_path[1024];
+    char valid_priv[1024], valid_pub[1024];
+    char plugin_path[1024];
+    char corrupt_path[1024];
+    char* key_path = NULL;
     herr_t ret_value = SUCCEED;
 
     TESTING("invalid PEM file handling");
@@ -974,8 +1001,9 @@ test_invalid_pem_file_handling(void)
 
     /* Add valid key to KeyStore */
     key_path = add_key_to_keystore(keystore_dir, "validkey.pem", valid_pub);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
 
     /* Create 4 corrupted PEM files */
     snprintf(corrupt_path, sizeof(corrupt_path), "%s/truncated.pem", keystore_dir);
@@ -1019,8 +1047,9 @@ test_invalid_pem_file_handling(void)
     return SUCCEED;
 
 error:
-    if (keystore_dir)
+    if (keystore_dir) {
         free(keystore_dir);
+    }
     return FAIL;
 }
 
@@ -1032,14 +1061,13 @@ error:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_rsa4096_signature(void)
+static herr_t test_rsa4096_signature(void)
 {
-    char   priv4096[1024], pub4096[1024];
-    char   plugin_path[1024];
-    char  *keystore_dir = NULL;
-    char   keystore_path[1024];
-    char  *key_path  = NULL;
+    char priv4096[1024], pub4096[1024];
+    char plugin_path[1024];
+    char* keystore_dir = NULL;
+    char keystore_path[1024];
+    char* key_path = NULL;
     herr_t ret_value = SUCCEED;
 
     TESTING("RSA-4096 signature verification");
@@ -1063,8 +1091,9 @@ test_rsa4096_signature(void)
 
     /* Add public key to KeyStore */
     key_path = add_key_to_keystore(keystore_dir, "rsa4096.pem", pub4096);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
 
     /* Create and sign plugin with RSA-4096 key */
     snprintf(plugin_path, sizeof(plugin_path), "%s/plugin_rsa4096.so", PLUGIN_DIR);
@@ -1095,8 +1124,9 @@ test_rsa4096_signature(void)
     return SUCCEED;
 
 error:
-    if (keystore_dir)
+    if (keystore_dir) {
         free(keystore_dir);
+    }
     return FAIL;
 }
 
@@ -1109,17 +1139,16 @@ error:
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-test_keystore_symlink_rejection(void)
+static herr_t test_keystore_symlink_rejection(void)
 {
-#ifndef H5_HAVE_WIN32_API
-    char  *keystore_dir = NULL;
-    char   keystore_path[1024];
-    char   trusted_priv[1024], trusted_pub[1024];
-    char   attacker_priv[1024], attacker_pub[1024];
-    char   symlink_path[1024];
-    char   plugin_trusted[1024], plugin_attacker[1024];
-    char  *key_path = NULL;
+    #ifndef H5_HAVE_WIN32_API
+    char* keystore_dir = NULL;
+    char keystore_path[1024];
+    char trusted_priv[1024], trusted_pub[1024];
+    char attacker_priv[1024], attacker_pub[1024];
+    char symlink_path[1024];
+    char plugin_trusted[1024], plugin_attacker[1024];
+    char* key_path = NULL;
     herr_t status;
     herr_t ret_value = SUCCEED;
 
@@ -1153,8 +1182,9 @@ test_keystore_symlink_rejection(void)
 
     /* Add legitimate key to KeyStore */
     key_path = add_key_to_keystore(keystore_dir, "trusted.pem", trusted_pub);
-    if (key_path)
+    if (key_path) {
         free(key_path);
+    }
 
     /* Create symlink in KeyStore pointing to attacker key */
     snprintf(symlink_path, sizeof(symlink_path), "%s/bad.pem", keystore_dir);
@@ -1215,16 +1245,17 @@ test_keystore_symlink_rejection(void)
     return SUCCEED;
 
 error:
-    if (keystore_dir)
+    if (keystore_dir) {
         free(keystore_dir);
+    }
     return FAIL;
 
-#else
+    #else
     /* Windows - skip test */
     TESTING("symlink rejection in keystore (Unix only)");
     SKIPPED();
     return SUCCEED;
-#endif
+    #endif
 }
 
 /*-------------------------------------------------------------------------
@@ -1235,8 +1266,7 @@ error:
  * Return:      EXIT_SUCCESS/EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     int nerrors = 0;
 
@@ -1271,8 +1301,7 @@ main(void)
 
     /* Report results */
     if (nerrors) {
-        printf("\n***** %d PLUGIN SIGNATURE VERIFICATION TEST%s FAILED *****\n", nerrors,
-               nerrors > 1 ? "S" : "");
+        printf("\n***** %d PLUGIN SIGNATURE VERIFICATION TEST%s FAILED *****\n", nerrors, nerrors > 1 ? "S" : "");
         return EXIT_FAILURE;
     }
 
@@ -1280,10 +1309,9 @@ main(void)
     return EXIT_SUCCESS;
 }
 
-#else /* H5_REQUIRE_DIGITAL_SIGNATURE */
+#else  /* H5_REQUIRE_DIGITAL_SIGNATURE */
 
-int
-main(void)
+int main(void)
 {
     printf("Plugin signature verification is not enabled.\n");
     printf("Reconfigure with -DHDF5_REQUIRE_SIGNED_PLUGINS=ON to enable these tests.\n");

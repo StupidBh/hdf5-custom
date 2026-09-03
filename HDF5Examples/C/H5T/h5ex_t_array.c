@@ -18,31 +18,33 @@
 #define ADIM0    3
 #define ADIM1    5
 
-int
-main(void)
+int main(void)
 {
-    hid_t file     = H5I_INVALID_HID; /* File Handle */
-    hid_t space    = H5I_INVALID_HID; /* Dataspace Handle */
-    hid_t dset     = H5I_INVALID_HID; /* Dataset Handle */
+    hid_t file = H5I_INVALID_HID;  /* File Handle */
+    hid_t space = H5I_INVALID_HID; /* Dataspace Handle */
+    hid_t dset = H5I_INVALID_HID;  /* Dataset Handle */
     hid_t filetype = H5I_INVALID_HID;
-    hid_t memtype  = H5I_INVALID_HID;
+    hid_t memtype = H5I_INVALID_HID;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[1]  = {DIM0};
-    hsize_t adims[2] = {ADIM0, ADIM1};
-    int     wdata[DIM0][ADIM0][ADIM1]; /* Write buffer */
-    int  ***rdata = NULL;              /* Read buffer */
-    int     ndims;
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    hsize_t adims[2] = { ADIM0, ADIM1 };
+    int wdata[DIM0][ADIM0][ADIM1]; /* Write buffer */
+    int*** rdata = NULL;           /* Read buffer */
+    int ndims;
     hsize_t i, j, k;
 
     /*
      * Initialize data.  i is the element in the dataspace, j and k the
      * elements within the array datatype.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < ADIM0; j++)
-            for (k = 0; k < ADIM1; k++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < ADIM0; j++) {
+            for (k = 0; k < ADIM1; k++) {
                 wdata[i][j][k] = i * j - j * k + i * k;
+            }
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -53,7 +55,7 @@ main(void)
      * Create array datatypes for file and memory.
      */
     filetype = H5Tarray_create(H5T_STD_I64LE, 2, adims);
-    memtype  = H5Tarray_create(H5T_NATIVE_INT, 2, adims);
+    memtype = H5Tarray_create(H5T_NATIVE_INT, 2, adims);
 
     /*
      * Create dataspace.  Setting maximum size to NULL sets the maximum
@@ -64,7 +66,7 @@ main(void)
     /*
      * Create the dataset and write the array data to it.
      */
-    dset   = H5Dcreate(file, DATASET, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset = H5Dcreate(file, DATASET, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Dwrite(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata[0][0]);
 
     /*
@@ -93,7 +95,7 @@ main(void)
      * Get the datatype and its dimensions.
      */
     filetype = H5Dget_type(dset);
-    ndims    = H5Tget_array_dims(filetype, adims);
+    ndims = H5Tget_array_dims(filetype, adims);
 
     /*
      * Get dataspace and allocate memory for read buffer.  This is a
@@ -107,18 +109,18 @@ main(void)
      * Allocate array of pointers to two-dimensional arrays (the
      * elements of the dataset.
      */
-    rdata = (int ***)malloc(dims[0] * sizeof(int **));
+    rdata = (int***)malloc(dims[0] * sizeof(int**));
 
     /*
      * Allocate two dimensional array of pointers to rows in the data
      * elements.
      */
-    rdata[0] = (int **)malloc(dims[0] * adims[0] * sizeof(int *));
+    rdata[0] = (int**)malloc(dims[0] * adims[0] * sizeof(int*));
 
     /*
      * Allocate space for integer data.
      */
-    rdata[0][0] = (int *)malloc(dims[0] * adims[0] * adims[1] * sizeof(int));
+    rdata[0][0] = (int*)malloc(dims[0] * adims[0] * adims[1] * sizeof(int));
 
     /*
      * Set the members of the pointer arrays allocated above to point
@@ -126,8 +128,9 @@ main(void)
      */
     for (i = 0; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * adims[0];
-        for (j = 0; j < adims[0]; j++)
+        for (j = 0; j < adims[0]; j++) {
             rdata[i][j] = rdata[0][0] + (adims[0] * adims[1] * i) + (adims[1] * j);
+        }
     }
 
     /*
@@ -147,8 +150,9 @@ main(void)
         printf("%s[%" PRIuHSIZE "]:\n", DATASET, i);
         for (j = 0; j < adims[0]; j++) {
             printf(" [");
-            for (k = 0; k < adims[1]; k++)
+            for (k = 0; k < adims[1]; k++) {
                 printf(" %3d", rdata[i][j][k]);
+            }
             printf("]\n");
         }
         printf("\n");

@@ -38,21 +38,21 @@
 #define H5MM_malloc(Z) malloc(Z)
 
 #ifndef H5MM_DEBUG
-#define H5MM_memcpy(D, S, N) memcpy(D, S, N)
+    #define H5MM_memcpy(D, S, N) memcpy(D, S, N)
 #endif /* !H5MM_DEBUG */
 
 /*
  * Library prototypes...
  */
-H5_DLL void *H5MM_realloc(void *mem, size_t size);
-H5_DLL char *H5MM_xstrdup(const char *s) H5_ATTR_MALLOC;
-H5_DLL char *H5MM_strdup(const char *s) H5_ATTR_MALLOC;
-H5_DLL char *H5MM_strndup(const char *s, size_t n) H5_ATTR_MALLOC;
-H5_DLL void *H5MM_xfree(void *mem);
-H5_DLL void *H5MM_xfree_const(const void *mem);
+H5_DLL void* H5MM_realloc(void* mem, size_t size);
+H5_DLL char* H5MM_xstrdup(const char* s) H5_ATTR_MALLOC;
+H5_DLL char* H5MM_strdup(const char* s) H5_ATTR_MALLOC;
+H5_DLL char* H5MM_strndup(const char* s, size_t n) H5_ATTR_MALLOC;
+H5_DLL void* H5MM_xfree(void* mem);
+H5_DLL void* H5MM_xfree_const(const void* mem);
 
 #ifdef H5MM_DEBUG
-H5_DLL void *H5MM_memcpy(void *dest, const void *src, size_t n);
+H5_DLL void* H5MM_memcpy(void* dest, const void* src, size_t n);
 #endif
 
 #endif /* H5MMprivate_H */

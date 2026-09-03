@@ -18,15 +18,14 @@
 #include "H5ACprivate.h"
 #include "H5Pprivate.h"
 
-static int
-test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
+static int test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
 {
     MPI_Request req[2];
-    MPI_Status  status;
-    hid_t       pl; /* Decoded property list */
-    size_t      buf_size = 0;
-    void       *sbuf     = NULL;
-    herr_t      ret; /* Generic return value */
+    MPI_Status status;
+    hid_t pl; /* Decoded property list */
+    size_t buf_size = 0;
+    void* sbuf = NULL;
+    herr_t ret; /* Generic return value */
 
     if (mpi_rank == 0) {
         int send_size = 0;
@@ -35,7 +34,7 @@ test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
         ret = H5Pencode2(orig_pl, NULL, &buf_size, H5P_DEFAULT);
         VRFY((ret >= 0), "H5Pencode succeeded");
 
-        sbuf = (uint8_t *)malloc(buf_size);
+        sbuf = (uint8_t*)malloc(buf_size);
 
         ret = H5Pencode2(orig_pl, sbuf, &buf_size, H5P_DEFAULT);
         VRFY((ret >= 0), "H5Pencode succeeded");
@@ -48,13 +47,13 @@ test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
     } /* end if */
 
     if (mpi_rank == recv_proc) {
-        int   recv_size;
-        void *rbuf;
+        int recv_size;
+        void* rbuf;
 
         MPI_Recv(&recv_size, 1, MPI_INT, 0, 123, MPI_COMM_WORLD, &status);
         VRFY((recv_size >= 0), "MPI_Recv succeeded");
         buf_size = (size_t)recv_size;
-        rbuf     = (uint8_t *)malloc(buf_size);
+        rbuf = (uint8_t*)malloc(buf_size);
         MPI_Recv(rbuf, recv_size, MPI_BYTE, 0, 124, MPI_COMM_WORLD, &status);
 
         pl = H5Pdecode(rbuf);
@@ -65,8 +64,9 @@ test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
         ret = H5Pclose(pl);
         VRFY((ret >= 0), "H5Pclose succeeded");
 
-        if (NULL != rbuf)
+        if (NULL != rbuf) {
             free(rbuf);
+        }
     } /* end if */
 
     if (0 == mpi_rank) {
@@ -75,15 +75,15 @@ test_encode_decode(hid_t orig_pl, int mpi_rank, int recv_proc)
         H5_WARN_MPI_STATUSES_IGNORE_ON
     }
 
-    if (NULL != sbuf)
+    if (NULL != sbuf) {
         free(sbuf);
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     return 0;
 }
 
-void
-test_plist_ed(void H5_ATTR_UNUSED *params)
+void test_plist_ed(void H5_ATTR_UNUSED* params)
 {
     hid_t dcpl;   /* dataset create prop. list */
     hid_t dapl;   /* dataset access prop. list */
@@ -100,59 +100,62 @@ test_plist_ed(void H5_ATTR_UNUSED *params)
 
     int mpi_size, mpi_rank, recv_proc;
 
-    hsize_t             chunk_size = 16384; /* chunk size */
-    double              fill       = 2.7;   /* Fill value */
-    size_t              nslots     = 521 * 2;
-    size_t              nbytes     = 1048576 * 10;
-    double              w0         = 0.5;
-    unsigned            max_compact;
-    unsigned            min_dense;
-    hsize_t             max_size[1]; /*data space maximum size */
-    const char         *c_to_f          = "x+32";
-    H5AC_cache_config_t my_cache_config = {H5AC__CURR_CACHE_CONFIG_VERSION,
-                                           true,
-                                           false,
-                                           false,
-                                           "temp",
-                                           true,
-                                           false,
-                                           (2 * 2048 * 1024),
-                                           0.3,
-                                           (64 * 1024 * 1024),
-                                           (4 * 1024 * 1024),
-                                           60000,
-                                           H5C_incr__threshold,
-                                           0.8,
-                                           3.0,
-                                           true,
-                                           (8 * 1024 * 1024),
-                                           H5C_flash_incr__add_space,
-                                           2.0,
-                                           0.25,
-                                           H5C_decr__age_out_with_threshold,
-                                           0.997,
-                                           0.8,
-                                           true,
-                                           (3 * 1024 * 1024),
-                                           3,
-                                           false,
-                                           0.2,
-                                           (256 * 2048),
-                                           H5AC__DEFAULT_METADATA_WRITE_STRATEGY};
+    hsize_t chunk_size = 16384; /* chunk size */
+    double fill = 2.7;          /* Fill value */
+    size_t nslots = 521 * 2;
+    size_t nbytes = 1'048'576 * 10;
+    double w0 = 0.5;
+    unsigned max_compact;
+    unsigned min_dense;
+    hsize_t max_size[1]; /*data space maximum size */
+    const char* c_to_f = "x+32";
+    H5AC_cache_config_t my_cache_config = { H5AC__CURR_CACHE_CONFIG_VERSION,
+                                            true,
+                                            false,
+                                            false,
+                                            "temp",
+                                            true,
+                                            false,
+                                            (2 * 2048 * 1024),
+                                            0.3,
+                                            (64 * 1024 * 1024),
+                                            (4 * 1024 * 1024),
+                                            60000,
+                                            H5C_incr__threshold,
+                                            0.8,
+                                            3.0,
+                                            true,
+                                            (8 * 1024 * 1024),
+                                            H5C_flash_incr__add_space,
+                                            2.0,
+                                            0.25,
+                                            H5C_decr__age_out_with_threshold,
+                                            0.997,
+                                            0.8,
+                                            true,
+                                            (3 * 1024 * 1024),
+                                            3,
+                                            false,
+                                            0.2,
+                                            (256 * 2048),
+                                            H5AC__DEFAULT_METADATA_WRITE_STRATEGY };
 
     herr_t ret; /* Generic return value */
 
-    if (VERBOSE_MED)
+    if (VERBOSE_MED) {
         printf("Encode/Decode DCPLs\n");
+    }
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
-    if (mpi_size == 1)
+    if (mpi_size == 1) {
         recv_proc = 0;
-    else
+    }
+    else {
         recv_proc = 1;
+    }
 
     dcpl = H5Pcreate(H5P_DATASET_CREATE);
     VRFY((dcpl >= 0), "H5Pcreate succeeded");
@@ -167,7 +170,7 @@ test_plist_ed(void H5_ATTR_UNUSED *params)
     VRFY((ret >= 0), "set fill-value succeeded");
 
     max_size[0] = 100;
-    ret         = H5Pset_external(dcpl, "ext1.data", 0, (hsize_t)(max_size[0] * sizeof(int) / 4));
+    ret = H5Pset_external(dcpl, "ext1.data", 0, (hsize_t)(max_size[0] * sizeof(int) / 4));
     VRFY((ret >= 0), "set external succeeded");
     ret = H5Pset_external(dcpl, "ext2.data", 0, (hsize_t)(max_size[0] * sizeof(int) / 4));
     VRFY((ret >= 0), "set external succeeded");
@@ -348,19 +351,19 @@ test_plist_ed(void H5_ATTR_UNUSED *params)
     ret = H5Pset_family_offset(fapl, 1024);
     VRFY((ret >= 0), "H5Pset_family_offset succeeded");
 
-    ret = H5Pset_meta_block_size(fapl, 2098452);
+    ret = H5Pset_meta_block_size(fapl, 2'098'452);
     VRFY((ret >= 0), "H5Pset_meta_block_size succeeded");
 
-    ret = H5Pset_sieve_buf_size(fapl, 1048576);
+    ret = H5Pset_sieve_buf_size(fapl, 1'048'576);
     VRFY((ret >= 0), "H5Pset_sieve_buf_size succeeded");
 
     ret = H5Pset_alignment(fapl, 2, 1024);
     VRFY((ret >= 0), "H5Pset_alignment succeeded");
 
-    ret = H5Pset_cache(fapl, 1024, 128, 10485760, 0.3);
+    ret = H5Pset_cache(fapl, 1024, 128, 10'485'760, 0.3);
     VRFY((ret >= 0), "H5Pset_cache succeeded");
 
-    ret = H5Pset_elink_file_cache_size(fapl, 10485760);
+    ret = H5Pset_elink_file_cache_size(fapl, 10'485'760);
     VRFY((ret >= 0), "H5Pset_elink_file_cache_size succeeded");
 
     ret = H5Pset_gc_references(fapl, 1);
@@ -445,32 +448,32 @@ test_plist_ed(void H5_ATTR_UNUSED *params)
     VRFY((ret >= 0), "H5Pclose succeeded");
 }
 
-void
-external_links(void H5_ATTR_UNUSED *params)
+void external_links(void H5_ATTR_UNUSED* params)
 {
-    hid_t lcpl  = H5I_INVALID_HID; /* link create prop. list */
-    hid_t lapl  = H5I_INVALID_HID; /* link access prop. list */
-    hid_t fapl  = H5I_INVALID_HID; /* file access prop. list */
-    hid_t gapl  = H5I_INVALID_HID; /* group access prop. list */
-    hid_t fid   = H5I_INVALID_HID; /* file id */
+    hid_t lcpl = H5I_INVALID_HID;  /* link create prop. list */
+    hid_t lapl = H5I_INVALID_HID;  /* link access prop. list */
+    hid_t fapl = H5I_INVALID_HID;  /* file access prop. list */
+    hid_t gapl = H5I_INVALID_HID;  /* group access prop. list */
+    hid_t fid = H5I_INVALID_HID;   /* file id */
     hid_t group = H5I_INVALID_HID; /* group id */
-    int   mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
 
     MPI_Comm comm;
-    int      doIO;
-    int      i, mrc;
+    int doIO;
+    int i, mrc;
 
     herr_t ret;        /* Generic return value */
     htri_t tri_status; /* tri return value */
 
-    const char *filename     = "HDF5test.h5";
-    const char *filename_ext = "HDF5test_ext.h5";
-    const char *group_path   = "/Base/Block/Step";
-    const char *link_name    = "link"; /* external link */
-    char        link_path[50];
+    const char* filename = "HDF5test.h5";
+    const char* filename_ext = "HDF5test_ext.h5";
+    const char* group_path = "/Base/Block/Step";
+    const char* link_name = "link"; /* external link */
+    char link_path[50];
 
-    if (VERBOSE_MED)
+    if (VERBOSE_MED) {
         printf("Check external links\n");
+    }
 
     /* set up MPI parameters */
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
@@ -480,7 +483,6 @@ external_links(void H5_ATTR_UNUSED *params)
        linked external files */
 
     if (mpi_rank == 0) {
-
         lcpl = H5Pcreate(H5P_LINK_CREATE);
         VRFY((lcpl >= 0), "H5Pcreate succeeded");
 
@@ -537,14 +539,14 @@ external_links(void H5_ATTR_UNUSED *params)
      */
 
     for (i = 0; i < 2; i++) {
-
         comm = MPI_COMM_WORLD;
 
-        if (i == 0)
+        if (i == 0) {
             doIO = 1;
+        }
         else {
             doIO = mpi_rank % 2;
-            mrc  = MPI_Comm_split(MPI_COMM_WORLD, doIO, mpi_rank, &comm);
+            mrc = MPI_Comm_split(MPI_COMM_WORLD, doIO, mpi_rank, &comm);
             VRFY((mrc == MPI_SUCCESS), "");
         }
 

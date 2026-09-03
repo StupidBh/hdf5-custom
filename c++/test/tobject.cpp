@@ -59,8 +59,7 @@ const H5std_string DSET_IN_GRP1_2_PATH("/Top Group/Sub-Group 1.2/Dataset_in_Grou
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-static void
-test_get_objname()
+static void test_get_objname()
 {
     SUBTEST("H5Object::getObjName on Groups and Datasets");
 
@@ -69,7 +68,7 @@ test_get_objname()
         H5File file(FILE_OBJECTS, H5F_ACC_TRUNC);
 
         // Create a top group and 2 subgroups
-        Group grp1   = file.createGroup(GROUP1, 0);
+        Group grp1 = file.createGroup(GROUP1, 0);
         Group grp1_1 = grp1.createGroup(GROUP1_1, 0);
         Group grp1_2 = grp1.createGroup(GROUP1_2, 0);
 
@@ -81,9 +80,9 @@ test_get_objname()
 
         // Random length is 4
         if (name_len > 4) {
-            char *grp1_name = new char[5];
-            name_len        = grp1.getObjName(grp1_name, 5);
-            verify_val(const_cast<const char *>(grp1_name), "/Top", "Group::getObjName", __LINE__, __FILE__);
+            char* grp1_name = new char[5];
+            name_len = grp1.getObjName(grp1_name, 5);
+            verify_val(const_cast<const char*>(grp1_name), "/Top", "Group::getObjName", __LINE__, __FILE__);
             delete[] grp1_name;
         }
 
@@ -124,7 +123,7 @@ test_get_objname()
 
         // Reopen that same dataset then check the name again with another
         // overload: ssize_t getObjName(H5std_string& obj_name, size_t len = 0)
-        dsingrp  = grp1_2.openDataSet(DSET_IN_GRP1_2);
+        dsingrp = grp1_2.openDataSet(DSET_IN_GRP1_2);
         name_len = dsingrp.getObjName(ds_name);
         verify_val(ds_name, DSET_IN_GRP1_2_PATH, "DataSet::getObjName", __LINE__, __FILE__);
 
@@ -134,7 +133,7 @@ test_get_objname()
     } // try block
 
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_get_objname", __LINE__, __FILE__);
     }
 } // test_get_objname
@@ -158,8 +157,7 @@ test_get_objname()
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-static void
-test_existance()
+static void test_existance()
 {
     SUBTEST("H5File::exists and Group::exists");
 
@@ -207,7 +205,7 @@ test_existance()
 
         // Check if a dataset exists given dataset as location with full path name
         DataSet dset1 = file.openDataSet(DSET_IN_FILE);
-        exists        = dset1.nameExists("/Top Group/Dataset_in_Group_1");
+        exists = dset1.nameExists("/Top Group/Dataset_in_Group_1");
         verify_val(exists, true, "Group::nameExists given dataset with full path name", __LINE__, __FILE__);
 
         exists = grp1_2.nameExists(DSET_IN_GRP1);
@@ -224,7 +222,7 @@ test_existance()
     } // try block
 
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_existance", __LINE__, __FILE__);
     }
 } // test_existance
@@ -238,8 +236,7 @@ test_existance()
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-static void
-test_get_objname_ontypes()
+static void test_get_objname_ontypes()
 {
     SUBTEST("H5Object::getObjName on Committed Datatypes");
 
@@ -307,8 +304,7 @@ test_get_objname_ontypes()
         // Name this datatype
         new_int_type.commit(grp, "IntType NATIVE_INT");
         ssize_t name_len = new_int_type.getObjName(type_name); // default len
-        verify_val(name_len, static_cast<ssize_t>(strlen("/typetests/IntType NATIVE_INT")),
-                   "DataType::getObjName", __LINE__, __FILE__);
+        verify_val(name_len, static_cast<ssize_t>(strlen("/typetests/IntType NATIVE_INT")), "DataType::getObjName", __LINE__, __FILE__);
         verify_val(type_name, "/typetests/IntType NATIVE_INT", "DataType::getObjName", __LINE__, __FILE__);
 
         // Close everything or they can be closed when objects go out of scope
@@ -320,7 +316,7 @@ test_get_objname_ontypes()
         PASSED();
     } // end top try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_get_objname_ontypes", __LINE__, __FILE__);
     }
 } // test_get_objname_ontypes
@@ -334,8 +330,7 @@ test_get_objname_ontypes()
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-static void
-test_get_objtype()
+static void test_get_objtype()
 {
     SUBTEST("H5File::childObjType and H5Group::childObjType");
 
@@ -353,29 +348,25 @@ test_get_objtype()
         // Get and verify object type with
         // H5O_type_t childObjType(const H5std_string& objname)
         H5O_type_t objtype = file.childObjType(DSET_IN_FILE);
-        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_DATASET), "DataSet::childObjType",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_DATASET), "DataSet::childObjType", __LINE__, __FILE__);
 
         // Get and verify object type with
         // H5O_type_t childObjType(const char* objname)
         objtype = grp1.childObjType(GROUP1_1.c_str());
-        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_GROUP), "DataSet::childObjType",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_GROUP), "DataSet::childObjType", __LINE__, __FILE__);
 
         // Get and verify object type with
         // H5O_type_t childObjType(hsize_t index, H5_index_t index_type,
         // H5_iter_order_t order, const char* objname=".")
         objtype = grp1.childObjType(1, H5_INDEX_NAME, H5_ITER_INC);
-        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_NAMED_DATATYPE),
-                   "DataSet::childObjType", __LINE__, __FILE__);
+        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_NAMED_DATATYPE), "DataSet::childObjType", __LINE__, __FILE__);
 
         // Get and verify object type with
         // H5O_type_t childObjType(hsize_t index,
         // H5_index_t index_type=H5_INDEX_NAME,
         // H5_iter_order_t order=H5_ITER_INC, const char* objname=".")
         objtype = grp1.childObjType(2);
-        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_GROUP), "DataSet::childObjType",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(objtype), static_cast<long>(H5O_TYPE_GROUP), "DataSet::childObjType", __LINE__, __FILE__);
 
         // Everything will be closed as they go out of scope
 
@@ -383,7 +374,7 @@ test_get_objtype()
     } // try block
 
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_get_objtype", __LINE__, __FILE__);
     }
 } // test_get_objtype
@@ -404,8 +395,7 @@ const H5std_string DSETNAME("dataset");
 #define DIM0 5
 #define DIM1 10
 
-static void
-test_open_object_header()
+static void test_open_object_header()
 {
     hsize_t dims[2];
 
@@ -430,31 +420,28 @@ test_open_object_header()
         dims[0] = DIM0;
         dims[1] = DIM1;
         DataSpace dspace(RANK, dims);
-        DataSet   dset(file1.createDataSet(DSETNAME, PredType::NATIVE_INT, dspace));
+        DataSet dset(file1.createDataSet(DSETNAME, PredType::NATIVE_INT, dspace));
 
         // Close dataset and dataspace
         dset.close();
         dspace.close();
 
         // Now make sure that getObjId can open all three types of objects
-        hid_t obj_grp   = file1.getObjId(GROUPNAME);
+        hid_t obj_grp = file1.getObjId(GROUPNAME);
         hid_t obj_dtype = file1.getObjId(DTYPENAME);
-        hid_t obj_dset  = file1.getObjId(DSETNAME);
+        hid_t obj_dset = file1.getObjId(DSETNAME);
 
         // Make sure that each is the right kind of ID
         H5I_type_t id_type = IdComponent::getHDFObjType(obj_grp);
-        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_GROUP), "H5Iget_type for group ID",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_GROUP), "H5Iget_type for group ID", __LINE__, __FILE__);
         id_type = IdComponent::getHDFObjType(obj_dtype);
-        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_DATATYPE), "H5Iget_type for datatype ID",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_DATATYPE), "H5Iget_type for datatype ID", __LINE__, __FILE__);
         id_type = IdComponent::getHDFObjType(obj_dset);
-        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_DATASET), "H5Iget_type for dataset ID",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(id_type), static_cast<long>(H5I_DATASET), "H5Iget_type for dataset ID", __LINE__, __FILE__);
 
         /* Do something more complex with each of the IDs to make sure */
 
-        Group   grp2(obj_grp);
+        Group grp2(obj_grp);
         hsize_t num_objs = grp2.getNumObjs();
         verify_val(static_cast<long>(num_objs), 1, "H5Gget_info", __LINE__, __FILE__);
         // There should be one object, the datatype
@@ -463,7 +450,7 @@ test_open_object_header()
         file1.closeObjId(obj_dtype);
 
         dset.setId(obj_dset);
-        dspace         = dset.getSpace();
+        dspace = dset.getSpace();
         bool is_simple = dspace.isSimple();
         verify_val(is_simple, true, "isSimple", __LINE__, __FILE__);
         dspace.close();
@@ -473,8 +460,7 @@ test_open_object_header()
 
         dtype.setId(obj_dtype);
         H5T_class_t type_class = dtype.getClass();
-        verify_val(static_cast<long>(type_class), static_cast<long>(H5T_INTEGER), "H5Tget_class", __LINE__,
-                   __FILE__);
+        verify_val(static_cast<long>(type_class), static_cast<long>(H5T_INTEGER), "H5Tget_class", __LINE__, __FILE__);
         dtype.close();
 
         // Close datatype object
@@ -493,13 +479,13 @@ test_open_object_header()
         PASSED();
     } // end of try block
     // catch invalid action exception
-    catch (InvalidActionException &E) {
+    catch (InvalidActionException& E) {
         cerr << " in InvalidActionException" << endl;
         cerr << " *FAILED*" << endl;
         cerr << "    <<<  " << E.getDetailMsg() << "  >>>" << endl << endl;
     }
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         cerr << " in Exception" << endl;
         issue_fail_msg("test_file_name()", __LINE__, __FILE__, E.getCDetailMsg());
     }
@@ -517,8 +503,8 @@ test_open_object_header()
 const H5std_string FILE_OBJINFO("tobject_getinfo.h5");
 const H5std_string GROUP1NAME("group1");
 const H5std_string GROUP2NAME("group2");
-static void
-test_getobjectinfo_same_file()
+
+static void test_getobjectinfo_same_file()
 {
     H5O_info2_t oinfo1, oinfo2; /* Object info structs */
 
@@ -583,7 +569,7 @@ test_getobjectinfo_same_file()
         PASSED();
     } // end of try block
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         cerr << " in Exception " << E.getCFuncName() << "detail: " << E.getCDetailMsg() << endl;
         issue_fail_msg("test_getobjectinfo_same_file()", __LINE__, __FILE__, E.getCDetailMsg());
     }
@@ -610,8 +596,8 @@ const H5std_string GROUP20NAME("/group20");
 const H5std_string GROUP21NAME("/group20/group21");
 const H5std_string GROUP22NAME("group21/group22");
 const H5std_string GROUP22FULLNAME("/group20/group21/group22");
-static void
-test_intermediate_groups()
+
+static void test_intermediate_groups()
 {
     // Output message about test being performed
     SUBTEST("Group::set/getCreateIntermediateGroup");
@@ -639,7 +625,7 @@ test_intermediate_groups()
         try {
             Group grp14_nopl(file.createGroup(GROUP14NAME));
         }
-        catch (FileIException &expected1) {
+        catch (FileIException& expected1) {
         } // Failure is ignored
 
         // Create GROUP14NAME with the flag to create missing groups set
@@ -655,7 +641,7 @@ test_intermediate_groups()
         try {
             Group grp14_false(file.createGroup(GROUP14NAME, lcpl));
         }
-        catch (FileIException &expected2) {
+        catch (FileIException& expected2) {
         } // Failure is ignored
 
         // Set the flag to create missing groups set to true
@@ -695,7 +681,7 @@ test_intermediate_groups()
         PASSED();
     } // end of try block
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         cerr << " in Exception " << E.getCFuncName() << "detail: " << E.getCDetailMsg() << endl;
         issue_fail_msg("test_intermediate_groups()", __LINE__, __FILE__, E.getCDetailMsg());
     }
@@ -711,8 +697,7 @@ test_intermediate_groups()
  *              Failure: -1
  *-------------------------------------------------------------------------
  */
-extern "C" void
-test_object(void *params)
+extern "C" void test_object(void* params)
 {
     (void)params;
 
@@ -737,8 +722,7 @@ test_object(void *params)
  * Return       None
  *-------------------------------------------------------------------------
  */
-extern "C" void
-cleanup_object(void *params)
+extern "C" void cleanup_object(void* params)
 {
     (void)params;
 

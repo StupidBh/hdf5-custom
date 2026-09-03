@@ -74,17 +74,17 @@
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5A__is_shared_test(hid_t attr_id)
+htri_t H5A__is_shared_test(hid_t attr_id)
 {
-    H5A_t *attr;             /* Attribute object for ID */
+    H5A_t* attr;             /* Attribute object for ID */
     htri_t ret_value = FAIL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check arguments */
-    if (NULL == (attr = (H5A_t *)H5VL_object_verify(attr_id, H5I_ATTR)))
+    if (NULL == (attr = (H5A_t*)H5VL_object_verify(attr_id, H5I_ATTR))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an attribute");
+    }
 
     /* Check if attribute is shared */
     ret_value = H5O_msg_is_shared(H5O_ATTR_ID, attr);
@@ -102,35 +102,38 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5A__get_shared_rc_test(hid_t attr_id, hsize_t *ref_count)
+herr_t H5A__get_shared_rc_test(hid_t attr_id, hsize_t* ref_count)
 {
-    H5A_t      *attr;                         /* Attribute object for ID */
-    H5CX_node_t api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool        api_ctx_pushed = false;       /* Whether API context pushed */
-    herr_t      ret_value      = SUCCEED;     /* Return value */
+    H5A_t* attr;                           /* Attribute object for ID */
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
+    herr_t ret_value = SUCCEED;            /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check arguments */
-    if (NULL == (attr = (H5A_t *)H5VL_object_verify(attr_id, H5I_ATTR)))
+    if (NULL == (attr = (H5A_t*)H5VL_object_verify(attr_id, H5I_ATTR))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an attribute");
+    }
 
     /* Push API context */
-    if (H5CX_push(&api_ctx) < 0)
+    if (H5CX_push(&api_ctx) < 0) {
         HGOTO_ERROR(H5E_ATTR, H5E_CANTSET, FAIL, "can't set API context");
+    }
     api_ctx_pushed = true;
 
     /* Sanity check */
     assert(H5O_msg_is_shared(H5O_ATTR_ID, attr));
 
     /* Retrieve ref count for shared or shareable attribute */
-    if (H5SM_get_refcount(attr->oloc.file, H5O_ATTR_ID, &attr->sh_loc, ref_count) < 0)
+    if (H5SM_get_refcount(attr->oloc.file, H5O_ATTR_ID, &attr->sh_loc, ref_count) < 0) {
         HGOTO_ERROR(H5E_ATTR, H5E_CANTGET, FAIL, "can't retrieve shared message ref count");
+    }
 
 done:
-    if (api_ctx_pushed && H5CX_pop(false) < 0)
+    if (api_ctx_pushed && H5CX_pop(false) < 0) {
         HDONE_ERROR(H5E_ATTR, H5E_CANTRESET, FAIL, "can't reset API context");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5A__get_shared_rc_test() */

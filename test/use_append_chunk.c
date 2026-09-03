@@ -63,38 +63,39 @@
  */
 #if defined(H5_HAVE_FORK) && defined(H5_HAVE_WAITPID)
 
-#include "use.h"
+    #include "use.h"
 
-#define USE_APPEND_CHUNK_PROGNAME "use_append_chunk"
+    #define USE_APPEND_CHUNK_PROGNAME "use_append_chunk"
 
 static options_t UC_opts; /* Use Case Options */
 
 /* Setup parameters for the use case.
  * Return: 0 succeed; -1 fail.
  */
-int
-setup_parameters(int argc, char *const argv[], options_t *opts)
+int setup_parameters(int argc, char* const argv[], options_t* opts)
 {
     /* use case defaults */
     memset(opts, 0, sizeof(options_t));
-    opts->chunksize   = Chunksize_DFT;
-    opts->use_swmr    = true; /* use swmr open */
-    opts->iterations  = 1;
+    opts->chunksize = Chunksize_DFT;
+    opts->use_swmr = true; /* use swmr open */
+    opts->iterations = 1;
     opts->chunkplanes = 1;
-    opts->progname    = USE_APPEND_CHUNK_PROGNAME;
+    opts->progname = USE_APPEND_CHUNK_PROGNAME;
 
-    if (parse_option(argc, argv, opts) < 0)
+    if (parse_option(argc, argv, opts) < 0) {
         return (-1);
+    }
 
     opts->chunkdims[0] = opts->chunkplanes;
     opts->chunkdims[1] = opts->chunkdims[2] = opts->chunksize;
 
-    opts->dims[0]     = 0;
+    opts->dims[0] = 0;
     opts->max_dims[0] = H5S_UNLIMITED;
     opts->dims[1] = opts->dims[2] = opts->max_dims[1] = opts->max_dims[2] = opts->chunksize;
 
-    if (opts->nplanes == 0)
+    if (opts->nplanes == 0) {
         opts->nplanes = (hsize_t)opts->chunksize;
+    }
 
     show_parameters(opts);
     return (0);
@@ -107,18 +108,17 @@ setup_parameters(int argc, char *const argv[], options_t *opts)
  *       while parent process continues as the writer process;
  * both run till ending conditions are met.
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     pid_t childpid = 0;
     pid_t mypid, tmppid;
-    int   child_status;
-    int   child_wait_option = 0;
-    int   ret_value         = 0;
-    int   child_ret_value;
-    bool  send_wait = false;
-    hid_t fapl      = H5I_INVALID_HID; /* File access property list */
-    hid_t fid       = H5I_INVALID_HID; /* File ID */
+    int child_status;
+    int child_wait_option = 0;
+    int ret_value = 0;
+    int child_ret_value;
+    bool send_wait = false;
+    hid_t fapl = H5I_INVALID_HID; /* File access property list */
+    hid_t fid = H5I_INVALID_HID;  /* File ID */
 
     if (setup_parameters(argc, argv, &UC_opts) < 0) {
         Hgoto_error(1);
@@ -215,8 +215,7 @@ main(int argc, char *argv[])
         }
     }
 
-    if ((fid = H5Fopen(UC_opts.filename, H5F_ACC_RDWR | (UC_opts.use_swmr ? H5F_ACC_SWMR_WRITE : 0), fapl)) <
-        0) {
+    if ((fid = H5Fopen(UC_opts.filename, H5F_ACC_RDWR | (UC_opts.use_swmr ? H5F_ACC_SWMR_WRITE : 0), fapl)) < 0) {
         fprintf(stderr, "H5Fopen failed\n");
         Hgoto_error(1);
     }
@@ -268,10 +267,9 @@ done:
     return (ret_value);
 }
 
-#else /* defined(H5_HAVE_FORK) && defined(H5_HAVE_WAITPID) */
+#else  /* defined(H5_HAVE_FORK) && defined(H5_HAVE_WAITPID) */
 
-int
-main(void)
+int main(void)
 {
     fprintf(stderr, "Non-POSIX platform. Skipping.\n");
     return EXIT_SUCCESS;

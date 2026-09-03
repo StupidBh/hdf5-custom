@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -31,8 +30,8 @@ main(void)
             // adjust the file access properties
         }
 
-        unsigned mode   = H5F_ACC_EXCL;
-        char     name[] = "f1.h5";
+        unsigned mode = H5F_ACC_EXCL;
+        char name[] = "f1.h5";
 
         if ((file = H5Fcreate(name, mode, fcpl, fapl)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -53,7 +52,7 @@ fail_fcpl:;
     //! <!-- [read] -->
     {
         __label__ fail_fapl, fail_file;
-        hid_t   fapl, file;
+        hid_t fapl, file;
         hsize_t size;
 
         if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) == H5I_INVALID_HID) {
@@ -64,8 +63,8 @@ fail_fcpl:;
             // adjust the file access properties
         }
 
-        unsigned mode   = H5F_ACC_RDONLY;
-        char     name[] = "f1.h5";
+        unsigned mode = H5F_ACC_RDONLY;
+        char name[] = "f1.h5";
 
         if ((file = H5Fopen(name, mode, fapl)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -90,8 +89,8 @@ fail_fapl:;
         __label__ fail_file;
         hid_t file;
 
-        unsigned mode   = H5F_ACC_RDWR;
-        char     name[] = "f1.h5";
+        unsigned mode = H5F_ACC_RDWR;
+        char name[] = "f1.h5";
 
         if ((file = H5Fopen(name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -110,40 +109,43 @@ fail_file:;
 
     //! <!-- [minimal] -->
     {
-        unsigned mode   = H5F_ACC_TRUNC;
-        char     name[] = "f11.h5";
+        unsigned mode = H5F_ACC_TRUNC;
+        char name[] = "f11.h5";
 
         hid_t file = H5Fcreate(name, mode, H5P_DEFAULT, H5P_DEFAULT);
-        if (file != H5I_INVALID_HID)
+        if (file != H5I_INVALID_HID) {
             H5Fclose(file);
-        else
+        }
+        else {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [minimal] -->
 
     //! <!-- [open] -->
     {
-        unsigned mode   = H5F_ACC_RDONLY;
-        char     name[] = "f11.h5";
+        unsigned mode = H5F_ACC_RDONLY;
+        char name[] = "f11.h5";
 
         hid_t file = H5Fopen(name, mode, H5P_DEFAULT);
-        if (file != H5I_INVALID_HID)
+        if (file != H5I_INVALID_HID) {
             H5Fclose(file);
-        else
+        }
+        else {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [open] -->
 
     //! <!-- [flush] -->
     {
-        unsigned mode   = H5F_ACC_RDWR;
-        char     name[] = "f11.h5";
+        unsigned mode = H5F_ACC_RDWR;
+        char name[] = "f11.h5";
 
         hid_t file = H5Fopen(name, mode, H5P_DEFAULT);
         if (file != H5I_INVALID_HID) {
             int step;
             for (step = 0; step < 1000; ++step) {
-
                 // do important work & flush every 20 steps
 
                 if (step % 20 == 0) {
@@ -155,33 +157,37 @@ fail_file:;
                 }
             }
 
-            if (H5Fclose(file) < 0)
+            if (H5Fclose(file) < 0) {
                 perror("H5Fclose failed.");
+            }
         }
-        else
+        else {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [flush] -->
 
     //! <!-- [libver_bounds] -->
     {
-        unsigned mode   = H5F_ACC_RDWR;
-        char     name[] = "f11.h5";
+        unsigned mode = H5F_ACC_RDWR;
+        char name[] = "f11.h5";
 
         hid_t file = H5Fopen(name, mode, H5P_DEFAULT);
         if (file != H5I_INVALID_HID) {
             if (H5Fset_libver_bounds(file, H5F_LIBVER_EARLIEST, H5F_LIBVER_V18) >= 0) {
-
                 // object creation will not exceed HDF5 version 1.8.x
             }
-            else
+            else {
                 perror("H5Fset_libver_bounds failed.");
+            }
 
-            if (H5Fclose(file) < 0)
+            if (H5Fclose(file) < 0) {
                 perror("H5Fclose failed.");
+            }
         }
-        else
+        else {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [libver_bounds] -->
 
@@ -193,7 +199,6 @@ fail_file:;
             if ((group = H5Gcreate1(file, "mount_point", H5P_DEFAULT)) != H5I_INVALID_HID) {
                 if ((child = H5Fopen("f1.h5", H5F_ACC_RDONLY, H5P_DEFAULT)) != H5I_INVALID_HID) {
                     if (H5Fmount(group, ".", child, H5P_DEFAULT) >= 0) {
-
                         // do something useful w/ the mounted file
                     }
                     else {
@@ -206,8 +211,9 @@ fail_file:;
             }
             H5Fclose(file);
         }
-        else
+        else {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [mount] -->
 

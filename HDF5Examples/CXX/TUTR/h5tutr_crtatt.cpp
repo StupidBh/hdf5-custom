@@ -26,11 +26,10 @@ const H5std_string ATTR_NAME("Units");
 
 const int DIM1 = 2;
 
-int
-main(void)
+int main(void)
 {
-    int     attr_data[2] = {100, 200};
-    hsize_t dims[1]      = {DIM1};
+    int attr_data[2] = { 100, 200 };
+    hsize_t dims[1] = { DIM1 };
 
     // Try block to detect exceptions raised by any of the calls inside it
     try {
@@ -39,7 +38,7 @@ main(void)
         Exception::dontPrint();
 
         // Open an existing file and dataset.
-        H5File  file(FILE_NAME, H5F_ACC_RDWR);
+        H5File file(FILE_NAME, H5F_ACC_RDWR);
         DataSet dataset = file.openDataSet(DATASET_NAME);
 
         // Create the data space for the attribute.

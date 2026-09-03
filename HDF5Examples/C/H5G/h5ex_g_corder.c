@@ -15,18 +15,17 @@
 
 #define FILENAME "h5ex_g_corder.h5"
 
-int
-main(void)
+int main(void)
 {
-    hid_t      file     = H5I_INVALID_HID;
-    hid_t      group    = H5I_INVALID_HID;
-    hid_t      subgroup = H5I_INVALID_HID;
-    hid_t      gcpl     = H5I_INVALID_HID;
-    herr_t     status;
+    hid_t file = H5I_INVALID_HID;
+    hid_t group = H5I_INVALID_HID;
+    hid_t subgroup = H5I_INVALID_HID;
+    hid_t gcpl = H5I_INVALID_HID;
+    herr_t status;
     H5G_info_t ginfo;
-    ssize_t    size;        /* Size of name */
-    hsize_t    i;           /* Index */
-    char      *name = NULL; /* Output buffer */
+    ssize_t size;      /* Size of name */
+    hsize_t i;         /* Index */
+    char* name = NULL; /* Output buffer */
 
     /*
      * Create a new file using the default properties.
@@ -39,7 +38,7 @@ main(void)
      * group that does not have this property set will result in an
      * error.
      */
-    gcpl   = H5Pcreate(H5P_GROUP_CREATE);
+    gcpl = H5Pcreate(H5P_GROUP_CREATE);
     status = H5Pset_link_creation_order(gcpl, H5P_CRT_ORDER_TRACKED | H5P_CRT_ORDER_INDEXED);
 
     /*
@@ -53,13 +52,13 @@ main(void)
      * the creation order tracking property set.
      */
     subgroup = H5Gcreate(group, "H", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    status   = H5Gclose(subgroup);
+    status = H5Gclose(subgroup);
     subgroup = H5Gcreate(group, "D", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    status   = H5Gclose(subgroup);
+    status = H5Gclose(subgroup);
     subgroup = H5Gcreate(group, "F", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    status   = H5Gclose(subgroup);
+    status = H5Gclose(subgroup);
     subgroup = H5Gcreate(group, "5", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    status   = H5Gclose(subgroup);
+    status = H5Gclose(subgroup);
 
     /*
      * Get group info.
@@ -72,7 +71,6 @@ main(void)
      */
     printf("Traversing group using alphabetical indices:\n\n");
     for (i = 0; i < ginfo.nlinks; i++) {
-
         /*
          * Get size of name, add 1 for null terminator.
          */
@@ -81,7 +79,7 @@ main(void)
         /*
          * Allocate storage for name.
          */
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
 
         /*
          * Retrieve name, print it, and free the previously allocated
@@ -98,7 +96,6 @@ main(void)
      */
     printf("\nTraversing group using creation order indices:\n\n");
     for (i = 0; i < ginfo.nlinks; i++) {
-
         /*
          * Get size of name, add 1 for null terminator.
          */
@@ -107,14 +104,13 @@ main(void)
         /*
          * Allocate storage for name.
          */
-        name = (char *)malloc(size);
+        name = (char*)malloc(size);
 
         /*
          * Retrieve name, print it, and free the previously allocated
          * space.
          */
-        size = H5Lget_name_by_idx(group, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i, name, (size_t)size,
-                                  H5P_DEFAULT);
+        size = H5Lget_name_by_idx(group, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i, name, (size_t)size, H5P_DEFAULT);
         printf("Index %d: %s\n", (int)i, name);
         free(name);
     }

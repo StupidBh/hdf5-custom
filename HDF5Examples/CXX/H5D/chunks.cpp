@@ -25,13 +25,12 @@ using namespace H5;
 
 const H5std_string FILE_NAME("SDSextendible.h5");
 const H5std_string DATASET_NAME("ExtendibleArray");
-const int          NX    = 10;
-const int          NY    = 5;
-const int          RANK  = 2;
-const int          RANKC = 1;
+const int NX = 10;
+const int NY = 5;
+const int RANK = 2;
+const int RANKC = 1;
 
-int
-main(void)
+int main(void)
 {
     hsize_t i, j;
 
@@ -46,7 +45,7 @@ main(void)
         /*
          * Open the file and the dataset.
          */
-        H5File  file(FILE_NAME, H5F_ACC_RDONLY);
+        H5File file(FILE_NAME, H5F_ACC_RDONLY);
         DataSet dataset = file.openDataSet(DATASET_NAME);
 
         /*
@@ -64,8 +63,7 @@ main(void)
          */
         hsize_t dims[2]; // dataset dimensions
         rank = filespace.getSimpleExtentDims(dims);
-        cout << "dataset rank = " << rank << ", dimensions " << (unsigned long)(dims[0]) << " x "
-             << (unsigned long)(dims[1]) << endl;
+        cout << "dataset rank = " << rank << ", dimensions " << (unsigned long)(dims[0]) << " x " << (unsigned long)(dims[1]) << endl;
 
         /*
          * Define the memory space to read dataset.
@@ -81,8 +79,9 @@ main(void)
         cout << "\n";
         cout << "Dataset: \n";
         for (j = 0; j < dims[0]; j++) {
-            for (i = 0; i < dims[1]; i++)
+            for (i = 0; i < dims[1]; i++) {
                 cout << data_out[j][i] << " ";
+            }
             cout << endl;
         }
 
@@ -115,9 +114,9 @@ main(void)
         /*
          * Define the column (hyperslab) to read.
          */
-        hsize_t offset[2] = {0, 2};
-        hsize_t count[2]  = {10, 1};
-        int     column[10]; // buffer for column to be read
+        hsize_t offset[2] = { 0, 2 };
+        hsize_t count[2] = { 10, 1 };
+        int column[10]; // buffer for column to be read
 
         /*
          * Define hyperslab and read.
@@ -127,8 +126,9 @@ main(void)
 
         cout << endl;
         cout << "Third column: " << endl;
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
             cout << column[i] << endl;
+        }
 
         /*
          *          Third column:
@@ -153,14 +153,13 @@ main(void)
          * Check if dataset is chunked.
          */
         hsize_t chunk_dims[2];
-        int     rank_chunk;
+        int rank_chunk;
         if (H5D_CHUNKED == cparms.getLayout()) {
             /*
              * Get chunking information: rank and dimensions
              */
             rank_chunk = cparms.getChunk(2, chunk_dims);
-            cout << "chunk rank " << rank_chunk << "dimensions " << (unsigned long)(chunk_dims[0]) << " x "
-                 << (unsigned long)(chunk_dims[1]) << endl;
+            cout << "chunk rank " << rank_chunk << "dimensions " << (unsigned long)(chunk_dims[0]) << " x " << (unsigned long)(chunk_dims[1]) << endl;
 
             /*
              * Define the memory space to read a chunk.
@@ -172,8 +171,8 @@ main(void)
              */
             offset[0] = 2;
             offset[1] = 0;
-            count[0]  = chunk_dims[0];
-            count[1]  = chunk_dims[1];
+            count[0] = chunk_dims[0];
+            count[1] = chunk_dims[1];
             filespace.selectHyperslab(H5S_SELECT_SET, count, offset);
 
             /*
@@ -184,8 +183,9 @@ main(void)
             cout << endl;
             cout << "Chunk:" << endl;
             for (j = 0; j < chunk_dims[0]; j++) {
-                for (i = 0; i < chunk_dims[1]; i++)
+                for (i = 0; i < chunk_dims[1]; i++) {
                     cout << chunk_out[j][i] << " ";
+                }
                 cout << endl;
             }
             /*

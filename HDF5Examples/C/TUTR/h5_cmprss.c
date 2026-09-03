@@ -22,18 +22,16 @@
 #define DIM0     100
 #define DIM1     20
 
-int
-main(void)
+int main(void)
 {
-
     hid_t file_id, dataset_id, dataspace_id; /* identifiers */
     hid_t plist_id;
 
-    size_t       nelmts;
-    unsigned     flags, filter_info;
+    size_t nelmts;
+    unsigned flags, filter_info;
     H5Z_filter_t filter_type;
 
-    herr_t  status;
+    herr_t status;
     hsize_t dims[2];
     hsize_t cdims[2];
 
@@ -50,8 +48,8 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Create dataset "Compressed Data" in the group using absolute name.  */
-    dims[0]      = DIM0;
-    dims[1]      = DIM1;
+    dims[0] = DIM0;
+    dims[1] = DIM1;
     dataspace_id = H5Screate_simple(RANK, dims, NULL);
 
     plist_id = H5Pcreate(H5P_DATASET_CREATE);
@@ -59,7 +57,7 @@ main(void)
     /* Dataset must be chunked for compression */
     cdims[0] = 20;
     cdims[1] = 20;
-    status   = H5Pset_chunk(plist_id, 2, cdims);
+    status = H5Pset_chunk(plist_id, 2, cdims);
 
     /* Set ZLIB / DEFLATE Compression using compression level 6.
      * To use SZIP Compression comment out these lines.
@@ -72,12 +70,13 @@ main(void)
     status = H5Pset_szip (plist_id, szip_options_mask, szip_pixels_per_block);
     */
 
-    dataset_id = H5Dcreate2(file_id, "Compressed_Data", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, plist_id,
-                            H5P_DEFAULT);
+    dataset_id = H5Dcreate2(file_id, "Compressed_Data", H5T_STD_I32BE, dataspace_id, H5P_DEFAULT, plist_id, H5P_DEFAULT);
 
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             buf[i][j] = i + j;
+        }
+    }
 
     status = H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf);
 
@@ -87,7 +86,7 @@ main(void)
     status = H5Fclose(file_id);
 
     /* Now reopen the file and dataset in the file. */
-    file_id    = H5Fopen(FILENAME, H5F_ACC_RDWR, H5P_DEFAULT);
+    file_id = H5Fopen(FILENAME, H5F_ACC_RDWR, H5P_DEFAULT);
     dataset_id = H5Dopen2(file_id, "Compressed_Data", H5P_DEFAULT);
 
     /* Retrieve filter information. */
@@ -97,18 +96,13 @@ main(void)
     printf("Number of filters associated with dataset: %i\n", numfilt);
 
     for (i = 0; i < numfilt; i++) {
-        nelmts      = 0;
+        nelmts = 0;
         filter_type = H5Pget_filter2(plist_id, i, &flags, &nelmts, NULL, 0, NULL, &filter_info);
         printf("Filter Type: ");
         switch (filter_type) {
-            case H5Z_FILTER_DEFLATE:
-                printf("H5Z_FILTER_DEFLATE\n");
-                break;
-            case H5Z_FILTER_SZIP:
-                printf("H5Z_FILTER_SZIP\n");
-                break;
-            default:
-                printf("Other filter type included.\n");
+        case H5Z_FILTER_DEFLATE: printf("H5Z_FILTER_DEFLATE\n"); break;
+        case H5Z_FILTER_SZIP   : printf("H5Z_FILTER_SZIP\n"); break;
+        default                : printf("Other filter type included.\n");
         }
     }
 

@@ -64,17 +64,18 @@
  *
  *--------------------------------------------------------------------------
  */
-static inline herr_t
-H5TS_barrier_wait(H5TS_barrier_t *barrier)
+static inline herr_t H5TS_barrier_wait(H5TS_barrier_t* barrier)
 {
-    if (H5_UNLIKELY(NULL == barrier))
+    if (H5_UNLIKELY(NULL == barrier)) {
         return FAIL;
+    }
 
 #ifdef H5_HAVE_PTHREAD_BARRIER
     {
         int ret = pthread_barrier_wait(barrier);
-        if (H5_UNLIKELY(ret != 0 && ret != PTHREAD_BARRIER_SERIAL_THREAD))
+        if (H5_UNLIKELY(ret != 0 && ret != PTHREAD_BARRIER_SERIAL_THREAD)) {
             return FAIL;
+        }
     }
 #else
     {
@@ -87,8 +88,9 @@ H5TS_barrier_wait(H5TS_barrier_t *barrier)
         }
         else {
             /* Not the last thread, wait for the generation to change */
-            while (H5TS_atomic_load_uint(&barrier->generation) == my_generation)
+            while (H5TS_atomic_load_uint(&barrier->generation) == my_generation) {
                 H5TS_thread_yield();
+            }
         }
     }
 #endif

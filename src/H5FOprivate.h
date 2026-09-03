@@ -29,17 +29,17 @@ typedef H5SL_t H5FO_t; /* Currently, all open objects are stored in skip list */
 /* Macros */
 
 /* Private routines */
-H5_DLL herr_t  H5FO_create(const H5F_t *f);
-H5_DLL void   *H5FO_opened(const H5F_t *f, haddr_t addr);
-H5_DLL herr_t  H5FO_insert(const H5F_t *f, haddr_t addr, void *obj, bool delete_flag);
-H5_DLL herr_t  H5FO_delete(H5F_t *f, haddr_t addr);
-H5_DLL herr_t  H5FO_mark(const H5F_t *f, haddr_t addr, bool deleted);
-H5_DLL bool    H5FO_marked(const H5F_t *f, haddr_t addr);
-H5_DLL herr_t  H5FO_dest(const H5F_t *f);
-H5_DLL herr_t  H5FO_top_create(H5F_t *f);
-H5_DLL herr_t  H5FO_top_incr(const H5F_t *f, haddr_t addr);
-H5_DLL herr_t  H5FO_top_decr(const H5F_t *f, haddr_t addr);
-H5_DLL hsize_t H5FO_top_count(const H5F_t *f, haddr_t addr);
-H5_DLL herr_t  H5FO_top_dest(H5F_t *f);
+H5_DLL herr_t H5FO_create(const H5F_t* f);
+H5_DLL void* H5FO_opened(const H5F_t* f, haddr_t addr);
+H5_DLL herr_t H5FO_insert(const H5F_t* f, haddr_t addr, void* obj, bool delete_flag);
+H5_DLL herr_t H5FO_delete(H5F_t* f, haddr_t addr);
+H5_DLL herr_t H5FO_mark(const H5F_t* f, haddr_t addr, bool deleted);
+H5_DLL bool H5FO_marked(const H5F_t* f, haddr_t addr);
+H5_DLL herr_t H5FO_dest(const H5F_t* f);
+H5_DLL herr_t H5FO_top_create(H5F_t* f);
+H5_DLL herr_t H5FO_top_incr(const H5F_t* f, haddr_t addr);
+H5_DLL herr_t H5FO_top_decr(const H5F_t* f, haddr_t addr);
+H5_DLL hsize_t H5FO_top_count(const H5F_t* f, haddr_t addr);
+H5_DLL herr_t H5FO_top_dest(H5F_t* f);
 
 #endif /* H5FOprivate_H */

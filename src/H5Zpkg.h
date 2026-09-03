@@ -11,14 +11,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #if !(defined H5Z_FRIEND || defined H5Z_MODULE)
-#error "Do not include this file outside the H5Z package!"
+    #error "Do not include this file outside the H5Z package!"
 #endif
 
 #ifndef H5Zpkg_H
-#define H5Zpkg_H
+    #define H5Zpkg_H
 
-/* Include private header file */
-#include "H5Zprivate.h" /* Filter functions                */
+    /* Include private header file */
+    #include "H5Zprivate.h" /* Filter functions                */
 
 /********************/
 /* Internal filters */
@@ -36,19 +36,19 @@ H5_DLLVAR H5Z_class2_t H5Z_NBIT[1];
 /* Scale/offset filter */
 H5_DLLVAR H5Z_class2_t H5Z_SCALEOFFSET[1];
 
-/********************/
-/* External filters */
-/********************/
+    /********************/
+    /* External filters */
+    /********************/
 
-/* Deflate filter */
-#ifdef H5_HAVE_FILTER_DEFLATE
+    /* Deflate filter */
+    #ifdef H5_HAVE_FILTER_DEFLATE
 H5_DLLVAR const H5Z_class2_t H5Z_DEFLATE[1];
-#endif /* H5_HAVE_FILTER_DEFLATE */
+    #endif /* H5_HAVE_FILTER_DEFLATE */
 
-/* szip filter */
-#ifdef H5_HAVE_FILTER_SZIP
+    /* szip filter */
+    #ifdef H5_HAVE_FILTER_SZIP
 H5_DLLVAR H5Z_class2_t H5Z_SZIP[1];
-#endif /* H5_HAVE_FILTER_SZIP */
+    #endif /* H5_HAVE_FILTER_SZIP */
 
 /* Package internal routines */
 H5_DLL herr_t H5Z__unregister(H5Z_filter_t filter_id);

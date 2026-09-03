@@ -28,15 +28,13 @@ using std::endl;
 using namespace H5;
 
 const H5std_string FILE_NAME("Group.h5");
-const int          RANK = 2;
+const int RANK = 2;
 
 // Operator function
-extern "C" herr_t file_info(hid_t loc_id, const char *name, const H5L_info2_t *linfo, void *opdata);
+extern "C" herr_t file_info(hid_t loc_id, const char* name, const H5L_info2_t* linfo, void* opdata);
 
-int
-main(void)
+int main(void)
 {
-
     hsize_t dims[2];
     hsize_t cdims[2];
 
@@ -52,12 +50,12 @@ main(void)
          * Create the named file, truncating the existing one if any,
          * using default create and access property lists.
          */
-        H5File *file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
+        H5File* file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
 
         /*
          * Create a group in the file
          */
-        Group *group = new Group(file->createGroup("/Data"));
+        Group* group = new Group(file->createGroup("/Data"));
 
         /*
          * Create dataset "Compressed Data" in the group using absolute
@@ -65,20 +63,19 @@ main(void)
          * GZIP compression with the compression effort set to 6.
          * Note that compression can be used only when dataset is chunked.
          */
-        dims[0]                     = 1000;
-        dims[1]                     = 20;
-        cdims[0]                    = 20;
-        cdims[1]                    = 20;
-        DataSpace        *dataspace = new DataSpace(RANK, dims); // create new dspace
-        DSetCreatPropList ds_creatplist;                         // create dataset creation prop list
-        ds_creatplist.setChunk(2, cdims);                        // then modify it for compression
+        dims[0] = 1000;
+        dims[1] = 20;
+        cdims[0] = 20;
+        cdims[1] = 20;
+        DataSpace* dataspace = new DataSpace(RANK, dims); // create new dspace
+        DSetCreatPropList ds_creatplist;                  // create dataset creation prop list
+        ds_creatplist.setChunk(2, cdims);                 // then modify it for compression
         ds_creatplist.setDeflate(6);
 
         /*
          * Create the first dataset.
          */
-        DataSet *dataset = new DataSet(
-            file->createDataSet("/Data/Compressed_Data", PredType::NATIVE_INT, *dataspace, ds_creatplist));
+        DataSet* dataset = new DataSet(file->createDataSet("/Data/Compressed_Data", PredType::NATIVE_INT, *dataspace, ds_creatplist));
 
         /*
          * Close the first dataset.
@@ -89,10 +86,10 @@ main(void)
         /*
          * Create the second dataset.
          */
-        dims[0]   = 500;
-        dims[1]   = 20;
+        dims[0] = 500;
+        dims[1] = 20;
         dataspace = new DataSpace(RANK, dims); // create second dspace
-        dataset   = new DataSet(file->createDataSet("/Data/Float_Data", PredType::NATIVE_FLOAT, *dataspace));
+        dataset = new DataSet(file->createDataSet("/Data/Float_Data", PredType::NATIVE_FLOAT, *dataspace));
 
         delete dataset;
         delete dataspace;
@@ -102,7 +99,7 @@ main(void)
         /*
          * Now reopen the file and group in the file.
          */
-        file  = new H5File(FILE_NAME, H5F_ACC_RDWR);
+        file = new H5File(FILE_NAME, H5F_ACC_RDWR);
         group = new Group(file->openGroup("Data"));
 
         /*
@@ -204,8 +201,7 @@ main(void)
 /*
  * Operator function.
  */
-herr_t
-file_info(hid_t loc_id, const char *name, const H5L_info2_t *linfo, void *opdata)
+herr_t file_info(hid_t loc_id, const char* name, const H5L_info2_t* linfo, void* opdata)
 {
     hid_t group;
 

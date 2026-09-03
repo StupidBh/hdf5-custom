@@ -22,26 +22,27 @@
 #define TRANSFORM  "x+1"
 #define RTRANSFORM "x-1"
 
-int
-main(void)
+int main(void)
 {
-    hid_t file  = H5I_INVALID_HID;
+    hid_t file = H5I_INVALID_HID;
     hid_t space = H5I_INVALID_HID;
-    hid_t dset  = H5I_INVALID_HID;
-    hid_t dxpl  = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t dxpl = H5I_INVALID_HID;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[2] = {DIM0, DIM1};
-    int     wdata[DIM0][DIM1]; /* Write buffer */
-    int     rdata[DIM0][DIM1]; /* Read buffer */
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    int rdata[DIM0][DIM1]; /* Read buffer */
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Output the data to the screen.
@@ -49,8 +50,9 @@ main(void)
     printf("Original Data:\n");
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", wdata[i][j]);
+        }
         printf("]\n");
     }
 
@@ -69,7 +71,7 @@ main(void)
      * Create the dataset transfer property list and define the
      * transform expression.
      */
-    dxpl   = H5Pcreate(H5P_DATASET_XFER);
+    dxpl = H5Pcreate(H5P_DATASET_XFER);
     status = H5Pset_data_transform(dxpl, TRANSFORM);
 
     /*
@@ -114,8 +116,9 @@ main(void)
     printf("\nData as written with transform \"%s\":\n", TRANSFORM);
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 
@@ -123,7 +126,7 @@ main(void)
      * Create the dataset transfer property list and define the
      * transform expression.
      */
-    dxpl   = H5Pcreate(H5P_DATASET_XFER);
+    dxpl = H5Pcreate(H5P_DATASET_XFER);
     status = H5Pset_data_transform(dxpl, RTRANSFORM);
 
     /*
@@ -134,12 +137,12 @@ main(void)
     /*
      * Output the data to the screen.
      */
-    printf("\nData as written with transform \"%s\" and read with transform \"%s\":\n", TRANSFORM,
-           RTRANSFORM);
+    printf("\nData as written with transform \"%s\" and read with transform \"%s\":\n", TRANSFORM, RTRANSFORM);
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

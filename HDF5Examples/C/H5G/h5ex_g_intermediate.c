@@ -18,14 +18,13 @@ Note: This example includes older cases from previous versions
 /*
  * Operator function to be called by H5Ovisit.
  */
-herr_t op_func(hid_t loc_id, const char *name, const H5O_info_t *info, void *operator_data);
+herr_t op_func(hid_t loc_id, const char* name, const H5O_info_t* info, void* operator_data);
 
-int
-main(void)
+int main(void)
 {
-    hid_t  file  = H5I_INVALID_HID;
-    hid_t  group = H5I_INVALID_HID;
-    hid_t  gcpl  = H5I_INVALID_HID;
+    hid_t file = H5I_INVALID_HID;
+    hid_t group = H5I_INVALID_HID;
+    hid_t gcpl = H5I_INVALID_HID;
     herr_t status;
 
     /*
@@ -37,7 +36,7 @@ main(void)
      * Create group creation property list and set it to allow creation
      * of intermediate groups.
      */
-    gcpl   = H5Pcreate(H5P_LINK_CREATE);
+    gcpl = H5Pcreate(H5P_LINK_CREATE);
     status = H5Pset_create_intermediate_group(gcpl, 1);
 
     /*
@@ -75,8 +74,7 @@ main(void)
   name and type of the object passed to it.
 
  ************************************************************/
-herr_t
-op_func(hid_t loc_id, const char *name, const H5O_info_t *info, void *operator_data)
+herr_t op_func(hid_t loc_id, const char* name, const H5O_info_t* info, void* operator_data)
 {
     printf("/"); /* Print root group in object path */
 
@@ -84,22 +82,17 @@ op_func(hid_t loc_id, const char *name, const H5O_info_t *info, void *operator_d
      * Check if the current object is the root group, and if not print
      * the full path name and type.
      */
-    if (name[0] == '.') /* Root group, do not print '.' */
+    if (name[0] == '.') { /* Root group, do not print '.' */
         printf("  (Group)\n");
-    else
+    }
+    else {
         switch (info->type) {
-            case H5O_TYPE_GROUP:
-                printf("%s  (Group)\n", name);
-                break;
-            case H5O_TYPE_DATASET:
-                printf("%s  (Dataset)\n", name);
-                break;
-            case H5O_TYPE_NAMED_DATATYPE:
-                printf("%s  (Datatype)\n", name);
-                break;
-            default:
-                printf("%s  (Unknown)\n", name);
+        case H5O_TYPE_GROUP         : printf("%s  (Group)\n", name); break;
+        case H5O_TYPE_DATASET       : printf("%s  (Dataset)\n", name); break;
+        case H5O_TYPE_NAMED_DATATYPE: printf("%s  (Datatype)\n", name); break;
+        default                     : printf("%s  (Unknown)\n", name);
         }
+    }
 
     return 0;
 }

@@ -32,15 +32,14 @@
 #define ATTR3     "__333333333__"
 #define ATTR3_LEN 1
 
-int
-main(void)
+int main(void)
 {
-    hid_t  fid;             /* File ID */
-    hid_t  gid, gid2, gid3; /* Group IDs */
-    hid_t  aid;             /* Attribute ID */
-    hid_t  sid;             /* Dataspace ID */
-    hid_t  tid;             /* Datatype ID */
-    herr_t ret;             /* Generic return value */
+    hid_t fid;             /* File ID */
+    hid_t gid, gid2, gid3; /* Group IDs */
+    hid_t aid;             /* Attribute ID */
+    hid_t sid;             /* Dataspace ID */
+    hid_t tid;             /* Datatype ID */
+    herr_t ret;            /* Generic return value */
 
     /* Create file */
     fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);

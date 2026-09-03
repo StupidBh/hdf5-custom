@@ -83,20 +83,22 @@
  *              error return value.
  *-------------------------------------------------------------------------
  */
-bool
-H5FD__supports_swmr_test(const char *vfd_name)
+bool H5FD__supports_swmr_test(const char* vfd_name)
 {
     bool ret_value = false;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    if (!vfd_name)
+    if (!vfd_name) {
         vfd_name = getenv("HDF5_TEST_DRIVER");
+    }
 
-    if (!vfd_name || !strcmp(vfd_name, "") || !strcmp(vfd_name, H5_DEFAULT_VFD_NAME))
+    if (!vfd_name || !strcmp(vfd_name, "") || !strcmp(vfd_name, H5_DEFAULT_VFD_NAME)) {
         ret_value = true;
-    else
+    }
+    else {
         ret_value = !strcmp(vfd_name, "log") || !strcmp(vfd_name, "sec2");
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5FD__supports_swmr_test() */

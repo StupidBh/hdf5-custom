@@ -17,25 +17,25 @@
 
 #include "H5FDmodule.h" /* This source code file is part of the H5FD module */
 
-#include "H5private.h" /* Generic Functions        */
+#include "H5private.h"  /* Generic Functions        */
 
 #ifdef H5_HAVE_LIBHDFS
 
-#include "H5Eprivate.h"  /* Error handling           */
-#include "H5FDhdfs.h"    /* hdfs file driver         */
-#include "H5FDpkg.h"     /* File drivers             */
-#include "H5FLprivate.h" /* Free Lists               */
-#include "H5Iprivate.h"  /* IDs                      */
-#include "H5MMprivate.h" /* Memory management        */
+    #include "H5Eprivate.h"  /* Error handling           */
+    #include "H5FDhdfs.h"    /* hdfs file driver         */
+    #include "H5FDpkg.h"     /* File drivers             */
+    #include "H5FLprivate.h" /* Free Lists               */
+    #include "H5Iprivate.h"  /* IDs                      */
+    #include "H5MMprivate.h" /* Memory management        */
 
-/* HDFS routines */
-#include "hdfs.h"
+    /* HDFS routines */
+    #include "hdfs.h"
 
-/* toggle function call prints: 1 turns on */
-#define HDFS_DEBUG 0
+    /* toggle function call prints: 1 turns on */
+    #define HDFS_DEBUG 0
 
-/* toggle stats collection and reporting */
-#define HDFS_STATS 0
+    /* toggle stats collection and reporting */
+    #define HDFS_STATS 0
 
 /* The driver identification number, initialized at runtime */
 hid_t H5FD_HDFS_id_g = H5I_INVALID_HID;
@@ -45,43 +45,41 @@ hid_t H5FD_HDFS_id_g = H5I_INVALID_HID;
  */
 static bool H5FD_hdfs_init_s = false;
 
-#if HDFS_STATS
+    #if HDFS_STATS
 
-/* arbitrarily large value, such that any reasonable size read will be "less"
- * than this value and set a true minimum
- * not 0 because that may be a valid recorded minimum in degenerate cases
- */
-#define HDFS_STATS_STARTING_MIN 0xfffffffful
+        /* arbitrarily large value, such that any reasonable size read will be "less"
+         * than this value and set a true minimum
+         * not 0 because that may be a valid recorded minimum in degenerate cases
+         */
+        #define HDFS_STATS_STARTING_MIN 0xfffffffful
 
-/* Configuration definitions for stats collection and breakdown
- *
- * 2^10 = 1024
- *     Reads up to 1024 bytes (1 kB) fall in bin 0
- * 2^(10+(1*16)) = 2^26 = 64MB
- *     Reads of 64MB or greater fall in "overflow" bin[BIN_COUNT]
- */
-#define HDFS_STATS_BASE        2
-#define HDFS_STATS_INTERVAL    1
-#define HDFS_STATS_START_POWER 10
-#define HDFS_STATS_BIN_COUNT   16 /* MUST BE GREATER THAN 0 */
+        /* Configuration definitions for stats collection and breakdown
+         *
+         * 2^10 = 1024
+         *     Reads up to 1024 bytes (1 kB) fall in bin 0
+         * 2^(10+(1*16)) = 2^26 = 64MB
+         *     Reads of 64MB or greater fall in "overflow" bin[BIN_COUNT]
+         */
+        #define HDFS_STATS_BASE        2
+        #define HDFS_STATS_INTERVAL    1
+        #define HDFS_STATS_START_POWER 10
+        #define HDFS_STATS_BIN_COUNT   16 /* MUST BE GREATER THAN 0 */
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Calculate `BASE ^ (START_POWER + (INTERVAL * bin_i))`
- * Stores result at `(unsigned long long *) out_ptr`.
- * Used in computing boundaries between stats bins.
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
-#define HDFS_STATS_POW(bin_i, out_ptr)                                                                       \
-    {                                                                                                        \
-        unsigned long long donotshadowresult = 1;                                                            \
-        unsigned           donotshadowindex  = 0;                                                            \
-        for (donotshadowindex = 0;                                                                           \
-             donotshadowindex < (((bin_i) * HDFS_STATS_INTERVAL) + HDFS_STATS_START_POWER);                  \
-             donotshadowindex++) {                                                                           \
-            donotshadowresult *= HDFS_STATS_BASE;                                                            \
-        }                                                                                                    \
-        *(out_ptr) = donotshadowresult;                                                                      \
-    }
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Calculate `BASE ^ (START_POWER + (INTERVAL * bin_i))`
+         * Stores result at `(unsigned long long *) out_ptr`.
+         * Used in computing boundaries between stats bins.
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         */
+        #define HDFS_STATS_POW(bin_i, out_ptr)                                                                                                  \
+            {                                                                                                                                   \
+                unsigned long long donotshadowresult = 1;                                                                                       \
+                unsigned donotshadowindex = 0;                                                                                                  \
+                for (donotshadowindex = 0; donotshadowindex < (((bin_i) * HDFS_STATS_INTERVAL) + HDFS_STATS_START_POWER); donotshadowindex++) { \
+                    donotshadowresult *= HDFS_STATS_BASE;                                                                                       \
+                }                                                                                                                               \
+                *(out_ptr) = donotshadowresult;                                                                                                 \
+            }
 
 /* array to hold pre-computed boundaries for stats bins */
 static unsigned long long hdfs_stats_boundaries[HDFS_STATS_BIN_COUNT];
@@ -113,19 +111,20 @@ static unsigned long long hdfs_stats_boundaries[HDFS_STATS_BIN_COUNT];
  *     Largest read size in this bin.
  *
  ***************************************************************************/
-typedef struct {
+typedef struct
+{
     unsigned long long count;
     unsigned long long bytes;
     unsigned long long min;
     unsigned long long max;
 } hdfs_statsbin;
 
-#endif /* HDFS_STATS */
+    #endif /* HDFS_STATS */
 
-/* "unique" identifier for `hdfs_t` structures.
- * Randomly generated by unweighted dice rolls.
- */
-#define HDFS_HDFST_MAGIC 0x1AD5DE84
+    /* "unique" identifier for `hdfs_t` structures.
+     * Randomly generated by unweighted dice rolls.
+     */
+    #define HDFS_HDFST_MAGIC 0x1AD5DE84
 
 /***************************************************************************
  *
@@ -159,11 +158,12 @@ typedef struct {
  *
  ***************************************************************************
  */
-typedef struct {
+typedef struct
+{
     unsigned long magic;
-    hdfsFS        filesystem;
-    hdfsFileInfo *fileinfo;
-    hdfsFile      file;
+    hdfsFS filesystem;
+    hdfsFileInfo* fileinfo;
+    hdfsFile file;
 } hdfs_t;
 
 /***************************************************************************
@@ -219,36 +219,35 @@ typedef struct {
  * *** end HDFS_STATS ***
  *
  ***************************************************************************/
-typedef struct H5FD_hdfs_t {
-    H5FD_t           pub;
+typedef struct H5FD_hdfs_t
+{
+    H5FD_t pub;
     H5FD_hdfs_fapl_t fa;
-    haddr_t          eoa;
-    hdfs_t          *hdfs_handle;
-#if HDFS_STATS
+    haddr_t eoa;
+    hdfs_t* hdfs_handle;
+    #if HDFS_STATS
     hdfs_statsbin meta[HDFS_STATS_BIN_COUNT + 1];
     hdfs_statsbin raw[HDFS_STATS_BIN_COUNT + 1];
-#endif
+    #endif
 } H5FD_hdfs_t;
 
 /* Prototypes */
-static void   *H5FD__hdfs_fapl_get(H5FD_t *_file);
-static void   *H5FD__hdfs_fapl_copy(const void *_old_fa);
-static herr_t  H5FD__hdfs_fapl_free(void *_fa);
-static H5FD_t *H5FD__hdfs_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxaddr);
-static herr_t  H5FD__hdfs_close(H5FD_t *_file);
-static int     H5FD__hdfs_cmp(const H5FD_t *_f1, const H5FD_t *_f2);
-static herr_t  H5FD__hdfs_query(const H5FD_t *_f1, unsigned long *flags);
-static haddr_t H5FD__hdfs_get_eoa(const H5FD_t *_file, H5FD_mem_t type);
-static herr_t  H5FD__hdfs_set_eoa(H5FD_t *_file, H5FD_mem_t type, haddr_t addr);
-static haddr_t H5FD__hdfs_get_eof(const H5FD_t *_file, H5FD_mem_t type);
-static herr_t  H5FD__hdfs_get_handle(H5FD_t *_file, hid_t fapl, void **file_handle);
-static herr_t  H5FD__hdfs_read(H5FD_t *_file, H5FD_mem_t type, hid_t fapl_id, haddr_t addr, size_t size,
-                               void *buf);
-static herr_t  H5FD__hdfs_write(H5FD_t *_file, H5FD_mem_t type, hid_t fapl_id, haddr_t addr, size_t size,
-                                const void *buf);
-static herr_t  H5FD__hdfs_truncate(H5FD_t *_file, hid_t dxpl_id, bool closing);
+static void* H5FD__hdfs_fapl_get(H5FD_t* _file);
+static void* H5FD__hdfs_fapl_copy(const void* _old_fa);
+static herr_t H5FD__hdfs_fapl_free(void* _fa);
+static H5FD_t* H5FD__hdfs_open(const char* name, unsigned flags, hid_t fapl_id, haddr_t maxaddr);
+static herr_t H5FD__hdfs_close(H5FD_t* _file);
+static int H5FD__hdfs_cmp(const H5FD_t* _f1, const H5FD_t* _f2);
+static herr_t H5FD__hdfs_query(const H5FD_t* _f1, unsigned long* flags);
+static haddr_t H5FD__hdfs_get_eoa(const H5FD_t* _file, H5FD_mem_t type);
+static herr_t H5FD__hdfs_set_eoa(H5FD_t* _file, H5FD_mem_t type, haddr_t addr);
+static haddr_t H5FD__hdfs_get_eof(const H5FD_t* _file, H5FD_mem_t type);
+static herr_t H5FD__hdfs_get_handle(H5FD_t* _file, hid_t fapl, void** file_handle);
+static herr_t H5FD__hdfs_read(H5FD_t* _file, H5FD_mem_t type, hid_t fapl_id, haddr_t addr, size_t size, void* buf);
+static herr_t H5FD__hdfs_write(H5FD_t* _file, H5FD_mem_t type, hid_t fapl_id, haddr_t addr, size_t size, const void* buf);
+static herr_t H5FD__hdfs_truncate(H5FD_t* _file, hid_t dxpl_id, bool closing);
 
-static herr_t H5FD__hdfs_validate_config(const H5FD_hdfs_fapl_t *fa);
+static herr_t H5FD__hdfs_validate_config(const H5FD_hdfs_fapl_t* fa);
 
 static const H5FD_class_t H5FD_hdfs_g = {
     H5FD_CLASS_VERSION,       /* struct version       */
@@ -305,20 +304,21 @@ H5FL_DEFINE_STATIC(H5FD_hdfs_t);
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5FD__hdfs_register(void)
+herr_t H5FD__hdfs_register(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
-    if (H5I_VFL != H5I_get_type(H5FD_HDFS_id_g))
-        if ((H5FD_HDFS_id_g = H5FD_register(&H5FD_hdfs_g, sizeof(H5FD_class_t), false)) < 0)
+    if (H5I_VFL != H5I_get_type(H5FD_HDFS_id_g)) {
+        if ((H5FD_HDFS_id_g = H5FD_register(&H5FD_hdfs_g, sizeof(H5FD_class_t), false)) < 0) {
             HGOTO_ERROR(H5E_VFL, H5E_CANTREGISTER, FAIL, "unable to register hdfs driver");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -333,14 +333,13 @@ done:
  *
  *---------------------------------------------------------------------------
  */
-herr_t
-H5FD__hdfs_unregister(void)
+herr_t H5FD__hdfs_unregister(void)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     /* Reset VFL ID */
     H5FD_HDFS_id_g = H5I_INVALID_HID;
@@ -357,18 +356,17 @@ H5FD__hdfs_unregister(void)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_init(void)
+static herr_t H5FD__hdfs_init(void)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
-#if HDFS_STATS
+    #if HDFS_STATS
     /* pre-compute statsbin boundaries
      */
     for (unsigned bin_i = 0; bin_i < HDFS_STATS_BIN_COUNT; bin_i++) {
@@ -377,7 +375,7 @@ H5FD__hdfs_init(void)
         HDFS_STATS_POW(bin_i, &value)
         hdfs_stats_boundaries[bin_i] = value;
     }
-#endif
+    #endif
 
     /* Indicate that driver is set up */
     H5FD_hdfs_init_s = true;
@@ -396,64 +394,79 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static hdfs_t *
-H5FD__hdfs_handle_open(const char *path, const char *namenode_name, const int32_t namenode_port,
-                       const char *user_name, const char *kerberos_ticket_cache,
-                       const int32_t stream_buffer_size)
+static hdfs_t* H5FD__hdfs_handle_open(const char* path,
+                                      const char* namenode_name,
+                                      const int32_t namenode_port,
+                                      const char* user_name,
+                                      const char* kerberos_ticket_cache,
+                                      const int32_t stream_buffer_size)
 {
-    struct hdfsBuilder *builder   = NULL;
-    hdfs_t             *handle    = NULL;
-    hdfs_t             *ret_value = NULL;
+    struct hdfsBuilder* builder = NULL;
+    hdfs_t* handle = NULL;
+    hdfs_t* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     /* Initialize driver, if it's not yet */
-    if (!H5FD_hdfs_init_s)
-        if (H5FD__hdfs_init() < 0)
+    if (!H5FD_hdfs_init_s) {
+        if (H5FD__hdfs_init() < 0) {
             HGOTO_ERROR(H5E_VFL, H5E_CANTINIT, NULL, "can't initialize driver");
+        }
+    }
 
-    if (path == NULL || path[0] == '\0')
+    if (path == NULL || path[0] == '\0') {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "path cannot be null");
-    if (namenode_name == NULL)
+    }
+    if (namenode_name == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "namenode name cannot be null");
-    if (namenode_port < 0 || namenode_port > 65535)
+    }
+    if (namenode_port < 0 || namenode_port > 65535) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "namenode port must be non-negative and <= 65535");
-    if (stream_buffer_size < 0)
+    }
+    if (stream_buffer_size < 0) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "buffer size must non-negative");
+    }
 
-    handle = (hdfs_t *)H5MM_malloc(sizeof(hdfs_t));
-    if (handle == NULL)
+    handle = (hdfs_t*)H5MM_malloc(sizeof(hdfs_t));
+    if (handle == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_CANTALLOC, NULL, "could not malloc space for handle");
+    }
 
-    handle->magic      = (unsigned long)HDFS_HDFST_MAGIC;
+    handle->magic = (unsigned long)HDFS_HDFST_MAGIC;
     handle->filesystem = NULL; /* TODO: not a pointer; NULL may cause bug */
-    handle->fileinfo   = NULL;
-    handle->file       = NULL; /* TODO: not a pointer; NULL may cause bug */
+    handle->fileinfo = NULL;
+    handle->file = NULL;       /* TODO: not a pointer; NULL may cause bug */
 
     builder = hdfsNewBuilder();
-    if (!builder)
+    if (!builder) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "(hdfs) failed to create builder");
+    }
     hdfsBuilderSetNameNode(builder, namenode_name);
     hdfsBuilderSetNameNodePort(builder, (tPort)namenode_port);
-    if (user_name != NULL && user_name[0] != '\0')
+    if (user_name != NULL && user_name[0] != '\0') {
         hdfsBuilderSetUserName(builder, user_name);
-    if (kerberos_ticket_cache != NULL && kerberos_ticket_cache[0] != '\0')
+    }
+    if (kerberos_ticket_cache != NULL && kerberos_ticket_cache[0] != '\0') {
         hdfsBuilderSetKerbTicketCachePath(builder, kerberos_ticket_cache);
+    }
 
     /* Call to `hdfsBuilderConnect` releases builder, regardless of success. */
     handle->filesystem = hdfsBuilderConnect(builder);
-    if (!handle->filesystem)
+    if (!handle->filesystem) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "(hdfs) could not connect to default namenode");
+    }
     handle->fileinfo = hdfsGetPathInfo(handle->filesystem, path);
-    if (!handle->fileinfo)
+    if (!handle->fileinfo) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "hdfsGetPathInfo failed");
+    }
     handle->file = hdfsOpenFile(handle->filesystem, path, O_RDONLY, stream_buffer_size, 0, 0);
-    if (!handle->file)
+    if (!handle->file) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTOPENFILE, NULL, "(hdfs) could not open");
+    }
 
     ret_value = handle;
 
@@ -462,14 +475,19 @@ done:
         /* error; clean up */
         assert(handle->magic == HDFS_HDFST_MAGIC);
         handle->magic++;
-        if (handle->file != NULL)
-            if (FAIL == (hdfsCloseFile(handle->filesystem, handle->file)))
+        if (handle->file != NULL) {
+            if (FAIL == (hdfsCloseFile(handle->filesystem, handle->file))) {
                 HDONE_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, NULL, "unable to close hdfs file handle");
-        if (handle->fileinfo != NULL)
+            }
+        }
+        if (handle->fileinfo != NULL) {
             hdfsFreeFileInfo(handle->fileinfo, 1);
-        if (handle->filesystem != NULL)
-            if (FAIL == (hdfsDisconnect(handle->filesystem)))
+        }
+        if (handle->filesystem != NULL) {
+            if (FAIL == (hdfsDisconnect(handle->filesystem))) {
                 HDONE_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, NULL, "unable to disconnect from hdfs");
+            }
+        }
         H5MM_xfree(handle);
     }
 
@@ -487,31 +505,37 @@ done:
  *
  *--------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_handle_close(hdfs_t *handle)
+static herr_t H5FD__hdfs_handle_close(hdfs_t* handle)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
-    if (handle == NULL)
+    if (handle == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "handle cannot be null");
-    if (handle->magic != HDFS_HDFST_MAGIC)
+    }
+    if (handle->magic != HDFS_HDFST_MAGIC) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "handle has invalid magic");
+    }
 
     handle->magic++;
-    if (handle->file != NULL)
-        if (FAIL == (hdfsCloseFile(handle->filesystem, handle->file)))
+    if (handle->file != NULL) {
+        if (FAIL == (hdfsCloseFile(handle->filesystem, handle->file))) {
             HDONE_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, FAIL, "unable to close hdfs file handle");
-    if (handle->fileinfo != NULL)
+        }
+    }
+    if (handle->fileinfo != NULL) {
         hdfsFreeFileInfo(handle->fileinfo, 1);
-    if (handle->filesystem != NULL)
-        if (FAIL == (hdfsDisconnect(handle->filesystem)))
+    }
+    if (handle->filesystem != NULL) {
+        if (FAIL == (hdfsDisconnect(handle->filesystem))) {
             HDONE_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, FAIL, "unable to disconnect hdfs file system");
+        }
+    }
 
     H5MM_xfree(handle);
 
@@ -536,8 +560,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_validate_config(const H5FD_hdfs_fapl_t *fa)
+static herr_t H5FD__hdfs_validate_config(const H5FD_hdfs_fapl_t* fa)
 {
     herr_t ret_value = SUCCEED;
 
@@ -545,12 +568,15 @@ H5FD__hdfs_validate_config(const H5FD_hdfs_fapl_t *fa)
 
     assert(fa != NULL);
 
-    if (fa->version != H5FD__CURR_HDFS_FAPL_T_VERSION)
+    if (fa->version != H5FD__CURR_HDFS_FAPL_T_VERSION) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "Unknown H5FD_hdfs_fapl_t version");
-    if (fa->namenode_port > 65535)
+    }
+    if (fa->namenode_port > 65535) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "Invalid namenode port number");
-    if (fa->namenode_port < 0)
+    }
+    if (fa->namenode_port < 0) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "Invalid namenode port number");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -568,27 +594,28 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pset_fapl_hdfs(hid_t fapl_id, H5FD_hdfs_fapl_t *fa)
+herr_t H5Pset_fapl_hdfs(hid_t fapl_id, H5FD_hdfs_fapl_t* fa)
 {
-    H5P_genplist_t *plist     = NULL; /* Property list pointer */
-    herr_t          ret_value = FAIL;
+    H5P_genplist_t* plist = NULL; /* Property list pointer */
+    herr_t ret_value = FAIL;
 
     FUNC_ENTER_API(FAIL)
 
     assert(fa != NULL);
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     plist = H5P_object_verify(fapl_id, H5P_FILE_ACCESS, false);
-    if (plist == NULL)
+    if (plist == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a file access property list");
-    if (FAIL == H5FD__hdfs_validate_config(fa))
+    }
+    if (FAIL == H5FD__hdfs_validate_config(fa)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid hdfs config");
+    }
 
-    ret_value = H5P_set_driver(plist, H5FD_HDFS, (void *)fa, NULL);
+    ret_value = H5P_set_driver(plist, H5FD_HDFS, (void*)fa, NULL);
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -606,31 +633,34 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pget_fapl_hdfs(hid_t fapl_id, H5FD_hdfs_fapl_t *fa_dst /*out*/)
+herr_t H5Pget_fapl_hdfs(hid_t fapl_id, H5FD_hdfs_fapl_t* fa_dst /*out*/)
 {
-    const H5FD_hdfs_fapl_t *fa_src    = NULL;
-    H5P_genplist_t         *plist     = NULL;
-    herr_t                  ret_value = SUCCEED;
+    const H5FD_hdfs_fapl_t* fa_src = NULL;
+    H5P_genplist_t* plist = NULL;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_API(FAIL)
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
-    if (fa_dst == NULL)
+    if (fa_dst == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "fa_dst ptr is NULL");
+    }
     plist = H5P_object_verify(fapl_id, H5P_FILE_ACCESS, true);
-    if (plist == NULL)
+    if (plist == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a file access list");
+    }
 
-    if (H5FD_HDFS != H5P_peek_driver(plist))
+    if (H5FD_HDFS != H5P_peek_driver(plist)) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADVALUE, FAIL, "incorrect VFL driver");
+    }
 
-    fa_src = (const H5FD_hdfs_fapl_t *)H5P_peek_driver_info(plist);
-    if (fa_src == NULL)
+    fa_src = (const H5FD_hdfs_fapl_t*)H5P_peek_driver_info(plist);
+    if (fa_src == NULL) {
         HGOTO_ERROR(H5E_PLIST, H5E_BADVALUE, FAIL, "bad VFL driver info");
+    }
 
     /* Copy the hdfs fapl data out */
     H5MM_memcpy(fa_dst, fa_src, sizeof(H5FD_hdfs_fapl_t));
@@ -651,18 +681,18 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5FD__hdfs_fapl_get(H5FD_t *_file)
+static void* H5FD__hdfs_fapl_get(H5FD_t* _file)
 {
-    H5FD_hdfs_t      *file      = (H5FD_hdfs_t *)_file;
-    H5FD_hdfs_fapl_t *fa        = NULL;
-    void             *ret_value = NULL;
+    H5FD_hdfs_t* file = (H5FD_hdfs_t*)_file;
+    H5FD_hdfs_fapl_t* fa = NULL;
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
-    fa = (H5FD_hdfs_fapl_t *)H5MM_calloc(sizeof(H5FD_hdfs_fapl_t));
-    if (fa == NULL)
+    fa = (H5FD_hdfs_fapl_t*)H5MM_calloc(sizeof(H5FD_hdfs_fapl_t));
+    if (fa == NULL) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, NULL, "memory allocation failed");
+    }
 
     /* Copy the fields of the structure */
     H5MM_memcpy(fa, &(file->fa), sizeof(H5FD_hdfs_fapl_t));
@@ -670,8 +700,9 @@ H5FD__hdfs_fapl_get(H5FD_t *_file)
     ret_value = fa;
 
 done:
-    if (ret_value == NULL && fa != NULL)
+    if (ret_value == NULL && fa != NULL) {
         H5MM_xfree(fa); /* clean up on error */
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5FD__hdfs_fapl_get() */
@@ -687,25 +718,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static void *
-H5FD__hdfs_fapl_copy(const void *_old_fa)
+static void* H5FD__hdfs_fapl_copy(const void* _old_fa)
 {
-    const H5FD_hdfs_fapl_t *old_fa    = (const H5FD_hdfs_fapl_t *)_old_fa;
-    H5FD_hdfs_fapl_t       *new_fa    = NULL;
-    void                   *ret_value = NULL;
+    const H5FD_hdfs_fapl_t* old_fa = (const H5FD_hdfs_fapl_t*)_old_fa;
+    H5FD_hdfs_fapl_t* new_fa = NULL;
+    void* ret_value = NULL;
 
     FUNC_ENTER_PACKAGE
 
-    new_fa = (H5FD_hdfs_fapl_t *)H5MM_malloc(sizeof(H5FD_hdfs_fapl_t));
-    if (new_fa == NULL)
+    new_fa = (H5FD_hdfs_fapl_t*)H5MM_malloc(sizeof(H5FD_hdfs_fapl_t));
+    if (new_fa == NULL) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, NULL, "memory allocation failed");
+    }
 
     H5MM_memcpy(new_fa, old_fa, sizeof(H5FD_hdfs_fapl_t));
     ret_value = new_fa;
 
 done:
-    if (ret_value == NULL && new_fa != NULL)
+    if (ret_value == NULL && new_fa != NULL) {
         H5MM_xfree(new_fa); /* clean up on error */
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5FD__hdfs_fapl_copy() */
@@ -719,10 +751,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_fapl_free(void *_fa)
+static herr_t H5FD__hdfs_fapl_free(void* _fa)
 {
-    H5FD_hdfs_fapl_t *fa = (H5FD_hdfs_fapl_t *)_fa;
+    H5FD_hdfs_fapl_t* fa = (H5FD_hdfs_fapl_t*)_fa;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -733,7 +764,7 @@ H5FD__hdfs_fapl_free(void *_fa)
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* H5FD__hdfs_fapl_free() */
 
-#if HDFS_STATS
+    #if HDFS_STATS
 /*----------------------------------------------------------------------------
  *
  * Function: hdfs__reset_stats()
@@ -752,38 +783,38 @@ H5FD__hdfs_fapl_free(void *_fa)
  *
  *----------------------------------------------------------------------------
  */
-static herr_t
-hdfs__reset_stats(H5FD_hdfs_t *file)
+static herr_t hdfs__reset_stats(H5FD_hdfs_t* file)
 {
-    unsigned i         = 0;
-    herr_t   ret_value = SUCCEED;
+    unsigned i = 0;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+        #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+        #endif
 
-    if (file == NULL)
+    if (file == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "file was null");
+    }
 
     for (i = 0; i <= HDFS_STATS_BIN_COUNT; i++) {
         file->raw[i].bytes = 0;
         file->raw[i].count = 0;
-        file->raw[i].min   = (unsigned long long)HDFS_STATS_STARTING_MIN;
-        file->raw[i].max   = 0;
+        file->raw[i].min = (unsigned long long)HDFS_STATS_STARTING_MIN;
+        file->raw[i].max = 0;
 
         file->meta[i].bytes = 0;
         file->meta[i].count = 0;
-        file->meta[i].min   = (unsigned long long)HDFS_STATS_STARTING_MIN;
-        file->meta[i].max   = 0;
+        file->meta[i].min = (unsigned long long)HDFS_STATS_STARTING_MIN;
+        file->meta[i].max = 0;
     }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 
 } /* hdfs__reset_stats */
-#endif /* HDFS_STATS */
+    #endif /* HDFS_STATS */
 
 /*-------------------------------------------------------------------------
  *
@@ -805,71 +836,81 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static H5FD_t *
-H5FD__hdfs_open(const char *path, unsigned flags, hid_t fapl_id, haddr_t maxaddr)
+static H5FD_t* H5FD__hdfs_open(const char* path, unsigned flags, hid_t fapl_id, haddr_t maxaddr)
 {
-    H5FD_t          *ret_value = NULL;
-    H5FD_hdfs_t     *file      = NULL;
-    hdfs_t          *handle    = NULL;
+    H5FD_t* ret_value = NULL;
+    H5FD_hdfs_t* file = NULL;
+    hdfs_t* handle = NULL;
     H5FD_hdfs_fapl_t fa;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif /* HDFS_DEBUG */
+    #endif /* HDFS_DEBUG */
 
     /* Sanity check on file offsets */
     HDcompile_assert(sizeof(HDoff_t) >= sizeof(size_t));
 
     /* Check arguments */
-    if (!path || !*path)
+    if (!path || !*path) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "invalid file name");
-    if (0 == maxaddr || HADDR_UNDEF == maxaddr)
+    }
+    if (0 == maxaddr || HADDR_UNDEF == maxaddr) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADRANGE, NULL, "bogus maxaddr");
-    if (H5FD_ADDR_OVERFLOW(maxaddr))
+    }
+    if (H5FD_ADDR_OVERFLOW(maxaddr)) {
         HGOTO_ERROR(H5E_ARGS, H5E_OVERFLOW, NULL, "bogus maxaddr");
-    if (flags != H5F_ACC_RDONLY)
+    }
+    if (flags != H5F_ACC_RDONLY) {
         HGOTO_ERROR(H5E_ARGS, H5E_UNSUPPORTED, NULL, "only Read-Only access allowed");
-    if (fapl_id == H5P_DEFAULT || fapl_id == H5P_FILE_ACCESS_DEFAULT)
+    }
+    if (fapl_id == H5P_DEFAULT || fapl_id == H5P_FILE_ACCESS_DEFAULT) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "fapl cannot be H5P_DEFAULT");
-    if (FAIL == H5Pget_fapl_hdfs(fapl_id, &fa))
+    }
+    if (FAIL == H5Pget_fapl_hdfs(fapl_id, &fa)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, NULL, "can't get property list");
+    }
 
-    handle = H5FD__hdfs_handle_open(path, fa.namenode_name, fa.namenode_port, fa.user_name,
-                                    fa.kerberos_ticket_cache, fa.stream_buffer_size);
-    if (handle == NULL)
+    handle = H5FD__hdfs_handle_open(path, fa.namenode_name, fa.namenode_port, fa.user_name, fa.kerberos_ticket_cache, fa.stream_buffer_size);
+    if (handle == NULL) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTOPENFILE, NULL, "could not open");
+    }
 
     assert(handle->magic == HDFS_HDFST_MAGIC);
 
     /* Create new file struct */
     file = H5FL_CALLOC(H5FD_hdfs_t);
-    if (file == NULL)
+    if (file == NULL) {
         HGOTO_ERROR(H5E_VFL, H5E_CANTALLOC, NULL, "unable to allocate file struct");
+    }
     file->hdfs_handle = handle;
     H5MM_memcpy(&(file->fa), &fa, sizeof(H5FD_hdfs_fapl_t));
 
-#if HDFS_STATS
-    if (FAIL == hdfs__reset_stats(file))
+    #if HDFS_STATS
+    if (FAIL == hdfs__reset_stats(file)) {
         HGOTO_ERROR(H5E_INTERNAL, H5E_UNINITIALIZED, NULL, "unable to reset file statistics");
-#endif /* HDFS_STATS */
+    }
+    #endif /* HDFS_STATS */
 
-    ret_value = (H5FD_t *)file;
+    ret_value = (H5FD_t*)file;
 
 done:
     if (ret_value == NULL) {
-        if (handle != NULL)
-            if (FAIL == H5FD__hdfs_handle_close(handle))
+        if (handle != NULL) {
+            if (FAIL == H5FD__hdfs_handle_close(handle)) {
                 HDONE_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, NULL, "unable to close HDFS file handle");
-        if (file != NULL)
+            }
+        }
+        if (file != NULL) {
             file = H5FL_FREE(H5FD_hdfs_t, file);
+        }
     } /* end if null return value (error) */
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5FD__hdfs_open() */
 
-#if HDFS_STATS
+    #if HDFS_STATS
 
 /*----------------------------------------------------------------------------
  *
@@ -923,75 +964,83 @@ done:
  *
  *----------------------------------------------------------------------------
  */
-static herr_t
-hdfs__fprint_stats(FILE *stream, const H5FD_hdfs_t *file)
+static herr_t hdfs__fprint_stats(FILE* stream, const H5FD_hdfs_t* file)
 {
-    herr_t             ret_value    = SUCCEED;
-    parsed_url_t      *purl         = NULL;
-    unsigned           i            = 0;
-    unsigned long      count_meta   = 0;
-    unsigned long      count_raw    = 0;
-    double             average_meta = 0.0;
-    double             average_raw  = 0.0;
-    unsigned long long min_meta     = (unsigned long long)HDFS_STATS_STARTING_MIN;
-    unsigned long long min_raw      = (unsigned long long)HDFS_STATS_STARTING_MIN;
-    unsigned long long max_meta     = 0;
-    unsigned long long max_raw      = 0;
-    unsigned long long bytes_raw    = 0;
-    unsigned long long bytes_meta   = 0;
-    double             re_dub       = 0.0; /* reusable double variable */
-    unsigned           suffix_i     = 0;
-    const char         suffixes[]   = {' ', 'K', 'M', 'G', 'T', 'P'};
+    herr_t ret_value = SUCCEED;
+    parsed_url_t* purl = NULL;
+    unsigned i = 0;
+    unsigned long count_meta = 0;
+    unsigned long count_raw = 0;
+    double average_meta = 0.0;
+    double average_raw = 0.0;
+    unsigned long long min_meta = (unsigned long long)HDFS_STATS_STARTING_MIN;
+    unsigned long long min_raw = (unsigned long long)HDFS_STATS_STARTING_MIN;
+    unsigned long long max_meta = 0;
+    unsigned long long max_raw = 0;
+    unsigned long long bytes_raw = 0;
+    unsigned long long bytes_meta = 0;
+    double re_dub = 0.0; /* reusable double variable */
+    unsigned suffix_i = 0;
+    const char suffixes[] = { ' ', 'K', 'M', 'G', 'T', 'P' };
 
     FUNC_ENTER_PACKAGE
 
-    if (stream == NULL)
+    if (stream == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "file stream cannot be null");
-    if (file == NULL)
+    }
+    if (file == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "file cannot be null");
-    if (file->hdfs_handle == NULL)
+    }
+    if (file->hdfs_handle == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "hdfs handle cannot be null");
-    if (file->hdfs_handle->magic != HDFS_HDFST_MAGIC)
+    }
+    if (file->hdfs_handle->magic != HDFS_HDFST_MAGIC) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "hdfs handle has invalid magic");
+    }
 
     /*******************
      * AGGREGATE STATS *
      *******************/
 
     for (i = 0; i <= HDFS_STATS_BIN_COUNT; i++) {
-        const hdfs_statsbin *r = &file->raw[i];
-        const hdfs_statsbin *m = &file->meta[i];
+        const hdfs_statsbin* r = &file->raw[i];
+        const hdfs_statsbin* m = &file->meta[i];
 
-        if (m->min < min_meta)
+        if (m->min < min_meta) {
             min_meta = m->min;
-        if (r->min < min_raw)
+        }
+        if (r->min < min_raw) {
             min_raw = r->min;
-        if (m->max > max_meta)
+        }
+        if (m->max > max_meta) {
             max_meta = m->max;
-        if (r->max > max_raw)
+        }
+        if (r->max > max_raw) {
             max_raw = r->max;
+        }
 
         count_raw += r->count;
         count_meta += m->count;
         bytes_raw += r->bytes;
         bytes_meta += m->bytes;
     }
-    if (count_raw > 0)
+    if (count_raw > 0) {
         average_raw = (double)bytes_raw / (double)count_raw;
-    if (count_meta > 0)
+    }
+    if (count_meta > 0) {
         average_meta = (double)bytes_meta / (double)count_meta;
+    }
 
     /******************
      * PRINT OVERVIEW *
      ******************/
 
-    fprintf(stream, "TOTAL READS: %llu  (%llu meta, %llu raw)\n", count_raw + count_meta, count_meta,
-            count_raw);
-    fprintf(stream, "TOTAL BYTES: %llu  (%llu meta, %llu raw)\n", bytes_raw + bytes_meta, bytes_meta,
-            bytes_raw);
+    fprintf(stream, "TOTAL READS: %llu  (%llu meta, %llu raw)\n", count_raw + count_meta, count_meta, count_raw);
+    fprintf(stream, "TOTAL BYTES: %llu  (%llu meta, %llu raw)\n", bytes_raw + bytes_meta, bytes_meta, bytes_raw);
 
-    if (count_raw + count_meta == 0)
+    if (count_raw + count_meta == 0) {
         goto done;
+    }
 
     /*************************
      * PRINT AGGREGATE STATS *
@@ -999,49 +1048,57 @@ hdfs__fprint_stats(FILE *stream, const H5FD_hdfs_t *file)
 
     fprintf(stream, "SIZES     meta      raw\n");
     fprintf(stream, "  min ");
-    if (count_meta == 0)
+    if (count_meta == 0) {
         fprintf(stream, "   0.000  ");
+    }
     else {
         re_dub = (double)min_meta;
-        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
             re_dub /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         fprintf(stream, "%8.3lf%c ", re_dub, suffixes[suffix_i]);
     }
 
-    if (count_raw == 0)
+    if (count_raw == 0) {
         fprintf(stream, "   0.000 \n");
+    }
     else {
         re_dub = (double)min_raw;
-        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
             re_dub /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         fprintf(stream, "%8.3lf%c\n", re_dub, suffixes[suffix_i]);
     }
 
     fprintf(stream, "  avg ");
     re_dub = (double)average_meta;
-    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
         re_dub /= 1024.0;
+    }
     assert(suffix_i < sizeof(suffixes));
     fprintf(stream, "%8.3lf%c ", re_dub, suffixes[suffix_i]);
 
     re_dub = (double)average_raw;
-    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
         re_dub /= 1024.0;
+    }
     assert(suffix_i < sizeof(suffixes));
     fprintf(stream, "%8.3lf%c\n", re_dub, suffixes[suffix_i]);
 
     fprintf(stream, "  max ");
     re_dub = (double)max_meta;
-    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
         re_dub /= 1024.0;
+    }
     assert(suffix_i < sizeof(suffixes));
     fprintf(stream, "%8.3lf%c ", re_dub, suffixes[suffix_i]);
 
     re_dub = (double)max_raw;
-    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+    for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
         re_dub /= 1024.0;
+    }
     assert(suffix_i < sizeof(suffixes));
     fprintf(stream, "%8.3lf%c\n", re_dub, suffixes[suffix_i]);
 
@@ -1053,22 +1110,23 @@ hdfs__fprint_stats(FILE *stream, const H5FD_hdfs_t *file)
     fprintf(stream, "    up-to      meta     raw     meta      raw       meta      raw\n");
 
     for (i = 0; i <= HDFS_STATS_BIN_COUNT; i++) {
-        const hdfs_statsbin *m;
-        const hdfs_statsbin *r;
-        unsigned long long   range_end = 0;
-        char                 bm_suffix = ' '; /* bytes-meta */
-        double               bm_val    = 0.0;
-        char                 br_suffix = ' '; /* bytes-raw */
-        double               br_val    = 0.0;
-        char                 am_suffix = ' '; /* average-meta */
-        double               am_val    = 0.0;
-        char                 ar_suffix = ' '; /* average-raw */
-        double               ar_val    = 0.0;
+        const hdfs_statsbin* m;
+        const hdfs_statsbin* r;
+        unsigned long long range_end = 0;
+        char bm_suffix = ' '; /* bytes-meta */
+        double bm_val = 0.0;
+        char br_suffix = ' '; /* bytes-raw */
+        double br_val = 0.0;
+        char am_suffix = ' '; /* average-meta */
+        double am_val = 0.0;
+        char ar_suffix = ' '; /* average-raw */
+        double ar_val = 0.0;
 
         m = &file->meta[i];
         r = &file->raw[i];
-        if (r->count == 0 && m->count == 0)
+        if (r->count == 0 && m->count == 0) {
             continue;
+        }
 
         range_end = hdfs_stats_boundaries[i];
 
@@ -1076,55 +1134,69 @@ hdfs__fprint_stats(FILE *stream, const H5FD_hdfs_t *file)
             range_end = hdfs_stats_boundaries[i - 1];
             fprintf(stream, ">");
         }
-        else
+        else {
             fprintf(stream, " ");
+        }
 
         bm_val = (double)m->bytes;
-        for (suffix_i = 0; bm_val >= 1024.0; suffix_i++)
+        for (suffix_i = 0; bm_val >= 1024.0; suffix_i++) {
             bm_val /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         bm_suffix = suffixes[suffix_i];
 
         br_val = (double)r->bytes;
-        for (suffix_i = 0; br_val >= 1024.0; suffix_i++)
+        for (suffix_i = 0; br_val >= 1024.0; suffix_i++) {
             br_val /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         br_suffix = suffixes[suffix_i];
 
-        if (m->count > 0)
+        if (m->count > 0) {
             am_val = (double)(m->bytes) / (double)(m->count);
-        for (suffix_i = 0; am_val >= 1024.0; suffix_i++)
+        }
+        for (suffix_i = 0; am_val >= 1024.0; suffix_i++) {
             am_val /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         am_suffix = suffixes[suffix_i];
 
-        if (r->count > 0)
+        if (r->count > 0) {
             ar_val = (double)(r->bytes) / (double)(r->count);
-        for (suffix_i = 0; ar_val >= 1024.0; suffix_i++)
+        }
+        for (suffix_i = 0; ar_val >= 1024.0; suffix_i++) {
             ar_val /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
         ar_suffix = suffixes[suffix_i];
 
         re_dub = (double)range_end;
-        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++)
+        for (suffix_i = 0; re_dub >= 1024.0; suffix_i++) {
             re_dub /= 1024.0;
+        }
         assert(suffix_i < sizeof(suffixes));
 
-        fprintf(stream, " %8.3f%c %7d %7d %8.3f%c %8.3f%c %8.3f%c %8.3f%c\n", re_dub,
+        fprintf(stream,
+                " %8.3f%c %7d %7d %8.3f%c %8.3f%c %8.3f%c %8.3f%c\n",
+                re_dub,
                 suffixes[suffix_i], /* bin ceiling      */
                 m->count,           /* metadata reads   */
                 r->count,           /* raw data reads    */
-                bm_val, bm_suffix,  /* metadata bytes   */
-                br_val, br_suffix,  /* raw data bytes    */
-                am_val, am_suffix,  /* metadata average */
-                ar_val, ar_suffix); /* raw data average  */
+                bm_val,
+                bm_suffix,          /* metadata bytes   */
+                br_val,
+                br_suffix,          /* raw data bytes    */
+                am_val,
+                am_suffix,          /* metadata average */
+                ar_val,
+                ar_suffix);         /* raw data average  */
         fflush(stream);
     }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* hdfs__fprint_stats */
-#endif /* HDFS_STATS */
+    #endif /* HDFS_STATS */
 
 /*-------------------------------------------------------------------------
  *
@@ -1140,17 +1212,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_close(H5FD_t *_file)
+static herr_t H5FD__hdfs_close(H5FD_t* _file)
 {
-    H5FD_hdfs_t *file      = (H5FD_hdfs_t *)_file;
-    herr_t       ret_value = SUCCEED;
+    H5FD_hdfs_t* file = (H5FD_hdfs_t*)_file;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     /* Sanity checks */
     assert(file != NULL);
@@ -1158,15 +1229,18 @@ H5FD__hdfs_close(H5FD_t *_file)
     assert(file->hdfs_handle->magic == HDFS_HDFST_MAGIC);
 
     /* Close the underlying request handle */
-    if (file->hdfs_handle != NULL)
-        if (FAIL == H5FD__hdfs_handle_close(file->hdfs_handle))
+    if (file->hdfs_handle != NULL) {
+        if (FAIL == H5FD__hdfs_handle_close(file->hdfs_handle)) {
             HGOTO_ERROR(H5E_VFL, H5E_CANTCLOSEFILE, FAIL, "unable to close HDFS file handle");
+        }
+    }
 
-#if HDFS_STATS
+    #if HDFS_STATS
     /* TODO: mechanism to re-target stats printout */
-    if (FAIL == hdfs__fprint_stats(stdout, file))
+    if (FAIL == hdfs__fprint_stats(stdout, file)) {
         HGOTO_ERROR(H5E_INTERNAL, H5E_ERROR, FAIL, "problem while writing file statistics");
-#endif /* HDFS_STATS */
+    }
+    #endif /* HDFS_STATS */
 
     /* Release the file info */
     file = H5FL_FREE(H5FD_hdfs_t, file);
@@ -1190,20 +1264,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5FD__hdfs_cmp(const H5FD_t *_f1, const H5FD_t *_f2)
+static int H5FD__hdfs_cmp(const H5FD_t* _f1, const H5FD_t* _f2)
 {
-    int                ret_value = 0;
-    const H5FD_hdfs_t *f1        = (const H5FD_hdfs_t *)_f1;
-    const H5FD_hdfs_t *f2        = (const H5FD_hdfs_t *)_f2;
-    hdfsFileInfo      *finfo1    = NULL;
-    hdfsFileInfo      *finfo2    = NULL;
+    int ret_value = 0;
+    const H5FD_hdfs_t* f1 = (const H5FD_hdfs_t*)_f1;
+    const H5FD_hdfs_t* f2 = (const H5FD_hdfs_t*)_f2;
+    hdfsFileInfo* finfo1 = NULL;
+    hdfsFileInfo* finfo2 = NULL;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif /* HDFS_DEBUG */
+    #endif /* HDFS_DEBUG */
 
     assert(f1->hdfs_handle != NULL);
     assert(f2->hdfs_handle != NULL);
@@ -1266,14 +1339,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_query(const H5FD_t H5_ATTR_UNUSED *_file, unsigned long *flags)
+static herr_t H5FD__hdfs_query(const H5FD_t H5_ATTR_UNUSED* _file, unsigned long* flags)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     if (flags) {
         *flags = 0;
@@ -1299,16 +1371,15 @@ H5FD__hdfs_query(const H5FD_t H5_ATTR_UNUSED *_file, unsigned long *flags)
  *
  *-------------------------------------------------------------------------
  */
-static haddr_t
-H5FD__hdfs_get_eoa(const H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type)
+static haddr_t H5FD__hdfs_get_eoa(const H5FD_t* _file, H5FD_mem_t H5_ATTR_UNUSED type)
 {
-    const H5FD_hdfs_t *file = (const H5FD_hdfs_t *)_file;
+    const H5FD_hdfs_t* file = (const H5FD_hdfs_t*)_file;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(file->eoa)
 } /* end H5FD__hdfs_get_eoa() */
@@ -1327,16 +1398,15 @@ H5FD__hdfs_get_eoa(const H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_set_eoa(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, haddr_t addr)
+static herr_t H5FD__hdfs_set_eoa(H5FD_t* _file, H5FD_mem_t H5_ATTR_UNUSED type, haddr_t addr)
 {
-    H5FD_hdfs_t *file = (H5FD_hdfs_t *)_file;
+    H5FD_hdfs_t* file = (H5FD_hdfs_t*)_file;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     file->eoa = addr;
 
@@ -1358,16 +1428,15 @@ H5FD__hdfs_set_eoa(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, haddr_t addr)
  *
  *-------------------------------------------------------------------------
  */
-static haddr_t
-H5FD__hdfs_get_eof(const H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type)
+static haddr_t H5FD__hdfs_get_eof(const H5FD_t* _file, H5FD_mem_t H5_ATTR_UNUSED type)
 {
-    const H5FD_hdfs_t *file = (const H5FD_hdfs_t *)_file;
+    const H5FD_hdfs_t* file = (const H5FD_hdfs_t*)_file;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     assert(file->hdfs_handle != NULL);
     assert(file->hdfs_handle->magic == HDFS_HDFST_MAGIC);
@@ -1389,20 +1458,20 @@ H5FD__hdfs_get_eof(const H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_get_handle(H5FD_t *_file, hid_t H5_ATTR_UNUSED fapl, void **file_handle)
+static herr_t H5FD__hdfs_get_handle(H5FD_t* _file, hid_t H5_ATTR_UNUSED fapl, void** file_handle)
 {
-    H5FD_hdfs_t *file      = (H5FD_hdfs_t *)_file;
-    herr_t       ret_value = SUCCEED;
+    H5FD_hdfs_t* file = (H5FD_hdfs_t*)_file;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif /* HDFS_DEBUG */
+    #endif /* HDFS_DEBUG */
 
-    if (!file_handle)
+    if (!file_handle) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "file handle not valid");
+    }
 
     *file_handle = file->hdfs_handle;
 
@@ -1429,24 +1498,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_read(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UNUSED dxpl_id, haddr_t addr,
-                size_t size, void *buf)
+static herr_t H5FD__hdfs_read(H5FD_t* _file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UNUSED dxpl_id, haddr_t addr, size_t size, void* buf)
 {
-    H5FD_hdfs_t *file      = (H5FD_hdfs_t *)_file;
-    size_t       filesize  = 0;
-    herr_t       ret_value = SUCCEED;
-#if HDFS_STATS
+    H5FD_hdfs_t* file = (H5FD_hdfs_t*)_file;
+    size_t filesize = 0;
+    herr_t ret_value = SUCCEED;
+    #if HDFS_STATS
     /* working variables for storing stats */
-    hdfs_statsbin *bin   = NULL;
-    unsigned       bin_i = 0;
-#endif /* HDFS_STATS */
+    hdfs_statsbin* bin = NULL;
+    unsigned bin_i = 0;
+    #endif /* HDFS_STATS */
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif /* HDFS_DEBUG */
+    #endif /* HDFS_DEBUG */
 
     assert(file != NULL);
     assert(file->hdfs_handle != NULL);
@@ -1455,19 +1522,22 @@ H5FD__hdfs_read(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UNU
 
     filesize = (size_t)file->hdfs_handle->fileinfo->mSize;
 
-    if ((addr > filesize) || ((addr + size) > filesize))
+    if ((addr > filesize) || ((addr + size) > filesize)) {
         HGOTO_ERROR(H5E_ARGS, H5E_OVERFLOW, FAIL, "range exceeds file address");
+    }
 
-    if (FAIL ==
-        hdfsPread(file->hdfs_handle->filesystem, file->hdfs_handle->file, (tOffset)addr, buf, (tSize)size))
+    if (FAIL == hdfsPread(file->hdfs_handle->filesystem, file->hdfs_handle->file, (tOffset)addr, buf, (tSize)size)) {
         HGOTO_ERROR(H5E_VFL, H5E_READERROR, FAIL, "unable to execute read");
+    }
 
-#if HDFS_STATS
+    #if HDFS_STATS
 
     /* Find which "bin" this read fits in. Can be "overflow" bin. */
-    for (bin_i = 0; bin_i < HDFS_STATS_BIN_COUNT; bin_i++)
-        if ((unsigned long long)size < hdfs_stats_boundaries[bin_i])
+    for (bin_i = 0; bin_i < HDFS_STATS_BIN_COUNT; bin_i++) {
+        if ((unsigned long long)size < hdfs_stats_boundaries[bin_i]) {
             break;
+        }
+    }
     bin = (type == H5FD_MEM_DRAW) ? &file->raw[bin_i] : &file->meta[bin_i];
 
     /* Store collected stats in appropriate bin */
@@ -1476,15 +1546,17 @@ H5FD__hdfs_read(H5FD_t *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UNU
         bin->max = size;
     }
     else {
-        if (size < bin->min)
+        if (size < bin->min) {
             bin->min = size;
-        if (size > bin->max)
+        }
+        if (size > bin->max) {
             bin->max = size;
+        }
     }
     bin->count++;
     bin->bytes += (unsigned long long)size;
 
-#endif /* HDFS_STATS */
+    #endif /* HDFS_STATS */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1505,17 +1577,20 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_write(H5FD_t H5_ATTR_UNUSED *_file, H5FD_mem_t H5_ATTR_UNUSED type, hid_t H5_ATTR_UNUSED dxpl_id,
-                 haddr_t H5_ATTR_UNUSED addr, size_t H5_ATTR_UNUSED size, const void H5_ATTR_UNUSED *buf)
+static herr_t H5FD__hdfs_write(H5FD_t H5_ATTR_UNUSED* _file,
+                               H5FD_mem_t H5_ATTR_UNUSED type,
+                               hid_t H5_ATTR_UNUSED dxpl_id,
+                               haddr_t H5_ATTR_UNUSED addr,
+                               size_t H5_ATTR_UNUSED size,
+                               const void H5_ATTR_UNUSED* buf)
 {
     herr_t ret_value = FAIL;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     HGOTO_ERROR(H5E_VFL, H5E_UNSUPPORTED, FAIL, "cannot write to read-only file");
 
@@ -1540,16 +1615,15 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5FD__hdfs_truncate(H5FD_t H5_ATTR_UNUSED *_file, hid_t H5_ATTR_UNUSED dxpl_id, bool H5_ATTR_UNUSED closing)
+static herr_t H5FD__hdfs_truncate(H5FD_t H5_ATTR_UNUSED* _file, hid_t H5_ATTR_UNUSED dxpl_id, bool H5_ATTR_UNUSED closing)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#if HDFS_DEBUG
+    #if HDFS_DEBUG
     fprintf(stdout, "called %s.\n", __func__);
-#endif
+    #endif
 
     HGOTO_ERROR(H5E_VFL, H5E_UNSUPPORTED, FAIL, "cannot truncate read-only file");
 

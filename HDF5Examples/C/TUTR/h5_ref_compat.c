@@ -28,28 +28,28 @@
 #define BUF_SIZE 4 /* Size of example buffer */
 #define NREFS    1 /* Number of references */
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file1, dset1, space1;
-    hsize_t dset1_dims[NDIMS] = {BUF_SIZE};
-    int     dset_buf[BUF_SIZE];
+    hid_t file1, dset1, space1;
+    hsize_t dset1_dims[NDIMS] = { BUF_SIZE };
+    int dset_buf[BUF_SIZE];
 
-    hid_t      dset2, space2;
-    hsize_t    dset2_dims[NDIMS]  = {NREFS};
-    hobj_ref_t ref_buf[NREFS]     = {0};
-    H5R_ref_t  new_ref_buf[NREFS] = {0};
+    hid_t dset2, space2;
+    hsize_t dset2_dims[NDIMS] = { NREFS };
+    hobj_ref_t ref_buf[NREFS] = { 0 };
+    H5R_ref_t new_ref_buf[NREFS] = { 0 };
     H5O_type_t obj_type;
-    int        i;
+    int i;
 
-    for (i = 0; i < BUF_SIZE; i++)
+    for (i = 0; i < BUF_SIZE; i++) {
         dset_buf[i] = i;
+    }
 
     /* Create file with one dataset and close it */
     file1 = H5Fcreate(H5FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     space1 = H5Screate_simple(NDIMS, dset1_dims, NULL);
-    dset1  = H5Dcreate2(file1, "dataset1", H5T_NATIVE_INT, space1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset1 = H5Dcreate2(file1, "dataset1", H5T_NATIVE_INT, space1, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     H5Dwrite(dset1, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_buf);
     H5Dclose(dset1);
     H5Sclose(space1);
@@ -62,7 +62,7 @@ main(void)
 
     /* Store reference in separate dataset using deprecated reference type */
     space2 = H5Screate_simple(NDIMS, dset2_dims, NULL);
-    dset2  = H5Dcreate2(file1, "references", H5T_STD_REF_OBJ, space2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset2 = H5Dcreate2(file1, "references", H5T_STD_REF_OBJ, space2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     H5Dwrite(dset2, H5T_STD_REF_OBJ, H5S_ALL, H5S_ALL, H5P_DEFAULT, ref_buf);
     H5Dclose(dset2);
     H5Sclose(space2);
@@ -75,7 +75,7 @@ main(void)
     H5Dclose(dset2);
 
     /* Access reference and read dataset data through new API */
-    assert(H5Rget_type((const H5R_ref_t *)&new_ref_buf[0]) == H5R_OBJECT2);
+    assert(H5Rget_type((const H5R_ref_t*)&new_ref_buf[0]) == H5R_OBJECT2);
     H5Rget_obj_type3(&new_ref_buf[0], H5P_DEFAULT, &obj_type);
     assert(obj_type == H5O_TYPE_DATASET);
     dset1 = H5Ropen_object(&new_ref_buf[0], H5P_DEFAULT, H5P_DEFAULT);
@@ -83,7 +83,8 @@ main(void)
     H5Dclose(dset1);
     H5Rdestroy(&new_ref_buf[0]);
 
-    for (i = 0; i < BUF_SIZE; i++)
+    for (i = 0; i < BUF_SIZE; i++) {
         assert(dset_buf[i] == i);
+    }
     return 0;
 }

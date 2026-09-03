@@ -21,28 +21,29 @@
 #define DIM1     7
 #define FILLVAL  99
 
-int
-main(void)
+int main(void)
 {
-    hid_t file  = H5I_INVALID_HID;
+    hid_t file = H5I_INVALID_HID;
     hid_t space = H5I_INVALID_HID;
     hid_t dset1 = H5I_INVALID_HID;
     hid_t dset2 = H5I_INVALID_HID;
-    hid_t dcpl  = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
     /* Handles */
-    herr_t             status;
+    herr_t status;
     H5D_space_status_t space_status;
-    hsize_t            dims[2] = {DIM0, DIM1};
-    hsize_t            storage_size;
-    int                wdata[DIM0][DIM1]; /* Write buffer */
-    hsize_t            i, j;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    hsize_t storage_size;
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -81,19 +82,17 @@ main(void)
     /*
      * Retrieve and print space status and storage size for dset1.
      */
-    status       = H5Dget_space_status(dset1, &space_status);
+    status = H5Dget_space_status(dset1, &space_status);
     storage_size = H5Dget_storage_size(dset1);
-    printf("Space for %s has%sbeen allocated.\n", DATASET1,
-           space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
+    printf("Space for %s has%sbeen allocated.\n", DATASET1, space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
     printf("Storage size for %s is: %ld bytes.\n", DATASET1, (long)storage_size);
 
     /*
      * Retrieve and print space status and storage size for dset2.
      */
-    status       = H5Dget_space_status(dset2, &space_status);
+    status = H5Dget_space_status(dset2, &space_status);
     storage_size = H5Dget_storage_size(dset2);
-    printf("Space for %s has%sbeen allocated.\n", DATASET2,
-           space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
+    printf("Space for %s has%sbeen allocated.\n", DATASET2, space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
     printf("Storage size for %s is: %ld bytes.\n", DATASET2, (long)storage_size);
 
     printf("\nWriting data...\n\n");
@@ -107,19 +106,17 @@ main(void)
     /*
      * Retrieve and print space status and storage size for dset1.
      */
-    status       = H5Dget_space_status(dset1, &space_status);
+    status = H5Dget_space_status(dset1, &space_status);
     storage_size = H5Dget_storage_size(dset1);
-    printf("Space for %s has%sbeen allocated.\n", DATASET1,
-           space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
+    printf("Space for %s has%sbeen allocated.\n", DATASET1, space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
     printf("Storage size for %s is: %ld bytes.\n", DATASET1, (long)storage_size);
 
     /*
      * Retrieve and print space status and storage size for dset2.
      */
-    status       = H5Dget_space_status(dset2, &space_status);
+    status = H5Dget_space_status(dset2, &space_status);
     storage_size = H5Dget_storage_size(dset2);
-    printf("Space for %s has%sbeen allocated.\n", DATASET2,
-           space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
+    printf("Space for %s has%sbeen allocated.\n", DATASET2, space_status == H5D_SPACE_STATUS_ALLOCATED ? " " : " not ");
     printf("Storage size for %s is: %ld bytes.\n", DATASET2, (long)storage_size);
 
     /*

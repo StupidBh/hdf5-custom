@@ -22,12 +22,12 @@
 #include "H5_api_misc_test_parallel.h"
 #include "H5_api_object_test_parallel.h"
 #ifdef H5_API_TEST_HAVE_ASYNC
-#include "H5_api_async_test_parallel.h"
+    #include "H5_api_async_test_parallel.h"
 #endif
 
 char H5_api_test_parallel_filename[H5_API_TEST_FILENAME_MAX_LENGTH];
 
-const char *test_path_prefix;
+const char* test_path_prefix;
 
 int mpi_size;
 int mpi_rank;
@@ -39,82 +39,91 @@ int mpi_rank;
  * - enabled by default
  */
 #ifdef H5_API_TEST_HAVE_ASYNC
-#define H5_API_PARALLEL_TESTS                                                                                \
-    X(H5_API_TEST_NULL, "", NULL, 0)                                                                         \
-    X(H5_API_TEST_FILE, "file", H5_api_file_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_GROUP, "group", H5_api_group_test_parallel_add, 1)                                         \
-    X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_parallel_add, 1)                                   \
-    X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_parallel_add, 1)                                \
-    X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_parallel_add, 1)                             \
-    X(H5_API_TEST_LINK, "link", H5_api_link_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_OBJECT, "object", H5_api_object_test_parallel_add, 1)                                      \
-    X(H5_API_TEST_MISC, "misc", H5_api_misc_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_ASYNC, "async", H5_api_async_test_parallel_add, 1)                                         \
-    X(H5_API_TEST_MAX, "", NULL, 0)
+    #define H5_API_PARALLEL_TESTS                                                    \
+        X(H5_API_TEST_NULL, "", NULL, 0)                                             \
+        X(H5_API_TEST_FILE, "file", H5_api_file_test_parallel_add, 1)                \
+        X(H5_API_TEST_GROUP, "group", H5_api_group_test_parallel_add, 1)             \
+        X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_parallel_add, 1)       \
+        X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_parallel_add, 1)    \
+        X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_parallel_add, 1) \
+        X(H5_API_TEST_LINK, "link", H5_api_link_test_parallel_add, 1)                \
+        X(H5_API_TEST_OBJECT, "object", H5_api_object_test_parallel_add, 1)          \
+        X(H5_API_TEST_MISC, "misc", H5_api_misc_test_parallel_add, 1)                \
+        X(H5_API_TEST_ASYNC, "async", H5_api_async_test_parallel_add, 1)             \
+        X(H5_API_TEST_MAX, "", NULL, 0)
 #else
-#define H5_API_PARALLEL_TESTS                                                                                \
-    X(H5_API_TEST_NULL, "", NULL, 0)                                                                         \
-    X(H5_API_TEST_FILE, "file", H5_api_file_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_GROUP, "group", H5_api_group_test_parallel_add, 1)                                         \
-    X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_parallel_add, 1)                                   \
-    X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_parallel_add, 1)                                \
-    X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_parallel_add, 1)                             \
-    X(H5_API_TEST_LINK, "link", H5_api_link_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_OBJECT, "object", H5_api_object_test_parallel_add, 1)                                      \
-    X(H5_API_TEST_MISC, "misc", H5_api_misc_test_parallel_add, 1)                                            \
-    X(H5_API_TEST_MAX, "", NULL, 0)
+    #define H5_API_PARALLEL_TESTS                                                    \
+        X(H5_API_TEST_NULL, "", NULL, 0)                                             \
+        X(H5_API_TEST_FILE, "file", H5_api_file_test_parallel_add, 1)                \
+        X(H5_API_TEST_GROUP, "group", H5_api_group_test_parallel_add, 1)             \
+        X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_parallel_add, 1)       \
+        X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_parallel_add, 1)    \
+        X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_parallel_add, 1) \
+        X(H5_API_TEST_LINK, "link", H5_api_link_test_parallel_add, 1)                \
+        X(H5_API_TEST_OBJECT, "object", H5_api_object_test_parallel_add, 1)          \
+        X(H5_API_TEST_MISC, "misc", H5_api_misc_test_parallel_add, 1)                \
+        X(H5_API_TEST_MAX, "", NULL, 0)
 #endif
 
 #define X(a, b, c, d) a,
-enum H5_api_test_type { H5_API_PARALLEL_TESTS };
+
+enum H5_api_test_type
+{
+    H5_API_PARALLEL_TESTS
+};
+
 #undef X
 #define X(a, b, c, d) b,
-static const char *const H5_api_test_name[] = {H5_API_PARALLEL_TESTS};
+static const char* const H5_api_test_name[] = { H5_API_PARALLEL_TESTS };
 #undef X
 #define X(a, b, c, d) c,
-static void (*H5_api_test_add_func[])(void) = {H5_API_PARALLEL_TESTS};
+static void (*H5_api_test_add_func[])(void) = { H5_API_PARALLEL_TESTS };
 #undef X
 #define X(a, b, c, d) d,
-static int H5_api_test_enabled[] = {H5_API_PARALLEL_TESTS};
+static int H5_api_test_enabled[] = { H5_API_PARALLEL_TESTS };
 #undef X
 
-static enum H5_api_test_type
-H5_api_test_name_to_type(const char *test_name)
+static enum H5_api_test_type H5_api_test_name_to_type(const char* test_name)
 {
     enum H5_api_test_type i = 0;
 
-    while (strcmp(H5_api_test_name[i], test_name) && i != H5_API_TEST_MAX)
+    while (strcmp(H5_api_test_name[i], test_name) && i != H5_API_TEST_MAX) {
         i++;
+    }
 
     return ((i == H5_API_TEST_MAX) ? H5_API_TEST_NULL : i);
 }
 
-static void
-H5_api_test_add(void)
+static void H5_api_test_add(void)
 {
     enum H5_api_test_type i;
 
-    for (i = H5_API_TEST_FILE; i < H5_API_TEST_MAX; i++)
-        if (H5_api_test_enabled[i])
+    for (i = H5_API_TEST_FILE; i < H5_API_TEST_MAX; i++) {
+        if (H5_api_test_enabled[i]) {
             H5_api_test_add_func[i]();
+        }
+    }
 }
 
-hid_t
-create_mpi_fapl(MPI_Comm comm, MPI_Info info, bool coll_md_read)
+hid_t create_mpi_fapl(MPI_Comm comm, MPI_Info info, bool coll_md_read)
 {
     hid_t ret_pl = H5I_INVALID_HID;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
-    if ((ret_pl = H5Pcreate(H5P_FILE_ACCESS)) < 0)
+    if ((ret_pl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
         goto error;
+    }
 
-    if (H5Pset_fapl_mpio(ret_pl, comm, info) < 0)
+    if (H5Pset_fapl_mpio(ret_pl, comm, info) < 0) {
         goto error;
-    if (H5Pset_all_coll_metadata_ops(ret_pl, coll_md_read) < 0)
+    }
+    if (H5Pset_all_coll_metadata_ops(ret_pl, coll_md_read) < 0) {
         goto error;
-    if (H5Pset_coll_metadata_write(ret_pl, true) < 0)
+    }
+    if (H5Pset_coll_metadata_write(ret_pl, true) < 0) {
         goto error;
+    }
 
     return ret_pl;
 
@@ -127,45 +136,49 @@ error:
  * is always `mpi_size` to allow for convenient subsetting; the rest
  * of the dimensions are randomized.
  */
-int
-generate_random_parallel_dimensions(int space_rank, hsize_t **dims_out)
+int generate_random_parallel_dimensions(int space_rank, hsize_t** dims_out)
 {
-    hsize_t *dims = NULL;
-    size_t   i;
+    hsize_t* dims = NULL;
+    size_t i;
 
-    if (space_rank <= 0)
+    if (space_rank <= 0) {
         goto error;
+    }
 
-    if (NULL == (dims = malloc((size_t)space_rank * sizeof(hsize_t))))
+    if (NULL == (dims = malloc((size_t)space_rank * sizeof(hsize_t)))) {
         goto error;
+    }
     if (MAINPROCESS) {
         for (i = 0; i < (size_t)space_rank; i++) {
-            if (i == 0)
+            if (i == 0) {
                 dims[i] = (hsize_t)mpi_size;
-            else
+            }
+            else {
                 dims[i] = (hsize_t)((rand() % MAX_DIM_SIZE) + 1);
+            }
         }
     }
 
     /*
      * Ensure that the dataset dimensions are uniform across ranks.
      */
-    if (MPI_SUCCESS != MPI_Bcast(dims, space_rank, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD))
+    if (MPI_SUCCESS != MPI_Bcast(dims, space_rank, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD)) {
         goto error;
+    }
 
     *dims_out = dims;
 
     return 0;
 
 error:
-    if (dims)
+    if (dims) {
         free(dims);
+    }
 
     return -1;
 }
 
-static int
-parse_command_line(int argc, char **argv)
+static int parse_command_line(int argc, char** argv)
 {
     /* Simple argument checking, TODO can improve that later */
     if (argc > 1) {
@@ -180,8 +193,7 @@ parse_command_line(int argc, char **argv)
     return 0;
 }
 
-static void
-usage(FILE *stream)
+static void usage(FILE* stream)
 {
     fprintf(stream, "file        run only the file interface tests\n");
     fprintf(stream, "group       run only the group interface tests\n");
@@ -194,21 +206,20 @@ usage(FILE *stream)
     fprintf(stream, "async       run only the async interface tests\n");
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     H5E_auto2_t default_err_func;
-    const char *vol_connector_string;
-    const char *vol_connector_name;
-    unsigned    seed;
-    hid_t       fapl_id                   = H5I_INVALID_HID;
-    hid_t       default_con_id            = H5I_INVALID_HID;
-    hid_t       registered_con_id         = H5I_INVALID_HID;
-    char       *vol_connector_string_copy = NULL;
-    char       *vol_connector_info        = NULL;
-    void       *default_err_data          = NULL;
-    int         required                  = MPI_THREAD_MULTIPLE;
-    int         provided;
+    const char* vol_connector_string;
+    const char* vol_connector_name;
+    unsigned seed;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t default_con_id = H5I_INVALID_HID;
+    hid_t registered_con_id = H5I_INVALID_HID;
+    char* vol_connector_string_copy = NULL;
+    char* vol_connector_info = NULL;
+    void* default_err_data = NULL;
+    int required = MPI_THREAD_MULTIPLE;
+    int provided;
 
     /*
      * Attempt to initialize with MPI_THREAD_MULTIPLE for VOL connectors
@@ -223,8 +234,9 @@ main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
 
     if (provided < required) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             printf("** INFO: couldn't initialize with MPI_THREAD_MULTIPLE threading support **\n");
+        }
     }
 
     /*
@@ -239,8 +251,9 @@ main(int argc, char **argv)
 
     /* Initialize testing framework */
     if (TestInit(argv[0], usage, NULL, NULL, NULL, mpi_rank) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "Couldn't initialize testing framework\n");
+        }
         goto error;
     }
 
@@ -266,14 +279,15 @@ main(int argc, char **argv)
 
     /* Parse command line arguments */
     if (TestParseCmdLine(argc, argv) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "Couldn't parse command-line arguments\n");
+        }
         goto error;
     }
 
-    n_tests_run_g     = 0;
-    n_tests_passed_g  = 0;
-    n_tests_failed_g  = 0;
+    n_tests_run_g = 0;
+    n_tests_passed_g = 0;
+    n_tests_failed_g = 0;
     n_tests_skipped_g = 0;
 
     if (MAINPROCESS) {
@@ -282,36 +296,39 @@ main(int argc, char **argv)
 
     if (mpi_size > 1) {
         if (MPI_SUCCESS != MPI_Bcast(&seed, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD)) {
-            if (MAINPROCESS)
+            if (MAINPROCESS) {
                 fprintf(stderr, "Couldn't broadcast test seed\n");
+            }
             goto error;
         }
     }
 
     srand(seed);
 
-    if (NULL == (test_path_prefix = getenv(HDF5_API_TEST_PATH_PREFIX)))
+    if (NULL == (test_path_prefix = getenv(HDF5_API_TEST_PATH_PREFIX))) {
         test_path_prefix = "";
+    }
 
-    snprintf(H5_api_test_parallel_filename, H5_API_TEST_FILENAME_MAX_LENGTH, "%s%s", test_path_prefix,
-             PARALLEL_TEST_FILE_NAME);
+    snprintf(H5_api_test_parallel_filename, H5_API_TEST_FILENAME_MAX_LENGTH, "%s%s", test_path_prefix, PARALLEL_TEST_FILE_NAME);
 
     vol_connector_string = getenv(HDF5_VOL_CONNECTOR);
 
     if (!vol_connector_string || *vol_connector_string == '\0') {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             printf("No VOL connector selected; using native VOL connector\n");
+        }
         vol_connector_name = "native";
         vol_connector_info = NULL;
     }
     else {
-        char *token = NULL;
+        char* token = NULL;
 
         BEGIN_INDEPENDENT_OP(copy_connector_string)
         {
             if (NULL == (vol_connector_string_copy = strdup(vol_connector_string))) {
-                if (MAINPROCESS)
+                if (MAINPROCESS) {
                     fprintf(stderr, "Unable to copy VOL connector string\n");
+                }
                 INDEPENDENT_OP_ERROR(copy_connector_string);
             }
         }
@@ -320,8 +337,9 @@ main(int argc, char **argv)
         BEGIN_INDEPENDENT_OP(get_connector_name)
         {
             if (NULL == (token = strtok(vol_connector_string_copy, " "))) {
-                if (MAINPROCESS)
+                if (MAINPROCESS) {
                     fprintf(stderr, "Error while parsing VOL connector string\n");
+                }
                 INDEPENDENT_OP_ERROR(get_connector_name);
             }
         }
@@ -335,8 +353,7 @@ main(int argc, char **argv)
     }
 
     if (MAINPROCESS) {
-        printf("Running parallel API tests with VOL connector '%s' and info string '%s'\n\n",
-               vol_connector_name, vol_connector_info ? vol_connector_info : "");
+        printf("Running parallel API tests with VOL connector '%s' and info string '%s'\n\n", vol_connector_name, vol_connector_info ? vol_connector_info : "");
         printf("Test parameters:\n");
         printf("  - Test file name: '%s'\n", H5_api_test_parallel_filename);
         printf("  - Number of MPI ranks: %d\n", mpi_size);
@@ -347,8 +364,9 @@ main(int argc, char **argv)
     BEGIN_INDEPENDENT_OP(create_fapl)
     {
         if ((fapl_id = create_mpi_fapl(MPI_COMM_WORLD, MPI_INFO_NULL, false)) < 0) {
-            if (MAINPROCESS)
+            if (MAINPROCESS) {
                 fprintf(stderr, "Unable to create FAPL\n");
+            }
             INDEPENDENT_OP_ERROR(create_fapl);
         }
     }
@@ -367,15 +385,16 @@ main(int argc, char **argv)
             htri_t is_registered;
 
             if ((is_registered = H5VLis_connector_registered_by_name(vol_connector_name)) < 0) {
-                if (MAINPROCESS)
+                if (MAINPROCESS) {
                     fprintf(stderr, "Unable to determine if VOL connector is registered\n");
+                }
                 INDEPENDENT_OP_ERROR(check_vol_register);
             }
 
             if (!is_registered) {
-                if (MAINPROCESS)
-                    fprintf(stderr, "Specified VOL connector '%s' wasn't correctly registered!\n",
-                            vol_connector_name);
+                if (MAINPROCESS) {
+                    fprintf(stderr, "Specified VOL connector '%s' wasn't correctly registered!\n", vol_connector_name);
+                }
                 INDEPENDENT_OP_ERROR(check_vol_register);
             }
             else {
@@ -387,27 +406,30 @@ main(int argc, char **argv)
                  * for the registered connector before running the tests.
                  */
                 if (H5Pget_vol_id(fapl_id, &default_con_id) < 0) {
-                    if (MAINPROCESS)
+                    if (MAINPROCESS) {
                         fprintf(stderr, "Couldn't retrieve ID of VOL connector set on default FAPL\n");
+                    }
                     INDEPENDENT_OP_ERROR(check_vol_register);
                 }
 
                 if ((registered_con_id = H5VLget_connector_id_by_name(vol_connector_name)) < 0) {
-                    if (MAINPROCESS)
+                    if (MAINPROCESS) {
                         fprintf(stderr, "Couldn't retrieve ID of registered VOL connector\n");
+                    }
                     INDEPENDENT_OP_ERROR(check_vol_register);
                 }
 
                 if (H5VLcmp_connector_cls(&cmp, default_con_id, registered_con_id) < 0) {
-                    if (MAINPROCESS)
+                    if (MAINPROCESS) {
                         fprintf(stderr, "Couldn't compare VOL connector classes\n");
+                    }
                     INDEPENDENT_OP_ERROR(check_vol_register);
                 }
 
                 if (0 != cmp) {
-                    if (MAINPROCESS)
-                        fprintf(stderr,
-                                "VOL connector set on default FAPL didn't match specified VOL connector\n");
+                    if (MAINPROCESS) {
+                        fprintf(stderr, "VOL connector set on default FAPL didn't match specified VOL connector\n");
+                    }
                     INDEPENDENT_OP_ERROR(check_vol_register);
                 }
             }
@@ -422,8 +444,9 @@ main(int argc, char **argv)
     {
         vol_cap_flags_g = H5VL_CAP_FLAG_NONE;
         if (H5Pget_vol_cap_flags(fapl_id, &vol_cap_flags_g) < 0) {
-            if (MAINPROCESS)
+            if (MAINPROCESS) {
                 fprintf(stderr, "Unable to retrieve VOL connector capability flags\n");
+            }
             INDEPENDENT_OP_ERROR(get_capability_flags);
         }
     }
@@ -437,8 +460,7 @@ main(int argc, char **argv)
     {
         if (MAINPROCESS) {
             if (create_test_container(H5_api_test_parallel_filename, vol_cap_flags_g) < 0) {
-                fprintf(stderr, "    failed to create testing container file '%s'\n",
-                        H5_api_test_parallel_filename);
+                fprintf(stderr, "    failed to create testing container file '%s'\n", H5_api_test_parallel_filename);
                 INDEPENDENT_OP_ERROR(create_test_container);
             }
         }
@@ -449,85 +471,107 @@ main(int argc, char **argv)
 
     /* Perform tests */
     if (PerformTests() < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "Couldn't run tests\n");
+        }
         goto error;
     }
 
-    if (MAINPROCESS)
+    if (MAINPROCESS) {
         printf("\n");
+    }
 
     if (MAINPROCESS) {
         /* Display test summary, if requested */
-        if (GetTestSummary())
+        if (GetTestSummary()) {
             TestSummary(stdout);
+        }
 
         printf("Deleting container file for tests\n\n");
     }
 
-    if (GetTestCleanup())
+    if (GetTestCleanup()) {
         H5Fdelete(H5_api_test_parallel_filename, fapl_id);
+    }
 
     if (n_tests_run_g > 0) {
-        if (MAINPROCESS)
-            printf("The below statistics are minimum values due to the possibility of some ranks failing a "
-                   "test while others pass:\n");
-
-        if (MPI_SUCCESS != MPI_Allreduce(MPI_IN_PLACE, &n_tests_passed_g, 1, H5_SIZE_T_AS_MPI_TYPE, MPI_MIN,
-                                         MPI_COMM_WORLD)) {
-            if (MAINPROCESS)
-                printf("    failed to collect consensus about the minimum number of tests that passed -- "
-                       "reporting rank 0's (possibly inaccurate) value\n");
+        if (MAINPROCESS) {
+            printf(
+                "The below statistics are minimum values due to the possibility of some ranks failing a "
+                "test while others pass:\n");
         }
 
-        if (MAINPROCESS)
-            printf("%s%zu/%zu (%.2f%%) API tests passed across all ranks with VOL connector '%s'\n",
-                   n_tests_passed_g > 0 ? "At least " : "", n_tests_passed_g, n_tests_run_g,
-                   ((double)n_tests_passed_g / (double)n_tests_run_g * 100.0), vol_connector_name);
+        if (MPI_SUCCESS != MPI_Allreduce(MPI_IN_PLACE, &n_tests_passed_g, 1, H5_SIZE_T_AS_MPI_TYPE, MPI_MIN, MPI_COMM_WORLD)) {
+            if (MAINPROCESS) {
+                printf(
+                    "    failed to collect consensus about the minimum number of tests that passed -- "
+                    "reporting rank 0's (possibly inaccurate) value\n");
+            }
+        }
 
-        if (MPI_SUCCESS != MPI_Allreduce(MPI_IN_PLACE, &n_tests_failed_g, 1, H5_SIZE_T_AS_MPI_TYPE, MPI_MIN,
-                                         MPI_COMM_WORLD)) {
-            if (MAINPROCESS)
-                printf("    failed to collect consensus about the minimum number of tests that failed -- "
-                       "reporting rank 0's (possibly inaccurate) value\n");
+        if (MAINPROCESS) {
+            printf("%s%zu/%zu (%.2f%%) API tests passed across all ranks with VOL connector '%s'\n",
+                   n_tests_passed_g > 0 ? "At least " : "",
+                   n_tests_passed_g,
+                   n_tests_run_g,
+                   ((double)n_tests_passed_g / (double)n_tests_run_g * 100.0),
+                   vol_connector_name);
+        }
+
+        if (MPI_SUCCESS != MPI_Allreduce(MPI_IN_PLACE, &n_tests_failed_g, 1, H5_SIZE_T_AS_MPI_TYPE, MPI_MIN, MPI_COMM_WORLD)) {
+            if (MAINPROCESS) {
+                printf(
+                    "    failed to collect consensus about the minimum number of tests that failed -- "
+                    "reporting rank 0's (possibly inaccurate) value\n");
+            }
         }
 
         if (MAINPROCESS) {
             printf("%s%zu/%zu (%.2f%%) API tests did not pass across all ranks with VOL connector '%s'\n",
-                   n_tests_failed_g > 0 ? "At least " : "", n_tests_failed_g, n_tests_run_g,
-                   ((double)n_tests_failed_g / (double)n_tests_run_g * 100.0), vol_connector_name);
+                   n_tests_failed_g > 0 ? "At least " : "",
+                   n_tests_failed_g,
+                   n_tests_run_g,
+                   ((double)n_tests_failed_g / (double)n_tests_run_g * 100.0),
+                   vol_connector_name);
 
-            printf("%zu/%zu (%.2f%%) API tests were skipped with VOL connector '%s'\n", n_tests_skipped_g,
-                   n_tests_run_g, ((double)n_tests_skipped_g / (double)n_tests_run_g * 100.0),
+            printf("%zu/%zu (%.2f%%) API tests were skipped with VOL connector '%s'\n",
+                   n_tests_skipped_g,
+                   n_tests_run_g,
+                   ((double)n_tests_skipped_g / (double)n_tests_run_g * 100.0),
                    vol_connector_name);
         }
     }
 
     if (default_con_id >= 0 && H5VLclose(default_con_id) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "    failed to close VOL connector ID\n");
+        }
     }
 
     if (registered_con_id >= 0 && H5VLclose(registered_con_id) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "    failed to close VOL connector ID\n");
+        }
     }
 
     if (fapl_id >= 0 && H5Pclose(fapl_id) < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "    failed to close MPI FAPL\n");
+        }
     }
 
     free(vol_connector_string_copy);
     vol_connector_string_copy = NULL;
 
-    if (GetTestNumErrs() > 0)
+    if (GetTestNumErrs() > 0) {
         n_tests_failed_g += (size_t)GetTestNumErrs();
+    }
 
     /* Release test infrastructure */
     if (TestShutdown() < 0) {
-        if (MAINPROCESS)
+        if (MAINPROCESS) {
             fprintf(stderr, "Couldn't shut down testing framework\n");
+        }
         goto error;
     }
 
@@ -536,10 +580,12 @@ main(int argc, char **argv)
     MPI_Finalize();
 
     /* Exit failure if errors encountered; else exit success. */
-    if (n_tests_failed_g > 0)
+    if (n_tests_failed_g > 0) {
         exit(EXIT_FAILURE);
-    else
+    }
+    else {
         exit(EXIT_SUCCESS);
+    }
 
 error:
     free(vol_connector_string_copy);

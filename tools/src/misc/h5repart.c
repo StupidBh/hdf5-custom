@@ -41,24 +41,25 @@
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *progname)
+static void usage(const char* progname)
 {
-    fprintf(stderr, "usage: %s [-v] [-V] [-[b|m] N[g|m|k]] [-family_to_sec2|-family_to_single] SRC DST\n",
-            progname);
+    fprintf(stderr, "usage: %s [-v] [-V] [-[b|m] N[g|m|k]] [-family_to_sec2|-family_to_single] SRC DST\n", progname);
     fprintf(stderr, "   -v     Produce verbose output\n");
     fprintf(stderr, "   -V     Print a version number and exit\n");
     fprintf(stderr, "   -b N   The I/O block size, defaults to 1kB\n");
     fprintf(stderr, "   -m N   The destination member size or 1GB\n");
     fprintf(stderr, "   -family_to_sec2   Deprecated version of -family_to_single (below)\n");
-    fprintf(stderr, "   -family_to_single   Change file driver from family to the default single-file VFD "
-                    "(windows or sec2)\n");
+    fprintf(stderr,
+            "   -family_to_single   Change file driver from family to the default single-file VFD "
+            "(windows or sec2)\n");
     fprintf(stderr, "   SRC    The name of the source file\n");
     fprintf(stderr, "   DST    The name of the destination files\n");
-    fprintf(stderr, "Sizes may be suffixed with 'g' for GB, 'm' for MB or "
-                    "'k' for kB.\n");
-    fprintf(stderr, "File family names include an integer printf "
-                    "format such as '%%d'\n");
+    fprintf(stderr,
+            "Sizes may be suffixed with 'g' for GB, 'm' for MB or "
+            "'k' for kB.\n");
+    fprintf(stderr,
+            "File family names include an integer printf "
+            "format such as '%%d'\n");
     exit(EXIT_FAILURE);
 }
 
@@ -82,11 +83,10 @@ usage(const char *progname)
  *
  *-------------------------------------------------------------------------
  */
-static HDoff_t
-get_size(const char *progname, int *argno, int argc, char *argv[])
+static HDoff_t get_size(const char* progname, int* argno, int argc, char* argv[])
 {
     HDoff_t retval = -1;
-    char   *suffix = NULL;
+    char* suffix = NULL;
 
     if (isdigit((int)(argv[*argno][2]))) {
         retval = strtol(argv[*argno] + 2, &suffix, 10);
@@ -97,25 +97,19 @@ get_size(const char *progname, int *argno, int argc, char *argv[])
     }
     else {
         retval = strtol(argv[*argno + 1], &suffix, 0);
-        if (suffix == argv[*argno + 1])
+        if (suffix == argv[*argno + 1]) {
             usage(progname);
+        }
         *argno += 2;
     }
     if (suffix && suffix[0] && !suffix[1]) {
         switch (*suffix) {
-            case 'G':
-            case 'g':
-                retval *= 1024 * 1024 * 1024;
-                break;
-            case 'M':
-            case 'm':
-                retval *= 1024 * 1024;
-                break;
-            case 'k':
-                retval *= 1024;
-                break;
-            default:
-                usage(progname);
+        case 'G':
+        case 'g': retval *= 1024 * 1024 * 1024; break;
+        case 'M':
+        case 'm': retval *= 1024 * 1024; break;
+        case 'k': retval *= 1024; break;
+        default : usage(progname);
         }
     }
     else if (suffix && suffix[0]) {
@@ -128,51 +122,52 @@ get_size(const char *progname, int *argno, int argc, char *argv[])
  * Function:    main
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    const char *prog_name;         /*program name            */
-    size_t      blk_size = 1024;   /*size of each I/O block    */
-    char       *buf      = NULL;   /*I/O block buffer        */
-    size_t      n, i;              /*counters            */
-    ssize_t     nio;               /*I/O return value        */
-    int         argno = 1;         /*program argument number    */
-    int         src, dst = -1;     /*source & destination files    */
-    int         need_seek = false; /*destination needs to seek?    */
-    int         need_write;        /*data needs to be written?    */
-    h5_stat_t   sb;                /*temporary file stat buffer    */
+    const char* prog_name;         /*program name            */
+    size_t blk_size = 1024;        /*size of each I/O block    */
+    char* buf = NULL;              /*I/O block buffer        */
+    size_t n, i;                   /*counters            */
+    ssize_t nio;                   /*I/O return value        */
+    int argno = 1;                 /*program argument number    */
+    int src, dst = -1;             /*source & destination files    */
+    int need_seek = false;         /*destination needs to seek?    */
+    int need_write;                /*data needs to be written?    */
+    h5_stat_t sb;                  /*temporary file stat buffer    */
 
-    int verbose = false; /*display file names?        */
+    int verbose = false;           /*display file names?        */
 
-    const char *src_gen_name;    /*general source name        */
-    char       *src_name = NULL; /*source member name        */
+    const char* src_gen_name;      /*general source name        */
+    char* src_name = NULL;         /*source member name        */
 
-    int src_is_family;  /*is source name a family name?    */
-    int src_membno = 0; /*source member number        */
+    int src_is_family;             /*is source name a family name?    */
+    int src_membno = 0;            /*source member number        */
 
-    const char *dst_gen_name;    /*general destination name    */
-    char       *dst_name = NULL; /*destination member name    */
-    int         dst_is_family;   /*is dst name a family name?    */
-    int         dst_membno = 0;  /*destination member number    */
+    const char* dst_gen_name;      /*general destination name    */
+    char* dst_name = NULL;         /*destination member name    */
+    int dst_is_family;             /*is dst name a family name?    */
+    int dst_membno = 0;            /*destination member number    */
 
-    HDoff_t left_overs = 0;  /*amount of zeros left over    */
-    HDoff_t src_offset = 0;  /*offset in source member    */
-    HDoff_t dst_offset = 0;  /*offset in destination member    */
-    HDoff_t src_size;        /*source logical member size    */
-    HDoff_t src_act_size;    /*source actual member size    */
-    HDoff_t dst_size = 1 GB; /*destination logical memb size    */
-    hid_t   fapl;            /*file access property list     */
-    hid_t   file;
-    hsize_t hdsize;                   /*destination logical memb size */
-    bool    family_to_single = false; /*change family to single file driver? */
+    HDoff_t left_overs = 0;        /*amount of zeros left over    */
+    HDoff_t src_offset = 0;        /*offset in source member    */
+    HDoff_t dst_offset = 0;        /*offset in destination member    */
+    HDoff_t src_size;              /*source logical member size    */
+    HDoff_t src_act_size;          /*source actual member size    */
+    HDoff_t dst_size = 1 GB;       /*destination logical memb size    */
+    hid_t fapl;                    /*file access property list     */
+    hid_t file;
+    hsize_t hdsize;                /*destination logical memb size */
+    bool family_to_single = false; /*change family to single file driver? */
 
     /*
      * Get the program name from argv[0]. Use only the last component.
      */
-    if ((prog_name = strrchr(argv[0], '/')))
+    if ((prog_name = strrchr(argv[0], '/'))) {
         prog_name++;
-    else
+    }
+    else {
         prog_name = argv[0];
+    }
 
     /*
      * Parse switches.
@@ -183,8 +178,7 @@ main(int argc, char *argv[])
             argno++;
         }
         else if (!strcmp(argv[argno], "-V")) {
-            printf("This is %s version %u.%u release %u\n", prog_name, H5_VERS_MAJOR, H5_VERS_MINOR,
-                   H5_VERS_RELEASE);
+            printf("This is %s version %u.%u release %u\n", prog_name, H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
             exit(EXIT_SUCCESS);
         }
         else if (!strcmp(argv[argno], "-family_to_sec2")) {
@@ -204,20 +198,23 @@ main(int argc, char *argv[])
         else {
             usage(prog_name);
         } /* end if */
-    }     /* end while */
+    } /* end while */
 
     /* allocate names */
-    if (NULL == (src_name = (char *)calloc((size_t)NAMELEN, sizeof(char))))
+    if (NULL == (src_name = (char*)calloc((size_t)NAMELEN, sizeof(char)))) {
         exit(EXIT_FAILURE);
-    if (NULL == (dst_name = (char *)calloc((size_t)NAMELEN, sizeof(char))))
+    }
+    if (NULL == (dst_name = (char*)calloc((size_t)NAMELEN, sizeof(char)))) {
         exit(EXIT_FAILURE);
+    }
 
     /*
      * Get the name for the source file and open the first member.  The size
      * of the first member determines the logical size of all the members.
      */
-    if (argno >= argc)
+    if (argno >= argc) {
         usage(prog_name);
+    }
     src_gen_name = argv[argno++];
     if (!src_gen_name) {
         fprintf(stderr, "invalid source file name pointer");
@@ -239,14 +236,16 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     src_size = src_act_size = sb.st_size;
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "< %s\n", src_name);
+    }
 
     /*
      * Get the name for the destination file and open the first member.
      */
-    if (argno >= argc)
+    if (argno >= argc) {
         usage(prog_name);
+    }
     dst_gen_name = argv[argno++];
     if (!dst_gen_name) {
         fprintf(stderr, "invalid destination file name pointer");
@@ -261,27 +260,29 @@ main(int argc, char *argv[])
         perror(dst_name);
         exit(EXIT_FAILURE);
     }
-    if (verbose)
+    if (verbose) {
         fprintf(stderr, "> %s\n", dst_name);
+    }
 
     /* No more arguments */
-    if (argno < argc)
+    if (argno < argc) {
         usage(prog_name);
+    }
 
     /* Now the real work, split the file */
-    buf = (char *)malloc(blk_size);
+    buf = (char*)malloc(blk_size);
     while (src_offset < src_size) {
-
         /* Read a block.  The amount to read is the minimum of:
          *    1. The I/O block size
          *    2. What's left to write in the destination member
          *    3. Left over zeros or what's left in the source member.
          */
         n = blk_size;
-        if (dst_is_family)
+        if (dst_is_family) {
             n = (size_t)MIN((HDoff_t)n, dst_size - dst_offset);
+        }
         if (left_overs) {
-            n          = (size_t)MIN((HDoff_t)n, left_overs);
+            n = (size_t)MIN((HDoff_t)n, left_overs);
             left_overs = left_overs - (HDoff_t)n;
             need_write = false;
         }
@@ -296,13 +297,14 @@ main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             for (i = 0; i < n; i++) {
-                if (buf[i])
+                if (buf[i]) {
                     break;
+                }
             }
             need_write = (i < n);
         }
         else {
-            n          = 0;
+            n = 0;
             left_overs = src_size - src_act_size;
             need_write = false;
         }
@@ -367,8 +369,9 @@ main(int argc, char *argv[])
                 fprintf(stderr, "%s: member truncated to %lu bytes\n", src_name, (unsigned long)src_size);
             }
             src_offset = 0;
-            if (verbose)
+            if (verbose) {
                 fprintf(stderr, "< %s\n", src_name);
+            }
         }
 
         /*
@@ -405,9 +408,10 @@ main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
             dst_offset = 0;
-            need_seek  = false;
-            if (verbose)
+            need_seek = false;
+            if (verbose) {
                 fprintf(stderr, "> %s\n", dst_name);
+            }
         }
     }
 
@@ -489,7 +493,7 @@ main(int argc, char *argv[])
             perror("H5Fclose");
             exit(EXIT_FAILURE);
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     if (H5Pclose(fapl) < 0) {
         perror("H5Pclose");

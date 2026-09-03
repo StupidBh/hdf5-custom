@@ -37,12 +37,12 @@
 #include "H5_api_object_test.h"
 #include "H5_api_test_util.h"
 #ifdef H5_API_TEST_HAVE_ASYNC
-#include "H5_api_async_test.h"
+    #include "H5_api_async_test.h"
 #endif
 
 char H5_api_test_filename[H5_API_TEST_FILENAME_MAX_LENGTH];
 
-const char *test_path_prefix;
+const char* test_path_prefix;
 
 /* X-macro to define the following for each test:
  * - enum type
@@ -51,68 +51,73 @@ const char *test_path_prefix;
  * - enabled by default
  */
 #ifdef H5_API_TEST_HAVE_ASYNC
-#define H5_API_TESTS                                                                                         \
-    X(H5_API_TEST_NULL, "", NULL, 0)                                                                         \
-    X(H5_API_TEST_FILE, "file", H5_api_file_test_add, 1)                                                     \
-    X(H5_API_TEST_GROUP, "group", H5_api_group_test_add, 1)                                                  \
-    X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_add, 1)                                            \
-    X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_add, 1)                                         \
-    X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_add, 1)                                      \
-    X(H5_API_TEST_LINK, "link", H5_api_link_test_add, 1)                                                     \
-    X(H5_API_TEST_OBJECT, "object", H5_api_object_test_add, 1)                                               \
-    X(H5_API_TEST_MISC, "misc", H5_api_misc_test_add, 1)                                                     \
-    X(H5_API_TEST_ASYNC, "async", H5_api_async_test_add, 1)                                                  \
-    X(H5_API_TEST_MAX, "", NULL, 0)
+    #define H5_API_TESTS                                                    \
+        X(H5_API_TEST_NULL, "", NULL, 0)                                    \
+        X(H5_API_TEST_FILE, "file", H5_api_file_test_add, 1)                \
+        X(H5_API_TEST_GROUP, "group", H5_api_group_test_add, 1)             \
+        X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_add, 1)       \
+        X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_add, 1)    \
+        X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_add, 1) \
+        X(H5_API_TEST_LINK, "link", H5_api_link_test_add, 1)                \
+        X(H5_API_TEST_OBJECT, "object", H5_api_object_test_add, 1)          \
+        X(H5_API_TEST_MISC, "misc", H5_api_misc_test_add, 1)                \
+        X(H5_API_TEST_ASYNC, "async", H5_api_async_test_add, 1)             \
+        X(H5_API_TEST_MAX, "", NULL, 0)
 #else
-#define H5_API_TESTS                                                                                         \
-    X(H5_API_TEST_NULL, "", NULL, 0)                                                                         \
-    X(H5_API_TEST_FILE, "file", H5_api_file_test_add, 1)                                                     \
-    X(H5_API_TEST_GROUP, "group", H5_api_group_test_add, 1)                                                  \
-    X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_add, 1)                                            \
-    X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_add, 1)                                         \
-    X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_add, 1)                                      \
-    X(H5_API_TEST_LINK, "link", H5_api_link_test_add, 1)                                                     \
-    X(H5_API_TEST_OBJECT, "object", H5_api_object_test_add, 1)                                               \
-    X(H5_API_TEST_MISC, "misc", H5_api_misc_test_add, 1)                                                     \
-    X(H5_API_TEST_MAX, "", NULL, 0)
+    #define H5_API_TESTS                                                    \
+        X(H5_API_TEST_NULL, "", NULL, 0)                                    \
+        X(H5_API_TEST_FILE, "file", H5_api_file_test_add, 1)                \
+        X(H5_API_TEST_GROUP, "group", H5_api_group_test_add, 1)             \
+        X(H5_API_TEST_DATASET, "dataset", H5_api_dataset_test_add, 1)       \
+        X(H5_API_TEST_DATATYPE, "datatype", H5_api_datatype_test_add, 1)    \
+        X(H5_API_TEST_ATTRIBUTE, "attribute", H5_api_attribute_test_add, 1) \
+        X(H5_API_TEST_LINK, "link", H5_api_link_test_add, 1)                \
+        X(H5_API_TEST_OBJECT, "object", H5_api_object_test_add, 1)          \
+        X(H5_API_TEST_MISC, "misc", H5_api_misc_test_add, 1)                \
+        X(H5_API_TEST_MAX, "", NULL, 0)
 #endif
 
 #define X(a, b, c, d) a,
-enum H5_api_test_type { H5_API_TESTS };
+
+enum H5_api_test_type
+{
+    H5_API_TESTS
+};
+
 #undef X
 #define X(a, b, c, d) b,
-static const char *const H5_api_test_name[] = {H5_API_TESTS};
+static const char* const H5_api_test_name[] = { H5_API_TESTS };
 #undef X
 #define X(a, b, c, d) c,
-static void (*H5_api_test_add_func[])(void) = {H5_API_TESTS};
+static void (*H5_api_test_add_func[])(void) = { H5_API_TESTS };
 #undef X
 #define X(a, b, c, d) d,
-static int H5_api_test_enabled[] = {H5_API_TESTS};
+static int H5_api_test_enabled[] = { H5_API_TESTS };
 #undef X
 
-static enum H5_api_test_type
-H5_api_test_name_to_type(const char *test_name)
+static enum H5_api_test_type H5_api_test_name_to_type(const char* test_name)
 {
     enum H5_api_test_type i = 0;
 
-    while (strcmp(H5_api_test_name[i], test_name) && i != H5_API_TEST_MAX)
+    while (strcmp(H5_api_test_name[i], test_name) && i != H5_API_TEST_MAX) {
         i++;
+    }
 
     return ((i == H5_API_TEST_MAX) ? H5_API_TEST_NULL : i);
 }
 
-static void
-H5_api_test_add(void)
+static void H5_api_test_add(void)
 {
     enum H5_api_test_type i;
 
-    for (i = H5_API_TEST_FILE; i < H5_API_TEST_MAX; i++)
-        if (H5_api_test_enabled[i])
+    for (i = H5_API_TEST_FILE; i < H5_API_TEST_MAX; i++) {
+        if (H5_api_test_enabled[i]) {
             H5_api_test_add_func[i]();
+        }
+    }
 }
 
-static int
-parse_command_line(int argc, char **argv)
+static int parse_command_line(int argc, char** argv)
 {
     /* Simple argument checking, TODO can improve that later */
     if (argc > 1) {
@@ -127,8 +132,7 @@ parse_command_line(int argc, char **argv)
     return 0;
 }
 
-static void
-usage(FILE *stream)
+static void usage(FILE* stream)
 {
     fprintf(stream, "file        run only the file interface tests\n");
     fprintf(stream, "group       run only the group interface tests\n");
@@ -141,20 +145,19 @@ usage(FILE *stream)
     fprintf(stream, "async       run only the async interface tests\n");
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     H5E_auto2_t default_err_func;
-    const char *vol_connector_string;
-    const char *vol_connector_name;
-    unsigned    seed;
-    hid_t       fapl_id                   = H5I_INVALID_HID;
-    hid_t       default_con_id            = H5I_INVALID_HID;
-    hid_t       registered_con_id         = H5I_INVALID_HID;
-    char       *vol_connector_string_copy = NULL;
-    char       *vol_connector_info        = NULL;
-    void       *default_err_data          = NULL;
-    bool        err_occurred              = false;
+    const char* vol_connector_string;
+    const char* vol_connector_name;
+    unsigned seed;
+    hid_t fapl_id = H5I_INVALID_HID;
+    hid_t default_con_id = H5I_INVALID_HID;
+    hid_t registered_con_id = H5I_INVALID_HID;
+    char* vol_connector_string_copy = NULL;
+    char* vol_connector_info = NULL;
+    void* default_err_data = NULL;
+    bool err_occurred = false;
 
     H5open();
 
@@ -195,16 +198,17 @@ main(int argc, char **argv)
         goto done;
     }
 
-    n_tests_run_g     = 0;
-    n_tests_passed_g  = 0;
-    n_tests_failed_g  = 0;
+    n_tests_run_g = 0;
+    n_tests_passed_g = 0;
+    n_tests_failed_g = 0;
     n_tests_skipped_g = 0;
 
     seed = (unsigned)time(NULL);
     srand(seed);
 
-    if (NULL == (test_path_prefix = getenv(HDF5_API_TEST_PATH_PREFIX)))
+    if (NULL == (test_path_prefix = getenv(HDF5_API_TEST_PATH_PREFIX))) {
         test_path_prefix = "";
+    }
 
     snprintf(H5_api_test_filename, H5_API_TEST_FILENAME_MAX_LENGTH, "%s%s", test_path_prefix, TEST_FILE_NAME);
 
@@ -216,7 +220,7 @@ main(int argc, char **argv)
         vol_connector_info = NULL;
     }
     else {
-        char *token;
+        char* token;
 
         if (NULL == (vol_connector_string_copy = strdup(vol_connector_string))) {
             fprintf(stderr, "Unable to copy VOL connector string\n");
@@ -237,8 +241,7 @@ main(int argc, char **argv)
         }
     }
 
-    printf("Running API tests with VOL connector '%s' and info string '%s'\n\n", vol_connector_name,
-           vol_connector_info ? vol_connector_info : "");
+    printf("Running API tests with VOL connector '%s' and info string '%s'\n\n", vol_connector_name, vol_connector_info ? vol_connector_info : "");
     printf("Test parameters:\n");
     printf("  - Test file name: '%s'\n", H5_api_test_filename);
     printf("  - Test seed: %u\n", seed);
@@ -267,8 +270,7 @@ main(int argc, char **argv)
         }
 
         if (!is_registered) {
-            fprintf(stderr, "Specified VOL connector '%s' wasn't correctly registered!\n",
-                    vol_connector_name);
+            fprintf(stderr, "Specified VOL connector '%s' wasn't correctly registered!\n", vol_connector_name);
             err_occurred = true;
             goto done;
         }
@@ -336,8 +338,9 @@ main(int argc, char **argv)
     printf("\n");
 
     /* Display test summary, if requested */
-    if (GetTestSummary())
+    if (GetTestSummary()) {
         TestSummary(stdout);
+    }
 
     printf("Deleting container file for tests\n\n");
 
@@ -352,12 +355,20 @@ main(int argc, char **argv)
     }
 
     if (n_tests_run_g > 0) {
-        printf("%zu/%zu (%.2f%%) API tests passed with VOL connector '%s'\n", n_tests_passed_g, n_tests_run_g,
-               ((double)n_tests_passed_g / (double)n_tests_run_g * 100.0), vol_connector_name);
-        printf("%zu/%zu (%.2f%%) API tests did not pass with VOL connector '%s'\n", n_tests_failed_g,
-               n_tests_run_g, ((double)n_tests_failed_g / (double)n_tests_run_g * 100.0), vol_connector_name);
-        printf("%zu/%zu (%.2f%%) API tests were skipped with VOL connector '%s'\n", n_tests_skipped_g,
-               n_tests_run_g, ((double)n_tests_skipped_g / (double)n_tests_run_g * 100.0),
+        printf("%zu/%zu (%.2f%%) API tests passed with VOL connector '%s'\n",
+               n_tests_passed_g,
+               n_tests_run_g,
+               ((double)n_tests_passed_g / (double)n_tests_run_g * 100.0),
+               vol_connector_name);
+        printf("%zu/%zu (%.2f%%) API tests did not pass with VOL connector '%s'\n",
+               n_tests_failed_g,
+               n_tests_run_g,
+               ((double)n_tests_failed_g / (double)n_tests_run_g * 100.0),
+               vol_connector_name);
+        printf("%zu/%zu (%.2f%%) API tests were skipped with VOL connector '%s'\n",
+               n_tests_skipped_g,
+               n_tests_run_g,
+               ((double)n_tests_skipped_g / (double)n_tests_run_g * 100.0),
                vol_connector_name);
     }
 
@@ -379,8 +390,9 @@ done:
         err_occurred = true;
     }
 
-    if (GetTestNumErrs() > 0)
+    if (GetTestNumErrs() > 0) {
         n_tests_failed_g += (size_t)GetTestNumErrs();
+    }
 
     /* Release test infrastructure */
     if (TestShutdown() < 0) {
@@ -391,8 +403,10 @@ done:
     H5close();
 
     /* Exit failure if errors encountered; else exit success. */
-    if (err_occurred || n_tests_failed_g > 0)
+    if (err_occurred || n_tests_failed_g > 0) {
         exit(EXIT_FAILURE);
-    else
+    }
+    else {
         exit(EXIT_SUCCESS);
+    }
 }

@@ -29,23 +29,24 @@ const H5std_string DATASET_NAME("ArrayOfStructures");
 const H5std_string MEMBER1("a_name");
 const H5std_string MEMBER2("b_name");
 const H5std_string MEMBER3("c_name");
-const int          LENGTH = 10;
-const int          RANK   = 1;
+const int LENGTH = 10;
+const int RANK = 1;
 
-int
-main(void)
+int main(void)
 {
     /* First structure  and dataset*/
-    typedef struct s1_t {
-        int    a;
-        float  b;
+    typedef struct s1_t
+    {
+        int a;
+        float b;
         double c;
     } s1_t;
 
     /* Second structure (subset of s1_t)  and dataset*/
-    typedef struct s2_t {
+    typedef struct s2_t
+    {
         double c;
-        int    a;
+        int a;
     } s2_t;
 
     // Try block to detect exceptions raised by any of the calls inside it
@@ -53,7 +54,7 @@ main(void)
         /*
          * Initialize the data
          */
-        int  i;
+        int i;
         s1_t s1[LENGTH];
         for (i = 0; i < LENGTH; i++) {
             s1[i].a = i;
@@ -70,13 +71,13 @@ main(void)
         /*
          * Create the data space.
          */
-        hsize_t   dim[] = {LENGTH}; /* Dataspace dimensions */
+        hsize_t dim[] = { LENGTH }; /* Dataspace dimensions */
         DataSpace space(RANK, dim);
 
         /*
          * Create the file.
          */
-        H5File *file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
+        H5File* file = new H5File(FILE_NAME, H5F_ACC_TRUNC);
 
         /*
          * Create the memory datatype.
@@ -89,7 +90,7 @@ main(void)
         /*
          * Create the dataset.
          */
-        DataSet *dataset;
+        DataSet* dataset;
         dataset = new DataSet(file->createDataSet(DATASET_NAME, mtype1, space));
 
         /*
@@ -106,7 +107,7 @@ main(void)
         /*
          * Open the file and the dataset.
          */
-        file    = new H5File(FILE_NAME, H5F_ACC_RDONLY);
+        file = new H5File(FILE_NAME, H5F_ACC_RDONLY);
         dataset = new DataSet(file->openDataSet(DATASET_NAME));
 
         /*
@@ -128,13 +129,15 @@ main(void)
          * Display the fields
          */
         cout << endl << "Field c : " << endl;
-        for (i = 0; i < LENGTH; i++)
+        for (i = 0; i < LENGTH; i++) {
             cout << s2[i].c << " ";
+        }
         cout << endl;
 
         cout << endl << "Field a : " << endl;
-        for (i = 0; i < LENGTH; i++)
+        for (i = 0; i < LENGTH; i++) {
             cout << s2[i].a << " ";
+        }
         cout << endl;
 
         /*
@@ -154,8 +157,9 @@ main(void)
          * Display the field
          */
         cout << endl << "Field b : " << endl;
-        for (i = 0; i < LENGTH; i++)
+        for (i = 0; i < LENGTH; i++) {
             cout << s3[i] << " ";
+        }
         cout << endl;
 
         /*

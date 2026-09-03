@@ -39,53 +39,53 @@
 
 #ifdef H5_HAVE_PARALLEL
 
-/****************/
-/* Local Macros */
-/****************/
+    /****************/
+    /* Local Macros */
+    /****************/
 
-/* Macros to represent different IO options */
-#define H5D_ONE_LINK_CHUNK_IO          0
-#define H5D_MULTI_CHUNK_IO             1
-#define H5D_ONE_LINK_CHUNK_IO_MORE_OPT 2
-#define H5D_MULTI_CHUNK_IO_MORE_OPT    3
+    /* Macros to represent different IO options */
+    #define H5D_ONE_LINK_CHUNK_IO          0
+    #define H5D_MULTI_CHUNK_IO             1
+    #define H5D_ONE_LINK_CHUNK_IO_MORE_OPT 2
+    #define H5D_MULTI_CHUNK_IO_MORE_OPT    3
 
-/* Macros to represent different IO modes(NONE, Independent or collective)for multiple chunk IO case */
-#define H5D_CHUNK_IO_MODE_COL 1
+    /* Macros to represent different IO modes(NONE, Independent or collective)for multiple chunk IO case */
+    #define H5D_CHUNK_IO_MODE_COL 1
 
-/* Macros to represent the regularity of the selection for multiple chunk IO case. */
-#define H5D_CHUNK_SELECT_REG 1
+    /* Macros to represent the regularity of the selection for multiple chunk IO case. */
+    #define H5D_CHUNK_SELECT_REG 1
 
-/*
- * Threshold value for redistributing shared filtered chunks
- * on all MPI ranks, or just MPI rank 0
- */
-#define H5D_CHUNK_REDISTRIBUTE_THRES ((size_t)((25 * H5_MB) / sizeof(H5D_chunk_redistribute_info_t)))
+    /*
+     * Threshold value for redistributing shared filtered chunks
+     * on all MPI ranks, or just MPI rank 0
+     */
+    #define H5D_CHUNK_REDISTRIBUTE_THRES ((size_t)((25 * H5_MB) / sizeof(H5D_chunk_redistribute_info_t)))
 
-/*
- * Initial allocation size for the arrays that hold
- * buffers for chunk modification data that is sent
- * to other ranks and the MPI_Request objects for
- * those send operations
- */
-#define H5D_CHUNK_NUM_SEND_MSGS_INIT 64
+    /*
+     * Initial allocation size for the arrays that hold
+     * buffers for chunk modification data that is sent
+     * to other ranks and the MPI_Request objects for
+     * those send operations
+     */
+    #define H5D_CHUNK_NUM_SEND_MSGS_INIT 64
 
-/*
- * Define a tag value for the MPI messages sent/received for
- * chunk modification data
- */
-#define H5D_CHUNK_MOD_DATA_TAG 64
+    /*
+     * Define a tag value for the MPI messages sent/received for
+     * chunk modification data
+     */
+    #define H5D_CHUNK_MOD_DATA_TAG 64
 
-/*
- * Macro to initialize a H5D_chk_idx_info_t
- * structure, given a pointer to a H5D_io_info_t
- * structure
- */
-#define H5D_MPIO_INIT_CHUNK_IDX_INFO(index_info, dset)                                                       \
-    do {                                                                                                     \
-        (index_info).f      = (dset)->oloc.file;                                                             \
-        (index_info).pline  = &((dset)->shared->dcpl_cache.pline);                                           \
-        (index_info).layout = &((dset)->shared->layout);                                                     \
-    } while (0)
+    /*
+     * Macro to initialize a H5D_chk_idx_info_t
+     * structure, given a pointer to a H5D_io_info_t
+     * structure
+     */
+    #define H5D_MPIO_INIT_CHUNK_IDX_INFO(index_info, dset)            \
+        do {                                                          \
+            (index_info).f = (dset)->oloc.file;                       \
+            (index_info).pline = &((dset)->shared->dcpl_cache.pline); \
+            (index_info).layout = &((dset)->shared->layout);          \
+        } while (0)
 
 /******************/
 /* Local Typedefs */
@@ -93,18 +93,20 @@
 
 /* Combine chunk/piece address and chunk/piece info into a struct for
  * better performance. */
-typedef struct H5D_chunk_addr_info_t {
+typedef struct H5D_chunk_addr_info_t
+{
     /* piece for multi-dset */
-    haddr_t          piece_addr;
+    haddr_t piece_addr;
     H5D_piece_info_t piece_info;
 } H5D_chunk_addr_info_t;
 
 /* Rank 0 Bcast values */
-typedef enum H5D_mpio_no_rank0_bcast_cause_t {
-    H5D_MPIO_RANK0_BCAST            = 0x00,
-    H5D_MPIO_RANK0_NOT_H5S_ALL      = 0x01,
-    H5D_MPIO_RANK0_NOT_CONTIGUOUS   = 0x02,
-    H5D_MPIO_RANK0_NOT_FIXED_SIZE   = 0x04,
+typedef enum H5D_mpio_no_rank0_bcast_cause_t
+{
+    H5D_MPIO_RANK0_BCAST = 0x00,
+    H5D_MPIO_RANK0_NOT_H5S_ALL = 0x01,
+    H5D_MPIO_RANK0_NOT_CONTIGUOUS = 0x02,
+    H5D_MPIO_RANK0_NOT_FIXED_SIZE = 0x04,
     H5D_MPIO_RANK0_GREATER_THAN_2GB = 0x08
 } H5D_mpio_no_rank0_bcast_cause_t;
 
@@ -113,11 +115,12 @@ typedef enum H5D_mpio_no_rank0_bcast_cause_t {
  * during a parallel write of a chunked dataset with filters
  * applied.
  */
-typedef struct H5D_chunk_alloc_info_t {
+typedef struct H5D_chunk_alloc_info_t
+{
     H5F_block_t chunk_current;
     H5F_block_t chunk_new;
-    hsize_t     chunk_idx;
-    haddr_t     dset_oloc_addr;
+    hsize_t chunk_idx;
+    haddr_t dset_oloc_addr;
 } H5D_chunk_alloc_info_t;
 
 /*
@@ -146,7 +149,8 @@ typedef struct H5D_chunk_alloc_info_t {
  *   be arranged next to each other in the structure to minimize
  *   the calculated key length.
  */
-typedef struct H5D_chunk_index_info_t {
+typedef struct H5D_chunk_index_info_t
+{
     /*
      * These two fields must come in this order and next to
      * each other for proper and efficient hashing
@@ -155,7 +159,7 @@ typedef struct H5D_chunk_index_info_t {
     haddr_t dset_oloc_addr;
 
     unsigned filter_mask;
-    bool     need_insert;
+    bool need_insert;
 } H5D_chunk_index_info_t;
 
 /*
@@ -230,20 +234,21 @@ typedef struct H5D_chunk_index_info_t {
  * hh - A handle for hash tables provided by the uthash.h header
  *
  */
-typedef struct H5D_filtered_collective_chunk_info_t {
+typedef struct H5D_filtered_collective_chunk_info_t
+{
     H5D_chunk_index_info_t index_info;
 
-    H5D_piece_info_t *chunk_info;
-    H5F_block_t       chunk_current;
-    H5F_block_t       chunk_new;
-    bool              need_read;
-    bool              skip_filter_pline;
-    size_t            io_size;
-    size_t            chunk_buf_size;
-    int               orig_owner;
-    int               new_owner;
-    int               num_writers;
-    void             *buf;
+    H5D_piece_info_t* chunk_info;
+    H5F_block_t chunk_current;
+    H5F_block_t chunk_new;
+    bool need_read;
+    bool skip_filter_pline;
+    size_t io_size;
+    size_t chunk_buf_size;
+    int orig_owner;
+    int new_owner;
+    int num_writers;
+    void* buf;
 
     UT_hash_handle hh;
 } H5D_filtered_collective_chunk_info_t;
@@ -252,16 +257,17 @@ typedef struct H5D_filtered_collective_chunk_info_t {
  * Information cached about each dataset involved when performing
  * collective I/O on filtered chunks.
  */
-typedef struct H5D_mpio_filtered_dset_info_t {
-    const H5D_dset_io_info_t *dset_io_info;
-    H5D_fill_buf_info_t       fb_info;
-    H5D_chk_idx_info_t        chunk_idx_info;
-    hsize_t                   file_chunk_size;
-    haddr_t                   dset_oloc_addr;
-    H5S_t                    *fill_space;
-    bool                      should_fill;
-    bool                      fb_info_init;
-    bool                      index_empty;
+typedef struct H5D_mpio_filtered_dset_info_t
+{
+    const H5D_dset_io_info_t* dset_io_info;
+    H5D_fill_buf_info_t fb_info;
+    H5D_chk_idx_info_t chunk_idx_info;
+    hsize_t file_chunk_size;
+    haddr_t dset_oloc_addr;
+    H5S_t* fill_space;
+    bool should_fill;
+    bool fb_info_init;
+    bool index_empty;
 
     UT_hash_handle hh;
 } H5D_mpio_filtered_dset_info_t;
@@ -322,18 +328,20 @@ typedef struct H5D_mpio_filtered_dset_info_t {
  *                        routines.
  *
  */
-typedef struct H5D_filtered_collective_io_info_t {
-    H5D_filtered_collective_chunk_info_t *chunk_infos;
-    H5D_filtered_collective_chunk_info_t *chunk_hash_table;
-    size_t                                chunk_hash_table_keylen;
-    size_t                                num_chunk_infos;
-    size_t                                num_chunks_to_read;
-    bool                                  all_dset_indices_empty;
-    bool                                  no_dset_index_insert_methods;
+typedef struct H5D_filtered_collective_io_info_t
+{
+    H5D_filtered_collective_chunk_info_t* chunk_infos;
+    H5D_filtered_collective_chunk_info_t* chunk_hash_table;
+    size_t chunk_hash_table_keylen;
+    size_t num_chunk_infos;
+    size_t num_chunks_to_read;
+    bool all_dset_indices_empty;
+    bool no_dset_index_insert_methods;
 
-    union {
-        H5D_mpio_filtered_dset_info_t *single_dset_info;
-        H5D_mpio_filtered_dset_info_t *dset_info_hash_table;
+    union
+    {
+        H5D_mpio_filtered_dset_info_t* single_dset_info;
+        H5D_mpio_filtered_dset_info_t* dset_info_hash_table;
     } dset_info;
 } H5D_filtered_collective_io_info_t;
 
@@ -341,13 +349,14 @@ typedef struct H5D_filtered_collective_io_info_t {
  * Information necessary for redistributing shared chunks during
  * a parallel write of a chunked dataset with filters applied.
  */
-typedef struct H5D_chunk_redistribute_info_t {
+typedef struct H5D_chunk_redistribute_info_t
+{
     H5F_block_t chunk_block;
-    hsize_t     chunk_idx;
-    haddr_t     dset_oloc_addr;
-    int         orig_owner;
-    int         new_owner;
-    int         num_writers;
+    hsize_t chunk_idx;
+    haddr_t dset_oloc_addr;
+    int orig_owner;
+    int new_owner;
+    int num_writers;
 } H5D_chunk_redistribute_info_t;
 
 /*
@@ -355,83 +364,81 @@ typedef struct H5D_chunk_redistribute_info_t {
  * chunk index during a parallel write of a chunked dataset with
  * filters applied.
  */
-typedef struct H5D_chunk_insert_info_t {
-    H5F_block_t            chunk_block;
+typedef struct H5D_chunk_insert_info_t
+{
+    H5F_block_t chunk_block;
     H5D_chunk_index_info_t index_info;
 } H5D_chunk_insert_info_t;
 
 /********************/
 /* Local Prototypes */
 /********************/
-static herr_t H5D__piece_io(H5D_io_info_t *io_info);
-static herr_t H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_info,
-                                             int mpi_rank, int mpi_size);
-static herr_t H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_infos,
-                                                      size_t num_dset_infos, int mpi_rank, int mpi_size);
-static herr_t H5D__link_piece_collective_io(H5D_io_info_t *io_info, int mpi_rank);
-static herr_t H5D__link_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_infos,
-                                                     size_t num_dset_infos, int mpi_rank, int mpi_size);
-static herr_t H5D__inter_collective_io(H5D_io_info_t *io_info, const H5D_dset_io_info_t *di,
-                                       H5S_t *file_space, H5S_t *mem_space);
-static herr_t H5D__final_collective_io(H5D_io_info_t *io_info, hsize_t mpi_buf_count,
-                                       MPI_Datatype mpi_file_type, MPI_Datatype mpi_buf_type);
-static herr_t H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t assign_io_mode[],
-                                    haddr_t chunk_addr[], int mpi_rank, int mpi_size);
-static herr_t H5D__mpio_get_sum_chunk(const H5D_io_info_t *io_info, int *sum_chunkf);
-static herr_t H5D__mpio_get_sum_chunk_dset(const H5D_io_info_t *io_info, const H5D_dset_io_info_t *dset_info,
-                                           int *sum_chunkf);
-static herr_t H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t      *io_info,
-                                                           const H5D_dset_io_info_t *di,
-                                                           size_t num_dset_infos, int mpi_rank,
-                                                           H5D_filtered_collective_io_info_t *chunk_list);
-static herr_t H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t *chunk_list,
-                                                   const H5D_io_info_t *io_info, int mpi_rank, int mpi_size,
-                                                   size_t **rank_chunks_assigned_map);
-static herr_t H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chunk_list,
-                                                       size_t *num_chunks_assigned_map,
-                                                       bool all_ranks_involved, const H5D_io_info_t *io_info,
-                                                       int mpi_rank, int mpi_size);
-static herr_t H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk_list,
-                                                      H5D_io_info_t *io_info, int mpi_rank,
+static herr_t H5D__piece_io(H5D_io_info_t* io_info);
+static herr_t H5D__multi_chunk_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_info, int mpi_rank, int mpi_size);
+static herr_t H5D__multi_chunk_filtered_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_infos, size_t num_dset_infos, int mpi_rank, int mpi_size);
+static herr_t H5D__link_piece_collective_io(H5D_io_info_t* io_info, int mpi_rank);
+static herr_t H5D__link_chunk_filtered_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_infos, size_t num_dset_infos, int mpi_rank, int mpi_size);
+static herr_t H5D__inter_collective_io(H5D_io_info_t* io_info, const H5D_dset_io_info_t* di, H5S_t* file_space, H5S_t* mem_space);
+static herr_t H5D__final_collective_io(H5D_io_info_t* io_info, hsize_t mpi_buf_count, MPI_Datatype mpi_file_type, MPI_Datatype mpi_buf_type);
+static herr_t H5D__obtain_mpio_mode(H5D_io_info_t* io_info, H5D_dset_io_info_t* di, uint8_t assign_io_mode[], haddr_t chunk_addr[], int mpi_rank, int mpi_size);
+static herr_t H5D__mpio_get_sum_chunk(const H5D_io_info_t* io_info, int* sum_chunkf);
+static herr_t H5D__mpio_get_sum_chunk_dset(const H5D_io_info_t* io_info, const H5D_dset_io_info_t* dset_info, int* sum_chunkf);
+static herr_t H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t* io_info,
+                                                           const H5D_dset_io_info_t* di,
+                                                           size_t num_dset_infos,
+                                                           int mpi_rank,
+                                                           H5D_filtered_collective_io_info_t* chunk_list);
+static herr_t H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t* chunk_list,
+                                                   const H5D_io_info_t* io_info,
+                                                   int mpi_rank,
+                                                   int mpi_size,
+                                                   size_t** rank_chunks_assigned_map);
+static herr_t H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t* chunk_list,
+                                                       size_t* num_chunks_assigned_map,
+                                                       bool all_ranks_involved,
+                                                       const H5D_io_info_t* io_info,
+                                                       int mpi_rank,
+                                                       int mpi_size);
+static herr_t H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t* chunk_list,
+                                                      H5D_io_info_t* io_info,
+                                                      int mpi_rank,
                                                       int H5_ATTR_NDEBUG_UNUSED mpi_size,
-                                                      unsigned char          ***chunk_msg_bufs,
-                                                      int                      *chunk_msg_bufs_len);
-static herr_t H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chunk_list,
-                                                       const H5D_io_info_t *io_info, size_t num_dset_infos,
-                                                       int mpi_rank);
-static herr_t H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *chunk_list,
-                                                         unsigned char                    **chunk_msg_bufs,
-                                                         int chunk_msg_bufs_len, const H5D_io_info_t *io_info,
-                                                         size_t num_dset_infos, int mpi_rank);
-static herr_t H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t *chunk_list,
-                                                             size_t        *num_chunks_assigned_map,
-                                                             H5D_io_info_t *io_info, size_t num_dset_infos,
-                                                             int mpi_rank, int mpi_size);
-static herr_t H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *chunk_list,
-                                                           size_t        *num_chunks_assigned_map,
-                                                           H5D_io_info_t *io_info, size_t num_dset_infos,
-                                                           int mpi_rank, int mpi_size);
-static herr_t H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype *contig_type,
-                                                          bool         *contig_type_derived,
-                                                          MPI_Datatype *resized_type,
-                                                          bool         *resized_type_derived);
-static herr_t H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype *contig_type, bool *contig_type_derived,
-                                                   MPI_Datatype *resized_type, bool *resized_type_derived);
-static herr_t H5D__mpio_get_chunk_insert_info_types(MPI_Datatype *contig_type, bool *contig_type_derived,
-                                                    MPI_Datatype *resized_type, bool *resized_type_derived);
-static herr_t H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t *chunk_list,
-                                                   H5F_shared_t *f_sh, H5D_io_op_type_t op_type);
-static int    H5D__cmp_piece_addr(const void *chunk_addr_info1, const void *chunk_addr_info2);
-static int    H5D__cmp_filtered_collective_io_info_entry(const void *filtered_collective_io_info_entry1,
-                                                         const void *filtered_collective_io_info_entry2);
-static int    H5D__cmp_chunk_redistribute_info(const void *entry1, const void *entry2);
-static int    H5D__cmp_chunk_redistribute_info_orig_owner(const void *entry1, const void *entry2);
+                                                      unsigned char*** chunk_msg_bufs,
+                                                      int* chunk_msg_bufs_len);
+static herr_t
+    H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t* chunk_list, const H5D_io_info_t* io_info, size_t num_dset_infos, int mpi_rank);
+static herr_t H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t* chunk_list,
+                                                         unsigned char** chunk_msg_bufs,
+                                                         int chunk_msg_bufs_len,
+                                                         const H5D_io_info_t* io_info,
+                                                         size_t num_dset_infos,
+                                                         int mpi_rank);
+static herr_t H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t* chunk_list,
+                                                             size_t* num_chunks_assigned_map,
+                                                             H5D_io_info_t* io_info,
+                                                             size_t num_dset_infos,
+                                                             int mpi_rank,
+                                                             int mpi_size);
+static herr_t H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t* chunk_list,
+                                                           size_t* num_chunks_assigned_map,
+                                                           H5D_io_info_t* io_info,
+                                                           size_t num_dset_infos,
+                                                           int mpi_rank,
+                                                           int mpi_size);
+static herr_t
+    H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived);
+static herr_t H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived);
+static herr_t H5D__mpio_get_chunk_insert_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived);
+static herr_t H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t* chunk_list, H5F_shared_t* f_sh, H5D_io_op_type_t op_type);
+static int H5D__cmp_piece_addr(const void* chunk_addr_info1, const void* chunk_addr_info2);
+static int H5D__cmp_filtered_collective_io_info_entry(const void* filtered_collective_io_info_entry1, const void* filtered_collective_io_info_entry2);
+static int H5D__cmp_chunk_redistribute_info(const void* entry1, const void* entry2);
+static int H5D__cmp_chunk_redistribute_info_orig_owner(const void* entry1, const void* entry2);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
 static herr_t H5D__mpio_debug_init(void);
-static herr_t H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t *chunk_list,
-                                                            int                                mpi_rank);
-#endif
+static herr_t H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t* chunk_list, int mpi_rank);
+    #endif
 
 /*********************/
 /* Package Variables */
@@ -444,7 +451,7 @@ static herr_t H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collect
 /* Declare extern free list to manage the H5S_sel_iter_t struct */
 H5FL_EXTERN(H5S_sel_iter_t);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
 
 /* Flags to control debug actions in this file.
  * (Meant to be indexed by characters)
@@ -472,75 +479,74 @@ H5FL_EXTERN(H5S_sel_iter_t);
  *      '0-7' only show output from ranks 0 through 7
  *
  */
-static int               H5D_mpio_debug_flags_s[256];
-static int               H5D_mpio_debug_rank_s[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
-static bool              H5D_mpio_debug_inited    = false;
-static const char *const trace_in_pre             = "-> ";
-static const char *const trace_out_pre            = "<- ";
-static int               debug_indent             = 0;
-static FILE             *debug_stream             = NULL;
+static int H5D_mpio_debug_flags_s[256];
+static int H5D_mpio_debug_rank_s[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+static bool H5D_mpio_debug_inited = false;
+static const char* const trace_in_pre = "-> ";
+static const char* const trace_out_pre = "<- ";
+static int debug_indent = 0;
+static FILE* debug_stream = NULL;
 
-/* Determine if this rank should output debugging info */
-#define H5D_MPIO_DEBUG_THIS_RANK(rank)                                                                       \
-    (H5D_mpio_debug_rank_s[0] < 0 || rank == H5D_mpio_debug_rank_s[0] || rank == H5D_mpio_debug_rank_s[1] || \
-     rank == H5D_mpio_debug_rank_s[2] || rank == H5D_mpio_debug_rank_s[3] ||                                 \
-     rank == H5D_mpio_debug_rank_s[4] || rank == H5D_mpio_debug_rank_s[5] ||                                 \
-     rank == H5D_mpio_debug_rank_s[6] || rank == H5D_mpio_debug_rank_s[7])
+        /* Determine if this rank should output debugging info */
+        #define H5D_MPIO_DEBUG_THIS_RANK(rank)                                                                                                               \
+            (H5D_mpio_debug_rank_s[0] < 0 || rank == H5D_mpio_debug_rank_s[0] || rank == H5D_mpio_debug_rank_s[1] || rank == H5D_mpio_debug_rank_s[2] ||     \
+             rank == H5D_mpio_debug_rank_s[3] || rank == H5D_mpio_debug_rank_s[4] || rank == H5D_mpio_debug_rank_s[5] || rank == H5D_mpio_debug_rank_s[6] || \
+             rank == H5D_mpio_debug_rank_s[7])
 
-/* Print some debugging string */
-#define H5D_MPIO_DEBUG(rank, string)                                                                         \
-    do {                                                                                                     \
-        if (debug_stream && H5D_MPIO_DEBUG_THIS_RANK(rank)) {                                                \
-            fprintf(debug_stream, "%*s(Rank %d) " string "\n", debug_indent, "", rank);                      \
-            fflush(debug_stream);                                                                            \
-        }                                                                                                    \
-    } while (0)
+        /* Print some debugging string */
+        #define H5D_MPIO_DEBUG(rank, string)                                                    \
+            do {                                                                                \
+                if (debug_stream && H5D_MPIO_DEBUG_THIS_RANK(rank)) {                           \
+                    fprintf(debug_stream, "%*s(Rank %d) " string "\n", debug_indent, "", rank); \
+                    fflush(debug_stream);                                                       \
+                }                                                                               \
+            } while (0)
 
-/* Print some debugging string with printf-style arguments */
-#define H5D_MPIO_DEBUG_VA(rank, string, ...)                                                                 \
-    do {                                                                                                     \
-        if (debug_stream && H5D_MPIO_DEBUG_THIS_RANK(rank)) {                                                \
-            fprintf(debug_stream, "%*s(Rank %d) " string "\n", debug_indent, "", rank, __VA_ARGS__);         \
-            fflush(debug_stream);                                                                            \
-        }                                                                                                    \
-    } while (0)
+        /* Print some debugging string with printf-style arguments */
+        #define H5D_MPIO_DEBUG_VA(rank, string, ...)                                                         \
+            do {                                                                                             \
+                if (debug_stream && H5D_MPIO_DEBUG_THIS_RANK(rank)) {                                        \
+                    fprintf(debug_stream, "%*s(Rank %d) " string "\n", debug_indent, "", rank, __VA_ARGS__); \
+                    fflush(debug_stream);                                                                    \
+                }                                                                                            \
+            } while (0)
 
-#define H5D_MPIO_TRACE_ENTER(rank)                                                                           \
-    do {                                                                                                     \
-        bool trace_flag = H5D_mpio_debug_flags_s[(int)'t'];                                                  \
-                                                                                                             \
-        if (trace_flag) {                                                                                    \
-            H5D_MPIO_DEBUG_VA(rank, "%s%s", trace_in_pre, __func__);                                         \
-            debug_indent += (int)strlen(trace_in_pre);                                                       \
-        }                                                                                                    \
-    } while (0)
+        #define H5D_MPIO_TRACE_ENTER(rank)                                   \
+            do {                                                             \
+                bool trace_flag = H5D_mpio_debug_flags_s[(int)'t'];          \
+                                                                             \
+                if (trace_flag) {                                            \
+                    H5D_MPIO_DEBUG_VA(rank, "%s%s", trace_in_pre, __func__); \
+                    debug_indent += (int)strlen(trace_in_pre);               \
+                }                                                            \
+            } while (0)
 
-#define H5D_MPIO_TRACE_EXIT(rank)                                                                            \
-    do {                                                                                                     \
-        bool trace_flag = H5D_mpio_debug_flags_s[(int)'t'];                                                  \
-                                                                                                             \
-        if (trace_flag) {                                                                                    \
-            debug_indent -= (int)strlen(trace_out_pre);                                                      \
-            H5D_MPIO_DEBUG_VA(rank, "%s%s", trace_out_pre, __func__);                                        \
-        }                                                                                                    \
-    } while (0)
+        #define H5D_MPIO_TRACE_EXIT(rank)                                     \
+            do {                                                              \
+                bool trace_flag = H5D_mpio_debug_flags_s[(int)'t'];           \
+                                                                              \
+                if (trace_flag) {                                             \
+                    debug_indent -= (int)strlen(trace_out_pre);               \
+                    H5D_MPIO_DEBUG_VA(rank, "%s%s", trace_out_pre, __func__); \
+                }                                                             \
+            } while (0)
 
-#define H5D_MPIO_TIME_START(rank, op_name)                                                                   \
-    {                                                                                                        \
-        bool              time_flag  = H5D_mpio_debug_flags_s[(int)'c'];                                     \
-        double            start_time = 0.0, end_time = 0.0;                                                  \
-        const char *const op = op_name;                                                                      \
-                                                                                                             \
-        if (time_flag) {                                                                                     \
-            start_time = MPI_Wtime();                                                                        \
-        }
+        #define H5D_MPIO_TIME_START(rank, op_name)                 \
+            {                                                      \
+                bool time_flag = H5D_mpio_debug_flags_s[(int)'c']; \
+                double start_time = 0.0, end_time = 0.0;           \
+                const char* const op = op_name;                    \
+                                                                   \
+                if (time_flag) {                                   \
+                    start_time = MPI_Wtime();                      \
+                }
 
-#define H5D_MPIO_TIME_STOP(rank)                                                                             \
-    if (time_flag) {                                                                                         \
-        end_time = MPI_Wtime();                                                                              \
-        H5D_MPIO_DEBUG_VA(rank, "'%s' took %f seconds", op, (end_time - start_time));                        \
-    }                                                                                                        \
-    }
+        #define H5D_MPIO_TIME_STOP(rank)                                                      \
+            if (time_flag) {                                                                  \
+                end_time = MPI_Wtime();                                                       \
+                H5D_MPIO_DEBUG_VA(rank, "'%s' took %f seconds", op, (end_time - start_time)); \
+            }                                                                                 \
+            }
 
 /*---------------------------------------------------------------------------
  * Function:    H5D__mpio_parse_debug_str
@@ -551,8 +557,7 @@ static FILE             *debug_stream             = NULL;
  *
  *---------------------------------------------------------------------------
  */
-static void
-H5D__mpio_parse_debug_str(const char *s)
+static void H5D__mpio_parse_debug_str(const char* s)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -564,30 +569,34 @@ H5D__mpio_parse_debug_str(const char *s)
         if (c >= (int)'0' && c <= (int)'9') {
             bool range = false;
 
-            if (*(s + 1) && *(s + 2))
+            if (*(s + 1) && *(s + 2)) {
                 range = (int)*(s + 1) == '-' && (int)*(s + 2) >= (int)'0' && (int)*(s + 2) <= (int)'9';
+            }
 
             if (range) {
                 int start_rank = c - (int)'0';
-                int end_rank   = (int)*(s + 2) - '0';
-                int num_ranks  = end_rank - start_rank + 1;
+                int end_rank = (int)*(s + 2) - '0';
+                int num_ranks = end_rank - start_rank + 1;
                 int i;
 
                 if (num_ranks > 8) {
-                    end_rank  = start_rank + 7;
+                    end_rank = start_rank + 7;
                     num_ranks = 8;
                 }
 
-                for (i = 0; i < num_ranks; i++)
+                for (i = 0; i < num_ranks; i++) {
                     H5D_mpio_debug_rank_s[i] = start_rank++;
+                }
 
                 s += 3;
             }
-            else
+            else {
                 H5D_mpio_debug_rank_s[0] = c - (int)'0';
+            }
         }
-        else
+        else {
             H5D_mpio_debug_flags_s[c]++;
+        }
 
         s++;
     }
@@ -595,11 +604,10 @@ H5D__mpio_parse_debug_str(const char *s)
     FUNC_LEAVE_NOAPI_VOID
 }
 
-static herr_t
-H5D__mpio_debug_init(void)
+static herr_t H5D__mpio_debug_init(void)
 {
-    const char *debug_str;
-    herr_t      ret_value = SUCCEED;
+    const char* debug_str;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -610,18 +618,20 @@ H5D__mpio_debug_init(void)
 
     /* Retrieve and parse the H5Dmpio debug string */
     debug_str = getenv("H5D_mpio_Debug");
-    if (debug_str)
+    if (debug_str) {
         H5D__mpio_parse_debug_str(debug_str);
+    }
 
-    if (H5DEBUG(D))
+    if (H5DEBUG(D)) {
         debug_stream = stdout;
+    }
 
     H5D_mpio_debug_inited = true;
 
     FUNC_LEAVE_NOAPI(ret_value)
 }
 
-#endif
+    #endif
 
 /*-------------------------------------------------------------------------
  * Function:    H5D__mpio_opt_possible
@@ -637,20 +647,19 @@ H5D__mpio_debug_init(void)
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5D__mpio_opt_possible(H5D_io_info_t *io_info)
+htri_t H5D__mpio_opt_possible(H5D_io_info_t* io_info)
 {
     H5FD_mpio_xfer_t io_xfer_mode; /* MPI I/O transfer mode */
-    size_t           i;
-    H5D_t           *dset;
-    const H5S_t     *file_space;
-    const H5S_t     *mem_space;
-    H5D_type_info_t *type_info;
-    unsigned         local_cause[2] = {0, 0}; /* [0] Local reason(s) for breaking collective mode */
-                                              /* [1] Flag if dataset is both: H5S_ALL and small */
-    unsigned global_cause[2] = {0, 0};        /* Global reason(s) for breaking collective mode */
-    htri_t   is_vl_storage;    /* Whether the dataset's datatype is stored in a variable-length form */
-    htri_t   ret_value = true; /* Return value */
+    size_t i;
+    H5D_t* dset;
+    const H5S_t* file_space;
+    const H5S_t* mem_space;
+    H5D_type_info_t* type_info;
+    unsigned local_cause[2] = { 0, 0 };  /* [0] Local reason(s) for breaking collective mode */
+                                         /* [1] Flag if dataset is both: H5S_ALL and small */
+    unsigned global_cause[2] = { 0, 0 }; /* Global reason(s) for breaking collective mode */
+    htri_t is_vl_storage;                /* Whether the dataset's datatype is stored in a variable-length form */
+    htri_t ret_value = true;             /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -663,27 +672,31 @@ H5D__mpio_opt_possible(H5D_io_info_t *io_info)
     }
 
     /* For independent I/O, get out quickly and don't try to form consensus */
-    if (H5CX_get_io_xfer_mode(&io_xfer_mode) < 0)
+    if (H5CX_get_io_xfer_mode(&io_xfer_mode) < 0) {
         /* Set error flag, but keep going */
         local_cause[0] |= H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE;
-    if (io_xfer_mode == H5FD_MPIO_INDEPENDENT)
+    }
+    if (io_xfer_mode == H5FD_MPIO_INDEPENDENT) {
         local_cause[0] |= H5D_MPIO_SET_INDEPENDENT;
+    }
 
     for (i = 0; i < io_info->count; i++) {
         /* Check for skipped I/O */
-        if (io_info->dsets_info[i].skip_io)
+        if (io_info->dsets_info[i].skip_io) {
             continue;
+        }
 
         /* Set convenience pointers */
-        dset       = io_info->dsets_info[i].dset;
+        dset = io_info->dsets_info[i].dset;
         file_space = io_info->dsets_info[i].file_space;
-        mem_space  = io_info->dsets_info[i].mem_space;
-        type_info  = &io_info->dsets_info[i].type_info;
+        mem_space = io_info->dsets_info[i].mem_space;
+        type_info = &io_info->dsets_info[i].type_info;
 
         /* Optimized MPI types flag must be set */
         /* (based on 'HDF5_MPI_OPT_TYPES' environment variable) */
-        if (!H5FD_mpi_opt_types_g)
+        if (!H5FD_mpi_opt_types_g) {
             local_cause[0] |= H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED;
+        }
 
         /* Decision on whether to use selection I/O should have been made by now */
         assert(io_info->use_select_io != H5D_SELECTION_IO_MODE_DEFAULT);
@@ -692,47 +705,50 @@ H5D__mpio_opt_possible(H5D_io_info_t *io_info)
          * is auto (default), disable collective for now and re-enable later if we can */
         if (io_info->use_select_io != H5D_SELECTION_IO_MODE_ON) {
             /* Don't allow collective operations if datatype conversions need to happen */
-            if (!type_info->is_conv_noop)
+            if (!type_info->is_conv_noop) {
                 local_cause[0] |= H5D_MPIO_DATATYPE_CONVERSION;
+            }
 
             /* Don't allow collective operations if data transform operations should occur */
-            if (!type_info->is_xform_noop)
+            if (!type_info->is_xform_noop) {
                 local_cause[0] |= H5D_MPIO_DATA_TRANSFORMS;
+            }
         }
 
         /* Check whether these are both simple or scalar dataspaces */
-        if (!((H5S_SIMPLE == H5S_GET_EXTENT_TYPE(mem_space) || H5S_SCALAR == H5S_GET_EXTENT_TYPE(mem_space) ||
-               H5S_NULL == H5S_GET_EXTENT_TYPE(mem_space)) &&
-              (H5S_SIMPLE == H5S_GET_EXTENT_TYPE(file_space) ||
-               H5S_SCALAR == H5S_GET_EXTENT_TYPE(file_space))))
+        if (!((H5S_SIMPLE == H5S_GET_EXTENT_TYPE(mem_space) || H5S_SCALAR == H5S_GET_EXTENT_TYPE(mem_space) || H5S_NULL == H5S_GET_EXTENT_TYPE(mem_space)) &&
+              (H5S_SIMPLE == H5S_GET_EXTENT_TYPE(file_space) || H5S_SCALAR == H5S_GET_EXTENT_TYPE(file_space)))) {
             local_cause[0] |= H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES;
+        }
 
         /* Dataset storage must be contiguous or chunked */
-        if (!(dset->shared->layout.type == H5D_CONTIGUOUS || dset->shared->layout.type == H5D_CHUNKED))
+        if (!(dset->shared->layout.type == H5D_CONTIGUOUS || dset->shared->layout.type == H5D_CHUNKED)) {
             local_cause[0] |= H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET;
+        }
 
         /* check if external-file storage is used */
-        if (dset->shared->dcpl_cache.efl.nused > 0)
+        if (dset->shared->dcpl_cache.efl.nused > 0) {
             local_cause[0] |= H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET;
+        }
 
-            /* The handling of memory space is different for chunking and contiguous
-             *  storage.  For contiguous storage, mem_space and file_space won't change
-             *  when it it is doing disk IO.  For chunking storage, mem_space will
-             *  change for different chunks. So for chunking storage, whether we can
-             *  use collective IO will defer until each chunk IO is reached.
-             */
+        /* The handling of memory space is different for chunking and contiguous
+         *  storage.  For contiguous storage, mem_space and file_space won't change
+         *  when it it is doing disk IO.  For chunking storage, mem_space will
+         *  change for different chunks. So for chunking storage, whether we can
+         *  use collective IO will defer until each chunk IO is reached.
+         */
 
-#ifndef H5_HAVE_PARALLEL_FILTERED_WRITES
+    #ifndef H5_HAVE_PARALLEL_FILTERED_WRITES
         /* Don't allow writes to filtered datasets if the functionality is disabled */
-        if (io_info->op_type == H5D_IO_OP_WRITE && dset->shared->dcpl_cache.pline.nused > 0)
+        if (io_info->op_type == H5D_IO_OP_WRITE && dset->shared->dcpl_cache.pline.nused > 0) {
             local_cause[0] |= H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED;
-#endif
+        }
+    #endif
 
         /* Check if we would be able to perform collective if we could use selection I/O.  If so add reasons
          * for not using selection I/O to local_cause[0] */
         if ((io_info->use_select_io == H5D_SELECTION_IO_MODE_OFF) && local_cause[0] &&
-            !(local_cause[0] &
-              ~((unsigned)H5D_MPIO_DATATYPE_CONVERSION | (unsigned)H5D_MPIO_DATA_TRANSFORMS))) {
+            !(local_cause[0] & ~((unsigned)H5D_MPIO_DATATYPE_CONVERSION | (unsigned)H5D_MPIO_DATA_TRANSFORMS))) {
             assert(io_info->no_selection_io_cause & H5D_MPIO_NO_SELECTION_IO_CAUSES);
             local_cause[0] |= H5D_MPIO_NO_SELECTION_IO;
         }
@@ -742,30 +758,36 @@ H5D__mpio_opt_possible(H5D_io_info_t *io_info)
          */
 
         /* Check to see if the process is reading the entire dataset */
-        if (H5S_GET_SELECT_TYPE(file_space) != H5S_SEL_ALL)
+        if (H5S_GET_SELECT_TYPE(file_space) != H5S_SEL_ALL) {
             local_cause[1] |= H5D_MPIO_RANK0_NOT_H5S_ALL;
+        }
         /* Only perform this optimization for contiguous datasets, currently */
-        else if (H5D_CONTIGUOUS != dset->shared->layout.type)
+        else if (H5D_CONTIGUOUS != dset->shared->layout.type) {
             /* Flag to do a MPI_Bcast of the data from one proc instead of
              * having all the processes involved in the collective I/O.
              */
             local_cause[1] |= H5D_MPIO_RANK0_NOT_CONTIGUOUS;
-        else if ((is_vl_storage = H5T_is_vl_storage(type_info->dset_type)) < 0)
+        }
+        else if ((is_vl_storage = H5T_is_vl_storage(type_info->dset_type)) < 0) {
             local_cause[0] |= H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE;
-        else if (is_vl_storage)
+        }
+        else if (is_vl_storage) {
             local_cause[1] |= H5D_MPIO_RANK0_NOT_FIXED_SIZE;
+        }
         else {
             size_t type_size; /* Size of dataset's datatype */
 
             /* Retrieve the size of the dataset's datatype */
-            if (0 == (type_size = H5T_GET_SIZE(type_info->dset_type)))
+            if (0 == (type_size = H5T_GET_SIZE(type_info->dset_type))) {
                 local_cause[0] |= H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE;
+            }
             else {
                 hssize_t snelmts; /* [Signed] # of elements in dataset's dataspace */
 
                 /* Retrieve the size of the dataset's datatype */
-                if ((snelmts = H5S_GET_EXTENT_NPOINTS(file_space)) < 0)
+                if ((snelmts = H5S_GET_EXTENT_NPOINTS(file_space)) < 0) {
                     local_cause[0] |= H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE;
+                }
                 else {
                     hsize_t dset_size;
 
@@ -776,25 +798,27 @@ H5D__mpio_opt_possible(H5D_io_info_t *io_info)
                      * of the data from one process instead of having all the processes
                      * involved in the collective I/O.
                      */
-                    if (dset_size > ((hsize_t)(2.0F * H5_GB) - 1))
+                    if (dset_size > ((hsize_t)(2.0F * H5_GB) - 1)) {
                         local_cause[1] |= H5D_MPIO_RANK0_GREATER_THAN_2GB;
+                    }
                 } /* end else */
-            }     /* end else */
-        }         /* end else */
-    }             /* end for loop */
+            } /* end else */
+        } /* end else */
+    } /* end for loop */
 
     /* Check for independent I/O */
-    if (local_cause[0] & H5D_MPIO_SET_INDEPENDENT)
+    if (local_cause[0] & H5D_MPIO_SET_INDEPENDENT) {
         global_cause[0] = local_cause[0];
+    }
     else {
         int mpi_code; /* MPI error code */
 
         /* Form consensus opinion among all processes about whether to perform
          * collective I/O
          */
-        if (MPI_SUCCESS !=
-            (mpi_code = MPI_Allreduce(local_cause, global_cause, 2, MPI_UNSIGNED, MPI_BOR, io_info->comm)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Allreduce(local_cause, global_cause, 2, MPI_UNSIGNED, MPI_BOR, io_info->comm))) {
             HMPI_GOTO_ERROR(FAIL, "MPI_Allreduce failed", mpi_code)
+        }
     } /* end else */
 
     /* Set the local & global values of no-collective-cause in the API context */
@@ -804,10 +828,10 @@ H5D__mpio_opt_possible(H5D_io_info_t *io_info)
     /* Set read-with-rank0-and-bcast flag if possible */
     if (global_cause[0] == 0 && global_cause[1] == 0) {
         H5CX_set_mpio_rank0_bcast(true);
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
         H5CX_test_set_mpio_coll_rank0_bcast(true);
-#endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
-    }  /* end if */
+    #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
+    } /* end if */
 
     /* Set the return value, based on the global cause */
     ret_value = global_cause[0] > 0 ? false : true;
@@ -830,16 +854,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__mpio_get_no_coll_cause_strings(char *local_cause, size_t local_cause_len, char *global_cause,
-                                    size_t global_cause_len)
+herr_t H5D__mpio_get_no_coll_cause_strings(char* local_cause, size_t local_cause_len, char* global_cause, size_t global_cause_len)
 {
     uint32_t local_no_coll_cause;
     uint32_t global_no_coll_cause;
-    size_t   local_cause_bytes_written  = 0;
-    size_t   global_cause_bytes_written = 0;
-    int      nbits;
-    herr_t   ret_value = SUCCEED;
+    size_t local_cause_bytes_written = 0;
+    size_t global_cause_bytes_written = 0;
+    int nbits;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -852,16 +874,20 @@ H5D__mpio_get_no_coll_cause_strings(char *local_cause, size_t local_cause_len, c
     HDcompile_assert(H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE == (H5D_mpio_no_collective_cause_t)0x200);
 
     /* Initialize output buffers */
-    if (local_cause)
+    if (local_cause) {
         *local_cause = '\0';
-    if (global_cause)
+    }
+    if (global_cause) {
         *global_cause = '\0';
+    }
 
     /* Retrieve the local and global cause flags from the API context */
-    if (H5CX_get_mpio_local_no_coll_cause(&local_no_coll_cause) < 0)
+    if (H5CX_get_mpio_local_no_coll_cause(&local_no_coll_cause) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "unable to get local no collective cause value");
-    if (H5CX_get_mpio_global_no_coll_cause(&global_no_coll_cause) < 0)
+    }
+    if (H5CX_get_mpio_global_no_coll_cause(&global_no_coll_cause) < 0) {
         HGOTO_ERROR(H5E_CONTEXT, H5E_CANTGET, FAIL, "unable to get global no collective cause value");
+    }
 
     /*
      * Append each of the "reason for breaking collective I/O"
@@ -870,49 +896,35 @@ H5D__mpio_get_no_coll_cause_strings(char *local_cause, size_t local_cause_len, c
     nbits = 8 * sizeof(local_no_coll_cause);
     for (int bit_pos = 0; bit_pos < nbits; bit_pos++) {
         H5D_mpio_no_collective_cause_t cur_cause;
-        const char                    *cause_str;
-        size_t                         buf_space_left;
+        const char* cause_str;
+        size_t buf_space_left;
 
         cur_cause = (H5D_mpio_no_collective_cause_t)(1 << bit_pos);
-        if (cur_cause == H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE)
+        if (cur_cause == H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE) {
             break;
+        }
 
         switch (cur_cause) {
-            case H5D_MPIO_SET_INDEPENDENT:
-                cause_str = "independent I/O was requested";
-                break;
-            case H5D_MPIO_DATATYPE_CONVERSION:
-                cause_str = "datatype conversions were required";
-                break;
-            case H5D_MPIO_DATA_TRANSFORMS:
-                cause_str = "data transforms needed to be applied";
-                break;
-            case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED:
-                cause_str = "optimized MPI types flag wasn't set";
-                break;
-            case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES:
-                cause_str = "one of the dataspaces was neither simple nor scalar";
-                break;
-            case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET:
-                cause_str = "dataset was not contiguous or chunked";
-                break;
-            case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED:
-                cause_str = "parallel writes to filtered datasets are disabled";
-                break;
-            case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE:
-                cause_str = "an error occurred while checking if collective I/O was possible";
-                break;
-            case H5D_MPIO_NO_SELECTION_IO:
-                cause_str = "collective I/O may be supported by selection or vector I/O but that feature was "
-                            "not possible (see causes via H5Pget_no_selection_io_cause())";
-                break;
+        case H5D_MPIO_SET_INDEPENDENT                         : cause_str = "independent I/O was requested"; break;
+        case H5D_MPIO_DATATYPE_CONVERSION                     : cause_str = "datatype conversions were required"; break;
+        case H5D_MPIO_DATA_TRANSFORMS                         : cause_str = "data transforms needed to be applied"; break;
+        case H5D_MPIO_MPI_OPT_TYPES_ENV_VAR_DISABLED          : cause_str = "optimized MPI types flag wasn't set"; break;
+        case H5D_MPIO_NOT_SIMPLE_OR_SCALAR_DATASPACES         : cause_str = "one of the dataspaces was neither simple nor scalar"; break;
+        case H5D_MPIO_NOT_CONTIGUOUS_OR_CHUNKED_DATASET       : cause_str = "dataset was not contiguous or chunked"; break;
+        case H5D_MPIO_PARALLEL_FILTERED_WRITES_DISABLED       : cause_str = "parallel writes to filtered datasets are disabled"; break;
+        case H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE: cause_str = "an error occurred while checking if collective I/O was possible"; break;
+        case H5D_MPIO_NO_SELECTION_IO:
+            cause_str =
+                "collective I/O may be supported by selection or vector I/O but that feature was "
+                "not possible (see causes via H5Pget_no_selection_io_cause())";
+            break;
 
-            case H5D_MPIO_COLLECTIVE:
-            case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE:
-            default:
-                cause_str = "invalid or unknown no collective cause reason";
-                assert(0 && "invalid or unknown no collective cause reason");
-                break;
+        case H5D_MPIO_COLLECTIVE:
+        case H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE:
+        default:
+            cause_str = "invalid or unknown no collective cause reason";
+            assert(0 && "invalid or unknown no collective cause reason");
+            break;
         }
 
         /*
@@ -978,11 +990,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__mpio_select_read(const H5D_io_info_t *io_info, hsize_t mpi_buf_count, H5S_t H5_ATTR_UNUSED *file_space,
-                      H5S_t H5_ATTR_UNUSED *mem_space)
+herr_t H5D__mpio_select_read(const H5D_io_info_t* io_info, hsize_t mpi_buf_count, H5S_t H5_ATTR_UNUSED* file_space, H5S_t H5_ATTR_UNUSED* mem_space)
 {
-    void  *rbuf      = NULL;
+    void* rbuf = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
@@ -992,9 +1002,9 @@ H5D__mpio_select_read(const H5D_io_info_t *io_info, hsize_t mpi_buf_count, H5S_t
 
     /*OKAY: CAST DISCARDS CONST QUALIFIER*/
     H5_CHECK_OVERFLOW(mpi_buf_count, hsize_t, size_t);
-    if (H5F_shared_block_read(io_info->f_sh, H5FD_MEM_DRAW, io_info->store_faddr, (size_t)mpi_buf_count,
-                              rbuf) < 0)
+    if (H5F_shared_block_read(io_info->f_sh, H5FD_MEM_DRAW, io_info->store_faddr, (size_t)mpi_buf_count, rbuf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_READERROR, FAIL, "can't finish collective parallel read");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1012,12 +1022,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__mpio_select_write(const H5D_io_info_t *io_info, hsize_t mpi_buf_count, H5S_t H5_ATTR_UNUSED *file_space,
-                       H5S_t H5_ATTR_UNUSED *mem_space)
+herr_t H5D__mpio_select_write(const H5D_io_info_t* io_info, hsize_t mpi_buf_count, H5S_t H5_ATTR_UNUSED* file_space, H5S_t H5_ATTR_UNUSED* mem_space)
 {
-    const void *wbuf      = NULL;
-    herr_t      ret_value = SUCCEED;
+    const void* wbuf = NULL;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -1026,9 +1034,9 @@ H5D__mpio_select_write(const H5D_io_info_t *io_info, hsize_t mpi_buf_count, H5S_
 
     /*OKAY: CAST DISCARDS CONST QUALIFIER*/
     H5_CHECK_OVERFLOW(mpi_buf_count, hsize_t, size_t);
-    if (H5F_shared_block_write(io_info->f_sh, H5FD_MEM_DRAW, io_info->store_faddr, (size_t)mpi_buf_count,
-                               wbuf) < 0)
+    if (H5F_shared_block_write(io_info->f_sh, H5FD_MEM_DRAW, io_info->store_faddr, (size_t)mpi_buf_count, wbuf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "can't finish collective parallel write");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1045,25 +1053,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_get_sum_chunk(const H5D_io_info_t *io_info, int *sum_chunkf)
+static herr_t H5D__mpio_get_sum_chunk(const H5D_io_info_t* io_info, int* sum_chunkf)
 {
-    int    num_chunkf; /* Number of chunks to iterate over */
+    int num_chunkf; /* Number of chunks to iterate over */
     size_t ori_num_chunkf;
-    int    mpi_code; /* MPI return code */
+    int mpi_code;   /* MPI return code */
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     /* Get the number of chunks to perform I/O on */
-    num_chunkf     = 0;
+    num_chunkf = 0;
     ori_num_chunkf = io_info->pieces_added;
     H5_CHECKED_ASSIGN(num_chunkf, int, ori_num_chunkf, size_t);
 
     /* Determine the summation of number of chunks for all processes */
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Allreduce(&num_chunkf, sum_chunkf, 1, MPI_INT, MPI_SUM, io_info->comm)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Allreduce(&num_chunkf, sum_chunkf, 1, MPI_INT, MPI_SUM, io_info->comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Allreduce failed", mpi_code)
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1080,13 +1087,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_get_sum_chunk_dset(const H5D_io_info_t *io_info, const H5D_dset_io_info_t *dset_info,
-                             int *sum_chunkf)
+static herr_t H5D__mpio_get_sum_chunk_dset(const H5D_io_info_t* io_info, const H5D_dset_io_info_t* dset_info, int* sum_chunkf)
 {
-    int    num_chunkf; /* Number of chunks to iterate over */
+    int num_chunkf; /* Number of chunks to iterate over */
     size_t ori_num_chunkf;
-    int    mpi_code; /* MPI return code */
+    int mpi_code;   /* MPI return code */
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
@@ -1096,14 +1101,14 @@ H5D__mpio_get_sum_chunk_dset(const H5D_io_info_t *io_info, const H5D_dset_io_inf
     assert(dset_info->layout->type == H5D_CHUNKED);
 
     /* Get the number of chunks to perform I/O on */
-    num_chunkf     = 0;
+    num_chunkf = 0;
     ori_num_chunkf = H5SL_count(dset_info->layout_io_info.chunk_map->dset_sel_pieces);
     H5_CHECKED_ASSIGN(num_chunkf, int, ori_num_chunkf, size_t);
 
     /* Determine the summation of number of chunks for all processes */
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Allreduce(&num_chunkf, sum_chunkf, 1, MPI_INT, MPI_SUM, io_info->comm)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Allreduce(&num_chunkf, sum_chunkf, 1, MPI_INT, MPI_SUM, io_info->comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Allreduce failed", mpi_code)
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1135,23 +1140,22 @@ done:
  * Return:      Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__piece_io(H5D_io_info_t *io_info)
+static herr_t H5D__piece_io(H5D_io_info_t* io_info)
 {
     H5FD_mpio_chunk_opt_t chunk_opt_mode;
-#ifdef H5Dmpio_DEBUG
-    bool  log_file_flag  = false;
-    FILE *debug_log_file = NULL;
-#endif
-    int      io_option        = H5D_MULTI_CHUNK_IO_MORE_OPT;
-    bool     recalc_io_option = false;
-    bool     use_multi_dset   = false;
+    #ifdef H5Dmpio_DEBUG
+    bool log_file_flag = false;
+    FILE* debug_log_file = NULL;
+    #endif
+    int io_option = H5D_MULTI_CHUNK_IO_MORE_OPT;
+    bool recalc_io_option = false;
+    bool use_multi_dset = false;
     unsigned one_link_chunk_io_threshold; /* Threshold to use single collective I/O for all chunks */
-    int      sum_chunk = -1;
-    int      mpi_rank;
-    int      mpi_size;
-    size_t   i;
-    herr_t   ret_value = SUCCEED;
+    int sum_chunk = -1;
+    int mpi_rank;
+    int mpi_size;
+    size_t i;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -1161,26 +1165,30 @@ H5D__piece_io(H5D_io_info_t *io_info)
     assert(io_info->count > 0);
 
     /* Obtain the current rank of the process and the number of ranks */
-    if ((mpi_rank = H5F_mpi_get_rank(io_info->dsets_info[0].dset->oloc.file)) < 0)
+    if ((mpi_rank = H5F_mpi_get_rank(io_info->dsets_info[0].dset->oloc.file)) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_MPI, FAIL, "unable to obtain MPI rank");
-    if ((mpi_size = H5F_mpi_get_size(io_info->dsets_info[0].dset->oloc.file)) < 0)
+    }
+    if ((mpi_size = H5F_mpi_get_size(io_info->dsets_info[0].dset->oloc.file)) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_MPI, FAIL, "unable to obtain MPI size");
+    }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     /* Initialize file-level debugging if not initialized */
-    if (!H5D_mpio_debug_inited && H5D__mpio_debug_init() < 0)
+    if (!H5D_mpio_debug_inited && H5D__mpio_debug_init() < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "can't initialize H5Dmpio debugging");
+    }
 
     /* Open file for debugging if necessary */
     log_file_flag = H5D_mpio_debug_flags_s[(int)'f'];
     if (log_file_flag) {
-        char   debug_log_filename[1024];
+        char debug_log_filename[1024];
         time_t time_now;
 
         snprintf(debug_log_filename, 1024, "H5Dmpio_debug.rank%d", mpi_rank);
 
-        if (NULL == (debug_log_file = fopen(debug_log_filename, "a")))
+        if (NULL == (debug_log_file = fopen(debug_log_filename, "a"))) {
             HGOTO_ERROR(H5E_IO, H5E_OPENERROR, FAIL, "couldn't open debugging log file");
+        }
 
         /* Print a short header for this I/O operation */
         time_now = time(NULL);
@@ -1188,21 +1196,25 @@ H5D__piece_io(H5D_io_info_t *io_info)
 
         debug_stream = debug_log_file;
     }
-#endif
+    #endif
 
     /* Check the optional property list for the collective chunk IO optimization option.
      * Only set here if it's a static option, if it needs to be calculated using the
      * number of chunks per process delay that calculation until later. */
-    if (H5CX_get_mpio_chunk_opt_mode(&chunk_opt_mode) < 0)
+    if (H5CX_get_mpio_chunk_opt_mode(&chunk_opt_mode) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get chunk optimization option");
+    }
 
-    if (H5FD_MPIO_CHUNK_ONE_IO == chunk_opt_mode)
+    if (H5FD_MPIO_CHUNK_ONE_IO == chunk_opt_mode) {
         io_option = H5D_ONE_LINK_CHUNK_IO; /*no opt*/
+    }
     /* direct request to multi-chunk-io */
-    else if (H5FD_MPIO_CHUNK_MULTI_IO == chunk_opt_mode)
+    else if (H5FD_MPIO_CHUNK_MULTI_IO == chunk_opt_mode) {
         io_option = H5D_MULTI_CHUNK_IO;
-    else
+    }
+    else {
         recalc_io_option = true;
+    }
 
     /* Check if we can and should use multi dataset path */
     if (io_info->count > 1 && (io_option == H5D_ONE_LINK_CHUNK_IO || recalc_io_option)) {
@@ -1212,23 +1224,23 @@ H5D__piece_io(H5D_io_info_t *io_info)
         /* Check if this I/O exceeds one linked chunk threshold */
         if (recalc_io_option && use_multi_dset) {
             /* Get the chunk optimization option threshold */
-            if (H5CX_get_mpio_chunk_opt_num(&one_link_chunk_io_threshold) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL,
-                            "couldn't get chunk optimization option threshold value");
+            if (H5CX_get_mpio_chunk_opt_num(&one_link_chunk_io_threshold) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get chunk optimization option threshold value");
+            }
 
             /* If the threshold is 0, no need to check number of chunks */
             if (one_link_chunk_io_threshold > 0) {
                 /* Get number of chunks for all processes */
-                if (H5D__mpio_get_sum_chunk(io_info, &sum_chunk) < 0)
-                    HGOTO_ERROR(H5E_DATASPACE, H5E_CANTSWAP, FAIL,
-                                "unable to obtain the total chunk number of all processes");
+                if (H5D__mpio_get_sum_chunk(io_info, &sum_chunk) < 0) {
+                    HGOTO_ERROR(H5E_DATASPACE, H5E_CANTSWAP, FAIL, "unable to obtain the total chunk number of all processes");
+                }
 
                 /* If the average number of chunk per process is less than the threshold, we will do multi
                  * chunk IO.  If this threshold is not exceeded for all datasets, no need to check it again
                  * for each individual dataset. */
                 if ((unsigned)sum_chunk / (unsigned)mpi_size < one_link_chunk_io_threshold) {
                     recalc_io_option = false;
-                    use_multi_dset   = false;
+                    use_multi_dset = false;
                 }
             }
         }
@@ -1236,48 +1248,47 @@ H5D__piece_io(H5D_io_info_t *io_info)
 
     /* Perform multi dataset I/O if appropriate */
     if (use_multi_dset) {
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
         /*** Set collective chunk user-input optimization API. ***/
         if (H5D_ONE_LINK_CHUNK_IO == io_option) {
-            if (H5CX_test_set_mpio_coll_chunk_link_hard(0) < 0)
+            if (H5CX_test_set_mpio_coll_chunk_link_hard(0) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+            }
         } /* end if */
-#endif    /* H5_HAVE_INSTRUMENTED_LIBRARY */
+    #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
 
         /* Process all the filtered datasets first */
         if (io_info->filtered_count > 0) {
-            if (H5D__link_chunk_filtered_collective_io(io_info, io_info->dsets_info, io_info->count, mpi_rank,
-                                                       mpi_size) < 0)
-                HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                            FAIL, "couldn't finish filtered linked chunk MPI-IO");
+            if (H5D__link_chunk_filtered_collective_io(io_info, io_info->dsets_info, io_info->count, mpi_rank, mpi_size) < 0) {
+                HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR), FAIL, "couldn't finish filtered linked chunk MPI-IO");
+            }
         }
 
         /* Process all the unfiltered datasets */
         if ((io_info->filtered_count == 0) || (io_info->filtered_count < io_info->count)) {
             /* Perform unfiltered link chunk collective IO */
-            if (H5D__link_piece_collective_io(io_info, mpi_rank) < 0)
-                HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                            FAIL, "couldn't finish linked chunk MPI-IO");
+            if (H5D__link_piece_collective_io(io_info, mpi_rank) < 0) {
+                HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR), FAIL, "couldn't finish linked chunk MPI-IO");
+            }
         }
     }
     else {
         /* Loop over datasets */
         for (i = 0; i < io_info->count; i++) {
-            if (io_info->dsets_info[i].skip_io)
+            if (io_info->dsets_info[i].skip_io) {
                 continue;
+            }
 
             if (io_info->dsets_info[i].layout->type == H5D_CONTIGUOUS) {
                 /* Contiguous: call H5D__inter_collective_io() directly */
                 H5D_mpio_actual_io_mode_t actual_io_mode = H5D_MPIO_CONTIGUOUS_COLLECTIVE;
 
                 io_info->store_faddr = io_info->dsets_info[i].store->contig.dset_addr;
-                io_info->base_maddr  = io_info->dsets_info[i].buf;
+                io_info->base_maddr = io_info->dsets_info[i].buf;
 
-                if (H5D__inter_collective_io(io_info, &io_info->dsets_info[i],
-                                             io_info->dsets_info[i].file_space,
-                                             io_info->dsets_info[i].mem_space) < 0)
-                    HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                FAIL, "couldn't finish shared collective MPI-IO");
+                if (H5D__inter_collective_io(io_info, &io_info->dsets_info[i], io_info->dsets_info[i].file_space, io_info->dsets_info[i].mem_space) < 0) {
+                    HGOTO_ERROR(H5E_IO, (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR), FAIL, "couldn't finish shared collective MPI-IO");
+                }
 
                 /* Set the actual I/O mode property. internal_collective_io will not break to
                  * independent I/O, so we set it here.
@@ -1291,129 +1302,137 @@ H5D__piece_io(H5D_io_info_t *io_info)
                 /* Recalculate io_option if necessary */
                 if (recalc_io_option) {
                     /* Get the chunk optimization option threshold */
-                    if (H5CX_get_mpio_chunk_opt_num(&one_link_chunk_io_threshold) < 0)
-                        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL,
-                                    "couldn't get chunk optimization option threshold value");
+                    if (H5CX_get_mpio_chunk_opt_num(&one_link_chunk_io_threshold) < 0) {
+                        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get chunk optimization option threshold value");
+                    }
 
                     /* If the threshold is 0, no need to check number of chunks */
                     if (one_link_chunk_io_threshold == 0) {
-                        io_option        = H5D_ONE_LINK_CHUNK_IO_MORE_OPT;
+                        io_option = H5D_ONE_LINK_CHUNK_IO_MORE_OPT;
                         recalc_io_option = false;
                     }
                     else {
                         /* Get number of chunks for all processes */
-                        if (H5D__mpio_get_sum_chunk_dset(io_info, &io_info->dsets_info[i], &sum_chunk) < 0)
-                            HGOTO_ERROR(H5E_DATASPACE, H5E_CANTSWAP, FAIL,
-                                        "unable to obtain the total chunk number of all processes");
+                        if (H5D__mpio_get_sum_chunk_dset(io_info, &io_info->dsets_info[i], &sum_chunk) < 0) {
+                            HGOTO_ERROR(H5E_DATASPACE, H5E_CANTSWAP, FAIL, "unable to obtain the total chunk number of all processes");
+                        }
 
                         /* step 1: choose an IO option */
                         /* If the average number of chunk per process is greater than a threshold, we will do
                          * one link chunked IO. */
-                        if ((unsigned)sum_chunk / (unsigned)mpi_size >= one_link_chunk_io_threshold)
+                        if ((unsigned)sum_chunk / (unsigned)mpi_size >= one_link_chunk_io_threshold) {
                             io_option = H5D_ONE_LINK_CHUNK_IO_MORE_OPT;
-                        else
+                        }
+                        else {
                             io_option = H5D_MULTI_CHUNK_IO_MORE_OPT;
+                        }
                     }
                 }
 
                 /* step 2:  Go ahead to do IO.*/
                 switch (io_option) {
-                    case H5D_ONE_LINK_CHUNK_IO:
-                    case H5D_ONE_LINK_CHUNK_IO_MORE_OPT:
-                        /* Check if there are any filters in the pipeline */
-                        if (io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) {
-                            if (H5D__link_chunk_filtered_collective_io(io_info, &io_info->dsets_info[i], 1,
-                                                                       mpi_rank, mpi_size) < 0)
-                                HGOTO_ERROR(
-                                    H5E_IO,
-                                    (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                    FAIL, "couldn't finish filtered linked chunk MPI-IO");
-                        } /* end if */
-                        else {
-                            /* If there is more than one dataset we cannot make the multi dataset call here,
-                             * fall back to multi chunk */
-                            if (io_info->count > 1) {
-                                io_option        = H5D_MULTI_CHUNK_IO_MORE_OPT;
-                                recalc_io_option = true;
+                case H5D_ONE_LINK_CHUNK_IO:
+                case H5D_ONE_LINK_CHUNK_IO_MORE_OPT:
+                    /* Check if there are any filters in the pipeline */
+                    if (io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) {
+                        if (H5D__link_chunk_filtered_collective_io(io_info, &io_info->dsets_info[i], 1, mpi_rank, mpi_size) < 0) {
+                            HGOTO_ERROR(H5E_IO,
+                                        (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
+                                        FAIL,
+                                        "couldn't finish filtered linked chunk MPI-IO");
+                        }
+                    } /* end if */
+                    else {
+                        /* If there is more than one dataset we cannot make the multi dataset call here,
+                         * fall back to multi chunk */
+                        if (io_info->count > 1) {
+                            io_option = H5D_MULTI_CHUNK_IO_MORE_OPT;
+                            recalc_io_option = true;
 
-                                if (H5D__multi_chunk_collective_io(io_info, &io_info->dsets_info[i], mpi_rank,
-                                                                   mpi_size) < 0)
-                                    HGOTO_ERROR(
-                                        H5E_IO,
-                                        (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                        FAIL, "couldn't finish optimized multiple chunk MPI-IO");
-                            }
-                            else {
-                                /* Perform unfiltered link chunk collective IO */
-                                if (H5D__link_piece_collective_io(io_info, mpi_rank) < 0)
-                                    HGOTO_ERROR(
-                                        H5E_IO,
-                                        (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                        FAIL, "couldn't finish linked chunk MPI-IO");
+                            if (H5D__multi_chunk_collective_io(io_info, &io_info->dsets_info[i], mpi_rank, mpi_size) < 0) {
+                                HGOTO_ERROR(H5E_IO,
+                                            (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
+                                            FAIL,
+                                            "couldn't finish optimized multiple chunk MPI-IO");
                             }
                         }
-
-                        break;
-
-                    case H5D_MULTI_CHUNK_IO: /* direct request to do multi-chunk IO */
-                    default:                 /* multiple chunk IO via threshold */
-                        /* Check if there are any filters in the pipeline */
-                        if (io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) {
-                            if (H5D__multi_chunk_filtered_collective_io(io_info, &io_info->dsets_info[i], 1,
-                                                                        mpi_rank, mpi_size) < 0)
-                                HGOTO_ERROR(
-                                    H5E_IO,
-                                    (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                    FAIL, "couldn't finish optimized multiple filtered chunk MPI-IO");
-                        } /* end if */
                         else {
-                            /* Perform unfiltered multi chunk collective IO */
-                            if (H5D__multi_chunk_collective_io(io_info, &io_info->dsets_info[i], mpi_rank,
-                                                               mpi_size) < 0)
-                                HGOTO_ERROR(
-                                    H5E_IO,
-                                    (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
-                                    FAIL, "couldn't finish optimized multiple chunk MPI-IO");
+                            /* Perform unfiltered link chunk collective IO */
+                            if (H5D__link_piece_collective_io(io_info, mpi_rank) < 0) {
+                                HGOTO_ERROR(H5E_IO,
+                                            (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
+                                            FAIL,
+                                            "couldn't finish linked chunk MPI-IO");
+                            }
                         }
+                    }
 
-                        break;
+                    break;
+
+                case H5D_MULTI_CHUNK_IO: /* direct request to do multi-chunk IO */
+                default:                 /* multiple chunk IO via threshold */
+                    /* Check if there are any filters in the pipeline */
+                    if (io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) {
+                        if (H5D__multi_chunk_filtered_collective_io(io_info, &io_info->dsets_info[i], 1, mpi_rank, mpi_size) < 0) {
+                            HGOTO_ERROR(H5E_IO,
+                                        (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
+                                        FAIL,
+                                        "couldn't finish optimized multiple filtered chunk MPI-IO");
+                        }
+                    } /* end if */
+                    else {
+                        /* Perform unfiltered multi chunk collective IO */
+                        if (H5D__multi_chunk_collective_io(io_info, &io_info->dsets_info[i], mpi_rank, mpi_size) < 0) {
+                            HGOTO_ERROR(H5E_IO,
+                                        (H5D_IO_OP_READ == io_info->op_type ? H5E_READERROR : H5E_WRITEERROR),
+                                        FAIL,
+                                        "couldn't finish optimized multiple chunk MPI-IO");
+                        }
+                    }
+
+                    break;
                 } /* end switch */
 
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
                 {
                     /*** Set collective chunk user-input optimization APIs. ***/
                     if (H5D_ONE_LINK_CHUNK_IO == io_option) {
-                        if (H5CX_test_set_mpio_coll_chunk_link_hard(0) < 0)
+                        if (H5CX_test_set_mpio_coll_chunk_link_hard(0) < 0) {
                             HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+                        }
                     } /* end if */
                     else if (H5D_MULTI_CHUNK_IO == io_option) {
-                        if (H5CX_test_set_mpio_coll_chunk_multi_hard(0) < 0)
+                        if (H5CX_test_set_mpio_coll_chunk_multi_hard(0) < 0) {
                             HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+                        }
                     } /* end else-if */
                     else if (H5D_ONE_LINK_CHUNK_IO_MORE_OPT == io_option) {
-                        if (H5CX_test_set_mpio_coll_chunk_link_num_true(0) < 0)
+                        if (H5CX_test_set_mpio_coll_chunk_link_num_true(0) < 0) {
                             HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+                        }
                     } /* end if */
                     else if (H5D_MULTI_CHUNK_IO_MORE_OPT == io_option) {
-                        if (H5CX_test_set_mpio_coll_chunk_link_num_false(0) < 0)
+                        if (H5CX_test_set_mpio_coll_chunk_link_num_false(0) < 0) {
                             HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+                        }
                     } /* end if */
                 }
-#endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
+    #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
             }
         }
     }
 
 done:
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     /* Close debugging log file */
     if (debug_log_file) {
         fprintf(debug_log_file, "##############\n\n");
-        if (EOF == fclose(debug_log_file))
+        if (EOF == fclose(debug_log_file)) {
             HDONE_ERROR(H5E_IO, H5E_CLOSEERROR, FAIL, "couldn't close debugging log file");
+        }
         debug_stream = H5DEBUG(D) ? stdout : NULL;
     }
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__piece_io */
@@ -1428,16 +1447,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__collective_read(H5D_io_info_t *io_info)
+herr_t H5D__collective_read(H5D_io_info_t* io_info)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Call generic selection operation */
-    if (H5D__piece_io(io_info) < 0)
+    if (H5D__piece_io(io_info) < 0) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_READERROR, FAIL, "read error");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1453,16 +1472,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5D__collective_write(H5D_io_info_t *io_info)
+herr_t H5D__collective_write(H5D_io_info_t* io_info)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Call generic selection operation */
-    if (H5D__piece_io(io_info) < 0)
+    if (H5D__piece_io(io_info) < 0) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_WRITEERROR, FAIL, "write error");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1484,53 +1503,56 @@ done:
  *-------------------------------------------------------------------------
  */
 static herr_t
-#ifdef H5Dmpio_DEBUG
-H5D__link_piece_collective_io(H5D_io_info_t *io_info, int mpi_rank)
-#else
-H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_rank)
-#endif
+    #ifdef H5Dmpio_DEBUG
+    H5D__link_piece_collective_io(H5D_io_info_t* io_info, int mpi_rank)
+    #else
+    H5D__link_piece_collective_io(H5D_io_info_t* io_info, int H5_ATTR_UNUSED mpi_rank)
+    #endif
 {
-    MPI_Datatype  chunk_final_mtype; /* Final memory MPI datatype for all chunks with selection */
-    bool          chunk_final_mtype_is_derived = false;
-    MPI_Datatype  chunk_final_ftype; /* Final file MPI datatype for all chunks with selection */
-    bool          chunk_final_ftype_is_derived = false;
-    H5D_storage_t ctg_store; /* Storage info for "fake" contiguous dataset */
-    MPI_Datatype *chunk_mtype           = NULL;
-    MPI_Datatype *chunk_ftype           = NULL;
-    MPI_Aint     *chunk_file_disp_array = NULL;
-    MPI_Aint     *chunk_mem_disp_array  = NULL;
-    bool *chunk_mft_is_derived_array = NULL; /* Flags to indicate each chunk's MPI file datatype is derived */
-    bool *chunk_mbt_is_derived_array =
-        NULL;                          /* Flags to indicate each chunk's MPI memory datatype is derived */
-    int *chunk_mpi_file_counts = NULL; /* Count of MPI file datatype for each chunk */
-    int *chunk_mpi_mem_counts  = NULL; /* Count of MPI memory datatype for each chunk */
-    int  mpi_code;                     /* MPI return code */
+    MPI_Datatype chunk_final_mtype; /* Final memory MPI datatype for all chunks with selection */
+    bool chunk_final_mtype_is_derived = false;
+    MPI_Datatype chunk_final_ftype; /* Final file MPI datatype for all chunks with selection */
+    bool chunk_final_ftype_is_derived = false;
+    H5D_storage_t ctg_store;        /* Storage info for "fake" contiguous dataset */
+    MPI_Datatype* chunk_mtype = NULL;
+    MPI_Datatype* chunk_ftype = NULL;
+    MPI_Aint* chunk_file_disp_array = NULL;
+    MPI_Aint* chunk_mem_disp_array = NULL;
+    bool* chunk_mft_is_derived_array = NULL; /* Flags to indicate each chunk's MPI file datatype is derived */
+    bool* chunk_mbt_is_derived_array = NULL; /* Flags to indicate each chunk's MPI memory datatype is derived */
+    int* chunk_mpi_file_counts = NULL;       /* Count of MPI file datatype for each chunk */
+    int* chunk_mpi_mem_counts = NULL;        /* Count of MPI memory datatype for each chunk */
+    int mpi_code;                            /* MPI return code */
     H5D_mpio_actual_chunk_opt_mode_t actual_chunk_opt_mode = H5D_MPIO_LINK_CHUNK;
-    H5D_mpio_actual_io_mode_t        actual_io_mode        = 0;
-    herr_t                           ret_value             = SUCCEED;
+    H5D_mpio_actual_io_mode_t actual_io_mode = 0;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     /* set actual_io_mode */
     for (size_t i = 0; i < io_info->count; i++) {
         /* Skip this dataset if no I/O is being performed */
-        if (io_info->dsets_info[i].skip_io)
+        if (io_info->dsets_info[i].skip_io) {
             continue;
+        }
 
         /* Filtered datasets are processed elsewhere. A contiguous dataset
          * could possibly have filters in the DCPL pipeline, but the library
          * will currently ignore optional filters in that case.
          */
-        if ((io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) &&
-            (io_info->dsets_info[i].layout->type != H5D_CONTIGUOUS))
+        if ((io_info->dsets_info[i].dset->shared->dcpl_cache.pline.nused > 0) && (io_info->dsets_info[i].layout->type != H5D_CONTIGUOUS)) {
             continue;
+        }
 
-        if (io_info->dsets_info[i].layout->type == H5D_CHUNKED)
+        if (io_info->dsets_info[i].layout->type == H5D_CHUNKED) {
             actual_io_mode |= H5D_MPIO_CHUNK_COLLECTIVE;
-        else if (io_info->dsets_info[i].layout->type == H5D_CONTIGUOUS)
+        }
+        else if (io_info->dsets_info[i].layout->type == H5D_CONTIGUOUS) {
             actual_io_mode |= H5D_MPIO_CONTIGUOUS_COLLECTIVE;
-        else
+        }
+        else {
             HGOTO_ERROR(H5E_IO, H5E_UNSUPPORTED, FAIL, "unsupported storage layout");
+        }
     }
 
     /* Set the actual-chunk-opt-mode property. */
@@ -1543,9 +1565,9 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
     /* Code block for actual actions (Build a MPI Type, IO) */
     {
         hsize_t mpi_buf_count; /* Number of MPI types */
-        size_t  num_chunk;     /* Number of chunks for this process */
+        size_t num_chunk;      /* Number of chunks for this process */
 
-        H5D_piece_info_t *piece_info;
+        H5D_piece_info_t* piece_info;
 
         /* local variable for base address for buffer */
         H5_flexible_const_ptr_t base_buf_addr;
@@ -1556,9 +1578,9 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
         num_chunk = io_info->pieces_added - io_info->filtered_pieces_added;
         H5_CHECK_OVERFLOW(num_chunk, size_t, int);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
         H5D_MPIO_DEBUG_VA(mpi_rank, "num_chunk = %zu\n", num_chunk);
-#endif
+    #endif
 
         /* Set up MPI datatype for chunks selected */
         if (num_chunk) {
@@ -1576,32 +1598,35 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
             }
 
             /* Sort sel_pieces if necessary */
-            if (need_sort)
-                qsort(io_info->sel_pieces, io_info->pieces_added, sizeof(io_info->sel_pieces[0]),
-                      H5D__cmp_piece_addr);
+            if (need_sort) {
+                qsort(io_info->sel_pieces, io_info->pieces_added, sizeof(io_info->sel_pieces[0]), H5D__cmp_piece_addr);
+            }
 
             /* Allocate chunking information */
-            if (NULL == (chunk_mtype = (MPI_Datatype *)H5MM_malloc(num_chunk * sizeof(MPI_Datatype))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk memory datatype buffer");
-            if (NULL == (chunk_ftype = (MPI_Datatype *)H5MM_malloc(num_chunk * sizeof(MPI_Datatype))))
+            if (NULL == (chunk_mtype = (MPI_Datatype*)H5MM_malloc(num_chunk * sizeof(MPI_Datatype)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk memory datatype buffer");
+            }
+            if (NULL == (chunk_ftype = (MPI_Datatype*)H5MM_malloc(num_chunk * sizeof(MPI_Datatype)))) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk file datatype buffer");
-            if (NULL == (chunk_file_disp_array = (MPI_Aint *)H5MM_malloc(num_chunk * sizeof(MPI_Aint))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk file displacement buffer");
-            if (NULL == (chunk_mem_disp_array = (MPI_Aint *)H5MM_calloc(num_chunk * sizeof(MPI_Aint))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk memory displacement buffer");
-            if (NULL == (chunk_mpi_mem_counts = (int *)H5MM_calloc(num_chunk * sizeof(int))))
+            }
+            if (NULL == (chunk_file_disp_array = (MPI_Aint*)H5MM_malloc(num_chunk * sizeof(MPI_Aint)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk file displacement buffer");
+            }
+            if (NULL == (chunk_mem_disp_array = (MPI_Aint*)H5MM_calloc(num_chunk * sizeof(MPI_Aint)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk memory displacement buffer");
+            }
+            if (NULL == (chunk_mpi_mem_counts = (int*)H5MM_calloc(num_chunk * sizeof(int)))) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk memory counts buffer");
-            if (NULL == (chunk_mpi_file_counts = (int *)H5MM_calloc(num_chunk * sizeof(int))))
+            }
+            if (NULL == (chunk_mpi_file_counts = (int*)H5MM_calloc(num_chunk * sizeof(int)))) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk file counts buffer");
-            if (NULL == (chunk_mbt_is_derived_array = (bool *)H5MM_calloc(num_chunk * sizeof(bool))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk memory is derived datatype flags buffer");
-            if (NULL == (chunk_mft_is_derived_array = (bool *)H5MM_calloc(num_chunk * sizeof(bool))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk file is derived datatype flags buffer");
+            }
+            if (NULL == (chunk_mbt_is_derived_array = (bool*)H5MM_calloc(num_chunk * sizeof(bool)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk memory is derived datatype flags buffer");
+            }
+            if (NULL == (chunk_mft_is_derived_array = (bool*)H5MM_calloc(num_chunk * sizeof(bool)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk file is derived datatype flags buffer");
+            }
 
             /*
              * After sorting sel_pieces according to file address, locate
@@ -1612,20 +1637,20 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
             for (size_t i = 0; i < io_info->pieces_added; i++) {
                 if (!io_info->sel_pieces[i]->filtered_dset) {
                     ctg_store.contig.dset_addr = io_info->sel_pieces[i]->faddr;
-                    base_buf_addr              = io_info->sel_pieces[i]->dset_info->buf;
+                    base_buf_addr = io_info->sel_pieces[i]->dset_info->buf;
                     break;
                 }
             }
             assert(ctg_store.contig.dset_addr != HADDR_UNDEF);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
             H5D_MPIO_DEBUG(mpi_rank, "before iterate over selected pieces\n");
-#endif
+    #endif
 
             /* Obtain MPI derived datatype from all individual pieces */
             /* Iterate over selected pieces for this process */
             for (size_t i = 0, curr_idx = 0; i < io_info->pieces_added; i++) {
-                hsize_t *permute_map = NULL; /* array that holds the mapping from the old,
+                hsize_t* permute_map = NULL; /* array that holds the mapping from the old,
                                                 out-of-order displacements to the in-order
                                                 displacements of the MPI datatypes of the
                                                 point selection of the file space */
@@ -1635,15 +1660,17 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
                 piece_info = io_info->sel_pieces[i];
 
                 /* Skip over filtered pieces as they are processed elsewhere */
-                if (piece_info->filtered_dset)
+                if (piece_info->filtered_dset) {
                     continue;
+                }
 
                 /* Obtain disk and memory MPI derived datatype */
                 /* NOTE: The permute_map array can be allocated within H5S_mpio_space_type
                  *              and will be fed into the next call to H5S_mpio_space_type
                  *              where it will be freed.
                  */
-                if (H5S_mpio_space_type(piece_info->fspace, piece_info->dset_info->type_info.src_type_size,
+                if (H5S_mpio_space_type(piece_info->fspace,
+                                        piece_info->dset_info->type_info.src_type_size,
                                         &chunk_ftype[curr_idx],                  /* OUT: datatype created */
                                         &chunk_mpi_file_counts[curr_idx],        /* OUT */
                                         &(chunk_mft_is_derived_array[curr_idx]), /* OUT */
@@ -1656,84 +1683,92 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
                                                                                     permutation of points
                                                                                     selected in case they
                                                                                     are out of order */
-                                        &is_permuted /* OUT */) < 0)
+                                        &is_permuted /* OUT */) < 0) {
                     HGOTO_ERROR(H5E_DATASPACE, H5E_BADTYPE, FAIL, "couldn't create MPI file type");
+                }
 
                 /* Sanity check */
-                if (is_permuted)
+                if (is_permuted) {
                     assert(permute_map);
-                if (H5S_mpio_space_type(piece_info->mspace, piece_info->dset_info->type_info.dst_type_size,
-                                        &chunk_mtype[curr_idx], &chunk_mpi_mem_counts[curr_idx],
-                                        &(chunk_mbt_is_derived_array[curr_idx]), false, /* this is a memory
-                                                                                           space, so if the
-                                                                                           file space is not
-                                                                                           permuted, there is
-                                                                                           no need to permute
-                                                                                           the datatype if the
-                                                                                           point selections
-                                                                                           are out of order */
+                }
+                if (H5S_mpio_space_type(piece_info->mspace,
+                                        piece_info->dset_info->type_info.dst_type_size,
+                                        &chunk_mtype[curr_idx],
+                                        &chunk_mpi_mem_counts[curr_idx],
+                                        &(chunk_mbt_is_derived_array[curr_idx]),
+                                        false,        /* this is a memory
+                                                         space, so if the
+                                                         file space is not
+                                                         permuted, there is
+                                                         no need to permute
+                                                         the datatype if the
+                                                         point selections
+                                                         are out of order */
                                         &permute_map, /* IN: the permutation map
                                                          generated by the
                                                          file_space selection
                                                          and applied to the
                                                          memory selection */
-                                        &is_permuted /* IN */) < 0)
+                                        &is_permuted /* IN */) < 0) {
                     HGOTO_ERROR(H5E_DATASPACE, H5E_BADTYPE, FAIL, "couldn't create MPI buf type");
+                }
                 /* Sanity check */
-                if (is_permuted)
+                if (is_permuted) {
                     assert(!permute_map);
+                }
 
                 /* Piece address relative to the first piece addr
                  * Assign piece address to MPI displacement
                  * (assume MPI_Aint big enough to hold it) */
-                chunk_file_disp_array[curr_idx] =
-                    (MPI_Aint)piece_info->faddr - (MPI_Aint)ctg_store.contig.dset_addr;
+                chunk_file_disp_array[curr_idx] = (MPI_Aint)piece_info->faddr - (MPI_Aint)ctg_store.contig.dset_addr;
 
                 if (io_info->op_type == H5D_IO_OP_WRITE) {
-                    chunk_mem_disp_array[curr_idx] =
-                        (MPI_Aint)piece_info->dset_info->buf.cvp - (MPI_Aint)base_buf_addr.cvp;
+                    chunk_mem_disp_array[curr_idx] = (MPI_Aint)piece_info->dset_info->buf.cvp - (MPI_Aint)base_buf_addr.cvp;
                 }
                 else if (io_info->op_type == H5D_IO_OP_READ) {
-                    chunk_mem_disp_array[curr_idx] =
-                        (MPI_Aint)piece_info->dset_info->buf.vp - (MPI_Aint)base_buf_addr.vp;
+                    chunk_mem_disp_array[curr_idx] = (MPI_Aint)piece_info->dset_info->buf.vp - (MPI_Aint)base_buf_addr.vp;
                 }
 
                 curr_idx++;
             } /* end for */
 
             /* Create final MPI derived datatype for the file */
-            if (MPI_SUCCESS !=
-                (mpi_code = MPI_Type_create_struct((int)num_chunk, chunk_mpi_file_counts,
-                                                   chunk_file_disp_array, chunk_ftype, &chunk_final_ftype)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct((int)num_chunk, chunk_mpi_file_counts, chunk_file_disp_array, chunk_ftype, &chunk_final_ftype))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+            }
 
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(&chunk_final_ftype)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(&chunk_final_ftype))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+            }
             chunk_final_ftype_is_derived = true;
 
             /* Create final MPI derived datatype for memory */
-            if (MPI_SUCCESS !=
-                (mpi_code = MPI_Type_create_struct((int)num_chunk, chunk_mpi_mem_counts, chunk_mem_disp_array,
-                                                   chunk_mtype, &chunk_final_mtype)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct((int)num_chunk, chunk_mpi_mem_counts, chunk_mem_disp_array, chunk_mtype, &chunk_final_mtype))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(&chunk_final_mtype)))
+            }
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(&chunk_final_mtype))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+            }
             chunk_final_mtype_is_derived = true;
 
             /* Free the file & memory MPI datatypes for each chunk */
             for (size_t i = 0; i < num_chunk; i++) {
-                if (chunk_mbt_is_derived_array[i])
-                    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(chunk_mtype + i)))
+                if (chunk_mbt_is_derived_array[i]) {
+                    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(chunk_mtype + i))) {
                         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+                    }
+                }
 
-                if (chunk_mft_is_derived_array[i])
-                    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(chunk_ftype + i)))
+                if (chunk_mft_is_derived_array[i]) {
+                    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(chunk_ftype + i))) {
                         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+                    }
+                }
             } /* end for */
 
             /* We have a single, complicated MPI datatype for both memory & file */
             mpi_buf_count = (hsize_t)1;
-        }      /* end if */
+        } /* end if */
         else { /* no selection at all for this process */
             ctg_store.contig.dset_addr = 0;
 
@@ -1748,50 +1783,61 @@ H5D__link_piece_collective_io(H5D_io_info_t *io_info, int H5_ATTR_UNUSED mpi_ran
             mpi_buf_count = (hsize_t)0;
         } /* end else */
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
         H5D_MPIO_DEBUG(mpi_rank, "before coming to final collective I/O");
-#endif
+    #endif
         /* Set up the base storage address for this piece */
         io_info->store_faddr = ctg_store.contig.dset_addr;
-        io_info->base_maddr  = base_buf_addr;
+        io_info->base_maddr = base_buf_addr;
 
         /* Perform final collective I/O operation */
-        if (H5D__final_collective_io(io_info, mpi_buf_count, chunk_final_ftype, chunk_final_mtype) < 0)
+        if (H5D__final_collective_io(io_info, mpi_buf_count, chunk_final_ftype, chunk_final_mtype) < 0) {
             HGOTO_ERROR(H5E_IO, H5E_CANTGET, FAIL, "couldn't finish MPI-IO");
+        }
     }
 
 done:
-#ifdef H5Dmpio_DEBUG
-    H5D_MPIO_DEBUG_VA(mpi_rank, "before freeing memory inside H5D_link_collective_io ret_value = %d",
-                      ret_value);
-#endif
+    #ifdef H5Dmpio_DEBUG
+    H5D_MPIO_DEBUG_VA(mpi_rank, "before freeing memory inside H5D_link_collective_io ret_value = %d", ret_value);
+    #endif
 
-    if (ret_value < 0)
+    if (ret_value < 0) {
         H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_NO_CHUNK_OPTIMIZATION);
+    }
 
     /* Release resources */
-    if (chunk_mtype)
+    if (chunk_mtype) {
         H5MM_xfree(chunk_mtype);
-    if (chunk_ftype)
+    }
+    if (chunk_ftype) {
         H5MM_xfree(chunk_ftype);
-    if (chunk_file_disp_array)
+    }
+    if (chunk_file_disp_array) {
         H5MM_xfree(chunk_file_disp_array);
-    if (chunk_mem_disp_array)
+    }
+    if (chunk_mem_disp_array) {
         H5MM_xfree(chunk_mem_disp_array);
-    if (chunk_mpi_mem_counts)
+    }
+    if (chunk_mpi_mem_counts) {
         H5MM_xfree(chunk_mpi_mem_counts);
-    if (chunk_mpi_file_counts)
+    }
+    if (chunk_mpi_file_counts) {
         H5MM_xfree(chunk_mpi_file_counts);
-    if (chunk_mbt_is_derived_array)
+    }
+    if (chunk_mbt_is_derived_array) {
         H5MM_xfree(chunk_mbt_is_derived_array);
-    if (chunk_mft_is_derived_array)
+    }
+    if (chunk_mft_is_derived_array) {
         H5MM_xfree(chunk_mft_is_derived_array);
+    }
 
     /* Free the MPI buf and file types, if they were derived */
-    if (chunk_final_mtype_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_final_mtype)))
+    if (chunk_final_mtype_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_final_mtype))) {
         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
-    if (chunk_final_ftype_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_final_ftype)))
+    }
+    if (chunk_final_ftype_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_final_ftype))) {
         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__link_piece_collective_io */
@@ -1864,26 +1910,23 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__link_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_infos,
-                                       size_t num_dset_infos, int mpi_rank, int mpi_size)
+static herr_t H5D__link_chunk_filtered_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_infos, size_t num_dset_infos, int mpi_rank, int mpi_size)
 {
-    H5D_filtered_collective_io_info_t chunk_list               = {0};
-    unsigned char                   **chunk_msg_bufs           = NULL;
-    size_t                           *rank_chunks_assigned_map = NULL;
-    int                               chunk_msg_bufs_len       = 0;
-    herr_t                            ret_value                = SUCCEED;
+    H5D_filtered_collective_io_info_t chunk_list = { 0 };
+    unsigned char** chunk_msg_bufs = NULL;
+    size_t* rank_chunks_assigned_map = NULL;
+    int chunk_msg_bufs_len = 0;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     assert(io_info);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
-    H5D_MPIO_DEBUG_VA(mpi_rank, "Performing Linked-chunk I/O (%s) with MPI Comm size of %d",
-                      io_info->op_type == H5D_IO_OP_WRITE ? "write" : "read", mpi_size);
+    H5D_MPIO_DEBUG_VA(mpi_rank, "Performing Linked-chunk I/O (%s) with MPI Comm size of %d", io_info->op_type == H5D_IO_OP_WRITE ? "write" : "read", mpi_size);
     H5D_MPIO_TIME_START(mpi_rank, "Linked-chunk I/O");
-#endif
+    #endif
 
     /* Set the actual-chunk-opt-mode property. */
     H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_LINK_CHUNK);
@@ -1895,26 +1938,26 @@ H5D__link_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_
 
     /* Build a list of selected chunks in the collective io operation */
 
-    if (H5D__mpio_collective_filtered_chunk_io_setup(io_info, dset_infos, num_dset_infos, mpi_rank,
-                                                     &chunk_list) < 0)
+    if (H5D__mpio_collective_filtered_chunk_io_setup(io_info, dset_infos, num_dset_infos, mpi_rank, &chunk_list) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't construct filtered I/O info list");
+    }
 
     if (io_info->op_type == H5D_IO_OP_READ) { /* Filtered collective read */
-        if (H5D__mpio_collective_filtered_chunk_read(&chunk_list, io_info, num_dset_infos, mpi_rank) < 0)
+        if (H5D__mpio_collective_filtered_chunk_read(&chunk_list, io_info, num_dset_infos, mpi_rank) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "couldn't read filtered chunks");
+        }
     }
     else { /* Filtered collective write */
         if (mpi_size > 1) {
             /* Redistribute shared chunks being written to */
-            if (H5D__mpio_redistribute_shared_chunks(&chunk_list, io_info, mpi_rank, mpi_size,
-                                                     &rank_chunks_assigned_map) < 0)
+            if (H5D__mpio_redistribute_shared_chunks(&chunk_list, io_info, mpi_rank, mpi_size, &rank_chunks_assigned_map) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to redistribute shared chunks");
+            }
 
             /* Send any chunk modification messages for chunks this rank no longer owns */
-            if (H5D__mpio_share_chunk_modification_data(&chunk_list, io_info, mpi_rank, mpi_size,
-                                                        &chunk_msg_bufs, &chunk_msg_bufs_len) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                            "unable to send chunk modification data between MPI ranks");
+            if (H5D__mpio_share_chunk_modification_data(&chunk_list, io_info, mpi_rank, mpi_size, &chunk_msg_bufs, &chunk_msg_bufs_len) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to send chunk modification data between MPI ranks");
+            }
 
             /* Make sure the local chunk list was updated correctly */
             assert(chunk_list.num_chunk_infos == rank_chunks_assigned_map[mpi_rank]);
@@ -1925,22 +1968,22 @@ H5D__link_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_
          * the chunks. As chunk reads are done collectively here, all ranks
          * must participate.
          */
-        if (H5D__mpio_collective_filtered_chunk_update(&chunk_list, chunk_msg_bufs, chunk_msg_bufs_len,
-                                                       io_info, num_dset_infos, mpi_rank) < 0)
+        if (H5D__mpio_collective_filtered_chunk_update(&chunk_list, chunk_msg_bufs, chunk_msg_bufs_len, io_info, num_dset_infos, mpi_rank) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't update modified chunks");
+        }
 
         /* Free up resources used by chunk hash table now that we're done updating chunks */
         HASH_CLEAR(hh, chunk_list.chunk_hash_table);
 
         /* All ranks now collectively re-allocate file space for all chunks */
-        if (H5D__mpio_collective_filtered_chunk_reallocate(&chunk_list, rank_chunks_assigned_map, io_info,
-                                                           num_dset_infos, mpi_rank, mpi_size) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                        "couldn't collectively re-allocate file space for chunks");
+        if (H5D__mpio_collective_filtered_chunk_reallocate(&chunk_list, rank_chunks_assigned_map, io_info, num_dset_infos, mpi_rank, mpi_size) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't collectively re-allocate file space for chunks");
+        }
 
         /* Perform vector I/O on chunks */
-        if (H5D__mpio_collective_filtered_vec_io(&chunk_list, io_info->f_sh, io_info->op_type) < 0)
+        if (H5D__mpio_collective_filtered_vec_io(&chunk_list, io_info->f_sh, io_info->op_type) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't perform vector I/O on filtered chunks");
+        }
 
         /* Free up resources in anticipation of following collective operation */
         for (size_t i = 0; i < chunk_list.num_chunk_infos; i++) {
@@ -1953,71 +1996,79 @@ H5D__link_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_
         /* Participate in the collective re-insertion of all chunks modified
          * into the chunk index
          */
-        if (H5D__mpio_collective_filtered_chunk_reinsert(&chunk_list, rank_chunks_assigned_map, io_info,
-                                                         num_dset_infos, mpi_rank, mpi_size) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                        "couldn't collectively re-insert modified chunks into chunk index");
+        if (H5D__mpio_collective_filtered_chunk_reinsert(&chunk_list, rank_chunks_assigned_map, io_info, num_dset_infos, mpi_rank, mpi_size) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't collectively re-insert modified chunks into chunk index");
+        }
     }
 
 done:
-    if (ret_value < 0)
+    if (ret_value < 0) {
         H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_NO_CHUNK_OPTIMIZATION);
+    }
 
     if (chunk_msg_bufs) {
-        for (size_t i = 0; i < (size_t)chunk_msg_bufs_len; i++)
+        for (size_t i = 0; i < (size_t)chunk_msg_bufs_len; i++) {
             H5MM_free(chunk_msg_bufs[i]);
+        }
 
         H5MM_free(chunk_msg_bufs);
     }
 
     HASH_CLEAR(hh, chunk_list.chunk_hash_table);
 
-    if (rank_chunks_assigned_map)
+    if (rank_chunks_assigned_map) {
         H5MM_free(rank_chunks_assigned_map);
+    }
 
     /* Free resources used by a rank which had some selection */
     if (chunk_list.chunk_infos) {
-        for (size_t i = 0; i < chunk_list.num_chunk_infos; i++)
-            if (chunk_list.chunk_infos[i].buf)
+        for (size_t i = 0; i < chunk_list.num_chunk_infos; i++) {
+            if (chunk_list.chunk_infos[i].buf) {
                 H5MM_free(chunk_list.chunk_infos[i].buf);
+            }
+        }
 
         H5MM_free(chunk_list.chunk_infos);
     } /* end if */
 
     /* Free resources used by cached dataset info */
     if ((num_dset_infos == 1) && (chunk_list.dset_info.single_dset_info)) {
-        H5D_mpio_filtered_dset_info_t *curr_dset_info = chunk_list.dset_info.single_dset_info;
+        H5D_mpio_filtered_dset_info_t* curr_dset_info = chunk_list.dset_info.single_dset_info;
 
-        if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0)
+        if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "can't release fill buffer info");
-        if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0)
+        }
+        if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CLOSEERROR, FAIL, "can't close fill space");
+        }
 
         H5MM_free(chunk_list.dset_info.single_dset_info);
         chunk_list.dset_info.single_dset_info = NULL;
     }
     else if ((num_dset_infos > 1) && (chunk_list.dset_info.dset_info_hash_table)) {
-        H5D_mpio_filtered_dset_info_t *curr_dset_info;
-        H5D_mpio_filtered_dset_info_t *tmp;
+        H5D_mpio_filtered_dset_info_t* curr_dset_info;
+        H5D_mpio_filtered_dset_info_t* tmp;
 
         HASH_ITER(hh, chunk_list.dset_info.dset_info_hash_table, curr_dset_info, tmp)
         {
             HASH_DELETE(hh, chunk_list.dset_info.dset_info_hash_table, curr_dset_info);
 
-            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0)
+            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "can't release fill buffer info");
-            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0)
+            }
+            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CLOSEERROR, FAIL, "can't close fill space");
+            }
 
             H5MM_free(curr_dset_info);
             curr_dset_info = NULL;
         }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__link_chunk_filtered_collective_io() */
@@ -2036,25 +2087,20 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_info, int mpi_rank,
-                               int mpi_size)
+static herr_t H5D__multi_chunk_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_info, int mpi_rank, int mpi_size)
 {
-    uint8_t                   *chunk_io_option = NULL;
-    haddr_t                   *chunk_addr      = NULL;
-    H5D_storage_t              store; /* union of EFL and chunk pointer in file space */
-    H5FD_mpio_collective_opt_t last_coll_opt_mode =
-        H5FD_MPIO_COLLECTIVE_IO; /* Last parallel transfer with independent IO or collective IO with this mode
-                                  */
-    H5FD_mpio_collective_opt_t orig_coll_opt_mode =
-        H5FD_MPIO_COLLECTIVE_IO;           /* Original parallel transfer property on entering this function */
-    size_t                    total_chunk; /* Total # of chunks in dataset */
-    size_t                    num_chunk;   /* Number of chunks for this process */
-    H5SL_node_t              *piece_node      = NULL; /* Current node in chunk skip list */
-    H5D_piece_info_t         *next_chunk_info = NULL; /* Chunk info for next selected chunk */
-    size_t                    u;                      /* Local index variable */
-    H5D_mpio_actual_io_mode_t actual_io_mode =
-        H5D_MPIO_NO_COLLECTIVE; /* Local variable for tracking the I/O mode used. */
+    uint8_t* chunk_io_option = NULL;
+    haddr_t* chunk_addr = NULL;
+    H5D_storage_t store;                                                     /* union of EFL and chunk pointer in file space */
+    H5FD_mpio_collective_opt_t last_coll_opt_mode = H5FD_MPIO_COLLECTIVE_IO; /* Last parallel transfer with independent IO or collective IO with this mode
+                                                                              */
+    H5FD_mpio_collective_opt_t orig_coll_opt_mode = H5FD_MPIO_COLLECTIVE_IO; /* Original parallel transfer property on entering this function */
+    size_t total_chunk;                                                      /* Total # of chunks in dataset */
+    size_t num_chunk;                                                        /* Number of chunks for this process */
+    H5SL_node_t* piece_node = NULL;                                          /* Current node in chunk skip list */
+    H5D_piece_info_t* next_chunk_info = NULL;                                /* Chunk info for next selected chunk */
+    size_t u;                                                                /* Local index variable */
+    H5D_mpio_actual_io_mode_t actual_io_mode = H5D_MPIO_NO_COLLECTIVE;       /* Local variable for tracking the I/O mode used. */
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_TAG(dset_info->dset->oloc.addr)
@@ -2062,8 +2108,9 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
     assert(dset_info->layout->type == H5D_CHUNKED);
 
     /* Get the current I/O collective opt mode so we can restore it later */
-    if (H5CX_get_mpio_coll_opt(&orig_coll_opt_mode) < 0)
+    if (H5CX_get_mpio_coll_opt(&orig_coll_opt_mode) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get MPI-I/O collective_op property");
+    }
 
     /* Set the actual chunk opt mode property */
     H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_MULTI_CHUNK);
@@ -2073,16 +2120,17 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
     assert(total_chunk != 0);
 
     /* Allocate memories */
-    chunk_io_option = (uint8_t *)H5MM_calloc(total_chunk);
-    chunk_addr      = (haddr_t *)H5MM_calloc(total_chunk * sizeof(haddr_t));
+    chunk_io_option = (uint8_t*)H5MM_calloc(total_chunk);
+    chunk_addr = (haddr_t*)H5MM_calloc(total_chunk * sizeof(haddr_t));
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_DEBUG_VA(mpi_rank, "total_chunk %zu", total_chunk);
-#endif
+    #endif
 
     /* Obtain IO option for each chunk */
-    if (H5D__obtain_mpio_mode(io_info, dset_info, chunk_io_option, chunk_addr, mpi_rank, mpi_size) < 0)
+    if (H5D__obtain_mpio_mode(io_info, dset_info, chunk_io_option, chunk_addr, mpi_rank, mpi_size) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTRECV, FAIL, "unable to obtain MPIO mode");
+    }
 
     /* Set memory buffers */
     io_info->base_maddr = dset_info->buf;
@@ -2097,21 +2145,23 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
         /* Start at the beginning of the chunk map skiplist.  Since these chunks are
          * stored in index order and since we're iterating in index order we can
          * just check for each chunk being selected in order */
-        if (NULL == (piece_node = H5SL_first(dset_info->layout_io_info.chunk_map->dset_sel_pieces)))
+        if (NULL == (piece_node = H5SL_first(dset_info->layout_io_info.chunk_map->dset_sel_pieces))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get piece node from skip list");
-        if (NULL == (next_chunk_info = (H5D_piece_info_t *)H5SL_item(piece_node)))
+        }
+        if (NULL == (next_chunk_info = (H5D_piece_info_t*)H5SL_item(piece_node))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get piece info from skip list");
+        }
     }
 
     /* Loop over _all_ the chunks */
     for (u = 0; u < total_chunk; u++) {
-        H5D_piece_info_t *chunk_info; /* Chunk info for current chunk */
-        H5S_t            *fspace;     /* Dataspace describing chunk & selection in it */
-        H5S_t            *mspace; /* Dataspace describing selection in memory corresponding to this chunk */
+        H5D_piece_info_t* chunk_info; /* Chunk info for current chunk */
+        H5S_t* fspace;                /* Dataspace describing chunk & selection in it */
+        H5S_t* mspace;                /* Dataspace describing selection in memory corresponding to this chunk */
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
         H5D_MPIO_DEBUG_VA(mpi_rank, "mpi_rank = %d, chunk index = %zu", mpi_rank, u);
-#endif
+    #endif
 
         /* Check if this chunk is the next chunk in the skip list, if there are
          * selected chunks left to process */
@@ -2126,27 +2176,29 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
 
             /* Advance next chunk to next node in skip list, if there are more chunks selected */
             if (num_chunk) {
-                if (NULL == (piece_node = H5SL_next(piece_node)))
+                if (NULL == (piece_node = H5SL_next(piece_node))) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "chunk skip list terminated early");
-                if (NULL == (next_chunk_info = (H5D_piece_info_t *)H5SL_item(piece_node)))
+                }
+                if (NULL == (next_chunk_info = (H5D_piece_info_t*)H5SL_item(piece_node))) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get piece info from skip list");
+                }
             }
 
             /* Pass in chunk's coordinates in a union. */
             store.chunk.scaled = chunk_info->scaled;
         }
-        else
+        else {
             chunk_info = NULL;
+        }
 
         /* Collective IO for this chunk,
          * Note: even there is no selection for this process, the process still
          *      needs to contribute MPI NONE TYPE.
          */
         if (chunk_io_option[u] == H5D_CHUNK_IO_MODE_COL) {
-#ifdef H5Dmpio_DEBUG
-            H5D_MPIO_DEBUG_VA(mpi_rank, "inside collective chunk IO mpi_rank = %d, chunk index = %zu",
-                              mpi_rank, u);
-#endif
+    #ifdef H5Dmpio_DEBUG
+            H5D_MPIO_DEBUG_VA(mpi_rank, "inside collective chunk IO mpi_rank = %d, chunk index = %zu", mpi_rank, u);
+    #endif
 
             /* Set the file & memory dataspaces */
             if (chunk_info) {
@@ -2168,8 +2220,9 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
 
             /* Switch back to collective I/O */
             if (last_coll_opt_mode != H5FD_MPIO_COLLECTIVE_IO) {
-                if (H5CX_set_mpio_coll_opt(H5FD_MPIO_COLLECTIVE_IO) < 0)
+                if (H5CX_set_mpio_coll_opt(H5FD_MPIO_COLLECTIVE_IO) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "can't switch to collective I/O");
+                }
                 last_coll_opt_mode = H5FD_MPIO_COLLECTIVE_IO;
             } /* end if */
 
@@ -2177,14 +2230,14 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
             io_info->store_faddr = chunk_addr[u];
 
             /* Perform the I/O */
-            if (H5D__inter_collective_io(io_info, dset_info, fspace, mspace) < 0)
+            if (H5D__inter_collective_io(io_info, dset_info, fspace, mspace) < 0) {
                 HGOTO_ERROR(H5E_IO, H5E_CANTGET, FAIL, "couldn't finish shared collective MPI-IO");
-        }      /* end if */
+            }
+        } /* end if */
         else { /* possible independent IO for this chunk */
-#ifdef H5Dmpio_DEBUG
-            H5D_MPIO_DEBUG_VA(mpi_rank, "inside independent IO mpi_rank = %d, chunk index = %zu", mpi_rank,
-                              u);
-#endif
+    #ifdef H5Dmpio_DEBUG
+            H5D_MPIO_DEBUG_VA(mpi_rank, "inside independent IO mpi_rank = %d, chunk index = %zu", mpi_rank, u);
+    #endif
 
             assert(chunk_io_option[u] == 0);
 
@@ -2202,8 +2255,9 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
 
             /* Using independent I/O with file setview.*/
             if (last_coll_opt_mode != H5FD_MPIO_INDIVIDUAL_IO) {
-                if (H5CX_set_mpio_coll_opt(H5FD_MPIO_INDIVIDUAL_IO) < 0)
+                if (H5CX_set_mpio_coll_opt(H5FD_MPIO_INDIVIDUAL_IO) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "can't switch to individual I/O");
+                }
                 last_coll_opt_mode = H5FD_MPIO_INDIVIDUAL_IO;
             } /* end if */
 
@@ -2211,30 +2265,35 @@ H5D__multi_chunk_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_
             io_info->store_faddr = chunk_addr[u];
 
             /* Perform the I/O */
-            if (H5D__inter_collective_io(io_info, dset_info, fspace, mspace) < 0)
+            if (H5D__inter_collective_io(io_info, dset_info, fspace, mspace) < 0) {
                 HGOTO_ERROR(H5E_IO, H5E_CANTGET, FAIL, "couldn't finish shared collective MPI-IO");
-#ifdef H5Dmpio_DEBUG
+            }
+    #ifdef H5Dmpio_DEBUG
             H5D_MPIO_DEBUG(mpi_rank, "after inter collective IO");
-#endif
+    #endif
         } /* end else */
-    }     /* end for */
+    } /* end for */
 
     /* Write the local value of actual io mode to the API context. */
     H5CX_set_mpio_actual_io_mode(actual_io_mode);
 
 done:
-    if (ret_value < 0)
+    if (ret_value < 0) {
         H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_NO_CHUNK_OPTIMIZATION);
+    }
 
     /* Reset collective opt mode */
-    if (H5CX_set_mpio_coll_opt(orig_coll_opt_mode) < 0)
+    if (H5CX_set_mpio_coll_opt(orig_coll_opt_mode) < 0) {
         HDONE_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "can't reset MPI-I/O collective_op property");
+    }
 
     /* Free memory */
-    if (chunk_io_option)
+    if (chunk_io_option) {
         H5MM_xfree(chunk_io_option);
-    if (chunk_addr)
+    }
+    if (chunk_addr) {
         H5MM_xfree(chunk_addr);
+    }
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5D__multi_chunk_collective_io */
@@ -2317,29 +2376,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info_t *dset_infos,
-                                        size_t num_dset_infos, int mpi_rank, int mpi_size)
+static herr_t H5D__multi_chunk_filtered_collective_io(H5D_io_info_t* io_info, H5D_dset_io_info_t* dset_infos, size_t num_dset_infos, int mpi_rank, int mpi_size)
 {
-    H5D_filtered_collective_io_info_t chunk_list     = {0};
-    unsigned char                   **chunk_msg_bufs = NULL;
-    bool                              have_chunk_to_process;
-    size_t                            max_num_chunks;
-    int                               chunk_msg_bufs_len = 0;
-    int                               mpi_code;
-    herr_t                            ret_value = SUCCEED;
+    H5D_filtered_collective_io_info_t chunk_list = { 0 };
+    unsigned char** chunk_msg_bufs = NULL;
+    bool have_chunk_to_process;
+    size_t max_num_chunks;
+    int chunk_msg_bufs_len = 0;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_TAG(dset_infos->dset->oloc.addr)
 
     assert(io_info);
     assert(num_dset_infos == 1); /* Currently only supported with 1 dataset at a time */
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
-    H5D_MPIO_DEBUG_VA(mpi_rank, "Performing Multi-chunk I/O (%s) with MPI Comm size of %d",
-                      io_info->op_type == H5D_IO_OP_WRITE ? "write" : "read", mpi_size);
+    H5D_MPIO_DEBUG_VA(mpi_rank, "Performing Multi-chunk I/O (%s) with MPI Comm size of %d", io_info->op_type == H5D_IO_OP_WRITE ? "write" : "read", mpi_size);
     H5D_MPIO_TIME_START(mpi_rank, "Multi-chunk I/O");
-#endif
+    #endif
 
     /* Set the actual chunk opt mode property */
     H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_MULTI_CHUNK);
@@ -2350,17 +2406,19 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
     H5CX_set_mpio_actual_io_mode(H5D_MPIO_CHUNK_COLLECTIVE);
 
     /* Build a list of selected chunks in the collective IO operation */
-    if (H5D__mpio_collective_filtered_chunk_io_setup(io_info, dset_infos, 1, mpi_rank, &chunk_list) < 0)
+    if (H5D__mpio_collective_filtered_chunk_io_setup(io_info, dset_infos, 1, mpi_rank, &chunk_list) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't construct filtered I/O info list");
+    }
 
     /* Retrieve the maximum number of chunks selected for any rank */
-    if (MPI_SUCCESS != (mpi_code = MPI_Allreduce(&chunk_list.num_chunk_infos, &max_num_chunks, 1,
-                                                 MPI_UNSIGNED_LONG_LONG, MPI_MAX, io_info->comm)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Allreduce(&chunk_list.num_chunk_infos, &max_num_chunks, 1, MPI_UNSIGNED_LONG_LONG, MPI_MAX, io_info->comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Allreduce failed", mpi_code)
+    }
 
     /* If no one has anything selected at all, end the operation */
-    if (0 == max_num_chunks)
+    if (0 == max_num_chunks) {
         HGOTO_DONE(SUCCEED);
+    }
 
     if (io_info->op_type == H5D_IO_OP_READ) { /* Filtered collective read */
         for (size_t i = 0; i < max_num_chunks; i++) {
@@ -2374,18 +2432,19 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
              * on whether this rank has a chunk to work on for this iteration
              */
             if (have_chunk_to_process) {
-                single_chunk_list.chunk_infos        = &chunk_list.chunk_infos[i];
-                single_chunk_list.num_chunk_infos    = 1;
+                single_chunk_list.chunk_infos = &chunk_list.chunk_infos[i];
+                single_chunk_list.num_chunk_infos = 1;
                 single_chunk_list.num_chunks_to_read = chunk_list.chunk_infos[i].need_read ? 1 : 0;
             }
             else {
-                single_chunk_list.chunk_infos        = NULL;
-                single_chunk_list.num_chunk_infos    = 0;
+                single_chunk_list.chunk_infos = NULL;
+                single_chunk_list.num_chunk_infos = 0;
                 single_chunk_list.num_chunks_to_read = 0;
             }
 
-            if (H5D__mpio_collective_filtered_chunk_read(&single_chunk_list, io_info, 1, mpi_rank) < 0)
+            if (H5D__mpio_collective_filtered_chunk_read(&single_chunk_list, io_info, 1, mpi_rank) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "couldn't read filtered chunks");
+            }
 
             if (have_chunk_to_process && chunk_list.chunk_infos[i].buf) {
                 H5MM_free(chunk_list.chunk_infos[i].buf);
@@ -2396,14 +2455,14 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
     else { /* Filtered collective write */
         if (mpi_size > 1) {
             /* Redistribute shared chunks being written to */
-            if (H5D__mpio_redistribute_shared_chunks(&chunk_list, io_info, mpi_rank, mpi_size, NULL) < 0)
+            if (H5D__mpio_redistribute_shared_chunks(&chunk_list, io_info, mpi_rank, mpi_size, NULL) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to redistribute shared chunks");
+            }
 
             /* Send any chunk modification messages for chunks this rank no longer owns */
-            if (H5D__mpio_share_chunk_modification_data(&chunk_list, io_info, mpi_rank, mpi_size,
-                                                        &chunk_msg_bufs, &chunk_msg_bufs_len) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                            "unable to send chunk modification data between MPI ranks");
+            if (H5D__mpio_share_chunk_modification_data(&chunk_list, io_info, mpi_rank, mpi_size, &chunk_msg_bufs, &chunk_msg_bufs_len) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to send chunk modification data between MPI ranks");
+            }
         }
 
         /* Iterate over the max number of chunks among all ranks, as this rank could
@@ -2414,21 +2473,20 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
             H5D_filtered_collective_io_info_t single_chunk_list = chunk_list;
 
             /* Check if this rank has a chunk to work on for this iteration */
-            have_chunk_to_process =
-                (i < chunk_list.num_chunk_infos) && (mpi_rank == chunk_list.chunk_infos[i].new_owner);
+            have_chunk_to_process = (i < chunk_list.num_chunk_infos) && (mpi_rank == chunk_list.chunk_infos[i].new_owner);
 
             /*
              * Setup a chunk list structure for either 1 or 0 chunks, depending
              * on whether this rank has a chunk to work on for this iteration
              */
             if (have_chunk_to_process) {
-                single_chunk_list.chunk_infos        = &chunk_list.chunk_infos[i];
-                single_chunk_list.num_chunk_infos    = 1;
+                single_chunk_list.chunk_infos = &chunk_list.chunk_infos[i];
+                single_chunk_list.num_chunk_infos = 1;
                 single_chunk_list.num_chunks_to_read = chunk_list.chunk_infos[i].need_read ? 1 : 0;
             }
             else {
-                single_chunk_list.chunk_infos        = NULL;
-                single_chunk_list.num_chunk_infos    = 0;
+                single_chunk_list.chunk_infos = NULL;
+                single_chunk_list.num_chunk_infos = 0;
                 single_chunk_list.num_chunks_to_read = 0;
             }
 
@@ -2437,20 +2495,19 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
              * the chunks. As chunk reads are done collectively here, all ranks
              * must participate.
              */
-            if (H5D__mpio_collective_filtered_chunk_update(&single_chunk_list, chunk_msg_bufs,
-                                                           chunk_msg_bufs_len, io_info, 1, mpi_rank) < 0)
+            if (H5D__mpio_collective_filtered_chunk_update(&single_chunk_list, chunk_msg_bufs, chunk_msg_bufs_len, io_info, 1, mpi_rank) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't update modified chunks");
+            }
 
             /* All ranks now collectively re-allocate file space for all chunks */
-            if (H5D__mpio_collective_filtered_chunk_reallocate(&single_chunk_list, NULL, io_info, 1, mpi_rank,
-                                                               mpi_size) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                            "couldn't collectively re-allocate file space for chunks");
+            if (H5D__mpio_collective_filtered_chunk_reallocate(&single_chunk_list, NULL, io_info, 1, mpi_rank, mpi_size) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't collectively re-allocate file space for chunks");
+            }
 
             /* Perform vector I/O on chunks */
-            if (H5D__mpio_collective_filtered_vec_io(&single_chunk_list, io_info->f_sh, io_info->op_type) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                            "couldn't perform vector I/O on filtered chunks");
+            if (H5D__mpio_collective_filtered_vec_io(&single_chunk_list, io_info->f_sh, io_info->op_type) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't perform vector I/O on filtered chunks");
+            }
 
             /* Free up resources in anticipation of following collective operation */
             if (have_chunk_to_process && chunk_list.chunk_infos[i].buf) {
@@ -2461,20 +2518,21 @@ H5D__multi_chunk_filtered_collective_io(H5D_io_info_t *io_info, H5D_dset_io_info
             /* Participate in the collective re-insertion of all chunks modified
              * in this iteration into the chunk index
              */
-            if (H5D__mpio_collective_filtered_chunk_reinsert(&single_chunk_list, NULL, io_info, 1, mpi_rank,
-                                                             mpi_size) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                            "couldn't collectively re-insert modified chunks into chunk index");
+            if (H5D__mpio_collective_filtered_chunk_reinsert(&single_chunk_list, NULL, io_info, 1, mpi_rank, mpi_size) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't collectively re-insert modified chunks into chunk index");
+            }
         } /* end for */
     }
 
 done:
-    if (ret_value < 0)
+    if (ret_value < 0) {
         H5CX_set_mpio_actual_chunk_opt(H5D_MPIO_NO_CHUNK_OPTIMIZATION);
+    }
 
     if (chunk_msg_bufs) {
-        for (size_t i = 0; i < (size_t)chunk_msg_bufs_len; i++)
+        for (size_t i = 0; i < (size_t)chunk_msg_bufs_len; i++) {
             H5MM_free(chunk_msg_bufs[i]);
+        }
 
         H5MM_free(chunk_msg_bufs);
     }
@@ -2483,47 +2541,53 @@ done:
 
     /* Free resources used by a rank which had some selection */
     if (chunk_list.chunk_infos) {
-        for (size_t i = 0; i < chunk_list.num_chunk_infos; i++)
-            if (chunk_list.chunk_infos[i].buf)
+        for (size_t i = 0; i < chunk_list.num_chunk_infos; i++) {
+            if (chunk_list.chunk_infos[i].buf) {
                 H5MM_free(chunk_list.chunk_infos[i].buf);
+            }
+        }
 
         H5MM_free(chunk_list.chunk_infos);
     } /* end if */
 
     /* Free resources used by cached dataset info */
     if ((num_dset_infos == 1) && (chunk_list.dset_info.single_dset_info)) {
-        H5D_mpio_filtered_dset_info_t *curr_dset_info = chunk_list.dset_info.single_dset_info;
+        H5D_mpio_filtered_dset_info_t* curr_dset_info = chunk_list.dset_info.single_dset_info;
 
-        if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0)
+        if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "can't release fill buffer info");
-        if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0)
+        }
+        if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CLOSEERROR, FAIL, "can't close fill space");
+        }
 
         H5MM_free(chunk_list.dset_info.single_dset_info);
         chunk_list.dset_info.single_dset_info = NULL;
     }
     else if ((num_dset_infos > 1) && (chunk_list.dset_info.dset_info_hash_table)) {
-        H5D_mpio_filtered_dset_info_t *curr_dset_info;
-        H5D_mpio_filtered_dset_info_t *tmp;
+        H5D_mpio_filtered_dset_info_t* curr_dset_info;
+        H5D_mpio_filtered_dset_info_t* tmp;
 
         HASH_ITER(hh, chunk_list.dset_info.dset_info_hash_table, curr_dset_info, tmp)
         {
             HASH_DELETE(hh, chunk_list.dset_info.dset_info_hash_table, curr_dset_info);
 
-            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0)
+            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "can't release fill buffer info");
-            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0)
+            }
+            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CLOSEERROR, FAIL, "can't close fill space");
+            }
 
             H5MM_free(curr_dset_info);
             curr_dset_info = NULL;
         }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI_TAG(ret_value)
 } /* end H5D__multi_chunk_filtered_collective_io() */
@@ -2538,35 +2602,34 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__inter_collective_io(H5D_io_info_t *io_info, const H5D_dset_io_info_t *di, H5S_t *file_space,
-                         H5S_t *mem_space)
+static herr_t H5D__inter_collective_io(H5D_io_info_t* io_info, const H5D_dset_io_info_t* di, H5S_t* file_space, H5S_t* mem_space)
 {
-    int          mpi_buf_count; /* # of MPI types */
-    bool         mbt_is_derived = false;
-    bool         mft_is_derived = false;
+    int mpi_buf_count; /* # of MPI types */
+    bool mbt_is_derived = false;
+    bool mft_is_derived = false;
     MPI_Datatype mpi_file_type, mpi_buf_type;
-    int          mpi_code; /* MPI return code */
-#ifdef H5Dmpio_DEBUG
+    int mpi_code; /* MPI return code */
+    #ifdef H5Dmpio_DEBUG
     int mpi_rank;
-#endif
+    #endif
     herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_PACKAGE
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     mpi_rank = H5F_mpi_get_rank(di->dset->oloc.file);
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Inter collective I/O");
-    if (mpi_rank < 0)
+    if (mpi_rank < 0) {
         HGOTO_ERROR(H5E_IO, H5E_MPI, FAIL, "unable to obtain MPI rank");
-#endif
+    }
+    #endif
 
     assert(io_info);
 
     if ((file_space != NULL) && (mem_space != NULL)) {
-        int      mpi_file_count;     /* Number of file "objects" to transfer */
-        hsize_t *permute_map = NULL; /* array that holds the mapping from the old,
+        int mpi_file_count;          /* Number of file "objects" to transfer */
+        hsize_t* permute_map = NULL; /* array that holds the mapping from the old,
                                         out-of-order displacements to the in-order
                                         displacements of the MPI datatypes of the
                                         point selection of the file space */
@@ -2579,7 +2642,10 @@ H5D__inter_collective_io(H5D_io_info_t *io_info, const H5D_dset_io_info_t *di, H
          *              and will be fed into the next call to H5S_mpio_space_type
          *              where it will be freed.
          */
-        if (H5S_mpio_space_type(file_space, di->type_info.src_type_size, &mpi_file_type, &mpi_file_count,
+        if (H5S_mpio_space_type(file_space,
+                                di->type_info.src_type_size,
+                                &mpi_file_type,
+                                &mpi_file_count,
                                 &mft_is_derived, /* OUT: datatype created */
                                 true,            /* this is a file space, so
                                                     permute the datatype if the
@@ -2590,12 +2656,17 @@ H5D__inter_collective_io(H5D_io_info_t *io_info, const H5D_dset_io_info_t *di, H
                                                     points selected in
                                                     case they are out of
                                                     order */
-                                &is_permuted /* OUT */) < 0)
+                                &is_permuted /* OUT */) < 0) {
             HGOTO_ERROR(H5E_DATASPACE, H5E_BADTYPE, FAIL, "couldn't create MPI file type");
+        }
         /* Sanity check */
-        if (is_permuted)
+        if (is_permuted) {
             assert(permute_map);
-        if (H5S_mpio_space_type(mem_space, di->type_info.src_type_size, &mpi_buf_type, &mpi_buf_count,
+        }
+        if (H5S_mpio_space_type(mem_space,
+                                di->type_info.src_type_size,
+                                &mpi_buf_type,
+                                &mpi_buf_count,
                                 &mbt_is_derived, /* OUT: datatype created */
                                 false,           /* this is a memory space, so if
                                                     the file space is not
@@ -2609,41 +2680,46 @@ H5D__inter_collective_io(H5D_io_info_t *io_info, const H5D_dset_io_info_t *di, H
                                                     and applied to the
                                                     memory selection */
                                 ,
-                                &is_permuted /* IN */) < 0)
+                                &is_permuted /* IN */) < 0) {
             HGOTO_ERROR(H5E_DATASPACE, H5E_BADTYPE, FAIL, "couldn't create MPI buffer type");
+        }
         /* Sanity check */
-        if (is_permuted)
+        if (is_permuted) {
             assert(!permute_map);
+        }
     } /* end if */
     else {
         /* For non-selection, participate with a none MPI derived datatype, the count is 0.  */
-        mpi_buf_type   = MPI_BYTE;
-        mpi_file_type  = MPI_BYTE;
-        mpi_buf_count  = 0;
+        mpi_buf_type = MPI_BYTE;
+        mpi_file_type = MPI_BYTE;
+        mpi_buf_count = 0;
         mbt_is_derived = false;
         mft_is_derived = false;
     } /* end else */
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_DEBUG(mpi_rank, "before final collective I/O");
-#endif
+    #endif
 
     /* Perform final collective I/O operation */
-    if (H5D__final_collective_io(io_info, (hsize_t)mpi_buf_count, mpi_file_type, mpi_buf_type) < 0)
+    if (H5D__final_collective_io(io_info, (hsize_t)mpi_buf_count, mpi_file_type, mpi_buf_type) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_CANTGET, FAIL, "couldn't finish collective MPI-IO");
+    }
 
 done:
     /* Free the MPI buf and file types, if they were derived */
-    if (mbt_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&mpi_buf_type)))
+    if (mbt_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&mpi_buf_type))) {
         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
-    if (mft_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&mpi_file_type)))
+    }
+    if (mft_is_derived && MPI_SUCCESS != (mpi_code = MPI_Type_free(&mpi_file_type))) {
         HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+    }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_DEBUG_VA(mpi_rank, "before leaving inter_collective_io ret_value = %d", ret_value);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__inter_collective_io() */
@@ -2657,44 +2733,46 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__final_collective_io(H5D_io_info_t *io_info, hsize_t mpi_buf_count, MPI_Datatype mpi_file_type,
-                         MPI_Datatype mpi_buf_type)
+static herr_t H5D__final_collective_io(H5D_io_info_t* io_info, hsize_t mpi_buf_count, MPI_Datatype mpi_file_type, MPI_Datatype mpi_buf_type)
 {
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     int mpi_rank;
-#endif
+    #endif
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     mpi_rank = H5F_mpi_get_rank(io_info->dsets_info[0].dset->oloc.file);
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Final collective I/O");
-    if (mpi_rank < 0)
+    if (mpi_rank < 0) {
         HGOTO_ERROR(H5E_IO, H5E_MPI, FAIL, "unable to obtain MPI rank");
-#endif
+    }
+    #endif
 
     /* Pass buf type, file type to the file driver.  */
-    if (H5CX_set_mpi_coll_datatypes(mpi_buf_type, mpi_file_type) < 0)
+    if (H5CX_set_mpi_coll_datatypes(mpi_buf_type, mpi_file_type) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "can't set MPI-I/O collective I/O datatypes");
+    }
 
     if (io_info->op_type == H5D_IO_OP_WRITE) {
-        if ((io_info->md_io_ops.single_write_md)(io_info, mpi_buf_count, NULL, NULL) < 0)
+        if ((io_info->md_io_ops.single_write_md)(io_info, mpi_buf_count, NULL, NULL) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "optimized write failed");
+        }
     } /* end if */
     else {
-        if ((io_info->md_io_ops.single_read_md)(io_info, mpi_buf_count, NULL, NULL) < 0)
+        if ((io_info->md_io_ops.single_read_md)(io_info, mpi_buf_count, NULL, NULL) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "optimized read failed");
+        }
     } /* end else */
 
 done:
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_DEBUG_VA(mpi_rank, "ret_value before leaving final_collective_io=%d", ret_value);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__final_collective_io */
@@ -2710,17 +2788,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5D__cmp_piece_addr(const void *piece_info1, const void *piece_info2)
+static int H5D__cmp_piece_addr(const void* piece_info1, const void* piece_info2)
 {
     haddr_t addr1;
     haddr_t addr2;
-    int     ret_value = 0;
+    int ret_value = 0;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    addr1 = (*((const H5D_piece_info_t *const *)piece_info1))->faddr;
-    addr2 = (*((const H5D_piece_info_t *const *)piece_info2))->faddr;
+    addr1 = (*((const H5D_piece_info_t* const*)piece_info1))->faddr;
+    addr2 = (*((const H5D_piece_info_t* const*)piece_info2))->faddr;
 
     ret_value = H5_addr_cmp(addr1, addr2);
 
@@ -2740,20 +2817,18 @@ H5D__cmp_piece_addr(const void *piece_info1, const void *piece_info2)
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5D__cmp_filtered_collective_io_info_entry(const void *filtered_collective_io_info_entry1,
-                                           const void *filtered_collective_io_info_entry2)
+static int H5D__cmp_filtered_collective_io_info_entry(const void* filtered_collective_io_info_entry1, const void* filtered_collective_io_info_entry2)
 {
-    const H5D_filtered_collective_chunk_info_t *entry1;
-    const H5D_filtered_collective_chunk_info_t *entry2;
-    haddr_t                                     addr1     = HADDR_UNDEF;
-    haddr_t                                     addr2     = HADDR_UNDEF;
-    int                                         ret_value = 0;
+    const H5D_filtered_collective_chunk_info_t* entry1;
+    const H5D_filtered_collective_chunk_info_t* entry2;
+    haddr_t addr1 = HADDR_UNDEF;
+    haddr_t addr2 = HADDR_UNDEF;
+    int ret_value = 0;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    entry1 = (const H5D_filtered_collective_chunk_info_t *)filtered_collective_io_info_entry1;
-    entry2 = (const H5D_filtered_collective_chunk_info_t *)filtered_collective_io_info_entry2;
+    entry1 = (const H5D_filtered_collective_chunk_info_t*)filtered_collective_io_info_entry1;
+    entry2 = (const H5D_filtered_collective_chunk_info_t*)filtered_collective_io_info_entry2;
 
     addr1 = entry1->chunk_new.offset;
     addr2 = entry2->chunk_new.offset;
@@ -2779,8 +2854,9 @@ H5D__cmp_filtered_collective_io_info_entry(const void *filtered_collective_io_in
             ret_value = (chunk_idx1 > chunk_idx2) - (chunk_idx1 < chunk_idx2);
         }
     }
-    else
+    else {
         ret_value = H5_addr_defined(addr1) ? 1 : -1;
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__cmp_filtered_collective_io_info_entry() */
@@ -2798,19 +2874,18 @@ H5D__cmp_filtered_collective_io_info_entry(const void *filtered_collective_io_in
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5D__cmp_chunk_redistribute_info(const void *_entry1, const void *_entry2)
+static int H5D__cmp_chunk_redistribute_info(const void* _entry1, const void* _entry2)
 {
-    const H5D_chunk_redistribute_info_t *entry1;
-    const H5D_chunk_redistribute_info_t *entry2;
-    haddr_t                              oloc_addr1;
-    haddr_t                              oloc_addr2;
-    int                                  ret_value = 0;
+    const H5D_chunk_redistribute_info_t* entry1;
+    const H5D_chunk_redistribute_info_t* entry2;
+    haddr_t oloc_addr1;
+    haddr_t oloc_addr2;
+    int ret_value = 0;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    entry1 = (const H5D_chunk_redistribute_info_t *)_entry1;
-    entry2 = (const H5D_chunk_redistribute_info_t *)_entry2;
+    entry1 = (const H5D_chunk_redistribute_info_t*)_entry1;
+    entry2 = (const H5D_chunk_redistribute_info_t*)_entry2;
 
     oloc_addr1 = entry1->dset_oloc_addr;
     oloc_addr2 = entry2->dset_oloc_addr;
@@ -2829,8 +2904,9 @@ H5D__cmp_chunk_redistribute_info(const void *_entry1, const void *_entry2)
 
             ret_value = (orig_owner1 > orig_owner2) - (orig_owner1 < orig_owner2);
         }
-        else
+        else {
             ret_value = (chunk_index1 > chunk_index2) - (chunk_index1 < chunk_index2);
+        }
     }
 
     FUNC_LEAVE_NOAPI(ret_value)
@@ -2860,19 +2936,18 @@ H5D__cmp_chunk_redistribute_info(const void *_entry1, const void *_entry2)
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5D__cmp_chunk_redistribute_info_orig_owner(const void *_entry1, const void *_entry2)
+static int H5D__cmp_chunk_redistribute_info_orig_owner(const void* _entry1, const void* _entry2)
 {
-    const H5D_chunk_redistribute_info_t *entry1;
-    const H5D_chunk_redistribute_info_t *entry2;
-    int                                  owner1    = -1;
-    int                                  owner2    = -1;
-    int                                  ret_value = 0;
+    const H5D_chunk_redistribute_info_t* entry1;
+    const H5D_chunk_redistribute_info_t* entry2;
+    int owner1 = -1;
+    int owner2 = -1;
+    int ret_value = 0;
 
     FUNC_ENTER_PACKAGE_NOERR
 
-    entry1 = (const H5D_chunk_redistribute_info_t *)_entry1;
-    entry2 = (const H5D_chunk_redistribute_info_t *)_entry2;
+    entry1 = (const H5D_chunk_redistribute_info_t*)_entry1;
+    entry2 = (const H5D_chunk_redistribute_info_t*)_entry2;
 
     owner1 = entry1->orig_owner;
     owner2 = entry2->orig_owner;
@@ -2902,11 +2977,13 @@ H5D__cmp_chunk_redistribute_info_orig_owner(const void *_entry1, const void *_en
                 ret_value = (chunk_idx1 > chunk_idx2) - (chunk_idx1 < chunk_idx2);
             }
         }
-        else
+        else {
             ret_value = H5_addr_defined(addr1) ? 1 : -1;
+        }
     }
-    else
+    else {
         ret_value = (owner1 > owner2) - (owner1 < owner2);
+    }
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__cmp_chunk_redistribute_info_orig_owner() */
@@ -2945,26 +3022,24 @@ H5D__cmp_chunk_redistribute_info_orig_owner(const void *_entry1, const void *_en
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t assign_io_mode[],
-                      haddr_t chunk_addr[], int mpi_rank, int mpi_size)
+static herr_t H5D__obtain_mpio_mode(H5D_io_info_t* io_info, H5D_dset_io_info_t* di, uint8_t assign_io_mode[], haddr_t chunk_addr[], int mpi_rank, int mpi_size)
 {
-    size_t                  total_chunks;
-    unsigned                percent_nproc_per_chunk, threshold_nproc_per_chunk;
-    uint8_t                *io_mode_info      = NULL;
-    uint8_t                *recv_io_mode_info = NULL;
-    uint8_t                *mergebuf          = NULL;
-    uint8_t                *tempbuf;
-    H5SL_node_t            *chunk_node;
-    H5D_piece_info_t       *chunk_info;
+    size_t total_chunks;
+    unsigned percent_nproc_per_chunk, threshold_nproc_per_chunk;
+    uint8_t* io_mode_info = NULL;
+    uint8_t* recv_io_mode_info = NULL;
+    uint8_t* mergebuf = NULL;
+    uint8_t* tempbuf;
+    H5SL_node_t* chunk_node;
+    H5D_piece_info_t* chunk_info;
     H5P_coll_md_read_flag_t md_reads_file_flag;
-    bool                    md_reads_context_flag;
-    bool                    restore_md_reads_state = false;
-    MPI_Comm                comm;
-    int                     root;
-    size_t                  ic;
-    int                     mpi_code;
-    herr_t                  ret_value = SUCCEED;
+    bool md_reads_context_flag;
+    bool restore_md_reads_state = false;
+    MPI_Comm comm;
+    int root;
+    size_t ic;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -2976,14 +3051,17 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
 
     /* Setup parameters */
     H5_CHECKED_ASSIGN(total_chunks, size_t, di->layout->u.chunk.nchunks, hsize_t);
-    if (H5CX_get_mpio_chunk_opt_ratio(&percent_nproc_per_chunk) < 0)
+    if (H5CX_get_mpio_chunk_opt_ratio(&percent_nproc_per_chunk) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't get percent nproc per chunk");
+    }
     /* if ratio is 0, perform collective io */
     if (0 == percent_nproc_per_chunk) {
-        if (H5D__chunk_addrmap(di->dset, chunk_addr) < 0)
+        if (H5D__chunk_addrmap(di->dset, chunk_addr) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get chunk address");
-        for (ic = 0; ic < total_chunks; ic++)
+        }
+        for (ic = 0; ic < total_chunks; ic++) {
             assign_io_mode[ic] = H5D_CHUNK_IO_MODE_COL;
+        }
 
         HGOTO_DONE(SUCCEED);
     } /* end if */
@@ -2991,34 +3069,38 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
     threshold_nproc_per_chunk = (unsigned)mpi_size * percent_nproc_per_chunk / 100;
 
     /* Allocate memory */
-    if (NULL == (io_mode_info = (uint8_t *)H5MM_calloc(total_chunks)))
+    if (NULL == (io_mode_info = (uint8_t*)H5MM_calloc(total_chunks))) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate I/O mode info buffer");
-    if (NULL == (mergebuf = (uint8_t *)H5MM_malloc((sizeof(haddr_t) + 1) * total_chunks)))
+    }
+    if (NULL == (mergebuf = (uint8_t*)H5MM_malloc((sizeof(haddr_t) + 1) * total_chunks))) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate mergebuf buffer");
+    }
     tempbuf = mergebuf + total_chunks;
-    if (mpi_rank == root)
-        if (NULL == (recv_io_mode_info = (uint8_t *)H5MM_malloc(total_chunks * (size_t)mpi_size)))
+    if (mpi_rank == root) {
+        if (NULL == (recv_io_mode_info = (uint8_t*)H5MM_malloc(total_chunks * (size_t)mpi_size))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate recv I/O mode info buffer");
+        }
+    }
 
     /* Obtain the regularity and selection information for all chunks in this process. */
     chunk_node = H5SL_first(di->layout_io_info.chunk_map->dset_sel_pieces);
     while (chunk_node) {
-        chunk_info = (H5D_piece_info_t *)H5SL_item(chunk_node);
+        chunk_info = (H5D_piece_info_t*)H5SL_item(chunk_node);
 
         io_mode_info[chunk_info->index] = H5D_CHUNK_SELECT_REG; /* this chunk is selected and is "regular" */
-        chunk_node                      = H5SL_next(chunk_node);
+        chunk_node = H5SL_next(chunk_node);
     } /* end while */
 
     /* Gather all the information */
     H5_CHECK_OVERFLOW(total_chunks, size_t, int);
-    if (MPI_SUCCESS != (mpi_code = MPI_Gather(io_mode_info, (int)total_chunks, MPI_BYTE, recv_io_mode_info,
-                                              (int)total_chunks, MPI_BYTE, root, comm)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Gather(io_mode_info, (int)total_chunks, MPI_BYTE, recv_io_mode_info, (int)total_chunks, MPI_BYTE, root, comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Gather failed", mpi_code)
+    }
 
     /* Calculate the mode for IO(collective, independent or none) at root process */
     if (mpi_rank == root) {
-        size_t    nproc;
-        unsigned *nproc_per_chunk;
+        size_t nproc;
+        unsigned* nproc_per_chunk;
 
         /*
          * If enabled, disable collective metadata reads here.
@@ -3027,13 +3109,13 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
          * metadata reads are enabled.
          */
         if (H5F_get_coll_metadata_reads(di->dset->oloc.file)) {
-#ifndef NDEBUG
+    #ifndef NDEBUG
             {
                 H5D_chk_idx_info_t idx_info;
-                bool               index_is_open;
+                bool index_is_open;
 
-                idx_info.f      = di->dset->oloc.file;
-                idx_info.pline  = &di->dset->shared->dcpl_cache.pline;
+                idx_info.f = di->dset->oloc.file;
+                idx_info.pline = &di->dset->shared->dcpl_cache.pline;
                 idx_info.layout = &di->dset->shared->layout;
 
                 /*
@@ -3044,9 +3126,9 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
                 idx_info.layout->storage.u.chunk.ops->is_open(&idx_info, &index_is_open);
                 assert(index_is_open);
             }
-#endif
+    #endif
 
-            md_reads_file_flag    = H5P_FORCE_FALSE;
+            md_reads_file_flag = H5P_FORCE_FALSE;
             md_reads_context_flag = false;
             H5F_set_coll_metadata_reads(di->dset->oloc.file, &md_reads_file_flag, &md_reads_context_flag);
             restore_md_reads_state = true;
@@ -3054,8 +3136,9 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
 
         /* pre-computing: calculate number of processes and
             regularity of the selection occupied in each chunk */
-        if (NULL == (nproc_per_chunk = (unsigned *)H5MM_calloc(total_chunks * sizeof(unsigned))))
+        if (NULL == (nproc_per_chunk = (unsigned*)H5MM_calloc(total_chunks * sizeof(unsigned)))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate nproc_per_chunk buffer");
+        }
 
         /* calculating the chunk address */
         if (H5D__chunk_addrmap(di->dset, chunk_addr) < 0) {
@@ -3065,22 +3148,22 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
 
         /* checking for number of process per chunk and regularity of the selection*/
         for (nproc = 0; nproc < (size_t)mpi_size; nproc++) {
-            uint8_t *tmp_recv_io_mode_info = recv_io_mode_info + (nproc * total_chunks);
+            uint8_t* tmp_recv_io_mode_info = recv_io_mode_info + (nproc * total_chunks);
 
             /* Calculate the number of process per chunk and adding irregular selection option */
             for (ic = 0; ic < total_chunks; ic++, tmp_recv_io_mode_info++) {
                 if (*tmp_recv_io_mode_info != 0) {
                     nproc_per_chunk[ic]++;
                 } /* end if */
-            }     /* end for */
-        }         /* end for */
+            } /* end for */
+        } /* end for */
 
         /* Calculating MPIO mode for each chunk (collective, independent, none) */
         for (ic = 0; ic < total_chunks; ic++) {
             if (nproc_per_chunk[ic] > MAX(1, threshold_nproc_per_chunk)) {
                 assign_io_mode[ic] = H5D_CHUNK_IO_MODE_COL;
             } /* end if */
-        }     /* end for */
+        } /* end for */
 
         /* merge buffer io_mode info and chunk addr into one */
         H5MM_memcpy(mergebuf, assign_io_mode, total_chunks);
@@ -3090,42 +3173,50 @@ H5D__obtain_mpio_mode(H5D_io_info_t *io_info, H5D_dset_io_info_t *di, uint8_t as
     } /* end if */
 
     /* Broadcasting the MPI_IO option info. and chunk address info. */
-    if ((sizeof(haddr_t) + 1) * total_chunks > INT_MAX)
+    if ((sizeof(haddr_t) + 1) * total_chunks > INT_MAX) {
         HGOTO_ERROR(H5E_DATASET, H5E_BADVALUE, FAIL, "result overflow");
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Bcast(mergebuf, (int)((sizeof(haddr_t) + 1) * total_chunks), MPI_BYTE, root, comm)))
+    }
+    if (MPI_SUCCESS != (mpi_code = MPI_Bcast(mergebuf, (int)((sizeof(haddr_t) + 1) * total_chunks), MPI_BYTE, root, comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_BCast failed", mpi_code)
+    }
 
     H5MM_memcpy(assign_io_mode, mergebuf, total_chunks);
     H5MM_memcpy(chunk_addr, tempbuf, sizeof(haddr_t) * total_chunks);
 
-#ifdef H5_HAVE_INSTRUMENTED_LIBRARY
+    #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
     {
         bool coll_op = false;
 
-        for (ic = 0; ic < total_chunks; ic++)
+        for (ic = 0; ic < total_chunks; ic++) {
             if (assign_io_mode[ic] == H5D_CHUNK_IO_MODE_COL) {
-                if (H5CX_test_set_mpio_coll_chunk_multi_ratio_coll(0) < 0)
+                if (H5CX_test_set_mpio_coll_chunk_multi_ratio_coll(0) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+                }
                 coll_op = true;
                 break;
             } /* end if */
+        }
 
-        if (!coll_op)
-            if (H5CX_test_set_mpio_coll_chunk_multi_ratio_ind(0) < 0)
+        if (!coll_op) {
+            if (H5CX_test_set_mpio_coll_chunk_multi_ratio_ind(0) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTSET, FAIL, "unable to set property value");
+            }
+        }
     }
-#endif
+    #endif
 
 done:
     /* Re-enable collective metadata reads if we disabled them */
-    if (restore_md_reads_state)
+    if (restore_md_reads_state) {
         H5F_set_coll_metadata_reads(di->dset->oloc.file, &md_reads_file_flag, &md_reads_context_flag);
+    }
 
-    if (io_mode_info)
+    if (io_mode_info) {
         H5MM_free(io_mode_info);
-    if (mergebuf)
+    }
+    if (mergebuf) {
         H5MM_free(mergebuf);
+    }
     if (recv_io_mode_info) {
         assert(mpi_rank == root);
         H5MM_free(recv_io_mode_info);
@@ -3149,18 +3240,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const H5D_dset_io_info_t *di,
-                                             size_t num_dset_infos, int mpi_rank,
-                                             H5D_filtered_collective_io_info_t *chunk_list)
+static herr_t H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t* io_info,
+                                                           const H5D_dset_io_info_t* di,
+                                                           size_t num_dset_infos,
+                                                           int mpi_rank,
+                                                           H5D_filtered_collective_io_info_t* chunk_list)
 {
-    H5D_filtered_collective_chunk_info_t *local_info_array    = NULL;
-    H5D_mpio_filtered_dset_info_t        *curr_dset_info      = NULL;
-    size_t                                num_chunks_selected = 0;
-    size_t                                num_chunks_to_read  = 0;
-    size_t                                buf_idx             = 0;
-    bool                                  need_sort           = false;
-    herr_t                                ret_value           = SUCCEED;
+    H5D_filtered_collective_chunk_info_t* local_info_array = NULL;
+    H5D_mpio_filtered_dset_info_t* curr_dset_info = NULL;
+    size_t num_chunks_selected = 0;
+    size_t num_chunks_to_read = 0;
+    size_t buf_idx = 0;
+    bool need_sort = false;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -3168,40 +3260,40 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
     assert(di);
     assert(chunk_list);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Filtered Collective I/O Setup");
-#endif
+    #endif
 
     /* Calculate hash key length for chunk hash table */
     if (num_dset_infos > 1) {
         /* Just in case the structure changes... */
-        HDcompile_assert(offsetof(H5D_chunk_index_info_t, dset_oloc_addr) >
-                         offsetof(H5D_chunk_index_info_t, chunk_idx));
+        HDcompile_assert(offsetof(H5D_chunk_index_info_t, dset_oloc_addr) > offsetof(H5D_chunk_index_info_t, chunk_idx));
 
         /* Calculate key length using uthash compound key example */
-        chunk_list->chunk_hash_table_keylen = offsetof(H5D_chunk_index_info_t, dset_oloc_addr) +
-                                              sizeof(haddr_t) - offsetof(H5D_chunk_index_info_t, chunk_idx);
+        chunk_list->chunk_hash_table_keylen = offsetof(H5D_chunk_index_info_t, dset_oloc_addr) + sizeof(haddr_t) - offsetof(H5D_chunk_index_info_t, chunk_idx);
     }
-    else
+    else {
         chunk_list->chunk_hash_table_keylen = sizeof(hsize_t);
+    }
 
-    chunk_list->all_dset_indices_empty       = true;
+    chunk_list->all_dset_indices_empty = true;
     chunk_list->no_dset_index_insert_methods = true;
 
     /* Calculate size needed for total chunk list */
     for (size_t dset_idx = 0; dset_idx < num_dset_infos; dset_idx++) {
         /* Skip this dataset if no I/O is being performed */
-        if (di[dset_idx].skip_io)
+        if (di[dset_idx].skip_io) {
             continue;
+        }
 
         /* Only process filtered, chunked datasets. A contiguous dataset
          * could possibly have filters in the DCPL pipeline, but the library
          * will currently ignore optional filters in that case.
          */
-        if ((di[dset_idx].dset->shared->dcpl_cache.pline.nused == 0) ||
-            (di[dset_idx].layout->type == H5D_CONTIGUOUS))
+        if ((di[dset_idx].dset->shared->dcpl_cache.pline.nused == 0) || (di[dset_idx].layout->type == H5D_CONTIGUOUS)) {
             continue;
+        }
 
         assert(di[dset_idx].layout->type == H5D_CHUNKED);
         assert(di[dset_idx].layout->storage.type == H5D_CHUNKED);
@@ -3209,26 +3301,29 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
         num_chunks_selected += H5SL_count(di[dset_idx].layout_io_info.chunk_map->dset_sel_pieces);
     }
 
-    if (num_chunks_selected)
-        if (NULL == (local_info_array = H5MM_malloc(num_chunks_selected * sizeof(*local_info_array))))
+    if (num_chunks_selected) {
+        if (NULL == (local_info_array = H5MM_malloc(num_chunks_selected * sizeof(*local_info_array)))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate local io info array buffer");
+        }
+    }
 
     for (size_t dset_idx = 0; dset_idx < num_dset_infos; dset_idx++) {
         H5D_chunk_ud_t udata;
-        H5O_fill_t    *fill_msg;
-        haddr_t        prev_tag = HADDR_UNDEF;
+        H5O_fill_t* fill_msg;
+        haddr_t prev_tag = HADDR_UNDEF;
 
         /* Skip this dataset if no I/O is being performed */
-        if (di[dset_idx].skip_io)
+        if (di[dset_idx].skip_io) {
             continue;
+        }
 
         /* Only process filtered, chunked datasets. A contiguous dataset
          * could possibly have filters in the DCPL pipeline, but the library
          * will currently ignore optional filters in that case.
          */
-        if ((di[dset_idx].dset->shared->dcpl_cache.pline.nused == 0) ||
-            (di[dset_idx].layout->type == H5D_CONTIGUOUS))
+        if ((di[dset_idx].dset->shared->dcpl_cache.pline.nused == 0) || (di[dset_idx].layout->type == H5D_CONTIGUOUS)) {
             continue;
+        }
 
         assert(di[dset_idx].layout->storage.type == H5D_CHUNKED);
         assert(di[dset_idx].layout->storage.u.chunk.idx_type != H5D_CHUNK_IDX_NONE);
@@ -3242,46 +3337,51 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
          * table is used to quickly match a particular chunk with the cached
          * information pertaining to the dataset it resides in.
          */
-        if (NULL == (curr_dset_info = H5MM_malloc(sizeof(H5D_mpio_filtered_dset_info_t))))
+        if (NULL == (curr_dset_info = H5MM_malloc(sizeof(H5D_mpio_filtered_dset_info_t)))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate space for dataset info");
+        }
 
         memset(&curr_dset_info->fb_info, 0, sizeof(H5D_fill_buf_info_t));
 
         H5D_MPIO_INIT_CHUNK_IDX_INFO(curr_dset_info->chunk_idx_info, di[dset_idx].dset);
 
-        curr_dset_info->dset_io_info    = &di[dset_idx];
+        curr_dset_info->dset_io_info = &di[dset_idx];
         curr_dset_info->file_chunk_size = di[dset_idx].dset->shared->layout.u.chunk.size;
-        curr_dset_info->dset_oloc_addr  = di[dset_idx].dset->oloc.addr;
-        curr_dset_info->fill_space      = NULL;
-        curr_dset_info->fb_info_init    = false;
-        curr_dset_info->index_empty     = false;
+        curr_dset_info->dset_oloc_addr = di[dset_idx].dset->oloc.addr;
+        curr_dset_info->fill_space = NULL;
+        curr_dset_info->fb_info_init = false;
+        curr_dset_info->index_empty = false;
 
         /* Determine if fill values should be written to chunks */
         fill_msg = &di[dset_idx].dset->shared->dcpl_cache.fill;
-        curr_dset_info->should_fill =
-            (fill_msg->fill_time == H5D_FILL_TIME_ALLOC) ||
-            ((fill_msg->fill_time == H5D_FILL_TIME_IFSET) && fill_msg->fill_defined);
+        curr_dset_info->should_fill = (fill_msg->fill_time == H5D_FILL_TIME_ALLOC) || ((fill_msg->fill_time == H5D_FILL_TIME_IFSET) && fill_msg->fill_defined);
 
         if (curr_dset_info->should_fill) {
             hsize_t chunk_dims[H5S_MAX_RANK];
 
             assert(di[dset_idx].dset->shared->ndims == di[dset_idx].dset->shared->layout.u.chunk.ndims - 1);
-            for (size_t dim_idx = 0; dim_idx < di[dset_idx].dset->shared->layout.u.chunk.ndims - 1; dim_idx++)
+            for (size_t dim_idx = 0; dim_idx < di[dset_idx].dset->shared->layout.u.chunk.ndims - 1; dim_idx++) {
                 chunk_dims[dim_idx] = di[dset_idx].dset->shared->layout.u.chunk.dim[dim_idx];
+            }
 
             /* Get a dataspace for filling chunk memory buffers */
-            if (NULL == (curr_dset_info->fill_space = H5S_create_simple(
-                             di[dset_idx].dset->shared->layout.u.chunk.ndims - 1, chunk_dims, NULL)))
+            if (NULL == (curr_dset_info->fill_space = H5S_create_simple(di[dset_idx].dset->shared->layout.u.chunk.ndims - 1, chunk_dims, NULL))) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unable to create chunk fill dataspace");
+            }
 
             /* Initialize fill value buffer */
-            if (H5D__fill_init(&curr_dset_info->fb_info, NULL, (H5MM_allocate_t)H5D__chunk_mem_alloc,
-                               (void *)&di[dset_idx].dset->shared->dcpl_cache.pline,
+            if (H5D__fill_init(&curr_dset_info->fb_info,
+                               NULL,
+                               (H5MM_allocate_t)H5D__chunk_mem_alloc,
+                               (void*)&di[dset_idx].dset->shared->dcpl_cache.pline,
                                (H5MM_free_t)H5D__chunk_mem_free,
-                               (void *)&di[dset_idx].dset->shared->dcpl_cache.pline,
-                               &di[dset_idx].dset->shared->dcpl_cache.fill, di[dset_idx].dset->shared->type,
-                               0, curr_dset_info->file_chunk_size) < 0)
+                               (void*)&di[dset_idx].dset->shared->dcpl_cache.pline,
+                               &di[dset_idx].dset->shared->dcpl_cache.fill,
+                               di[dset_idx].dset->shared->type,
+                               0,
+                               curr_dset_info->file_chunk_size) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "can't initialize fill value buffer");
+            }
 
             curr_dset_info->fb_info_init = true;
         }
@@ -3293,15 +3393,19 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
          * later. If all datasets have empty chunk indices, we can skip the
          * collective read entirely.
          */
-        if (fill_msg->alloc_time == H5D_ALLOC_TIME_INCR)
-            if (H5D__chunk_index_empty(di[dset_idx].dset, &curr_dset_info->index_empty) < 0)
+        if (fill_msg->alloc_time == H5D_ALLOC_TIME_INCR) {
+            if (H5D__chunk_index_empty(di[dset_idx].dset, &curr_dset_info->index_empty) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "couldn't determine if chunk index is empty");
+            }
+        }
 
-        if ((fill_msg->alloc_time != H5D_ALLOC_TIME_INCR) || !curr_dset_info->index_empty)
+        if ((fill_msg->alloc_time != H5D_ALLOC_TIME_INCR) || !curr_dset_info->index_empty) {
             chunk_list->all_dset_indices_empty = false;
+        }
 
-        if (curr_dset_info->chunk_idx_info.layout->storage.u.chunk.ops->insert)
+        if (curr_dset_info->chunk_idx_info.layout->storage.u.chunk.ops->insert) {
             chunk_list->no_dset_index_insert_methods = false;
+        }
 
         /*
          * For multi-dataset I/O, use a hash table to keep a mapping between
@@ -3310,11 +3414,11 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
          * worked on.
          */
         if (num_dset_infos > 1) {
-            HASH_ADD(hh, chunk_list->dset_info.dset_info_hash_table, dset_oloc_addr, sizeof(haddr_t),
-                     curr_dset_info);
+            HASH_ADD(hh, chunk_list->dset_info.dset_info_hash_table, dset_oloc_addr, sizeof(haddr_t), curr_dset_info);
         }
-        else
+        else {
             chunk_list->dset_info.single_dset_info = curr_dset_info;
+        }
         curr_dset_info = NULL;
 
         /*
@@ -3326,36 +3430,35 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
         H5AC_tag(di[dset_idx].dset->oloc.addr, &prev_tag);
 
         if (H5SL_count(di[dset_idx].layout_io_info.chunk_map->dset_sel_pieces)) {
-            H5SL_node_t *chunk_node;
-            bool         filter_partial_edge_chunks;
+            H5SL_node_t* chunk_node;
+            bool filter_partial_edge_chunks;
 
             /* Determine whether partial edge chunks should be filtered */
-            filter_partial_edge_chunks = !(di[dset_idx].dset->shared->layout.u.chunk.flags &
-                                           H5O_LAYOUT_CHUNK_DONT_FILTER_PARTIAL_BOUND_CHUNKS);
+            filter_partial_edge_chunks = !(di[dset_idx].dset->shared->layout.u.chunk.flags & H5O_LAYOUT_CHUNK_DONT_FILTER_PARTIAL_BOUND_CHUNKS);
 
             chunk_node = H5SL_first(di[dset_idx].layout_io_info.chunk_map->dset_sel_pieces);
             while (chunk_node) {
-                H5D_piece_info_t *chunk_info;
-                hsize_t           select_npoints;
+                H5D_piece_info_t* chunk_info;
+                hsize_t select_npoints;
 
-                chunk_info = (H5D_piece_info_t *)H5SL_item(chunk_node);
+                chunk_info = (H5D_piece_info_t*)H5SL_item(chunk_node);
                 assert(chunk_info->filtered_dset);
 
                 /* Obtain this chunk's address */
-                if (H5D__chunk_lookup(di[dset_idx].dset, chunk_info->scaled, &udata) < 0)
+                if (H5D__chunk_lookup(di[dset_idx].dset, chunk_info->scaled, &udata) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "error looking up chunk address");
+                }
 
                 /* Initialize rank-local chunk info */
-                local_info_array[buf_idx].chunk_info     = chunk_info;
+                local_info_array[buf_idx].chunk_info = chunk_info;
                 local_info_array[buf_idx].chunk_buf_size = 0;
-                local_info_array[buf_idx].num_writers    = 0;
-                local_info_array[buf_idx].orig_owner     = mpi_rank;
-                local_info_array[buf_idx].new_owner      = mpi_rank;
-                local_info_array[buf_idx].buf            = NULL;
+                local_info_array[buf_idx].num_writers = 0;
+                local_info_array[buf_idx].orig_owner = mpi_rank;
+                local_info_array[buf_idx].new_owner = mpi_rank;
+                local_info_array[buf_idx].buf = NULL;
 
                 select_npoints = H5S_GET_SELECT_NPOINTS(chunk_info->fspace);
-                local_info_array[buf_idx].io_size =
-                    (size_t)select_npoints * di[dset_idx].type_info.dst_type_size;
+                local_info_array[buf_idx].io_size = (size_t)select_npoints * di[dset_idx].type_info.dst_type_size;
 
                 /*
                  * Determine whether this chunk will need to be read from the file. If this is
@@ -3401,16 +3504,16 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
                  * message is used to correctly apply chunk modification data from the message, so
                  * must be kept around both before and after I/O in this case.
                  */
-                if (io_info->op_type == H5D_IO_OP_READ)
+                if (io_info->op_type == H5D_IO_OP_READ) {
                     local_info_array[buf_idx].need_read = true;
+                }
                 else {
-                    local_info_array[buf_idx].need_read =
-                        local_info_array[buf_idx].io_size <
-                        (size_t)di[dset_idx].dset->shared->layout.u.chunk.size;
+                    local_info_array[buf_idx].need_read = local_info_array[buf_idx].io_size < (size_t)di[dset_idx].dset->shared->layout.u.chunk.size;
                 }
 
-                if (local_info_array[buf_idx].need_read)
+                if (local_info_array[buf_idx].need_read) {
                     num_chunks_to_read++;
+                }
 
                 local_info_array[buf_idx].skip_filter_pline = false;
                 if (!filter_partial_edge_chunks) {
@@ -3418,15 +3521,17 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
                      * If this is a partial edge chunk and the "don't filter partial edge
                      * chunks" flag is set, make sure not to apply filters to the chunk.
                      */
-                    if (H5D__chunk_is_partial_edge_chunk(
-                            di[dset_idx].dset->shared->ndims, di[dset_idx].dset->shared->layout.u.chunk.dim,
-                            chunk_info->scaled, di[dset_idx].dset->shared->curr_dims))
+                    if (H5D__chunk_is_partial_edge_chunk(di[dset_idx].dset->shared->ndims,
+                                                         di[dset_idx].dset->shared->layout.u.chunk.dim,
+                                                         chunk_info->scaled,
+                                                         di[dset_idx].dset->shared->curr_dims)) {
                         local_info_array[buf_idx].skip_filter_pline = true;
+                    }
                 }
 
                 /* Initialize the chunk's shared info */
                 local_info_array[buf_idx].chunk_current = udata.chunk_block;
-                local_info_array[buf_idx].chunk_new     = udata.chunk_block;
+                local_info_array[buf_idx].chunk_new = udata.chunk_block;
 
                 /*
                  * Check if the list is not in ascending order of offset in the file
@@ -3437,9 +3542,9 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
                     haddr_t curr_chunk_offset = local_info_array[buf_idx].chunk_current.offset;
                     haddr_t prev_chunk_offset = local_info_array[buf_idx - 1].chunk_current.offset;
 
-                    if (!H5_addr_defined(prev_chunk_offset) || !H5_addr_defined(curr_chunk_offset) ||
-                        (curr_chunk_offset < prev_chunk_offset))
+                    if (!H5_addr_defined(prev_chunk_offset) || !H5_addr_defined(curr_chunk_offset) || (curr_chunk_offset < prev_chunk_offset)) {
                         need_sort = true;
+                    }
                 }
 
                 /* Needed for proper hashing later on */
@@ -3452,10 +3557,12 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
                  * extensible array code calculated instead of what was calculated
                  * in the chunk file mapping.
                  */
-                if (di[dset_idx].dset->shared->layout.u.chunk.idx_type == H5D_CHUNK_IDX_EARRAY)
+                if (di[dset_idx].dset->shared->layout.u.chunk.idx_type == H5D_CHUNK_IDX_EARRAY) {
                     local_info_array[buf_idx].index_info.chunk_idx = udata.chunk_idx;
-                else
+                }
+                else {
                     local_info_array[buf_idx].index_info.chunk_idx = chunk_info->index;
+                }
 
                 assert(H5_addr_defined(di[dset_idx].dset->oloc.addr));
                 local_info_array[buf_idx].index_info.dset_oloc_addr = di[dset_idx].dset->oloc.addr;
@@ -3474,37 +3581,40 @@ H5D__mpio_collective_filtered_chunk_io_setup(const H5D_io_info_t *io_info, const
     }
 
     /* Ensure the chunk list is sorted in ascending order of offset in the file */
-    if (local_info_array && need_sort)
-        qsort(local_info_array, num_chunks_selected, sizeof(H5D_filtered_collective_chunk_info_t),
-              H5D__cmp_filtered_collective_io_info_entry);
+    if (local_info_array && need_sort) {
+        qsort(local_info_array, num_chunks_selected, sizeof(H5D_filtered_collective_chunk_info_t), H5D__cmp_filtered_collective_io_info_entry);
+    }
 
-    chunk_list->chunk_infos        = local_info_array;
-    chunk_list->num_chunk_infos    = num_chunks_selected;
+    chunk_list->chunk_infos = local_info_array;
+    chunk_list->num_chunk_infos = num_chunks_selected;
     chunk_list->num_chunks_to_read = num_chunks_to_read;
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D__mpio_dump_collective_filtered_chunk_list(chunk_list, mpi_rank);
-#endif
+    #endif
 
 done:
     if (ret_value < 0) {
         /* Free temporary cached dataset info object */
         if (curr_dset_info) {
-            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0)
+            if (curr_dset_info->fb_info_init && H5D__fill_term(&curr_dset_info->fb_info) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "can't release fill buffer info");
-            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0)
+            }
+            if (curr_dset_info->fill_space && H5S_close(curr_dset_info->fill_space) < 0) {
                 HDONE_ERROR(H5E_DATASET, H5E_CLOSEERROR, FAIL, "can't close fill space");
+            }
 
             H5MM_free(curr_dset_info);
             curr_dset_info = NULL;
 
-            if (num_dset_infos == 1)
+            if (num_dset_infos == 1) {
                 chunk_list->dset_info.single_dset_info = NULL;
+            }
         }
 
         /* Free resources used by cached dataset info hash table */
         if (num_dset_infos > 1) {
-            H5D_mpio_filtered_dset_info_t *tmp;
+            H5D_mpio_filtered_dset_info_t* tmp;
 
             HASH_ITER(hh, chunk_list->dset_info.dset_info_hash_table, curr_dset_info, tmp)
             {
@@ -3514,18 +3624,20 @@ done:
             }
         }
 
-        if (num_dset_infos == 1)
+        if (num_dset_infos == 1) {
             chunk_list->dset_info.single_dset_info = NULL;
-        else
+        }
+        else {
             chunk_list->dset_info.dset_info_hash_table = NULL;
+        }
 
         H5MM_free(local_info_array);
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_collective_filtered_chunk_io_setup() */
@@ -3550,16 +3662,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t *chunk_list,
-                                     const H5D_io_info_t *io_info, int mpi_rank, int mpi_size,
-                                     size_t **rank_chunks_assigned_map)
+static herr_t H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t* chunk_list,
+                                                   const H5D_io_info_t* io_info,
+                                                   int mpi_rank,
+                                                   int mpi_size,
+                                                   size_t** rank_chunks_assigned_map)
 {
-    bool    redistribute_on_all_ranks;
-    size_t *num_chunks_map       = NULL;
-    size_t  coll_chunk_list_size = 0;
-    int     mpi_code;
-    herr_t  ret_value = SUCCEED;
+    bool redistribute_on_all_ranks;
+    size_t* num_chunks_map = NULL;
+    size_t coll_chunk_list_size = 0;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -3567,26 +3680,28 @@ H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t *chunk_li
     assert(io_info);
     assert(mpi_size > 1); /* No chunk sharing is possible for MPI Comm size of 1 */
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Redistribute shared chunks");
-#endif
+    #endif
 
     /*
      * Allocate an array for each rank to keep track of the number of
      * chunks assigned to any other rank in order to cut down on future
      * MPI communication.
      */
-    if (NULL == (num_chunks_map = H5MM_malloc((size_t)mpi_size * sizeof(*num_chunks_map))))
+    if (NULL == (num_chunks_map = H5MM_malloc((size_t)mpi_size * sizeof(*num_chunks_map)))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate assigned chunks array");
+    }
 
     /* Perform initial Allgather to determine the collective chunk list size */
-    if (MPI_SUCCESS != (mpi_code = MPI_Allgather(&chunk_list->num_chunk_infos, 1, H5_SIZE_T_AS_MPI_TYPE,
-                                                 num_chunks_map, 1, H5_SIZE_T_AS_MPI_TYPE, io_info->comm)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Allgather(&chunk_list->num_chunk_infos, 1, H5_SIZE_T_AS_MPI_TYPE, num_chunks_map, 1, H5_SIZE_T_AS_MPI_TYPE, io_info->comm))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Allgather failed", mpi_code)
+    }
 
-    for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++)
+    for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++) {
         coll_chunk_list_size += num_chunks_map[curr_rank];
+    }
 
     /*
      * Determine whether we should perform chunk redistribution on all
@@ -3597,9 +3712,9 @@ H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t *chunk_li
      */
     redistribute_on_all_ranks = coll_chunk_list_size < H5D_CHUNK_REDISTRIBUTE_THRES;
 
-    if (H5D__mpio_redistribute_shared_chunks_int(chunk_list, num_chunks_map, redistribute_on_all_ranks,
-                                                 io_info, mpi_rank, mpi_size) < 0)
+    if (H5D__mpio_redistribute_shared_chunks_int(chunk_list, num_chunks_map, redistribute_on_all_ranks, io_info, mpi_rank, mpi_size) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTREDISTRIBUTE, FAIL, "can't redistribute shared chunks");
+    }
 
     /*
      * If the caller provided a pointer for the mapping from
@@ -3613,9 +3728,9 @@ H5D__mpio_redistribute_shared_chunks(H5D_filtered_collective_io_info_t *chunk_li
          * ranks.
          */
         if (!redistribute_on_all_ranks) {
-            if (MPI_SUCCESS !=
-                (mpi_code = MPI_Bcast(num_chunks_map, mpi_size, H5_SIZE_T_AS_MPI_TYPE, 0, io_info->comm)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Bcast(num_chunks_map, mpi_size, H5_SIZE_T_AS_MPI_TYPE, 0, io_info->comm))) {
                 HMPI_GOTO_ERROR(FAIL, "couldn't broadcast chunk mapping to other ranks", mpi_code)
+            }
         }
 
         *rank_chunks_assigned_map = num_chunks_map;
@@ -3626,10 +3741,10 @@ done:
         num_chunks_map = H5MM_xfree(num_chunks_map);
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_redistribute_shared_chunks() */
@@ -3687,23 +3802,25 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chunk_list,
-                                         size_t *num_chunks_assigned_map, bool all_ranks_involved,
-                                         const H5D_io_info_t *io_info, int mpi_rank, int mpi_size)
+static herr_t H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t* chunk_list,
+                                                       size_t* num_chunks_assigned_map,
+                                                       bool all_ranks_involved,
+                                                       const H5D_io_info_t* io_info,
+                                                       int mpi_rank,
+                                                       int mpi_size)
 {
     MPI_Datatype struct_type;
     MPI_Datatype packed_type;
-    bool         struct_type_derived         = false;
-    bool         packed_type_derived         = false;
-    size_t       coll_chunk_list_num_entries = 0;
-    void        *coll_chunk_list             = NULL;
-    int         *counts_disps_array          = NULL;
-    int         *counts_ptr                  = NULL;
-    int         *displacements_ptr           = NULL;
-    int          num_chunks_int;
-    int          mpi_code;
-    herr_t       ret_value = SUCCEED;
+    bool struct_type_derived = false;
+    bool packed_type_derived = false;
+    size_t coll_chunk_list_num_entries = 0;
+    void* coll_chunk_list = NULL;
+    int* counts_disps_array = NULL;
+    int* counts_ptr = NULL;
+    int* displacements_ptr = NULL;
+    int num_chunks_int;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -3712,10 +3829,10 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
     assert(io_info);
     assert(mpi_size > 1);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Redistribute shared chunks (internal)");
-#endif
+    #endif
 
     /*
      * Make sure it's safe to cast this rank's number
@@ -3739,22 +3856,23 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          */
         if (NULL == (counts_disps_array = H5MM_malloc(2 * (size_t)mpi_size * sizeof(*counts_disps_array)))) {
             /* Push an error, but still participate in collective gather operation */
-            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate receive counts and displacements array");
+            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate receive counts and displacements array");
         }
         else {
             /* Set the receive counts from the assigned chunks map */
             counts_ptr = counts_disps_array;
 
-            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++) {
                 H5_CHECKED_ASSIGN(counts_ptr[curr_rank], int, num_chunks_assigned_map[curr_rank], size_t);
+            }
 
             /* Set the displacements into the receive buffer for the gather operation */
             displacements_ptr = &counts_disps_array[mpi_size];
 
             *displacements_ptr = 0;
-            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++) {
                 displacements_ptr[curr_rank] = displacements_ptr[curr_rank - 1] + counts_ptr[curr_rank - 1];
+            }
         }
     }
 
@@ -3762,19 +3880,27 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
      * Construct MPI derived types for extracting information
      * necessary for MPI communication
      */
-    if (H5D__mpio_get_chunk_redistribute_info_types(&packed_type, &packed_type_derived, &struct_type,
-                                                    &struct_type_derived) < 0) {
+    if (H5D__mpio_get_chunk_redistribute_info_types(&packed_type, &packed_type_derived, &struct_type, &struct_type_derived) < 0) {
         /* Push an error, but still participate in collective gather operation */
-        HDONE_ERROR(H5E_DATASET, H5E_CANTGET, FAIL,
-                    "can't create derived datatypes for chunk redistribution info");
+        HDONE_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived datatypes for chunk redistribution info");
     }
 
     /* Perform gather operation */
-    if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos, num_chunks_int, struct_type, counts_ptr,
-                              displacements_ptr, packed_type, all_ranks_involved, 0, io_info->comm, mpi_rank,
-                              mpi_size, &coll_chunk_list, &coll_chunk_list_num_entries) < 0)
-        HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL,
-                    "can't gather chunk redistribution info to involved ranks");
+    if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos,
+                              num_chunks_int,
+                              struct_type,
+                              counts_ptr,
+                              displacements_ptr,
+                              packed_type,
+                              all_ranks_involved,
+                              0,
+                              io_info->comm,
+                              mpi_rank,
+                              mpi_size,
+                              &coll_chunk_list,
+                              &coll_chunk_list_num_entries) < 0) {
+        HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL, "can't gather chunk redistribution info to involved ranks");
+    }
 
     /*
      * If all ranks are redistributing shared chunks, we no
@@ -3785,8 +3911,9 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
     }
 
     /* No useful work to do - exit */
-    if (coll_chunk_list_num_entries == 0)
+    if (coll_chunk_list_num_entries == 0) {
         HGOTO_DONE(SUCCEED);
+    }
 
     /*
      * Phase 2 - Involved ranks now redistribute any shared chunks to new
@@ -3794,7 +3921,7 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
      */
 
     if (all_ranks_involved || (mpi_rank == 0)) {
-        H5D_chunk_redistribute_info_t *chunk_entry;
+        H5D_chunk_redistribute_info_t* chunk_entry;
 
         /* Clear the mapping from rank value -> number of assigned chunks */
         memset(num_chunks_assigned_map, 0, (size_t)mpi_size * sizeof(*num_chunks_assigned_map));
@@ -3803,8 +3930,7 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          * Sort collective chunk list according to:
          *   dataset object header address -> chunk index value -> original owning MPI rank for chunk
          */
-        qsort(coll_chunk_list, coll_chunk_list_num_entries, sizeof(H5D_chunk_redistribute_info_t),
-              H5D__cmp_chunk_redistribute_info);
+        qsort(coll_chunk_list, coll_chunk_list_num_entries, sizeof(H5D_chunk_redistribute_info_t), H5D__cmp_chunk_redistribute_info);
 
         /*
          * Process all chunks in the collective chunk list.
@@ -3814,14 +3940,14 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          * (while processing duplicate entries for shared
          * chunks).
          */
-        chunk_entry = &((H5D_chunk_redistribute_info_t *)coll_chunk_list)[0];
+        chunk_entry = &((H5D_chunk_redistribute_info_t*)coll_chunk_list)[0];
         for (size_t entry_idx = 0; entry_idx < coll_chunk_list_num_entries;) {
             haddr_t curr_oloc_addr;
             hsize_t curr_chunk_idx;
-            size_t  set_begin_index;
-            bool    keep_processing;
-            int     num_writers;
-            int     new_chunk_owner;
+            size_t set_begin_index;
+            bool keep_processing;
+            int num_writers;
+            int new_chunk_owner;
 
             /* Set chunk's initial new owner to its original owner */
             new_chunk_owner = chunk_entry->orig_owner;
@@ -3851,9 +3977,9 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
                  * writing to the chunk which currently has the least amount
                  * of chunks assigned to it
                  */
-                if (num_chunks_assigned_map[chunk_entry->orig_owner] <
-                    num_chunks_assigned_map[new_chunk_owner])
+                if (num_chunks_assigned_map[chunk_entry->orig_owner] < num_chunks_assigned_map[new_chunk_owner]) {
                     new_chunk_owner = chunk_entry->orig_owner;
+                }
 
                 /* Update the number of writers to this particular chunk */
                 num_writers++;
@@ -3874,11 +4000,11 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
 
             /* Set all processed chunk entries' "new_owner" and "num_writers" fields */
             for (; set_begin_index < entry_idx; set_begin_index++) {
-                H5D_chunk_redistribute_info_t *entry;
+                H5D_chunk_redistribute_info_t* entry;
 
-                entry = &((H5D_chunk_redistribute_info_t *)coll_chunk_list)[set_begin_index];
+                entry = &((H5D_chunk_redistribute_info_t*)coll_chunk_list)[set_begin_index];
 
-                entry->new_owner   = new_chunk_owner;
+                entry->new_owner = new_chunk_owner;
                 entry->num_writers = num_writers;
             }
 
@@ -3902,8 +4028,7 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          *       algorithm may be devised that doesn't rely on frail sorting,
          *       but the current implementation is a quick and naive approach.
          */
-        qsort(coll_chunk_list, coll_chunk_list_num_entries, sizeof(H5D_chunk_redistribute_info_t),
-              H5D__cmp_chunk_redistribute_info_orig_owner);
+        qsort(coll_chunk_list, coll_chunk_list_num_entries, sizeof(H5D_chunk_redistribute_info_t), H5D__cmp_chunk_redistribute_info_orig_owner);
     }
 
     if (all_ranks_involved) {
@@ -3914,24 +4039,25 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          * in the collective chunk list corresponding to this rank's locally
          * selected chunks and update the local list after redistribution.
          */
-        for (entry_idx = 0; entry_idx < coll_chunk_list_num_entries; entry_idx++)
-            if (mpi_rank == ((H5D_chunk_redistribute_info_t *)coll_chunk_list)[entry_idx].orig_owner)
+        for (entry_idx = 0; entry_idx < coll_chunk_list_num_entries; entry_idx++) {
+            if (mpi_rank == ((H5D_chunk_redistribute_info_t*)coll_chunk_list)[entry_idx].orig_owner) {
                 break;
+            }
+        }
 
         for (size_t info_idx = 0; info_idx < (size_t)num_chunks_int; info_idx++) {
-            H5D_chunk_redistribute_info_t *coll_entry;
+            H5D_chunk_redistribute_info_t* coll_entry;
 
-            coll_entry = &((H5D_chunk_redistribute_info_t *)coll_chunk_list)[entry_idx++];
+            coll_entry = &((H5D_chunk_redistribute_info_t*)coll_chunk_list)[entry_idx++];
 
-            chunk_list->chunk_infos[info_idx].new_owner   = coll_entry->new_owner;
+            chunk_list->chunk_infos[info_idx].new_owner = coll_entry->new_owner;
             chunk_list->chunk_infos[info_idx].num_writers = coll_entry->num_writers;
 
             /*
              * Check if the chunk list struct's `num_chunks_to_read` field
              * needs to be updated
              */
-            if (chunk_list->chunk_infos[info_idx].need_read &&
-                (chunk_list->chunk_infos[info_idx].new_owner != mpi_rank)) {
+            if (chunk_list->chunk_infos[info_idx].need_read && (chunk_list->chunk_infos[info_idx].new_owner != mpi_rank)) {
                 chunk_list->chunk_infos[info_idx].need_read = false;
 
                 assert(chunk_list->num_chunks_to_read > 0);
@@ -3945,10 +4071,17 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          * of the collective chunk list back to each rank so that their
          * local chunk lists get updated
          */
-        if (MPI_SUCCESS !=
-            (mpi_code = MPI_Scatterv(coll_chunk_list, counts_ptr, displacements_ptr, packed_type,
-                                     chunk_list->chunk_infos, num_chunks_int, struct_type, 0, io_info->comm)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Scatterv(coll_chunk_list,
+                                                    counts_ptr,
+                                                    displacements_ptr,
+                                                    packed_type,
+                                                    chunk_list->chunk_infos,
+                                                    num_chunks_int,
+                                                    struct_type,
+                                                    0,
+                                                    io_info->comm))) {
             HMPI_GOTO_ERROR(FAIL, "unable to scatter shared chunks info buffer", mpi_code)
+        }
 
         /*
          * Now that chunks have been redistributed, each rank must update
@@ -3956,8 +4089,7 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
          * may now be out of date.
          */
         for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-            if ((chunk_list->chunk_infos[info_idx].new_owner != mpi_rank) &&
-                chunk_list->chunk_infos[info_idx].need_read) {
+            if ((chunk_list->chunk_infos[info_idx].new_owner != mpi_rank) && chunk_list->chunk_infos[info_idx].need_read) {
                 chunk_list->chunk_infos[info_idx].need_read = false;
 
                 assert(chunk_list->num_chunks_to_read > 0);
@@ -3966,28 +4098,30 @@ H5D__mpio_redistribute_shared_chunks_int(H5D_filtered_collective_io_info_t *chun
         }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D__mpio_dump_collective_filtered_chunk_list(chunk_list, mpi_rank);
-#endif
+    #endif
 
 done:
     H5MM_free(coll_chunk_list);
 
     if (struct_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (packed_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&packed_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&packed_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
     H5MM_free(counts_disps_array);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_redistribute_shared_chunks_int() */
@@ -4066,28 +4200,30 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk_list, H5D_io_info_t *io_info,
-                                        int mpi_rank, int H5_ATTR_NDEBUG_UNUSED mpi_size,
-                                        unsigned char ***chunk_msg_bufs, int *chunk_msg_bufs_len)
+static herr_t H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t* chunk_list,
+                                                      H5D_io_info_t* io_info,
+                                                      int mpi_rank,
+                                                      int H5_ATTR_NDEBUG_UNUSED mpi_size,
+                                                      unsigned char*** chunk_msg_bufs,
+                                                      int* chunk_msg_bufs_len)
 {
-    H5D_filtered_collective_chunk_info_t *chunk_table       = NULL;
-    H5S_sel_iter_t                       *mem_iter          = NULL;
-    unsigned char                       **msg_send_bufs     = NULL;
-    unsigned char                       **msg_recv_bufs     = NULL;
-    MPI_Request                          *send_requests     = NULL;
-    MPI_Request                          *recv_requests     = NULL;
-    MPI_Request                           ibarrier          = MPI_REQUEST_NULL;
-    bool                                  mem_iter_init     = false;
-    bool                                  ibarrier_posted   = false;
-    size_t                                send_bufs_nalloc  = 0;
-    size_t                                num_send_requests = 0;
-    size_t                                num_recv_requests = 0;
-    size_t                                num_msgs_incoming = 0;
-    size_t                                hash_keylen       = 0;
-    size_t                                last_assigned_idx;
-    int                                   mpi_code;
-    herr_t                                ret_value = SUCCEED;
+    H5D_filtered_collective_chunk_info_t* chunk_table = NULL;
+    H5S_sel_iter_t* mem_iter = NULL;
+    unsigned char** msg_send_bufs = NULL;
+    unsigned char** msg_recv_bufs = NULL;
+    MPI_Request* send_requests = NULL;
+    MPI_Request* recv_requests = NULL;
+    MPI_Request ibarrier = MPI_REQUEST_NULL;
+    bool mem_iter_init = false;
+    bool ibarrier_posted = false;
+    size_t send_bufs_nalloc = 0;
+    size_t num_send_requests = 0;
+    size_t num_recv_requests = 0;
+    size_t num_msgs_incoming = 0;
+    size_t hash_keylen = 0;
+    size_t last_assigned_idx;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -4097,10 +4233,10 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
     assert(chunk_msg_bufs);
     assert(chunk_msg_bufs_len);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Share chunk modification data");
-#endif
+    #endif
 
     /* Set to latest format for encoding dataspace */
     H5CX_set_libver_bounds(NULL);
@@ -4110,20 +4246,22 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
         assert(hash_keylen > 0);
 
         /* Allocate a selection iterator for iterating over chunk dataspaces */
-        if (NULL == (mem_iter = H5FL_MALLOC(H5S_sel_iter_t)))
+        if (NULL == (mem_iter = H5FL_MALLOC(H5S_sel_iter_t))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate dataspace selection iterator");
+        }
 
         /*
          * Allocate send buffer and MPI_Request arrays for non-blocking
          * sends of outgoing chunk messages
          */
         send_bufs_nalloc = H5D_CHUNK_NUM_SEND_MSGS_INIT;
-        if (NULL == (msg_send_bufs = H5MM_malloc(send_bufs_nalloc * sizeof(*msg_send_bufs))))
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate chunk modification message buffer array");
+        if (NULL == (msg_send_bufs = H5MM_malloc(send_bufs_nalloc * sizeof(*msg_send_bufs)))) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk modification message buffer array");
+        }
 
-        if (NULL == (send_requests = H5MM_malloc(send_bufs_nalloc * sizeof(*send_requests))))
+        if (NULL == (send_requests = H5MM_malloc(send_bufs_nalloc * sizeof(*send_requests)))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate send requests array");
+        }
     }
 
     /*
@@ -4142,7 +4280,7 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
      */
     last_assigned_idx = 0;
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = &chunk_list->chunk_infos[info_idx];
+        H5D_filtered_collective_chunk_info_t* chunk_entry = &chunk_list->chunk_infos[info_idx];
 
         if (mpi_rank == chunk_entry->new_owner) {
             num_msgs_incoming += (size_t)(chunk_entry->num_writers - 1);
@@ -4169,24 +4307,24 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
              * object header address and the chunk's index value so we can
              * update the correct chunk with the received data.
              */
-            HASH_ADD(hh, chunk_table, index_info.chunk_idx, hash_keylen,
-                     &chunk_list->chunk_infos[last_assigned_idx]);
+            HASH_ADD(hh, chunk_table, index_info.chunk_idx, hash_keylen, &chunk_list->chunk_infos[last_assigned_idx]);
 
             last_assigned_idx++;
         }
         else {
-            H5D_piece_info_t *chunk_info = chunk_entry->chunk_info;
-            unsigned char    *mod_data_p = NULL;
-            hsize_t           iter_nelmts;
-            size_t            mod_data_size = 0;
-            size_t            space_size    = 0;
+            H5D_piece_info_t* chunk_info = chunk_entry->chunk_info;
+            unsigned char* mod_data_p = NULL;
+            hsize_t iter_nelmts;
+            size_t mod_data_size = 0;
+            size_t space_size = 0;
 
             /* Add the size of the chunk hash table key to the encoded size */
             mod_data_size += hash_keylen;
 
             /* Determine size of serialized chunk file dataspace */
-            if (H5S_encode(chunk_info->fspace, &mod_data_p, &space_size) < 0)
+            if (H5S_encode(chunk_info->fspace, &mod_data_p, &space_size) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "unable to get encoded dataspace size");
+            }
             mod_data_size += space_size;
 
             /* Determine size of data being written */
@@ -4195,9 +4333,9 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
 
             mod_data_size += (size_t)iter_nelmts * chunk_info->dset_info->type_info.src_type_size;
 
-            if (NULL == (msg_send_bufs[num_send_requests] = H5MM_malloc(mod_data_size)))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk modification message buffer");
+            if (NULL == (msg_send_bufs[num_send_requests] = H5MM_malloc(mod_data_size))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk modification message buffer");
+            }
 
             mod_data_p = msg_send_bufs[num_send_requests];
 
@@ -4209,21 +4347,20 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
             mod_data_p += hash_keylen;
 
             /* Serialize the chunk's file dataspace into the buffer */
-            if (H5S_encode(chunk_info->fspace, &mod_data_p, &mod_data_size) < 0)
+            if (H5S_encode(chunk_info->fspace, &mod_data_p, &mod_data_size) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTENCODE, FAIL, "unable to encode dataspace");
+            }
 
             /* Initialize iterator for memory selection */
-            if (H5S_select_iter_init(mem_iter, chunk_info->mspace,
-                                     chunk_info->dset_info->type_info.src_type_size,
-                                     H5S_SEL_ITER_SHARE_WITH_DATASPACE) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                            "unable to initialize memory selection information");
+            if (H5S_select_iter_init(mem_iter, chunk_info->mspace, chunk_info->dset_info->type_info.src_type_size, H5S_SEL_ITER_SHARE_WITH_DATASPACE) < 0) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unable to initialize memory selection information");
+            }
             mem_iter_init = true;
 
             /* Collect the modification data into the buffer */
-            if (0 ==
-                H5D__gather_mem(chunk_info->dset_info->buf.cvp, mem_iter, (size_t)iter_nelmts, mod_data_p))
+            if (0 == H5D__gather_mem(chunk_info->dset_info->buf.cvp, mem_iter, (size_t)iter_nelmts, mod_data_p)) {
                 HGOTO_ERROR(H5E_IO, H5E_CANTGATHER, FAIL, "couldn't gather from write buffer");
+            }
 
             /*
              * Ensure that the size of the chunk data being sent can be
@@ -4237,42 +4374,46 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
             H5_CHECK_OVERFLOW(mod_data_size, size_t, int);
 
             /* Send modification data to new owner */
-            if (MPI_SUCCESS !=
-                (mpi_code = MPI_Issend(msg_send_bufs[num_send_requests], (int)mod_data_size, MPI_BYTE,
-                                       chunk_entry->new_owner, H5D_CHUNK_MOD_DATA_TAG, io_info->comm,
-                                       &send_requests[num_send_requests])))
+            if (MPI_SUCCESS != (mpi_code = MPI_Issend(msg_send_bufs[num_send_requests],
+                                                      (int)mod_data_size,
+                                                      MPI_BYTE,
+                                                      chunk_entry->new_owner,
+                                                      H5D_CHUNK_MOD_DATA_TAG,
+                                                      io_info->comm,
+                                                      &send_requests[num_send_requests]))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Issend failed", mpi_code)
+            }
 
             num_send_requests++;
 
             /* Resize send buffer and send request arrays if necessary */
             if (num_send_requests == send_bufs_nalloc) {
-                void *tmp_alloc;
+                void* tmp_alloc;
 
                 send_bufs_nalloc = (size_t)((double)send_bufs_nalloc * 1.5);
 
-                if (NULL ==
-                    (tmp_alloc = H5MM_realloc(msg_send_bufs, send_bufs_nalloc * sizeof(*msg_send_bufs))))
-                    HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                                "couldn't resize chunk modification message buffer array");
+                if (NULL == (tmp_alloc = H5MM_realloc(msg_send_bufs, send_bufs_nalloc * sizeof(*msg_send_bufs)))) {
+                    HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't resize chunk modification message buffer array");
+                }
                 msg_send_bufs = tmp_alloc;
 
-                if (NULL ==
-                    (tmp_alloc = H5MM_realloc(send_requests, send_bufs_nalloc * sizeof(*send_requests))))
+                if (NULL == (tmp_alloc = H5MM_realloc(send_requests, send_bufs_nalloc * sizeof(*send_requests)))) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't resize send requests array");
+                }
                 send_requests = tmp_alloc;
             }
 
-            if (H5S_SELECT_ITER_RELEASE(mem_iter) < 0)
+            if (H5S_SELECT_ITER_RELEASE(mem_iter) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "couldn't release memory selection iterator");
+            }
             mem_iter_init = false;
         }
     }
 
     /* Check if the number of send or receive requests will overflow an int (MPI requirement) */
-    if (num_send_requests > INT_MAX || num_msgs_incoming > INT_MAX)
-        HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL,
-                    "too many shared chunks in parallel filtered write operation");
+    if (num_send_requests > INT_MAX || num_msgs_incoming > INT_MAX) {
+        HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "too many shared chunks in parallel filtered write operation");
+    }
 
     H5_CHECK_OVERFLOW(num_send_requests, size_t, int);
     H5_CHECK_OVERFLOW(num_msgs_incoming, size_t, int);
@@ -4282,23 +4423,24 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
      * receives of incoming chunk messages
      */
     if (num_msgs_incoming) {
-        if (NULL == (msg_recv_bufs = H5MM_malloc(num_msgs_incoming * sizeof(*msg_recv_bufs))))
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate chunk modification message buffer array");
+        if (NULL == (msg_recv_bufs = H5MM_malloc(num_msgs_incoming * sizeof(*msg_recv_bufs)))) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk modification message buffer array");
+        }
 
-        if (NULL == (recv_requests = H5MM_malloc(num_msgs_incoming * sizeof(*recv_requests))))
+        if (NULL == (recv_requests = H5MM_malloc(num_msgs_incoming * sizeof(*recv_requests)))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate receive requests array");
+        }
     }
 
     /* Process any incoming messages until everyone is done */
     do {
         MPI_Status status;
-        int        msg_flag;
+        int msg_flag;
 
         /* Probe for an incoming message from any rank */
-        if (MPI_SUCCESS != (mpi_code = MPI_Iprobe(MPI_ANY_SOURCE, H5D_CHUNK_MOD_DATA_TAG, io_info->comm,
-                                                  &msg_flag, &status)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Iprobe(MPI_ANY_SOURCE, H5D_CHUNK_MOD_DATA_TAG, io_info->comm, &msg_flag, &status))) {
             HMPI_GOTO_ERROR(FAIL, "MPI_Iprobe failed", mpi_code)
+        }
 
         /*
          * If a message was found, allocate a buffer for the message and
@@ -4307,23 +4449,29 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
         if (msg_flag) {
             MPI_Count msg_size = 0;
 
-            if (MPI_SUCCESS != (mpi_code = MPI_Get_elements_x(&status, MPI_BYTE, &msg_size)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Get_elements_x(&status, MPI_BYTE, &msg_size))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Get_elements_x failed", mpi_code)
+            }
 
             H5_CHECK_OVERFLOW(msg_size, MPI_Count, int);
-            if (msg_size <= 0)
+            if (msg_size <= 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_BADVALUE, FAIL, "invalid chunk modification message size");
+            }
 
             assert((num_recv_requests + 1) <= num_msgs_incoming);
-            if (NULL ==
-                (msg_recv_bufs[num_recv_requests] = H5MM_malloc((size_t)msg_size * sizeof(unsigned char))))
-                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate chunk modification message receive buffer");
+            if (NULL == (msg_recv_bufs[num_recv_requests] = H5MM_malloc((size_t)msg_size * sizeof(unsigned char)))) {
+                HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk modification message receive buffer");
+            }
 
-            if (MPI_SUCCESS != (mpi_code = MPI_Irecv(msg_recv_bufs[num_recv_requests], (int)msg_size,
-                                                     MPI_BYTE, status.MPI_SOURCE, H5D_CHUNK_MOD_DATA_TAG,
-                                                     io_info->comm, &recv_requests[num_recv_requests])))
+            if (MPI_SUCCESS != (mpi_code = MPI_Irecv(msg_recv_bufs[num_recv_requests],
+                                                     (int)msg_size,
+                                                     MPI_BYTE,
+                                                     status.MPI_SOURCE,
+                                                     H5D_CHUNK_MOD_DATA_TAG,
+                                                     io_info->comm,
+                                                     &recv_requests[num_recv_requests]))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Irecv failed", mpi_code)
+            }
 
             num_recv_requests++;
         }
@@ -4331,26 +4479,29 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
         if (ibarrier_posted) {
             int ibarrier_completed;
 
-            if (MPI_SUCCESS != (mpi_code = MPI_Test(&ibarrier, &ibarrier_completed, MPI_STATUS_IGNORE)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Test(&ibarrier, &ibarrier_completed, MPI_STATUS_IGNORE))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Test failed", mpi_code)
+            }
 
-            if (ibarrier_completed)
+            if (ibarrier_completed) {
                 break;
+            }
         }
         else {
             int all_sends_completed;
 
             /* Determine if all send requests have completed */
             H5_WARN_MPI_STATUSES_IGNORE_OFF
-            if (MPI_SUCCESS != (mpi_code = MPI_Testall((int)num_send_requests, send_requests,
-                                                       &all_sends_completed, MPI_STATUSES_IGNORE)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Testall((int)num_send_requests, send_requests, &all_sends_completed, MPI_STATUSES_IGNORE))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Testall failed", mpi_code)
+            }
             H5_WARN_MPI_STATUSES_IGNORE_ON
 
             if (all_sends_completed) {
                 /* Post non-blocking barrier */
-                if (MPI_SUCCESS != (mpi_code = MPI_Ibarrier(io_info->comm, &ibarrier)))
+                if (MPI_SUCCESS != (mpi_code = MPI_Ibarrier(io_info->comm, &ibarrier))) {
                     HMPI_GOTO_ERROR(FAIL, "MPI_Ibarrier failed", mpi_code)
+                }
                 ibarrier_posted = true;
 
                 /*
@@ -4359,8 +4510,9 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
                  */
                 if (msg_send_bufs) {
                     for (size_t i = 0; i < num_send_requests; i++) {
-                        if (msg_send_bufs[i])
+                        if (msg_send_bufs[i]) {
                             H5MM_free(msg_send_bufs[i]);
+                        }
                     }
 
                     msg_send_bufs = H5MM_xfree(msg_send_bufs);
@@ -4381,8 +4533,9 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
      * are available.
      */
     H5_WARN_MPI_STATUSES_IGNORE_OFF
-    if (MPI_SUCCESS != (mpi_code = MPI_Waitall((int)num_recv_requests, recv_requests, MPI_STATUSES_IGNORE)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Waitall((int)num_recv_requests, recv_requests, MPI_STATUSES_IGNORE))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Waitall failed", mpi_code)
+    }
     H5_WARN_MPI_STATUSES_IGNORE_ON
 
     /* Set the new number of locally-selected chunks */
@@ -4392,15 +4545,16 @@ H5D__mpio_share_chunk_modification_data(H5D_filtered_collective_io_info_t *chunk
     chunk_list->chunk_hash_table = chunk_table;
 
     /* Return chunk message buffers if any were received */
-    *chunk_msg_bufs     = msg_recv_bufs;
+    *chunk_msg_bufs = msg_recv_bufs;
     *chunk_msg_bufs_len = (int)num_recv_requests;
 
 done:
     if (ret_value < 0) {
         /* If this rank failed, make sure to participate in collective barrier */
         if (!ibarrier_posted) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Ibarrier(io_info->comm, &ibarrier)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Ibarrier(io_info->comm, &ibarrier))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Ibarrier failed", mpi_code)
+            }
         }
 
         if (num_send_requests) {
@@ -4426,30 +4580,34 @@ done:
         HASH_CLEAR(hh, chunk_table);
     }
 
-    if (recv_requests)
+    if (recv_requests) {
         H5MM_free(recv_requests);
-    if (send_requests)
+    }
+    if (send_requests) {
         H5MM_free(send_requests);
+    }
 
     if (msg_send_bufs) {
         for (size_t i = 0; i < num_send_requests; i++) {
-            if (msg_send_bufs[i])
+            if (msg_send_bufs[i]) {
                 H5MM_free(msg_send_bufs[i]);
+            }
         }
 
         H5MM_free(msg_send_bufs);
     }
 
     if (mem_iter) {
-        if (mem_iter_init && H5S_SELECT_ITER_RELEASE(mem_iter) < 0)
+        if (mem_iter_init && H5S_SELECT_ITER_RELEASE(mem_iter) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "couldn't release dataspace selection iterator");
+        }
         mem_iter = H5FL_FREE(H5S_sel_iter_t, mem_iter);
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_share_chunk_modification_data() */
@@ -4467,24 +4625,23 @@ done:
  *-------------------------------------------------------------------------
  */
 static herr_t
-H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chunk_list,
-                                         const H5D_io_info_t *io_info, size_t num_dset_infos, int mpi_rank)
+    H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t* chunk_list, const H5D_io_info_t* io_info, size_t num_dset_infos, int mpi_rank)
 {
     H5Z_EDC_t err_detect; /* Error detection info */
-    H5Z_cb_t  filter_cb;  /* I/O filter callback function */
-    herr_t    ret_value = SUCCEED;
+    H5Z_cb_t filter_cb;   /* I/O filter callback function */
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     assert(chunk_list);
     assert(io_info);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Filtered collective chunk read");
-#else
+    #else
     (void)mpi_rank;
-#endif
+    #endif
 
     /*
      * Allocate memory buffers for all chunks being read. Chunk data buffers are of
@@ -4500,19 +4657,19 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
      *    chunk size would of course be bad.
      */
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = &chunk_list->chunk_infos[info_idx];
-        H5D_mpio_filtered_dset_info_t        *cached_dset_info;
-        hsize_t                               file_chunk_size;
+        H5D_filtered_collective_chunk_info_t* chunk_entry = &chunk_list->chunk_infos[info_idx];
+        H5D_mpio_filtered_dset_info_t* cached_dset_info;
+        hsize_t file_chunk_size;
 
         assert(chunk_entry->need_read);
 
         /* Find the cached dataset info for the dataset this chunk is in */
         if (num_dset_infos > 1) {
-            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &chunk_entry->index_info.dset_oloc_addr,
-                      sizeof(haddr_t), cached_dset_info);
+            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &chunk_entry->index_info.dset_oloc_addr, sizeof(haddr_t), cached_dset_info);
             if (cached_dset_info == NULL) {
-                if (chunk_list->all_dset_indices_empty)
+                if (chunk_list->all_dset_indices_empty) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
+                }
                 else {
                     /* Push an error, but participate in collective read */
                     HDONE_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
@@ -4520,8 +4677,9 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
                 }
             }
         }
-        else
+        else {
             cached_dset_info = chunk_list->dset_info.single_dset_info;
+        }
         assert(cached_dset_info);
 
         file_chunk_size = cached_dset_info->file_chunk_size;
@@ -4529,8 +4687,9 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
         chunk_entry->chunk_buf_size = MAX(chunk_entry->chunk_current.length, file_chunk_size);
 
         if (NULL == (chunk_entry->buf = H5MM_malloc(chunk_entry->chunk_buf_size))) {
-            if (chunk_list->all_dset_indices_empty)
+            if (chunk_list->all_dset_indices_empty) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk data buffer");
+            }
             else {
                 /* Push an error, but participate in collective read */
                 HDONE_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk data buffer");
@@ -4555,10 +4714,12 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
 
         if (chunk_entry->need_read) {
             /* Set chunk's new length for eventual filter pipeline calls */
-            if (chunk_entry->skip_filter_pline)
+            if (chunk_entry->skip_filter_pline) {
                 chunk_entry->chunk_new.length = file_chunk_size;
-            else
+            }
+            else {
                 chunk_entry->chunk_new.length = chunk_entry->chunk_current.length;
+            }
         }
         else {
             /* Set chunk's new length for eventual filter pipeline calls */
@@ -4571,16 +4732,16 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
 
                 /* Write fill value to memory buffer */
                 if (H5D__fill(cached_dset_info->fb_info.fill_buf,
-                              cached_dset_info->dset_io_info->type_info.dset_type, chunk_entry->buf,
+                              cached_dset_info->dset_io_info->type_info.dset_type,
+                              chunk_entry->buf,
                               cached_dset_info->dset_io_info->type_info.mem_type,
                               cached_dset_info->fill_space) < 0) {
-                    if (chunk_list->all_dset_indices_empty)
-                        HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                                    "couldn't fill chunk buffer with fill value");
+                    if (chunk_list->all_dset_indices_empty) {
+                        HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't fill chunk buffer with fill value");
+                    }
                     else {
                         /* Push an error, but participate in collective read */
-                        HDONE_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                                    "couldn't fill chunk buffer with fill value");
+                        HDONE_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't fill chunk buffer with fill value");
                         break;
                     }
                 }
@@ -4589,16 +4750,20 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
     }
 
     /* Perform collective vector read if necessary */
-    if (!chunk_list->all_dset_indices_empty)
-        if (H5D__mpio_collective_filtered_vec_io(chunk_list, io_info->f_sh, H5D_IO_OP_READ) < 0)
+    if (!chunk_list->all_dset_indices_empty) {
+        if (H5D__mpio_collective_filtered_vec_io(chunk_list, io_info->f_sh, H5D_IO_OP_READ) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "couldn't perform vector I/O on filtered chunks");
+        }
+    }
 
     if (chunk_list->num_chunk_infos) {
         /* Retrieve filter settings from API context */
-        if (H5CX_get_err_detect(&err_detect) < 0)
+        if (H5CX_get_err_detect(&err_detect) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get error detection info");
-        if (H5CX_get_filter_cb(&filter_cb) < 0)
+        }
+        if (H5CX_get_filter_cb(&filter_cb) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get I/O filter callback function");
+        }
     }
 
     /*
@@ -4606,26 +4771,35 @@ H5D__mpio_collective_filtered_chunk_read(H5D_filtered_collective_io_info_t *chun
      * data out to the application's read buffer.
      */
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = &chunk_list->chunk_infos[info_idx];
-        H5D_piece_info_t                     *chunk_info  = chunk_entry->chunk_info;
-        hsize_t                               iter_nelmts;
+        H5D_filtered_collective_chunk_info_t* chunk_entry = &chunk_list->chunk_infos[info_idx];
+        H5D_piece_info_t* chunk_info = chunk_entry->chunk_info;
+        hsize_t iter_nelmts;
 
         /* Unfilter the chunk, unless we didn't read it from the file */
         if (chunk_entry->need_read && !chunk_entry->skip_filter_pline) {
-            if (H5Z_pipeline(&chunk_info->dset_info->dset->shared->dcpl_cache.pline, H5Z_FLAG_REVERSE,
-                             &(chunk_entry->index_info.filter_mask), err_detect, filter_cb,
-                             (size_t *)&chunk_entry->chunk_new.length, &chunk_entry->chunk_buf_size,
-                             &chunk_entry->buf) < 0)
+            if (H5Z_pipeline(&chunk_info->dset_info->dset->shared->dcpl_cache.pline,
+                             H5Z_FLAG_REVERSE,
+                             &(chunk_entry->index_info.filter_mask),
+                             err_detect,
+                             filter_cb,
+                             (size_t*)&chunk_entry->chunk_new.length,
+                             &chunk_entry->chunk_buf_size,
+                             &chunk_entry->buf) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFILTER, FAIL, "couldn't unfilter chunk for modifying");
+            }
         }
 
         /* Scatter the chunk data to the read buffer */
         iter_nelmts = H5S_GET_SELECT_NPOINTS(chunk_info->fspace);
 
-        if (H5D_select_io_mem(chunk_info->dset_info->buf.vp, chunk_info->mspace, chunk_entry->buf,
-                              chunk_info->fspace, chunk_info->dset_info->type_info.src_type_size,
-                              (size_t)iter_nelmts) < 0)
+        if (H5D_select_io_mem(chunk_info->dset_info->buf.vp,
+                              chunk_info->mspace,
+                              chunk_entry->buf,
+                              chunk_info->fspace,
+                              chunk_info->dset_info->type_info.src_type_size,
+                              (size_t)iter_nelmts) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "couldn't copy chunk data to read buffer");
+        }
     }
 
 done:
@@ -4637,10 +4811,10 @@ done:
         }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_collective_filtered_chunk_read() */
@@ -4657,18 +4831,20 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *chunk_list,
-                                           unsigned char **chunk_msg_bufs, int chunk_msg_bufs_len,
-                                           const H5D_io_info_t *io_info, size_t num_dset_infos, int mpi_rank)
+static herr_t H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t* chunk_list,
+                                                         unsigned char** chunk_msg_bufs,
+                                                         int chunk_msg_bufs_len,
+                                                         const H5D_io_info_t* io_info,
+                                                         size_t num_dset_infos,
+                                                         int mpi_rank)
 {
-    H5S_sel_iter_t *sel_iter = NULL; /* Dataspace selection iterator for H5D__scatter_mem */
-    H5Z_EDC_t       err_detect;      /* Error detection info */
-    H5Z_cb_t        filter_cb;       /* I/O filter callback function */
-    uint8_t        *key_buf       = NULL;
-    H5S_t          *dataspace     = NULL;
-    bool            sel_iter_init = false;
-    herr_t          ret_value     = SUCCEED;
+    H5S_sel_iter_t* sel_iter = NULL; /* Dataspace selection iterator for H5D__scatter_mem */
+    H5Z_EDC_t err_detect;            /* Error detection info */
+    H5Z_cb_t filter_cb;              /* I/O filter callback function */
+    uint8_t* key_buf = NULL;
+    H5S_t* dataspace = NULL;
+    bool sel_iter_init = false;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -4676,10 +4852,10 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
     assert((chunk_msg_bufs && chunk_list->chunk_hash_table) || 0 == chunk_msg_bufs_len);
     assert(io_info);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Filtered collective chunk update");
-#endif
+    #endif
 
     /*
      * Allocate memory buffers for all owned chunks. Chunk data buffers are of the
@@ -4701,19 +4877,19 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
      *    chunk size would of course be bad.
      */
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = &chunk_list->chunk_infos[info_idx];
-        H5D_mpio_filtered_dset_info_t        *cached_dset_info;
-        hsize_t                               file_chunk_size;
+        H5D_filtered_collective_chunk_info_t* chunk_entry = &chunk_list->chunk_infos[info_idx];
+        H5D_mpio_filtered_dset_info_t* cached_dset_info;
+        hsize_t file_chunk_size;
 
         assert(mpi_rank == chunk_entry->new_owner);
 
         /* Find the cached dataset info for the dataset this chunk is in */
         if (num_dset_infos > 1) {
-            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &chunk_entry->index_info.dset_oloc_addr,
-                      sizeof(haddr_t), cached_dset_info);
+            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &chunk_entry->index_info.dset_oloc_addr, sizeof(haddr_t), cached_dset_info);
             if (cached_dset_info == NULL) {
-                if (chunk_list->all_dset_indices_empty)
+                if (chunk_list->all_dset_indices_empty) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
+                }
                 else {
                     /* Push an error, but participate in collective read */
                     HDONE_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
@@ -4721,8 +4897,9 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
                 }
             }
         }
-        else
+        else {
             cached_dset_info = chunk_list->dset_info.single_dset_info;
+        }
         assert(cached_dset_info);
 
         file_chunk_size = cached_dset_info->file_chunk_size;
@@ -4734,14 +4911,17 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
          * out fill values to it, make sure to 0-fill its memory buffer
          * so we don't use uninitialized memory.
          */
-        if (!H5_addr_defined(chunk_entry->chunk_current.offset) && !cached_dset_info->should_fill)
+        if (!H5_addr_defined(chunk_entry->chunk_current.offset) && !cached_dset_info->should_fill) {
             chunk_entry->buf = H5MM_calloc(chunk_entry->chunk_buf_size);
-        else
+        }
+        else {
             chunk_entry->buf = H5MM_malloc(chunk_entry->chunk_buf_size);
+        }
 
         if (NULL == chunk_entry->buf) {
-            if (chunk_list->all_dset_indices_empty)
+            if (chunk_list->all_dset_indices_empty) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk data buffer");
+            }
             else {
                 /* Push an error, but participate in collective read */
                 HDONE_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate chunk data buffer");
@@ -4749,9 +4929,10 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
             }
         }
 
-        if (!chunk_entry->need_read)
+        if (!chunk_entry->need_read) {
             /* Set chunk's new length for eventual filter pipeline calls */
             chunk_entry->chunk_new.length = file_chunk_size;
+        }
         else {
             /*
              * Check whether the chunk needs to be read from the file, based
@@ -4770,10 +4951,12 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
 
             if (chunk_entry->need_read) {
                 /* Set chunk's new length for eventual filter pipeline calls */
-                if (chunk_entry->skip_filter_pline)
+                if (chunk_entry->skip_filter_pline) {
                     chunk_entry->chunk_new.length = file_chunk_size;
-                else
+                }
+                else {
                     chunk_entry->chunk_new.length = chunk_entry->chunk_current.length;
+                }
             }
             else {
                 /* Set chunk's new length for eventual filter pipeline calls */
@@ -4786,16 +4969,16 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
 
                     /* Write fill value to memory buffer */
                     if (H5D__fill(cached_dset_info->fb_info.fill_buf,
-                                  cached_dset_info->dset_io_info->type_info.dset_type, chunk_entry->buf,
+                                  cached_dset_info->dset_io_info->type_info.dset_type,
+                                  chunk_entry->buf,
                                   cached_dset_info->dset_io_info->type_info.mem_type,
                                   cached_dset_info->fill_space) < 0) {
-                        if (chunk_list->all_dset_indices_empty)
-                            HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                                        "couldn't fill chunk buffer with fill value");
+                        if (chunk_list->all_dset_indices_empty) {
+                            HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't fill chunk buffer with fill value");
+                        }
                         else {
                             /* Push an error, but participate in collective read */
-                            HDONE_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                                        "couldn't fill chunk buffer with fill value");
+                            HDONE_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "couldn't fill chunk buffer with fill value");
                             break;
                         }
                     }
@@ -4805,9 +4988,11 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
     }
 
     /* Perform collective vector read if necessary */
-    if (!chunk_list->all_dset_indices_empty)
-        if (H5D__mpio_collective_filtered_vec_io(chunk_list, io_info->f_sh, H5D_IO_OP_READ) < 0)
+    if (!chunk_list->all_dset_indices_empty) {
+        if (H5D__mpio_collective_filtered_vec_io(chunk_list, io_info->f_sh, H5D_IO_OP_READ) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "couldn't perform vector I/O on filtered chunks");
+        }
+    }
 
     /*
      * Now that all owned chunks have been read, update the chunks
@@ -4816,17 +5001,19 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
 
     if (chunk_list->num_chunk_infos > 0) {
         /* Retrieve filter settings from API context */
-        if (H5CX_get_err_detect(&err_detect) < 0)
+        if (H5CX_get_err_detect(&err_detect) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get error detection info");
-        if (H5CX_get_filter_cb(&filter_cb) < 0)
+        }
+        if (H5CX_get_filter_cb(&filter_cb) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't get I/O filter callback function");
+        }
     }
 
     /* Process all chunks with data from the owning rank first */
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = &chunk_list->chunk_infos[info_idx];
-        H5D_piece_info_t                     *chunk_info  = chunk_entry->chunk_info;
-        hsize_t                               iter_nelmts;
+        H5D_filtered_collective_chunk_info_t* chunk_entry = &chunk_list->chunk_infos[info_idx];
+        H5D_piece_info_t* chunk_info = chunk_entry->chunk_info;
+        hsize_t iter_nelmts;
 
         assert(mpi_rank == chunk_entry->new_owner);
 
@@ -4835,35 +5022,46 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
          * the file, so we need to unfilter it
          */
         if (chunk_entry->need_read && !chunk_entry->skip_filter_pline) {
-            if (H5Z_pipeline(&chunk_info->dset_info->dset->shared->dcpl_cache.pline, H5Z_FLAG_REVERSE,
-                             &(chunk_entry->index_info.filter_mask), err_detect, filter_cb,
-                             (size_t *)&chunk_entry->chunk_new.length, &chunk_entry->chunk_buf_size,
-                             &chunk_entry->buf) < 0)
+            if (H5Z_pipeline(&chunk_info->dset_info->dset->shared->dcpl_cache.pline,
+                             H5Z_FLAG_REVERSE,
+                             &(chunk_entry->index_info.filter_mask),
+                             err_detect,
+                             filter_cb,
+                             (size_t*)&chunk_entry->chunk_new.length,
+                             &chunk_entry->chunk_buf_size,
+                             &chunk_entry->buf) < 0) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFILTER, FAIL, "couldn't unfilter chunk for modifying");
+            }
         }
 
         iter_nelmts = H5S_GET_SELECT_NPOINTS(chunk_info->mspace);
 
-        if (H5D_select_io_mem(chunk_entry->buf, chunk_info->fspace, chunk_info->dset_info->buf.cvp,
-                              chunk_info->mspace, chunk_info->dset_info->type_info.dst_type_size,
-                              (size_t)iter_nelmts) < 0)
+        if (H5D_select_io_mem(chunk_entry->buf,
+                              chunk_info->fspace,
+                              chunk_info->dset_info->buf.cvp,
+                              chunk_info->mspace,
+                              chunk_info->dset_info->type_info.dst_type_size,
+                              (size_t)iter_nelmts) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't copy chunk data to write buffer");
+        }
     }
 
     /* Allocate iterator for memory selection */
     if (chunk_msg_bufs_len > 0) {
         assert(chunk_list->chunk_hash_table_keylen > 0);
-        if (NULL == (key_buf = H5MM_malloc(chunk_list->chunk_hash_table_keylen)))
+        if (NULL == (key_buf = H5MM_malloc(chunk_list->chunk_hash_table_keylen))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate hash table key buffer");
+        }
 
-        if (NULL == (sel_iter = H5FL_MALLOC(H5S_sel_iter_t)))
+        if (NULL == (sel_iter = H5FL_MALLOC(H5S_sel_iter_t))) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "couldn't allocate memory iterator");
+        }
     }
 
     /* Now process all received chunk message buffers */
     for (size_t buf_idx = 0; buf_idx < (size_t)chunk_msg_bufs_len; buf_idx++) {
-        H5D_filtered_collective_chunk_info_t *chunk_entry = NULL;
-        const unsigned char                  *msg_ptr     = chunk_msg_bufs[buf_idx];
+        H5D_filtered_collective_chunk_info_t* chunk_entry = NULL;
+        const unsigned char* msg_ptr = chunk_msg_bufs[buf_idx];
 
         if (msg_ptr) {
             /* Retrieve the chunk hash table key from the chunk message buffer */
@@ -4871,12 +5069,13 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
             msg_ptr += chunk_list->chunk_hash_table_keylen;
 
             /* Find the chunk entry according to its chunk hash table key */
-            HASH_FIND(hh, chunk_list->chunk_hash_table, key_buf, chunk_list->chunk_hash_table_keylen,
-                      chunk_entry);
-            if (chunk_entry == NULL)
+            HASH_FIND(hh, chunk_list->chunk_hash_table, key_buf, chunk_list->chunk_hash_table_keylen, chunk_entry);
+            if (chunk_entry == NULL) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find chunk entry");
-            if (mpi_rank != chunk_entry->new_owner)
+            }
+            if (mpi_rank != chunk_entry->new_owner) {
                 HGOTO_ERROR(H5E_DATASET, H5E_BADVALUE, FAIL, "chunk owner set to incorrect MPI rank");
+            }
 
             /*
              * Only process the chunk if its data buffer is allocated.
@@ -4884,35 +5083,38 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
              * a chunk at a time, so we need to skip over messages
              * that aren't for the chunk we're currently working on.
              */
-            if (!chunk_entry->buf)
+            if (!chunk_entry->buf) {
                 continue;
+            }
             else {
                 hsize_t iter_nelmts;
 
                 /* Decode the chunk file dataspace from the message */
-                if (NULL == (dataspace = H5S_decode(&msg_ptr)))
+                if (NULL == (dataspace = H5S_decode(&msg_ptr))) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTDECODE, FAIL, "unable to decode dataspace");
+                }
 
-                if (H5S_select_iter_init(sel_iter, dataspace,
-                                         chunk_entry->chunk_info->dset_info->type_info.dst_type_size,
-                                         H5S_SEL_ITER_SHARE_WITH_DATASPACE) < 0)
-                    HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL,
-                                "unable to initialize memory selection information");
+                if (H5S_select_iter_init(sel_iter, dataspace, chunk_entry->chunk_info->dset_info->type_info.dst_type_size, H5S_SEL_ITER_SHARE_WITH_DATASPACE) < 0) {
+                    HGOTO_ERROR(H5E_DATASET, H5E_CANTINIT, FAIL, "unable to initialize memory selection information");
+                }
                 sel_iter_init = true;
 
                 iter_nelmts = H5S_GET_SELECT_NPOINTS(dataspace);
 
                 /* Update the chunk data with the received modification data */
-                if (H5D__scatter_mem(msg_ptr, sel_iter, (size_t)iter_nelmts, chunk_entry->buf) < 0)
+                if (H5D__scatter_mem(msg_ptr, sel_iter, (size_t)iter_nelmts, chunk_entry->buf) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "couldn't scatter to write buffer");
+                }
 
-                if (H5S_SELECT_ITER_RELEASE(sel_iter) < 0)
+                if (H5S_SELECT_ITER_RELEASE(sel_iter) < 0) {
                     HGOTO_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "couldn't release selection iterator");
+                }
                 sel_iter_init = false;
 
                 if (dataspace) {
-                    if (H5S_close(dataspace) < 0)
+                    if (H5S_close(dataspace) < 0) {
                         HGOTO_ERROR(H5E_DATASPACE, H5E_CANTFREE, FAIL, "can't close dataspace");
+                    }
                     dataspace = NULL;
                 }
 
@@ -4925,29 +5127,35 @@ H5D__mpio_collective_filtered_chunk_update(H5D_filtered_collective_io_info_t *ch
     /* Finally, filter all the chunks */
     for (size_t info_idx = 0; info_idx < chunk_list->num_chunk_infos; info_idx++) {
         if (!chunk_list->chunk_infos[info_idx].skip_filter_pline) {
-            if (H5Z_pipeline(
-                    &chunk_list->chunk_infos[info_idx].chunk_info->dset_info->dset->shared->dcpl_cache.pline,
-                    0, &(chunk_list->chunk_infos[info_idx].index_info.filter_mask), err_detect, filter_cb,
-                    (size_t *)&chunk_list->chunk_infos[info_idx].chunk_new.length,
-                    &chunk_list->chunk_infos[info_idx].chunk_buf_size,
-                    &chunk_list->chunk_infos[info_idx].buf) < 0)
+            if (H5Z_pipeline(&chunk_list->chunk_infos[info_idx].chunk_info->dset_info->dset->shared->dcpl_cache.pline,
+                             0,
+                             &(chunk_list->chunk_infos[info_idx].index_info.filter_mask),
+                             err_detect,
+                             filter_cb,
+                             (size_t*)&chunk_list->chunk_infos[info_idx].chunk_new.length,
+                             &chunk_list->chunk_infos[info_idx].chunk_buf_size,
+                             &chunk_list->chunk_infos[info_idx].buf) < 0) {
                 HGOTO_ERROR(H5E_PLINE, H5E_CANTFILTER, FAIL, "output pipeline failed");
+            }
         }
 
-#if H5_SIZEOF_SIZE_T > 4
+    #if H5_SIZEOF_SIZE_T > 4
         /* Check for the chunk expanding too much to encode in a 32-bit value */
-        if (chunk_list->chunk_infos[info_idx].chunk_new.length > ((size_t)0xffffffff))
+        if (chunk_list->chunk_infos[info_idx].chunk_new.length > ((size_t)0xffffffff)) {
             HGOTO_ERROR(H5E_DATASET, H5E_BADRANGE, FAIL, "chunk too large for 32-bit length");
-#endif
+        }
+    #endif
     }
 
 done:
-    if (dataspace && (H5S_close(dataspace) < 0))
+    if (dataspace && (H5S_close(dataspace) < 0)) {
         HDONE_ERROR(H5E_DATASPACE, H5E_CANTFREE, FAIL, "can't close dataspace");
+    }
 
     if (sel_iter) {
-        if (sel_iter_init && H5S_SELECT_ITER_RELEASE(sel_iter) < 0)
+        if (sel_iter_init && H5S_SELECT_ITER_RELEASE(sel_iter) < 0) {
             HDONE_ERROR(H5E_DATASET, H5E_CANTFREE, FAIL, "couldn't release selection iterator");
+        }
         sel_iter = H5FL_FREE(H5S_sel_iter_t, sel_iter);
     }
 
@@ -4963,10 +5171,10 @@ done:
         }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_collective_filtered_chunk_update() */
@@ -4984,35 +5192,37 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t *chunk_list,
-                                               size_t *num_chunks_assigned_map, H5D_io_info_t *io_info,
-                                               size_t num_dset_infos, int mpi_rank, int mpi_size)
+static herr_t H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t* chunk_list,
+                                                             size_t* num_chunks_assigned_map,
+                                                             H5D_io_info_t* io_info,
+                                                             size_t num_dset_infos,
+                                                             int mpi_rank,
+                                                             int mpi_size)
 {
-    H5D_chunk_alloc_info_t *collective_list = NULL;
-    MPI_Datatype            send_type;
-    MPI_Datatype            recv_type;
-    bool                    send_type_derived          = false;
-    bool                    recv_type_derived          = false;
-    bool                    need_sort                  = false;
-    size_t                  collective_num_entries     = 0;
-    size_t                  num_local_chunks_processed = 0;
-    void                   *gathered_array             = NULL;
-    int                    *counts_disps_array         = NULL;
-    int                    *counts_ptr                 = NULL;
-    int                    *displacements_ptr          = NULL;
-    int                     mpi_code;
-    herr_t                  ret_value = SUCCEED;
+    H5D_chunk_alloc_info_t* collective_list = NULL;
+    MPI_Datatype send_type;
+    MPI_Datatype recv_type;
+    bool send_type_derived = false;
+    bool recv_type_derived = false;
+    bool need_sort = false;
+    size_t collective_num_entries = 0;
+    size_t num_local_chunks_processed = 0;
+    void* gathered_array = NULL;
+    int* counts_disps_array = NULL;
+    int* counts_ptr = NULL;
+    int* displacements_ptr = NULL;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     assert(chunk_list);
     assert(io_info);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Reallocation of chunk file space");
-#endif
+    #endif
 
     /*
      * Make sure it's safe to cast this rank's number
@@ -5021,10 +5231,9 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
     H5_CHECK_OVERFLOW(chunk_list->num_chunk_infos, size_t, int);
 
     /* Create derived datatypes for the chunk file space info needed */
-    if (H5D__mpio_get_chunk_alloc_info_types(&recv_type, &recv_type_derived, &send_type, &send_type_derived) <
-        0)
-        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL,
-                    "can't create derived datatypes for chunk file space info");
+    if (H5D__mpio_get_chunk_alloc_info_types(&recv_type, &recv_type_derived, &send_type, &send_type_derived) < 0) {
+        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived datatypes for chunk file space info");
+    }
 
     /*
      * Gather the new chunk sizes to all ranks for a collective reallocation
@@ -5039,30 +5248,41 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
          */
         if (NULL == (counts_disps_array = H5MM_malloc(2 * (size_t)mpi_size * sizeof(*counts_disps_array)))) {
             /* Push an error, but still participate in collective gather operation */
-            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate receive counts and displacements array");
+            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate receive counts and displacements array");
         }
         else {
             /* Set the receive counts from the assigned chunks map */
             counts_ptr = counts_disps_array;
 
-            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++) {
                 H5_CHECKED_ASSIGN(counts_ptr[curr_rank], int, num_chunks_assigned_map[curr_rank], size_t);
+            }
 
             /* Set the displacements into the receive buffer for the gather operation */
             displacements_ptr = &counts_disps_array[mpi_size];
 
             *displacements_ptr = 0;
-            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++) {
                 displacements_ptr[curr_rank] = displacements_ptr[curr_rank - 1] + counts_ptr[curr_rank - 1];
+            }
         }
 
         /* Perform gather operation */
-        if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos, (int)chunk_list->num_chunk_infos, send_type,
-                                  counts_ptr, displacements_ptr, recv_type, true, 0, io_info->comm, mpi_rank,
-                                  mpi_size, &gathered_array, &collective_num_entries) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL,
-                        "can't gather chunk file space info to/from ranks");
+        if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos,
+                                  (int)chunk_list->num_chunk_infos,
+                                  send_type,
+                                  counts_ptr,
+                                  displacements_ptr,
+                                  recv_type,
+                                  true,
+                                  0,
+                                  io_info->comm,
+                                  mpi_rank,
+                                  mpi_size,
+                                  &gathered_array,
+                                  &collective_num_entries) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL, "can't gather chunk file space info to/from ranks");
+        }
     }
     else {
         /*
@@ -5072,51 +5292,57 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
          * contributing before performing the actual gather operation. Use
          * the 'simple' MPI_Allgatherv wrapper for this.
          */
-        if (H5_mpio_gatherv_alloc_simple(chunk_list->chunk_infos, (int)chunk_list->num_chunk_infos, send_type,
-                                         recv_type, true, 0, io_info->comm, mpi_rank, mpi_size,
-                                         &gathered_array, &collective_num_entries) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL,
-                        "can't gather chunk file space info to/from ranks");
+        if (H5_mpio_gatherv_alloc_simple(chunk_list->chunk_infos,
+                                         (int)chunk_list->num_chunk_infos,
+                                         send_type,
+                                         recv_type,
+                                         true,
+                                         0,
+                                         io_info->comm,
+                                         mpi_rank,
+                                         mpi_size,
+                                         &gathered_array,
+                                         &collective_num_entries) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL, "can't gather chunk file space info to/from ranks");
+        }
     }
 
     /* Collectively re-allocate the modified chunks (from each rank) in the file */
-    collective_list            = (H5D_chunk_alloc_info_t *)gathered_array;
+    collective_list = (H5D_chunk_alloc_info_t*)gathered_array;
     num_local_chunks_processed = 0;
     for (size_t entry_idx = 0; entry_idx < collective_num_entries; entry_idx++) {
-        H5D_mpio_filtered_dset_info_t *cached_dset_info;
-        H5D_chunk_alloc_info_t        *coll_entry = &collective_list[entry_idx];
-        bool                           need_insert;
-        bool                           update_local_chunk;
+        H5D_mpio_filtered_dset_info_t* cached_dset_info;
+        H5D_chunk_alloc_info_t* coll_entry = &collective_list[entry_idx];
+        bool need_insert;
+        bool update_local_chunk;
 
         /* Find the cached dataset info for the dataset this chunk is in */
         if (num_dset_infos > 1) {
-            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &coll_entry->dset_oloc_addr,
-                      sizeof(haddr_t), cached_dset_info);
-            if (cached_dset_info == NULL)
+            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &coll_entry->dset_oloc_addr, sizeof(haddr_t), cached_dset_info);
+            if (cached_dset_info == NULL) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
+            }
         }
-        else
+        else {
             cached_dset_info = chunk_list->dset_info.single_dset_info;
+        }
         assert(cached_dset_info);
 
-        if (H5D__chunk_file_alloc(&cached_dset_info->chunk_idx_info, &coll_entry->chunk_current,
-                                  &coll_entry->chunk_new, &need_insert, NULL) < 0)
+        if (H5D__chunk_file_alloc(&cached_dset_info->chunk_idx_info, &coll_entry->chunk_current, &coll_entry->chunk_new, &need_insert, NULL) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTALLOC, FAIL, "unable to allocate chunk");
+        }
 
         /*
          * If we just re-allocated a chunk that is local to this
          * rank, make sure to update the chunk entry in the local
          * chunk list
          */
-        update_local_chunk =
-            (num_local_chunks_processed < chunk_list->num_chunk_infos) &&
-            (coll_entry->dset_oloc_addr ==
-             chunk_list->chunk_infos[num_local_chunks_processed].index_info.dset_oloc_addr) &&
-            (coll_entry->chunk_idx ==
-             chunk_list->chunk_infos[num_local_chunks_processed].index_info.chunk_idx);
+        update_local_chunk = (num_local_chunks_processed < chunk_list->num_chunk_infos) &&
+                             (coll_entry->dset_oloc_addr == chunk_list->chunk_infos[num_local_chunks_processed].index_info.dset_oloc_addr) &&
+                             (coll_entry->chunk_idx == chunk_list->chunk_infos[num_local_chunks_processed].index_info.chunk_idx);
 
         if (update_local_chunk) {
-            H5D_filtered_collective_chunk_info_t *local_chunk;
+            H5D_filtered_collective_chunk_info_t* local_chunk;
 
             local_chunk = &chunk_list->chunk_infos[num_local_chunks_processed];
 
@@ -5124,7 +5350,7 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
             assert(mpi_rank == local_chunk->orig_owner);
             assert(mpi_rank == local_chunk->new_owner);
 
-            local_chunk->chunk_new              = coll_entry->chunk_new;
+            local_chunk->chunk_new = coll_entry->chunk_new;
             local_chunk->index_info.need_insert = need_insert;
 
             /*
@@ -5134,12 +5360,12 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
              */
             if (num_local_chunks_processed) {
                 haddr_t curr_chunk_offset = local_chunk->chunk_new.offset;
-                haddr_t prev_chunk_offset =
-                    chunk_list->chunk_infos[num_local_chunks_processed - 1].chunk_new.offset;
+                haddr_t prev_chunk_offset = chunk_list->chunk_infos[num_local_chunks_processed - 1].chunk_new.offset;
 
                 assert(H5_addr_defined(prev_chunk_offset) && H5_addr_defined(curr_chunk_offset));
-                if (curr_chunk_offset < prev_chunk_offset)
+                if (curr_chunk_offset < prev_chunk_offset) {
                     need_sort = true;
+                }
             }
 
             num_local_chunks_processed++;
@@ -5152,27 +5378,29 @@ H5D__mpio_collective_filtered_chunk_reallocate(H5D_filtered_collective_io_info_t
      * Ensure this rank's local chunk list is sorted in
      * ascending order of offset in the file
      */
-    if (need_sort)
-        qsort(chunk_list->chunk_infos, chunk_list->num_chunk_infos,
-              sizeof(H5D_filtered_collective_chunk_info_t), H5D__cmp_filtered_collective_io_info_entry);
+    if (need_sort) {
+        qsort(chunk_list->chunk_infos, chunk_list->num_chunk_infos, sizeof(H5D_filtered_collective_chunk_info_t), H5D__cmp_filtered_collective_io_info_entry);
+    }
 
 done:
     H5MM_free(gathered_array);
     H5MM_free(counts_disps_array);
 
     if (send_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&send_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&send_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (recv_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&recv_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&recv_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* H5D__mpio_collective_filtered_chunk_reallocate() */
@@ -5190,39 +5418,42 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *chunk_list,
-                                             size_t *num_chunks_assigned_map, H5D_io_info_t *io_info,
-                                             size_t num_dset_infos, int mpi_rank, int mpi_size)
+static herr_t H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t* chunk_list,
+                                                           size_t* num_chunks_assigned_map,
+                                                           H5D_io_info_t* io_info,
+                                                           size_t num_dset_infos,
+                                                           int mpi_rank,
+                                                           int mpi_size)
 {
     MPI_Datatype send_type;
     MPI_Datatype recv_type;
-    size_t       collective_num_entries = 0;
-    bool         send_type_derived      = false;
-    bool         recv_type_derived      = false;
-    void        *gathered_array         = NULL;
-    int         *counts_disps_array     = NULL;
-    int         *counts_ptr             = NULL;
-    int         *displacements_ptr      = NULL;
-    int          mpi_code;
-    herr_t       ret_value = SUCCEED;
+    size_t collective_num_entries = 0;
+    bool send_type_derived = false;
+    bool recv_type_derived = false;
+    void* gathered_array = NULL;
+    int* counts_disps_array = NULL;
+    int* counts_ptr = NULL;
+    int* displacements_ptr = NULL;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     assert(chunk_list);
     assert(io_info);
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TRACE_ENTER(mpi_rank);
     H5D_MPIO_TIME_START(mpi_rank, "Reinsertion of modified chunks into chunk index");
-#endif
+    #endif
 
     /*
      * If no datasets involved have a chunk index 'insert'
      * operation, this function is a no-op
      */
-    if (chunk_list->no_dset_index_insert_methods)
+    if (chunk_list->no_dset_index_insert_methods) {
         HGOTO_DONE(SUCCEED);
+    }
 
     /*
      * Make sure it's safe to cast this rank's number
@@ -5231,10 +5462,9 @@ H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *
     H5_CHECK_OVERFLOW(chunk_list->num_chunk_infos, size_t, int);
 
     /* Create derived datatypes for the chunk re-insertion info needed */
-    if (H5D__mpio_get_chunk_insert_info_types(&recv_type, &recv_type_derived, &send_type,
-                                              &send_type_derived) < 0)
-        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL,
-                    "can't create derived datatypes for chunk re-insertion info");
+    if (H5D__mpio_get_chunk_insert_info_types(&recv_type, &recv_type_derived, &send_type, &send_type_derived) < 0) {
+        HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived datatypes for chunk re-insertion info");
+    }
 
     /*
      * Gather information to all ranks for a collective re-insertion
@@ -5249,30 +5479,41 @@ H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *
          */
         if (NULL == (counts_disps_array = H5MM_malloc(2 * (size_t)mpi_size * sizeof(*counts_disps_array)))) {
             /* Push an error, but still participate in collective gather operation */
-            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate receive counts and displacements array");
+            HDONE_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate receive counts and displacements array");
         }
         else {
             /* Set the receive counts from the assigned chunks map */
             counts_ptr = counts_disps_array;
 
-            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 0; curr_rank < mpi_size; curr_rank++) {
                 H5_CHECKED_ASSIGN(counts_ptr[curr_rank], int, num_chunks_assigned_map[curr_rank], size_t);
+            }
 
             /* Set the displacements into the receive buffer for the gather operation */
             displacements_ptr = &counts_disps_array[mpi_size];
 
             *displacements_ptr = 0;
-            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++)
+            for (int curr_rank = 1; curr_rank < mpi_size; curr_rank++) {
                 displacements_ptr[curr_rank] = displacements_ptr[curr_rank - 1] + counts_ptr[curr_rank - 1];
+            }
         }
 
         /* Perform gather operation */
-        if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos, (int)chunk_list->num_chunk_infos, send_type,
-                                  counts_ptr, displacements_ptr, recv_type, true, 0, io_info->comm, mpi_rank,
-                                  mpi_size, &gathered_array, &collective_num_entries) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL,
-                        "can't gather chunk index re-insertion info to/from ranks");
+        if (H5_mpio_gatherv_alloc(chunk_list->chunk_infos,
+                                  (int)chunk_list->num_chunk_infos,
+                                  send_type,
+                                  counts_ptr,
+                                  displacements_ptr,
+                                  recv_type,
+                                  true,
+                                  0,
+                                  io_info->comm,
+                                  mpi_rank,
+                                  mpi_size,
+                                  &gathered_array,
+                                  &collective_num_entries) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL, "can't gather chunk index re-insertion info to/from ranks");
+        }
     }
     else {
         /*
@@ -5282,44 +5523,54 @@ H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *
          * contributing before performing the actual gather operation. Use
          * the 'simple' MPI_Allgatherv wrapper for this.
          */
-        if (H5_mpio_gatherv_alloc_simple(chunk_list->chunk_infos, (int)chunk_list->num_chunk_infos, send_type,
-                                         recv_type, true, 0, io_info->comm, mpi_rank, mpi_size,
-                                         &gathered_array, &collective_num_entries) < 0)
-            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL,
-                        "can't gather chunk index re-insertion info to/from ranks");
+        if (H5_mpio_gatherv_alloc_simple(chunk_list->chunk_infos,
+                                         (int)chunk_list->num_chunk_infos,
+                                         send_type,
+                                         recv_type,
+                                         true,
+                                         0,
+                                         io_info->comm,
+                                         mpi_rank,
+                                         mpi_size,
+                                         &gathered_array,
+                                         &collective_num_entries) < 0) {
+            HGOTO_ERROR(H5E_DATASET, H5E_CANTGATHER, FAIL, "can't gather chunk index re-insertion info to/from ranks");
+        }
     }
 
     for (size_t entry_idx = 0; entry_idx < collective_num_entries; entry_idx++) {
-        H5D_mpio_filtered_dset_info_t *cached_dset_info;
-        H5D_chunk_insert_info_t       *coll_entry = &((H5D_chunk_insert_info_t *)gathered_array)[entry_idx];
-        H5D_chunk_ud_t                 chunk_ud;
-        haddr_t                        prev_tag = HADDR_UNDEF;
-        hsize_t                        scaled_coords[H5O_LAYOUT_NDIMS];
+        H5D_mpio_filtered_dset_info_t* cached_dset_info;
+        H5D_chunk_insert_info_t* coll_entry = &((H5D_chunk_insert_info_t*)gathered_array)[entry_idx];
+        H5D_chunk_ud_t chunk_ud;
+        haddr_t prev_tag = HADDR_UNDEF;
+        hsize_t scaled_coords[H5O_LAYOUT_NDIMS];
 
         /*
          * We only need to reinsert this chunk if we had to actually
          * allocate or reallocate space in the file for it
          */
-        if (!coll_entry->index_info.need_insert)
+        if (!coll_entry->index_info.need_insert) {
             continue;
+        }
 
         /* Find the cached dataset info for the dataset this chunk is in */
         if (num_dset_infos > 1) {
-            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &coll_entry->index_info.dset_oloc_addr,
-                      sizeof(haddr_t), cached_dset_info);
-            if (cached_dset_info == NULL)
+            HASH_FIND(hh, chunk_list->dset_info.dset_info_hash_table, &coll_entry->index_info.dset_oloc_addr, sizeof(haddr_t), cached_dset_info);
+            if (cached_dset_info == NULL) {
                 HGOTO_ERROR(H5E_DATASET, H5E_CANTFIND, FAIL, "unable to find cached dataset info entry");
+            }
         }
-        else
+        else {
             cached_dset_info = chunk_list->dset_info.single_dset_info;
+        }
         assert(cached_dset_info);
 
-        chunk_ud.common.layout  = &cached_dset_info->chunk_idx_info.layout->u.chunk;
+        chunk_ud.common.layout = &cached_dset_info->chunk_idx_info.layout->u.chunk;
         chunk_ud.common.storage = &cached_dset_info->chunk_idx_info.layout->storage.u.chunk;
-        chunk_ud.common.scaled  = scaled_coords;
+        chunk_ud.common.scaled = scaled_coords;
 
         chunk_ud.chunk_block = coll_entry->chunk_block;
-        chunk_ud.chunk_idx   = coll_entry->index_info.chunk_idx;
+        chunk_ud.chunk_idx = coll_entry->index_info.chunk_idx;
         chunk_ud.filter_mask = coll_entry->index_info.filter_mask;
 
         /* Calculate scaled coordinates for the chunk */
@@ -5338,23 +5589,23 @@ H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *
              *       callback that accepts a chunk index and provides the
              *       caller with the scaled coordinates for that chunk.
              */
-            H5VM_array_calc_pre(
-                chunk_ud.chunk_idx, cached_dset_info->dset_io_info->dset->shared->ndims,
-                cached_dset_info->chunk_idx_info.layout->u.chunk.u.earray.swizzled_down_chunks,
-                scaled_coords);
+            H5VM_array_calc_pre(chunk_ud.chunk_idx,
+                                cached_dset_info->dset_io_info->dset->shared->ndims,
+                                cached_dset_info->chunk_idx_info.layout->u.chunk.u.earray.swizzled_down_chunks,
+                                scaled_coords);
 
-            H5VM_unswizzle_coords(hsize_t, scaled_coords,
-                                  cached_dset_info->chunk_idx_info.layout->u.chunk.u.earray.unlim_dim);
+            H5VM_unswizzle_coords(hsize_t, scaled_coords, cached_dset_info->chunk_idx_info.layout->u.chunk.u.earray.unlim_dim);
         }
         else {
-            H5VM_array_calc_pre(chunk_ud.chunk_idx, cached_dset_info->dset_io_info->dset->shared->ndims,
+            H5VM_array_calc_pre(chunk_ud.chunk_idx,
+                                cached_dset_info->dset_io_info->dset->shared->ndims,
                                 cached_dset_info->dset_io_info->dset->shared->layout.u.chunk.down_chunks,
                                 scaled_coords);
         }
 
         scaled_coords[cached_dset_info->dset_io_info->dset->shared->ndims] = 0;
 
-#ifndef NDEBUG
+    #ifndef NDEBUG
         /*
          * If a matching local chunk entry is found, the
          * `chunk_info` structure (which contains the chunk's
@@ -5367,29 +5618,30 @@ H5D__mpio_collective_filtered_chunk_reinsert(H5D_filtered_collective_io_info_t *
             bool same_chunk;
 
             /* Chunks must have the same index and reside in the same dataset */
-            same_chunk = (0 == H5_addr_cmp(coll_entry->index_info.dset_oloc_addr,
-                                           chunk_list->chunk_infos[dbg_idx].index_info.dset_oloc_addr));
-            same_chunk = same_chunk && (coll_entry->index_info.chunk_idx ==
-                                        chunk_list->chunk_infos[dbg_idx].index_info.chunk_idx);
+            same_chunk = (0 == H5_addr_cmp(coll_entry->index_info.dset_oloc_addr, chunk_list->chunk_infos[dbg_idx].index_info.dset_oloc_addr));
+            same_chunk = same_chunk && (coll_entry->index_info.chunk_idx == chunk_list->chunk_infos[dbg_idx].index_info.chunk_idx);
 
             if (same_chunk) {
-                bool coords_match =
-                    !memcmp(scaled_coords, chunk_list->chunk_infos[dbg_idx].chunk_info->scaled,
-                            cached_dset_info->dset_io_info->dset->shared->ndims * sizeof(hsize_t));
+                bool coords_match = !memcmp(scaled_coords,
+                                            chunk_list->chunk_infos[dbg_idx].chunk_info->scaled,
+                                            cached_dset_info->dset_io_info->dset->shared->ndims * sizeof(hsize_t));
 
-                assert(coords_match && "Calculated scaled coordinates for chunk didn't match "
-                                       "chunk's actual scaled coordinates!");
+                assert(coords_match &&
+                       "Calculated scaled coordinates for chunk didn't match "
+                       "chunk's actual scaled coordinates!");
                 break;
             }
         }
-#endif
+    #endif
 
         /* Set metadata tagging with dataset oheader addr */
         H5AC_tag(cached_dset_info->dset_io_info->dset->oloc.addr, &prev_tag);
 
-        if ((cached_dset_info->chunk_idx_info.layout->storage.u.chunk.ops->insert)(
-                &cached_dset_info->chunk_idx_info, &chunk_ud, cached_dset_info->dset_io_info->dset) < 0)
+        if ((cached_dset_info->chunk_idx_info.layout->storage.u.chunk.ops->insert)(&cached_dset_info->chunk_idx_info,
+                                                                                   &chunk_ud,
+                                                                                   cached_dset_info->dset_io_info->dset) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_CANTINSERT, FAIL, "unable to insert chunk address into index");
+        }
 
         /* Reset metadata tagging */
         H5AC_tag(prev_tag, NULL);
@@ -5400,18 +5652,20 @@ done:
     H5MM_free(counts_disps_array);
 
     if (send_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&send_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&send_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (recv_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&recv_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&recv_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
     H5D_MPIO_TIME_STOP(mpi_rank);
     H5D_MPIO_TRACE_EXIT(mpi_rank);
-#endif
+    #endif
 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_collective_filtered_chunk_reinsert() */
@@ -5441,19 +5695,18 @@ done:
  *-------------------------------------------------------------------------
  */
 static herr_t
-H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype *contig_type, bool *contig_type_derived,
-                                            MPI_Datatype *resized_type, bool *resized_type_derived)
+    H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived)
 {
-    MPI_Datatype struct_type              = MPI_DATATYPE_NULL;
-    bool         struct_type_derived      = false;
-    MPI_Datatype chunk_block_type         = MPI_DATATYPE_NULL;
-    bool         chunk_block_type_derived = false;
+    MPI_Datatype struct_type = MPI_DATATYPE_NULL;
+    bool struct_type_derived = false;
+    MPI_Datatype chunk_block_type = MPI_DATATYPE_NULL;
+    bool chunk_block_type_derived = false;
     MPI_Datatype types[6];
-    MPI_Aint     displacements[6];
-    int          block_lengths[6];
-    int          field_count;
-    int          mpi_code;
-    herr_t       ret_value = SUCCEED;
+    MPI_Aint displacements[6];
+    int block_lengths[6];
+    int field_count;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -5462,12 +5715,13 @@ H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype *contig_type, bool *con
     assert(resized_type);
     assert(resized_type_derived);
 
-    *contig_type_derived  = false;
+    *contig_type_derived = false;
     *resized_type_derived = false;
 
     /* Create struct type for the inner H5F_block_t structure */
-    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0)
+    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived type for chunk file description");
+    }
 
     field_count = 6;
     assert(field_count == (sizeof(types) / sizeof(MPI_Datatype)));
@@ -5489,19 +5743,20 @@ H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype *contig_type, bool *con
     displacements[3] = offsetof(H5D_chunk_redistribute_info_t, orig_owner);
     displacements[4] = offsetof(H5D_chunk_redistribute_info_t, new_owner);
     displacements[5] = offsetof(H5D_chunk_redistribute_info_t, num_writers);
-    types[0]         = chunk_block_type;
-    types[1]         = HSIZE_AS_MPI_TYPE;
-    types[2]         = HADDR_AS_MPI_TYPE;
-    types[3]         = MPI_INT;
-    types[4]         = MPI_INT;
-    types[5]         = MPI_INT;
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, contig_type)))
+    types[0] = chunk_block_type;
+    types[1] = HSIZE_AS_MPI_TYPE;
+    types[2] = HADDR_AS_MPI_TYPE;
+    types[3] = MPI_INT;
+    types[4] = MPI_INT;
+    types[5] = MPI_INT;
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     *contig_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
     /* Create struct type to extract the chunk_current, chunk_idx,
      * dset_oloc_addr, orig_owner, new_owner and num_writers fields
@@ -5519,44 +5774,49 @@ H5D__mpio_get_chunk_redistribute_info_types(MPI_Datatype *contig_type, bool *con
     displacements[3] = offsetof(H5D_filtered_collective_chunk_info_t, orig_owner);
     displacements[4] = offsetof(H5D_filtered_collective_chunk_info_t, new_owner);
     displacements[5] = offsetof(H5D_filtered_collective_chunk_info_t, num_writers);
-    types[0]         = chunk_block_type;
-    types[1]         = HSIZE_AS_MPI_TYPE;
-    types[2]         = HADDR_AS_MPI_TYPE;
-    types[3]         = MPI_INT;
-    types[4]         = MPI_INT;
-    types[5]         = MPI_INT;
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type)))
+    types[0] = chunk_block_type;
+    types[1] = HSIZE_AS_MPI_TYPE;
+    types[2] = HADDR_AS_MPI_TYPE;
+    types[3] = MPI_INT;
+    types[4] = MPI_INT;
+    types[5] = MPI_INT;
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     struct_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(
-                            struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_resized failed", mpi_code)
+    }
     *resized_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
 done:
     if (struct_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (chunk_block_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
     if (ret_value < 0) {
         if (*resized_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *resized_type_derived = false;
         }
         if (*contig_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *contig_type_derived = false;
         }
     }
@@ -5587,20 +5847,18 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype *contig_type, bool *contig_type_derived,
-                                     MPI_Datatype *resized_type, bool *resized_type_derived)
+static herr_t H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived)
 {
-    MPI_Datatype struct_type              = MPI_DATATYPE_NULL;
-    bool         struct_type_derived      = false;
-    MPI_Datatype chunk_block_type         = MPI_DATATYPE_NULL;
-    bool         chunk_block_type_derived = false;
+    MPI_Datatype struct_type = MPI_DATATYPE_NULL;
+    bool struct_type_derived = false;
+    MPI_Datatype chunk_block_type = MPI_DATATYPE_NULL;
+    bool chunk_block_type_derived = false;
     MPI_Datatype types[4];
-    MPI_Aint     displacements[4];
-    int          block_lengths[4];
-    int          field_count;
-    int          mpi_code;
-    herr_t       ret_value = SUCCEED;
+    MPI_Aint displacements[4];
+    int block_lengths[4];
+    int field_count;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -5609,12 +5867,13 @@ H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype *contig_type, bool *contig_typ
     assert(resized_type);
     assert(resized_type_derived);
 
-    *contig_type_derived  = false;
+    *contig_type_derived = false;
     *resized_type_derived = false;
 
     /* Create struct type for the inner H5F_block_t structure */
-    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0)
+    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived type for chunk file description");
+    }
 
     field_count = 4;
     assert(field_count == (sizeof(types) / sizeof(MPI_Datatype)));
@@ -5631,17 +5890,18 @@ H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype *contig_type, bool *contig_typ
     displacements[1] = offsetof(H5D_chunk_alloc_info_t, chunk_new);
     displacements[2] = offsetof(H5D_chunk_alloc_info_t, chunk_idx);
     displacements[3] = offsetof(H5D_chunk_alloc_info_t, dset_oloc_addr);
-    types[0]         = chunk_block_type;
-    types[1]         = chunk_block_type;
-    types[2]         = HSIZE_AS_MPI_TYPE;
-    types[3]         = HADDR_AS_MPI_TYPE;
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, contig_type)))
+    types[0] = chunk_block_type;
+    types[1] = chunk_block_type;
+    types[2] = HSIZE_AS_MPI_TYPE;
+    types[3] = HADDR_AS_MPI_TYPE;
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     *contig_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
     /*
      * Create struct type to extract the chunk_current, chunk_new, chunk_idx
@@ -5656,42 +5916,47 @@ H5D__mpio_get_chunk_alloc_info_types(MPI_Datatype *contig_type, bool *contig_typ
     displacements[1] = offsetof(H5D_filtered_collective_chunk_info_t, chunk_new);
     displacements[2] = offsetof(H5D_filtered_collective_chunk_info_t, index_info.chunk_idx);
     displacements[3] = offsetof(H5D_filtered_collective_chunk_info_t, index_info.dset_oloc_addr);
-    types[0]         = chunk_block_type;
-    types[1]         = chunk_block_type;
-    types[2]         = HSIZE_AS_MPI_TYPE;
-    types[3]         = HADDR_AS_MPI_TYPE;
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type)))
+    types[0] = chunk_block_type;
+    types[1] = chunk_block_type;
+    types[2] = HSIZE_AS_MPI_TYPE;
+    types[3] = HADDR_AS_MPI_TYPE;
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     struct_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(
-                            struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_resized failed", mpi_code)
+    }
     *resized_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
 done:
     if (struct_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (chunk_block_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
     if (ret_value < 0) {
         if (*resized_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *resized_type_derived = false;
         }
         if (*contig_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *contig_type_derived = false;
         }
     }
@@ -5724,21 +5989,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_get_chunk_insert_info_types(MPI_Datatype *contig_type, bool *contig_type_derived,
-                                      MPI_Datatype *resized_type, bool *resized_type_derived)
+static herr_t H5D__mpio_get_chunk_insert_info_types(MPI_Datatype* contig_type, bool* contig_type_derived, MPI_Datatype* resized_type, bool* resized_type_derived)
 {
-    MPI_Datatype struct_type              = MPI_DATATYPE_NULL;
-    bool         struct_type_derived      = false;
-    MPI_Datatype chunk_block_type         = MPI_DATATYPE_NULL;
-    bool         chunk_block_type_derived = false;
-    MPI_Aint     contig_type_extent;
+    MPI_Datatype struct_type = MPI_DATATYPE_NULL;
+    bool struct_type_derived = false;
+    MPI_Datatype chunk_block_type = MPI_DATATYPE_NULL;
+    bool chunk_block_type_derived = false;
+    MPI_Aint contig_type_extent;
     MPI_Datatype types[5];
-    MPI_Aint     displacements[5];
-    int          block_lengths[5];
-    int          field_count;
-    int          mpi_code;
-    herr_t       ret_value = SUCCEED;
+    MPI_Aint displacements[5];
+    int block_lengths[5];
+    int field_count;
+    int mpi_code;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -5747,12 +6010,13 @@ H5D__mpio_get_chunk_insert_info_types(MPI_Datatype *contig_type, bool *contig_ty
     assert(resized_type);
     assert(resized_type_derived);
 
-    *contig_type_derived  = false;
+    *contig_type_derived = false;
     *resized_type_derived = false;
 
     /* Create struct type for an H5F_block_t structure */
-    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0)
+    if (H5F_mpi_get_file_block_type(false, &chunk_block_type, &chunk_block_type_derived) < 0) {
         HGOTO_ERROR(H5E_DATASET, H5E_CANTGET, FAIL, "can't create derived type for chunk file description");
+    }
 
     field_count = 5;
     assert(field_count == (sizeof(types) / sizeof(MPI_Datatype)));
@@ -5773,28 +6037,31 @@ H5D__mpio_get_chunk_insert_info_types(MPI_Datatype *contig_type, bool *contig_ty
     displacements[2] = offsetof(H5D_chunk_insert_info_t, index_info.dset_oloc_addr);
     displacements[3] = offsetof(H5D_chunk_insert_info_t, index_info.filter_mask);
     displacements[4] = offsetof(H5D_chunk_insert_info_t, index_info.need_insert);
-    types[0]         = chunk_block_type;
-    types[1]         = HSIZE_AS_MPI_TYPE;
-    types[2]         = HADDR_AS_MPI_TYPE;
-    types[3]         = MPI_UNSIGNED;
-    types[4]         = MPI_C_BOOL;
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type)))
+    types[0] = chunk_block_type;
+    types[1] = HSIZE_AS_MPI_TYPE;
+    types[2] = HADDR_AS_MPI_TYPE;
+    types[3] = MPI_UNSIGNED;
+    types[4] = MPI_C_BOOL;
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     struct_type_derived = true;
 
     contig_type_extent = (MPI_Aint)(sizeof(H5F_block_t) + sizeof(H5D_chunk_index_info_t));
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(struct_type, 0, contig_type_extent, contig_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(struct_type, 0, contig_type_extent, contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_resized failed", mpi_code)
+    }
     *contig_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(contig_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
     struct_type_derived = false;
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+    }
 
     /*
      * Create struct type to correctly extract all needed
@@ -5806,38 +6073,43 @@ H5D__mpio_get_chunk_insert_info_types(MPI_Datatype *contig_type, bool *contig_ty
     displacements[2] = offsetof(H5D_filtered_collective_chunk_info_t, index_info.dset_oloc_addr);
     displacements[3] = offsetof(H5D_filtered_collective_chunk_info_t, index_info.filter_mask);
     displacements[4] = offsetof(H5D_filtered_collective_chunk_info_t, index_info.need_insert);
-    if (MPI_SUCCESS !=
-        (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_struct(field_count, block_lengths, displacements, types, &struct_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_struct failed", mpi_code)
+    }
     struct_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(
-                            struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_create_resized(struct_type, 0, sizeof(H5D_filtered_collective_chunk_info_t), resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_resized failed", mpi_code)
+    }
     *resized_type_derived = true;
 
-    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type)))
+    if (MPI_SUCCESS != (mpi_code = MPI_Type_commit(resized_type))) {
         HMPI_GOTO_ERROR(FAIL, "MPI_Type_commit failed", mpi_code)
+    }
 
 done:
     if (struct_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&struct_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
     if (chunk_block_type_derived) {
-        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type)))
+        if (MPI_SUCCESS != (mpi_code = MPI_Type_free(&chunk_block_type))) {
             HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+        }
     }
 
     if (ret_value < 0) {
         if (*resized_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(resized_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *resized_type_derived = false;
         }
         if (*contig_type_derived) {
-            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type)))
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_free(contig_type))) {
                 HMPI_DONE_ERROR(FAIL, "MPI_Type_free failed", mpi_code)
+            }
             *contig_type_derived = false;
         }
     }
@@ -5857,50 +6129,50 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t *chunk_list, H5F_shared_t *f_sh,
-                                     H5D_io_op_type_t op_type)
+static herr_t H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t* chunk_list, H5F_shared_t* f_sh, H5D_io_op_type_t op_type)
 {
-    const void **io_wbufs = NULL;
-    void       **io_rbufs = NULL;
-    H5FD_mem_t   io_types[2];
-    uint32_t     iovec_count = 0;
-    haddr_t     *io_addrs    = NULL;
-    size_t      *io_sizes    = NULL;
-    herr_t       ret_value   = SUCCEED;
+    const void** io_wbufs = NULL;
+    void** io_rbufs = NULL;
+    H5FD_mem_t io_types[2];
+    uint32_t iovec_count = 0;
+    haddr_t* io_addrs = NULL;
+    size_t* io_sizes = NULL;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
     assert(chunk_list);
     assert(f_sh);
 
-    if (op_type == H5D_IO_OP_WRITE)
+    if (op_type == H5D_IO_OP_WRITE) {
         iovec_count = (uint32_t)chunk_list->num_chunk_infos;
+    }
     else {
         assert(chunk_list->num_chunks_to_read <= chunk_list->num_chunk_infos);
         iovec_count = (uint32_t)chunk_list->num_chunks_to_read;
     }
 
     if (iovec_count > 0) {
-        if (chunk_list->num_chunk_infos > UINT32_MAX)
-            HGOTO_ERROR(H5E_INTERNAL, H5E_BADRANGE, FAIL,
-                        "number of chunk entries in I/O operation exceeds UINT32_MAX");
+        if (chunk_list->num_chunk_infos > UINT32_MAX) {
+            HGOTO_ERROR(H5E_INTERNAL, H5E_BADRANGE, FAIL, "number of chunk entries in I/O operation exceeds UINT32_MAX");
+        }
 
-        if (NULL == (io_addrs = H5MM_malloc(iovec_count * sizeof(*io_addrs))))
-            HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                        "couldn't allocate space for I/O addresses vector");
-        if (NULL == (io_sizes = H5MM_malloc(iovec_count * sizeof(*io_sizes))))
+        if (NULL == (io_addrs = H5MM_malloc(iovec_count * sizeof(*io_addrs)))) {
+            HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate space for I/O addresses vector");
+        }
+        if (NULL == (io_sizes = H5MM_malloc(iovec_count * sizeof(*io_sizes)))) {
             HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate space for I/O sizes vector");
+        }
 
         if (op_type == H5D_IO_OP_WRITE) {
-            if (NULL == (io_wbufs = H5MM_malloc(iovec_count * sizeof(*io_wbufs))))
-                HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate space for I/O buffers vector");
+            if (NULL == (io_wbufs = H5MM_malloc(iovec_count * sizeof(*io_wbufs)))) {
+                HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate space for I/O buffers vector");
+            }
         }
         else {
-            if (NULL == (io_rbufs = H5MM_malloc(iovec_count * sizeof(*io_rbufs))))
-                HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL,
-                            "couldn't allocate space for I/O buffers vector");
+            if (NULL == (io_rbufs = H5MM_malloc(iovec_count * sizeof(*io_rbufs)))) {
+                HGOTO_ERROR(H5E_RESOURCE, H5E_CANTALLOC, FAIL, "couldn't allocate space for I/O buffers vector");
+            }
         }
 
         /*
@@ -5912,10 +6184,11 @@ H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t *ch
         io_types[1] = H5FD_MEM_NOLIST;
 
         for (size_t i = 0, vec_idx = 0; i < chunk_list->num_chunk_infos; i++) {
-            H5F_block_t *chunk_block;
+            H5F_block_t* chunk_block;
 
-            if (op_type == H5D_IO_OP_READ && !chunk_list->chunk_infos[i].need_read)
+            if (op_type == H5D_IO_OP_READ && !chunk_list->chunk_infos[i].need_read) {
                 continue;
+            }
 
             /*
              * Check that we aren't going to accidentally try to write past the
@@ -5926,8 +6199,7 @@ H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t *ch
             assert(vec_idx < iovec_count);
 
             /* Set convenience pointer for current chunk block */
-            chunk_block = (op_type == H5D_IO_OP_READ) ? &chunk_list->chunk_infos[i].chunk_current
-                                                      : &chunk_list->chunk_infos[i].chunk_new;
+            chunk_block = (op_type == H5D_IO_OP_READ) ? &chunk_list->chunk_infos[i].chunk_current : &chunk_list->chunk_infos[i].chunk_new;
 
             assert(H5_addr_defined(chunk_block->offset));
             io_addrs[vec_idx] = chunk_block->offset;
@@ -5939,29 +6211,34 @@ H5D__mpio_collective_filtered_vec_io(const H5D_filtered_collective_io_info_t *ch
              * not equal to it; file addresses should only appear in the
              * chunk list once.
              */
-#ifndef NDEBUG
-            if (vec_idx > 0)
+    #ifndef NDEBUG
+            if (vec_idx > 0) {
                 assert(io_addrs[vec_idx] > io_addrs[vec_idx - 1]);
-#endif
+            }
+    #endif
 
             io_sizes[vec_idx] = (size_t)chunk_block->length;
 
-            if (op_type == H5D_IO_OP_WRITE)
+            if (op_type == H5D_IO_OP_WRITE) {
                 io_wbufs[vec_idx] = chunk_list->chunk_infos[i].buf;
-            else
+            }
+            else {
                 io_rbufs[vec_idx] = chunk_list->chunk_infos[i].buf;
+            }
 
             vec_idx++;
         }
     }
 
     if (op_type == H5D_IO_OP_WRITE) {
-        if (H5F_shared_vector_write(f_sh, iovec_count, io_types, io_addrs, io_sizes, io_wbufs) < 0)
+        if (H5F_shared_vector_write(f_sh, iovec_count, io_types, io_addrs, io_sizes, io_wbufs) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "vector write call failed");
+        }
     }
     else {
-        if (H5F_shared_vector_read(f_sh, iovec_count, io_types, io_addrs, io_sizes, io_rbufs) < 0)
+        if (H5F_shared_vector_read(f_sh, iovec_count, io_types, io_addrs, io_sizes, io_rbufs) < 0) {
             HGOTO_ERROR(H5E_DATASET, H5E_READERROR, FAIL, "vector read call failed");
+        }
     }
 
 done:
@@ -5973,14 +6250,13 @@ done:
     FUNC_LEAVE_NOAPI(ret_value)
 }
 
-#ifdef H5Dmpio_DEBUG
+    #ifdef H5Dmpio_DEBUG
 
-static herr_t
-H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t *chunk_list, int mpi_rank)
+static herr_t H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t* chunk_list, int mpi_rank)
 {
-    H5D_filtered_collective_chunk_info_t *chunk_entry;
-    size_t                                i;
-    herr_t                                ret_value = SUCCEED;
+    H5D_filtered_collective_chunk_info_t* chunk_entry;
+    size_t i;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -5999,34 +6275,34 @@ H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t 
         H5D_MPIO_DEBUG(mpi_rank, "   - Chunk Fspace Info -");
         H5D_MPIO_DEBUG_VA(mpi_rank,
                           "     Chunk Current Info: { Offset: %" PRIuHADDR ", Length: %" PRIuHADDR " }",
-                          chunk_entry->chunk_current.offset, chunk_entry->chunk_current.length);
-        H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk New Info: { Offset: %" PRIuHADDR ", Length: %" PRIuHADDR " }",
-                          chunk_entry->chunk_new.offset, chunk_entry->chunk_new.length);
+                          chunk_entry->chunk_current.offset,
+                          chunk_entry->chunk_current.length);
+        H5D_MPIO_DEBUG_VA(mpi_rank,
+                          "     Chunk New Info: { Offset: %" PRIuHADDR ", Length: %" PRIuHADDR " }",
+                          chunk_entry->chunk_new.offset,
+                          chunk_entry->chunk_new.length);
 
         H5D_MPIO_DEBUG(mpi_rank, "   - Chunk Insert Info -");
         H5D_MPIO_DEBUG_VA(mpi_rank,
-                          "     Chunk Scaled Coords (4-d): { %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE
-                          ", %" PRIuHSIZE " }",
+                          "     Chunk Scaled Coords (4-d): { %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE ", %" PRIuHSIZE " }",
                           chunk_rank < 1 ? 0 : chunk_entry->chunk_info->scaled[0],
                           chunk_rank < 2 ? 0 : chunk_entry->chunk_info->scaled[1],
                           chunk_rank < 3 ? 0 : chunk_entry->chunk_info->scaled[2],
                           chunk_rank < 4 ? 0 : chunk_entry->chunk_info->scaled[3]);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Index: %" PRIuHSIZE, chunk_entry->index_info.chunk_idx);
-        H5D_MPIO_DEBUG_VA(mpi_rank, "     Dataset Object Header Address: %" PRIuHADDR,
-                          chunk_entry->index_info.dset_oloc_addr);
+        H5D_MPIO_DEBUG_VA(mpi_rank, "     Dataset Object Header Address: %" PRIuHADDR, chunk_entry->index_info.dset_oloc_addr);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Filter Mask: %u", chunk_entry->index_info.filter_mask);
-        H5D_MPIO_DEBUG_VA(mpi_rank, "     Need Insert: %s",
-                          chunk_entry->index_info.need_insert ? "YES" : "NO");
+        H5D_MPIO_DEBUG_VA(mpi_rank, "     Need Insert: %s", chunk_entry->index_info.need_insert ? "YES" : "NO");
 
         H5D_MPIO_DEBUG(mpi_rank, "   - Other Info -");
-        H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Info Ptr: %p", (void *)chunk_entry->chunk_info);
+        H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Info Ptr: %p", (void*)chunk_entry->chunk_info);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Need Read: %s", chunk_entry->need_read ? "YES" : "NO");
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk I/O Size: %zu", chunk_entry->io_size);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Buffer Size: %zu", chunk_entry->chunk_buf_size);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     Original Owner: %d", chunk_entry->orig_owner);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     New Owner: %d", chunk_entry->new_owner);
         H5D_MPIO_DEBUG_VA(mpi_rank, "     # of Writers: %d", chunk_entry->num_writers);
-        H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Data Buffer Ptr: %p", (void *)chunk_entry->buf);
+        H5D_MPIO_DEBUG_VA(mpi_rank, "     Chunk Data Buffer Ptr: %p", (void*)chunk_entry->buf);
 
         H5D_MPIO_DEBUG(mpi_rank, " }");
     }
@@ -6035,6 +6311,6 @@ H5D__mpio_dump_collective_filtered_chunk_list(H5D_filtered_collective_io_info_t 
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5D__mpio_dump_collective_filtered_chunk_list() */
 
-#endif
+    #endif
 
 #endif /* H5_HAVE_PARALLEL */

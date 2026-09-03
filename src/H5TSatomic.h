@@ -62,8 +62,7 @@
  *
  *--------------------------------------------------------------------------
  */
-static inline int
-H5TS_atomic_load_int(H5TS_atomic_int_t *obj)
+static inline int H5TS_atomic_load_int(H5TS_atomic_int_t* obj)
 {
     int ret_value;
 
@@ -88,8 +87,7 @@ H5TS_atomic_load_int(H5TS_atomic_int_t *obj)
  *
  *--------------------------------------------------------------------------
  */
-static inline void
-H5TS_atomic_store_int(H5TS_atomic_int_t *obj, int desired)
+static inline void H5TS_atomic_store_int(H5TS_atomic_int_t* obj, int desired)
 {
     /* Lock mutex that protects the "atomic" value */
     H5TS_mutex_lock(&obj->mutex);
@@ -114,8 +112,7 @@ H5TS_atomic_store_int(H5TS_atomic_int_t *obj, int desired)
  *
  *--------------------------------------------------------------------------
  */
-static inline int
-H5TS_atomic_fetch_add_int(H5TS_atomic_int_t *obj, int arg)
+static inline int H5TS_atomic_fetch_add_int(H5TS_atomic_int_t* obj, int arg)
 {
     int ret_value;
 
@@ -145,8 +142,7 @@ H5TS_atomic_fetch_add_int(H5TS_atomic_int_t *obj, int arg)
  *
  *--------------------------------------------------------------------------
  */
-static inline int
-H5TS_atomic_fetch_sub_int(H5TS_atomic_int_t *obj, int arg)
+static inline int H5TS_atomic_fetch_sub_int(H5TS_atomic_int_t* obj, int arg)
 {
     int ret_value;
 
@@ -174,8 +170,7 @@ H5TS_atomic_fetch_sub_int(H5TS_atomic_int_t *obj, int arg)
  *
  *--------------------------------------------------------------------------
  */
-static inline unsigned
-H5TS_atomic_load_uint(H5TS_atomic_uint_t *obj)
+static inline unsigned H5TS_atomic_load_uint(H5TS_atomic_uint_t* obj)
 {
     unsigned ret_value;
 
@@ -200,8 +195,7 @@ H5TS_atomic_load_uint(H5TS_atomic_uint_t *obj)
  *
  *--------------------------------------------------------------------------
  */
-static inline void
-H5TS_atomic_store_uint(H5TS_atomic_uint_t *obj, unsigned desired)
+static inline void H5TS_atomic_store_uint(H5TS_atomic_uint_t* obj, unsigned desired)
 {
     /* Lock mutex that protects the "atomic" value */
     H5TS_mutex_lock(&obj->mutex);
@@ -226,8 +220,7 @@ H5TS_atomic_store_uint(H5TS_atomic_uint_t *obj, unsigned desired)
  *
  *--------------------------------------------------------------------------
  */
-static inline unsigned
-H5TS_atomic_fetch_add_uint(H5TS_atomic_uint_t *obj, unsigned arg)
+static inline unsigned H5TS_atomic_fetch_add_uint(H5TS_atomic_uint_t* obj, unsigned arg)
 {
     unsigned ret_value;
 
@@ -257,8 +250,7 @@ H5TS_atomic_fetch_add_uint(H5TS_atomic_uint_t *obj, unsigned arg)
  *
  *--------------------------------------------------------------------------
  */
-static inline unsigned
-H5TS_atomic_fetch_sub_uint(H5TS_atomic_uint_t *obj, unsigned arg)
+static inline unsigned H5TS_atomic_fetch_sub_uint(H5TS_atomic_uint_t* obj, unsigned arg)
 {
     unsigned ret_value;
 
@@ -287,10 +279,9 @@ H5TS_atomic_fetch_sub_uint(H5TS_atomic_uint_t *obj, unsigned arg)
  *
  *--------------------------------------------------------------------------
  */
-static inline void *
-H5TS_atomic_exchange_voidp(H5TS_atomic_voidp_t *obj, void *desired)
+static inline void* H5TS_atomic_exchange_voidp(H5TS_atomic_voidp_t* obj, void* desired)
 {
-    void *ret_value;
+    void* ret_value;
 
     /* Lock mutex that protects the "atomic" value */
     H5TS_mutex_lock(&obj->mutex);
@@ -321,8 +312,7 @@ H5TS_atomic_exchange_voidp(H5TS_atomic_voidp_t *obj, void *desired)
  *
  *--------------------------------------------------------------------------
  */
-static inline bool
-H5TS_atomic_compare_exchange_strong_voidp(H5TS_atomic_voidp_t *obj, void **expected, void *desired)
+static inline bool H5TS_atomic_compare_exchange_strong_voidp(H5TS_atomic_voidp_t* obj, void** expected, void* desired)
 {
     bool ret_value;
 
@@ -332,7 +322,7 @@ H5TS_atomic_compare_exchange_strong_voidp(H5TS_atomic_voidp_t *obj, void **expec
     /* Compare 'obj' w/'expected' */
     if (obj->value == *expected) {
         obj->value = desired;
-        ret_value  = true;
+        ret_value = true;
     }
     else {
         *expected = obj->value;

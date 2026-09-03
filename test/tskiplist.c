@@ -30,20 +30,18 @@
 #define NUM_ELEMS 1000
 
 /* Random numbers */
-static int *rand_num;
-static int *sort_rand_num;
-static int *rev_sort_rand_num;
+static int* rand_num;
+static int* sort_rand_num;
+static int* rev_sort_rand_num;
 
-static int
-tst_sort(const void *i1, const void *i2)
+static int tst_sort(const void* i1, const void* i2)
 {
-    return (*(const int *)i1 - *(const int *)i2);
+    return (*(const int*)i1 - *(const int*)i2);
 }
 
-static int
-tst_rev_sort(const void *i1, const void *i2)
+static int tst_rev_sort(const void* i1, const void* i2)
 {
-    return (*(const int *)i2 - *(const int *)i1);
+    return (*(const int*)i2 - *(const int*)i1);
 }
 
 /****************************************************************
@@ -52,19 +50,18 @@ tst_rev_sort(const void *i1, const void *i2)
 **      Initialize data for skip list testing
 **
 ****************************************************************/
-static void
-test_skiplist_init(void)
+static void test_skiplist_init(void)
 {
-    int      new_val; /* New value to insert */
-    unsigned found;   /* Flag to indicate value was inserted already */
-    size_t   u, v;    /* Local index variables */
+    int new_val;    /* New value to insert */
+    unsigned found; /* Flag to indicate value was inserted already */
+    size_t u, v;    /* Local index variables */
 
     /* Allocate arrays */
-    rand_num = (int *)malloc(sizeof(int) * NUM_ELEMS);
+    rand_num = (int*)malloc(sizeof(int) * NUM_ELEMS);
     CHECK_PTR(rand_num, "malloc");
-    sort_rand_num = (int *)malloc(sizeof(int) * NUM_ELEMS);
+    sort_rand_num = (int*)malloc(sizeof(int) * NUM_ELEMS);
     CHECK_PTR(sort_rand_num, "malloc");
-    rev_sort_rand_num = (int *)malloc(sizeof(int) * NUM_ELEMS);
+    rev_sort_rand_num = (int*)malloc(sizeof(int) * NUM_ELEMS);
     CHECK_PTR(rev_sort_rand_num, "malloc");
 
     /* Initialize random number seed */
@@ -80,9 +77,11 @@ test_skiplist_init(void)
             new_val = (int)(rand() % 10001) - 5001;
 
             /* Check if the value is already in the array */
-            for (v = 0; v < u; v++)
-                if (rand_num[v] == new_val)
+            for (v = 0; v < u; v++) {
+                if (rand_num[v] == new_val) {
                     found = 1;
+                }
+            }
         } while (found);
 
         /* Set unique value in array */
@@ -108,11 +107,10 @@ test_skiplist_init(void)
 **      Tests creating and closing skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_create(void)
+static void test_skiplist_create(void)
 {
-    H5SL_t *slist; /* Skip list created */
-    herr_t  ret;   /* Generic return value */
+    H5SL_t* slist; /* Skip list created */
+    herr_t ret;    /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(6, ("Testing Creating & Closing Skip Lists\n"));
@@ -133,16 +131,15 @@ test_skiplist_create(void)
 **      Tests inserting single object into skip list.
 **
 ****************************************************************/
-static void
-test_skiplist_insert(void)
+static void test_skiplist_insert(void)
 {
-    H5SL_t *slist;     /* Skip list created */
-    int     key,       /* Key of item to insert */
-        item;          /* Item to insert */
-    int    search_key; /* Key of item to search for in skip list */
-    int   *found_item; /* Item found in skip list */
-    size_t num;        /* Number of elements in skip list */
-    herr_t ret;        /* Generic return value */
+    H5SL_t* slist;   /* Skip list created */
+    int key,         /* Key of item to insert */
+        item;        /* Item to insert */
+    int search_key;  /* Key of item to search for in skip list */
+    int* found_item; /* Item found in skip list */
+    size_t num;      /* Number of elements in skip list */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Insertion Into Skip List\n"));
@@ -156,14 +153,14 @@ test_skiplist_insert(void)
     VERIFY(num, 0, "H5SL_count");
 
     /* Try searching for item in empty skip list */
-    key        = 37;
-    found_item = (int *)H5SL_search(slist, &key);
+    key = 37;
+    found_item = (int*)H5SL_search(slist, &key);
     CHECK_PTR_NULL(found_item, "H5SL_search");
 
     /* Insert an object into the skip list */
-    key  = 2;
+    key = 2;
     item = 10;
-    ret  = H5SL_insert(slist, &item, &key);
+    ret = H5SL_insert(slist, &item, &key);
     CHECK(ret, FAIL, "H5SL_insert");
 
     /* Check that the skip list has one element */
@@ -171,18 +168,18 @@ test_skiplist_insert(void)
     VERIFY(num, 1, "H5SL_count");
 
     /* Search for the item just inserted */
-    found_item = (int *)H5SL_search(slist, &key);
+    found_item = (int*)H5SL_search(slist, &key);
     CHECK_PTR(found_item, "H5SL_search");
     VERIFY(*found_item, item, "H5SL_search");
 
     /* Search for an item not in list */
     search_key = 37;
-    found_item = (int *)H5SL_search(slist, &search_key);
+    found_item = (int*)H5SL_search(slist, &search_key);
     CHECK_PTR_NULL(found_item, "H5SL_search");
 
     /* Attempt to insert duplicate key (should fail) */
     search_key = 2;
-    ret        = H5SL_insert(slist, &search_key, &search_key);
+    ret = H5SL_insert(slist, &search_key, &search_key);
     VERIFY(ret, FAIL, "H5SL_insert");
 
     /* Close the skip list */
@@ -197,14 +194,13 @@ test_skiplist_insert(void)
 **      Tests inserting many objects into skip list.
 **
 ****************************************************************/
-static void
-test_skiplist_insert_many(void)
+static void test_skiplist_insert_many(void)
 {
-    H5SL_t *slist;      /* Skip list created */
-    size_t  num;        /* Number of elements in skip list */
-    size_t  u;          /* Local index variable */
-    int    *found_item; /* Item found in skip list */
-    herr_t  ret;        /* Generic return value */
+    H5SL_t* slist;   /* Skip list created */
+    size_t num;      /* Number of elements in skip list */
+    size_t u;        /* Local index variable */
+    int* found_item; /* Item found in skip list */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Insertion of Many Items Into Skip List\n"));
@@ -229,7 +225,7 @@ test_skiplist_insert_many(void)
 
     /* Search for all objects in the skip list */
     for (u = 0; u < NUM_ELEMS; u++) {
-        found_item = (int *)H5SL_search(slist, &rand_num[u]);
+        found_item = (int*)H5SL_search(slist, &rand_num[u]);
         CHECK_PTR(found_item, "H5SL_search");
         VERIFY(*found_item, rand_num[u], "H5SL_search");
     } /* end for */
@@ -268,17 +264,16 @@ test_skiplist_insert_many(void)
 **      Tests basic object removal from skip list.
 **
 ****************************************************************/
-static void
-test_skiplist_remove(void)
+static void test_skiplist_remove(void)
 {
-    H5SL_t *slist;     /* Skip list created */
-    int     key1,      /* Key of 1st item to insert */
-        key2,          /* Key of 2nd item to insert */
-        key3;          /* Key of 3rd item to insert */
-    int    search_key; /* Key of item to search for in skip list */
-    int   *found_item; /* Item found in skip list */
-    size_t num;        /* Number of elements in skip list */
-    herr_t ret;        /* Generic return value */
+    H5SL_t* slist;   /* Skip list created */
+    int key1,        /* Key of 1st item to insert */
+        key2,        /* Key of 2nd item to insert */
+        key3;        /* Key of 3rd item to insert */
+    int search_key;  /* Key of item to search for in skip list */
+    int* found_item; /* Item found in skip list */
+    size_t num;      /* Number of elements in skip list */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Removal From Skip List\n"));
@@ -293,20 +288,20 @@ test_skiplist_remove(void)
 
     /* Try removing an item in empty skip list */
     search_key = 37;
-    found_item = (int *)H5SL_remove(slist, &search_key);
+    found_item = (int*)H5SL_remove(slist, &search_key);
     CHECK_PTR_NULL(found_item, "H5SL_remove");
 
     /* Insert three objects into the skip list */
     key1 = 15;
-    ret  = H5SL_insert(slist, &key1, &key1);
+    ret = H5SL_insert(slist, &key1, &key1);
     CHECK(ret, FAIL, "H5SL_insert");
 
     key2 = 10;
-    ret  = H5SL_insert(slist, &key2, &key2);
+    ret = H5SL_insert(slist, &key2, &key2);
     CHECK(ret, FAIL, "H5SL_insert");
 
     key3 = 20;
-    ret  = H5SL_insert(slist, &key3, &key3);
+    ret = H5SL_insert(slist, &key3, &key3);
     CHECK(ret, FAIL, "H5SL_insert");
 
     /* Check that the skip list has three elements */
@@ -315,17 +310,17 @@ test_skiplist_remove(void)
 
     /* Try removing items from skip list */
     search_key = key1;
-    found_item = (int *)H5SL_remove(slist, &search_key);
+    found_item = (int*)H5SL_remove(slist, &search_key);
     CHECK_PTR(found_item, "H5SL_remove");
     CHECK_PTR_EQ(found_item, &key1, "H5SL_remove");
 
     search_key = key2;
-    found_item = (int *)H5SL_remove(slist, &search_key);
+    found_item = (int*)H5SL_remove(slist, &search_key);
     CHECK_PTR(found_item, "H5SL_remove");
     CHECK_PTR_EQ(found_item, &key2, "H5SL_remove");
 
     search_key = key3;
-    found_item = (int *)H5SL_remove(slist, &search_key);
+    found_item = (int*)H5SL_remove(slist, &search_key);
     CHECK_PTR(found_item, "H5SL_remove");
     CHECK_PTR_EQ(found_item, &key3, "H5SL_remove");
 
@@ -335,7 +330,7 @@ test_skiplist_remove(void)
 
     /* Try removing items from empty skip list (after its been worked on) */
     search_key = key1;
-    found_item = (int *)H5SL_remove(slist, &search_key);
+    found_item = (int*)H5SL_remove(slist, &search_key);
     CHECK_PTR_NULL(found_item, "H5SL_remove");
 
     /* Close the skip list */
@@ -350,14 +345,13 @@ test_skiplist_remove(void)
 **      Tests removing many objects from skip list.
 **
 ****************************************************************/
-static void
-test_skiplist_remove_many(void)
+static void test_skiplist_remove_many(void)
 {
-    H5SL_t *slist;      /* Skip list created */
-    size_t  num;        /* Number of elements in skip list */
-    size_t  u;          /* Local index variable */
-    int    *found_item; /* Item found in skip list */
-    herr_t  ret;        /* Generic return value */
+    H5SL_t* slist;   /* Skip list created */
+    size_t num;      /* Number of elements in skip list */
+    size_t u;        /* Local index variable */
+    int* found_item; /* Item found in skip list */
+    herr_t ret;      /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Removal of Many Items From Skip List\n"));
@@ -382,7 +376,7 @@ test_skiplist_remove_many(void)
 
     /* Remove all objects from the skip list (in random order) */
     for (u = 0; u < NUM_ELEMS; u++) {
-        found_item = (int *)H5SL_remove(slist, &rand_num[u]);
+        found_item = (int*)H5SL_remove(slist, &rand_num[u]);
         CHECK_PTR(found_item, "H5SL_remove");
         VERIFY(*found_item, rand_num[u], "H5SL_remove");
     } /* end for */
@@ -406,7 +400,7 @@ test_skiplist_remove_many(void)
 
     /* Remove all objects from the skip list */
     for (u = 0; u < NUM_ELEMS; u++) {
-        found_item = (int *)H5SL_remove(slist, &sort_rand_num[u]);
+        found_item = (int*)H5SL_remove(slist, &sort_rand_num[u]);
         CHECK_PTR(found_item, "H5SL_remove");
         VERIFY(*found_item, sort_rand_num[u], "H5SL_remove");
     } /* end for */
@@ -430,7 +424,7 @@ test_skiplist_remove_many(void)
 
     /* Remove all objects from the skip list */
     for (u = 0; u < NUM_ELEMS; u++) {
-        found_item = (int *)H5SL_remove(slist, &rev_sort_rand_num[u]);
+        found_item = (int*)H5SL_remove(slist, &rev_sort_rand_num[u]);
         CHECK_PTR(found_item, "H5SL_remove");
         VERIFY(*found_item, rev_sort_rand_num[u], "H5SL_remove");
     } /* end for */
@@ -451,15 +445,14 @@ test_skiplist_remove_many(void)
 **      Tests iterating over nodes in skip list with first/next calls.
 **
 ****************************************************************/
-static void
-test_skiplist_firstnext(void)
+static void test_skiplist_firstnext(void)
 {
-    H5SL_t      *slist;      /* Skip list created */
-    H5SL_node_t *node;       /* Skip list node */
-    size_t       num;        /* Number of elements in skip list */
-    size_t       u;          /* Local index variable */
-    int         *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    int* found_item;   /* Item found in skip list */
+    herr_t ret;        /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Iterating Over Skip List With First/Next\n"));
@@ -491,7 +484,7 @@ test_skiplist_firstnext(void)
     CHECK_PTR(node, "H5SL_first");
     u = 0;
     while (node != NULL) {
-        found_item = (int *)H5SL_item(node);
+        found_item = (int*)H5SL_item(node);
         VERIFY(*found_item, sort_rand_num[u], "H5SL_next");
         u++;
         node = H5SL_next(node);
@@ -517,23 +510,25 @@ test_skiplist_firstnext(void)
 **      Tests using strings for keys in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_string(void)
+static void test_skiplist_string(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       num;   /* Number of elements in skip list */
-    size_t       u;     /* Local index variable */
-    typedef struct string_node {
-        int         i;
-        const char *s;
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+
+    typedef struct string_node
+    {
+        int i;
+        const char* s;
     } string_node;
-    string_node  data[10]        = {{10, "10"}, {20, "20"}, {15, "15"}, {5, "05"},  {50, "50"},
-                                    {30, "30"}, {31, "31"}, {32, "32"}, {80, "80"}, {90, "90"}};
-    string_node  hashed_data[10] = {{5, "05"},  {10, "10"}, {15, "15"}, {20, "20"}, {30, "30"},
-                                    {31, "31"}, {32, "32"}, {50, "50"}, {80, "80"}, {90, "90"}};
-    string_node *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+
+    string_node data[10] = { { 10, "10" }, { 20, "20" }, { 15, "15" }, { 5, "05" },  { 50, "50" },
+                             { 30, "30" }, { 31, "31" }, { 32, "32" }, { 80, "80" }, { 90, "90" } };
+    string_node hashed_data[10] = { { 5, "05" },  { 10, "10" }, { 15, "15" }, { 20, "20" }, { 30, "30" },
+                                    { 31, "31" }, { 32, "32" }, { 50, "50" }, { 80, "80" }, { 90, "90" } };
+    string_node* found_item; /* Item found in skip list */
+    herr_t ret;              /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List With String Keys\n"));
@@ -558,9 +553,9 @@ test_skiplist_string(void)
 
     /* Iterate over all the nodes in the skip list */
     node = H5SL_first(slist);
-    u    = 0;
+    u = 0;
     while (node != NULL) {
-        found_item = (string_node *)H5SL_item(node);
+        found_item = (string_node*)H5SL_item(node);
         VERIFY(found_item->i, hashed_data[u].i, "H5SL_next");
         u++;
         node = H5SL_next(node);
@@ -572,12 +567,11 @@ test_skiplist_string(void)
 
 } /* end test_skiplist_string() */
 
-static herr_t
-test_skiplist_iter(void *item, void H5_ATTR_UNUSED *key, void *op_data)
+static herr_t test_skiplist_iter(void* item, void H5_ATTR_UNUSED* key, void* op_data)
 {
-    size_t *up = (size_t *)op_data;
+    size_t* up = (size_t*)op_data;
 
-    VERIFY(*(int *)item, sort_rand_num[*up], "H5SL_iterate");
+    VERIFY(*(int*)item, sort_rand_num[*up], "H5SL_iterate");
     (*up)++;
 
     return (0);
@@ -589,13 +583,12 @@ test_skiplist_iter(void *item, void H5_ATTR_UNUSED *key, void *op_data)
 **      Tests iterating over nodes in skip list with callbacks.
 **
 ****************************************************************/
-static void
-test_skiplist_iterate(void)
+static void test_skiplist_iterate(void)
 {
-    H5SL_t *slist; /* Skip list created */
-    size_t  num;   /* Number of elements in skip list */
-    size_t  u;     /* Local index variable */
-    herr_t  ret;   /* Generic return value */
+    H5SL_t* slist; /* Skip list created */
+    size_t num;    /* Number of elements in skip list */
+    size_t u;      /* Local index variable */
+    herr_t ret;    /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Iterating Over Skip List\n"));
@@ -619,7 +612,7 @@ test_skiplist_iterate(void)
     VERIFY(num, NUM_ELEMS, "H5SL_count");
 
     /* Iterate over all the nodes in the skip list */
-    u   = 0;
+    u = 0;
     ret = H5SL_iterate(slist, test_skiplist_iter, &u);
     CHECK(ret, FAIL, "H5SL_iterate");
 
@@ -635,17 +628,16 @@ test_skiplist_iterate(void)
 **      Tests using hsize_t for keys in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_hsize(void)
+static void test_skiplist_hsize(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       num;   /* Number of elements in skip list */
-    size_t       u;     /* Local index variable */
-    hsize_t      data[10]        = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
-    hsize_t      sorted_data[10] = {5, 10, 15, 20, 30, 31, 32, 50, 80, 90};
-    hsize_t     *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    hsize_t data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
+    hsize_t sorted_data[10] = { 5, 10, 15, 20, 30, 31, 32, 50, 80, 90 };
+    hsize_t* found_item; /* Item found in skip list */
+    herr_t ret;          /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List With hsize_t Keys\n"));
@@ -670,9 +662,9 @@ test_skiplist_hsize(void)
 
     /* Iterate over all the nodes in the skip list */
     node = H5SL_first(slist);
-    u    = 0;
+    u = 0;
     while (node != NULL) {
-        found_item = (hsize_t *)H5SL_item(node);
+        found_item = (hsize_t*)H5SL_item(node);
         VERIFY(*found_item, sorted_data[u], "H5SL_next");
         u++;
         node = H5SL_next(node);
@@ -690,17 +682,16 @@ test_skiplist_hsize(void)
 **      Tests using unsigned for keys in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_unsigned(void)
+static void test_skiplist_unsigned(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       num;   /* Number of elements in skip list */
-    size_t       u;     /* Local index variable */
-    unsigned     data[10]        = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
-    unsigned     sorted_data[10] = {5, 10, 15, 20, 30, 31, 32, 50, 80, 90};
-    unsigned    *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
+    unsigned sorted_data[10] = { 5, 10, 15, 20, 30, 31, 32, 50, 80, 90 };
+    unsigned* found_item; /* Item found in skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List With unsigned Keys\n"));
@@ -725,9 +716,9 @@ test_skiplist_unsigned(void)
 
     /* Iterate over all the nodes in the skip list */
     node = H5SL_first(slist);
-    u    = 0;
+    u = 0;
     while (node != NULL) {
-        found_item = (unsigned *)H5SL_item(node);
+        found_item = (unsigned*)H5SL_item(node);
         VERIFY(*found_item, sorted_data[u], "H5SL_next");
         u++;
         node = H5SL_next(node);
@@ -745,19 +736,16 @@ test_skiplist_unsigned(void)
 **      Tests using H5_obj_t's for keys in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_obj(void)
+static void test_skiplist_obj(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       num;   /* Number of elements in skip list */
-    size_t       u;     /* Local index variable */
-    H5_obj_t     data[10]        = {{10, 12}, {20, 12}, {10, 32}, {10, 11}, {50, 1},
-                                    {8, 12},  {31, 12}, {20, 11}, {31, 11}, {8, 32}};
-    H5_obj_t     sorted_data[10] = {{8, 12},  {8, 32},  {10, 11}, {10, 12}, {10, 32},
-                                    {20, 11}, {20, 12}, {31, 11}, {31, 12}, {50, 1}};
-    H5_obj_t    *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    H5_obj_t data[10] = { { 10, 12 }, { 20, 12 }, { 10, 32 }, { 10, 11 }, { 50, 1 }, { 8, 12 }, { 31, 12 }, { 20, 11 }, { 31, 11 }, { 8, 32 } };
+    H5_obj_t sorted_data[10] = { { 8, 12 }, { 8, 32 }, { 10, 11 }, { 10, 12 }, { 10, 32 }, { 20, 11 }, { 20, 12 }, { 31, 11 }, { 31, 12 }, { 50, 1 } };
+    H5_obj_t* found_item; /* Item found in skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List With H5_obj_t Keys\n"));
@@ -782,9 +770,9 @@ test_skiplist_obj(void)
 
     /* Iterate over all the nodes in the skip list */
     node = H5SL_first(slist);
-    u    = 0;
+    u = 0;
     while (node != NULL) {
-        found_item = (H5_obj_t *)H5SL_item(node);
+        found_item = (H5_obj_t*)H5SL_item(node);
         VERIFY(found_item->fileno, sorted_data[u].fileno, "H5SL_next");
         VERIFY(found_item->addr, sorted_data[u].addr, "H5SL_next");
         u++;
@@ -805,40 +793,39 @@ test_skiplist_obj(void)
 **      key.a-key.b.
 **
 ****************************************************************/
-typedef struct generic_t {
+typedef struct generic_t
+{
     unsigned a;
     unsigned b;
 } generic_t;
 
-static int
-test_skiplist_generic_cmp(const void *_key1, const void *_key2)
+static int test_skiplist_generic_cmp(const void* _key1, const void* _key2)
 {
-    const generic_t *key1 = (const generic_t *)_key1;
-    const generic_t *key2 = (const generic_t *)_key2;
-    long long        result =
-        (long long)(key1->a) - (long long)(key1->b) - (long long)(key2->a) + (long long)(key2->b);
+    const generic_t* key1 = (const generic_t*)_key1;
+    const generic_t* key2 = (const generic_t*)_key2;
+    long long result = (long long)(key1->a) - (long long)(key1->b) - (long long)(key2->a) + (long long)(key2->b);
 
-    if (result < 0)
+    if (result < 0) {
         return -1;
-    else if (result > 0)
+    }
+    else if (result > 0) {
         return 1;
-    else
+    }
+    else {
         return 0;
+    }
 } /* end test_skiplist_generic_cmp */
 
-static void
-test_skiplist_generic(void)
+static void test_skiplist_generic(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       num;   /* Number of elements in skip list */
-    size_t       u;     /* Local index variable */
-    generic_t    data[10]        = {{10, 1},   {20, 13}, {15, 32}, {5, 2},   {50, 37},
-                                    {30, 100}, {31, 38}, {32, 34}, {80, 32}, {90, 0}};
-    generic_t    sorted_data[10] = {{30, 100}, {15, 32}, {31, 38}, {32, 34}, {5, 2},
-                                    {20, 13},  {10, 1},  {50, 37}, {80, 32}, {90, 0}};
-    generic_t   *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    generic_t data[10] = { { 10, 1 }, { 20, 13 }, { 15, 32 }, { 5, 2 }, { 50, 37 }, { 30, 100 }, { 31, 38 }, { 32, 34 }, { 80, 32 }, { 90, 0 } };
+    generic_t sorted_data[10] = { { 30, 100 }, { 15, 32 }, { 31, 38 }, { 32, 34 }, { 5, 2 }, { 20, 13 }, { 10, 1 }, { 50, 37 }, { 80, 32 }, { 90, 0 } };
+    generic_t* found_item; /* Item found in skip list */
+    herr_t ret;            /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List With generic Keys\n"));
@@ -863,9 +850,9 @@ test_skiplist_generic(void)
 
     /* Iterate over all the nodes in the skip list */
     node = H5SL_first(slist);
-    u    = 0;
+    u = 0;
     while (node != NULL) {
-        found_item = (generic_t *)H5SL_item(node);
+        found_item = (generic_t*)H5SL_item(node);
         VERIFY(found_item->a, sorted_data[u].a, "H5SL_next");
         VERIFY(found_item->b, sorted_data[u].b, "H5SL_next");
         u++;
@@ -884,15 +871,14 @@ test_skiplist_generic(void)
 **      Tests iterating over nodes in skip list with last/prev calls.
 **
 ****************************************************************/
-static void
-test_skiplist_lastprev(void)
+static void test_skiplist_lastprev(void)
 {
-    H5SL_t      *slist;      /* Skip list created */
-    H5SL_node_t *node;       /* Skip list node */
-    size_t       num;        /* Number of elements in skip list */
-    size_t       u;          /* Local index variable */
-    int         *found_item; /* Item found in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t num;        /* Number of elements in skip list */
+    size_t u;          /* Local index variable */
+    int* found_item;   /* Item found in skip list */
+    herr_t ret;        /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Iterating Over Skip List With Last/Prev\n"));
@@ -924,7 +910,7 @@ test_skiplist_lastprev(void)
     CHECK_PTR(node, "H5SL_last");
     u = NUM_ELEMS - 1;
     while (node != NULL) {
-        found_item = (int *)H5SL_item(node);
+        found_item = (int*)H5SL_item(node);
         VERIFY(*found_item, sort_rand_num[u], "H5SL_prev");
         u--;
         node = H5SL_prev(node);
@@ -950,17 +936,16 @@ test_skiplist_lastprev(void)
 **      Tests 'find' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_find(void)
+static void test_skiplist_find(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       u;     /* Local index variable */
-    unsigned     data[10]        = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
-    unsigned     sorted_data[10] = {5, 10, 15, 20, 30, 31, 32, 50, 80, 90};
-    unsigned    *found_item; /* Item found in skip list */
-    unsigned     find_item;  /* Item to find in skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t u;          /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
+    unsigned sorted_data[10] = { 5, 10, 15, 20, 30, 31, 32, 50, 80, 90 };
+    unsigned* found_item; /* Item found in skip list */
+    unsigned find_item;   /* Item to find in skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Find' Operation\n"));
@@ -977,13 +962,13 @@ test_skiplist_find(void)
 
     /* Find the element with key==30 in the skip list */
     find_item = 30;
-    node      = H5SL_find(slist, &find_item);
+    node = H5SL_find(slist, &find_item);
     CHECK_PTR(node, "H5SL_find");
 
     /* Iterate over the rest of the nodes in the skip list */
     u = 4;
     while (node != NULL) {
-        found_item = (unsigned *)H5SL_item(node);
+        found_item = (unsigned*)H5SL_item(node);
         VERIFY(*found_item, sorted_data[u], "H5SL_next");
         u++;
         node = H5SL_next(node);
@@ -991,7 +976,7 @@ test_skiplist_find(void)
 
     /* Check for trying to locate non-existent item */
     find_item = 81;
-    node      = H5SL_find(slist, &find_item);
+    node = H5SL_find(slist, &find_item);
     CHECK_PTR_NULL(node, "H5SL_find");
 
     /* Close the skip list */
@@ -1006,17 +991,16 @@ test_skiplist_find(void)
 **      Tests 'add' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_add(void)
+static void test_skiplist_add(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       u;     /* Local index variable */
-    unsigned     data[10]        = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
-    unsigned     sorted_data[10] = {5, 10, 15, 20, 30, 31, 32, 50, 80, 90};
-    unsigned    *found_item; /* Item found in skip list */
-    unsigned     new_item;   /* Item to add to skip list */
-    herr_t       ret;        /* Generic return value */
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t u;          /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
+    unsigned sorted_data[10] = { 5, 10, 15, 20, 30, 31, 32, 50, 80, 90 };
+    unsigned* found_item; /* Item found in skip list */
+    unsigned new_item;    /* Item to add to skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Add' Operation\n"));
@@ -1033,7 +1017,7 @@ test_skiplist_add(void)
 
     /* Add the element with key==12 in the skip list */
     new_item = 12;
-    node     = H5SL_add(slist, &new_item, &new_item);
+    node = H5SL_add(slist, &new_item, &new_item);
     CHECK_PTR(node, "H5SL_add");
 
     /* Advance to next node in list */
@@ -1043,7 +1027,7 @@ test_skiplist_add(void)
     /* Iterate over the rest of the nodes in the skip list */
     u = 2;
     while (node != NULL) {
-        found_item = (unsigned *)H5SL_item(node);
+        found_item = (unsigned*)H5SL_item(node);
         VERIFY(*found_item, sorted_data[u], "H5SL_item");
         u++;
         node = H5SL_next(node);
@@ -1055,12 +1039,11 @@ test_skiplist_add(void)
 
 } /* end test_skiplist_add() */
 
-static herr_t
-test_skiplist_destroy_free(void *item, void H5_ATTR_UNUSED *key, void *op_data)
+static herr_t test_skiplist_destroy_free(void* item, void H5_ATTR_UNUSED* key, void* op_data)
 {
-    unsigned *free_count = (unsigned *)op_data;
+    unsigned* free_count = (unsigned*)op_data;
 
-    VERIFY(*(int *)item, sort_rand_num[*free_count], "H5SL_destroy");
+    VERIFY(*(int*)item, sort_rand_num[*free_count], "H5SL_destroy");
     (*free_count)++;
 
     return (0);
@@ -1072,13 +1055,12 @@ test_skiplist_destroy_free(void *item, void H5_ATTR_UNUSED *key, void *op_data)
 **      Tests 'destroy' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_destroy(void)
+static void test_skiplist_destroy(void)
 {
-    H5SL_t  *slist;      /* Skip list created */
-    size_t   u;          /* Local index variable */
+    H5SL_t* slist;       /* Skip list created */
+    size_t u;            /* Local index variable */
     unsigned free_count; /* Number of items freed */
-    herr_t   ret;        /* Generic return value */
+    herr_t ret;          /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Destroy' Operation\n"));
@@ -1095,7 +1077,7 @@ test_skiplist_destroy(void)
 
     /* Destroy the skip list */
     free_count = 0;
-    ret        = H5SL_destroy(slist, test_skiplist_destroy_free, &free_count);
+    ret = H5SL_destroy(slist, test_skiplist_destroy_free, &free_count);
     CHECK(ret, FAIL, "H5SL_destroy");
     VERIFY(free_count, NUM_ELEMS, "H5SL_destroy");
 
@@ -1107,14 +1089,13 @@ test_skiplist_destroy(void)
 **      Tests 'free' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_free(void)
+static void test_skiplist_free(void)
 {
-    H5SL_t  *slist;      /* Skip list created */
-    size_t   num;        /* Number of elements in skip list */
-    size_t   u;          /* Local index variable */
+    H5SL_t* slist;       /* Skip list created */
+    size_t num;          /* Number of elements in skip list */
+    size_t u;            /* Local index variable */
     unsigned free_count; /* Number of items freed */
-    herr_t   ret;        /* Generic return value */
+    herr_t ret;          /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Free' Operation\n"));
@@ -1131,7 +1112,7 @@ test_skiplist_free(void)
 
     /* Destroy the skip list */
     free_count = 0;
-    ret        = H5SL_free(slist, test_skiplist_destroy_free, &free_count);
+    ret = H5SL_free(slist, test_skiplist_destroy_free, &free_count);
     CHECK(ret, FAIL, "H5SL_destroy");
     VERIFY(free_count, NUM_ELEMS, "H5SL_free");
 
@@ -1161,16 +1142,15 @@ test_skiplist_free(void)
 **      Tests 'less' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_less(void)
+static void test_skiplist_less(void)
 {
-    H5SL_t  *slist; /* Skip list created */
-    size_t   u;     /* Local index variable */
-    unsigned data[10] = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
+    H5SL_t* slist; /* Skip list created */
+    size_t u;      /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
     /* unsigned sorted_data[10]={ 5, 10, 15, 20, 30, 31, 32, 50, 80, 90}; */
-    unsigned *found_item; /* Item found in skip list */
-    unsigned  find_item;  /* Item to add to skip list */
-    herr_t    ret;        /* Generic return value */
+    unsigned* found_item; /* Item found in skip list */
+    unsigned find_item;   /* Item to add to skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Less' Operation\n"));
@@ -1186,31 +1166,31 @@ test_skiplist_less(void)
     } /* end for */
 
     /* Check for exact match of items in various positions */
-    find_item  = 20;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 20;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_less");
-    find_item  = 90;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 90;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_less");
-    find_item  = 5;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 5;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_less");
 
     /* Find item less than a missing key, in various positions */
-    find_item  = 19;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 19;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, 15, "H5SL_less");
-    find_item  = 89;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 89;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, 80, "H5SL_less");
-    find_item  = 100;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 100;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, 90, "H5SL_less");
-    find_item  = 9;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 9;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     VERIFY(*found_item, 5, "H5SL_less");
-    find_item  = 4;
-    found_item = (unsigned *)H5SL_less(slist, &find_item);
+    find_item = 4;
+    found_item = (unsigned*)H5SL_less(slist, &find_item);
     CHECK_PTR_NULL(found_item, "H5SL_less");
 
     /* Close the skip list */
@@ -1225,16 +1205,15 @@ test_skiplist_less(void)
 **      Tests 'greater' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_greater(void)
+static void test_skiplist_greater(void)
 {
-    H5SL_t  *slist; /* Skip list created */
-    size_t   u;     /* Local index variable */
-    unsigned data[10] = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
+    H5SL_t* slist; /* Skip list created */
+    size_t u;      /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
     /* unsigned sorted_data[10]={ 5, 10, 15, 20, 30, 31, 32, 50, 80, 90}; */
-    unsigned *found_item; /* Item found in skip list */
-    unsigned  find_item;  /* Item to add to skip list */
-    herr_t    ret;        /* Generic return value */
+    unsigned* found_item; /* Item found in skip list */
+    unsigned find_item;   /* Item to add to skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Greater' Operation\n"));
@@ -1250,31 +1229,31 @@ test_skiplist_greater(void)
     } /* end for */
 
     /* Check for exact match of items in various positions */
-    find_item  = 20;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 20;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_greater");
-    find_item  = 90;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 90;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_greater");
-    find_item  = 5;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 5;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, find_item, "H5SL_greater");
 
     /* Find item greater than a missing key, in various positions */
-    find_item  = 19;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 19;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, 20, "H5SL_greater");
-    find_item  = 89;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 89;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, 90, "H5SL_greater");
-    find_item  = 100;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 100;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     CHECK_PTR_NULL(found_item, "H5SL_greater");
-    find_item  = 6;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 6;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, 10, "H5SL_greater");
-    find_item  = 4;
-    found_item = (unsigned *)H5SL_greater(slist, &find_item);
+    find_item = 4;
+    found_item = (unsigned*)H5SL_greater(slist, &find_item);
     VERIFY(*found_item, 5, "H5SL_greater");
 
     /* Close the skip list */
@@ -1289,17 +1268,16 @@ test_skiplist_greater(void)
 **      Tests 'below' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_below(void)
+static void test_skiplist_below(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       u;     /* Local index variable */
-    unsigned     data[10] = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t u;          /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
     /* unsigned sorted_data[10]={ 5, 10, 15, 20, 30, 31, 32, 50, 80, 90}; */
-    unsigned *found_item; /* Item found in skip list */
-    unsigned  find_item;  /* Item to add to skip list */
-    herr_t    ret;        /* Generic return value */
+    unsigned* found_item; /* Item found in skip list */
+    unsigned find_item;   /* Item to add to skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Below' Operation\n"));
@@ -1316,44 +1294,44 @@ test_skiplist_below(void)
 
     /* Check for exact match of items in various positions */
     find_item = 20;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_below");
     find_item = 90;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_below");
     find_item = 5;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_below");
 
     /* Find item less than a missing key, in various positions */
     find_item = 19;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 15, "H5SL_below");
     find_item = 89;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 80, "H5SL_below");
     find_item = 100;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 90, "H5SL_below");
     find_item = 9;
-    node      = H5SL_below(slist, &find_item);
+    node = H5SL_below(slist, &find_item);
     CHECK_PTR(node, "H5SL_below");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 5, "H5SL_below");
     find_item = 4;
-    node      = (H5SL_node_t *)H5SL_less(slist, &find_item);
+    node = (H5SL_node_t*)H5SL_less(slist, &find_item);
     CHECK_PTR_NULL(node, "H5SL_below");
 
     /* Close the skip list */
@@ -1368,17 +1346,16 @@ test_skiplist_below(void)
 **      Tests 'above' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_above(void)
+static void test_skiplist_above(void)
 {
-    H5SL_t      *slist; /* Skip list created */
-    H5SL_node_t *node;  /* Skip list node */
-    size_t       u;     /* Local index variable */
-    unsigned     data[10] = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
+    H5SL_t* slist;     /* Skip list created */
+    H5SL_node_t* node; /* Skip list node */
+    size_t u;          /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
     /* unsigned sorted_data[10]={ 5, 10, 15, 20, 30, 31, 32, 50, 80, 90}; */
-    unsigned *found_item; /* Item found in skip list */
-    unsigned  find_item;  /* Item to add to skip list */
-    herr_t    ret;        /* Generic return value */
+    unsigned* found_item; /* Item found in skip list */
+    unsigned find_item;   /* Item to add to skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Above' Operation\n"));
@@ -1395,44 +1372,44 @@ test_skiplist_above(void)
 
     /* Check for exact match of items in various positions */
     find_item = 20;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_above");
     find_item = 90;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_above");
     find_item = 5;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, find_item, "H5SL_above");
 
     /* Find item greater than a missing key, in various positions */
     find_item = 19;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 20, "H5SL_above");
     find_item = 89;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 90, "H5SL_above");
     find_item = 100;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR_NULL(node, "H5SL_above");
     find_item = 6;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 10, "H5SL_above");
     find_item = 4;
-    node      = H5SL_above(slist, &find_item);
+    node = H5SL_above(slist, &find_item);
     CHECK_PTR(node, "H5SL_above");
-    found_item = (unsigned *)H5SL_item(node);
+    found_item = (unsigned*)H5SL_item(node);
     VERIFY(*found_item, 5, "H5SL_above");
 
     /* Close the skip list */
@@ -1447,15 +1424,14 @@ test_skiplist_above(void)
 **      Tests 'remove first' operation in skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_remove_first(void)
+static void test_skiplist_remove_first(void)
 {
-    H5SL_t   *slist; /* Skip list created */
-    size_t    u;     /* Local index variable */
-    unsigned  data[10]        = {10, 20, 15, 5, 50, 30, 31, 32, 80, 90};
-    unsigned  sorted_data[10] = {5, 10, 15, 20, 30, 31, 32, 50, 80, 90};
-    unsigned *found_item; /* Item found in skip list */
-    herr_t    ret;        /* Generic return value */
+    H5SL_t* slist; /* Skip list created */
+    size_t u;      /* Local index variable */
+    unsigned data[10] = { 10, 20, 15, 5, 50, 30, 31, 32, 80, 90 };
+    unsigned sorted_data[10] = { 5, 10, 15, 20, 30, 31, 32, 50, 80, 90 };
+    unsigned* found_item; /* Item found in skip list */
+    herr_t ret;           /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Remove First' Operation\n"));
@@ -1472,12 +1448,12 @@ test_skiplist_remove_first(void)
 
     /* Remove objects from the skip list */
     for (u = 0; u < 10; u++) {
-        found_item = (unsigned *)H5SL_remove_first(slist);
+        found_item = (unsigned*)H5SL_remove_first(slist);
         VERIFY(*found_item, sorted_data[u], "H5SL_remove_first");
     } /* end for */
 
     /* Check for removing object from empty list */
-    found_item = (unsigned *)H5SL_remove_first(slist);
+    found_item = (unsigned*)H5SL_remove_first(slist);
     CHECK_PTR_NULL(found_item, "H5SL_remove_first");
 
     /* Close the skip list */
@@ -1492,14 +1468,13 @@ test_skiplist_remove_first(void)
 **      Tests 'remove first' operation in large skip lists.
 **
 ****************************************************************/
-static void
-test_skiplist_remove_first_many(void)
+static void test_skiplist_remove_first_many(void)
 {
-    H5SL_t *slist;               /* Skip list created */
-    size_t  u;                   /* Local index variable */
-    int    *found_item;          /* Item found in skip list */
-    int     prev_item = INT_MIN; /* Previously found item in skip list */
-    herr_t  ret;                 /* Generic return value */
+    H5SL_t* slist;           /* Skip list created */
+    size_t u;                /* Local index variable */
+    int* found_item;         /* Item found in skip list */
+    int prev_item = INT_MIN; /* Previously found item in skip list */
+    herr_t ret;              /* Generic return value */
 
     /* Output message about test being performed */
     MESSAGE(7, ("Testing Skip List 'Remove First' Operation\n"));
@@ -1516,13 +1491,13 @@ test_skiplist_remove_first_many(void)
 
     /* Remove objects from the skip list */
     for (u = 0; u < NUM_ELEMS; u++) {
-        found_item = (int *)H5SL_remove_first(slist);
+        found_item = (int*)H5SL_remove_first(slist);
         VERIFY(*found_item > prev_item, true, "H5SL_remove_first");
         prev_item = *found_item;
     } /* end for */
 
     /* Check for removing object from empty list */
-    found_item = (int *)H5SL_remove_first(slist);
+    found_item = (int*)H5SL_remove_first(slist);
     CHECK_PTR_NULL(found_item, "H5SL_remove_first");
 
     /* Close the skip list */
@@ -1537,16 +1512,18 @@ test_skiplist_remove_first_many(void)
 **      Release data for skip list testing
 **
 ****************************************************************/
-static void
-test_skiplist_term(void)
+static void test_skiplist_term(void)
 {
     /* Release arrays */
-    if (rand_num)
+    if (rand_num) {
         free(rand_num);
-    if (sort_rand_num)
+    }
+    if (sort_rand_num) {
         free(sort_rand_num);
-    if (rev_sort_rand_num)
+    }
+    if (rev_sort_rand_num) {
         free(rev_sort_rand_num);
+    }
 } /* end test_skiplist_term() */
 
 /****************************************************************
@@ -1554,8 +1531,7 @@ test_skiplist_term(void)
 **  test_skiplist(): Main H5SL testing routine.
 **
 ****************************************************************/
-void
-test_skiplist(void H5_ATTR_UNUSED *params)
+void test_skiplist(void H5_ATTR_UNUSED* params)
 {
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Skip Lists\n"));

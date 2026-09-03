@@ -59,7 +59,7 @@
 /* Local Variables */
 /*******************/
 
-#ifdef H5_HAVE_C11_THREADS
+    #ifdef H5_HAVE_C11_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_once
  *
@@ -69,16 +69,16 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_once(H5TS_once_t *once, H5TS_once_init_func_t func)
+herr_t H5TS_once(H5TS_once_t* once, H5TS_once_init_func_t func)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == once || NULL == func))
+    if (H5_UNLIKELY(NULL == once || NULL == func)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Invoke the function, only once per process */
     call_once(once, func);
@@ -86,8 +86,8 @@ H5TS_once(H5TS_once_t *once, H5TS_once_init_func_t func)
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_once() */
-#else
-#ifdef H5_HAVE_WIN_THREADS
+    #else
+        #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_once
  *
@@ -97,25 +97,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_once(H5TS_once_t *once, H5TS_once_init_func_t func)
+herr_t H5TS_once(H5TS_once_t* once, H5TS_once_init_func_t func)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == once || NULL == func))
+    if (H5_UNLIKELY(NULL == once || NULL == func)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Invoke the function, only once per process */
-    if (H5_UNLIKELY(0 == InitOnceExecuteOnce(once, func, NULL, NULL)))
+    if (H5_UNLIKELY(0 == InitOnceExecuteOnce(once, func, NULL, NULL))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_once() */
-#else
+        #else
 /*-------------------------------------------------------------------------
  * Function: H5TS_once
  *
@@ -125,25 +126,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_once(H5TS_once_t *once, H5TS_once_init_func_t func)
+herr_t H5TS_once(H5TS_once_t* once, H5TS_once_init_func_t func)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
     /* Sanity check */
-    if (H5_UNLIKELY(NULL == once || NULL == func))
+    if (H5_UNLIKELY(NULL == once || NULL == func)) {
         HGOTO_DONE(FAIL);
+    }
 
     /* Invoke the function, only once per process */
-    if (H5_UNLIKELY(pthread_once(once, func)))
+    if (H5_UNLIKELY(pthread_once(once, func))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_once() */
-#endif
-#endif
+        #endif
+    #endif
 
 #endif /* H5_HAVE_THREADS */

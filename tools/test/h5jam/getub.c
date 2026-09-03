@@ -14,15 +14,15 @@
 #include "h5tools.h"
 #include "h5tools_utils.h"
 
-void parse_command_line(int argc, const char *const *argv);
+void parse_command_line(int argc, const char* const* argv);
 
 /* Name of tool */
 #define PROGRAM_NAME "getub"
-static char *nbytes = NULL;
+static char* nbytes = NULL;
 
-static const char            *s_opts   = "c:";                     /* add more later ? */
-static struct h5_long_options l_opts[] = {{"c", require_arg, 'c'}, /* input file */
-                                          {NULL, 0, '\0'}};
+static const char* s_opts = "c:";                                     /* add more later ? */
+static struct h5_long_options l_opts[] = { { "c", require_arg, 'c' }, /* input file */
+                                           { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function:    usage
@@ -32,8 +32,7 @@ static struct h5_long_options l_opts[] = {{"c", require_arg, 'c'}, /* input file
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     fflush(stdout);
     fprintf(stdout, "usage: %s -c nb file] \n", prog);
@@ -50,23 +49,18 @@ usage(const char *prog)
  *              Failure:    Exits program with EXIT_FAILURE value.
  *-------------------------------------------------------------------------
  */
-void
-parse_command_line(int argc, const char *const *argv)
+void parse_command_line(int argc, const char* const* argv)
 {
     int opt;
 
     /* parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'c':
-                nbytes = strdup(H5_optarg);
-                break;
-            case '?':
-            default:
-                usage(h5tools_getprogname());
-                exit(EXIT_FAILURE);
+        case 'c': nbytes = strdup(H5_optarg); break;
+        case '?':
+        default : usage(h5tools_getprogname()); exit(EXIT_FAILURE);
         } /* end switch */
-    }     /* end while */
+    } /* end while */
 
     if (argc <= H5_optind) {
         error_msg("missing file name\n");
@@ -75,14 +69,13 @@ parse_command_line(int argc, const char *const *argv)
     } /* end if */
 } /* end parse_command_line() */
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    int      fd = H5I_INVALID_HID;
+    int fd = H5I_INVALID_HID;
     unsigned size;
-    char    *filename = NULL;
-    long     res;
-    char    *buf = NULL;
+    char* filename = NULL;
+    long res;
+    char* buf = NULL;
 
     h5tools_setprogname(PROGRAM_NAME);
     h5tools_setstatus(EXIT_SUCCESS);
@@ -90,7 +83,7 @@ main(int argc, char *argv[])
     /* Initialize h5tools lib */
     h5tools_init();
 
-    parse_command_line(argc, (const char *const *)argv);
+    parse_command_line(argc, (const char* const*)argv);
 
     if (NULL == nbytes) {
         /* missing arg */
@@ -120,7 +113,7 @@ main(int argc, char *argv[])
         goto error;
     } /* end if */
 
-    if (NULL == (buf = (char *)malloc((unsigned)(size + 1)))) {
+    if (NULL == (buf = (char*)malloc((unsigned)(size + 1)))) {
         error_msg("can't allocate buffer \n");
         goto error;
     } /* end if */
@@ -146,7 +139,8 @@ main(int argc, char *argv[])
 error:
     free(filename);
     free(buf);
-    if (fd >= 0)
+    if (fd >= 0) {
         HDclose(fd);
+    }
     return EXIT_FAILURE;
 } /* end main() */

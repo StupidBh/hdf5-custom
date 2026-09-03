@@ -6,21 +6,20 @@
 #include <stdlib.h>
 
 //! <!-- [H5Dchunk_iter_cb] -->
-int
-chunk_cb(const hsize_t *offset, unsigned filter_mask, haddr_t addr, hsize_t size, void *op_data)
+int chunk_cb(const hsize_t* offset, unsigned filter_mask, haddr_t addr, hsize_t size, void* op_data)
 {
     // only print the allocated chunk size only
     printf("%" PRIuHSIZE "\n", size);
     return EXIT_SUCCESS;
 }
+
 //! <!-- [H5Dchunk_iter_cb] -->
 
 //! <!-- [H5Ovisit_cb] -->
-herr_t
-H5Ovisit_cb(hid_t obj, const char *name, const H5O_info2_t *info, void *op_data)
+herr_t H5Ovisit_cb(hid_t obj, const char* name, const H5O_info2_t* info, void* op_data)
 {
-    herr_t retval    = 0;
-    char  *base_path = (char *)op_data;
+    herr_t retval = 0;
+    char* base_path = (char*)op_data;
 
     if (info->type == H5O_TYPE_DATASET) // current object is a dataset
     {
@@ -36,9 +35,9 @@ H5Ovisit_cb(hid_t obj, const char *name, const H5O_info2_t *info, void *op_data)
         if (H5Pget_layout(dcpl) == H5D_CHUNKED) // dataset is chunked
         {
             __label__ fail_dtype, fail_dspace, fail_shape;
-            hid_t   dspace, dtype;
-            size_t  size, i;
-            int     rank;
+            hid_t dspace, dtype;
+            size_t size, i;
+            int rank;
             hsize_t cdims[H5S_MAX_RANK];
 
             // get resources
@@ -51,15 +50,15 @@ H5Ovisit_cb(hid_t obj, const char *name, const H5O_info2_t *info, void *op_data)
                 goto fail_dspace;
             }
             // get the shape
-            if ((size = H5Tget_size(dtype)) == 0 || (rank = H5Sget_simple_extent_ndims(dspace)) < 0 ||
-                H5Pget_chunk(dcpl, H5S_MAX_RANK, cdims) < 0) {
+            if ((size = H5Tget_size(dtype)) == 0 || (rank = H5Sget_simple_extent_ndims(dspace)) < 0 || H5Pget_chunk(dcpl, H5S_MAX_RANK, cdims) < 0) {
                 retval = -1;
                 goto fail_shape;
             }
             // calculate the nominal chunk size
             size = 1;
-            for (i = 0; i < (size_t)rank; ++i)
+            for (i = 0; i < (size_t)rank; ++i) {
                 size *= cdims[i];
+            }
             // print dataset info
             printf("%s%s : nominal chunk size %lu [B] \n", base_path, name, size);
             // get the allocated chunk sizes
@@ -83,10 +82,10 @@ fail_dcpl:
 func_leave:
     return retval;
 }
+
 //! <!-- [H5Ovisit_cb] -->
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -95,8 +94,8 @@ main(void)
         __label__ fail_lcpl, fail_dset, fail_file;
         hid_t file, lcpl, fspace, dset;
 
-        unsigned mode        = H5F_ACC_TRUNC;
-        char     file_name[] = "d1.h5";
+        unsigned mode = H5F_ACC_TRUNC;
+        char file_name[] = "d1.h5";
         // link names can be arbitrary Unicode strings
         char dset_name[] = "σύνολο/δεδομένων";
 
@@ -119,13 +118,12 @@ main(void)
             goto fail_fspace;
         }
         // create a 1D dataspace
-        if ((fspace = H5Screate_simple(1, (hsize_t[]){10}, NULL)) == H5I_INVALID_HID) {
+        if ((fspace = H5Screate_simple(1, (hsize_t[]) { 10 }, NULL)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
             goto fail_fspace;
         }
         // create a 32-bit integer dataset
-        if ((dset = H5Dcreate2(file, dset_name, H5T_STD_I32LE, fspace, lcpl, H5P_DEFAULT, H5P_DEFAULT)) ==
-            H5I_INVALID_HID) {
+        if ((dset = H5Dcreate2(file, dset_name, H5T_STD_I32LE, fspace, lcpl, H5P_DEFAULT, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
             goto fail_dset;
         }
@@ -146,11 +144,11 @@ fail_file:;
         __label__ fail_dset, fail_file;
         hid_t file, dset;
 
-        unsigned mode        = H5F_ACC_RDONLY;
-        char     file_name[] = "d1.h5";
+        unsigned mode = H5F_ACC_RDONLY;
+        char file_name[] = "d1.h5";
         // assume a priori knowledge of dataset name and size
         char dset_name[] = "σύνολο/δεδομένων";
-        int  elts[10];
+        int elts[10];
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -161,8 +159,9 @@ fail_file:;
             goto fail_dset;
         }
         // read all dataset elements
-        if (H5Dread(dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, elts) < 0)
+        if (H5Dread(dset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, elts) < 0) {
             ret_val = EXIT_FAILURE;
+        }
 
         // do something w/ the dataset elements
 
@@ -178,10 +177,10 @@ fail_file:;
         __label__ fail_update, fail_fspace, fail_dset, fail_file;
         hid_t file, dset, fspace;
 
-        unsigned mode           = H5F_ACC_RDWR;
-        char     file_name[]    = "d1.h5";
-        char     dset_name[]    = "σύνολο/δεδομένων";
-        int      new_elts[6][2] = {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}};
+        unsigned mode = H5F_ACC_RDWR;
+        char file_name[] = "d1.h5";
+        char dset_name[] = "σύνολο/δεδομένων";
+        int new_elts[6][2] = { { -1, 1 }, { -2, 2 }, { -3, 3 }, { -4, 4 }, { -5, 5 }, { -6, 6 } };
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
@@ -197,15 +196,15 @@ fail_file:;
             goto fail_fspace;
         }
         // select the first 5 elements in odd positions
-        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, (hsize_t[]){1}, (hsize_t[]){2}, (hsize_t[]){5},
-                                NULL) < 0) {
+        if (H5Sselect_hyperslab(fspace, H5S_SELECT_SET, (hsize_t[]) { 1 }, (hsize_t[]) { 2 }, (hsize_t[]) { 5 }, NULL) < 0) {
             ret_val = EXIT_FAILURE;
             goto fail_update;
         }
 
         // (implicitly) select and write the first 5 elements of the second column of NEW_ELTS
-        if (H5Dwrite(dset, H5T_NATIVE_INT, H5S_ALL, fspace, H5P_DEFAULT, new_elts) < 0)
+        if (H5Dwrite(dset, H5T_NATIVE_INT, H5S_ALL, fspace, H5P_DEFAULT, new_elts) < 0) {
             ret_val = EXIT_FAILURE;
+        }
 
 fail_update:
         H5Sclose(fspace);
@@ -222,10 +221,10 @@ fail_file:;
         __label__ fail_delete, fail_file;
         hid_t file;
 
-        unsigned mode         = H5F_ACC_RDWR;
-        char     file_name[]  = "d1.h5";
-        char     group_name[] = "σύνολο";
-        char     dset_name[]  = "σύνολο/δεδομένων";
+        unsigned mode = H5F_ACC_RDWR;
+        char file_name[] = "d1.h5";
+        char group_name[] = "σύνολο";
+        char dset_name[] = "σύνολο/δεδομένων";
 
         if ((file = H5Fopen(file_name, mode, H5P_DEFAULT)) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;

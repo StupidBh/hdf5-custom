@@ -20,34 +20,35 @@
 #define LEN0      3
 #define LEN1      12
 
-int
-main(void)
+int main(void)
 {
     hid_t file, filetype, memtype, space, dset, attr;
     /* Handles */
     herr_t status;
-    hvl_t  wdata[2], /* Array of vlen structures */
-        *rdata;      /* Pointer to vlen structures */
-    hsize_t dims[1] = {2};
-    int    *ptr, ndims, i, j;
+    hvl_t wdata[2], /* Array of vlen structures */
+        *rdata;     /* Pointer to vlen structures */
+    hsize_t dims[1] = { 2 };
+    int *ptr, ndims, i, j;
 
     /*
      * Initialize variable-length data.  wdata[0] is a countdown of
      * length LEN0, wdata[1] is a Fibonacci sequence of length LEN1.
      */
     wdata[0].len = LEN0;
-    ptr          = (int *)malloc(wdata[0].len * sizeof(int));
-    for (i = 0; i < wdata[0].len; i++)
+    ptr = (int*)malloc(wdata[0].len * sizeof(int));
+    for (i = 0; i < wdata[0].len; i++) {
         ptr[i] = wdata[0].len - i; /* 3 2 1 */
-    wdata[0].p = (void *)ptr;
+    }
+    wdata[0].p = (void*)ptr;
 
     wdata[1].len = LEN1;
-    ptr          = (int *)malloc(wdata[1].len * sizeof(int));
-    ptr[0]       = 1;
-    ptr[1]       = 1;
-    for (i = 2; i < wdata[1].len; i++)
+    ptr = (int*)malloc(wdata[1].len * sizeof(int));
+    ptr[0] = 1;
+    ptr[1] = 1;
+    for (i = 2; i < wdata[1].len; i++) {
         ptr[i] = ptr[i - 1] + ptr[i - 2]; /* 1 1 2 3 5 8 etc. */
-    wdata[1].p = (void *)ptr;
+    }
+    wdata[1].p = (void*)ptr;
 
     /*
      * Create a new file using the default properties.
@@ -58,13 +59,13 @@ main(void)
      * Create variable-length datatype for file and memory.
      */
     filetype = H5Tvlen_create(H5T_STD_I32LE);
-    memtype  = H5Tvlen_create(H5T_NATIVE_INT);
+    memtype = H5Tvlen_create(H5T_NATIVE_INT);
 
     /*
      * Create dataset with a scalar dataspace.
      */
-    space  = H5Screate(H5S_SCALAR);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
+    space = H5Screate(H5S_SCALAR);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -76,7 +77,7 @@ main(void)
     /*
      * Create the attribute and write the variable-length data to it
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT);
     status = H5Awrite(attr, memtype, wdata);
 
     /*
@@ -113,7 +114,7 @@ main(void)
      */
     space = H5Aget_space(attr);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-    rdata = (hvl_t *)malloc(dims[0] * sizeof(hvl_t));
+    rdata = (hvl_t*)malloc(dims[0] * sizeof(hvl_t));
 
     /*
      * Create the memory datatype.
@@ -133,8 +134,9 @@ main(void)
         ptr = rdata[i].p;
         for (j = 0; j < rdata[i].len; j++) {
             printf(" %d", ptr[j]);
-            if ((j + 1) < rdata[i].len)
+            if ((j + 1) < rdata[i].len) {
                 printf(",");
+            }
         }
         printf(" }\n");
     }

@@ -24,8 +24,7 @@
 #include "h5repartgentest.h"
 #include "h5lsgentest.h"
 
-static int
-gen_h5copy_files(void)
+static int gen_h5copy_files(void)
 {
     Test_Obj_Copy();
     Test_Ref_Copy();
@@ -36,8 +35,7 @@ gen_h5copy_files(void)
     return EXIT_SUCCESS;
 }
 
-static int
-gen_h5diff_files(void)
+static int gen_h5diff_files(void)
 {
     int nerrors = 0;
 
@@ -53,8 +51,7 @@ gen_h5diff_files(void)
     nerrors += (test_attributes(H5DIFF_FILE6a, 2) < 0 ? 1 : 0);
 
     /* test attributes with verbose level */
-    nerrors +=
-        (test_attributes_verbose_level(ATTR_VERBOSE_LEVEL_FILE1, ATTR_VERBOSE_LEVEL_FILE2) < 0 ? 1 : 0);
+    nerrors += (test_attributes_verbose_level(ATTR_VERBOSE_LEVEL_FILE1, ATTR_VERBOSE_LEVEL_FILE2) < 0 ? 1 : 0);
 
     /* generate 2 files, the second call creates a similar file with differences */
     nerrors += (test_datasets(H5DIFF_FILE7, 0) < 0 ? 1 : 0);
@@ -147,8 +144,7 @@ gen_h5diff_files(void)
     return nerrors;
 }
 
-static int
-gen_h5dump_files(void)
+static int gen_h5dump_files(void)
 {
     int nerrors = 0;
     gent_group();
@@ -290,8 +286,7 @@ gen_h5dump_files(void)
     return nerrors;
 }
 
-static int
-gen_h5fc_files(void)
+static int gen_h5fc_files(void)
 {
     unsigned i, new_format;
 
@@ -310,19 +305,19 @@ gen_h5fc_files(void)
             char filename[50];
 
             memset(filename, 0, sizeof(filename));
-            if (!new_format)
+            if (!new_format) {
                 strcat(filename, "old_");
+            }
             strcat(filename, H5FC_FILENAME[i]);
 
             gen_ext(filename, new_format, i);
         } /* end for */
-    }     /* end for */
+    } /* end for */
 
     return EXIT_SUCCESS;
 }
 
-static int
-gen_h5jam_files(void)
+static int gen_h5jam_files(void)
 {
     int nerrors = 0;
 
@@ -338,11 +333,10 @@ gen_h5jam_files(void)
     return nerrors;
 }
 
-static int
-gen_h5repack_files(void)
+static int gen_h5repack_files(void)
 {
     int nerrors = 0;
-    int i       = 0;
+    int i = 0;
 
     for (i = 0; i < 2; i++) {
         bool external = (i & 1) ? true : false;
@@ -398,8 +392,7 @@ gen_h5repack_files(void)
  *     when encountered error similar to H5O_fill_old_decode in the
  *     jira issue.
  */
-static int
-gen_h5stat_files(void)
+static int gen_h5stat_files(void)
 {
     int nerrors = 0;
 
@@ -415,16 +408,14 @@ gen_h5stat_files(void)
     return nerrors;
 }
 
-static int
-gen_h5repart_files(void)
+static int gen_h5repart_files(void)
 {
     gent_repart_family();
 
     return EXIT_SUCCESS;
 }
 
-static int
-gen_h5ls_files(void)
+static int gen_h5ls_files(void)
 {
     int nerrors = 0;
 
@@ -482,8 +473,7 @@ gen_h5ls_files(void)
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(void)
+static void usage(void)
 {
     printf("Usage: h5gentest [options]\n");
     printf("Generate HDF5 test files for various tools.\n\n");
@@ -505,28 +495,25 @@ usage(void)
 /*
  * Generate the binary hdf5 files used for tools tests
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     /* command-line options: short and long-named parameters */
-    static const char            *s_opts   = "hacdufjrspl";
-    static struct h5_long_options l_opts[] = {
-        {"help", no_arg, 'h'},     {"all", no_arg, 'a'},      {"h5copy", no_arg, 'c'},
-        {"h5diff", no_arg, 'd'},   {"h5dump", no_arg, 'u'},   {"h5fc", no_arg, 'f'},
-        {"h5jam", no_arg, 'j'},    {"h5repack", no_arg, 'r'}, {"h5stat", no_arg, 's'},
-        {"h5repart", no_arg, 'p'}, {"h5ls", no_arg, 'l'},     {NULL, 0, 0}};
-    int  i;
-    int  opt;
-    bool run_all      = false;
-    bool run_h5copy   = false;
-    bool run_h5diff   = false;
-    bool run_h5dump   = false;
-    bool run_h5fc     = false;
-    bool run_h5jam    = false;
+    static const char* s_opts = "hacdufjrspl";
+    static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },   { "all", no_arg, 'a' },      { "h5copy", no_arg, 'c' }, { "h5diff", no_arg, 'd' },
+                                               { "h5dump", no_arg, 'u' }, { "h5fc", no_arg, 'f' },     { "h5jam", no_arg, 'j' },  { "h5repack", no_arg, 'r' },
+                                               { "h5stat", no_arg, 's' }, { "h5repart", no_arg, 'p' }, { "h5ls", no_arg, 'l' },   { NULL, 0, 0 } };
+    int i;
+    int opt;
+    bool run_all = false;
+    bool run_h5copy = false;
+    bool run_h5diff = false;
+    bool run_h5dump = false;
+    bool run_h5fc = false;
+    bool run_h5jam = false;
     bool run_h5repack = false;
-    bool run_h5stat   = false;
+    bool run_h5stat = false;
     bool run_h5repart = false;
-    bool run_h5ls     = false;
+    bool run_h5ls = false;
 
     /* Check for no command line parameters */
     if (argc == 1) {
@@ -534,49 +521,25 @@ main(int argc, char *argv[])
     }
     else {
         /* Parse command line arguments */
-        while ((opt = H5_get_option(argc, (const char *const *)argv, s_opts, l_opts)) != EOF) {
+        while ((opt = H5_get_option(argc, (const char* const*)argv, s_opts, l_opts)) != EOF) {
             switch ((char)opt) {
-                case 'h':
-                    usage();
-                    return EXIT_SUCCESS;
-                case 'a':
-                    run_all = true;
-                    break;
-                case 'c':
-                    run_h5copy = true;
-                    break;
-                case 'd':
-                    run_h5diff = true;
-                    break;
-                case 'u':
-                    run_h5dump = true;
-                    break;
-                case 'f':
-                    run_h5fc = true;
-                    break;
-                case 'j':
-                    run_h5jam = true;
-                    break;
-                case 'r':
-                    run_h5repack = true;
-                    break;
-                case 's':
-                    run_h5stat = true;
-                    break;
-                case 'p':
-                    run_h5repart = true;
-                    break;
-                case 'l':
-                    run_h5ls = true;
-                    break;
-                default:
-                    continue;
+            case 'h': usage(); return EXIT_SUCCESS;
+            case 'a': run_all = true; break;
+            case 'c': run_h5copy = true; break;
+            case 'd': run_h5diff = true; break;
+            case 'u': run_h5dump = true; break;
+            case 'f': run_h5fc = true; break;
+            case 'j': run_h5jam = true; break;
+            case 'r': run_h5repack = true; break;
+            case 's': run_h5stat = true; break;
+            case 'p': run_h5repart = true; break;
+            case 'l': run_h5ls = true; break;
+            default : continue;
             }
         } /* end of while */
     }
 
-    if (!run_all && !run_h5copy && !run_h5diff && !run_h5dump && !run_h5fc && !run_h5jam && !run_h5repack &&
-        !run_h5stat && !run_h5repart && !run_h5ls) {
+    if (!run_all && !run_h5copy && !run_h5diff && !run_h5dump && !run_h5fc && !run_h5jam && !run_h5repack && !run_h5stat && !run_h5repart && !run_h5ls) {
         usage();
         return EXIT_FAILURE;
     }

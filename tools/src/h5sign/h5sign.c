@@ -46,7 +46,7 @@
 
 /* On Windows, OpenSSL requires applink to bridge different CRT versions */
 #ifdef _MSC_VER
-#include <openssl/applink.c>
+    #include <openssl/applink.c>
 #endif
 
 /* Name of tool */
@@ -58,21 +58,19 @@
 #define HASH_CHUNK_SIZE ((size_t)(64 * 1024))
 
 /* Global options */
-static char *plugin_file   = NULL;
-static char *privkey_file  = NULL;
-static char *opt_algorithm = NULL;
-static int   opt_verbose   = 0;
-static int   opt_force     = 0;
+static char* plugin_file = NULL;
+static char* privkey_file = NULL;
+static char* opt_algorithm = NULL;
+static int opt_verbose = 0;
+static int opt_force = 0;
 
 /*
  * Command-line options: The user can specify short or long-named
  * parameters.
  */
-static const char            *s_opts   = "hp:k:a:fvV";
-static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},     {"plugin", require_arg, 'p'},
-                                          {"key", require_arg, 'k'}, {"algorithm", require_arg, 'a'},
-                                          {"force", no_arg, 'f'},    {"verbose", no_arg, 'v'},
-                                          {"version", no_arg, 'V'},  {NULL, 0, '\0'}};
+static const char* s_opts = "hp:k:a:fvV";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },  { "plugin", require_arg, 'p' }, { "key", require_arg, 'k' }, { "algorithm", require_arg, 'a' },
+                                           { "force", no_arg, 'f' }, { "verbose", no_arg, 'v' },     { "version", no_arg, 'V' },  { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function:    write_with_retry
@@ -84,9 +82,7 @@ static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},     {"plugin", 
  * Return:      SUCCEED/FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-write_with_retry(int fd, const unsigned char *data, size_t total, const char *what, const char *plugin_path,
-                 hsize_t rollback_size)
+static herr_t write_with_retry(int fd, const unsigned char* data, size_t total, const char* what, const char* plugin_path, hsize_t rollback_size)
 {
     size_t written = 0;
 
@@ -97,8 +93,7 @@ write_with_retry(int fd, const unsigned char *data, size_t total, const char *wh
         } while (-1 == wr && EINTR == errno);
 
         if (wr <= 0) {
-            fprintf(rawerrorstream, "Error: Cannot write %s to '%s': %s\n", what, plugin_path,
-                    strerror(errno));
+            fprintf(rawerrorstream, "Error: Cannot write %s to '%s': %s\n", what, plugin_path, strerror(errno));
             /* Attempt rollback: restore file to its pre-signing state */
             (void)HDftruncate(fd, (HDoff_t)rollback_size);
             return FAIL;
@@ -118,8 +113,7 @@ write_with_retry(int fd, const unsigned char *data, size_t total, const char *wh
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     fflush(rawoutstream);
     fprintf(rawoutstream, "usage: %s -p <plugin> -k <private-key.pem> [OPTIONS]\n", prog);
@@ -188,15 +182,17 @@ usage(const char *prog)
  * Return:      Does not return
  *-------------------------------------------------------------------------
  */
-static void
-leave(int ret)
+static void leave(int ret)
 {
-    if (plugin_file)
+    if (plugin_file) {
         free(plugin_file);
-    if (privkey_file)
+    }
+    if (privkey_file) {
         free(privkey_file);
-    if (opt_algorithm)
+    }
+    if (opt_algorithm) {
         free(opt_algorithm);
+    }
 
     h5tools_close();
     exit(ret);
@@ -210,11 +206,10 @@ leave(int ret)
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-report_openssl_error(const char *context)
+static void report_openssl_error(const char* context)
 {
     unsigned long ssl_err = ERR_get_error();
-    char          err_buf[256];
+    char err_buf[256];
     ERR_error_string_n(ssl_err, err_buf, sizeof(err_buf));
     fprintf(rawerrorstream, "Error: %s: %s\n", context, err_buf);
 }
@@ -228,59 +223,55 @@ report_openssl_error(const char *context)
  *              Failure: FAIL (exits program)
  *-------------------------------------------------------------------------
  */
-static herr_t
-parse_command_line(int argc, const char *const *argv)
+static herr_t parse_command_line(int argc, const char* const* argv)
 {
     int opt;
 
     /* Parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'p':
-                if (plugin_file)
-                    free(plugin_file);
-                plugin_file = strdup(H5_optarg);
-                if (!plugin_file) {
-                    fprintf(rawerrorstream, "Error: Out of memory\n");
-                    leave(EXIT_FAILURE);
-                }
-                break;
-            case 'k':
-                if (privkey_file)
-                    free(privkey_file);
-                privkey_file = strdup(H5_optarg);
-                if (!privkey_file) {
-                    fprintf(rawerrorstream, "Error: Out of memory\n");
-                    leave(EXIT_FAILURE);
-                }
-                break;
-            case 'a':
-                if (opt_algorithm)
-                    free(opt_algorithm);
-                opt_algorithm = strdup(H5_optarg);
-                if (!opt_algorithm) {
-                    fprintf(rawerrorstream, "Error: Out of memory\n");
-                    leave(EXIT_FAILURE);
-                }
-                break;
-            case 'f':
-                opt_force = 1;
-                break;
-            case 'v':
-                opt_verbose = 1;
-                break;
-            case 'h':
-                usage(h5tools_getprogname());
-                leave(EXIT_SUCCESS);
-                break;
-            case 'V':
-                print_version(h5tools_getprogname());
-                leave(EXIT_SUCCESS);
-                break;
-            case '?':
-            default:
-                usage(h5tools_getprogname());
+        case 'p':
+            if (plugin_file) {
+                free(plugin_file);
+            }
+            plugin_file = strdup(H5_optarg);
+            if (!plugin_file) {
+                fprintf(rawerrorstream, "Error: Out of memory\n");
                 leave(EXIT_FAILURE);
+            }
+            break;
+        case 'k':
+            if (privkey_file) {
+                free(privkey_file);
+            }
+            privkey_file = strdup(H5_optarg);
+            if (!privkey_file) {
+                fprintf(rawerrorstream, "Error: Out of memory\n");
+                leave(EXIT_FAILURE);
+            }
+            break;
+        case 'a':
+            if (opt_algorithm) {
+                free(opt_algorithm);
+            }
+            opt_algorithm = strdup(H5_optarg);
+            if (!opt_algorithm) {
+                fprintf(rawerrorstream, "Error: Out of memory\n");
+                leave(EXIT_FAILURE);
+            }
+            break;
+        case 'f': opt_force = 1; break;
+        case 'v': opt_verbose = 1; break;
+        case 'h':
+            usage(h5tools_getprogname());
+            leave(EXIT_SUCCESS);
+            break;
+        case 'V':
+            print_version(h5tools_getprogname());
+            leave(EXIT_SUCCESS);
+            break;
+        case '?':
+        default : usage(h5tools_getprogname()); leave(EXIT_FAILURE);
         }
     }
 
@@ -309,12 +300,11 @@ parse_command_line(int argc, const char *const *argv)
  *              Failure: NULL
  *-------------------------------------------------------------------------
  */
-static EVP_PKEY *
-read_private_key(const char *keyfile)
+static EVP_PKEY* read_private_key(const char* keyfile)
 {
-    BIO      *bio      = NULL;
-    EVP_PKEY *pkey     = NULL;
-    EVP_PKEY *ret_pkey = NULL;
+    BIO* bio = NULL;
+    EVP_PKEY* pkey = NULL;
+    EVP_PKEY* ret_pkey = NULL;
 
     /* Open key file using BIO (avoids OPENSSL_Applink issue on Windows) */
     if (NULL == (bio = BIO_new_file(keyfile, "r"))) {
@@ -327,8 +317,7 @@ read_private_key(const char *keyfile)
         report_openssl_error("Cannot read private key");
         fprintf(rawerrorstream, "       Key file: '%s'\n", keyfile);
         fprintf(rawerrorstream, "       Make sure the file is in PEM format.\n");
-        fprintf(rawerrorstream,
-                "       If the key is passphrase-protected, re-run interactively so OpenSSL\n");
+        fprintf(rawerrorstream, "       If the key is passphrase-protected, re-run interactively so OpenSSL\n");
         fprintf(rawerrorstream, "       can prompt for the passphrase (non-interactive use will fail).\n");
         goto done;
     }
@@ -360,13 +349,15 @@ read_private_key(const char *keyfile)
     }
 
     ret_pkey = pkey;
-    pkey     = NULL; /* Prevent cleanup */
+    pkey = NULL; /* Prevent cleanup */
 
 done:
-    if (bio)
+    if (bio) {
         BIO_free(bio);
-    if (pkey)
+    }
+    if (pkey) {
         EVP_PKEY_free(pkey);
+    }
 
     /* Clear OpenSSL error queue */
     ERR_clear_error();
@@ -379,13 +370,14 @@ done:
  * and OpenSSL EVP_MD getter.  Shared by parse_algorithm_name() and the
  * success-message printer in sign_plugin_file().
  */
-typedef const EVP_MD *(*evp_md_getter_t)(void);
+typedef const EVP_MD* (*evp_md_getter_t)(void);
 
-typedef struct {
-    const char     *cli_name;     /* Name accepted on the command line */
-    const char     *display_name; /* Human-readable name for messages */
-    H5PL_sig_algo_t algo_id;      /* H5PL_SIG_ALGO_* constant */
-    evp_md_getter_t md_getter;    /* OpenSSL EVP_MD factory function */
+typedef struct
+{
+    const char* cli_name;      /* Name accepted on the command line */
+    const char* display_name;  /* Human-readable name for messages */
+    H5PL_sig_algo_t algo_id;   /* H5PL_SIG_ALGO_* constant */
+    evp_md_getter_t md_getter; /* OpenSSL EVP_MD factory function */
 } h5sign_algo_entry_t;
 
 /* clang-format off */
@@ -409,12 +401,12 @@ static const size_t algo_table_size = sizeof(algo_table) / sizeof(algo_table[0])
  * Return:      Display name string, or NULL if unknown
  *-------------------------------------------------------------------------
  */
-static const char *
-algo_display_name(H5PL_sig_algo_t algo_id)
+static const char* algo_display_name(H5PL_sig_algo_t algo_id)
 {
     for (size_t i = 0; i < algo_table_size; i++) {
-        if (algo_table[i].algo_id == algo_id)
+        if (algo_table[i].algo_id == algo_id) {
             return algo_table[i].display_name;
+        }
     }
     return NULL;
 }
@@ -429,12 +421,11 @@ algo_display_name(H5PL_sig_algo_t algo_id)
  *              Failure: FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-parse_algorithm_name(const char *name, const EVP_MD **md_out, H5PL_sig_algo_t *algo_id_out)
+static herr_t parse_algorithm_name(const char* name, const EVP_MD** md_out, H5PL_sig_algo_t* algo_id_out)
 {
     for (size_t i = 0; i < algo_table_size; i++) {
         if (HDstrcasecmp(name, algo_table[i].cli_name) == 0) {
-            *md_out      = algo_table[i].md_getter();
+            *md_out = algo_table[i].md_getter();
             *algo_id_out = algo_table[i].algo_id;
             return SUCCEED;
         }
@@ -455,20 +446,18 @@ parse_algorithm_name(const char *name, const EVP_MD **md_out, H5PL_sig_algo_t *a
  *              Failure: FAIL
  *-------------------------------------------------------------------------
  */
-static herr_t
-sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *hash_algorithm,
-                 H5PL_sig_algo_t algorithm_id)
+static herr_t sign_plugin_file(const char* plugin_path, EVP_PKEY* private_key, const EVP_MD* hash_algorithm, H5PL_sig_algo_t algorithm_id)
 {
-    int            fd = -1;
-    h5_stat_t      st;
-    hsize_t        file_size   = 0;
-    unsigned char *hash_buffer = NULL;
-    unsigned char *signature   = NULL;
-    size_t         sig_len     = 0;
-    EVP_MD_CTX    *mdctx       = NULL;
-    EVP_PKEY_CTX  *pkey_ctx    = NULL;
-    herr_t         ret_value   = SUCCEED;
-    hsize_t        bytes_read  = 0;
+    int fd = -1;
+    h5_stat_t st;
+    hsize_t file_size = 0;
+    unsigned char* hash_buffer = NULL;
+    unsigned char* signature = NULL;
+    size_t sig_len = 0;
+    EVP_MD_CTX* mdctx = NULL;
+    EVP_PKEY_CTX* pkey_ctx = NULL;
+    herr_t ret_value = SUCCEED;
+    hsize_t bytes_read = 0;
 
     /* Open plugin file for reading and writing.
      * Keeping a single fd open throughout hashing and appending eliminates
@@ -497,7 +486,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
 
     /* Detect already-signed files: check for HDF5 magic number in the footer */
     if (file_size >= (hsize_t)H5PL_SIG_FOOTER_SIZE) {
-        uint8_t           check_buf[H5PL_SIG_FOOTER_SIZE];
+        uint8_t check_buf[H5PL_SIG_FOOTER_SIZE];
         H5PL_sig_footer_t check_footer;
 
         if (HDlseek(fd, (HDoff_t)(file_size - (hsize_t)H5PL_SIG_FOOTER_SIZE), SEEK_SET) >= 0) {
@@ -516,12 +505,10 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
                     /* --force: strip the existing signature and footer so we can re-sign */
                     {
                         uint32_t existing_sig_len = check_footer.signature_length;
-                        hsize_t  binary_size;
+                        hsize_t binary_size;
 
-                        if (existing_sig_len == 0 ||
-                            (hsize_t)existing_sig_len + (hsize_t)H5PL_SIG_FOOTER_SIZE > file_size) {
-                            fprintf(rawerrorstream, "Error: Corrupt signature footer in '%s' (sig_len=%u)\n",
-                                    plugin_path, existing_sig_len);
+                        if (existing_sig_len == 0 || (hsize_t)existing_sig_len + (hsize_t)H5PL_SIG_FOOTER_SIZE > file_size) {
+                            fprintf(rawerrorstream, "Error: Corrupt signature footer in '%s' (sig_len=%u)\n", plugin_path, existing_sig_len);
                             ret_value = FAIL;
                             goto done;
                         }
@@ -529,15 +516,14 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
                         binary_size = file_size - (hsize_t)existing_sig_len - (hsize_t)H5PL_SIG_FOOTER_SIZE;
 
                         if (HDftruncate(fd, (HDoff_t)binary_size) < 0) {
-                            fprintf(rawerrorstream, "Error: Cannot strip existing signature from '%s': %s\n",
-                                    plugin_path, strerror(errno));
+                            fprintf(rawerrorstream, "Error: Cannot strip existing signature from '%s': %s\n", plugin_path, strerror(errno));
                             ret_value = FAIL;
                             goto done;
                         }
 
-                        if (opt_verbose)
-                            fprintf(rawoutstream, "Existing signature stripped (%u bytes + %d byte footer)\n",
-                                    existing_sig_len, H5PL_SIG_FOOTER_SIZE);
+                        if (opt_verbose) {
+                            fprintf(rawoutstream, "Existing signature stripped (%u bytes + %d byte footer)\n", existing_sig_len, H5PL_SIG_FOOTER_SIZE);
+                        }
 
                         /* Update file_size to reflect the stripped binary */
                         file_size = binary_size;
@@ -548,8 +534,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
 
         /* Seek back to the beginning for hashing */
         if (HDlseek(fd, 0, SEEK_SET) < 0) {
-            fprintf(rawerrorstream, "Error: Cannot seek in plugin file '%s': %s\n", plugin_path,
-                    strerror(errno));
+            fprintf(rawerrorstream, "Error: Cannot seek in plugin file '%s': %s\n", plugin_path, strerror(errno));
             ret_value = FAIL;
             goto done;
         }
@@ -560,10 +545,8 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
      * file, so a signed file whose total on-disk size exceeds the limit but
      * whose binary is within range must still be signable. */
     if (file_size > (hsize_t)H5PL_MAX_PLUGIN_SIZE) {
-        fprintf(rawerrorstream, "Error: Plugin binary '%s' is too large (%llu bytes)\n", plugin_path,
-                (unsigned long long)file_size);
-        fprintf(rawerrorstream, "       Maximum binary size is %llu bytes (1GB)\n",
-                (unsigned long long)H5PL_MAX_PLUGIN_SIZE);
+        fprintf(rawerrorstream, "Error: Plugin binary '%s' is too large (%llu bytes)\n", plugin_path, (unsigned long long)file_size);
+        fprintf(rawerrorstream, "       Maximum binary size is %llu bytes (1GB)\n", (unsigned long long)H5PL_MAX_PLUGIN_SIZE);
         ret_value = FAIL;
         goto done;
     }
@@ -603,7 +586,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
     }
 
     /* Allocate buffer for reading file in chunks */
-    if (NULL == (hash_buffer = (unsigned char *)malloc(HASH_CHUNK_SIZE))) {
+    if (NULL == (hash_buffer = (unsigned char*)malloc(HASH_CHUNK_SIZE))) {
         fprintf(rawerrorstream, "Error: Cannot allocate hash buffer\n");
         ret_value = FAIL;
         goto done;
@@ -622,8 +605,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
 #endif
 
     while (bytes_read < file_size) {
-        size_t chunk_size =
-            (size_t)((file_size - bytes_read) > HASH_CHUNK_SIZE ? HASH_CHUNK_SIZE : (file_size - bytes_read));
+        size_t chunk_size = (size_t)((file_size - bytes_read) > HASH_CHUNK_SIZE ? HASH_CHUNK_SIZE : (file_size - bytes_read));
         h5_posix_io_ret_t read_result = 0;
 
         /* Read chunk with EINTR retry */
@@ -632,8 +614,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
         } while (-1 == read_result && EINTR == errno);
 
         if (read_result < 0) {
-            fprintf(rawerrorstream, "Error: Cannot read from plugin file '%s': %s\n", plugin_path,
-                    strerror(errno));
+            fprintf(rawerrorstream, "Error: Cannot read from plugin file '%s': %s\n", plugin_path, strerror(errno));
             ret_value = FAIL;
             goto done;
         }
@@ -654,8 +635,9 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
         bytes_read += (hsize_t)read_result;
     }
 
-    if (opt_verbose)
+    if (opt_verbose) {
         fprintf(rawoutstream, "Hash computed successfully\n");
+    }
 
     /* Get signature length */
     if (1 != EVP_DigestSignFinal(mdctx, NULL, &sig_len)) {
@@ -665,14 +647,13 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
     }
 
     if (sig_len == 0 || sig_len > H5PL_MAX_SIGNATURE_SIZE) {
-        fprintf(rawerrorstream, "Error: Invalid signature length: %zu bytes (max %d)\n", sig_len,
-                H5PL_MAX_SIGNATURE_SIZE);
+        fprintf(rawerrorstream, "Error: Invalid signature length: %zu bytes (max %d)\n", sig_len, H5PL_MAX_SIGNATURE_SIZE);
         ret_value = FAIL;
         goto done;
     }
 
     /* Allocate signature buffer */
-    if (NULL == (signature = (unsigned char *)malloc(sig_len))) {
+    if (NULL == (signature = (unsigned char*)malloc(sig_len))) {
         fprintf(rawerrorstream, "Error: Cannot allocate signature buffer\n");
         ret_value = FAIL;
         goto done;
@@ -692,8 +673,7 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
 
     /* Verify the signed file will not exceed the verifier's size limit */
     if ((hsize_t)(file_size + sig_len + H5PL_SIG_FOOTER_SIZE) > (hsize_t)H5PL_MAX_PLUGIN_SIZE) {
-        fprintf(rawerrorstream, "Error: Signed plugin would exceed maximum size (%llu bytes)\n",
-                (unsigned long long)H5PL_MAX_PLUGIN_SIZE);
+        fprintf(rawerrorstream, "Error: Signed plugin would exceed maximum size (%llu bytes)\n", (unsigned long long)H5PL_MAX_PLUGIN_SIZE);
         ret_value = FAIL;
         goto done;
     }
@@ -710,17 +690,18 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
         goto done;
     }
 
-    if (opt_verbose)
+    if (opt_verbose) {
         fprintf(rawoutstream, "Signature appended to plugin\n");
+    }
 
     /* Prepare and write footer in little-endian format */
     {
-        uint8_t           footer_buf[H5PL_SIG_FOOTER_SIZE];
+        uint8_t footer_buf[H5PL_SIG_FOOTER_SIZE];
         H5PL_sig_footer_t footer;
 
         footer.signature_length = (uint32_t)sig_len;
-        footer.algorithm_id     = algorithm_id;
-        footer.format_version   = H5PL_SIG_FORMAT_VERSION_CURRENT;
+        footer.algorithm_id = algorithm_id;
+        footer.format_version = H5PL_SIG_FORMAT_VERSION_CURRENT;
         H5PL_sig_encode_footer(footer_buf, sizeof(footer_buf), &footer);
 
         /* Write footer to file */
@@ -734,35 +715,41 @@ sign_plugin_file(const char *plugin_path, EVP_PKEY *private_key, const EVP_MD *h
     HDclose(fd);
     fd = -1;
 
-    if (opt_verbose)
+    if (opt_verbose) {
         fprintf(rawoutstream, "Footer written successfully\n");
+    }
 
     /* Success! */
     fprintf(rawoutstream, "\nPlugin signed successfully!\n");
     fprintf(rawoutstream, "  File:           %s\n", plugin_path);
     fprintf(rawoutstream, "  Original size:  %llu bytes\n", (unsigned long long)file_size);
     {
-        const char *algo_name = algo_display_name(algorithm_id);
-        if (algo_name)
+        const char* algo_name = algo_display_name(algorithm_id);
+        if (algo_name) {
             fprintf(rawoutstream, "  Hash algorithm: %s (0x%02X)\n", algo_name, algorithm_id);
-        else
+        }
+        else {
             fprintf(rawoutstream, "  Hash algorithm: 0x%02X\n", algorithm_id);
+        }
     }
     fprintf(rawoutstream, "  Signature size: %zu bytes\n", sig_len);
     fprintf(rawoutstream, "  Footer size:    %d bytes\n", H5PL_SIG_FOOTER_SIZE);
-    fprintf(rawoutstream, "  Final size:     %llu bytes\n",
-            (unsigned long long)(file_size + sig_len + H5PL_SIG_FOOTER_SIZE));
+    fprintf(rawoutstream, "  Final size:     %llu bytes\n", (unsigned long long)(file_size + sig_len + H5PL_SIG_FOOTER_SIZE));
     fprintf(rawoutstream, "\n");
 
 done:
-    if (fd >= 0)
+    if (fd >= 0) {
         HDclose(fd);
-    if (hash_buffer)
+    }
+    if (hash_buffer) {
         free(hash_buffer);
-    if (signature)
+    }
+    if (signature) {
         free(signature);
-    if (mdctx)
+    }
+    if (mdctx) {
         EVP_MD_CTX_free(mdctx);
+    }
 
     /* Clear OpenSSL error queue */
     ERR_clear_error();
@@ -779,13 +766,12 @@ done:
  *              Failure: EXIT_FAILURE
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    EVP_PKEY       *private_key    = NULL;
-    const EVP_MD   *hash_algorithm = NULL;
-    H5PL_sig_algo_t algorithm_id   = (H5PL_sig_algo_t)0;
-    int             ret_value      = EXIT_SUCCESS;
+    EVP_PKEY* private_key = NULL;
+    const EVP_MD* hash_algorithm = NULL;
+    H5PL_sig_algo_t algorithm_id = (H5PL_sig_algo_t)0;
+    int ret_value = EXIT_SUCCESS;
 
     /* Initialize HDF5 tools infrastructure */
     h5tools_setprogname(PROGRAMNAME);
@@ -795,7 +781,7 @@ main(int argc, char *argv[])
     h5tools_init();
 
     /* Parse command line */
-    if (parse_command_line(argc, (const char *const *)argv) < 0) {
+    if (parse_command_line(argc, (const char* const*)argv) < 0) {
         ret_value = EXIT_FAILURE;
         goto done;
     }
@@ -814,7 +800,7 @@ main(int argc, char *argv[])
     else {
         /* Default: SHA-512 with PKCS1 */
         hash_algorithm = EVP_sha512();
-        algorithm_id   = H5PL_SIG_ALGO_SHA512;
+        algorithm_id = H5PL_SIG_ALGO_SHA512;
         fprintf(rawoutstream, "Using default hash algorithm: sha512\n");
     }
 
@@ -840,8 +826,9 @@ main(int argc, char *argv[])
     fprintf(rawoutstream, "\n");
 
 done:
-    if (private_key)
+    if (private_key) {
         EVP_PKEY_free(private_key);
+    }
 
     leave(ret_value);
 

@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -58,7 +57,7 @@ fail_dcpl:;
     {
         __label__ fail_rc, fail_dcpl;
         hid_t dcpl;
-        int   rc;
+        int rc;
 
         // create an ID of a pre-defined ID type
         if ((dcpl = H5Pcreate(H5P_DATASET_XFER)) == H5I_INVALID_HID) {
@@ -90,7 +89,7 @@ fail_dcpl:;
     {
         __label__ fail_rc, fail_dcpl;
         hid_t dcpl;
-        int   rc;
+        int rc;
 
         // create an ID of a pre-defined ID type
         if ((dcpl = H5Pcreate(H5P_DATASET_XFER)) == H5I_INVALID_HID) {
@@ -119,7 +118,7 @@ fail_dcpl:;
     //! <!-- [delete] -->
 
     //! <!-- [create_ud] -->
-    herr_t free_func(void *obj)
+    herr_t free_func(void* obj)
     {
         printf("Calling free_func...\n");
         H5free_memory(obj);
@@ -129,8 +128,8 @@ fail_dcpl:;
     {
         __label__ fail_id, fail_obj, fail_register;
         H5I_type_t type;
-        int       *obj;
-        hid_t      obj_id;
+        int* obj;
+        hid_t obj_id;
 
         // register a new ID type
         if ((type = H5Iregister_type2(1024, &free_func)) < 0) {
@@ -164,7 +163,7 @@ fail_register:;
     {
         __label__ fail_query, fail_register;
         H5I_type_t type;
-        hsize_t    count;
+        hsize_t count;
 
         // register a new ID type
         if ((type = H5Iregister_type2(1024, NULL)) < 0) {
@@ -190,8 +189,8 @@ fail_register:;
     {
         __label__ fail_id, fail_register;
         H5I_type_t type;
-        int        obj = 42;
-        hid_t      obj_id;
+        int obj = 42;
+        hid_t obj_id;
 
         // register a new ID type
         if ((type = H5Iregister_type2(1024, NULL)) < 0) {

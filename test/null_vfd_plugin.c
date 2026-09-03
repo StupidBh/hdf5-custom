@@ -24,15 +24,13 @@
 #include "null_vfd_plugin.h"
 
 /* Prototypes */
-static H5FD_t *H5FD_null_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxaddr);
-static herr_t  H5FD_null_close(H5FD_t *_file);
-static herr_t  H5FD_null_read(H5FD_t *_file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size,
-                              void *buf);
-static herr_t  H5FD_null_write(H5FD_t *_file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size,
-                               const void *buf);
-static haddr_t H5FD_null_get_eoa(const H5FD_t *_file, H5FD_mem_t type);
-static herr_t  H5FD_null_set_eoa(H5FD_t *_file, H5FD_mem_t type, haddr_t addr);
-static haddr_t H5FD_null_get_eof(const H5FD_t *_file, H5FD_mem_t type);
+static H5FD_t* H5FD_null_open(const char* name, unsigned flags, hid_t fapl_id, haddr_t maxaddr);
+static herr_t H5FD_null_close(H5FD_t* _file);
+static herr_t H5FD_null_read(H5FD_t* _file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, void* buf);
+static herr_t H5FD_null_write(H5FD_t* _file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, const void* buf);
+static haddr_t H5FD_null_get_eoa(const H5FD_t* _file, H5FD_mem_t type);
+static herr_t H5FD_null_set_eoa(H5FD_t* _file, H5FD_mem_t type, haddr_t addr);
+static haddr_t H5FD_null_get_eof(const H5FD_t* _file, H5FD_mem_t type);
 
 static const H5FD_class_t H5FD_null_g = {
     H5FD_CLASS_VERSION,  /* struct version  */
@@ -77,8 +75,7 @@ static const H5FD_class_t H5FD_null_g = {
     H5FD_FLMAP_DICHOTOMY /* fl_map          */
 };
 
-static H5FD_t *
-H5FD_null_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxaddr)
+static H5FD_t* H5FD_null_open(const char* name, unsigned flags, hid_t fapl_id, haddr_t maxaddr)
 {
     (void)name;
     (void)flags;
@@ -88,29 +85,14 @@ H5FD_null_open(const char *name, unsigned flags, hid_t fapl_id, haddr_t maxaddr)
     return NULL;
 }
 
-static herr_t
-H5FD_null_close(H5FD_t *_file)
+static herr_t H5FD_null_close(H5FD_t* _file)
 {
     (void)_file;
 
     return 0;
 }
 
-static herr_t
-H5FD_null_read(H5FD_t *_file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, void *buf)
-{
-    (void)_file;
-    (void)type;
-    (void)dxpl_id;
-    (void)addr;
-    (void)size;
-    (void)buf;
-
-    return 0;
-}
-
-static herr_t
-H5FD_null_write(H5FD_t *_file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, const void *buf)
+static herr_t H5FD_null_read(H5FD_t* _file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, void* buf)
 {
     (void)_file;
     (void)type;
@@ -122,8 +104,19 @@ H5FD_null_write(H5FD_t *_file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, siz
     return 0;
 }
 
-static haddr_t
-H5FD_null_get_eoa(const H5FD_t *_file, H5FD_mem_t type)
+static herr_t H5FD_null_write(H5FD_t* _file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, size_t size, const void* buf)
+{
+    (void)_file;
+    (void)type;
+    (void)dxpl_id;
+    (void)addr;
+    (void)size;
+    (void)buf;
+
+    return 0;
+}
+
+static haddr_t H5FD_null_get_eoa(const H5FD_t* _file, H5FD_mem_t type)
 {
     (void)_file;
     (void)type;
@@ -131,8 +124,7 @@ H5FD_null_get_eoa(const H5FD_t *_file, H5FD_mem_t type)
     return HADDR_UNDEF;
 }
 
-static herr_t
-H5FD_null_set_eoa(H5FD_t *_file, H5FD_mem_t type, haddr_t addr)
+static herr_t H5FD_null_set_eoa(H5FD_t* _file, H5FD_mem_t type, haddr_t addr)
 {
     (void)_file;
     (void)type;
@@ -141,8 +133,7 @@ H5FD_null_set_eoa(H5FD_t *_file, H5FD_mem_t type, haddr_t addr)
     return 0;
 }
 
-static haddr_t
-H5FD_null_get_eof(const H5FD_t *_file, H5FD_mem_t type)
+static haddr_t H5FD_null_get_eof(const H5FD_t* _file, H5FD_mem_t type)
 {
     (void)_file;
     (void)type;
@@ -154,14 +145,12 @@ H5FD_null_get_eof(const H5FD_t *_file, H5FD_mem_t type)
  * the HDF5 library.
  */
 
-H5PL_type_t
-H5PLget_plugin_type(void)
+H5PL_type_t H5PLget_plugin_type(void)
 {
     return H5PL_TYPE_VFD;
 }
 
-const void *
-H5PLget_plugin_info(void)
+const void* H5PLget_plugin_info(void)
 {
     return &H5FD_null_g;
 }

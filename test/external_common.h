@@ -28,10 +28,11 @@
 #define GARBAGE_PER_FILE 10
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-H5TEST_DLL herr_t reset_raw_data_files(bool is_env);
+    H5TEST_DLL herr_t reset_raw_data_files(bool is_env);
 
 #ifdef __cplusplus
 }

@@ -32,18 +32,20 @@ using namespace H5;
 #define H5L_DIM2      100
 
 // Object visit structs
-typedef struct {
-    const char *path; /* Path to object */
-    H5O_type_t  type; /* Type of object */
+typedef struct
+{
+    const char* path; /* Path to object */
+    H5O_type_t type;  /* Type of object */
 } obj_visit_t;
 
 // User data for callback function
-typedef struct {
-    unsigned           idx;  /* Index in object visit structure */
-    const obj_visit_t *info; /* Pointer to the object visit structure to use */
+typedef struct
+{
+    unsigned idx;            /* Index in object visit structure */
+    const obj_visit_t* info; /* Pointer to the object visit structure to use */
 } ovisit_ud_t;
 
-static const char *FILENAME[] = {"link0", "link1.h5", "link2.h5", "visit", NULL};
+static const char* FILENAME[] = { "link0", "link1.h5", "link2.h5", "visit", NULL };
 
 /*-------------------------------------------------------------------------
  * Function:    test_basic_links
@@ -56,20 +58,21 @@ static const char *FILENAME[] = {"link0", "link1.h5", "link2.h5", "visit", NULL}
  * October 16, 2009
  *-------------------------------------------------------------------------
  */
-static void
-test_basic_links(hid_t fapl_id, bool new_format)
+static void test_basic_links(hid_t fapl_id, bool new_format)
 {
-    hsize_t size[1] = {1};
-    char    filename[NAME_BUF_SIZE];
+    hsize_t size[1] = { 1 };
+    char filename[NAME_BUF_SIZE];
 
     // Use the file access template id to create a file access prop. list.
     FileAccPropList fapl(fapl_id);
 
     try {
-        if (new_format)
+        if (new_format) {
             SUBTEST("Link creation (w/new group format)");
-        else
+        }
+        else {
             SUBTEST("Link creation");
+        }
 
         h5_fixname(FILENAME[0], fapl_id, filename, sizeof filename);
         H5File file(filename, H5F_ACC_TRUNC, FileCreatPropList::DEFAULT, fapl);
@@ -92,20 +95,24 @@ test_basic_links(hid_t fapl_id, bool new_format)
         // Because these are not implemented in the C++ API yet, they are
         // used so CommonFG::getLinkval can be tested.
         // Create a hard link
-        if (H5Lcreate_hard(file_id, "dset1", H5L_SAME_LOC, "grp1/hard1", H5P_DEFAULT, H5P_DEFAULT) < 0)
+        if (H5Lcreate_hard(file_id, "dset1", H5L_SAME_LOC, "grp1/hard1", H5P_DEFAULT, H5P_DEFAULT) < 0) {
             throw Exception("test_basic_links", "H5Lcreate_hard failed");
+        }
 
         // Create a symbolic link
-        if (H5Lcreate_soft("/dset1", file_id, "grp1/soft", H5P_DEFAULT, H5P_DEFAULT) < 0)
+        if (H5Lcreate_soft("/dset1", file_id, "grp1/soft", H5P_DEFAULT, H5P_DEFAULT) < 0) {
             throw Exception("test_basic_links", "H5Lcreate_soft failed");
+        }
 
         // Create a symbolic link to something that doesn't exist
-        if (H5Lcreate_soft("foobar", file_id, "grp1/dangle", H5P_DEFAULT, H5P_DEFAULT) < 0)
+        if (H5Lcreate_soft("foobar", file_id, "grp1/dangle", H5P_DEFAULT, H5P_DEFAULT) < 0) {
             throw Exception("test_basic_links", "H5Lcreate_soft failed");
+        }
 
         // Create a recursive symbolic link
-        if (H5Lcreate_soft("/grp1/recursive", file_id, "/grp1/recursive", H5P_DEFAULT, H5P_DEFAULT) < 0)
+        if (H5Lcreate_soft("/grp1/recursive", file_id, "/grp1/recursive", H5P_DEFAULT, H5P_DEFAULT) < 0) {
             throw Exception("test_basic_links", "H5Lcreate_soft failed");
+        }
 
         // Verify link values before closing the file
 
@@ -119,7 +126,7 @@ test_basic_links(hid_t fapl_id, bool new_format)
         verify_val(reclink_val, "/grp1/recursive", "H5File::getLinkval grp1/recursive", __LINE__, __FILE__);
 
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_basic_links()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
@@ -129,15 +136,19 @@ test_basic_links(hid_t fapl_id, bool new_format)
         H5File file(filename, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, fapl);
 
         // Verify link existence
-        if (file.nameExists("dset1", LinkAccPropList::DEFAULT) != true)
+        if (file.nameExists("dset1", LinkAccPropList::DEFAULT) != true) {
             throw InvalidActionException("H5File::nameExists", "dset1 doesn't exist");
-        if (file.nameExists("grp1/soft", LinkAccPropList::DEFAULT) != true)
+        }
+        if (file.nameExists("grp1/soft", LinkAccPropList::DEFAULT) != true) {
             throw InvalidActionException("H5File::nameExists", "grp1/soft doesn't exist");
+        }
         // Deprecated
-        if (file.exists("dset1", LinkAccPropList::DEFAULT) != true)
+        if (file.exists("dset1", LinkAccPropList::DEFAULT) != true) {
             throw InvalidActionException("H5File::exists", "dset1 doesn't exist");
-        if (file.exists("grp1/soft", LinkAccPropList::DEFAULT) != true)
+        }
+        if (file.exists("grp1/soft", LinkAccPropList::DEFAULT) != true) {
             throw InvalidActionException("H5File::exists", "grp1/soft doesn't exist");
+        }
 
         // Verify link values
         H5std_string softlink_val = file.getLinkval("grp1/soft");
@@ -148,7 +159,7 @@ test_basic_links(hid_t fapl_id, bool new_format)
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_basic_links()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_basic_links
@@ -166,17 +177,19 @@ test_basic_links(hid_t fapl_id, bool new_format)
  */
 const H5std_string GROUP1NAME("First_group");
 const H5std_string GROUP2NAME("Second_group");
-static void
-test_lcpl(hid_t fapl_id, bool new_format)
+
+static void test_lcpl(hid_t fapl_id, bool new_format)
 {
     H5L_info2_t linfo;
-    char        filename[1024];
-    hsize_t     dims[2];
+    char filename[1024];
+    hsize_t dims[2];
 
-    if (new_format)
+    if (new_format) {
         SUBTEST("Link creation property lists (w/new group format)");
-    else
+    }
+    else {
         SUBTEST("Link creation property lists");
+    }
 
     try {
         FileAccPropList fapl(fapl_id);
@@ -191,8 +204,9 @@ test_lcpl(hid_t fapl_id, bool new_format)
 
         // Check that its character encoding is the default.
         linfo = file.getLinkInfo(GROUP1NAME);
-        if (linfo.cset != H5T_CSET_ASCII)
+        if (linfo.cset != H5T_CSET_ASCII) {
             throw InvalidActionException("H5Lget_info", "Character encoding is not default");
+        }
 
         // Create and commit a datatype with the default LCPL.
         IntType dtype(PredType::NATIVE_INT);
@@ -201,8 +215,7 @@ test_lcpl(hid_t fapl_id, bool new_format)
 
         // Check that its character encoding is the default.
         linfo = file.getLinkInfo("/type");
-        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_ASCII),
-                   "Character encoding is not default", __LINE__, __FILE__);
+        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_ASCII), "Character encoding is not default", __LINE__, __FILE__);
 
         // Create a simple dataspace.
         dims[0] = H5L_DIM1;
@@ -215,8 +228,7 @@ test_lcpl(hid_t fapl_id, bool new_format)
 
         // Check that its character encoding is the default.
         linfo = file.getLinkInfo("/dataset");
-        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_ASCII),
-                   "Character encoding is not default", __LINE__, __FILE__);
+        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_ASCII), "Character encoding is not default", __LINE__, __FILE__);
 
         // Create a link creation property list with the UTF-8 character encoding.
         LinkCreatPropList lcpl;
@@ -228,12 +240,11 @@ test_lcpl(hid_t fapl_id, bool new_format)
 
         // Check that its character encoding is UTF-8.
         linfo = file.getLinkInfo(GROUP2NAME);
-        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_UTF8),
-                   "Character encoding is not UTF-8", __LINE__, __FILE__);
+        verify_val(static_cast<long>(linfo.cset), static_cast<long>(H5T_CSET_UTF8), "Character encoding is not UTF-8", __LINE__, __FILE__);
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_lcpl()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // end test_lcpl()
@@ -248,15 +259,16 @@ test_lcpl(hid_t fapl_id, bool new_format)
  * March, 2018
  *-------------------------------------------------------------------------
  */
-static void
-test_move(hid_t fapl_id, bool new_format)
+static void test_move(hid_t fapl_id, bool new_format)
 {
     char filename[1024];
 
-    if (new_format)
+    if (new_format) {
         SUBTEST("Group::moveLink (w/new group format)");
-    else
+    }
+    else {
         SUBTEST("Group::moveLink");
+    }
 
     try {
         FileAccPropList fapl(fapl_id);
@@ -284,14 +296,15 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED();
             cerr << "    Group group_move should not be moved across files" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
 
         // Move a soft link across files, should succeed
         grp_2.moveLink("soft", file_b, "soft_new_name");
-        if (file_b.exists("soft_new_name") != true)
+        if (file_b.exists("soft_new_name") != true) {
             throw InvalidActionException("H5File::exists", "grp1/soft doesn't exist");
+        }
 
         // Move a group across groups in the same file while renaming it
         grp_1.moveLink("group_move", grp_2, "group_new_name");
@@ -308,7 +321,7 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED();
             cerr << "    Group group_move should not be in original location" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
 
@@ -343,7 +356,7 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_newer_name should not be in GROUP1NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
         try {
@@ -353,7 +366,7 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_newer_name should not be in GROUP2NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
         try {
@@ -363,7 +376,7 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_new_name should not be in GROUP2NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
         try {
@@ -373,12 +386,12 @@ test_move(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_copy should not be in GROUP1NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_move()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_move
@@ -393,15 +406,16 @@ test_move(hid_t fapl_id, bool new_format)
  * March, 2018
  *-------------------------------------------------------------------------
  */
-static void
-test_copy(hid_t fapl_id, bool new_format)
+static void test_copy(hid_t fapl_id, bool new_format)
 {
     char filename[1024];
 
-    if (new_format)
+    if (new_format) {
         SUBTEST("Group::copyLink (w/new group format)");
-    else
+    }
+    else {
         SUBTEST("Group::copyLink");
+    }
 
     try {
         // Create two new files
@@ -423,14 +437,15 @@ test_copy(hid_t fapl_id, bool new_format)
         try {
             grp_1.copyLink("group_copy", file_b, "group_new_name");
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
 
         // Copy a soft link across files, should succeed
         grp_2.copyLink("soft", file_b, "soft_new_name");
-        if (file_b.exists("soft_new_name") != true)
+        if (file_b.exists("soft_new_name") != true) {
             throw InvalidActionException("H5File::exists", "soft_new_name doesn't exist");
+        }
 
         // Move a group across groups in the same file while renaming it
         H5std_string copy_name("group_copy");
@@ -496,7 +511,7 @@ test_copy(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_newer_name should not be in GROUP2NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
 
@@ -509,13 +524,13 @@ test_copy(hid_t fapl_id, bool new_format)
             H5_FAILED(); // Should throw an exception but didn't
             cerr << "    Group group_copy should not be in GROUP1NAME" << endl;
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
             // expected
         }
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_copy()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_copy
@@ -531,15 +546,16 @@ test_copy(hid_t fapl_id, bool new_format)
  * October 16, 2009
  *-------------------------------------------------------------------------
  */
-static void
-test_num_links(hid_t fapl_id, bool new_format)
+static void test_num_links(hid_t fapl_id, bool new_format)
 {
     char filename[NAME_BUF_SIZE];
 
-    if (new_format)
+    if (new_format) {
         SUBTEST("Setting number of links (w/new group format)");
-    else
+    }
+    else {
         SUBTEST("Setting number of links");
+    }
 
     try {
         // Use the file access template id to create a file access prop. list.
@@ -549,7 +565,7 @@ test_num_links(hid_t fapl_id, bool new_format)
         H5File file(filename, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, fapl);
 
         LinkAccPropList lapl;
-        size_t          nlinks = 5;
+        size_t nlinks = 5;
         lapl.setNumLinks(nlinks);
 
         // Read it back and verify
@@ -558,45 +574,46 @@ test_num_links(hid_t fapl_id, bool new_format)
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_num_links()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_num_links
 
 // Data for visit on the file
 static const obj_visit_t file_visit[] = {
-    {".", H5O_TYPE_GROUP},
-    {"Data", H5O_TYPE_GROUP},
-    {"Data/Compressed_Data", H5O_TYPE_DATASET},
-    {"Data/Float_Data", H5O_TYPE_DATASET},
+    { ".", H5O_TYPE_GROUP },
+    { "Data", H5O_TYPE_GROUP },
+    { "Data/Compressed_Data", H5O_TYPE_DATASET },
+    { "Data/Float_Data", H5O_TYPE_DATASET },
 };
 
 // Data for visit on the group
 static const obj_visit_t group_visit[] = {
-    {".", H5O_TYPE_GROUP},
-    {"Compressed_Data", H5O_TYPE_DATASET},
-    {"Float_Data", H5O_TYPE_DATASET},
+    { ".", H5O_TYPE_GROUP },
+    { "Compressed_Data", H5O_TYPE_DATASET },
+    { "Float_Data", H5O_TYPE_DATASET },
 };
 
 const H5std_string FILE_NAME("tvisit.h5");
 const H5std_string GROUP_NAME("/Data");
 const H5std_string DSET1_NAME("/Data/Compressed_Data");
 const H5std_string DSET2_NAME("/Data/Float_Data");
-const int          RANK = 2;
+const int RANK = 2;
 
 // Operator function
-static int
-visit_obj_cb(H5Object &obj, const H5std_string name, const H5O_info2_t *oinfo, void *_op_data)
+static int visit_obj_cb(H5Object& obj, const H5std_string name, const H5O_info2_t* oinfo, void* _op_data)
 {
     (void)obj; // Unused
 
-    ovisit_ud_t *op_data = static_cast<ovisit_ud_t *>(_op_data);
+    ovisit_ud_t* op_data = static_cast<ovisit_ud_t*>(_op_data);
 
     // Check for correct object information
-    if (strcmp(op_data->info[op_data->idx].path, name.c_str()) != 0)
+    if (strcmp(op_data->info[op_data->idx].path, name.c_str()) != 0) {
         return (H5_ITER_ERROR);
-    if (op_data->info[op_data->idx].type != oinfo->type)
+    }
+    if (op_data->info[op_data->idx].type != oinfo->type) {
         return (H5_ITER_ERROR);
+    }
 
     // Advance to next location
     op_data->idx++;
@@ -614,17 +631,18 @@ visit_obj_cb(H5Object &obj, const H5std_string name, const H5O_info2_t *oinfo, v
  * February 8, 2019
  *-------------------------------------------------------------------------
  */
-static void
-test_visit(hid_t fapl_id, bool new_format)
+static void test_visit(hid_t fapl_id, bool new_format)
 {
     hsize_t dims[2];
     hsize_t cdims[2];
-    char    filename[NAME_BUF_SIZE];
+    char filename[NAME_BUF_SIZE];
 
-    if (new_format)
+    if (new_format) {
         SUBTEST("H5Object::visit (w/new group format)");
-    else
+    }
+    else {
         SUBTEST("H5Object::visit");
+    }
 
     try {
         // Use the file access template id to create a file access prop. list
@@ -632,32 +650,31 @@ test_visit(hid_t fapl_id, bool new_format)
 
         // Build the hdf5 file name and create the file
         h5_fixname(FILENAME[3], fapl_id, filename, sizeof filename);
-        H5File *file = new H5File(filename, H5F_ACC_TRUNC, FileCreatPropList::DEFAULT, fapl);
+        H5File* file = new H5File(filename, H5F_ACC_TRUNC, FileCreatPropList::DEFAULT, fapl);
 
         // Create a group
-        Group *group = new Group(file->createGroup(GROUP_NAME));
+        Group* group = new Group(file->createGroup(GROUP_NAME));
 
         // Create a chunked/compressed dataset within this group specified by path
-        dims[0]                     = 20;
-        dims[1]                     = 2;
-        cdims[0]                    = 2;
-        cdims[1]                    = 2;
-        DataSpace        *dataspace = new DataSpace(RANK, dims); // create new dspace
-        DSetCreatPropList ds_creatplist;                         // create dataset creation prop list
-        ds_creatplist.setChunk(2, cdims);                        // then modify it for compression
+        dims[0] = 20;
+        dims[1] = 2;
+        cdims[0] = 2;
+        cdims[1] = 2;
+        DataSpace* dataspace = new DataSpace(RANK, dims); // create new dspace
+        DSetCreatPropList ds_creatplist;                  // create dataset creation prop list
+        ds_creatplist.setChunk(2, cdims);                 // then modify it for compression
         ds_creatplist.setDeflate(6);
 
-        DataSet *dataset =
-            new DataSet(file->createDataSet(DSET1_NAME, PredType::NATIVE_INT, *dataspace, ds_creatplist));
+        DataSet* dataset = new DataSet(file->createDataSet(DSET1_NAME, PredType::NATIVE_INT, *dataspace, ds_creatplist));
 
         delete dataset;
         delete dataspace;
 
         // Create another dataset
-        dims[0]   = 5;
-        dims[1]   = 2;
+        dims[0] = 5;
+        dims[1] = 2;
         dataspace = new DataSpace(RANK, dims); // create second dspace
-        dataset   = new DataSet(file->createDataSet(DSET2_NAME, PredType::NATIVE_FLOAT, *dataspace));
+        dataset = new DataSet(file->createDataSet(DSET2_NAME, PredType::NATIVE_FLOAT, *dataspace));
 
         // Close everything
         delete dataset;
@@ -666,7 +683,7 @@ test_visit(hid_t fapl_id, bool new_format)
         delete file;
 
         // Reopen the file and group in the file.
-        file  = new H5File(filename, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, fapl);
+        file = new H5File(filename, H5F_ACC_RDWR, FileCreatPropList::DEFAULT, fapl);
         group = new Group(file->openGroup("Data"));
 
         // Open the group
@@ -675,13 +692,13 @@ test_visit(hid_t fapl_id, bool new_format)
 
         // Visit objects in the file
         ovisit_ud_t udata; /* User-data for visiting */
-        udata.idx  = 0;
+        udata.idx = 0;
         udata.info = file_visit;
 
         file->visit(H5_INDEX_NAME, H5_ITER_INC, visit_obj_cb, &udata, H5O_INFO_BASIC);
 
         // Visit objects in the group
-        udata.idx  = 0;
+        udata.idx = 0;
         udata.info = group_visit;
 
         group->visit(H5_INDEX_NAME, H5_ITER_INC, visit_obj_cb, &udata, H5O_INFO_BASIC);
@@ -692,7 +709,7 @@ test_visit(hid_t fapl_id, bool new_format)
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         cerr << "in catch" << endl;
         issue_fail_msg("test_visit()", __LINE__, __FILE__, E.getCDetailMsg());
     }
@@ -708,38 +725,42 @@ test_visit(hid_t fapl_id, bool new_format)
  * October 16, 2009
  *-------------------------------------------------------------------------
  */
-extern "C" void
-test_links(void *params)
+extern "C" void test_links(void* params)
 {
-    hid_t    fapl_id, fapl2_id; /* File access property lists */
-    unsigned new_format;        /* Whether to use the new format or not */
+    hid_t fapl_id, fapl2_id; /* File access property lists */
+    unsigned new_format;     /* Whether to use the new format or not */
 
     (void)params;
 
-    if ((fapl_id = h5_fileaccess()) < 0)
+    if ((fapl_id = h5_fileaccess()) < 0) {
         throw Exception("test_links", "Unable to get file access property list");
+    }
 
     // Output message about test being performed
     MESSAGE(5, ("Testing Various Links\n"));
     try {
         /* Copy the file access property list */
-        if ((fapl2_id = H5Pcopy(fapl_id)) < 0)
+        if ((fapl2_id = H5Pcopy(fapl_id)) < 0) {
             throw Exception("test_links", "H5Pcopy failed");
+        }
 
         /* Set the "use the latest version of the format" bounds for creating
            objects in the file */
-        if (H5Pset_libver_bounds(fapl2_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0)
+        if (H5Pset_libver_bounds(fapl2_id, H5F_LIBVER_LATEST, H5F_LIBVER_LATEST) < 0) {
             throw Exception("test_links", "H5Pset_libver_bounds failed");
+        }
 
         /* Loop over using new group format */
         for (new_format = false; new_format <= true; new_format++) {
             hid_t my_fapl_id;
 
             /* Check for FAPL to use */
-            if (new_format)
+            if (new_format) {
                 my_fapl_id = fapl2_id;
-            else
+            }
+            else {
                 my_fapl_id = fapl_id;
+            }
 
             /* General tests... (on both old & new format groups */
             // FileAccPropList may be passed in instead of fapl id
@@ -757,7 +778,7 @@ test_links(void *params)
         h5_delete_all_test_files(FILENAME, fapl_id);
         H5Pclose(fapl_id);
     }
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_links()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 }
@@ -770,8 +791,7 @@ test_links(void *params)
  * Return       none
  *-------------------------------------------------------------------------
  */
-extern "C" void
-cleanup_links(void *params)
+extern "C" void cleanup_links(void* params)
 {
     (void)params;
 

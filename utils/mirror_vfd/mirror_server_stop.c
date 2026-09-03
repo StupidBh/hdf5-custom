@@ -19,10 +19,10 @@
 
 #ifdef H5_HAVE_MIRROR_VFD
 
-#define MSHS_OPTS_MAGIC     0x613B1C15u /* sanity-checking constant */
-#define MSHS_IP_STR_SIZE    20
-#define MSHS_DEFAULT_IP     "127.0.0.1"
-#define MSHS_DEFAULT_PORTNO 3000
+    #define MSHS_OPTS_MAGIC     0x613B1C15u /* sanity-checking constant */
+    #define MSHS_IP_STR_SIZE    20
+    #define MSHS_DEFAULT_IP     "127.0.0.1"
+    #define MSHS_DEFAULT_PORTNO 3000
 
 /* ----------------------------------------------------------------------------
  * Structure:   struct mshs_opts
@@ -44,11 +44,12 @@
  *
  * ----------------------------------------------------------------------------
  */
-struct mshs_opts {
+struct mshs_opts
+{
     uint32_t magic;
-    int      help;
-    int      portno;
-    char     ip[MSHS_IP_STR_SIZE + 1];
+    int help;
+    int portno;
+    char ip[MSHS_IP_STR_SIZE + 1];
 };
 
 /* ----------------------------------------------------------------------------
@@ -57,18 +58,19 @@ struct mshs_opts {
  * Purpose:     Print usage message to stdout.
  * ----------------------------------------------------------------------------
  */
-static void
-usage(void)
+static void usage(void)
 {
-    printf("mirror_server_stop [options]\n"
-           "System-independent Mirror Server shutdown program.\n"
-           "Sends shutdown message to Mirror Server at given IP:port\n"
-           "\n"
-           "Options:\n"
-           "    -h | --help Print this usage message and exit.\n"
-           "    --ip=ADDR   IP Address of remote server (default %s)\n"
-           "    --port=PORT Handshake port of remote server (default %d)\n",
-           MSHS_DEFAULT_IP, MSHS_DEFAULT_PORTNO);
+    printf(
+        "mirror_server_stop [options]\n"
+        "System-independent Mirror Server shutdown program.\n"
+        "Sends shutdown message to Mirror Server at given IP:port\n"
+        "\n"
+        "Options:\n"
+        "    -h | --help Print this usage message and exit.\n"
+        "    --ip=ADDR   IP Address of remote server (default %s)\n"
+        "    --port=PORT Handshake port of remote server (default %d)\n",
+        MSHS_DEFAULT_IP,
+        MSHS_DEFAULT_PORTNO);
 } /* end usage() */
 
 /* ----------------------------------------------------------------------------
@@ -81,13 +83,12 @@ usage(void)
  * Return:      0 on success, negative (-1) if error.
  * ----------------------------------------------------------------------------
  */
-static int
-parse_args(int argc, char **argv, struct mshs_opts *opts)
+static int parse_args(int argc, char** argv, struct mshs_opts* opts)
 {
     int i = 0;
 
-    opts->magic  = MSHS_OPTS_MAGIC;
-    opts->help   = 0;
+    opts->magic = MSHS_OPTS_MAGIC;
+    opts->help = 0;
     opts->portno = MSHS_DEFAULT_PORTNO;
     strncpy(opts->ip, MSHS_DEFAULT_IP, MSHS_IP_STR_SIZE);
 
@@ -125,11 +126,10 @@ parse_args(int argc, char **argv, struct mshs_opts *opts)
  * Return:      0 on success, negative (-1) if error.
  * ----------------------------------------------------------------------------
  */
-static int
-send_shutdown(struct mshs_opts *opts)
+static int send_shutdown(struct mshs_opts* opts)
 {
-    char               mybuf[16];
-    int                live_socket;
+    char mybuf[16];
+    int live_socket;
     struct sockaddr_in target_addr;
 
     if (opts->magic != MSHS_OPTS_MAGIC) {
@@ -143,12 +143,12 @@ send_shutdown(struct mshs_opts *opts)
         return -1;
     }
 
-    target_addr.sin_family      = AF_INET;
-    target_addr.sin_port        = htons((uint16_t)opts->portno);
+    target_addr.sin_family = AF_INET;
+    target_addr.sin_port = htons((uint16_t)opts->portno);
     target_addr.sin_addr.s_addr = inet_addr(opts->ip);
     memset(target_addr.sin_zero, 0, sizeof(target_addr.sin_zero));
 
-    if (connect(live_socket, (struct sockaddr *)&target_addr, (socklen_t)sizeof(target_addr)) < 0) {
+    if (connect(live_socket, (struct sockaddr*)&target_addr, (socklen_t)sizeof(target_addr)) < 0) {
         printf("ERROR connect() (%d)\n%s\n", errno, strerror(errno));
         return -1;
     }
@@ -177,8 +177,7 @@ send_shutdown(struct mshs_opts *opts)
 } /* end send_shutdown() */
 
 /* ------------------------------------------------------------------------- */
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     struct mshs_opts opts;
 
@@ -200,11 +199,10 @@ main(int argc, char **argv)
     exit(EXIT_SUCCESS);
 } /* end main() */
 
-#else /* H5_HAVE_MIRROR_VFD */
+#else  /* H5_HAVE_MIRROR_VFD */
 
 /* ------------------------------------------------------------------------- */
-int
-main(void)
+int main(void)
 {
     printf("Mirror VFD not built -- unable to perform shutdown.\n");
     exit(EXIT_FAILURE);

@@ -23,22 +23,22 @@
  *-------------------------------------------------------------------------
  */
 
-void
-init_packobject(pack_info_t *obj)
+void init_packobject(pack_info_t* obj)
 {
     int j, k;
 
     obj->path[0] = '\0';
     for (j = 0; j < H5_REPACK_MAX_NFILTERS; j++) {
-        obj->filter[j].filtn     = -1;
+        obj->filter[j].filtn = -1;
         obj->filter[j].cd_nelmts = DEFAULT_CDELEMTS;
-        for (k = 0; k < DEFAULT_CDELEMTS; k++)
+        for (k = 0; k < DEFAULT_CDELEMTS; k++) {
             obj->filter[j].cd_values[k] = 0;
+        }
     }
     obj->chunk.rank = -1;
-    obj->refobj_id  = -1;
-    obj->layout     = H5D_LAYOUT_ERROR;
-    obj->nfilters   = 0;
+    obj->refobj_id = -1;
+    obj->layout = H5D_LAYOUT_ERROR;
+    obj->nfilters = 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -50,13 +50,14 @@ init_packobject(pack_info_t *obj)
  *-------------------------------------------------------------------------
  */
 
-static void
-aux_tblinsert_filter(pack_opttbl_t *table, unsigned int idx, filter_info_t filt)
+static void aux_tblinsert_filter(pack_opttbl_t* table, unsigned int idx, filter_info_t filt)
 {
-    if (table->objs[idx].nfilters < H5_REPACK_MAX_NFILTERS)
+    if (table->objs[idx].nfilters < H5_REPACK_MAX_NFILTERS) {
         table->objs[idx].filter[table->objs[idx].nfilters++] = filt;
-    else
+    }
+    else {
         H5TOOLS_INFO("cannot insert the filter in this object. Maximum capacity exceeded");
+    }
 }
 
 /*-------------------------------------------------------------------------
@@ -67,8 +68,7 @@ aux_tblinsert_filter(pack_opttbl_t *table, unsigned int idx, filter_info_t filt)
  * Return: void
  *-------------------------------------------------------------------------
  */
-static void
-aux_tblinsert_layout(pack_opttbl_t *table, unsigned int idx, pack_info_t *pack)
+static void aux_tblinsert_layout(pack_opttbl_t* table, unsigned int idx, pack_info_t* pack)
 {
     int k;
 
@@ -77,14 +77,15 @@ aux_tblinsert_layout(pack_opttbl_t *table, unsigned int idx, pack_info_t *pack)
         /* -2 means the NONE option, remove chunking
         and set the layout to contiguous */
         if (pack->chunk.rank == -2) {
-            table->objs[idx].layout     = H5D_CONTIGUOUS;
+            table->objs[idx].layout = H5D_CONTIGUOUS;
             table->objs[idx].chunk.rank = -2;
         }
         /* otherwise set the chunking type */
         else {
             table->objs[idx].chunk.rank = pack->chunk.rank;
-            for (k = 0; k < pack->chunk.rank; k++)
+            for (k = 0; k < pack->chunk.rank; k++) {
                 table->objs[idx].chunk.chunk_lengths[k] = pack->chunk.chunk_lengths[k];
+            }
         }
     }
 }
@@ -97,22 +98,22 @@ aux_tblinsert_layout(pack_opttbl_t *table, unsigned int idx, pack_info_t *pack)
  * Return: 0, ok, -1, fail
  *-------------------------------------------------------------------------
  */
-static int
-aux_inctable(pack_opttbl_t *table, unsigned n_objs)
+static int aux_inctable(pack_opttbl_t* table, unsigned n_objs)
 {
-    unsigned     u;
-    pack_info_t *new_objs;
+    unsigned u;
+    pack_info_t* new_objs;
 
     table->size += n_objs;
-    new_objs = (pack_info_t *)realloc(table->objs, table->size * sizeof(pack_info_t));
+    new_objs = (pack_info_t*)realloc(table->objs, table->size * sizeof(pack_info_t));
     if (new_objs == NULL) {
         H5TOOLS_INFO("not enough memory for options table");
         return -1;
     }
     table->objs = new_objs;
 
-    for (u = table->nelems; u < table->size; u++)
+    for (u = table->nelems; u < table->size; u++) {
         init_packobject(&table->objs[u]);
+    }
 
     return 0;
 }
@@ -125,26 +126,26 @@ aux_inctable(pack_opttbl_t *table, unsigned n_objs)
  * Return: 0, ok, -1, fail
  *-------------------------------------------------------------------------
  */
-int
-options_table_init(pack_opttbl_t **tbl)
+int options_table_init(pack_opttbl_t** tbl)
 {
-    unsigned int   i;
-    pack_opttbl_t *table;
-    int            ret_value = 0;
+    unsigned int i;
+    pack_opttbl_t* table;
+    int ret_value = 0;
 
-    if (NULL == (table = (pack_opttbl_t *)malloc(sizeof(pack_opttbl_t)))) {
+    if (NULL == (table = (pack_opttbl_t*)malloc(sizeof(pack_opttbl_t)))) {
         H5TOOLS_GOTO_ERROR((-1), "not enough memory for options table");
     }
 
-    table->size   = 30;
+    table->size = 30;
     table->nelems = 0;
-    if (NULL == (table->objs = (pack_info_t *)malloc(table->size * sizeof(pack_info_t)))) {
+    if (NULL == (table->objs = (pack_info_t*)malloc(table->size * sizeof(pack_info_t)))) {
         free(table);
         H5TOOLS_GOTO_ERROR((-1), "not enough memory for options table");
     }
 
-    for (i = 0; i < table->size; i++)
+    for (i = 0; i < table->size; i++) {
         init_packobject(&table->objs[i]);
+    }
 
     *tbl = table;
 done:
@@ -160,8 +161,7 @@ done:
  *-------------------------------------------------------------------------
  */
 
-int
-options_table_free(pack_opttbl_t *table)
+int options_table_free(pack_opttbl_t* table)
 {
     free(table->objs);
     free(table);
@@ -176,18 +176,19 @@ options_table_free(pack_opttbl_t *table)
  * Return: 0, ok, -1, fail
  *-------------------------------------------------------------------------
  */
-int
-options_add_layout(obj_list_t *obj_list, unsigned n_objs, pack_info_t *pack, pack_opttbl_t *table)
+int options_add_layout(obj_list_t* obj_list, unsigned n_objs, pack_info_t* pack, pack_opttbl_t* table)
 {
     unsigned i, j, idx;
-    unsigned added     = 0;
-    bool     found     = false;
-    int      ret_value = 0;
+    unsigned added = 0;
+    bool found = false;
+    int ret_value = 0;
 
     /* increase the size of the collection by N_OBJS if necessary */
-    if (table->nelems + n_objs >= table->size)
-        if (aux_inctable(table, n_objs) < 0)
+    if (table->nelems + n_objs >= table->size) {
+        if (aux_inctable(table, n_objs) < 0) {
             return -1;
+        }
+    }
 
     /* search if this object is already in the table; "path" is the key */
     if (table->nelems > 0) {
@@ -209,7 +210,7 @@ options_add_layout(obj_list_t *obj_list, unsigned n_objs, pack_info_t *pack, pac
                         break;
                     }
                 } /* if */
-            }     /* i */
+            } /* i */
 
             if (!found) {
                 /* keep the grow in a temp var */
@@ -256,17 +257,18 @@ options_add_layout(obj_list_t *obj_list, unsigned n_objs, pack_info_t *pack, pac
  * Return: 0, ok, -1, fail
  *-------------------------------------------------------------------------
  */
-int
-options_add_filter(obj_list_t *obj_list, unsigned n_objs, filter_info_t filt, pack_opttbl_t *table)
+int options_add_filter(obj_list_t* obj_list, unsigned n_objs, filter_info_t filt, pack_opttbl_t* table)
 {
     unsigned int i, j, idx;
-    unsigned     added = 0;
-    bool         found = false;
+    unsigned added = 0;
+    bool found = false;
 
     /* increase the size of the collection by N_OBJS if necessary */
-    if (table->nelems + n_objs >= table->size)
-        if (aux_inctable(table, n_objs) < 0)
+    if (table->nelems + n_objs >= table->size) {
+        if (aux_inctable(table, n_objs) < 0) {
             return -1;
+        }
+    }
 
     /* search if this object is already in the table; "path" is the key */
     if (table->nelems > 0) {
@@ -281,7 +283,7 @@ options_add_filter(obj_list_t *obj_list, unsigned n_objs, filter_info_t filt, pa
                     found = true;
                     break;
                 } /* if */
-            }     /* i */
+            } /* i */
 
             if (!found) {
                 /* keep the grow in a temp var */
@@ -330,19 +332,19 @@ options_add_filter(obj_list_t *obj_list, unsigned n_objs, filter_info_t filt, pa
  *-------------------------------------------------------------------------
  */
 
-pack_info_t *
-options_get_object(const char *path, pack_opttbl_t *table)
+pack_info_t* options_get_object(const char* path, pack_opttbl_t* table)
 {
     unsigned int i;
-    char         tbl_path[MAX_NC_NAME + 1]; /* +1 for start with "/" case */
+    char tbl_path[MAX_NC_NAME + 1]; /* +1 for start with "/" case */
 
     for (i = 0; i < table->nelems; i++) {
         /* make full path (start with "/") to compare correctly  */
         if (table->objs[i].path[0] != '/') {
             snprintf(tbl_path, MAX_NC_NAME + 1, "/%s", table->objs[i].path);
         }
-        else
+        else {
             snprintf(tbl_path, MAX_NC_NAME + 1, "%s", table->objs[i].path);
+        }
 
         /* found it */
         if (strcmp(tbl_path, path) == 0) {

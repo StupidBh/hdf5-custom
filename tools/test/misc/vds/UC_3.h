@@ -41,20 +41,21 @@
 #define UC_32_VDS_DATATYPE H5T_STD_I32LE
 
 /* Starting size of virtual datasets */
-static hsize_t UC_31_VDS_DIMS[RANK] = {0, UC_31_VDS_HEIGHT, UC_31_VDS_WIDTH};
-static hsize_t UC_32_VDS_DIMS[RANK] = {0, UC_32_VDS_HEIGHT, UC_32_VDS_WIDTH};
+static hsize_t UC_31_VDS_DIMS[RANK] = { 0, UC_31_VDS_HEIGHT, UC_31_VDS_WIDTH };
+static hsize_t UC_32_VDS_DIMS[RANK] = { 0, UC_32_VDS_HEIGHT, UC_32_VDS_WIDTH };
 
 /* Maximum size of virtual datasets */
-static hsize_t UC_31_VDS_MAX_DIMS[RANK] = {UC_1_N_MAX_PLANES, UC_31_VDS_HEIGHT, UC_31_VDS_WIDTH};
-static hsize_t UC_32_VDS_MAX_DIMS[RANK] = {UC_2_N_MAX_PLANES, UC_32_VDS_HEIGHT, UC_32_VDS_WIDTH};
+static hsize_t UC_31_VDS_MAX_DIMS[RANK] = { UC_1_N_MAX_PLANES, UC_31_VDS_HEIGHT, UC_31_VDS_WIDTH };
+static hsize_t UC_32_VDS_MAX_DIMS[RANK] = { UC_2_N_MAX_PLANES, UC_32_VDS_HEIGHT, UC_32_VDS_WIDTH };
 
 /* Positions of mapped source datasets */
 static hsize_t UC_32_POSITIONS[UC_2_N_SOURCES][RANK] = {
-    /* A */ {0, 1, 1},
-    /* B */ {0, 4, 0},
-    /* C */ {0, 11, 4},
-    /* D */ {0, 1, 9},
-    /* E */ {0, 8, 12}};
+    /* A */ { 0, 1, 1 },
+    /* B */ { 0, 4, 0 },
+    /* C */ { 0, 11, 4 },
+    /* D */ { 0, 1, 9 },
+    /* E */ { 0, 8, 12 }
+};
 
 /* VDS file names */
 #define UC_31_VDS_FILE_NAME "3_1_vds.h5"

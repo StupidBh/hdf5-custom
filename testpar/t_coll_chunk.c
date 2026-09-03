@@ -19,19 +19,15 @@
 
 /* some commonly used routines for collective chunk IO tests*/
 
-static void ccslab_set(int mpi_rank, int mpi_size, hsize_t start[], hsize_t count[], hsize_t stride[],
-                       hsize_t block[], int mode);
+static void ccslab_set(int mpi_rank, int mpi_size, hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], int mode);
 
-static void ccdataset_fill(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[],
-                           DATATYPE *dataset, int mem_selection);
+static void ccdataset_fill(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], DATATYPE* dataset, int mem_selection);
 
-static void ccdataset_print(hsize_t start[], hsize_t block[], DATATYPE *dataset);
+static void ccdataset_print(hsize_t start[], hsize_t block[], DATATYPE* dataset);
 
-static int ccdataset_vrfy(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[],
-                          DATATYPE *dataset, DATATYPE *original, int mem_selection);
+static int ccdataset_vrfy(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], DATATYPE* dataset, DATATYPE* original, int mem_selection);
 
-static void coll_chunktest(const char *filename, int chunk_factor, int select_factor, int api_option,
-                           int file_selection, int mem_selection, int mode);
+static void coll_chunktest(const char* filename, int chunk_factor, int select_factor, int api_option, int file_selection, int mem_selection, int mode);
 
 /*-------------------------------------------------------------------------
  * Function:	coll_chunk1
@@ -63,21 +59,20 @@ static void coll_chunktest(const char *filename, int chunk_factor, int select_fa
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk1(void *params)
+void coll_chunk1(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -125,21 +120,20 @@ coll_chunk1(void *params)
  *
  * ------------------------------------------------------------------------
  */
-void
-coll_chunk2(void *params)
+void coll_chunk2(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -188,23 +182,22 @@ coll_chunk2(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk3(void *params)
+void coll_chunk3(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_size;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_size;
+    int mpi_rank;
 
     MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -253,21 +246,20 @@ coll_chunk3(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk4(void *params)
+void coll_chunk4(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -316,21 +308,20 @@ coll_chunk4(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk5(void *params)
+void coll_chunk5(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -381,21 +372,20 @@ coll_chunk5(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk6(void *params)
+void coll_chunk6(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -444,21 +434,20 @@ coll_chunk6(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk7(void *params)
+void coll_chunk7(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -507,21 +496,20 @@ coll_chunk7(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk8(void *params)
+void coll_chunk8(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -570,21 +558,20 @@ coll_chunk8(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk9(void *params)
+void coll_chunk9(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -633,21 +620,20 @@ coll_chunk9(void *params)
  * ------------------------------------------------------------------------
  */
 
-void
-coll_chunk10(void *params)
+void coll_chunk10(void* params)
 {
-    const char *filename = ((const H5Ptest_param_t *)params)->name;
-    int         mpi_rank;
+    const char* filename = ((const H5Ptest_param_t*)params)->name;
+    int mpi_rank;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
     /* Make sure the connector supports the API functions being tested */
-    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) ||
-        !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
+    if (!(vol_cap_flags_g & H5VL_CAP_FLAG_FILE_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_BASIC) || !(vol_cap_flags_g & H5VL_CAP_FLAG_DATASET_MORE)) {
         if (MAINPROCESS) {
             puts("SKIPPED");
-            printf("    API functions for basic file, dataset or dataset more aren't supported with this "
-                   "connector\n");
+            printf(
+                "    API functions for basic file, dataset or dataset more aren't supported with this "
+                "connector\n");
             fflush(stdout);
         }
 
@@ -679,33 +665,31 @@ coll_chunk10(void *params)
  *-------------------------------------------------------------------------
  */
 
-static void
-coll_chunktest(const char *filename, int chunk_factor, int select_factor, int api_option, int file_selection,
-               int mem_selection, int mode)
+static void coll_chunktest(const char* filename, int chunk_factor, int select_factor, int api_option, int file_selection, int mem_selection, int mode)
 {
     hid_t file, dataset, file_dataspace, mem_dataspace;
     hid_t acc_plist, xfer_plist, crp_plist;
 
     hsize_t dims[RANK], chunk_dims[RANK];
-    int    *data_array1  = NULL;
-    int    *data_origin1 = NULL;
+    int* data_array1 = NULL;
+    int* data_origin1 = NULL;
 
     hsize_t start[RANK], count[RANK], stride[RANK], block[RANK];
 
 #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
-    unsigned                prop_value;
+    unsigned prop_value;
     H5D_selection_io_mode_t selection_io_mode;
 #endif /* H5_HAVE_INSTRUMENTED_LIBRARY */
 
     int mpi_size, mpi_rank;
 
-    herr_t   status;
+    herr_t status;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
-    size_t   num_points;    /* for point selection */
-    hsize_t *coords = NULL; /* for point selection */
-    hsize_t  current_dims;  /* for point selection */
+    size_t num_points;      /* for point selection */
+    hsize_t* coords = NULL; /* for point selection */
+    hsize_t current_dims;   /* for point selection */
 
     /* set up MPI parameters */
     MPI_Comm_size(comm, &mpi_size);
@@ -727,7 +711,7 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     dims[1] = SPACE_DIM2;
 
     /* allocate memory for data buffer */
-    data_array1 = (int *)malloc(dims[0] * dims[1] * sizeof(int));
+    data_array1 = (int*)malloc(dims[0] * dims[1] * sizeof(int));
     VRFY((data_array1 != NULL), "data_array1 malloc succeeded");
 
     /* set up dimensions of the slab this process accesses */
@@ -735,19 +719,25 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
 
     /* set up the coords array selection */
     num_points = block[0] * block[1] * count[0] * count[1];
-    coords     = (hsize_t *)malloc(num_points * RANK * sizeof(hsize_t));
+    coords = (hsize_t*)malloc(num_points * RANK * sizeof(hsize_t));
     VRFY((coords != NULL), "coords malloc succeeded");
     point_set(start, count, stride, block, num_points, coords, mode);
 
     if (VERBOSE_MED) {
         hsize_t k = 0;
 
-        printf("start[]=(%lu, %lu), count[]=(%lu, %lu), stride[]=(%lu, %lu), block[]=(%lu, %lu), total "
-               "datapoints=%lu\n",
-               (unsigned long)start[0], (unsigned long)start[1], (unsigned long)count[0],
-               (unsigned long)count[1], (unsigned long)stride[0], (unsigned long)stride[1],
-               (unsigned long)block[0], (unsigned long)block[1],
-               (unsigned long)(block[0] * block[1] * count[0] * count[1]));
+        printf(
+            "start[]=(%lu, %lu), count[]=(%lu, %lu), stride[]=(%lu, %lu), block[]=(%lu, %lu), total "
+            "datapoints=%lu\n",
+            (unsigned long)start[0],
+            (unsigned long)start[1],
+            (unsigned long)count[0],
+            (unsigned long)count[1],
+            (unsigned long)stride[0],
+            (unsigned long)stride[1],
+            (unsigned long)block[0],
+            (unsigned long)block[1],
+            (unsigned long)(block[0] * block[1] * count[0] * count[1]));
 
         for (size_t i = 0; i < num_points; i++) {
             printf("(%d, %d)\n", (int)coords[k], (int)coords[k + 1]);
@@ -763,7 +753,7 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
         VRFY((mem_dataspace >= 0), "mem dataspace created succeeded");
     }
     else {
-        current_dims  = num_points;
+        current_dims = num_points;
         mem_dataspace = H5Screate_simple(1, &current_dims, NULL);
         VRFY((mem_dataspace >= 0), "mem_dataspace create succeeded");
     }
@@ -779,8 +769,7 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     status = H5Pset_chunk(crp_plist, 2, chunk_dims);
     VRFY((status >= 0), "chunk creation property list succeeded");
 
-    dataset = H5Dcreate2(file, DSET_COLLECTIVE_CHUNK_NAME, H5T_NATIVE_INT, file_dataspace, H5P_DEFAULT,
-                         crp_plist, H5P_DEFAULT);
+    dataset = H5Dcreate2(file, DSET_COLLECTIVE_CHUNK_NAME, H5T_NATIVE_INT, file_dataspace, H5P_DEFAULT, crp_plist, H5P_DEFAULT);
     VRFY((dataset >= 0), "dataset created succeeded");
 
     status = H5Pclose(crp_plist);
@@ -792,55 +781,53 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     MESG("data_array initialized");
 
     switch (file_selection) {
-        case HYPER:
-            status = H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, block);
-            VRFY((status >= 0), "hyperslab selection succeeded");
-            break;
+    case HYPER:
+        status = H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, block);
+        VRFY((status >= 0), "hyperslab selection succeeded");
+        break;
 
-        case POINT:
-            if (num_points) {
-                status = H5Sselect_elements(file_dataspace, H5S_SELECT_SET, num_points, coords);
-                VRFY((status >= 0), "Element selection succeeded");
-            }
-            else {
-                status = H5Sselect_none(file_dataspace);
-                VRFY((status >= 0), "none selection succeeded");
-            }
-            break;
+    case POINT:
+        if (num_points) {
+            status = H5Sselect_elements(file_dataspace, H5S_SELECT_SET, num_points, coords);
+            VRFY((status >= 0), "Element selection succeeded");
+        }
+        else {
+            status = H5Sselect_none(file_dataspace);
+            VRFY((status >= 0), "none selection succeeded");
+        }
+        break;
 
-        case ALL:
-            status = H5Sselect_all(file_dataspace);
-            VRFY((status >= 0), "H5Sselect_all succeeded");
-            break;
+    case ALL:
+        status = H5Sselect_all(file_dataspace);
+        VRFY((status >= 0), "H5Sselect_all succeeded");
+        break;
 
-        default:
-            break;
+    default: break;
     }
 
     switch (mem_selection) {
-        case HYPER:
-            status = H5Sselect_hyperslab(mem_dataspace, H5S_SELECT_SET, start, stride, count, block);
-            VRFY((status >= 0), "hyperslab selection succeeded");
-            break;
+    case HYPER:
+        status = H5Sselect_hyperslab(mem_dataspace, H5S_SELECT_SET, start, stride, count, block);
+        VRFY((status >= 0), "hyperslab selection succeeded");
+        break;
 
-        case POINT:
-            if (num_points) {
-                status = H5Sselect_elements(mem_dataspace, H5S_SELECT_SET, num_points, coords);
-                VRFY((status >= 0), "Element selection succeeded");
-            }
-            else {
-                status = H5Sselect_none(mem_dataspace);
-                VRFY((status >= 0), "none selection succeeded");
-            }
-            break;
+    case POINT:
+        if (num_points) {
+            status = H5Sselect_elements(mem_dataspace, H5S_SELECT_SET, num_points, coords);
+            VRFY((status >= 0), "Element selection succeeded");
+        }
+        else {
+            status = H5Sselect_none(mem_dataspace);
+            VRFY((status >= 0), "none selection succeeded");
+        }
+        break;
 
-        case ALL:
-            status = H5Sselect_all(mem_dataspace);
-            VRFY((status >= 0), "H5Sselect_all succeeded");
-            break;
+    case ALL:
+        status = H5Sselect_all(mem_dataspace);
+        VRFY((status >= 0), "H5Sselect_all succeeded");
+        break;
 
-        default:
-            break;
+    default: break;
     }
 
     /* set up the collective transfer property list */
@@ -855,93 +842,83 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     }
 
     switch (api_option) {
-        case API_LINK_HARD:
-            status = H5Pset_dxpl_mpio_chunk_opt(xfer_plist, H5FD_MPIO_CHUNK_ONE_IO);
-            VRFY((status >= 0), "collective chunk optimization succeeded");
-            break;
+    case API_LINK_HARD:
+        status = H5Pset_dxpl_mpio_chunk_opt(xfer_plist, H5FD_MPIO_CHUNK_ONE_IO);
+        VRFY((status >= 0), "collective chunk optimization succeeded");
+        break;
 
-        case API_MULTI_HARD:
-            status = H5Pset_dxpl_mpio_chunk_opt(xfer_plist, H5FD_MPIO_CHUNK_MULTI_IO);
-            VRFY((status >= 0), "collective chunk optimization succeeded ");
-            break;
+    case API_MULTI_HARD:
+        status = H5Pset_dxpl_mpio_chunk_opt(xfer_plist, H5FD_MPIO_CHUNK_MULTI_IO);
+        VRFY((status >= 0), "collective chunk optimization succeeded ");
+        break;
 
-        case API_LINK_TRUE:
-            status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 2);
-            VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
-            break;
+    case API_LINK_TRUE:
+        status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 2);
+        VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
+        break;
 
-        case API_LINK_FALSE:
-            status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 6);
-            VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
-            break;
+    case API_LINK_FALSE:
+        status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 6);
+        VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
+        break;
 
-        case API_MULTI_COLL:
-            status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 8); /* make sure it is using multi-chunk IO */
-            VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
-            status = H5Pset_dxpl_mpio_chunk_opt_ratio(xfer_plist, 50);
-            VRFY((status >= 0), "collective chunk optimization set chunk ratio succeeded");
-            break;
+    case API_MULTI_COLL:
+        status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 8); /* make sure it is using multi-chunk IO */
+        VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
+        status = H5Pset_dxpl_mpio_chunk_opt_ratio(xfer_plist, 50);
+        VRFY((status >= 0), "collective chunk optimization set chunk ratio succeeded");
+        break;
 
-        case API_MULTI_IND:
-            status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 8); /* make sure it is using multi-chunk IO */
-            VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
-            status = H5Pset_dxpl_mpio_chunk_opt_ratio(xfer_plist, 100);
-            VRFY((status >= 0), "collective chunk optimization set chunk ratio succeeded");
-            break;
+    case API_MULTI_IND:
+        status = H5Pset_dxpl_mpio_chunk_opt_num(xfer_plist, 8); /* make sure it is using multi-chunk IO */
+        VRFY((status >= 0), "collective chunk optimization set chunk number succeeded");
+        status = H5Pset_dxpl_mpio_chunk_opt_ratio(xfer_plist, 100);
+        VRFY((status >= 0), "collective chunk optimization set chunk ratio succeeded");
+        break;
 
-        default:;
+    default:;
     }
 
 #ifdef H5_HAVE_INSTRUMENTED_LIBRARY
     if (facc_type == FACC_MPIO) {
         switch (api_option) {
-            case API_LINK_HARD:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_HARD_NAME, H5D_XFER_COLL_CHUNK_SIZE,
-                                    &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_LINK_HARD:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_HARD_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            case API_MULTI_HARD:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_HARD_NAME, H5D_XFER_COLL_CHUNK_SIZE,
-                                    &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_MULTI_HARD:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_HARD_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            case API_LINK_TRUE:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status =
-                    H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_TRUE_NAME, H5D_XFER_COLL_CHUNK_SIZE,
-                               &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_LINK_TRUE:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_TRUE_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            case API_LINK_FALSE:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status =
-                    H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_FALSE_NAME, H5D_XFER_COLL_CHUNK_SIZE,
-                               &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_LINK_FALSE:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_FALSE_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            case API_MULTI_COLL:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status =
-                    H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_COLL_NAME,
-                               H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_MULTI_COLL:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_COLL_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            case API_MULTI_IND:
-                prop_value = H5D_XFER_COLL_CHUNK_DEF;
-                status =
-                    H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_IND_NAME, H5D_XFER_COLL_CHUNK_SIZE,
-                               &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
-                VRFY((status >= 0), "testing property list inserted succeeded");
-                break;
+        case API_MULTI_IND:
+            prop_value = H5D_XFER_COLL_CHUNK_DEF;
+            status = H5Pinsert2(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_IND_NAME, H5D_XFER_COLL_CHUNK_SIZE, &prop_value, NULL, NULL, NULL, NULL, NULL, NULL);
+            VRFY((status >= 0), "testing property list inserted succeeded");
+            break;
 
-            default:;
+        default:;
         }
     }
 #endif
@@ -960,44 +937,43 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
 
     if (facc_type == FACC_MPIO && (selection_io_mode == H5D_SELECTION_IO_MODE_OFF)) {
         switch (api_option) {
-            case API_LINK_HARD:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_HARD_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0), "API to set LINK COLLECTIVE IO directly succeeded");
-                break;
+        case API_LINK_HARD:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_HARD_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set LINK COLLECTIVE IO directly succeeded");
+            break;
 
-            case API_MULTI_HARD:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_HARD_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0), "API to set MULTI-CHUNK COLLECTIVE IO optimization succeeded");
-                break;
+        case API_MULTI_HARD:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_HARD_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set MULTI-CHUNK COLLECTIVE IO optimization succeeded");
+            break;
 
-            case API_LINK_TRUE:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_TRUE_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0), "API to set LINK COLLECTIVE IO succeeded");
-                break;
+        case API_LINK_TRUE:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_TRUE_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set LINK COLLECTIVE IO succeeded");
+            break;
 
-            case API_LINK_FALSE:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_FALSE_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0), "API to set LINK IO transferring to multi-chunk IO succeeded");
-                break;
+        case API_LINK_FALSE:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_LINK_NUM_FALSE_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set LINK IO transferring to multi-chunk IO succeeded");
+            break;
 
-            case API_MULTI_COLL:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_COLL_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0), "API to set MULTI-CHUNK COLLECTIVE IO with optimization succeeded");
-                break;
+        case API_MULTI_COLL:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_COLL_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set MULTI-CHUNK COLLECTIVE IO with optimization succeeded");
+            break;
 
-            case API_MULTI_IND:
-                status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_IND_NAME, &prop_value);
-                VRFY((status >= 0), "testing property list get succeeded");
-                VRFY((prop_value == 0),
-                     "API to set MULTI-CHUNK IO transferring to independent IO  succeeded");
-                break;
+        case API_MULTI_IND:
+            status = H5Pget(xfer_plist, H5D_XFER_COLL_CHUNK_MULTI_RATIO_IND_NAME, &prop_value);
+            VRFY((status >= 0), "testing property list get succeeded");
+            VRFY((prop_value == 0), "API to set MULTI-CHUNK IO transferring to independent IO  succeeded");
+            break;
 
-            default:;
+        default:;
         }
     }
 #endif
@@ -1017,17 +993,18 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     status = H5Fclose(file);
     VRFY((status >= 0), "");
 
-    if (data_array1)
+    if (data_array1) {
         free(data_array1);
+    }
 
     /* Use collective read to verify the correctness of collective write. */
 
     /* allocate memory for data buffer */
-    data_array1 = (int *)malloc(dims[0] * dims[1] * sizeof(int));
+    data_array1 = (int*)malloc(dims[0] * dims[1] * sizeof(int));
     VRFY((data_array1 != NULL), "data_array1 malloc succeeded");
 
     /* allocate memory for data buffer */
-    data_origin1 = (int *)malloc(dims[0] * dims[1] * sizeof(int));
+    data_origin1 = (int*)malloc(dims[0] * dims[1] * sizeof(int));
     VRFY((data_origin1 != NULL), "data_origin1 malloc succeeded");
 
     acc_plist = create_faccess_plist(comm, info, facc_type);
@@ -1055,61 +1032,59 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
         VRFY((mem_dataspace >= 0), "");
     }
     else {
-        current_dims  = num_points;
+        current_dims = num_points;
         mem_dataspace = H5Screate_simple(1, &current_dims, NULL);
         VRFY((mem_dataspace >= 0), "mem_dataspace create succeeded");
     }
 
     switch (file_selection) {
-        case HYPER:
-            status = H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, block);
-            VRFY((status >= 0), "hyperslab selection succeeded");
-            break;
+    case HYPER:
+        status = H5Sselect_hyperslab(file_dataspace, H5S_SELECT_SET, start, stride, count, block);
+        VRFY((status >= 0), "hyperslab selection succeeded");
+        break;
 
-        case POINT:
-            if (num_points) {
-                status = H5Sselect_elements(file_dataspace, H5S_SELECT_SET, num_points, coords);
-                VRFY((status >= 0), "Element selection succeeded");
-            }
-            else {
-                status = H5Sselect_none(file_dataspace);
-                VRFY((status >= 0), "none selection succeeded");
-            }
-            break;
+    case POINT:
+        if (num_points) {
+            status = H5Sselect_elements(file_dataspace, H5S_SELECT_SET, num_points, coords);
+            VRFY((status >= 0), "Element selection succeeded");
+        }
+        else {
+            status = H5Sselect_none(file_dataspace);
+            VRFY((status >= 0), "none selection succeeded");
+        }
+        break;
 
-        case ALL:
-            status = H5Sselect_all(file_dataspace);
-            VRFY((status >= 0), "H5Sselect_all succeeded");
-            break;
+    case ALL:
+        status = H5Sselect_all(file_dataspace);
+        VRFY((status >= 0), "H5Sselect_all succeeded");
+        break;
 
-        default:
-            break;
+    default: break;
     }
 
     switch (mem_selection) {
-        case HYPER:
-            status = H5Sselect_hyperslab(mem_dataspace, H5S_SELECT_SET, start, stride, count, block);
-            VRFY((status >= 0), "hyperslab selection succeeded");
-            break;
+    case HYPER:
+        status = H5Sselect_hyperslab(mem_dataspace, H5S_SELECT_SET, start, stride, count, block);
+        VRFY((status >= 0), "hyperslab selection succeeded");
+        break;
 
-        case POINT:
-            if (num_points) {
-                status = H5Sselect_elements(mem_dataspace, H5S_SELECT_SET, num_points, coords);
-                VRFY((status >= 0), "Element selection succeeded");
-            }
-            else {
-                status = H5Sselect_none(mem_dataspace);
-                VRFY((status >= 0), "none selection succeeded");
-            }
-            break;
+    case POINT:
+        if (num_points) {
+            status = H5Sselect_elements(mem_dataspace, H5S_SELECT_SET, num_points, coords);
+            VRFY((status >= 0), "Element selection succeeded");
+        }
+        else {
+            status = H5Sselect_none(mem_dataspace);
+            VRFY((status >= 0), "none selection succeeded");
+        }
+        break;
 
-        case ALL:
-            status = H5Sselect_all(mem_dataspace);
-            VRFY((status >= 0), "H5Sselect_all succeeded");
-            break;
+    case ALL:
+        status = H5Sselect_all(mem_dataspace);
+        VRFY((status >= 0), "H5Sselect_all succeeded");
+        break;
 
-        default:
-            break;
+    default: break;
     }
 
     /* fill dataset with test data */
@@ -1129,8 +1104,9 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
 
     /* verify the read data with original expected data */
     status = ccdataset_vrfy(start, count, stride, block, data_array1, data_origin1, mem_selection);
-    if (status)
+    if (status) {
         nerrors++;
+    }
 
     status = H5Pclose(xfer_plist);
     VRFY((status >= 0), "property list closed");
@@ -1151,114 +1127,121 @@ coll_chunktest(const char *filename, int chunk_factor, int select_factor, int ap
     VRFY((status >= 0), "H5Fclose");
 
     /* release data buffers */
-    if (coords)
+    if (coords) {
         free(coords);
-    if (data_array1)
+    }
+    if (data_array1) {
         free(data_array1);
-    if (data_origin1)
+    }
+    if (data_origin1) {
         free(data_origin1);
+    }
 }
 
 /* Set up the selection */
-static void
-ccslab_set(int mpi_rank, int mpi_size, hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[],
-           int mode)
+static void ccslab_set(int mpi_rank, int mpi_size, hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], int mode)
 {
-
     switch (mode) {
+    case BYROW_CONT:
+        /* Each process takes a slabs of rows. */
+        block[0] = 1;
+        block[1] = 1;
+        stride[0] = 1;
+        stride[1] = 1;
+        count[0] = SPACE_DIM1;
+        count[1] = SPACE_DIM2;
+        start[0] = (hsize_t)mpi_rank * count[0];
+        start[1] = 0;
 
-        case BYROW_CONT:
-            /* Each process takes a slabs of rows. */
-            block[0]  = 1;
-            block[1]  = 1;
-            stride[0] = 1;
-            stride[1] = 1;
-            count[0]  = SPACE_DIM1;
-            count[1]  = SPACE_DIM2;
-            start[0]  = (hsize_t)mpi_rank * count[0];
-            start[1]  = 0;
+        break;
 
-            break;
+    case BYROW_DISCONT:
+        /* Each process takes several disjoint blocks. */
+        block[0] = 1;
+        block[1] = 1;
+        stride[0] = 3;
+        stride[1] = 3;
+        count[0] = SPACE_DIM1 / (stride[0] * block[0]);
+        count[1] = (SPACE_DIM2) / (stride[1] * block[1]);
+        start[0] = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_rank;
+        start[1] = 0;
 
-        case BYROW_DISCONT:
-            /* Each process takes several disjoint blocks. */
-            block[0]  = 1;
-            block[1]  = 1;
-            stride[0] = 3;
-            stride[1] = 3;
-            count[0]  = SPACE_DIM1 / (stride[0] * block[0]);
-            count[1]  = (SPACE_DIM2) / (stride[1] * block[1]);
-            start[0]  = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_rank;
-            start[1]  = 0;
+        break;
 
-            break;
+    case BYROW_SELECTNONE:
+        /* Each process takes a slabs of rows, there are
+           no selections for the last process. */
+        block[0] = 1;
+        block[1] = 1;
+        stride[0] = 1;
+        stride[1] = 1;
+        count[0] = ((mpi_rank >= MAX(1, (mpi_size - 2))) ? 0 : SPACE_DIM1);
+        count[1] = SPACE_DIM2;
+        start[0] = (hsize_t)mpi_rank * count[0];
+        start[1] = 0;
 
-        case BYROW_SELECTNONE:
-            /* Each process takes a slabs of rows, there are
-               no selections for the last process. */
-            block[0]  = 1;
-            block[1]  = 1;
-            stride[0] = 1;
-            stride[1] = 1;
-            count[0]  = ((mpi_rank >= MAX(1, (mpi_size - 2))) ? 0 : SPACE_DIM1);
-            count[1]  = SPACE_DIM2;
-            start[0]  = (hsize_t)mpi_rank * count[0];
-            start[1]  = 0;
+        break;
 
-            break;
+    case BYROW_SELECTUNBALANCE:
+        /* The first one-third of the number of processes only
+           select top half of the domain, The rest will select the bottom
+           half of the domain. */
 
-        case BYROW_SELECTUNBALANCE:
-            /* The first one-third of the number of processes only
-               select top half of the domain, The rest will select the bottom
-               half of the domain. */
+        block[0] = 1;
+        count[0] = 2;
+        stride[0] = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_size / 4 + 1;
+        block[1] = SPACE_DIM2;
+        count[1] = 1;
+        start[1] = 0;
+        stride[1] = 1;
+        if ((mpi_rank * 3) < (mpi_size * 2)) {
+            start[0] = (hsize_t)mpi_rank;
+        }
+        else {
+            start[0] = (hsize_t)(1 + SPACE_DIM1 * mpi_size / 2 + (mpi_rank - 2 * mpi_size / 3));
+        }
+        break;
 
-            block[0]  = 1;
-            count[0]  = 2;
-            stride[0] = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_size / 4 + 1;
-            block[1]  = SPACE_DIM2;
-            count[1]  = 1;
-            start[1]  = 0;
-            stride[1] = 1;
-            if ((mpi_rank * 3) < (mpi_size * 2))
-                start[0] = (hsize_t)mpi_rank;
-            else
-                start[0] = (hsize_t)(1 + SPACE_DIM1 * mpi_size / 2 + (mpi_rank - 2 * mpi_size / 3));
-            break;
+    case BYROW_SELECTINCHUNK:
+        /* Each process will only select one chunk */
 
-        case BYROW_SELECTINCHUNK:
-            /* Each process will only select one chunk */
+        block[0] = 1;
+        count[0] = 1;
+        start[0] = (hsize_t)(mpi_rank * SPACE_DIM1);
+        stride[0] = 1;
+        block[1] = SPACE_DIM2;
+        count[1] = 1;
+        stride[1] = 1;
+        start[1] = 0;
 
-            block[0]  = 1;
-            count[0]  = 1;
-            start[0]  = (hsize_t)(mpi_rank * SPACE_DIM1);
-            stride[0] = 1;
-            block[1]  = SPACE_DIM2;
-            count[1]  = 1;
-            stride[1] = 1;
-            start[1]  = 0;
+        break;
 
-            break;
+    default:
+        /* Unknown mode.  Set it to cover the whole dataset. */
+        block[0] = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_size;
+        block[1] = SPACE_DIM2;
+        stride[0] = block[0];
+        stride[1] = block[1];
+        count[0] = 1;
+        count[1] = 1;
+        start[0] = 0;
+        start[1] = 0;
 
-        default:
-            /* Unknown mode.  Set it to cover the whole dataset. */
-            block[0]  = (hsize_t)SPACE_DIM1 * (hsize_t)mpi_size;
-            block[1]  = SPACE_DIM2;
-            stride[0] = block[0];
-            stride[1] = block[1];
-            count[0]  = 1;
-            count[1]  = 1;
-            start[0]  = 0;
-            start[1]  = 0;
-
-            break;
+        break;
     }
     if (VERBOSE_MED) {
-        printf("start[]=(%lu,%lu), count[]=(%lu,%lu), stride[]=(%lu,%lu), block[]=(%lu,%lu), total "
-               "datapoints=%lu\n",
-               (unsigned long)start[0], (unsigned long)start[1], (unsigned long)count[0],
-               (unsigned long)count[1], (unsigned long)stride[0], (unsigned long)stride[1],
-               (unsigned long)block[0], (unsigned long)block[1],
-               (unsigned long)(block[0] * block[1] * count[0] * count[1]));
+        printf(
+            "start[]=(%lu,%lu), count[]=(%lu,%lu), stride[]=(%lu,%lu), block[]=(%lu,%lu), total "
+            "datapoints=%lu\n",
+            (unsigned long)start[0],
+            (unsigned long)start[1],
+            (unsigned long)count[0],
+            (unsigned long)count[1],
+            (unsigned long)stride[0],
+            (unsigned long)stride[1],
+            (unsigned long)block[0],
+            (unsigned long)block[1],
+            (unsigned long)(block[0] * block[1] * count[0] * count[1]));
     }
 }
 
@@ -1266,13 +1249,11 @@ ccslab_set(int mpi_rank, int mpi_size, hsize_t start[], hsize_t count[], hsize_t
  * Fill the dataset with trivial data for testing.
  * Assume dimension rank is 2.
  */
-static void
-ccdataset_fill(hsize_t start[], hsize_t stride[], hsize_t count[], hsize_t block[], DATATYPE *dataset,
-               int mem_selection)
+static void ccdataset_fill(hsize_t start[], hsize_t stride[], hsize_t count[], hsize_t block[], DATATYPE* dataset, int mem_selection)
 {
-    DATATYPE *dataptr = dataset;
-    DATATYPE *tmptr;
-    hsize_t   i, j, k1, k2, k = 0;
+    DATATYPE* dataptr = dataset;
+    DATATYPE* tmptr;
+    hsize_t i, j, k1, k2, k = 0;
     /* put some trivial data in the data_array */
     tmptr = dataptr;
 
@@ -1283,10 +1264,8 @@ ccdataset_fill(hsize_t start[], hsize_t stride[], hsize_t count[], hsize_t block
         for (i = 0; i < block[0]; i++) {
             for (k2 = 0; k2 < count[1]; k2++) {
                 for (j = 0; j < block[1]; j++) {
-
                     if (ALL != mem_selection) {
-                        dataptr = tmptr + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] +
-                                           k2 * stride[1] + j);
+                        dataptr = tmptr + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] + k2 * stride[1] + j);
                     }
                     else {
                         dataptr = tmptr + k;
@@ -1303,12 +1282,11 @@ ccdataset_fill(hsize_t start[], hsize_t stride[], hsize_t count[], hsize_t block
 /*
  * Print the first block of the content of the dataset.
  */
-static void
-ccdataset_print(hsize_t start[], hsize_t block[], DATATYPE *dataset)
+static void ccdataset_print(hsize_t start[], hsize_t block[], DATATYPE* dataset)
 
 {
-    DATATYPE *dataptr = dataset;
-    hsize_t   i, j;
+    DATATYPE* dataptr = dataset;
+    hsize_t i, j;
 
     /* print the column heading */
     printf("Print only the first block of the dataset\n");
@@ -1331,21 +1309,24 @@ ccdataset_print(hsize_t start[], hsize_t block[], DATATYPE *dataset)
 /*
  * Print the content of the dataset.
  */
-static int
-ccdataset_vrfy(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], DATATYPE *dataset,
-               DATATYPE *original, int mem_selection)
+static int ccdataset_vrfy(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block[], DATATYPE* dataset, DATATYPE* original, int mem_selection)
 {
-    hsize_t   i, j, k1, k2, k = 0;
-    int       vrfyerrs;
+    hsize_t i, j, k1, k2, k = 0;
+    int vrfyerrs;
     DATATYPE *dataptr, *oriptr;
 
     /* print it if VERBOSE_MED */
     if (VERBOSE_MED) {
         printf("dataset_vrfy dumping:::\n");
         printf("start(%lu, %lu), count(%lu, %lu), stride(%lu, %lu), block(%lu, %lu)\n",
-               (unsigned long)start[0], (unsigned long)start[1], (unsigned long)count[0],
-               (unsigned long)count[1], (unsigned long)stride[0], (unsigned long)stride[1],
-               (unsigned long)block[0], (unsigned long)block[1]);
+               (unsigned long)start[0],
+               (unsigned long)start[1],
+               (unsigned long)count[0],
+               (unsigned long)count[1],
+               (unsigned long)stride[0],
+               (unsigned long)stride[1],
+               (unsigned long)block[0],
+               (unsigned long)block[1]);
         printf("original values:\n");
         ccdataset_print(start, block, original);
         printf("compared values:\n");
@@ -1359,29 +1340,28 @@ ccdataset_vrfy(hsize_t start[], hsize_t count[], hsize_t stride[], hsize_t block
             for (k2 = 0; k2 < count[1]; k2++) {
                 for (j = 0; j < block[1]; j++) {
                     if (ALL != mem_selection) {
-                        dataptr = dataset + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] +
-                                             k2 * stride[1] + j);
-                        oriptr  = original + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] +
-                                             k2 * stride[1] + j);
+                        dataptr = dataset + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] + k2 * stride[1] + j);
+                        oriptr = original + ((start[0] + k1 * stride[0] + i) * SPACE_DIM2 + start[1] + k2 * stride[1] + j);
                     }
                     else {
                         dataptr = dataset + k;
-                        oriptr  = original + k;
+                        oriptr = original + k;
                         k++;
                     }
                     if (*dataptr != *oriptr) {
                         if (vrfyerrs++ < MAX_ERR_REPORT || VERBOSE_MED) {
-                            printf("Dataset Verify failed at [%lu][%lu]: expect %d, got %d\n",
-                                   (unsigned long)i, (unsigned long)j, *(oriptr), *(dataptr));
+                            printf("Dataset Verify failed at [%lu][%lu]: expect %d, got %d\n", (unsigned long)i, (unsigned long)j, *(oriptr), *(dataptr));
                         }
                     }
                 }
             }
         }
     }
-    if (vrfyerrs > MAX_ERR_REPORT && !VERBOSE_MED)
+    if (vrfyerrs > MAX_ERR_REPORT && !VERBOSE_MED) {
         printf("[more errors ...]\n");
-    if (vrfyerrs)
+    }
+    if (vrfyerrs) {
         printf("%d errors found in ccdataset_vrfy\n", vrfyerrs);
+    }
     return (vrfyerrs);
 }

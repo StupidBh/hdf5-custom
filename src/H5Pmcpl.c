@@ -50,16 +50,16 @@
 /********************/
 
 /* Property class callbacks */
-static herr_t H5P__mcrt_reg_prop(H5P_genclass_t *pclass);
+static herr_t H5P__mcrt_reg_prop(H5P_genclass_t* pclass);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* Map create property list class library initialization object */
-const H5P_libclass_t H5P_CLS_MCRT[1] = {{
-    "map create",        /* Class name for debugging     */
-    H5P_TYPE_MAP_CREATE, /* Class type                   */
+const H5P_libclass_t H5P_CLS_MCRT[1] = { {
+    "map create",             /* Class name for debugging     */
+    H5P_TYPE_MAP_CREATE,      /* Class type                   */
 
     &H5P_CLS_OBJECT_CREATE_g, /* Parent class                 */
     &H5P_CLS_MAP_CREATE_g,    /* Pointer to class             */
@@ -67,13 +67,13 @@ const H5P_libclass_t H5P_CLS_MCRT[1] = {{
     &H5P_LST_MAP_CREATE_ID_g, /* Pointer to default property list ID */
     H5P__mcrt_reg_prop,       /* Default property registration routine */
 
-    NULL, /* Class creation callback      */
-    NULL, /* Class creation callback info */
-    NULL, /* Class copy callback          */
-    NULL, /* Class copy callback info     */
-    NULL, /* Class close callback         */
-    NULL  /* Class close callback info    */
-}};
+    NULL,                     /* Class creation callback      */
+    NULL,                     /* Class creation callback info */
+    NULL,                     /* Class copy callback          */
+    NULL,                     /* Class copy callback info     */
+    NULL,                     /* Class close callback         */
+    NULL                      /* Class close callback info    */
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -91,8 +91,7 @@ const H5P_libclass_t H5P_CLS_MCRT[1] = {{
  * Return:      Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__mcrt_reg_prop(H5P_genclass_t H5_ATTR_UNUSED *pclass)
+static herr_t H5P__mcrt_reg_prop(H5P_genclass_t H5_ATTR_UNUSED* pclass)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 

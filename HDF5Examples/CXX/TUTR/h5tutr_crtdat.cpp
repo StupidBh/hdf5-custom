@@ -23,12 +23,11 @@ using namespace H5;
 
 const H5std_string FILE_NAME("h5tutr_dset.h5");
 const H5std_string DATASET_NAME("dset");
-const int          NX   = 4; // dataset dimensions
-const int          NY   = 6;
-const int          RANK = 2;
+const int NX = 4; // dataset dimensions
+const int NY = 6;
+const int RANK = 2;
 
-int
-main(void)
+int main(void)
 {
     // Try block to detect exceptions raised by any of the calls inside it
     try {

@@ -44,24 +44,23 @@
 
 #ifdef H5_HAVE_THREADSAFE_API
 
-#define FILENAME    "ttsafe_attr_vlen.h5"
-#define ATTR_NAME   "root_attr"
-#define NUM_THREADS 32
+    #define FILENAME    "ttsafe_attr_vlen.h5"
+    #define ATTR_NAME   "root_attr"
+    #define NUM_THREADS 32
 
-H5TS_THREAD_RETURN_TYPE tts_attr_vlen_thread(void *);
+H5TS_THREAD_RETURN_TYPE tts_attr_vlen_thread(void*);
 
-void
-tts_attr_vlen(void H5_ATTR_UNUSED *params)
+void tts_attr_vlen(void H5_ATTR_UNUSED* params)
 {
-    H5TS_thread_t threads[NUM_THREADS] = {0};             /* Thread declaration */
-    hid_t         fid                  = H5I_INVALID_HID; /* File ID */
-    hid_t         gid                  = H5I_INVALID_HID; /* Group ID */
-    hid_t         atid                 = H5I_INVALID_HID; /* Datatype ID for attribute */
-    hid_t         asid                 = H5I_INVALID_HID; /* Dataspace ID for attribute */
-    hid_t         aid                  = H5I_INVALID_HID; /* The attribute ID */
-    const char   *string_attr          = "2.0";           /* The attribute data */
-    int           ret;                                    /* Return value */
-    int           i;                                      /* Local index variable */
+    H5TS_thread_t threads[NUM_THREADS] = { 0 }; /* Thread declaration */
+    hid_t fid = H5I_INVALID_HID;                /* File ID */
+    hid_t gid = H5I_INVALID_HID;                /* Group ID */
+    hid_t atid = H5I_INVALID_HID;               /* Datatype ID for attribute */
+    hid_t asid = H5I_INVALID_HID;               /* Dataspace ID for attribute */
+    hid_t aid = H5I_INVALID_HID;                /* The attribute ID */
+    const char* string_attr = "2.0";            /* The attribute data */
+    int ret;                                    /* Return value */
+    int i;                                      /* Local index variable */
 
     /* Create the HDF5 test file */
     fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -105,29 +104,33 @@ tts_attr_vlen(void H5_ATTR_UNUSED *params)
     CHECK(ret, H5I_INVALID_HID, "H5Tclose");
 
     /* Start multiple threads and execute tts_attr_vlen_thread() for each thread */
-    for (i = 0; i < NUM_THREADS; i++)
-        if (H5TS_thread_create(&threads[i], tts_attr_vlen_thread, NULL) < 0)
+    for (i = 0; i < NUM_THREADS; i++) {
+        if (H5TS_thread_create(&threads[i], tts_attr_vlen_thread, NULL) < 0) {
             TestErrPrintf("thread # %d did not start", i);
+        }
+    }
 
     /* Wait for the threads to end */
-    for (i = 0; i < NUM_THREADS; i++)
-        if (H5TS_thread_join(threads[i], NULL) < 0)
+    for (i = 0; i < NUM_THREADS; i++) {
+        if (H5TS_thread_join(threads[i], NULL) < 0) {
             TestErrPrintf("thread %d failed to join", i);
+        }
+    }
 
 } /* end tts_attr_vlen() */
 
 /* Start execution for each thread */
 H5TS_THREAD_RETURN_TYPE
-tts_attr_vlen_thread(void H5_ATTR_UNUSED *client_data)
+tts_attr_vlen_thread(void H5_ATTR_UNUSED* client_data)
 {
-    hid_t       fid  = H5I_INVALID_HID; /* File ID */
-    hid_t       gid  = H5I_INVALID_HID; /* Group ID */
-    hid_t       aid  = H5I_INVALID_HID; /* Attribute ID */
-    hid_t       asid = H5I_INVALID_HID; /* Dataspace ID for the attribute */
-    hid_t       atid = H5I_INVALID_HID; /* Datatype ID for the attribute */
-    char       *string_attr_check;      /* The attribute data being read */
-    const char *string_attr = "2.0";    /* The expected attribute data */
-    herr_t      ret;                    /* Return value */
+    hid_t fid = H5I_INVALID_HID;     /* File ID */
+    hid_t gid = H5I_INVALID_HID;     /* Group ID */
+    hid_t aid = H5I_INVALID_HID;     /* Attribute ID */
+    hid_t asid = H5I_INVALID_HID;    /* Dataspace ID for the attribute */
+    hid_t atid = H5I_INVALID_HID;    /* Datatype ID for the attribute */
+    char* string_attr_check;         /* The attribute data being read */
+    const char* string_attr = "2.0"; /* The expected attribute data */
+    herr_t ret;                      /* Return value */
 
     /* Open the test file */
     fid = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -179,8 +182,7 @@ tts_attr_vlen_thread(void H5_ATTR_UNUSED *client_data)
     return (H5TS_thread_ret_t)0;
 } /* end tts_attr_vlen_thread() */
 
-void
-cleanup_attr_vlen(void H5_ATTR_UNUSED *params)
+void cleanup_attr_vlen(void H5_ATTR_UNUSED* params)
 {
     if (GetTestCleanup()) {
         HDunlink(FILENAME);

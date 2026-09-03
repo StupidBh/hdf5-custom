@@ -27,25 +27,28 @@
 
 #define FILENAME "group_old.h5"
 
-int
-main(void)
+int main(void)
 {
     hid_t fid = H5I_INVALID_HID; /* File ID */
     hid_t gid = H5I_INVALID_HID; /* Group creation property list ID */
 
     /* Create file for test groups */
-    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((fid = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
+    }
 
     /* Create empty group that uses "symbol table" form to store links */
-    if ((gid = H5Gcreate2(fid, "old", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    if ((gid = H5Gcreate2(fid, "old", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         goto error;
-    if (H5Gclose(gid) < 0)
+    }
+    if (H5Gclose(gid) < 0) {
         goto error;
+    }
 
     /* Close file */
-    if (H5Fclose(fid) < 0)
+    if (H5Fclose(fid) < 0) {
         goto error;
+    }
 
     return 0;
 

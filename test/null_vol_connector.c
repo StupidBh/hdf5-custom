@@ -141,20 +141,19 @@ static const H5VL_class_t null_vol_g = {
         NULL, /* to_str           */
         NULL  /* from_str         */
     },
-    NULL /* optional         */
+    NULL      /* optional         */
 };
 
 /* These two functions are necessary to load this plugin using
  * the HDF5 library.
  */
 
-H5PL_type_t
-H5PLget_plugin_type(void)
+H5PL_type_t H5PLget_plugin_type(void)
 {
     return H5PL_TYPE_VOL;
 }
-const void *
-H5PLget_plugin_info(void)
+
+const void* H5PLget_plugin_info(void)
 {
     return &null_vol_g;
 }

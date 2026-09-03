@@ -33,11 +33,10 @@
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hid_t                        file; /* File IDs for old & new files */
-    hid_t                        fcpl; /* File creation property list */
+    hid_t file; /* File IDs for old & new files */
+    hid_t fcpl; /* File creation property list */
     herr_t H5_ATTR_NDEBUG_UNUSED ret;
 
     /* Create a file creation property list */

@@ -47,9 +47,10 @@
 /******************/
 
 /* Typedef for tagged entry iterator callback context - evict tagged entries */
-typedef struct {
-    H5F_t *f;                         /* File pointer for evicting entry */
-    bool   evicted_entries_last_pass; /* Flag to indicate that an entry
+typedef struct
+{
+    H5F_t* f;                         /* File pointer for evicting entry */
+    bool evicted_entries_last_pass;   /* Flag to indicate that an entry
                                        * was evicted when iterating over
                                        * cache
                                        */
@@ -64,21 +65,23 @@ typedef struct {
 } H5C_tag_iter_evict_ctx_t;
 
 /* Typedef for tagged entry iterator callback context - expunge tag type metadata */
-typedef struct {
-    H5F_t   *f;       /* File pointer for evicting entry */
-    int      type_id; /* Cache entry type to expunge */
-    unsigned flags;   /* Flags for expunging entry */
+typedef struct
+{
+    H5F_t* f;       /* File pointer for evicting entry */
+    int type_id;    /* Cache entry type to expunge */
+    unsigned flags; /* Flags for expunging entry */
 } H5C_tag_iter_ettm_ctx_t;
 
 /* Typedef for tagged entry iterator callback context - mark corked */
-typedef struct {
+typedef struct
+{
     bool cork_val; /* Corked value */
 } H5C_tag_iter_cork_ctx_t;
 
 /********************/
 /* Local Prototypes */
 /********************/
-static herr_t H5C__iter_tagged_entries_real(H5C_t *cache, haddr_t tag, H5C_tag_iter_cb_t cb, void *cb_ctx);
+static herr_t H5C__iter_tagged_entries_real(H5C_t* cache, haddr_t tag, H5C_tag_iter_cb_t cb, void* cb_ctx);
 
 /*********************/
 /* Package Variables */
@@ -113,8 +116,7 @@ H5FL_EXTERN(H5C_tag_info_t);
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_ignore_tags(H5C_t *cache)
+herr_t H5C_ignore_tags(H5C_t* cache)
 {
     FUNC_ENTER_NOAPI_NOERR
 
@@ -136,8 +138,7 @@ H5C_ignore_tags(H5C_t *cache)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE bool
-H5C_get_ignore_tags(const H5C_t *cache)
+H5_ATTR_PURE bool H5C_get_ignore_tags(const H5C_t* cache)
 {
     FUNC_ENTER_NOAPI_NOERR
 
@@ -157,8 +158,7 @@ H5C_get_ignore_tags(const H5C_t *cache)
  *
  *-------------------------------------------------------------------------
  */
-H5_ATTR_PURE uint32_t
-H5C_get_num_objs_corked(const H5C_t *cache)
+H5_ATTR_PURE uint32_t H5C_get_num_objs_corked(const H5C_t* cache)
 {
     FUNC_ENTER_NOAPI_NOERR
 
@@ -181,12 +181,11 @@ H5C_get_num_objs_corked(const H5C_t *cache)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C__tag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
+herr_t H5C__tag_entry(H5C_t* cache, H5C_cache_entry_t* entry)
 {
-    H5C_tag_info_t *tag_info;            /* Points to a tag info struct */
-    haddr_t         tag;                 /* Tag value */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5C_tag_info_t* tag_info;   /* Points to a tag info struct */
+    haddr_t tag;                /* Tag value */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -205,14 +204,16 @@ H5C__tag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
            arbitrarily set it to something for the sake of passing the tests.
            If the tag value is set, then we'll just let it get assigned without
            additional checking for correctness. */
-        if (!H5_addr_defined(tag))
+        if (!H5_addr_defined(tag)) {
             tag = H5AC__IGNORE_TAG;
+        }
     }
 #ifdef H5C_DO_TAGGING_SANITY_CHECKS
     else {
         /* Perform some sanity checks to ensure that a correct tag is being applied */
-        if (H5C_verify_tag(entry->type->id, tag) < 0)
+        if (H5C_verify_tag(entry->type->id, tag) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "tag verification failed");
+        }
     }
 #endif
 
@@ -222,8 +223,9 @@ H5C__tag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
     /* Check if this is the first entry for this tagged object */
     if (NULL == tag_info) {
         /* Allocate new tag info struct */
-        if (NULL == (tag_info = H5FL_CALLOC(H5C_tag_info_t)))
+        if (NULL == (tag_info = H5FL_CALLOC(H5C_tag_info_t))) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTALLOC, FAIL, "can't allocate tag info for cache entry");
+        }
 
         /* Set the tag for all entries */
         tag_info->tag = tag;
@@ -231,8 +233,9 @@ H5C__tag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
         /* Insert tag info into the hash table */
         HASH_ADD(hh, cache->tag_list, tag, sizeof(haddr_t), tag_info);
     }
-    else
+    else {
         assert(tag_info->corked || (tag_info->entry_cnt > 0 && tag_info->head));
+    }
 
     /* Sanity check entry, to avoid double insertions, etc */
     assert(entry->tl_next == NULL);
@@ -240,10 +243,11 @@ H5C__tag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
     assert(entry->tag_info == NULL);
 
     /* Add the entry to the list for the tagged object */
-    entry->tl_next  = tag_info->head;
+    entry->tl_next = tag_info->head;
     entry->tag_info = tag_info;
-    if (tag_info->head)
+    if (tag_info->head) {
         tag_info->head->tl_prev = entry;
+    }
     tag_info->head = entry;
     tag_info->entry_cnt++;
 
@@ -261,11 +265,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C__untag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
+herr_t H5C__untag_entry(H5C_t* cache, H5C_cache_entry_t* entry)
 {
-    H5C_tag_info_t *tag_info;            /* Points to a tag info struct */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5C_tag_info_t* tag_info;   /* Points to a tag info struct */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -276,17 +279,20 @@ H5C__untag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
     /* Get the entry's tag info struct */
     if (NULL != (tag_info = entry->tag_info)) {
         /* Remove the entry from the list */
-        if (entry->tl_next)
+        if (entry->tl_next) {
             entry->tl_next->tl_prev = entry->tl_prev;
-        if (entry->tl_prev)
+        }
+        if (entry->tl_prev) {
             entry->tl_prev->tl_next = entry->tl_next;
-        if (tag_info->head == entry)
+        }
+        if (tag_info->head == entry) {
             tag_info->head = entry->tl_next;
+        }
         tag_info->entry_cnt--;
 
         /* Reset pointers, to avoid confusion */
-        entry->tl_next  = NULL;
-        entry->tl_prev  = NULL;
+        entry->tl_next = NULL;
+        entry->tl_prev = NULL;
         entry->tag_info = NULL;
 
         /* Remove the tag info from the tag list, if there's no more entries with this tag */
@@ -298,8 +304,9 @@ H5C__untag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
             HASH_DELETE(hh, cache->tag_list, tag_info);
             tag_info = H5FL_FREE(H5C_tag_info_t, tag_info);
         }
-        else
+        else {
             assert(tag_info->corked || NULL != tag_info->head);
+        }
     }
 
     FUNC_LEAVE_NOAPI(ret_value)
@@ -314,11 +321,10 @@ H5C__untag_entry(H5C_t *cache, H5C_cache_entry_t *entry)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5C__iter_tagged_entries_real(H5C_t *cache, haddr_t tag, H5C_tag_iter_cb_t cb, void *cb_ctx)
+static herr_t H5C__iter_tagged_entries_real(H5C_t* cache, haddr_t tag, H5C_tag_iter_cb_t cb, void* cb_ctx)
 {
-    H5C_tag_info_t *tag_info;            /* Points to a tag info struct */
-    herr_t          ret_value = SUCCEED; /* Return value */
+    H5C_tag_info_t* tag_info;   /* Points to a tag info struct */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Function enter macro */
     FUNC_ENTER_PACKAGE
@@ -331,8 +337,8 @@ H5C__iter_tagged_entries_real(H5C_t *cache, haddr_t tag, H5C_tag_iter_cb_t cb, v
 
     /* If there's any entries for this tag, iterate over them */
     if (tag_info) {
-        H5C_cache_entry_t *entry;      /* Pointer to current entry */
-        H5C_cache_entry_t *next_entry; /* Pointer to next entry in hash bucket chain */
+        H5C_cache_entry_t* entry;      /* Pointer to current entry */
+        H5C_cache_entry_t* next_entry; /* Pointer to next entry in hash bucket chain */
 
         /* Sanity check */
         assert(tag_info->head);
@@ -345,8 +351,9 @@ H5C__iter_tagged_entries_real(H5C_t *cache, haddr_t tag, H5C_tag_iter_cb_t cb, v
             next_entry = entry->tl_next;
 
             /* Make callback for entry */
-            if ((cb)(entry, cb_ctx) != H5_ITER_CONT)
+            if ((cb)(entry, cb_ctx) != H5_ITER_CONT) {
                 HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "tagged entry iteration callback failed");
+            }
 
             /* Advance to next entry */
             entry = next_entry;
@@ -366,8 +373,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C__iter_tagged_entries(H5C_t *cache, haddr_t tag, bool match_global, H5C_tag_iter_cb_t cb, void *cb_ctx)
+herr_t H5C__iter_tagged_entries(H5C_t* cache, haddr_t tag, bool match_global, H5C_tag_iter_cb_t cb, void* cb_ctx)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -378,18 +384,21 @@ H5C__iter_tagged_entries(H5C_t *cache, haddr_t tag, bool match_global, H5C_tag_i
     assert(cache != NULL);
 
     /* Iterate over the entries for this tag */
-    if (H5C__iter_tagged_entries_real(cache, tag, cb, cb_ctx) < 0)
+    if (H5C__iter_tagged_entries_real(cache, tag, cb, cb_ctx) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "iteration of tagged entries failed");
+    }
 
     /* Check for iterating over global metadata */
     if (match_global) {
         /* Iterate over the entries for SOHM entries */
-        if (H5C__iter_tagged_entries_real(cache, H5AC__SOHM_TAG, cb, cb_ctx) < 0)
+        if (H5C__iter_tagged_entries_real(cache, H5AC__SOHM_TAG, cb, cb_ctx) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "iteration of tagged entries failed");
+        }
 
         /* Iterate over the entries for global heap entries */
-        if (H5C__iter_tagged_entries_real(cache, H5AC__GLOBALHEAP_TAG, cb, cb_ctx) < 0)
+        if (H5C__iter_tagged_entries_real(cache, H5AC__GLOBALHEAP_TAG, cb, cb_ctx) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "iteration of tagged entries failed");
+        }
     } /* end if */
 
 done:
@@ -405,11 +414,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5C__evict_tagged_entries_cb(H5C_cache_entry_t *entry, void *_ctx)
+static int H5C__evict_tagged_entries_cb(H5C_cache_entry_t* entry, void* _ctx)
 {
-    H5C_tag_iter_evict_ctx_t *ctx = (H5C_tag_iter_evict_ctx_t *)_ctx; /* Get pointer to iterator context */
-    int                       ret_value = H5_ITER_CONT;               /* Return value */
+    H5C_tag_iter_evict_ctx_t* ctx = (H5C_tag_iter_evict_ctx_t*)_ctx; /* Get pointer to iterator context */
+    int ret_value = H5_ITER_CONT;                                    /* Return value */
 
     /* Function enter macro */
     FUNC_ENTER_PACKAGE
@@ -419,25 +427,28 @@ H5C__evict_tagged_entries_cb(H5C_cache_entry_t *entry, void *_ctx)
     assert(ctx);
 
     /* Attempt to evict entry */
-    if (entry->is_protected)
+    if (entry->is_protected) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, H5_ITER_ERROR, "Cannot evict protected entry");
-    else if (entry->is_dirty)
+    }
+    else if (entry->is_dirty) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, H5_ITER_ERROR, "Cannot evict dirty entry");
-    else if (entry->is_pinned)
+    }
+    else if (entry->is_pinned) {
         /* Can't evict at this time, but let's note that we hit a pinned
             entry and we'll loop back around again (as evicting other
             entries will hopefully unpin this entry) */
         ctx->pinned_entries_need_evicted = true;
+    }
     else if (!entry->prefetched_dirty) {
         /* Evict the Entry */
-        if (H5C__flush_single_entry(ctx->f, entry,
-                                    H5C__FLUSH_INVALIDATE_FLAG | H5C__FLUSH_CLEAR_ONLY_FLAG |
-                                        H5C__DEL_FROM_SLIST_ON_DESTROY_FLAG) < 0)
+        if (H5C__flush_single_entry(ctx->f, entry, H5C__FLUSH_INVALIDATE_FLAG | H5C__FLUSH_CLEAR_ONLY_FLAG | H5C__DEL_FROM_SLIST_ON_DESTROY_FLAG) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, H5_ITER_ERROR, "Entry eviction failed.");
+        }
         ctx->evicted_entries_last_pass = true;
     }
-    else
+    else {
         ctx->skipped_pf_dirty_entries = true;
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -452,12 +463,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_evict_tagged_entries(H5F_t *f, haddr_t tag, bool match_global)
+herr_t H5C_evict_tagged_entries(H5F_t* f, haddr_t tag, bool match_global)
 {
-    H5C_t                   *cache;               /* Pointer to cache structure */
-    H5C_tag_iter_evict_ctx_t ctx;                 /* Context for iterator callback */
-    herr_t                   ret_value = SUCCEED; /* Return value */
+    H5C_t* cache;                 /* Pointer to cache structure */
+    H5C_tag_iter_evict_ctx_t ctx; /* Context for iterator callback */
+    herr_t ret_value = SUCCEED;   /* Return value */
 
     /* Function enter macro */
     FUNC_ENTER_NOAPI(FAIL)
@@ -475,12 +485,13 @@ H5C_evict_tagged_entries(H5F_t *f, haddr_t tag, bool match_global)
     do {
         /* Reset pinned/evicted tracking flags */
         ctx.pinned_entries_need_evicted = false;
-        ctx.evicted_entries_last_pass   = false;
-        ctx.skipped_pf_dirty_entries    = false;
+        ctx.evicted_entries_last_pass = false;
+        ctx.skipped_pf_dirty_entries = false;
 
         /* Iterate through entries in the cache */
-        if (H5C__iter_tagged_entries(cache, tag, match_global, H5C__evict_tagged_entries_cb, &ctx) < 0)
+        if (H5C__iter_tagged_entries(cache, tag, match_global, H5C__evict_tagged_entries_cb, &ctx) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "Iteration of tagged entries failed");
+        }
 
         /* Keep doing this until we have stopped evicted entries */
     } while (true == ctx.evicted_entries_last_pass);
@@ -510,8 +521,9 @@ H5C_evict_tagged_entries(H5F_t *f, haddr_t tag, bool match_global)
      * Thus we must ignore ctx.pinned_entries_need_evicted if
      * ctx.skipped_pf_dirty_entries is true.
      */
-    if ((!ctx.skipped_pf_dirty_entries) && (ctx.pinned_entries_need_evicted))
+    if ((!ctx.skipped_pf_dirty_entries) && (ctx.pinned_entries_need_evicted)) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, FAIL, "Pinned entries still need evicted?!");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -528,8 +540,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_verify_tag(int id, haddr_t tag)
+herr_t H5C_verify_tag(int id, haddr_t tag)
 {
     herr_t ret_value = SUCCEED;
 
@@ -538,11 +549,13 @@ H5C_verify_tag(int id, haddr_t tag)
     /* Perform some sanity checks on tag value. Certain entry
      * types require certain tag values, so check that these
      * constraints are met. */
-    if (tag == H5AC__IGNORE_TAG)
+    if (tag == H5AC__IGNORE_TAG) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "cannot ignore a tag while doing verification.");
+    }
     else if (tag == H5AC__INVALID_TAG) {
-        if (id != H5AC_PROXY_ENTRY_ID)
+        if (id != H5AC_PROXY_ENTRY_ID) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "no metadata tag provided");
+        }
     } /* end else-if */
     else {
         /* Perform some sanity checks on tag value. Certain entry
@@ -551,35 +564,40 @@ H5C_verify_tag(int id, haddr_t tag)
 
         /* Superblock */
         if ((id == H5AC_SUPERBLOCK_ID) || (id == H5AC_DRVRINFO_ID)) {
-            if (tag != H5AC__SUPERBLOCK_TAG)
+            if (tag != H5AC__SUPERBLOCK_TAG) {
                 HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "superblock not tagged with H5AC__SUPERBLOCK_TAG");
+            }
         } /* end if */
         else {
-            if (tag == H5AC__SUPERBLOCK_TAG)
-                HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL,
-                            "H5AC__SUPERBLOCK_TAG applied to non-superblock entry");
+            if (tag == H5AC__SUPERBLOCK_TAG) {
+                HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "H5AC__SUPERBLOCK_TAG applied to non-superblock entry");
+            }
         } /* end else */
 
         /* Free Space Manager */
-        if (tag == H5AC__FREESPACE_TAG && ((id != H5AC_FSPACE_HDR_ID) && (id != H5AC_FSPACE_SINFO_ID)))
+        if (tag == H5AC__FREESPACE_TAG && ((id != H5AC_FSPACE_HDR_ID) && (id != H5AC_FSPACE_SINFO_ID))) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "H5AC__FREESPACE_TAG applied to non-freespace entry");
+        }
 
         /* SOHM */
-        if ((id == H5AC_SOHM_TABLE_ID) || (id == H5AC_SOHM_LIST_ID))
-            if (tag != H5AC__SOHM_TAG)
+        if ((id == H5AC_SOHM_TABLE_ID) || (id == H5AC_SOHM_LIST_ID)) {
+            if (tag != H5AC__SOHM_TAG) {
                 HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "sohm entry not tagged with H5AC__SOHM_TAG");
+            }
+        }
 
         /* Global Heap */
         if (id == H5AC_GHEAP_ID) {
-            if (tag != H5AC__GLOBALHEAP_TAG)
+            if (tag != H5AC__GLOBALHEAP_TAG) {
                 HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "global heap not tagged with H5AC__GLOBALHEAP_TAG");
+            }
         } /* end if */
         else {
-            if (tag == H5AC__GLOBALHEAP_TAG)
-                HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL,
-                            "H5AC__GLOBALHEAP_TAG applied to non-globalheap entry");
+            if (tag == H5AC__GLOBALHEAP_TAG) {
+                HGOTO_ERROR(H5E_CACHE, H5E_CANTTAG, FAIL, "H5AC__GLOBALHEAP_TAG applied to non-globalheap entry");
+            }
         } /* end else */
-    }     /* end else */
+    } /* end else */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -595,11 +613,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5C__flush_tagged_entries_cb(H5C_cache_entry_t *entry, void *_ctx)
+static int H5C__flush_tagged_entries_cb(H5C_cache_entry_t* entry, void* _ctx)
 {
-    H5C_t *cache_ptr = (H5C_t *)_ctx;
-    int    ret_value = H5_ITER_CONT;
+    H5C_t* cache_ptr = (H5C_t*)_ctx;
+    int ret_value = H5_ITER_CONT;
 
     /* Function enter macro */
     FUNC_ENTER_PACKAGE
@@ -609,8 +626,9 @@ H5C__flush_tagged_entries_cb(H5C_cache_entry_t *entry, void *_ctx)
     assert(cache_ptr);
 
     /* We only want to add entries to the slist that actually need flushed (i.e., dirty ones) */
-    if (entry->is_dirty)
+    if (entry->is_dirty) {
         H5C__INSERT_ENTRY_IN_SLIST(cache_ptr, entry, H5_ITER_ERROR);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -625,11 +643,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_flush_tagged_entries(H5F_t *f, haddr_t tag)
+herr_t H5C_flush_tagged_entries(H5F_t* f, haddr_t tag)
 {
     /* Variable Declarations */
-    H5C_t *cache     = NULL;
+    H5C_t* cache = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI(FAIL)
@@ -642,21 +659,25 @@ H5C_flush_tagged_entries(H5F_t *f, haddr_t tag)
     cache = f->shared->cache;
 
     /* Enable the slist, as it is needed in the flush */
-    if (H5C_set_slist_enabled(f->shared->cache, true, false) < 0)
+    if (H5C_set_slist_enabled(f->shared->cache, true, false) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "set slist enabled failed");
+    }
 
     /* Iterate through hash table entries, adding those with specified tag to the slist, as well as any major
      * global entries which should always be flushed when flushing based on tag value */
-    if (H5C__iter_tagged_entries(cache, tag, true, H5C__flush_tagged_entries_cb, cache) < 0)
+    if (H5C__iter_tagged_entries(cache, tag, true, H5C__flush_tagged_entries_cb, cache) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "Iteration of tagged entries failed");
+    }
 
     /* Flush all entries in the slist */
-    if (H5C_flush_cache(f, H5C__FLUSH_IGNORE_PROTECTED_FLAG) < 0)
+    if (H5C_flush_cache(f, H5C__FLUSH_IGNORE_PROTECTED_FLAG) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, FAIL, "Can't flush cache");
+    }
 
     /* Disable the slist */
-    if (H5C_set_slist_enabled(f->shared->cache, false, false) < 0)
+    if (H5C_set_slist_enabled(f->shared->cache, false, false) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "disable slist failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -673,10 +694,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_retag_entries(H5C_t *cache, haddr_t src_tag, haddr_t dest_tag)
+herr_t H5C_retag_entries(H5C_t* cache, haddr_t src_tag, haddr_t dest_tag)
 {
-    H5C_tag_info_t *tag_info = NULL;
+    H5C_tag_info_t* tag_info = NULL;
 
     /* Function enter macro */
     FUNC_ENTER_NOAPI_NOERR
@@ -710,11 +730,10 @@ H5C_retag_entries(H5C_t *cache, haddr_t src_tag, haddr_t dest_tag)
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5C__expunge_tag_type_metadata_cb(H5C_cache_entry_t *entry, void *_ctx)
+static int H5C__expunge_tag_type_metadata_cb(H5C_cache_entry_t* entry, void* _ctx)
 {
-    H5C_tag_iter_ettm_ctx_t *ctx = (H5C_tag_iter_ettm_ctx_t *)_ctx; /* Get pointer to iterator context */
-    int                      ret_value = H5_ITER_CONT;              /* Return value */
+    H5C_tag_iter_ettm_ctx_t* ctx = (H5C_tag_iter_ettm_ctx_t*)_ctx; /* Get pointer to iterator context */
+    int ret_value = H5_ITER_CONT;                                  /* Return value */
 
     /* Function enter macro */
     FUNC_ENTER_PACKAGE
@@ -724,9 +743,11 @@ H5C__expunge_tag_type_metadata_cb(H5C_cache_entry_t *entry, void *_ctx)
     assert(ctx);
 
     /* Found one with the same tag and type id */
-    if (entry->type->id == ctx->type_id)
-        if (H5C_expunge_entry(ctx->f, entry->type, entry->addr, ctx->flags) < 0)
+    if (entry->type->id == ctx->type_id) {
+        if (H5C_expunge_entry(ctx->f, entry->type, entry->addr, ctx->flags) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_CANTEXPUNGE, H5_ITER_ERROR, "can't expunge entry");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -742,12 +763,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_expunge_tag_type_metadata(H5F_t *f, haddr_t tag, int type_id, unsigned flags)
+herr_t H5C_expunge_tag_type_metadata(H5F_t* f, haddr_t tag, int type_id, unsigned flags)
 {
-    H5C_t                  *cache;               /* Pointer to cache structure */
-    H5C_tag_iter_ettm_ctx_t ctx;                 /* Context for iterator callback */
-    herr_t                  ret_value = SUCCEED; /* Return value */
+    H5C_t* cache;                /* Pointer to cache structure */
+    H5C_tag_iter_ettm_ctx_t ctx; /* Context for iterator callback */
+    herr_t ret_value = SUCCEED;  /* Return value */
 
     /* Function enter macro */
     FUNC_ENTER_NOAPI(FAIL)
@@ -759,13 +779,14 @@ H5C_expunge_tag_type_metadata(H5F_t *f, haddr_t tag, int type_id, unsigned flags
     assert(cache != NULL);
 
     /* Construct context for iterator callbacks */
-    ctx.f       = f;
+    ctx.f = f;
     ctx.type_id = type_id;
-    ctx.flags   = flags;
+    ctx.flags = flags;
 
     /* Iterate through hash table entries, expunge those with specified tag and type id */
-    if (H5C__iter_tagged_entries(cache, tag, false, H5C__expunge_tag_type_metadata_cb, &ctx) < 0)
+    if (H5C__iter_tagged_entries(cache, tag, false, H5C__expunge_tag_type_metadata_cb, &ctx) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_BADITER, FAIL, "Iteration of tagged entries failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -780,10 +801,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5C_get_tag(const void *thing, haddr_t *tag)
+herr_t H5C_get_tag(const void* thing, haddr_t* tag)
 {
-    const H5C_cache_entry_t *entry = (const H5C_cache_entry_t *)thing; /* Pointer to cache entry */
+    const H5C_cache_entry_t* entry = (const H5C_cache_entry_t*)thing; /* Pointer to cache entry */
 
     FUNC_ENTER_NOAPI_NOERR
 

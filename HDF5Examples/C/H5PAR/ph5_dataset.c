@@ -12,24 +12,23 @@
 #define NY          5
 #define RANK        2
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     /*
      * HDF5 APIs definitions
      */
-    hid_t   file_id, dset_id;   /* file and dataset identifiers */
-    hid_t   filespace;          /* file and memory dataspace identifiers */
-    hsize_t dimsf[] = {NX, NY}; /* dataset dimensions */
-    int    *data;               /* pointer to data buffer to write */
-    hid_t   plist_id;           /* property list identifier */
-    int     i;
-    herr_t  status;
+    hid_t file_id, dset_id;       /* file and dataset identifiers */
+    hid_t filespace;              /* file and memory dataspace identifiers */
+    hsize_t dimsf[] = { NX, NY }; /* dataset dimensions */
+    int* data;                    /* pointer to data buffer to write */
+    hid_t plist_id;               /* property list identifier */
+    int i;
+    herr_t status;
 
     /*
      * MPI variables
      */
-    int      mpi_size, mpi_rank;
+    int mpi_size, mpi_rank;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
@@ -43,7 +42,7 @@ main(int argc, char **argv)
     /*
      * Initialize data buffer
      */
-    data = (int *)malloc(sizeof(int) * dimsf[0] * dimsf[1]);
+    data = (int*)malloc(sizeof(int) * dimsf[0] * dimsf[1]);
     for (i = 0; i < dimsf[0] * dimsf[1]; i++) {
         data[i] = i;
     }
@@ -85,8 +84,7 @@ main(int argc, char **argv)
     /*
      * Create the dataset with default properties and close filespace.
      */
-    dset_id =
-        H5Dcreate(file_id, DATASETNAME, H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    dset_id = H5Dcreate(file_id, DATASETNAME, H5T_NATIVE_INT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     /*
      * Create property list for collective dataset write.
      */
@@ -110,8 +108,9 @@ main(int argc, char **argv)
     H5Pclose(plist_id);
     H5Fclose(file_id);
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         printf("PHDF5 example finished with no errors\n");
+    }
 
     MPI_Finalize();
 

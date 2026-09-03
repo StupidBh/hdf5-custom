@@ -19,12 +19,12 @@
 #include "h5test.h"
 #include "H5srcdir.h"
 
-static const char *FILENAME[] = {"mtime", NULL};
+static const char* FILENAME[] = { "mtime", NULL };
 
 #define TESTFILE1 "tmtimeo.h5"
-#define MTIME1    1055531866
+#define MTIME1    1'055'531'866
 #define TESTFILE2 "tmtimen.h5"
-#define MTIME2    1041606478
+#define MTIME2    1'041'606'478
 
 /*-------------------------------------------------------------------------
  * Function:    main
@@ -35,42 +35,48 @@ static const char *FILENAME[] = {"mtime", NULL};
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hid_t       fapl, file, space, dset;
-    hsize_t     size[1] = {2};
-    time_t      now;
-    struct tm  *tm;
+    hid_t fapl, file, space, dset;
+    hsize_t size[1] = { 2 };
+    time_t now;
+    struct tm* tm;
     H5O_info2_t oi1, oi2;
     signed char buf1[32], buf2[32];
-    char        filename[1024];
-    int         token_cmp;
-    bool        driver_is_default_compatible;
+    char filename[1024];
+    int token_cmp;
+    bool driver_is_default_compatible;
 
     h5_test_init();
     fapl = h5_fileaccess();
 
     TESTING("modification time messages");
 
-    if (h5_driver_is_default_vfd_compatible(fapl, &driver_is_default_compatible) < 0)
+    if (h5_driver_is_default_vfd_compatible(fapl, &driver_is_default_compatible) < 0) {
         TEST_ERROR;
+    }
 
     /* Create the file, create a dataset, then close the file */
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         TEST_ERROR;
-    if ((space = H5Screate_simple(1, size, NULL)) < 0)
+    }
+    if ((space = H5Screate_simple(1, size, NULL)) < 0) {
         TEST_ERROR;
-    if ((dset = H5Dcreate2(file, "dset", H5T_NATIVE_SCHAR, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0)
+    }
+    if ((dset = H5Dcreate2(file, "dset", H5T_NATIVE_SCHAR, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
         TEST_ERROR;
+    }
     now = time(NULL);
-    if (H5Dclose(dset) < 0)
+    if (H5Dclose(dset) < 0) {
         TEST_ERROR;
-    if (H5Sclose(space) < 0)
+    }
+    if (H5Sclose(space) < 0) {
         TEST_ERROR;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         TEST_ERROR;
+    }
 
     /*
      * Open the file and get the modification time. We'll test the
@@ -78,20 +84,27 @@ main(void)
      * knowing its name.
      */
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
-    if ((file = H5Fopen(filename, H5F_ACC_RDONLY, fapl)) < 0)
+    if ((file = H5Fopen(filename, H5F_ACC_RDONLY, fapl)) < 0) {
         TEST_ERROR;
-    if (H5Oget_info_by_name3(file, "dset", &oi1, H5O_INFO_BASIC | H5O_INFO_TIME, H5P_DEFAULT) < 0)
+    }
+    if (H5Oget_info_by_name3(file, "dset", &oi1, H5O_INFO_BASIC | H5O_INFO_TIME, H5P_DEFAULT) < 0) {
         TEST_ERROR;
-    if ((dset = H5Dopen2(file, "dset", H5P_DEFAULT)) < 0)
+    }
+    if ((dset = H5Dopen2(file, "dset", H5P_DEFAULT)) < 0) {
         TEST_ERROR;
-    if (H5Oget_info3(dset, &oi2, H5O_INFO_BASIC | H5O_INFO_TIME) < 0)
+    }
+    if (H5Oget_info3(dset, &oi2, H5O_INFO_BASIC | H5O_INFO_TIME) < 0) {
         TEST_ERROR;
-    if (H5Otoken_cmp(file, &oi1.token, &oi2.token, &token_cmp) < 0)
+    }
+    if (H5Otoken_cmp(file, &oi1.token, &oi2.token, &token_cmp) < 0) {
         TEST_ERROR;
-    if (H5Dclose(dset) < 0)
+    }
+    if (H5Dclose(dset) < 0) {
         TEST_ERROR;
-    if (H5Fclose(file) < 0)
+    }
+    if (H5Fclose(file) < 0) {
         TEST_ERROR;
+    }
 
     /* Compare object tokens & times from the two ways of calling H5Oget_info() */
     if (token_cmp || oi1.ctime != oi2.ctime) {
@@ -113,9 +126,9 @@ main(void)
     else if (fabs(difftime(now, oi1.ctime)) > 60.0) {
         H5_FAILED();
         tm = localtime(&(oi1.ctime));
-        strftime((char *)buf1, sizeof buf1, "%Y-%m-%d %H:%M:%S", tm);
+        strftime((char*)buf1, sizeof buf1, "%Y-%m-%d %H:%M:%S", tm);
         tm = localtime(&now);
-        strftime((char *)buf2, sizeof buf2, "%Y-%m-%d %H:%M:%S", tm);
+        strftime((char*)buf2, sizeof buf2, "%Y-%m-%d %H:%M:%S", tm);
         printf("    got: %s\n    ans: %s\n", buf1, buf2);
         goto error;
     }
@@ -128,12 +141,13 @@ main(void)
         TESTING("accessing old modification time messages");
 
         {
-            const char *testfile = H5_get_srcdir_filename(TESTFILE1); /* Corrected test file name */
+            const char* testfile = H5_get_srcdir_filename(TESTFILE1); /* Corrected test file name */
 
             file = H5Fopen(testfile, H5F_ACC_RDONLY, H5P_DEFAULT);
             if (file >= 0) {
-                if (H5Oget_info_by_name3(file, "/Dataset1", &oi1, H5O_INFO_TIME, H5P_DEFAULT) < 0)
+                if (H5Oget_info_by_name3(file, "/Dataset1", &oi1, H5O_INFO_TIME, H5P_DEFAULT) < 0) {
                     TEST_ERROR;
+                }
                 if (oi1.ctime != MTIME1) {
                     H5_FAILED();
                     /* If this fails, examine H5Omtime.c.  Modification time is very
@@ -141,8 +155,9 @@ main(void)
                     puts("    Old modification time incorrect");
                     goto error;
                 }
-                if (H5Fclose(file) < 0)
+                if (H5Fclose(file) < 0) {
                     TEST_ERROR;
+                }
             }
             else {
                 H5_FAILED();
@@ -160,19 +175,21 @@ main(void)
         TESTING("accessing new modification time messages");
 
         {
-            const char *testfile = H5_get_srcdir_filename(TESTFILE2); /* Corrected test file name */
+            const char* testfile = H5_get_srcdir_filename(TESTFILE2); /* Corrected test file name */
 
             file = H5Fopen(testfile, H5F_ACC_RDONLY, H5P_DEFAULT);
             if (file >= 0) {
-                if (H5Oget_info_by_name3(file, "/Dataset1", &oi2, H5O_INFO_TIME, H5P_DEFAULT) < 0)
+                if (H5Oget_info_by_name3(file, "/Dataset1", &oi2, H5O_INFO_TIME, H5P_DEFAULT) < 0) {
                     TEST_ERROR;
+                }
                 if (oi2.ctime != MTIME2) {
                     H5_FAILED();
                     puts("    Modification time incorrect.");
                     goto error;
                 }
-                if (H5Fclose(file) < 0)
+                if (H5Fclose(file) < 0) {
                     TEST_ERROR;
+                }
             }
             else {
                 H5_FAILED();
@@ -184,8 +201,9 @@ main(void)
     }
 
     /* Verify symbol table messages are cached */
-    if (h5_verify_cached_stabs(FILENAME, fapl) < 0)
+    if (h5_verify_cached_stabs(FILENAME, fapl) < 0) {
         TEST_ERROR;
+    }
 
     /* All looks good */
     puts("All modification time tests passed.");

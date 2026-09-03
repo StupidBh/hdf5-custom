@@ -59,7 +59,7 @@
 /* Local Variables */
 /*******************/
 
-#ifdef H5_HAVE_C11_THREADS
+    #ifdef H5_HAVE_C11_THREADS
 
 /*-------------------------------------------------------------------------
  * Function: H5TS_cond_init
@@ -70,15 +70,15 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_init(H5TS_cond_t *cond)
+herr_t H5TS_cond_init(H5TS_cond_t* cond)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(cnd_init(cond) != thrd_success))
+    if (H5_UNLIKELY(cnd_init(cond) != thrd_success)) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -93,8 +93,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_destroy(H5TS_cond_t *cond)
+herr_t H5TS_cond_destroy(H5TS_cond_t* cond)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -104,8 +103,8 @@ H5TS_cond_destroy(H5TS_cond_t *cond)
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(SUCCEED)
 } /* end H5TS_cond_destroy() */
 
-#else
-#ifdef H5_HAVE_WIN_THREADS
+    #else
+        #ifdef H5_HAVE_WIN_THREADS
 /*-------------------------------------------------------------------------
  * Function: H5TS_cond_init
  *
@@ -115,8 +114,7 @@ H5TS_cond_destroy(H5TS_cond_t *cond)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_init(H5TS_cond_t *cond)
+herr_t H5TS_cond_init(H5TS_cond_t* cond)
 {
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
@@ -134,16 +132,12 @@ H5TS_cond_init(H5TS_cond_t *cond)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_destroy(H5TS_cond_t *cond)
-{
-    FUNC_ENTER_NOAPI_NAMECHECK_ONLY
+herr_t H5TS_cond_destroy(H5TS_cond_t* cond) { FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    /* Condition variables in Windows are not destroyed */
+                                                  /* Condition variables in Windows are not destroyed */
 
-    FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(SUCCEED)
-} /* end H5TS_cond_destroy() */
-#else
+                                                  FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(SUCCEED) } /* end H5TS_cond_destroy() */
+        #else
 /*-------------------------------------------------------------------------
  * Function: H5TS_cond_init
  *
@@ -153,15 +147,15 @@ H5TS_cond_destroy(H5TS_cond_t *cond)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_init(H5TS_cond_t *cond)
+herr_t H5TS_cond_init(H5TS_cond_t* cond)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(pthread_cond_init(cond, NULL)))
+    if (H5_UNLIKELY(pthread_cond_init(cond, NULL))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
@@ -176,21 +170,21 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5TS_cond_destroy(H5TS_cond_t *cond)
+herr_t H5TS_cond_destroy(H5TS_cond_t* cond)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI_NAMECHECK_ONLY
 
-    if (H5_UNLIKELY(pthread_cond_destroy(cond)))
+    if (H5_UNLIKELY(pthread_cond_destroy(cond))) {
         HGOTO_DONE(FAIL);
+    }
 
 done:
     FUNC_LEAVE_NOAPI_NAMECHECK_ONLY(ret_value)
 } /* end H5TS_cond_destroy() */
 
-#endif
-#endif
+        #endif
+    #endif
 
 #endif /* H5_HAVE_THREADS */

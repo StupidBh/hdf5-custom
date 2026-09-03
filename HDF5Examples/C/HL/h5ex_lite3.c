@@ -17,15 +17,14 @@
 #define FILENAME  "h5ex_lite3.h5"
 #define ATTR_SIZE 5
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file_id;
-    hid_t   dset_id;
-    hid_t   space_id;
-    hsize_t dims[1]         = {ATTR_SIZE};
-    int     data[ATTR_SIZE] = {1, 2, 3, 4, 5};
-    int     i;
+    hid_t file_id;
+    hid_t dset_id;
+    hid_t space_id;
+    hsize_t dims[1] = { ATTR_SIZE };
+    int data[ATTR_SIZE] = { 1, 2, 3, 4, 5 };
+    int i;
 
     /* create a file */
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -56,8 +55,9 @@ main(void)
     /* get the attribute "attr1" from the dataset "dset" */
     H5LTget_attribute_int(file_id, "dset", "attr1", data);
 
-    for (i = 0; i < ATTR_SIZE; i++)
+    for (i = 0; i < ATTR_SIZE; i++) {
         printf("  %d", data[i]);
+    }
     printf("\n");
 
     /* close file */

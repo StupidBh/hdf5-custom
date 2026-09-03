@@ -29,19 +29,19 @@
 #define H5TOOLS_DUMP_MAX_RANK H5S_MAX_RANK
 
 /* Stream macros */
-#define FLUSHSTREAM(S)                                                                                       \
-    if (S != NULL)                                                                                           \
+#define FLUSHSTREAM(S) \
+    if (S != NULL)     \
     fflush(S)
-#define PRINTSTREAM(S, F, ...)                                                                               \
-    if (S != NULL)                                                                                           \
+#define PRINTSTREAM(S, F, ...) \
+    if (S != NULL)             \
     fprintf(S, F, __VA_ARGS__)
-#define PRINTVALSTREAM(S, V)                                                                                 \
-    if (S != NULL)                                                                                           \
+#define PRINTVALSTREAM(S, V) \
+    if (S != NULL)           \
     fprintf(S, V)
-#define PUTSTREAM(X, S)                                                                                      \
-    do {                                                                                                     \
-        if (S != NULL)                                                                                       \
-            fputs(X, S);                                                                                     \
+#define PUTSTREAM(X, S)  \
+    do {                 \
+        if (S != NULL)   \
+            fputs(X, S); \
     } while (0)
 
 /*
@@ -114,105 +114,106 @@
  * dump structure for output - this was duplicated from the h5dump.h
  * file in order to support region reference data display
  */
-typedef struct h5tools_dump_header_t {
-    const char *name;
-    const char *filebegin;
-    const char *fileend;
-    const char *bootblockbegin;
-    const char *bootblockend;
-    const char *groupbegin;
-    const char *groupend;
-    const char *datasetbegin;
-    const char *datasetend;
-    const char *attributebegin;
-    const char *attributeend;
-    const char *datatypebegin;
-    const char *datatypeend;
-    const char *dataspacebegin;
-    const char *dataspaceend;
-    const char *databegin;
-    const char *dataend;
-    const char *softlinkbegin;
-    const char *softlinkend;
-    const char *extlinkbegin;
-    const char *extlinkend;
-    const char *udlinkbegin;
-    const char *udlinkend;
-    const char *subsettingbegin;
-    const char *subsettingend;
-    const char *startbegin;
-    const char *startend;
-    const char *stridebegin;
-    const char *strideend;
-    const char *countbegin;
-    const char *countend;
-    const char *blockbegin;
-    const char *blockend;
+typedef struct h5tools_dump_header_t
+{
+    const char* name;
+    const char* filebegin;
+    const char* fileend;
+    const char* bootblockbegin;
+    const char* bootblockend;
+    const char* groupbegin;
+    const char* groupend;
+    const char* datasetbegin;
+    const char* datasetend;
+    const char* attributebegin;
+    const char* attributeend;
+    const char* datatypebegin;
+    const char* datatypeend;
+    const char* dataspacebegin;
+    const char* dataspaceend;
+    const char* databegin;
+    const char* dataend;
+    const char* softlinkbegin;
+    const char* softlinkend;
+    const char* extlinkbegin;
+    const char* extlinkend;
+    const char* udlinkbegin;
+    const char* udlinkend;
+    const char* subsettingbegin;
+    const char* subsettingend;
+    const char* startbegin;
+    const char* startend;
+    const char* stridebegin;
+    const char* strideend;
+    const char* countbegin;
+    const char* countend;
+    const char* blockbegin;
+    const char* blockend;
 
-    const char *fileblockbegin;
-    const char *fileblockend;
-    const char *bootblockblockbegin;
-    const char *bootblockblockend;
-    const char *groupblockbegin;
-    const char *groupblockend;
-    const char *datasetblockbegin;
-    const char *datasetblockend;
-    const char *attributeblockbegin;
-    const char *attributeblockend;
-    const char *datatypeblockbegin;
-    const char *datatypeblockend;
-    const char *dataspaceblockbegin;
-    const char *dataspaceblockend;
-    const char *datablockbegin;
-    const char *datablockend;
-    const char *softlinkblockbegin;
-    const char *softlinkblockend;
-    const char *extlinkblockbegin;
-    const char *extlinkblockend;
-    const char *udlinkblockbegin;
-    const char *udlinkblockend;
-    const char *arrblockbegin;
-    const char *arrblockend;
-    const char *cmpdblockbegin;
-    const char *cmpdblockend;
-    const char *enumblockbegin;
-    const char *enumblockend;
-    const char *opaqblockbegin;
-    const char *opaqblockend;
-    const char *refblockbegin;
-    const char *refblockend;
-    const char *strblockbegin;
-    const char *strblockend;
-    const char *vlenblockbegin;
-    const char *vlenblockend;
-    const char *complexblockbegin;
-    const char *complexblockend;
-    const char *structblockbegin;
-    const char *structblockend;
-    const char *subsettingblockbegin;
-    const char *subsettingblockend;
-    const char *startblockbegin;
-    const char *startblockend;
-    const char *strideblockbegin;
-    const char *strideblockend;
-    const char *countblockbegin;
-    const char *countblockend;
-    const char *blockblockbegin;
-    const char *blockblockend;
+    const char* fileblockbegin;
+    const char* fileblockend;
+    const char* bootblockblockbegin;
+    const char* bootblockblockend;
+    const char* groupblockbegin;
+    const char* groupblockend;
+    const char* datasetblockbegin;
+    const char* datasetblockend;
+    const char* attributeblockbegin;
+    const char* attributeblockend;
+    const char* datatypeblockbegin;
+    const char* datatypeblockend;
+    const char* dataspaceblockbegin;
+    const char* dataspaceblockend;
+    const char* datablockbegin;
+    const char* datablockend;
+    const char* softlinkblockbegin;
+    const char* softlinkblockend;
+    const char* extlinkblockbegin;
+    const char* extlinkblockend;
+    const char* udlinkblockbegin;
+    const char* udlinkblockend;
+    const char* arrblockbegin;
+    const char* arrblockend;
+    const char* cmpdblockbegin;
+    const char* cmpdblockend;
+    const char* enumblockbegin;
+    const char* enumblockend;
+    const char* opaqblockbegin;
+    const char* opaqblockend;
+    const char* refblockbegin;
+    const char* refblockend;
+    const char* strblockbegin;
+    const char* strblockend;
+    const char* vlenblockbegin;
+    const char* vlenblockend;
+    const char* complexblockbegin;
+    const char* complexblockend;
+    const char* structblockbegin;
+    const char* structblockend;
+    const char* subsettingblockbegin;
+    const char* subsettingblockend;
+    const char* startblockbegin;
+    const char* startblockend;
+    const char* strideblockbegin;
+    const char* strideblockend;
+    const char* countblockbegin;
+    const char* countblockend;
+    const char* blockblockbegin;
+    const char* blockblockend;
 
-    const char *dataspacedescriptionbegin;
-    const char *dataspacedescriptionend;
-    const char *dataspacedimbegin;
-    const char *dataspacedimend;
+    const char* dataspacedescriptionbegin;
+    const char* dataspacedescriptionend;
+    const char* dataspacedimbegin;
+    const char* dataspacedimend;
 
-    const char *virtualselectionbegin;
-    const char *virtualselectionend;
-    const char *virtualselectionblockbegin;
-    const char *virtualselectionblockend;
-    const char *virtualfilenamebegin;
-    const char *virtualfilenameend;
-    const char *virtualdatasetnamebegin;
-    const char *virtualdatasetnameend;
+    const char* virtualselectionbegin;
+    const char* virtualselectionend;
+    const char* virtualselectionblockbegin;
+    const char* virtualselectionblockend;
+    const char* virtualfilenamebegin;
+    const char* virtualfilenameend;
+    const char* virtualdatasetnamebegin;
+    const char* virtualdatasetnameend;
 
 } h5tools_dump_header_t;
 
@@ -222,7 +223,8 @@ struct H5LD_memb_t;
 /*
  * Information about how to format output.
  */
-typedef struct h5tool_format_t {
+typedef struct h5tool_format_t
+{
     /*
      * Fields associated with formatting numeric data.  If a datatype matches
      * multiple formats based on its size, then the first applicable format
@@ -309,27 +311,27 @@ typedef struct h5tool_format_t {
      *
      * Numeric data is also subject to the formats for individual elements.
      */
-    bool        raw;
-    const char *fmt_raw;
-    const char *fmt_schar;
-    const char *fmt_uchar;
-    const char *fmt_short;
-    const char *fmt_ushort;
-    const char *fmt_int;
-    const char *fmt_uint;
-    const char *fmt_long;
-    const char *fmt_ulong;
-    const char *fmt_llong;
-    const char *fmt_ullong;
-    const char *fmt_float;
-    const char *fmt_double;
-    const char *fmt_ldouble;
-    const char *fmt_float_complex;
-    const char *fmt_double_complex;
-    const char *fmt_ldouble_complex;
-    int         ascii;
-    int         str_locale;
-    unsigned    str_repeat;
+    bool raw;
+    const char* fmt_raw;
+    const char* fmt_schar;
+    const char* fmt_uchar;
+    const char* fmt_short;
+    const char* fmt_ushort;
+    const char* fmt_int;
+    const char* fmt_uint;
+    const char* fmt_long;
+    const char* fmt_ulong;
+    const char* fmt_llong;
+    const char* fmt_ullong;
+    const char* fmt_float;
+    const char* fmt_double;
+    const char* fmt_ldouble;
+    const char* fmt_float_complex;
+    const char* fmt_double_complex;
+    const char* fmt_ldouble_complex;
+    int ascii;
+    int str_locale;
+    unsigned str_repeat;
 
     /*
      * Fields associated with compound array members.
@@ -347,10 +349,10 @@ typedef struct h5tool_format_t {
      *   linebreaks: a boolean value to determine if we want to break the line
      *               after each row of an array.
      */
-    const char *arr_pre;
-    const char *arr_sep;
-    const char *arr_suf;
-    int         arr_linebreak;
+    const char* arr_pre;
+    const char* arr_sep;
+    const char* arr_suf;
+    int arr_linebreak;
 
     /*
      * Fields associated with compound data types.
@@ -376,12 +378,12 @@ typedef struct h5tool_format_t {
      *
      *   listv:    h5watch: vector containing info about the list of compound fields to be printed.
      */
-    const char                      *cmpd_name;
-    const char                      *cmpd_sep;
-    const char                      *cmpd_pre;
-    const char                      *cmpd_suf;
-    const char                      *cmpd_end;
-    const struct H5LD_memb_t *const *cmpd_listv;
+    const char* cmpd_name;
+    const char* cmpd_sep;
+    const char* cmpd_pre;
+    const char* cmpd_suf;
+    const char* cmpd_end;
+    const struct H5LD_memb_t* const* cmpd_listv;
 
     /*
      * Fields associated with vlen data types.
@@ -400,10 +402,10 @@ typedef struct h5tool_format_t {
      *   end:       a string to print after we reach the last element of
      *              each compound type. prints out before the suf.
      */
-    const char *vlen_sep;
-    const char *vlen_pre;
-    const char *vlen_suf;
-    const char *vlen_end;
+    const char* vlen_sep;
+    const char* vlen_pre;
+    const char* vlen_suf;
+    const char* vlen_end;
 
     /*
      * Fields associated with the individual elements.
@@ -419,9 +421,9 @@ typedef struct h5tool_format_t {
      *              are followed on the same line by another element.  The
      *              default is a single space.
      */
-    const char *elmt_fmt;
-    const char *elmt_suf1;
-    const char *elmt_suf2;
+    const char* elmt_fmt;
+    const char* elmt_suf1;
+    const char* elmt_suf2;
 
     /*
      * Fields associated with the index values printed at the left edge of
@@ -440,9 +442,9 @@ typedef struct h5tool_format_t {
      *              printf(3) format which should include a format for a
      *              character string.  The default is "%s".
      */
-    const char *idx_n_fmt; /*index number format           */
-    const char *idx_sep;   /*separator between numbers     */
-    const char *idx_fmt;   /*entire index format           */
+    const char* idx_n_fmt; /*index number format           */
+    const char* idx_sep;   /*separator between numbers     */
+    const char* idx_fmt;   /*entire index format           */
 
     /*
      * Fields associated with entire lines.
@@ -498,15 +500,15 @@ typedef struct h5tool_format_t {
      * indentlevel: a string that shows how far to indent if extra spacing
      *              is needed. dumper uses it.
      */
-    unsigned    line_ncols;     /*columns of output             */
-    size_t      line_per_line;  /*max elements per line         */
-    const char *line_pre;       /*prefix at front of each line  */
-    const char *line_1st;       /*alternate pre. on first line  */
-    const char *line_cont;      /*alternate pre. on continuation*/
-    const char *line_suf;       /*string to append to each line */
-    const char *line_sep;       /*separates lines               */
-    int         line_multi_new; /*split multi-line outputs?     */
-    const char *line_indent;    /*for extra indentation if we need it*/
+    unsigned line_ncols;     /*columns of output             */
+    size_t line_per_line;    /*max elements per line         */
+    const char* line_pre;    /*prefix at front of each line  */
+    const char* line_1st;    /*alternate pre. on first line  */
+    const char* line_cont;   /*alternate pre. on continuation*/
+    const char* line_suf;    /*string to append to each line */
+    const char* line_sep;    /*separates lines               */
+    int line_multi_new;      /*split multi-line outputs?     */
+    const char* line_indent; /*for extra indentation if we need it*/
 
     /*used to skip the first set of checks for line length*/
     int skip_first;
@@ -515,17 +517,17 @@ typedef struct h5tool_format_t {
     int obj_hidefileno;
 
     /*string used to format the output for the object refs*/
-    const char *obj_format;
+    const char* obj_format;
 
     /*flag used to hide or show the file number for dataset regions*/
     int dset_hidefileno;
 
     /*string used to format the output for the dataset regions*/
-    const char *dset_format;
+    const char* dset_format;
 
-    const char *dset_blockformat_pre;
-    const char *dset_ptformat_pre;
-    const char *dset_ptformat;
+    const char* dset_blockformat_pre;
+    const char* dset_ptformat_pre;
+    const char* dset_ptformat;
 
     /*print array indices in output matrix */
     int pindex;
@@ -535,85 +537,102 @@ typedef struct h5tool_format_t {
 
 } h5tool_format_t;
 
-typedef struct subset_d {
-    hsize_t     *data;
+typedef struct subset_d
+{
+    hsize_t* data;
     unsigned int len;
 } subset_d;
 
 /* a structure to hold the subsetting particulars for a dataset */
-struct subset_t {
+struct subset_t
+{
     subset_d start;
     subset_d stride;
     subset_d count;
     subset_d block;
 };
 
-typedef struct h5tools_context_t {
-    size_t   cur_column;              /* current column for output */
-    size_t   cur_elmt;                /* current element/output line */
-    int      need_prefix;             /* is line prefix needed? */
-    unsigned ndims;                   /* dimensionality  */
-    hsize_t  p_min_idx[H5S_MAX_RANK]; /* min selected index */
-    hsize_t  p_max_idx[H5S_MAX_RANK]; /* max selected index */
-    int      prev_multiline;          /* was prev datum multiline? */
-    size_t   prev_prefix_len;         /* length of previous prefix */
-    int      continuation;            /* continuation of previous data?*/
-    hsize_t  size_last_dim;        /* the size of the last dimension, needed so we can break after each row */
-    unsigned indent_level;         /* the number of times we need some extra indentation */
-    unsigned default_indent_level; /* this is used when the indent level gets changed */
-    hsize_t  acc[H5S_MAX_RANK];    /* accumulator position */
-    hsize_t  pos[H5S_MAX_RANK];    /* matrix position */
-    hsize_t  sm_pos;               /* current stripmine element position */
-    const struct H5LD_memb_t *const
-        *cmpd_listv; /* h5watch: vector containing info about the list of compound fields to be printed */
-    struct subset_t *sset;          /* subsetting parameters */
-    int              display_index; /* */
-    int              display_char;  /* */
+typedef struct h5tools_context_t
+{
+    size_t cur_column;                           /* current column for output */
+    size_t cur_elmt;                             /* current element/output line */
+    int need_prefix;                             /* is line prefix needed? */
+    unsigned ndims;                              /* dimensionality  */
+    hsize_t p_min_idx[H5S_MAX_RANK];             /* min selected index */
+    hsize_t p_max_idx[H5S_MAX_RANK];             /* max selected index */
+    int prev_multiline;                          /* was prev datum multiline? */
+    size_t prev_prefix_len;                      /* length of previous prefix */
+    int continuation;                            /* continuation of previous data?*/
+    hsize_t size_last_dim;                       /* the size of the last dimension, needed so we can break after each row */
+    unsigned indent_level;                       /* the number of times we need some extra indentation */
+    unsigned default_indent_level;               /* this is used when the indent level gets changed */
+    hsize_t acc[H5S_MAX_RANK];                   /* accumulator position */
+    hsize_t pos[H5S_MAX_RANK];                   /* matrix position */
+    hsize_t sm_pos;                              /* current stripmine element position */
+    const struct H5LD_memb_t* const* cmpd_listv; /* h5watch: vector containing info about the list of compound fields to be printed */
+    struct subset_t* sset;                       /* subsetting parameters */
+    int display_index;                           /* */
+    int display_char;                            /* */
 } h5tools_context_t;
 
 /* VOL and VFD info structs used to set the file access property
  * lists in the tools.
  */
 
-typedef enum { VOL_BY_NAME, VOL_BY_VALUE } h5tools_vol_info_type_t;
-typedef enum { VFD_BY_NAME, VFD_BY_VALUE } h5tools_vfd_info_type_t;
+typedef enum
+{
+    VOL_BY_NAME,
+    VOL_BY_VALUE
+} h5tools_vol_info_type_t;
 
-typedef struct h5tools_vol_info_t {
+typedef enum
+{
+    VFD_BY_NAME,
+    VFD_BY_VALUE
+} h5tools_vfd_info_type_t;
+
+typedef struct h5tools_vol_info_t
+{
     h5tools_vol_info_type_t type;
 
     /* Pointer to information string to be passed to the connector for its setup */
-    const char *info_string;
+    const char* info_string;
 
     /* Field specifying either the connector's name or value (ID) */
-    union {
-        const char        *name;
+    union
+    {
+        const char* name;
         H5VL_class_value_t value;
     } u;
 } h5tools_vol_info_t;
 
-typedef struct h5tools_vfd_info_t {
+typedef struct h5tools_vfd_info_t
+{
     h5tools_vfd_info_type_t type;
 
     /* Pointer to information to be passed to the driver for its setup */
-    const void *info;
+    const void* info;
 
     /* Field specifying either the driver's name or value (ID) */
-    union {
-        const char        *name;
+    union
+    {
+        const char* name;
         H5FD_class_value_t value;
     } u;
 } h5tools_vfd_info_t;
 
 /* This enum should match the entries in the 'volnames'
  * array since they are indices into that array. */
-typedef enum {
+typedef enum
+{
     NATIVE_VOL_IDX = 0,
     PASS_THROUGH_VOL_IDX,
 } vol_idx;
 
 /* This enum should match the entries in the 'drivernames'
  * array since they are indices into that array. */
-typedef enum {
+typedef enum
+{
     SEC2_VFD_IDX = 0,
     DIRECT_VFD_IDX,
     LOG_VFD_IDX,
@@ -639,42 +658,43 @@ typedef enum {
 #include "h5tools_str.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-H5TOOLS_DLLVAR const char *volnames[];
-H5TOOLS_DLLVAR const char *drivernames[];
+    H5TOOLS_DLLVAR const char* volnames[];
+    H5TOOLS_DLLVAR const char* drivernames[];
 
-H5TOOLS_DLLVAR h5tool_format_t              h5tools_dataformat;
-H5TOOLS_DLLVAR const h5tools_dump_header_t  h5tools_standardformat;
-H5TOOLS_DLLVAR const h5tools_dump_header_t *h5tools_dump_header_format;
-H5TOOLS_DLLVAR H5E_auto2_t                  lib_func;
-H5TOOLS_DLLVAR H5E_auto2_t                  tools_func;
-H5TOOLS_DLLVAR void                        *lib_edata;
-H5TOOLS_DLLVAR void                        *tools_edata;
+    H5TOOLS_DLLVAR h5tool_format_t h5tools_dataformat;
+    H5TOOLS_DLLVAR const h5tools_dump_header_t h5tools_standardformat;
+    H5TOOLS_DLLVAR const h5tools_dump_header_t* h5tools_dump_header_format;
+    H5TOOLS_DLLVAR H5E_auto2_t lib_func;
+    H5TOOLS_DLLVAR H5E_auto2_t tools_func;
+    H5TOOLS_DLLVAR void* lib_edata;
+    H5TOOLS_DLLVAR void* tools_edata;
 
-H5TOOLS_DLLVAR unsigned           packed_bits_num;    /* number of packed bits to display */
-H5TOOLS_DLLVAR unsigned           packed_data_offset; /* offset of packed bits to display */
-H5TOOLS_DLLVAR unsigned           packed_data_length; /* length of packed bits to display */
-H5TOOLS_DLLVAR unsigned long long packed_data_mask;   /* mask in which packed bits to display */
-H5TOOLS_DLLVAR FILE              *rawattrstream;      /* output stream for raw attribute data */
-H5TOOLS_DLLVAR FILE              *rawdatastream;      /* output stream for raw data */
-H5TOOLS_DLLVAR FILE              *rawinstream;        /* input stream for raw input */
-H5TOOLS_DLLVAR FILE              *rawoutstream;       /* output stream for raw output */
-H5TOOLS_DLLVAR FILE              *rawerrorstream;     /* output stream for raw error */
-H5TOOLS_DLLVAR int                bin_output;         /* binary output */
-H5TOOLS_DLLVAR int                bin_form;           /* binary form */
-H5TOOLS_DLLVAR int                region_output;      /* region output */
-H5TOOLS_DLLVAR int                oid_output;         /* oid output */
-H5TOOLS_DLLVAR int                data_output;        /* data output */
-H5TOOLS_DLLVAR int                attr_data_output;   /* attribute data output */
+    H5TOOLS_DLLVAR unsigned packed_bits_num;            /* number of packed bits to display */
+    H5TOOLS_DLLVAR unsigned packed_data_offset;         /* offset of packed bits to display */
+    H5TOOLS_DLLVAR unsigned packed_data_length;         /* length of packed bits to display */
+    H5TOOLS_DLLVAR unsigned long long packed_data_mask; /* mask in which packed bits to display */
+    H5TOOLS_DLLVAR FILE* rawattrstream;                 /* output stream for raw attribute data */
+    H5TOOLS_DLLVAR FILE* rawdatastream;                 /* output stream for raw data */
+    H5TOOLS_DLLVAR FILE* rawinstream;                   /* input stream for raw input */
+    H5TOOLS_DLLVAR FILE* rawoutstream;                  /* output stream for raw output */
+    H5TOOLS_DLLVAR FILE* rawerrorstream;                /* output stream for raw error */
+    H5TOOLS_DLLVAR int bin_output;                      /* binary output */
+    H5TOOLS_DLLVAR int bin_form;                        /* binary form */
+    H5TOOLS_DLLVAR int region_output;                   /* region output */
+    H5TOOLS_DLLVAR int oid_output;                      /* oid output */
+    H5TOOLS_DLLVAR int data_output;                     /* data output */
+    H5TOOLS_DLLVAR int attr_data_output;                /* attribute data output */
 
-/* sort parameters */
-H5TOOLS_DLLVAR H5_index_t      sort_by;    /* sort_by [creation_order | name]  */
-H5TOOLS_DLLVAR H5_iter_order_t sort_order; /* sort_order [ascending | descending]   */
+    /* sort parameters */
+    H5TOOLS_DLLVAR H5_index_t sort_by;         /* sort_by [creation_order | name]  */
+    H5TOOLS_DLLVAR H5_iter_order_t sort_order; /* sort_order [ascending | descending]   */
 
-/* things to display or which are set via command line parameters */
-H5TOOLS_DLLVAR int enable_error_stack; /* re-enable error stack; disable=0 enable=1 */
+    /* things to display or which are set via command line parameters */
+    H5TOOLS_DLLVAR int enable_error_stack; /* re-enable error stack; disable=0 enable=1 */
 
 /* Strings for output */
 #define H5_TOOLS_GROUP     "GROUP"
@@ -684,60 +704,61 @@ H5TOOLS_DLLVAR int enable_error_stack; /* re-enable error stack; disable=0 enabl
 #define H5_TOOLS_MAP       "MAP"
 #define H5_TOOLS_UNKNOWN   "UNKNOWN"
 
-/* Definitions of useful routines */
-H5TOOLS_DLL void h5tools_init(void);
-H5TOOLS_DLL void h5tools_close(void);
+    /* Definitions of useful routines */
+    H5TOOLS_DLL void h5tools_init(void);
+    H5TOOLS_DLL void h5tools_close(void);
 
-H5TOOLS_DLL void h5tools_error_report(void);
-H5TOOLS_DLL int  h5tools_set_data_output_file(const char *fname, int is_bin);
-H5TOOLS_DLL int  h5tools_set_attr_output_file(const char *fname, int is_bin);
-H5TOOLS_DLL int  h5tools_set_input_file(const char *fname, int is_bin);
-H5TOOLS_DLL int  h5tools_set_output_file(const char *fname, int is_bin);
-H5TOOLS_DLL int  h5tools_set_error_file(const char *fname, int is_bin);
+    H5TOOLS_DLL void h5tools_error_report(void);
+    H5TOOLS_DLL int h5tools_set_data_output_file(const char* fname, int is_bin);
+    H5TOOLS_DLL int h5tools_set_attr_output_file(const char* fname, int is_bin);
+    H5TOOLS_DLL int h5tools_set_input_file(const char* fname, int is_bin);
+    H5TOOLS_DLL int h5tools_set_output_file(const char* fname, int is_bin);
+    H5TOOLS_DLL int h5tools_set_error_file(const char* fname, int is_bin);
 
-H5TOOLS_DLL hid_t   h5tools_get_new_fapl(hid_t prev_fapl_id);
-H5TOOLS_DLL herr_t  h5tools_get_vfd_name(hid_t fid, hid_t fapl_id, char *drivername, size_t drivername_size);
-H5TOOLS_DLL herr_t  h5tools_set_fapl_vfd(hid_t fapl_id, h5tools_vfd_info_t *vfd_info);
-H5TOOLS_DLL herr_t  h5tools_set_fapl_vol(hid_t fapl_id, h5tools_vol_info_t *vol_info);
-H5TOOLS_DLL hid_t   h5tools_fopen(const char *fname, unsigned flags, hid_t fapl, bool use_specific_driver,
-                                  char *drivername, size_t drivername_size);
-H5TOOLS_DLL hid_t   h5tools_get_little_endian_type(hid_t type);
-H5TOOLS_DLL hid_t   h5tools_get_big_endian_type(hid_t type);
-H5TOOLS_DLL htri_t  h5tools_detect_vlen(hid_t tid);
-H5TOOLS_DLL htri_t  h5tools_detect_vlen_str(hid_t tid);
-H5TOOLS_DLL bool    h5tools_is_obj_same(hid_t loc_id1, const char *name1, hid_t loc_id2, const char *name2);
-H5TOOLS_DLL void    init_acc_pos(unsigned ndims, const hsize_t *dims, hsize_t *acc, hsize_t *pos,
-                                 hsize_t *p_min_idx);
-H5TOOLS_DLL hsize_t calc_acc_pos(unsigned ndims, hsize_t elemtno, const hsize_t *acc, hsize_t *pos);
-H5TOOLS_DLL bool    h5tools_is_zero(const void *_mem, size_t size);
-H5TOOLS_DLL int     h5tools_canreadf(const char *name, hid_t dcpl_id);
-H5TOOLS_DLL int     h5tools_can_encode(H5Z_filter_t filtn);
+    H5TOOLS_DLL hid_t h5tools_get_new_fapl(hid_t prev_fapl_id);
+    H5TOOLS_DLL herr_t h5tools_get_vfd_name(hid_t fid, hid_t fapl_id, char* drivername, size_t drivername_size);
+    H5TOOLS_DLL herr_t h5tools_set_fapl_vfd(hid_t fapl_id, h5tools_vfd_info_t* vfd_info);
+    H5TOOLS_DLL herr_t h5tools_set_fapl_vol(hid_t fapl_id, h5tools_vol_info_t* vol_info);
+    H5TOOLS_DLL hid_t h5tools_fopen(const char* fname, unsigned flags, hid_t fapl, bool use_specific_driver, char* drivername, size_t drivername_size);
+    H5TOOLS_DLL hid_t h5tools_get_little_endian_type(hid_t type);
+    H5TOOLS_DLL hid_t h5tools_get_big_endian_type(hid_t type);
+    H5TOOLS_DLL htri_t h5tools_detect_vlen(hid_t tid);
+    H5TOOLS_DLL htri_t h5tools_detect_vlen_str(hid_t tid);
+    H5TOOLS_DLL bool h5tools_is_obj_same(hid_t loc_id1, const char* name1, hid_t loc_id2, const char* name2);
+    H5TOOLS_DLL void init_acc_pos(unsigned ndims, const hsize_t* dims, hsize_t* acc, hsize_t* pos, hsize_t* p_min_idx);
+    H5TOOLS_DLL hsize_t calc_acc_pos(unsigned ndims, hsize_t elemtno, const hsize_t* acc, hsize_t* pos);
+    H5TOOLS_DLL bool h5tools_is_zero(const void* _mem, size_t size);
+    H5TOOLS_DLL int h5tools_canreadf(const char* name, hid_t dcpl_id);
+    H5TOOLS_DLL int h5tools_can_encode(H5Z_filter_t filtn);
 
-H5TOOLS_DLL void h5tools_simple_prefix(FILE *stream, const h5tool_format_t *info, h5tools_context_t *ctx,
-                                       hsize_t elmtno, int secnum);
-H5TOOLS_DLL void h5tools_region_simple_prefix(FILE *stream, const h5tool_format_t *info,
-                                              h5tools_context_t *ctx, hsize_t elmtno, hsize_t *ptdata,
-                                              int secnum);
+    H5TOOLS_DLL void h5tools_simple_prefix(FILE* stream, const h5tool_format_t* info, h5tools_context_t* ctx, hsize_t elmtno, int secnum);
+    H5TOOLS_DLL void h5tools_region_simple_prefix(FILE* stream, const h5tool_format_t* info, h5tools_context_t* ctx, hsize_t elmtno, hsize_t* ptdata, int secnum);
 
-H5TOOLS_DLL int  render_bin_output(FILE *stream, hid_t container, hid_t tid, void *_mem, hsize_t nelmts);
-H5TOOLS_DLL int  render_bin_output_region_data_blocks(hid_t region_id, FILE *stream, hid_t container,
-                                                      unsigned ndims, hid_t type_id, hsize_t nblocks,
-                                                      const hsize_t *ptdata);
-H5TOOLS_DLL bool render_bin_output_region_blocks(hid_t region_space, hid_t region_id, FILE *stream,
-                                                 hid_t container);
-H5TOOLS_DLL int  render_bin_output_region_data_points(hid_t region_space, hid_t region_id, FILE *stream,
-                                                      hid_t container, unsigned ndims, hid_t type_id,
-                                                      hsize_t npoints);
-H5TOOLS_DLL bool render_bin_output_region_points(hid_t region_space, hid_t region_id, FILE *stream,
-                                                 hid_t container);
+    H5TOOLS_DLL int render_bin_output(FILE* stream, hid_t container, hid_t tid, void* _mem, hsize_t nelmts);
+    H5TOOLS_DLL int
+        render_bin_output_region_data_blocks(hid_t region_id, FILE* stream, hid_t container, unsigned ndims, hid_t type_id, hsize_t nblocks, const hsize_t* ptdata);
+    H5TOOLS_DLL bool render_bin_output_region_blocks(hid_t region_space, hid_t region_id, FILE* stream, hid_t container);
+    H5TOOLS_DLL int
+        render_bin_output_region_data_points(hid_t region_space, hid_t region_id, FILE* stream, hid_t container, unsigned ndims, hid_t type_id, hsize_t npoints);
+    H5TOOLS_DLL bool render_bin_output_region_points(hid_t region_space, hid_t region_id, FILE* stream, hid_t container);
 
-H5TOOLS_DLL bool h5tools_render_element(FILE *stream, const h5tool_format_t *info, h5tools_context_t *ctx,
-                                        h5tools_str_t *buffer, hsize_t *curr_pos, size_t ncols,
-                                        hsize_t local_elmt_counter, hsize_t elmt_counter);
-H5TOOLS_DLL bool h5tools_render_region_element(FILE *stream, const h5tool_format_t *info,
-                                               h5tools_context_t *ctx, h5tools_str_t *buffer,
-                                               hsize_t *curr_pos, size_t ncols, hsize_t *ptdata,
-                                               hsize_t local_elmt_counter, hsize_t elmt_counter);
+    H5TOOLS_DLL bool h5tools_render_element(FILE* stream,
+                                            const h5tool_format_t* info,
+                                            h5tools_context_t* ctx,
+                                            h5tools_str_t* buffer,
+                                            hsize_t* curr_pos,
+                                            size_t ncols,
+                                            hsize_t local_elmt_counter,
+                                            hsize_t elmt_counter);
+    H5TOOLS_DLL bool h5tools_render_region_element(FILE* stream,
+                                                   const h5tool_format_t* info,
+                                                   h5tools_context_t* ctx,
+                                                   h5tools_str_t* buffer,
+                                                   hsize_t* curr_pos,
+                                                   size_t ncols,
+                                                   hsize_t* ptdata,
+                                                   hsize_t local_elmt_counter,
+                                                   hsize_t elmt_counter);
 
 /* S3 schema prefix */
 #define S3_URI_PREFIX "s3://"

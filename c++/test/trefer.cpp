@@ -50,10 +50,11 @@ const int SPACE3_DIM1 = 100;
 const int POINT1_NPOINTS = 10;
 
 // Compound datatype
-typedef struct s1_t {
+typedef struct s1_t
+{
     unsigned int a;
     unsigned int b;
-    float        c;
+    float c;
 } s1_t;
 
 /*-------------------------------------------------------------------------
@@ -64,15 +65,14 @@ typedef struct s1_t {
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_reference_params()
+static void test_reference_params()
 {
-    const char *write_comment = "Foo!"; /* Comments for group */
+    const char* write_comment = "Foo!"; /* Comments for group */
 
     // Output message about test being performed
     SUBTEST("Object Reference Parameters");
 
-    H5File *file1 = NULL;
+    H5File* file1 = NULL;
     try {
         hobj_ref_t *wbuf, // buffer to write to disk
             *rbuf,        // buffer read from disk
@@ -80,15 +80,15 @@ test_reference_params()
 
         // Allocate write & read buffers
         size_t temp_size = MAX(sizeof(unsigned), sizeof(hobj_ref_t));
-        wbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
-        rbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
-        tbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
+        wbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
+        rbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
+        tbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
 
         // Create file FILE1
         file1 = new H5File(FILE1, H5F_ACC_TRUNC);
 
         // Create dataspace for datasets
-        hsize_t   dims1[] = {SPACE1_DIM1};
+        hsize_t dims1[] = { SPACE1_DIM1 };
         DataSpace sid1(SPACE1_RANK, dims1);
 
         // Create a group
@@ -100,10 +100,11 @@ test_reference_params()
         // Create a dataset (inside /Group1)
         DataSet dataset = group.createDataSet(DSET1_NAME, PredType::NATIVE_UINT, sid1);
 
-        unsigned *tu32; // Temporary pointer to uint32 data
-        unsigned  i;
-        for (tu32 = reinterpret_cast<unsigned *>(wbuf), i = 0; i < SPACE1_DIM1; i++)
+        unsigned* tu32; // Temporary pointer to uint32 data
+        unsigned i;
+        for (tu32 = reinterpret_cast<unsigned*>(wbuf), i = 0; i < SPACE1_DIM1; i++) {
             *tu32++ = i * 3; // from C test
+        }
 
         // Write selection to disk
         dataset.write(wbuf, PredType::NATIVE_UINT);
@@ -139,27 +140,27 @@ test_reference_params()
         try {
             file1->reference(NULL, "/Group1/Dataset1");
         }
-        catch (ReferenceException &E) {
+        catch (ReferenceException& E) {
         } // We expect this to fail
         try {
             file1->reference(&wbuf[0], NULL);
         }
-        catch (ReferenceException &E) {
+        catch (ReferenceException& E) {
         } // We expect this to fail
         try {
             file1->reference(&wbuf[0], "");
         }
-        catch (ReferenceException &E) {
+        catch (ReferenceException& E) {
         } // We expect this to fail
         try {
             file1->reference(&wbuf[0], "/Group1/Dataset1", H5R_MAXTYPE);
         }
-        catch (ReferenceException &E) {
+        catch (ReferenceException& E) {
         } // We expect this to fail
         try {
             file1->reference(&wbuf[0], "/Group1/Dataset1", H5R_DATASET_REGION);
         }
-        catch (ReferenceException &E) {
+        catch (ReferenceException& E) {
         } // We expect this to fail
 
         // Close resources
@@ -174,7 +175,7 @@ test_reference_params()
 
         PASSED();
     } // end try
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_reference_param()", __LINE__, __FILE__, E.getCFuncName(), E.getCDetailMsg());
     }
 
@@ -190,15 +191,14 @@ test_reference_params()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_reference_obj()
+static void test_reference_obj()
 {
     const H5std_string write_comment = "Foo!"; // Comments for group
 
     // Output message about test being performed
     SUBTEST("Object Reference Functions");
 
-    H5File *file1 = NULL;
+    H5File* file1 = NULL;
     try {
         hobj_ref_t *wbuf, // buffer to write to disk
             *rbuf,        // buffer read from disk
@@ -206,15 +206,15 @@ test_reference_obj()
 
         // Allocate write & read buffers
         size_t temp_size = MAX(sizeof(unsigned), sizeof(hobj_ref_t));
-        wbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
-        rbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
-        tbuf             = static_cast<hobj_ref_t *>(malloc(temp_size * SPACE1_DIM1));
+        wbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
+        rbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
+        tbuf = static_cast<hobj_ref_t*>(malloc(temp_size * SPACE1_DIM1));
 
         // Create file FILE1
         file1 = new H5File(FILE1, H5F_ACC_TRUNC);
 
         // Create dataspace for datasets
-        hsize_t   dims1[] = {SPACE1_DIM1};
+        hsize_t dims1[] = { SPACE1_DIM1 };
         DataSpace sid1(SPACE1_RANK, dims1);
 
         // Create dataset access property list
@@ -229,10 +229,11 @@ test_reference_obj()
         // Create a dataset (inside /Group1)
         DataSet dataset = group.createDataSet(DSET1_NAME, PredType::NATIVE_UINT, sid1);
 
-        unsigned *tu32; // Temporary pointer to uint32 data
-        unsigned  i;
-        for (tu32 = reinterpret_cast<unsigned *>(wbuf), i = 0; i < SPACE1_DIM1; i++)
+        unsigned* tu32; // Temporary pointer to uint32 data
+        unsigned i;
+        for (tu32 = reinterpret_cast<unsigned*>(wbuf), i = 0; i < SPACE1_DIM1; i++) {
             *tu32++ = i * 3; // from C test
+        }
 
         // Write selection to disk
         dataset.write(wbuf, PredType::NATIVE_UINT);
@@ -267,26 +268,22 @@ test_reference_obj()
         // Create reference to dataset and test getRefObjType
         file1->reference(&wbuf[0], "/Group1/Dataset1");
         H5O_type_t refobj_type = dataset.getRefObjType(&wbuf[0], H5R_OBJECT);
-        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_DATASET),
-                   "DataSet::getRefObjType", __LINE__, __FILE__);
+        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_DATASET), "DataSet::getRefObjType", __LINE__, __FILE__);
 
         // Create reference to dataset and test getRefObjType
         file1->reference(&wbuf[1], "/Group1/Dataset2");
         refobj_type = dataset.getRefObjType(&wbuf[1], H5R_OBJECT);
-        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_DATASET),
-                   "DataSet::getRefObjType", __LINE__, __FILE__);
+        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_DATASET), "DataSet::getRefObjType", __LINE__, __FILE__);
 
         // Create reference to group
         file1->reference(&wbuf[2], "/Group1");
         refobj_type = dataset.getRefObjType(&wbuf[2], H5R_OBJECT);
-        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_GROUP),
-                   "DataSet::getRefObjType", __LINE__, __FILE__);
+        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_GROUP), "DataSet::getRefObjType", __LINE__, __FILE__);
 
         // Create reference to named datatype
         file1->reference(&wbuf[3], "/Group1/Datatype1");
         refobj_type = dataset.getRefObjType(&wbuf[3], H5R_OBJECT);
-        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_NAMED_DATATYPE),
-                   "DataSet::getRefObjType", __LINE__, __FILE__);
+        verify_val(static_cast<long>(refobj_type), static_cast<long>(H5O_TYPE_NAMED_DATATYPE), "DataSet::getRefObjType", __LINE__, __FILE__);
 
         // Write selection to disk
         dataset.write(wbuf, PredType::STD_REF_OBJ);
@@ -310,16 +307,16 @@ test_reference_obj()
         DataSet dset2(dataset, &rbuf[0], H5R_OBJECT, dapl);
 
         // Check information in the referenced dataset
-        sid1                = dset2.getSpace();
+        sid1 = dset2.getSpace();
         hssize_t n_elements = sid1.getSimpleExtentNpoints();
         verify_val(static_cast<long>(n_elements), 4, "DataSpace::getSimpleExtentNpoints", __LINE__, __FILE__);
 
         // Read from disk
         dset2.read(tbuf, PredType::NATIVE_UINT);
 
-        for (tu32 = reinterpret_cast<unsigned *>(tbuf), i = 0; i < SPACE1_DIM1; i++, tu32++)
-            verify_val(*tu32, static_cast<uint32_t>(i * 3), "DataSpace::getSimpleExtentNpoints", __LINE__,
-                       __FILE__);
+        for (tu32 = reinterpret_cast<unsigned*>(tbuf), i = 0; i < SPACE1_DIM1; i++, tu32++) {
+            verify_val(*tu32, static_cast<uint32_t>(i * 3), "DataSpace::getSimpleExtentNpoints", __LINE__, __FILE__);
+        }
 
         // Close dereferenced dataset
         dset2.close();
@@ -341,7 +338,7 @@ test_reference_obj()
         try {
             H5std_string read_comment_tmp = group.getComment(NULL);
         }
-        catch (Exception &E) {
+        catch (Exception& E) {
         } // We expect this to fail
 
         // Close group
@@ -357,8 +354,7 @@ test_reference_obj()
         H5T_class_t tclass;
 
         tclass = dtype1.getClass();
-        verify_val(static_cast<long>(tclass), static_cast<long>(H5T_COMPOUND), "DataType::getClass", __LINE__,
-                   __FILE__);
+        verify_val(static_cast<long>(tclass), static_cast<long>(H5T_COMPOUND), "DataType::getClass", __LINE__, __FILE__);
         int n_members = dtype1.getNmembers();
         verify_val(n_members, 3, "CompType::getNmembers", __LINE__, __FILE__);
 
@@ -374,7 +370,7 @@ test_reference_obj()
 
         PASSED();
     } // end try
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_reference_obj()", __LINE__, __FILE__, E.getCFuncName(), E.getCDetailMsg());
     }
 
@@ -395,17 +391,16 @@ test_reference_obj()
 #define DSETNAME   "/dset"
 #define DSETNAME2  "dset2"
 
-static void
-test_reference_group()
+static void test_reference_group()
 {
-    hobj_ref_t         wref;                   /* Reference to write */
-    hobj_ref_t         rref;                   /* Reference to read */
+    hobj_ref_t wref;                           /* Reference to write */
+    hobj_ref_t rref;                           /* Reference to read */
     const H5std_string write_comment = "Foo!"; // Comments for group
 
     // Output message about test being performed
     SUBTEST("Object Reference to Group");
 
-    H5File *file1 = NULL;
+    H5File* file1 = NULL;
     try {
         /*
          * Create file with a group and a dataset containing an object
@@ -490,8 +485,7 @@ test_reference_group()
         H5O_info2_t oinfo;
         memset(&oinfo, 0, sizeof(oinfo));
         group.getObjinfo(".", H5_INDEX_NAME, H5_ITER_INC, 0, oinfo);
-        verify_val(static_cast<long>(oinfo.type), static_cast<long>(H5O_TYPE_DATASET), "Group::getObjinfo",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(oinfo.type), static_cast<long>(H5O_TYPE_DATASET), "Group::getObjinfo", __LINE__, __FILE__);
 
         // Check for out of bound query by index
         try {
@@ -501,7 +495,7 @@ test_reference_group()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("Group::getObjinfo", "Out of bound index.");
         }
-        catch (Exception &err) {
+        catch (Exception& err) {
         } // do nothing, failure expected
 
         // Unlink one of the objects in the dereferenced group, and re-check
@@ -517,7 +511,7 @@ test_reference_group()
 
         PASSED();
     } // end try
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_reference_group()", __LINE__, __FILE__, E.getCFuncName(), E.getCDetailMsg());
     }
 
@@ -532,18 +526,17 @@ test_reference_group()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_reference_region_1D()
+static void test_reference_region_1D()
 {
-    hsize_t  start[SPACE3_RANK];                  /* Starting location of hyperslab */
-    hsize_t  stride[SPACE3_RANK];                 /* Stride of hyperslab */
-    hsize_t  count[SPACE3_RANK];                  /* Element count of hyperslab */
-    hsize_t  block[SPACE3_RANK];                  /* Block size of hyperslab */
-    hsize_t  coord1[POINT1_NPOINTS][SPACE3_RANK]; /* Coordinates for point selection */
-    hsize_t *coords;                              /* Coordinate buffer */
-    hsize_t  low[SPACE3_RANK];                    /* Selection bounds */
-    hsize_t  high[SPACE3_RANK];                   /* Selection bounds */
-    int      i;                                   /* counting variables */
+    hsize_t start[SPACE3_RANK];                  /* Starting location of hyperslab */
+    hsize_t stride[SPACE3_RANK];                 /* Stride of hyperslab */
+    hsize_t count[SPACE3_RANK];                  /* Element count of hyperslab */
+    hsize_t block[SPACE3_RANK];                  /* Block size of hyperslab */
+    hsize_t coord1[POINT1_NPOINTS][SPACE3_RANK]; /* Coordinates for point selection */
+    hsize_t* coords;                             /* Coordinate buffer */
+    hsize_t low[SPACE3_RANK];                    /* Selection bounds */
+    hsize_t high[SPACE3_RANK];                   /* Selection bounds */
+    int i;                                       /* counting variables */
 
     // Output message about test being performed
     SUBTEST("1-D Dataset Region Reference Functions");
@@ -555,16 +548,16 @@ test_reference_region_1D()
             *drbuf;            // Buffer for reading numeric data from disk
 
         // Allocate write & read buffers
-        wbuf  = static_cast<hdset_reg_ref_t *>(calloc(SPACE1_DIM1, sizeof(hdset_reg_ref_t)));
-        rbuf  = static_cast<hdset_reg_ref_t *>(calloc(SPACE1_DIM1, sizeof(hdset_reg_ref_t)));
-        dwbuf = static_cast<uint8_t *>(calloc(SPACE3_DIM1, sizeof(uint8_t)));
-        drbuf = static_cast<uint8_t *>(calloc(SPACE3_DIM1, sizeof(uint8_t)));
+        wbuf = static_cast<hdset_reg_ref_t*>(calloc(SPACE1_DIM1, sizeof(hdset_reg_ref_t)));
+        rbuf = static_cast<hdset_reg_ref_t*>(calloc(SPACE1_DIM1, sizeof(hdset_reg_ref_t)));
+        dwbuf = static_cast<uint8_t*>(calloc(SPACE3_DIM1, sizeof(uint8_t)));
+        drbuf = static_cast<uint8_t*>(calloc(SPACE3_DIM1, sizeof(uint8_t)));
 
         // Create file FILE1
         H5File file1(FILE2, H5F_ACC_TRUNC);
 
         // Create dataspace for datasets
-        hsize_t   dims3[] = {SPACE3_DIM1};
+        hsize_t dims3[] = { SPACE3_DIM1 };
         DataSpace sid3(SPACE3_RANK, dims3);
 
         // Create dataset access property list
@@ -573,9 +566,10 @@ test_reference_region_1D()
         // Create a dataset
         DataSet dset3 = file1.createDataSet(DSET2_NAME, PredType::STD_U8LE, sid3);
 
-        uint8_t *tu8; // Temporary pointer to uint8 data
-        for (tu8 = dwbuf, i = 0; i < SPACE3_DIM1; i++)
+        uint8_t* tu8;                         // Temporary pointer to uint8 data
+        for (tu8 = dwbuf, i = 0; i < SPACE3_DIM1; i++) {
             *tu8++ = static_cast<uint8_t>(i); // from C test
+        }
 
         // Write selection to disk
         dset3.write(dwbuf, PredType::STD_U8LE);
@@ -584,7 +578,7 @@ test_reference_region_1D()
         dset3.close();
 
         // Create dataspace for datasets
-        hsize_t   dims1[] = {SPACE1_DIM1};
+        hsize_t dims1[] = { SPACE1_DIM1 };
         DataSpace sid1(SPACE1_RANK, dims1);
 
         // Create a dataset
@@ -595,10 +589,10 @@ test_reference_region_1D()
          */
 
         /* Select 15 2x1 hyperslabs for first reference */
-        start[0]  = 2;
+        start[0] = 2;
         stride[0] = 5;
-        count[0]  = 15;
-        block[0]  = 2;
+        count[0] = 15;
+        block[0] = 2;
 
         // Select a hyperslab region to add to the current selected region
         sid3.selectHyperslab(H5S_SELECT_SET, count, start, stride, block);
@@ -612,8 +606,7 @@ test_reference_region_1D()
 
         // Get and verify object type
         H5O_type_t obj_type = dset1.getRefObjType(&wbuf[0], H5R_DATASET_REGION);
-        verify_val(static_cast<long>(obj_type), static_cast<long>(H5O_TYPE_DATASET), "DataSet::getRefObjType",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(obj_type), static_cast<long>(H5O_TYPE_DATASET), "DataSet::getRefObjType", __LINE__, __FILE__);
 
         /* Select sequence of ten points for second reference */
         coord1[0][0] = 16;
@@ -628,7 +621,7 @@ test_reference_region_1D()
         coord1[9][0] = 3;
 
         // Selects array elements to be included in the selection for sid3
-        sid3.selectElements(H5S_SELECT_SET, POINT1_NPOINTS, reinterpret_cast<const hsize_t *>(coord1));
+        sid3.selectElements(H5S_SELECT_SET, POINT1_NPOINTS, reinterpret_cast<const hsize_t*>(coord1));
 
         // Get and verify the number of elements in a dataspace selection
         nelms = sid3.getSelectNpoints();
@@ -664,14 +657,12 @@ test_reference_region_1D()
 
             // Get and verify object type
             obj_type = dset1.getRefObjType(&rbuf[0], H5R_DATASET_REGION);
-            verify_val(static_cast<long>(obj_type), static_cast<long>(H5O_TYPE_DATASET),
-                       "DataSet::getRefObjType", __LINE__, __FILE__);
+            verify_val(static_cast<long>(obj_type), static_cast<long>(H5O_TYPE_DATASET), "DataSet::getRefObjType", __LINE__, __FILE__);
 
             // Get dataspace of dset3 the verify number of elements
-            sid1  = dset3.getSpace();
+            sid1 = dset3.getSpace();
             nelms = sid1.getSimpleExtentNpoints();
-            verify_val(static_cast<long>(nelms), 100, "DataSpace::getSimpleExtentNpoints", __LINE__,
-                       __FILE__);
+            verify_val(static_cast<long>(nelms), 100, "DataSpace::getSimpleExtentNpoints", __LINE__, __FILE__);
         } // End of test DataSet::dereference
 
         { // Test DataSet constructor -by dereference
@@ -680,10 +671,9 @@ test_reference_region_1D()
             DataSet newds(dset1, &rbuf[0], H5R_DATASET_REGION, dapl);
 
             // Get dataspace of newds then verify number of elements
-            sid1  = newds.getSpace();
+            sid1 = newds.getSpace();
             nelms = sid1.getSimpleExtentNpoints();
-            verify_val(static_cast<long>(nelms), 100, "DataSpace::getSimpleExtentNpoints", __LINE__,
-                       __FILE__);
+            verify_val(static_cast<long>(nelms), 100, "DataSpace::getSimpleExtentNpoints", __LINE__, __FILE__);
 
             // Close objects for this mini test
             newds.close();
@@ -693,9 +683,9 @@ test_reference_region_1D()
         // Read from disk
         dset3.read(drbuf, PredType::STD_U8LE);
 
-        for (tu8 = static_cast<uint8_t *>(drbuf), i = 0; i < SPACE3_DIM1; i++, tu8++)
-            verify_val(*tu8, static_cast<uint8_t>(i), "DataSpace::getSimpleExtentNpoints", __LINE__,
-                       __FILE__);
+        for (tu8 = static_cast<uint8_t*>(drbuf), i = 0; i < SPACE3_DIM1; i++, tu8++) {
+            verify_val(*tu8, static_cast<uint8_t>(i), "DataSpace::getSimpleExtentNpoints", __LINE__, __FILE__);
+        }
 
         /*
          * Test getting the referenced region
@@ -713,8 +703,7 @@ test_reference_region_1D()
         verify_val(static_cast<long>(nelms), 15, "DataSpace::getSelectNpoints", __LINE__, __FILE__);
 
         /* Allocate space for the hyperslab blocks */
-        coords =
-            static_cast<hsize_t *>(malloc(static_cast<size_t>(nelms) * SPACE3_RANK * sizeof(hsize_t) * 2));
+        coords = static_cast<hsize_t*>(malloc(static_cast<size_t>(nelms) * SPACE3_RANK * sizeof(hsize_t) * 2));
 
         // Get the list of hyperslab blocks currently selected
         reg_sp.getSelectHyperBlocklist(0, static_cast<hsize_t>(nelms), coords);
@@ -773,8 +762,7 @@ test_reference_region_1D()
         verify_val(static_cast<long>(nelmspts), 10, "DataSpace::getSelectNpoints", __LINE__, __FILE__);
 
         /* Allocate space for the hyperslab blocks */
-        coords =
-            static_cast<hsize_t *>(malloc(static_cast<size_t>(nelmspts) * SPACE3_RANK * sizeof(hsize_t)));
+        coords = static_cast<hsize_t*>(malloc(static_cast<size_t>(nelmspts) * SPACE3_RANK * sizeof(hsize_t)));
 
         // Get the list of element points currently selected
         elm_sp.getSelectElemPointlist(0, static_cast<hsize_t>(nelmspts), coords);
@@ -815,7 +803,7 @@ test_reference_region_1D()
 
         PASSED();
     } // end try
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_reference_region_1D()", __LINE__, __FILE__, E.getCFuncName(), E.getCDetailMsg());
     }
 } /* test_reference_region_1D() */
@@ -826,8 +814,7 @@ test_reference_region_1D()
  *
  *-------------------------------------------------------------------------
  */
-extern "C" void
-test_reference(void *params)
+extern "C" void test_reference(void* params)
 {
     (void)params;
 
@@ -849,8 +836,7 @@ test_reference(void *params)
  * Return       None
  *-------------------------------------------------------------------------
  */
-extern "C" void
-cleanup_reference(void *params)
+extern "C" void cleanup_reference(void* params)
 {
     (void)params;
 

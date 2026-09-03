@@ -16,14 +16,14 @@
  *        include H5Mprivate.h instead.
  */
 #if !(defined H5M_FRIEND || defined H5M_MODULE)
-#error "Do not include this file outside the H5M package!"
+    #error "Do not include this file outside the H5M package!"
 #endif
 
 #ifndef H5Mpkg_H
-#define H5Mpkg_H
+    #define H5Mpkg_H
 
-/* Get package's private header */
-#include "H5Mprivate.h"
+    /* Get package's private header */
+    #include "H5Mprivate.h"
 
 /* Other private headers needed by this file */
 

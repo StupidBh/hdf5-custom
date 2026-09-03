@@ -227,50 +227,54 @@
  **  This is the global dispatch table for the dump functions.
  **/
 /* the table of dump functions */
-typedef struct dump_functions_t {
-    void (*dump_group_function)(hid_t, const char *);
-    void (*dump_named_datatype_function)(hid_t, const char *);
-    void (*dump_dataset_function)(hid_t, const char *, struct subset_t *);
+typedef struct dump_functions_t
+{
+    void (*dump_group_function)(hid_t, const char*);
+    void (*dump_named_datatype_function)(hid_t, const char*);
+    void (*dump_dataset_function)(hid_t, const char*, struct subset_t*);
     void (*dump_dataspace_function)(hid_t);
     void (*dump_datatype_function)(hid_t);
-    herr_t (*dump_attribute_function)(hid_t, const char *, const H5A_info_t *, void *);
-    void (*dump_data_function)(hid_t, int, struct subset_t *, int);
+    herr_t (*dump_attribute_function)(hid_t, const char*, const H5A_info_t*, void*);
+    void (*dump_data_function)(hid_t, int, struct subset_t*, int);
 } dump_functions;
 
 /* List of table structures.  There is one table structure for each file */
-typedef struct h5dump_table_items_t {
-    unsigned long fileno;      /* File number that these tables refer to */
-    hid_t         oid;         /* ID of an object in this file, held open so fileno is consistent */
-    table_t      *group_table; /* Table of groups */
-    table_t      *dset_table;  /* Table of datasets */
-    table_t      *type_table;  /* Table of datatypes */
+typedef struct h5dump_table_items_t
+{
+    unsigned long fileno; /* File number that these tables refer to */
+    hid_t oid;            /* ID of an object in this file, held open so fileno is consistent */
+    table_t* group_table; /* Table of groups */
+    table_t* dset_table;  /* Table of datasets */
+    table_t* type_table;  /* Table of datatypes */
 } h5dump_table_items_t;
 
-typedef struct h5dump_table_list_t {
-    size_t                nalloc;
-    size_t                nused;
-    h5dump_table_items_t *tables;
+typedef struct h5dump_table_list_t
+{
+    size_t nalloc;
+    size_t nused;
+    h5dump_table_items_t* tables;
 } h5dump_table_list_t;
 
-h5dump_table_list_t table_list  = {0, 0, NULL};
-table_t            *group_table = NULL, *dset_table = NULL, *type_table = NULL;
+h5dump_table_list_t table_list = { 0, 0, NULL };
+table_t *group_table = NULL, *dset_table = NULL, *type_table = NULL;
 
-unsigned    dump_indent    = 0;     /* how far in to indent the line */
-int         unamedtype     = 0;     /* shared datatype with no name */
-bool        hit_elink      = false; /* whether we have traversed an external link */
-size_t      prefix_len     = 1024;
-char       *prefix         = NULL;
-const char *fp_format      = NULL;
-const char *fp_lformat     = NULL;
-const char *complex_format = NULL; /* format for printing complex numbers */
+unsigned dump_indent = 0; /* how far in to indent the line */
+int unamedtype = 0;       /* shared datatype with no name */
+bool hit_elink = false;   /* whether we have traversed an external link */
+size_t prefix_len = 1024;
+char* prefix = NULL;
+const char* fp_format = NULL;
+const char* fp_lformat = NULL;
+const char* complex_format = NULL; /* format for printing complex numbers */
 
 /* things to display or which are set via command line parameters */
-typedef struct {
+typedef struct
+{
     int display_all;
     int display_oid;
     int display_data;
     int display_attr_data;
-    int display_char; /* print 1-byte numbers as ASCII */
+    int display_char;           /* print 1-byte numbers as ASCII */
     int usingdasho;
     int display_bb;             /* superblock */
     int display_dcpl;           /* dcpl */
@@ -284,8 +288,8 @@ typedef struct {
     int display_vds_first;      /* vds display to all by default */
     int vds_gap_size;           /* vds skip missing files default is none */
 } dump_opt_t;
-dump_opt_t dump_opts = {true, false, true,  true,  false, false, false, false, false,
-                        true, false, false, false, false, true,  false, 0};
+
+dump_opt_t dump_opts = { true, false, true, true, false, false, false, false, false, true, false, false, false, false, true, false, 0 };
 
 #define PACKED_BITS_MAX      8                       /* Maximum number of packed-bits to display */
 #define PACKED_BITS_SIZE_MAX (8 * sizeof(long long)) /* Maximum bits size of integer types of packed-bits */
@@ -300,15 +304,15 @@ unsigned packed_length[PACKED_BITS_MAX];
  * The global table is set to either ddl_function_table or
  * xml_function_table in the initialization.
  */
-const dump_functions *dump_function_table;
+const dump_functions* dump_function_table;
 
 #ifdef __cplusplus
 "C"
 {
 #endif
 
-    void    add_prefix(char **prfx, size_t *prfx_len, const char *name);
-    hid_t   h5_fileaccess(void);
+    void add_prefix(char** prfx, size_t* prfx_len, const char* name);
+    hid_t h5_fileaccess(void);
     ssize_t table_list_add(hid_t oid, unsigned long file_no);
     ssize_t table_list_visited(unsigned long file_no);
 

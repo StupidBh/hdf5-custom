@@ -26,14 +26,13 @@ using namespace H5;
 const H5std_string FILE_NAME("h5tutr_groups.h5");
 const H5std_string DATASET_NAME1("/MyGroup/dset1");
 const H5std_string DATASET_NAME2("dset2");
-const int          RANK   = 2;
-const int          D1DIM1 = 3;
-const int          D1DIM2 = 3;
-const int          D2DIM1 = 2;
-const int          D2DIM2 = 10;
+const int RANK = 2;
+const int D1DIM1 = 3;
+const int D1DIM2 = 3;
+const int D2DIM1 = 2;
+const int D2DIM2 = 10;
 
-int
-main(void)
+int main(void)
 {
     int dset1_data[D1DIM1][D1DIM2], dset2_data[D2DIM1][D2DIM2]; // data buffers
     int i, j;
@@ -45,14 +44,18 @@ main(void)
         Exception::dontPrint();
 
         // Initialize the first dataset.
-        for (i = 0; i < D1DIM1; i++)
-            for (j = 0; j < D1DIM2; j++)
+        for (i = 0; i < D1DIM1; i++) {
+            for (j = 0; j < D1DIM2; j++) {
                 dset1_data[i][j] = j + 1;
+            }
+        }
 
         //  Initialize the second dataset.
-        for (i = 0; i < D2DIM1; i++)
-            for (j = 0; j < D2DIM2; j++)
+        for (i = 0; i < D2DIM1; i++) {
+            for (j = 0; j < D2DIM2; j++) {
                 dset2_data[i][j] = j + 1;
+            }
+        }
 
         // Open an existing file and dataset.
         H5File file(FILE_NAME, H5F_ACC_RDWR);
@@ -62,13 +65,13 @@ main(void)
         // used again later for another data space.  An HDF5 identifier is
         // closed by the destructor or the method 'close()'.
         hsize_t dims[RANK]; // dataset dimensions
-        dims[0]              = D1DIM1;
-        dims[1]              = D1DIM2;
-        DataSpace *dataspace = new DataSpace(RANK, dims);
+        dims[0] = D1DIM1;
+        dims[1] = D1DIM2;
+        DataSpace* dataspace = new DataSpace(RANK, dims);
 
         // Create the dataset in group "MyGroup".  Same note as for the
         // dataspace above.
-        DataSet *dataset = new DataSet(file.createDataSet(DATASET_NAME1, PredType::STD_I32BE, *dataspace));
+        DataSet* dataset = new DataSet(file.createDataSet(DATASET_NAME1, PredType::STD_I32BE, *dataspace));
 
         // Write the data to the dataset using default memory space, file
         // space, and transfer properties.
@@ -79,8 +82,8 @@ main(void)
         delete dataspace;
 
         // Create the data space for the second dataset.
-        dims[0]   = D2DIM1;
-        dims[1]   = D2DIM2;
+        dims[0] = D2DIM1;
+        dims[1] = D2DIM2;
         dataspace = new DataSpace(RANK, dims);
 
         // Create group "Group_A" in group "MyGroup".

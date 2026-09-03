@@ -85,9 +85,9 @@
  *
  *----------------------------------------------------------------------------
  */
-#define JSFAILED_AT()                                                                                        \
-    {                                                                                                        \
-        printf("*FAILED* at %s:%d in %s()...\n", __FILE__, __LINE__, __func__);                              \
+#define JSFAILED_AT()                                                           \
+    {                                                                           \
+        printf("*FAILED* at %s:%d in %s()...\n", __FILE__, __LINE__, __func__); \
     }
 
 /*----------------------------------------------------------------------------
@@ -110,10 +110,10 @@
  *
  *----------------------------------------------------------------------------
  */
-#define FAIL_IF(condition)                                                                                   \
-    if (condition) {                                                                                         \
-        JSFAILED_AT()                                                                                        \
-        goto error;                                                                                          \
+#define FAIL_IF(condition) \
+    if (condition) {       \
+        JSFAILED_AT()      \
+        goto error;        \
     }
 
 /*----------------------------------------------------------------------------
@@ -138,15 +138,15 @@
  *
  *----------------------------------------------------------------------------
  */
-#define JSERR_LONG(expected, actual, reason)                                                                 \
-    {                                                                                                        \
-        JSFAILED_AT()                                                                                        \
-        if (reason != NULL) {                                                                                \
-            printf("%s\n", (reason));                                                                        \
-        }                                                                                                    \
-        else {                                                                                               \
-            printf("  ! Expected %ld\n  ! Actual   %ld\n", (long)(expected), (long)(actual));                \
-        }                                                                                                    \
+#define JSERR_LONG(expected, actual, reason)                                                  \
+    {                                                                                         \
+        JSFAILED_AT()                                                                         \
+        if (reason != NULL) {                                                                 \
+            printf("%s\n", (reason));                                                         \
+        }                                                                                     \
+        else {                                                                                \
+            printf("  ! Expected %ld\n  ! Actual   %ld\n", (long)(expected), (long)(actual)); \
+        }                                                                                     \
     }
 
 /*----------------------------------------------------------------------------
@@ -174,111 +174,111 @@
  *
  *----------------------------------------------------------------------------
  */
-#define JSERR_STR(expected, actual, reason)                                                                  \
-    {                                                                                                        \
-        JSFAILED_AT()                                                                                        \
-        if ((reason) != NULL) {                                                                              \
-            printf("%s\n", (reason));                                                                        \
-        }                                                                                                    \
-        else {                                                                                               \
-            printf("!!! Expected:\n%s\n!!!Actual:\n%s\n", (expected), (actual));                             \
-        }                                                                                                    \
+#define JSERR_STR(expected, actual, reason)                                      \
+    {                                                                            \
+        JSFAILED_AT()                                                            \
+        if ((reason) != NULL) {                                                  \
+            printf("%s\n", (reason));                                            \
+        }                                                                        \
+        else {                                                                   \
+            printf("!!! Expected:\n%s\n!!!Actual:\n%s\n", (expected), (actual)); \
+        }                                                                        \
     }
 
 #ifdef JSVERIFY_EXP_ACT
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY()
- *
- * Purpose:
- *
- *     Verify that two long integers are equal.
- *     If unequal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY(expected, actual, reason)                                                                   \
-    if ((long)(actual) != (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY */
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSVERIFY()
+     *
+     * Purpose:
+     *
+     *     Verify that two long integers are equal.
+     *     If unequal, print failure message
+     *     (with `reason`, if not NULL; expected/actual if NULL)
+     *     and jump to `error` at end of function
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY(expected, actual, reason)         \
+        if ((long)(actual) != (long)(expected)) {      \
+            JSERR_LONG((expected), (actual), (reason)) \
+            goto error;                                \
+        } /* JSVERIFY */
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY_NOT()
- *
- * Purpose:
- *
- *     Verify that two long integers are _not_ equal.
- *     If equal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_NOT(expected, actual, reason)                                                               \
-    if ((long)(actual) == (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_NOT */
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSVERIFY_NOT()
+     *
+     * Purpose:
+     *
+     *     Verify that two long integers are _not_ equal.
+     *     If equal, print failure message
+     *     (with `reason`, if not NULL; expected/actual if NULL)
+     *     and jump to `error` at end of function
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY_NOT(expected, actual, reason)     \
+        if ((long)(actual) == (long)(expected)) {      \
+            JSERR_LONG((expected), (actual), (reason)) \
+            goto error;                                \
+        } /* JSVERIFY_NOT */
 
-/*----------------------------------------------------------------------------
- *
- * Macro: JSVERIFY_STR()
- *
- * Purpose:
- *
- *     Verify that two strings are equal.
- *     If unequal, print failure message
- *     (with `reason`, if not NULL; expected/actual if NULL)
- *     and jump to `error` at end of function
- *
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_STR(expected, actual, reason)                                                               \
-    if (strcmp((actual), (expected)) != 0) {                                                                 \
-        JSERR_STR((expected), (actual), (reason));                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_STR */
+    /*----------------------------------------------------------------------------
+     *
+     * Macro: JSVERIFY_STR()
+     *
+     * Purpose:
+     *
+     *     Verify that two strings are equal.
+     *     If unequal, print failure message
+     *     (with `reason`, if not NULL; expected/actual if NULL)
+     *     and jump to `error` at end of function
+     *
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY_STR(expected, actual, reason)     \
+        if (strcmp((actual), (expected)) != 0) {       \
+            JSERR_STR((expected), (actual), (reason)); \
+            goto error;                                \
+        } /* JSVERIFY_STR */
 
 #else /* JSVERIFY_EXP_ACT not defined                                        */
-/* Repeats macros above, but with actual/expected parameters reversed. */
+    /* Repeats macros above, but with actual/expected parameters reversed. */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY()
- * See: JSVERIFY documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY(actual, expected, reason)                                                                   \
-    if ((long)(actual) != (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason));                                                          \
-        goto error;                                                                                          \
-    } /* JSVERIFY */
+    /*----------------------------------------------------------------------------
+     * Macro: JSVERIFY()
+     * See: JSVERIFY documentation above.
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY(actual, expected, reason)          \
+        if ((long)(actual) != (long)(expected)) {       \
+            JSERR_LONG((expected), (actual), (reason)); \
+            goto error;                                 \
+        } /* JSVERIFY */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY_NOT()
- * See: JSVERIFY_NOT documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_NOT(actual, expected, reason)                                                               \
-    if ((long)(actual) == (long)(expected)) {                                                                \
-        JSERR_LONG((expected), (actual), (reason))                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_NOT */
+    /*----------------------------------------------------------------------------
+     * Macro: JSVERIFY_NOT()
+     * See: JSVERIFY_NOT documentation above.
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY_NOT(actual, expected, reason)     \
+        if ((long)(actual) == (long)(expected)) {      \
+            JSERR_LONG((expected), (actual), (reason)) \
+            goto error;                                \
+        } /* JSVERIFY_NOT */
 
-/*----------------------------------------------------------------------------
- * Macro: JSVERIFY_STR()
- * See: JSVERIFY_STR documentation above.
- *----------------------------------------------------------------------------
- */
-#define JSVERIFY_STR(actual, expected, reason)                                                               \
-    if (strcmp((actual), (expected)) != 0) {                                                                 \
-        JSERR_STR((expected), (actual), (reason));                                                           \
-        goto error;                                                                                          \
-    } /* JSVERIFY_STR */
+    /*----------------------------------------------------------------------------
+     * Macro: JSVERIFY_STR()
+     * See: JSVERIFY_STR documentation above.
+     *----------------------------------------------------------------------------
+     */
+    #define JSVERIFY_STR(actual, expected, reason)     \
+        if (strcmp((actual), (expected)) != 0) {       \
+            JSERR_STR((expected), (actual), (reason)); \
+            goto error;                                \
+        } /* JSVERIFY_STR */
 
 #endif /* ifdef/else JSVERIFY_EXP_ACT */
 
@@ -304,149 +304,148 @@
  *
  *----------------------------------------------------------------------------
  */
-static unsigned
-test_parse_tuple(void)
+static unsigned test_parse_tuple(void)
 {
     /*************************
      * TEST-LOCAL STRUCTURES *
      *************************/
 
-    struct testcase {
-        const char *test_msg;     /* info about test case */
-        const char *in_str;       /* input string */
-        int         sep;          /* separator "character" */
-        herr_t      exp_ret;      /* expected SUCCEED / FAIL */
-        unsigned    exp_nelems;   /* expected number of elements */
+    struct testcase
+    {
+        const char* test_msg;     /* info about test case */
+        const char* in_str;       /* input string */
+        int sep;                  /* separator "character" */
+        herr_t exp_ret;           /* expected SUCCEED / FAIL */
+        unsigned exp_nelems;      /* expected number of elements */
                                   /* (no more than 7!)           */
-        const char *exp_elems[7]; /* list of elements (no more than 7!) */
+        const char* exp_elems[7]; /* list of elements (no more than 7!) */
     };
 
     /******************
      * TEST VARIABLES *
      ******************/
 
-    struct testcase cases[] = {
-        {
-            "bad start",
-            "words(before)",
-            ';',
-            FAIL,
-            0,
-            {NULL},
-        },
-        {
-            "tuple not closed",
-            "(not ok",
-            ',',
-            FAIL,
-            0,
-            {NULL},
-        },
-        {
-            "empty tuple",
-            "()",
-            '-',
-            SUCCEED,
-            1,
-            {""},
-        },
-        {
-            "no separator",
-            "(stuff keeps on going)",
-            ',',
-            SUCCEED,
-            1,
-            {"stuff keeps on going"},
-        },
-        {
-            "4-ple, escaped separator",
-            "(elem0,elem1,el\\,em2,elem3)", /* "el\,em" */
-            ',',
-            SUCCEED,
-            4,
-            {"elem0", "elem1", "el,em2", "elem3"},
-        },
-        {
-            "5-ple, escaped escaped separator",
-            "(elem0,elem1,el\\\\,em2,elem3)",
-            ',',
-            SUCCEED,
-            5,
-            {"elem0", "elem1", "el\\", "em2", "elem3"},
-        },
-        {
-            "escaped non-comma separator",
-            "(5-2-7-2\\-6-2)",
-            '-',
-            SUCCEED,
-            5,
-            {"5", "2", "7", "2-6", "2"},
-        },
-        {
-            "embedded close-paren",
-            "(be;fo)re)",
-            ';',
-            SUCCEED,
-            2,
-            {"be", "fo)re"},
-        },
-        {
-            "embedded non-escaping backslash",
-            "(be;fo\\re)",
-            ';',
-            SUCCEED,
-            2,
-            {"be", "fo\\re"},
-        },
-        {
-            "double close-paren at end",
-            "(be;fore))",
-            ';',
-            SUCCEED,
-            2,
-            {"be", "fore)"},
-        },
-        {
-            "empty elements",
-            "(;a1;;a4;)",
-            ';',
-            SUCCEED,
-            5,
-            {"", "a1", "", "a4", ""},
-        },
-        {
-            "nested tuples with different separators",
-            "((4,e,a);(6,2,a))",
-            ';',
-            SUCCEED,
-            2,
-            {"(4,e,a)", "(6,2,a)"},
-        },
-        {
-            "nested tuples with same separators",
-            "((4,e,a),(6,2,a))",
-            ',',
-            SUCCEED,
-            6,
-            {"(4", "e", "a)", "(6", "2", "a)"},
-        },
-        {
-            "real-world use case",
-            "(us-east-2,AKIAIMC3D3XLYXLN5COA,ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+)",
-            ',',
-            SUCCEED,
-            3,
-            {"us-east-2", "AKIAIMC3D3XLYXLN5COA", "ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+"},
-        }};
+    struct testcase cases[] = { {
+                                    "bad start",
+                                    "words(before)",
+                                    ';',
+                                    FAIL,
+                                    0,
+                                    { NULL },
+                                },
+                                {
+                                    "tuple not closed",
+                                    "(not ok",
+                                    ',',
+                                    FAIL,
+                                    0,
+                                    { NULL },
+                                },
+                                {
+                                    "empty tuple",
+                                    "()",
+                                    '-',
+                                    SUCCEED,
+                                    1,
+                                    { "" },
+                                },
+                                {
+                                    "no separator",
+                                    "(stuff keeps on going)",
+                                    ',',
+                                    SUCCEED,
+                                    1,
+                                    { "stuff keeps on going" },
+                                },
+                                {
+                                    "4-ple, escaped separator",
+                                    "(elem0,elem1,el\\,em2,elem3)", /* "el\,em" */
+                                    ',',
+                                    SUCCEED,
+                                    4,
+                                    { "elem0", "elem1", "el,em2", "elem3" },
+                                },
+                                {
+                                    "5-ple, escaped escaped separator",
+                                    "(elem0,elem1,el\\\\,em2,elem3)",
+                                    ',',
+                                    SUCCEED,
+                                    5,
+                                    { "elem0", "elem1", "el\\", "em2", "elem3" },
+                                },
+                                {
+                                    "escaped non-comma separator",
+                                    "(5-2-7-2\\-6-2)",
+                                    '-',
+                                    SUCCEED,
+                                    5,
+                                    { "5", "2", "7", "2-6", "2" },
+                                },
+                                {
+                                    "embedded close-paren",
+                                    "(be;fo)re)",
+                                    ';',
+                                    SUCCEED,
+                                    2,
+                                    { "be", "fo)re" },
+                                },
+                                {
+                                    "embedded non-escaping backslash",
+                                    "(be;fo\\re)",
+                                    ';',
+                                    SUCCEED,
+                                    2,
+                                    { "be", "fo\\re" },
+                                },
+                                {
+                                    "double close-paren at end",
+                                    "(be;fore))",
+                                    ';',
+                                    SUCCEED,
+                                    2,
+                                    { "be", "fore)" },
+                                },
+                                {
+                                    "empty elements",
+                                    "(;a1;;a4;)",
+                                    ';',
+                                    SUCCEED,
+                                    5,
+                                    { "", "a1", "", "a4", "" },
+                                },
+                                {
+                                    "nested tuples with different separators",
+                                    "((4,e,a);(6,2,a))",
+                                    ';',
+                                    SUCCEED,
+                                    2,
+                                    { "(4,e,a)", "(6,2,a)" },
+                                },
+                                {
+                                    "nested tuples with same separators",
+                                    "((4,e,a),(6,2,a))",
+                                    ',',
+                                    SUCCEED,
+                                    6,
+                                    { "(4", "e", "a)", "(6", "2", "a)" },
+                                },
+                                {
+                                    "real-world use case",
+                                    "(us-east-2,AKIAIMC3D3XLYXLN5COA,ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+)",
+                                    ',',
+                                    SUCCEED,
+                                    3,
+                                    { "us-east-2", "AKIAIMC3D3XLYXLN5COA", "ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+" },
+                                } };
     struct testcase tc;
-    unsigned        n_tests       = 14;
-    unsigned        i             = 0;
-    unsigned        count         = 0;
-    unsigned        elem_i        = 0;
-    char          **parsed        = NULL;
-    char           *cpy           = NULL;
-    herr_t          success       = true;
-    bool            show_progress = false;
+    unsigned n_tests = 14;
+    unsigned i = 0;
+    unsigned count = 0;
+    unsigned elem_i = 0;
+    char** parsed = NULL;
+    char* cpy = NULL;
+    herr_t success = true;
+    bool show_progress = false;
 
     TESTING("arbitrary-count tuple parsing");
 
@@ -459,7 +458,6 @@ test_parse_tuple(void)
      *********/
 
     for (i = 0; i < n_tests; i++) {
-
         /* SETUP
          */
         assert(parsed == NULL);
@@ -474,11 +472,11 @@ test_parse_tuple(void)
         success = parse_tuple(tc.in_str, tc.sep, &cpy, &count, &parsed);
 
         JSVERIFY(tc.exp_ret, success, "function returned incorrect value")
-        JSVERIFY(tc.exp_nelems, count, (char *)NULL)
+        JSVERIFY(tc.exp_nelems, count, (char*)NULL)
         if (success == SUCCEED) {
             FAIL_IF(parsed == NULL)
             for (elem_i = 0; elem_i < count; elem_i++) {
-                JSVERIFY_STR(tc.exp_elems[elem_i], parsed[elem_i], (char *)NULL)
+                JSVERIFY_STR(tc.exp_elems[elem_i], parsed[elem_i], (char*)NULL)
             }
             /* TEARDOWN */
             assert(parsed != NULL);
@@ -502,10 +500,12 @@ error:
      * CLEANUP *
      ***********/
 
-    if (parsed != NULL)
+    if (parsed != NULL) {
         free(parsed);
-    if (cpy != NULL)
+    }
+    if (cpy != NULL) {
         free(cpy);
+    }
 
     return 1;
 
@@ -522,8 +522,7 @@ error:
  *
  *----------------------------------------------------------------------------
  */
-static unsigned
-test_populate_ros3_fa(void)
+static unsigned test_populate_ros3_fa(void)
 {
 #ifdef H5_HAVE_ROS3_VFD
     /*************************
@@ -534,9 +533,9 @@ test_populate_ros3_fa(void)
      * TEST-LOCAL VARIABLES *
      ************************/
 
-    H5FD_ros3_fapl_ext_t *fa            = NULL; /* Structure is too large for stack */
-    bool                  show_progress = false;
-    int                   bad_version   = 0xf87a; /* arbitrarily wrong version number */
+    H5FD_ros3_fapl_ext_t* fa = NULL; /* Structure is too large for stack */
+    bool show_progress = false;
+    int bad_version = 0xf87a;        /* arbitrarily wrong version number */
 #endif
 
     TESTING("programmatic ros3 fapl population");
@@ -547,9 +546,9 @@ test_populate_ros3_fa(void)
     fflush(stdout);
     return 0;
 #else
-#if H5TOOLS_UTILS_TEST_DEBUG > 0
+    #if H5TOOLS_UTILS_TEST_DEBUG > 0
     show_progress = true;
-#endif /* H5TOOLS_UTILS_TEST_DEBUG */
+    #endif /* H5TOOLS_UTILS_TEST_DEBUG */
 
     assert(bad_version != H5FD_CURR_ROS3_FAPL_T_VERSION);
 
@@ -565,7 +564,7 @@ test_populate_ros3_fa(void)
     /* NULL fapl config pointer fails
      */
     {
-        const char *values[] = {"x", "y", "z"};
+        const char* values[] = { "x", "y", "z" };
 
         if (show_progress) {
             printf("NULL fapl pointer\n");
@@ -578,7 +577,7 @@ test_populate_ros3_fa(void)
      */
     {
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = true;
         strcpy(fa->fa.aws_region, "u");
         strcpy(fa->fa.secret_id, "v");
@@ -590,25 +589,24 @@ test_populate_ros3_fa(void)
             printf("NULL values pointer\n");
         }
 
-        JSVERIFY(SUCCEED, h5tools_populate_ros3_fapl(fa, NULL, 0),
-                 "NULL values pointer yields \"default\" fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("y", fa->ep_url, (char *)NULL)
+        JSVERIFY(SUCCEED, h5tools_populate_ros3_fapl(fa, NULL, 0), "NULL values pointer yields \"default\" fapl")
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("y", fa->ep_url, (char*)NULL)
     }
 
     /* all-empty values
      * yields default fapl
      */
     {
-        const char *values[] = {"", "", "", ""};
+        const char* values[] = { "", "", "", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = true;
         strcpy(fa->fa.aws_region, "u");
         strcpy(fa->fa.secret_id, "v");
@@ -621,23 +619,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(SUCCEED, h5tools_populate_ros3_fapl(fa, values, 4), "empty values yields \"default\" fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("y", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("y", fa->ep_url, (char*)NULL)
     }
 
     /* successfully set fapl with values
      * excess value is ignored
      */
     {
-        const char *values[] = {"x", "y", "z", "a", "b"};
+        const char* values[] = { "x", "y", "z", "a", "b" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -650,23 +648,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(SUCCEED, h5tools_populate_ros3_fapl(fa, values, 5), "four values")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(true, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("x", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("y", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("z", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("a", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(true, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("x", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("y", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("z", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("a", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* NULL region
      * yields default fapl
      */
     {
-        const char *values[] = {NULL, "y", "z", ""};
+        const char* values[] = { NULL, "y", "z", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -679,23 +677,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* empty region
      * yields default fapl
      */
     {
-        const char *values[] = {"", "y", "z", ""};
+        const char* values[] = { "", "y", "z", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -708,25 +706,29 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* region overflow
      * yields default fapl
      */
     {
-        const char *values[] = {"somewhere over the rainbow not too high "
-                                "there is another rainbow bounding some darkened sky",
-                                "y", "z", ""};
+        const char* values[] = {
+            "somewhere over the rainbow not too high "
+            "there is another rainbow bounding some darkened sky",
+            "y",
+            "z",
+            ""
+        };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -741,23 +743,23 @@ test_populate_ros3_fa(void)
         assert(strlen(values[0]) > H5FD_ROS3_MAX_REGION_LEN);
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* NULL id
      * yields default fapl
      */
     {
-        const char *values[] = {"x", NULL, "z", ""};
+        const char* values[] = { "x", NULL, "z", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -770,23 +772,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* empty id (non-empty region, key)
      * yields default fapl
      */
     {
-        const char *values[] = {"x", "", "z", ""};
+        const char* values[] = { "x", "", "z", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -799,34 +801,35 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* id overflow
      * partial set: region
      */
     {
-        const char *values[] = {"x",
-                                "Why is it necessary to solve the problem? "
-                                "What benefits will you receive by solving the problem? "
-                                "What is the unknown? "
-                                "What is it you don't yet understand? "
-                                "What is the information you have? "
-                                "What isn't the problem? "
-                                "Is the information insufficient, redundant, or contradictory? "
-                                "Should you draw a diagram or figure of the problem? "
-                                "What are the boundaries of the problem? "
-                                "Can you separate the various parts of the problem?",
-                                "z", ""};
+        const char* values[] = { "x",
+                                 "Why is it necessary to solve the problem? "
+                                 "What benefits will you receive by solving the problem? "
+                                 "What is the unknown? "
+                                 "What is it you don't yet understand? "
+                                 "What is the information you have? "
+                                 "What isn't the problem? "
+                                 "Is the information insufficient, redundant, or contradictory? "
+                                 "Should you draw a diagram or figure of the problem? "
+                                 "What are the boundaries of the problem? "
+                                 "Can you separate the various parts of the problem?",
+                                 "z",
+                                 "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -841,23 +844,23 @@ test_populate_ros3_fa(void)
         assert(strlen(values[1]) > H5FD_ROS3_MAX_SECRET_ID_LEN);
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("x", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("x", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* NULL key
      * yields default fapl
      */
     {
-        const char *values[] = {"x", "y", NULL, ""};
+        const char* values[] = { "x", "y", NULL, "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -870,23 +873,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* NULL token
      * yields default fapl
      */
     {
-        const char *values[] = {"x", "y", "z", NULL};
+        const char* values[] = { "x", "y", "z", NULL };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -899,23 +902,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill token")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* empty key (non-empty region, id)
      * yields authenticating fapl
      */
     {
-        const char *values[] = {"x", "y", "", ""};
+        const char* values[] = { "x", "y", "", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -928,23 +931,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(SUCCEED, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(true, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("x", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("y", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(true, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("x", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("y", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* empty key, region (non-empty id)
      * yields default fapl
      */
     {
-        const char *values[] = {"", "y", "", ""};
+        const char* values[] = { "", "y", "", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -957,23 +960,23 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* empty key, id (non-empty region)
      * yields default fapl
      */
     {
-        const char *values[] = {"x", "", "", ""};
+        const char* values[] = { "x", "", "", "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -986,34 +989,35 @@ test_populate_ros3_fa(void)
         }
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* key overflow
      * partial set: region, id
      */
     {
-        const char *values[] = {"x", "y",
-                                "Why is it necessary to solve the problem? "
-                                "What benefits will you receive by solving the problem? "
-                                "What is the unknown? "
-                                "What is it you don't yet understand? "
-                                "What is the information you have? "
-                                "What isn't the problem? "
-                                "Is the information insufficient, redundant, or contradictory? "
-                                "Should you draw a diagram or figure of the problem? "
-                                "What are the boundaries of the problem? "
-                                "Can you separate the various parts of the problem?",
-                                ""};
+        const char* values[] = { "x",
+                                 "y",
+                                 "Why is it necessary to solve the problem? "
+                                 "What benefits will you receive by solving the problem? "
+                                 "What is the unknown? "
+                                 "What is it you don't yet understand? "
+                                 "What is the information you have? "
+                                 "What isn't the problem? "
+                                 "Is the information insufficient, redundant, or contradictory? "
+                                 "Should you draw a diagram or figure of the problem? "
+                                 "What are the boundaries of the problem? "
+                                 "Can you separate the various parts of the problem?",
+                                 "" };
 
         memset(fa, 0, sizeof(*fa));
-        fa->fa.version      = bad_version;
+        fa->fa.version = bad_version;
         fa->fa.authenticate = false;
         strcpy(fa->fa.aws_region, "a");
         strcpy(fa->fa.secret_id, "b");
@@ -1028,20 +1032,19 @@ test_populate_ros3_fa(void)
         assert(strlen(values[2]) > H5FD_ROS3_MAX_SECRET_KEY_LEN);
 
         JSVERIFY(FAIL, h5tools_populate_ros3_fapl(fa, values, 4), "could not fill fapl")
-        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char *)NULL)
-        JSVERIFY(false, fa->fa.authenticate, (char *)NULL)
-        JSVERIFY_STR("x", fa->fa.aws_region, (char *)NULL)
-        JSVERIFY_STR("y", fa->fa.secret_id, (char *)NULL)
-        JSVERIFY_STR("", fa->fa.secret_key, (char *)NULL)
-        JSVERIFY_STR("", fa->token, (char *)NULL)
-        JSVERIFY_STR("e", fa->ep_url, (char *)NULL)
+        JSVERIFY(H5FD_CURR_ROS3_FAPL_T_VERSION, fa->fa.version, (char*)NULL)
+        JSVERIFY(false, fa->fa.authenticate, (char*)NULL)
+        JSVERIFY_STR("x", fa->fa.aws_region, (char*)NULL)
+        JSVERIFY_STR("y", fa->fa.secret_id, (char*)NULL)
+        JSVERIFY_STR("", fa->fa.secret_key, (char*)NULL)
+        JSVERIFY_STR("", fa->token, (char*)NULL)
+        JSVERIFY_STR("e", fa->ep_url, (char*)NULL)
     }
 
     /* use case
      */
     {
-        const char *values[] = {"us-east-2", "AKIAIMC3D3XLYXLN5COA",
-                                "ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+", ""};
+        const char* values[] = { "us-east-2", "AKIAIMC3D3XLYXLN5COA", "ugs5aVVnLFCErO/8uW14iWE3K5AgXMpsMlWneO/+", "" };
 
         memset(fa, 0, sizeof(*fa));
 
@@ -1065,7 +1068,7 @@ error:
 
     return 1;
 
-#endif /* H5_HAVE_ROS3_VFD */
+#endif     /* H5_HAVE_ROS3_VFD */
 
 } /* test_populate_ros3_fa */
 
@@ -1080,8 +1083,7 @@ error:
  *
  *----------------------------------------------------------------------------
  */
-static unsigned
-test_set_configured_fapl(void)
+static unsigned test_set_configured_fapl(void)
 {
 #define UTIL_TEST_NOFAPL  1
 #define UTIL_TEST_DEFAULT 2
@@ -1090,15 +1092,17 @@ test_set_configured_fapl(void)
     /*************************
      * TEST-LOCAL STRUCTURES *
      *************************/
-    typedef struct testcase {
+    typedef struct testcase
+    {
         const char message[88];
-        int        expected;
-        int        fapl_choice;
+        int expected;
+        int fapl_choice;
         const char vfdname[12];
-        void      *conf_fa;
+        void* conf_fa;
     } testcase;
 
-    typedef struct other_fa_t {
+    typedef struct other_fa_t
+    {
         int a;
         int b;
         int c;
@@ -1108,10 +1112,10 @@ test_set_configured_fapl(void)
      * TEST-LOCAL VARIABLES *
      ************************/
 
-    hid_t      fapl_id  = H5I_INVALID_HID;
-    other_fa_t wrong_fa = {0x432, 0xf82, 0x9093};
+    hid_t fapl_id = H5I_INVALID_HID;
+    other_fa_t wrong_fa = { 0x432, 0xf82, 0x9093 };
 #ifdef H5_HAVE_ROS3_VFD
-    H5FD_ros3_fapl_ext_t *ros3_anon_fa = NULL;
+    H5FD_ros3_fapl_ext_t* ros3_anon_fa = NULL;
 #endif /* H5_HAVE_ROS3_VFD */
 #ifdef H5_HAVE_LIBHDFS
     H5FD_hdfs_fapl_t hdfs_fa = {
@@ -1122,7 +1126,7 @@ test_set_configured_fapl(void)
         "",   /* user name             */
         2048, /* stream buffer size    */
     };
-#endif                    /* H5_HAVE_LIBHDFS */
+#endif /* H5_HAVE_LIBHDFS */
     unsigned n_cases = 5; /* number of common testcases */
     testcase cases[] = {
         {
@@ -1179,7 +1183,10 @@ test_set_configured_fapl(void)
             NULL,
         },
         {
-            "(ROS3) successful set", 1, UTIL_TEST_CREATE, "ros3",
+            "(ROS3) successful set",
+            1,
+            UTIL_TEST_CREATE,
+            "ros3",
             NULL, /* NOTE: assigned below after FAPL structure is allocated - must keep testcase index in sync
                    */
         },
@@ -1215,10 +1222,11 @@ test_set_configured_fapl(void)
     unsigned int i;
 
 #ifdef H5_HAVE_ROS3_VFD
-    if (NULL == (ros3_anon_fa = calloc(1, sizeof(*ros3_anon_fa))))
+    if (NULL == (ros3_anon_fa = calloc(1, sizeof(*ros3_anon_fa)))) {
         goto error;
+    }
 
-    ros3_anon_fa->fa.version      = H5FD_CURR_ROS3_FAPL_T_VERSION;
+    ros3_anon_fa->fa.version = H5FD_CURR_ROS3_FAPL_T_VERSION;
     ros3_anon_fa->fa.authenticate = false;
 
     n_cases += 3;
@@ -1233,8 +1241,8 @@ test_set_configured_fapl(void)
 
     for (i = 0; i < n_cases; i++) {
         h5tools_vfd_info_t vfd_info;
-        hid_t              result;
-        testcase           C = cases[i];
+        hid_t result;
+        testcase C = cases[i];
 
         fapl_id = H5I_INVALID_HID;
 
@@ -1258,8 +1266,8 @@ test_set_configured_fapl(void)
 #endif /* UTIL_TEST_DEBUG */
 
         /* test */
-        vfd_info.type   = VFD_BY_NAME;
-        vfd_info.info   = C.conf_fa;
+        vfd_info.type = VFD_BY_NAME;
+        vfd_info.info = C.conf_fa;
         vfd_info.u.name = C.vfdname;
 
         if (C.expected == 1) {
@@ -1347,14 +1355,13 @@ error:
  *
  *----------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
     unsigned nerrors = 0;
 
 #ifdef _H5TEST_
     h5reset(); /* h5test? */
-#endif         /* _H5TEST_ */
+#endif /* _H5TEST_ */
 
     fprintf(stdout, "Testing h5tools_utils corpus.\n");
 

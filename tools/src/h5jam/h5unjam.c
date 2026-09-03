@@ -22,22 +22,21 @@
 
 hsize_t write_pad(int, hsize_t);
 hsize_t compute_pad(hsize_t);
-herr_t  copy_to_file(FILE *, FILE *, ssize_t, ssize_t);
+herr_t copy_to_file(FILE*, FILE*, ssize_t, ssize_t);
 
-int   do_delete   = false;
-char *output_file = NULL;
-char *input_file  = NULL;
-char *ub_file     = NULL;
+int do_delete = false;
+char* output_file = NULL;
+char* input_file = NULL;
+char* ub_file = NULL;
 
 /*
  * Command-line options: The user can specify short or long-named
  * parameters. The long-named ones can be partially spelled. When
  * adding more, make sure that they don't clash with each other.
  */
-static const char            *s_opts   = "hu:i:o:d:V";
-static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},   {"i", require_arg, 'i'},
-                                          {"u", require_arg, 'u'}, {"o", require_arg, 'o'},
-                                          {"delete", no_arg, 'd'}, {NULL, 0, '\0'}};
+static const char* s_opts = "hu:i:o:d:V";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },   { "i", require_arg, 'i' }, { "u", require_arg, 'u' },
+                                           { "o", require_arg, 'o' }, { "delete", no_arg, 'd' }, { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function:    usage
@@ -47,12 +46,10 @@ static struct h5_long_options l_opts[] = {{"help", no_arg, 'h'},   {"i", require
  * Return:      void
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
     fflush(rawoutstream);
-    fprintf(rawoutstream, "usage: %s -i <in_file.h5>  [-o <out_file.h5> ] [-u <out_user_file> | --delete]\n",
-            prog);
+    fprintf(rawoutstream, "usage: %s -i <in_file.h5>  [-o <out_file.h5> ] [-u <out_user_file> | --delete]\n", prog);
     fprintf(rawoutstream, "\n");
     fprintf(rawoutstream, "Splits user file and HDF5 file into two files: user block data and HDF5 data.\n");
     fprintf(rawoutstream, "\n");
@@ -90,71 +87,74 @@ usage(const char *prog)
  *              Failure:    Exits function with EXIT_FAILURE value.
  *-------------------------------------------------------------------------
  */
-static int
-parse_command_line(int argc, const char *const *argv)
+static int parse_command_line(int argc, const char* const* argv)
 {
     int opt = false;
 
     /* parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'o':
-                output_file = strdup(H5_optarg);
-                if (output_file)
-                    h5tools_set_data_output_file(output_file, 1);
-                break;
+        case 'o':
+            output_file = strdup(H5_optarg);
+            if (output_file) {
+                h5tools_set_data_output_file(output_file, 1);
+            }
+            break;
 
-            case 'i':
-                input_file = strdup(H5_optarg);
-                if (input_file)
-                    h5tools_set_input_file(input_file, 1);
-                break;
+        case 'i':
+            input_file = strdup(H5_optarg);
+            if (input_file) {
+                h5tools_set_input_file(input_file, 1);
+            }
+            break;
 
-            case 'u':
-                ub_file = strdup(H5_optarg);
-                if (ub_file)
-                    h5tools_set_output_file(ub_file, 1);
-                else
-                    rawoutstream = stdout;
-                break;
+        case 'u':
+            ub_file = strdup(H5_optarg);
+            if (ub_file) {
+                h5tools_set_output_file(ub_file, 1);
+            }
+            else {
+                rawoutstream = stdout;
+            }
+            break;
 
-            case 'd':
-                do_delete = true;
-                break;
+        case 'd': do_delete = true; break;
 
-            case 'h':
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto done;
+        case 'h':
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto done;
 
-            case 'V':
-                print_version(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto done;
+        case 'V':
+            print_version(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto done;
 
-            case '?':
-            default:
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_FAILURE);
-                goto done;
+        case '?':
+        default:
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_FAILURE);
+            goto done;
         }
     }
 
     return EXIT_SUCCESS;
 
 done:
-    if (input_file)
+    if (input_file) {
         free(input_file);
-    if (output_file)
+    }
+    if (output_file) {
         free(output_file);
-    if (ub_file)
+    }
+    if (ub_file) {
         free(ub_file);
+    }
 
     return EXIT_FAILURE;
 }
 
-static void
-leave(int ret)
+static void leave(int ret)
 {
     h5tools_close();
     exit(ret);
@@ -169,16 +169,15 @@ leave(int ret)
  *              Failure:    1
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    hid_t     ifile = H5I_INVALID_HID;
-    hid_t     plist = H5I_INVALID_HID;
-    HDoff_t   fsize;
-    hsize_t   usize;
-    htri_t    testval;
-    herr_t    status;
-    int       res;
+    hid_t ifile = H5I_INVALID_HID;
+    hid_t plist = H5I_INVALID_HID;
+    HDoff_t fsize;
+    hsize_t usize;
+    htri_t testval;
+    herr_t status;
+    int res;
     h5_stat_t sbuf;
 
     h5tools_setprogname(PROGRAMNAME);
@@ -187,8 +186,9 @@ main(int argc, char *argv[])
     /* Initialize h5tools lib  */
     h5tools_init();
 
-    if (EXIT_FAILURE == parse_command_line(argc, (const char *const *)argv))
+    if (EXIT_FAILURE == parse_command_line(argc, (const char* const*)argv)) {
         goto done;
+    }
 
     /* enable error reporting if command line option */
     h5tools_error_report();
@@ -282,11 +282,13 @@ main(int argc, char *argv[])
     }
 
 done:
-    if (input_file)
+    if (input_file) {
         free(input_file);
+    }
 
-    if (output_file)
+    if (output_file) {
         free(output_file);
+    }
 
     if (ub_file) {
         free(ub_file);
@@ -302,35 +304,37 @@ done:
  *  Returns 0 on success, -1 on failure.
  *-------------------------------------------------------------------------
  */
-herr_t
-copy_to_file(FILE *infid, FILE *ofid, ssize_t _where, ssize_t show_much)
+herr_t copy_to_file(FILE* infid, FILE* ofid, ssize_t _where, ssize_t show_much)
 {
     static char buf[COPY_BUF_SIZE];
-    size_t      how_much;
-    HDoff_t     where = (HDoff_t)_where;
-    HDoff_t     to;
-    HDoff_t     from;
-    herr_t      ret_value = 0;
+    size_t how_much;
+    HDoff_t where = (HDoff_t)_where;
+    HDoff_t to;
+    HDoff_t from;
+    herr_t ret_value = 0;
 
     /* nothing to copy */
-    if (show_much <= 0)
+    if (show_much <= 0) {
         goto done;
+    }
     how_much = (size_t)show_much;
 
     /* rewind */
     HDfseek(infid, 0L, 0);
 
     from = where;
-    to   = 0;
+    to = 0;
     while (how_much > 0) {
-        size_t bytes_in    = 0; /* # of bytes to read       */
-        size_t bytes_read  = 0; /* # of bytes actually read */
+        size_t bytes_in = 0;    /* # of bytes to read       */
+        size_t bytes_read = 0;  /* # of bytes actually read */
         size_t bytes_wrote = 0; /* # of bytes written   */
 
-        if (how_much > COPY_BUF_SIZE)
+        if (how_much > COPY_BUF_SIZE) {
             bytes_in = COPY_BUF_SIZE;
-        else
+        }
+        else {
             bytes_in = how_much;
+        }
 
         /* Seek to correct position in input file */
         HDfseek(infid, from, SEEK_SET);
@@ -359,7 +363,7 @@ copy_to_file(FILE *infid, FILE *ofid, ssize_t _where, ssize_t show_much)
             ret_value = -1;
             goto done;
         } /* end if */
-    }     /* end while */
+    } /* end while */
 
 done:
     return ret_value;

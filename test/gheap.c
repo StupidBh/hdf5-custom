@@ -33,18 +33,18 @@
 /* Number of heap objects to test */
 #define GHEAP_TEST_NOBJS 1024
 
-#define GHEAP_REPEATED_ERR(MSG)                                                                              \
-    do {                                                                                                     \
-        nerrors++;                                                                                           \
-        if (nerrors <= GHEAP_REPEATED_ERR_LIM) {                                                             \
-            H5_FAILED();                                                                                     \
-            puts(MSG);                                                                                       \
-            if (nerrors == GHEAP_REPEATED_ERR_LIM)                                                           \
-                puts("    Suppressing further errors...");                                                   \
-        }       /* end if */                                                                                 \
+#define GHEAP_REPEATED_ERR(MSG)                            \
+    do {                                                   \
+        nerrors++;                                         \
+        if (nerrors <= GHEAP_REPEATED_ERR_LIM) {           \
+            H5_FAILED();                                   \
+            puts(MSG);                                     \
+            if (nerrors == GHEAP_REPEATED_ERR_LIM)         \
+                puts("    Suppressing further errors..."); \
+        } /* end if */                                     \
     } while (0) /* end GHEAP_REPEATED_ERR */
 
-static const char *FILENAME[] = {"gheap1", "gheap2", "gheap3", "gheap4", "gheapooo", NULL};
+static const char* FILENAME[] = { "gheap1", "gheap2", "gheap3", "gheap4", "gheapooo", NULL };
 
 /*-------------------------------------------------------------------------
  * Function:    test_1
@@ -58,31 +58,32 @@ static const char *FILENAME[] = {"gheap1", "gheap2", "gheap3", "gheap4", "gheapo
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_1(hid_t fapl)
+static int test_1(hid_t fapl)
 {
-    hid_t   file = H5I_INVALID_HID;
-    H5F_t  *f    = NULL;
-    H5HG_t *obj  = NULL;
+    hid_t file = H5I_INVALID_HID;
+    H5F_t* f = NULL;
+    H5HG_t* obj = NULL;
     uint8_t out[GHEAP_TEST_NOBJS];
     uint8_t in[GHEAP_TEST_NOBJS];
-    size_t  u;
-    size_t  size;
-    herr_t  status;
-    int     nerrors = 0;
-    char    filename[1024];
+    size_t u;
+    size_t size;
+    herr_t status;
+    int nerrors = 0;
+    char filename[1024];
 
     TESTING("monotonically increasing lengths");
 
     /* Allocate buffer for H5HG_t */
-    if (NULL == (obj = (H5HG_t *)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS)))
+    if (NULL == (obj = (H5HG_t*)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS))) {
         goto error;
+    }
 
     /* Open a clean file */
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to create file");
         goto error;
@@ -133,10 +134,12 @@ test_1(hid_t fapl)
     free(obj);
     obj = NULL;
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if (nerrors)
+    }
+    if (nerrors) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -147,8 +150,9 @@ error:
         H5Fclose(file);
     }
     H5E_END_TRY
-    if (obj)
+    if (obj) {
         free(obj);
+    }
     return MAX(1, nerrors);
 }
 
@@ -164,30 +168,31 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_2(hid_t fapl)
+static int test_2(hid_t fapl)
 {
-    hid_t   file = H5I_INVALID_HID;
-    H5F_t  *f    = NULL;
-    H5HG_t *obj  = NULL;
+    hid_t file = H5I_INVALID_HID;
+    H5F_t* f = NULL;
+    H5HG_t* obj = NULL;
     uint8_t out[GHEAP_TEST_NOBJS];
     uint8_t in[GHEAP_TEST_NOBJS];
-    size_t  u;
-    size_t  size;
-    int     nerrors = 0;
-    char    filename[1024];
+    size_t u;
+    size_t size;
+    int nerrors = 0;
+    char filename[1024];
 
     TESTING("monotonically decreasing lengths");
 
     /* Allocate buffer for H5HG_t */
-    if (NULL == (obj = (H5HG_t *)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS)))
+    if (NULL == (obj = (H5HG_t*)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS))) {
         goto error;
+    }
 
     /* Open a clean file */
     h5_fixname(FILENAME[1], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to create file");
         goto error;
@@ -230,10 +235,12 @@ test_2(hid_t fapl)
     free(obj);
     obj = NULL;
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if (nerrors)
+    }
+    if (nerrors) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -244,8 +251,9 @@ error:
         H5Fclose(file);
     }
     H5E_END_TRY
-    if (obj)
+    if (obj) {
         free(obj);
+    }
     return MAX(1, nerrors);
 }
 
@@ -261,30 +269,31 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_3(hid_t fapl)
+static int test_3(hid_t fapl)
 {
-    hid_t   file = H5I_INVALID_HID;
-    H5F_t  *f    = NULL;
-    H5HG_t *obj  = NULL;
+    hid_t file = H5I_INVALID_HID;
+    H5F_t* f = NULL;
+    H5HG_t* obj = NULL;
     uint8_t out[GHEAP_TEST_NOBJS];
-    size_t  u;
-    size_t  size;
-    herr_t  status;
-    int     nerrors = 0;
-    char    filename[1024];
+    size_t u;
+    size_t size;
+    herr_t status;
+    int nerrors = 0;
+    char filename[1024];
 
     TESTING("complete object removal");
 
     /* Allocate buffer for H5HG_t */
-    if (NULL == (obj = (H5HG_t *)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS)))
+    if (NULL == (obj = (H5HG_t*)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS))) {
         goto error;
+    }
 
     /* Open a clean file */
     h5_fixname(FILENAME[2], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to create file");
         goto error;
@@ -317,10 +326,12 @@ test_3(hid_t fapl)
     free(obj);
     obj = NULL;
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if (nerrors)
+    }
+    if (nerrors) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -331,8 +342,9 @@ error:
         H5Fclose(file);
     }
     H5E_END_TRY
-    if (obj)
+    if (obj) {
         free(obj);
+    }
     return MAX(1, nerrors);
 }
 
@@ -349,30 +361,31 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_4(hid_t fapl)
+static int test_4(hid_t fapl)
 {
-    hid_t   file = H5I_INVALID_HID;
-    H5F_t  *f    = NULL;
-    H5HG_t *obj  = NULL;
+    hid_t file = H5I_INVALID_HID;
+    H5F_t* f = NULL;
+    H5HG_t* obj = NULL;
     uint8_t out[GHEAP_TEST_NOBJS];
-    size_t  u;
-    size_t  size;
-    herr_t  status;
-    int     nerrors = 0;
-    char    filename[1024];
+    size_t u;
+    size_t size;
+    herr_t status;
+    int nerrors = 0;
+    char filename[1024];
 
     TESTING("partial object removal");
 
     /* Allocate buffer for H5HG_t */
-    if (NULL == (obj = (H5HG_t *)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS)))
+    if (NULL == (obj = (H5HG_t*)malloc(sizeof(H5HG_t) * GHEAP_TEST_NOBJS))) {
         goto error;
+    }
 
     /* Open a clean file */
     h5_fixname(FILENAME[3], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to create file");
         goto error;
@@ -410,10 +423,12 @@ test_4(hid_t fapl)
     free(obj);
     obj = NULL;
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if (nerrors)
+    }
+    if (nerrors) {
         goto error;
+    }
 
     PASSED();
     return 0;
@@ -424,8 +439,9 @@ error:
         H5Fclose(file);
     }
     H5E_END_TRY
-    if (obj)
+    if (obj) {
         free(obj);
+    }
     return MAX(1, nerrors);
 }
 
@@ -443,27 +459,28 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static int
-test_ooo_indices(hid_t fapl)
+static int test_ooo_indices(hid_t fapl)
 {
-    hid_t    file = H5I_INVALID_HID;
-    H5F_t   *f    = NULL;
+    hid_t file = H5I_INVALID_HID;
+    H5F_t* f = NULL;
     unsigned i, j;
-    H5HG_t  *obj = NULL;
-    herr_t   status;
-    int      nerrors = 0;
-    char     filename[1024];
+    H5HG_t* obj = NULL;
+    herr_t status;
+    int nerrors = 0;
+    char filename[1024];
 
     TESTING("out of order indices");
 
-    if (NULL == (obj = (H5HG_t *)malloc(2000 * sizeof(*obj))))
+    if (NULL == (obj = (H5HG_t*)malloc(2000 * sizeof(*obj)))) {
         goto error;
+    }
 
     /* Open a clean file */
     h5_fixname(FILENAME[4], fapl, filename, sizeof filename);
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to create file");
         goto error;
@@ -480,22 +497,26 @@ test_ooo_indices(hid_t fapl)
         for (j = 1000 * ((~i & 1)); j < 1000 * ((~i & 1) + 1); j++) {
             H5Eclear2(H5E_DEFAULT);
             status = H5HG_insert(f, sizeof(j), &j, &obj[j]);
-            if (status < 0)
+            if (status < 0) {
                 GHEAP_REPEATED_ERR("    Unable to insert object into global heap");
+            }
 
             /* Check that the index is as expected */
-            if (obj[j].idx != ((1000 * i) + j - (1000 * ((~i & 1)))) % ((1U << 16) - 1) + 1)
+            if (obj[j].idx != ((1000 * i) + j - (1000 * ((~i & 1)))) % ((1U << 16) - 1) + 1) {
                 GHEAP_REPEATED_ERR("    Unexpected global heap index");
+            }
         }
 
         /* Remove the previous 1000 entries */
-        if (i > 0)
+        if (i > 0) {
             for (j = 1000 * (i & 1); j < 1000 * ((i & 1) + 1); j++) {
                 H5Eclear2(H5E_DEFAULT);
                 status = H5HG_remove(f, &obj[j]);
-                if (status < 0)
+                if (status < 0) {
                     GHEAP_REPEATED_ERR("    Unable to remove object from global heap");
+                }
             }
+        }
     }
 
     /* The indices should have "wrapped around" on the last iteration */
@@ -503,11 +524,13 @@ test_ooo_indices(hid_t fapl)
     assert(obj[535].idx == 1);
 
     /* Reopen the file */
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if ((file = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0)
+    }
+    if ((file = H5Fopen(filename, H5F_ACC_RDWR, fapl)) < 0) {
         goto error;
-    if (NULL == (f = (H5F_t *)H5VL_object(file))) {
+    }
+    if (NULL == (f = (H5F_t*)H5VL_object(file))) {
         H5_FAILED();
         puts("    Unable to open file");
         goto error;
@@ -515,8 +538,9 @@ test_ooo_indices(hid_t fapl)
 
     /* Read the objects to make sure the heap is still readable */
     for (i = 0; i < 1000; i++) {
-        if (NULL == H5HG_read(f, &obj[i], &j, NULL))
+        if (NULL == H5HG_read(f, &obj[i], &j, NULL)) {
             goto error;
+        }
         if (i != j) {
             H5_FAILED();
             puts("    Incorrect read value");
@@ -524,10 +548,12 @@ test_ooo_indices(hid_t fapl)
         }
     }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
-    if (nerrors)
+    }
+    if (nerrors) {
         goto error;
+    }
     free(obj);
     obj = NULL;
 
@@ -540,8 +566,9 @@ error:
         H5Fclose(file);
     }
     H5E_END_TRY
-    if (obj)
+    if (obj) {
         free(obj);
+    }
     return MAX(1, nerrors);
 } /* end test_ooo_indices */
 
@@ -554,21 +581,22 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    int         nerrors        = 0;
-    hid_t       fapl_id        = H5I_INVALID_HID;
-    H5CX_node_t api_ctx        = {{0}, NULL}; /* API context node to push */
-    bool        api_ctx_pushed = false;       /* Whether API context pushed */
+    int nerrors = 0;
+    hid_t fapl_id = H5I_INVALID_HID;
+    H5CX_node_t api_ctx = { { 0 }, NULL }; /* API context node to push */
+    bool api_ctx_pushed = false;           /* Whether API context pushed */
 
     h5_test_init();
-    if ((fapl_id = h5_fileaccess()) < 0)
+    if ((fapl_id = h5_fileaccess()) < 0) {
         goto error;
+    }
 
     /* Push API context */
-    if (H5CX_push(&api_ctx) < 0)
+    if (H5CX_push(&api_ctx) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = true;
 
     nerrors += test_1(fapl_id);
@@ -580,14 +608,16 @@ main(void)
     /* Verify symbol table messages are cached */
     nerrors += (h5_verify_cached_stabs(FILENAME, fapl_id) < 0 ? 1 : 0);
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
 
     puts("All global heap tests passed.");
 
     /* Pop API context */
-    if (api_ctx_pushed && H5CX_pop(false) < 0)
+    if (api_ctx_pushed && H5CX_pop(false) < 0) {
         FAIL_STACK_ERROR;
+    }
     api_ctx_pushed = false;
 
     h5_cleanup(FILENAME, fapl_id);
@@ -600,8 +630,9 @@ error:
     }
     H5E_END_TRY
 
-    if (api_ctx_pushed)
+    if (api_ctx_pushed) {
         H5CX_pop(false);
+    }
 
     puts("*** TESTS FAILED ***");
     exit(EXIT_FAILURE);

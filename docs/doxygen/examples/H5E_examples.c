@@ -9,8 +9,7 @@
 #define RESET "\x1b[0m"
 #define RED   "\x1b[31m"
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -26,8 +25,7 @@ main(void)
         }
 
         // create custom major and minor error codes
-        if ((major = H5Ecreate_msg(cls, H5E_MAJOR, "Okay, Houston, we've had a problem here")) ==
-            H5I_INVALID_HID) {
+        if ((major = H5Ecreate_msg(cls, H5E_MAJOR, "Okay, Houston, we've had a problem here")) == H5I_INVALID_HID) {
             ret_val = EXIT_FAILURE;
             goto fail_major;
         }
@@ -37,8 +35,7 @@ main(void)
         }
 
         // push a custom error message onto the default stack
-        if (H5Epush2(H5E_DEFAULT, __FILE__, __FUNCTION__, __LINE__, cls, major, minor, "%s Hello, error %s\n",
-                     RED, RESET) < 0) {
+        if (H5Epush2(H5E_DEFAULT, __FILE__, __FUNCTION__, __LINE__, cls, major, minor, "%s Hello, error %s\n", RED, RESET) < 0) {
             ret_val = EXIT_FAILURE;
             goto fail_push;
         }
@@ -81,16 +78,18 @@ fail_count:;
     {
         // pop 10 error messages off the default error stack
         // popping off non-existent messages is OK, but might be confusing
-        if (H5Epop(H5E_DEFAULT, 10) < 0)
+        if (H5Epop(H5E_DEFAULT, 10) < 0) {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [update] -->
 
     //! <!-- [delete] -->
     {
         // clear the default error stack (for the current thread)
-        if (H5Eclear2(H5E_DEFAULT) < 0)
+        if (H5Eclear2(H5E_DEFAULT) < 0) {
             ret_val = EXIT_FAILURE;
+        }
     }
     //! <!-- [delete] -->
 

@@ -16,53 +16,54 @@
  *          include H5TSprivate.h instead.
  */
 #if !(defined H5TS_FRIEND || defined H5TS_MODULE)
-#error "Do not include this file outside the H5TS package!"
+    #error "Do not include this file outside the H5TS package!"
 #endif
 
 #ifndef H5TSpkg_H
-#define H5TSpkg_H
+    #define H5TSpkg_H
 
-#ifdef H5_HAVE_THREADS
-/* Get package's private header */
-#include "H5TSprivate.h"
+    #ifdef H5_HAVE_THREADS
+        /* Get package's private header */
+        #include "H5TSprivate.h"
 
-/* Other private headers needed by this file */
+        /* Other private headers needed by this file */
 
-/**************************/
-/* Package Private Macros */
-/**************************/
+        /**************************/
+        /* Package Private Macros */
+        /**************************/
 
-/* Enable statistics for recursive R/W lock when H5TS debugging is enabled */
-#ifdef H5TS_DEBUG
-#define H5TS_ENABLE_REC_RWLOCK_STATS 1
-#else
-#define H5TS_ENABLE_REC_RWLOCK_STATS 0
-#endif
+        /* Enable statistics for recursive R/W lock when H5TS debugging is enabled */
+        #ifdef H5TS_DEBUG
+            #define H5TS_ENABLE_REC_RWLOCK_STATS 1
+        #else
+            #define H5TS_ENABLE_REC_RWLOCK_STATS 0
+        #endif
 
-/****************************/
-/* Package Private Typedefs */
-/****************************/
+    /****************************/
+    /* Package Private Typedefs */
+    /****************************/
 
-#ifdef H5_HAVE_THREADSAFE_API
+        #ifdef H5_HAVE_THREADSAFE_API
 /* Info for the global API lock */
-typedef struct H5TS_api_info_t {
-#ifdef H5_HAVE_THREADSAFE
+typedef struct H5TS_api_info_t
+{
+            #ifdef H5_HAVE_THREADSAFE
     /* API lock */
     H5TS_mutex_t api_mutex;
 
     /* Count of recursive API calls by the same thread */
     unsigned lock_count;
-#else /* H5_HAVE_CONCURRENCY */
+            #else /* H5_HAVE_CONCURRENCY */
     /* API lock */
     H5TS_rwlock_t api_lock;
-#endif
+            #endif
 
     /* Count of # of attempts to acquire API lock */
     H5TS_atomic_uint_t attempt_lock_count;
 } H5TS_api_info_t;
-#endif /* H5_HAVE_THREADSAFE_API */
+        #endif /* H5_HAVE_THREADSAFE_API */
 
-#if H5TS_ENABLE_REC_RWLOCK_STATS
+        #if H5TS_ENABLE_REC_RWLOCK_STATS
 /******************************************************************************
  *
  * Structure H5TS_rec_rwlock_stats_t
@@ -123,7 +124,8 @@ typedef struct H5TS_api_info_t {
  *
  ******************************************************************************/
 
-typedef struct H5TS_rec_rwlock_stats_t {
+typedef struct H5TS_rec_rwlock_stats_t
+{
     int64_t read_locks_granted;
     int64_t read_locks_released;
     int64_t real_read_locks_granted;
@@ -140,7 +142,7 @@ typedef struct H5TS_rec_rwlock_stats_t {
     int64_t write_locks_delayed;
     int64_t max_write_locks_pending;
 } H5TS_rec_rwlock_stats_t;
-#endif
+        #endif
 
 /******************************************************************************
  *
@@ -186,86 +188,88 @@ typedef struct H5TS_rec_rwlock_stats_t {
  *
  ******************************************************************************/
 
-typedef enum {
+typedef enum
+{
     H5TS_REC_RWLOCK_UNUSED = 0, /* Lock is currently unused */
     H5TS_REC_RWLOCK_WRITE,      /* Lock is a recursive write lock */
     H5TS_REC_RWLOCK_READ        /* Lock is a recursive read lock */
 } H5TS_rec_rwlock_type_t;
 
-typedef struct H5TS_rec_rwlock_t {
+typedef struct H5TS_rec_rwlock_t
+{
     /* General fields */
-    H5TS_mutex_t           mutex;
+    H5TS_mutex_t mutex;
     H5TS_rec_rwlock_type_t lock_type;
 
     /* Writer fields */
-    H5TS_cond_t   writers_cv;
+    H5TS_cond_t writers_cv;
     H5TS_thread_t write_thread;
-    int32_t       rec_write_lock_count;
-    int32_t       waiting_writers_count;
+    int32_t rec_write_lock_count;
+    int32_t waiting_writers_count;
 
     /* Reader fields */
     H5TS_cond_t readers_cv;
-    int32_t     reader_thread_count;
-    H5TS_key_t  rec_read_lock_count_key;
-    bool        is_key_registered;
+    int32_t reader_thread_count;
+    H5TS_key_t rec_read_lock_count_key;
+    bool is_key_registered;
 
-#if H5TS_ENABLE_REC_RWLOCK_STATS
+        #if H5TS_ENABLE_REC_RWLOCK_STATS
     /* Stats */
     H5TS_rec_rwlock_stats_t stats;
-#endif
+        #endif
 } H5TS_rec_rwlock_t;
 
-/*****************************/
-/* Package Private Variables */
-/*****************************/
+    /*****************************/
+    /* Package Private Variables */
+    /*****************************/
 
-#ifdef H5_HAVE_THREADSAFE_API
+        #ifdef H5_HAVE_THREADSAFE_API
 /* API threadsafety info */
 extern H5TS_api_info_t H5TS_api_info_p;
 
 /* Per-thread info */
 extern H5TS_key_t H5TS_thrd_info_key_g;
-#endif /* H5_HAVE_THREADSAFE_API */
+        #endif /* H5_HAVE_THREADSAFE_API */
 
-/******************************/
-/* Package Private Prototypes */
-/******************************/
-#ifdef H5_HAVE_THREADSAFE_API
+        /******************************/
+        /* Package Private Prototypes */
+        /******************************/
+        #ifdef H5_HAVE_THREADSAFE_API
 H5_DLL herr_t H5TS__init_package(void);
-H5_DLL herr_t H5TS__api_mutex_acquire(unsigned lock_count, bool *acquired);
-H5_DLL herr_t H5TS__api_mutex_release(unsigned *lock_count);
+H5_DLL herr_t H5TS__api_mutex_acquire(unsigned lock_count, bool* acquired);
+H5_DLL herr_t H5TS__api_mutex_release(unsigned* lock_count);
 H5_DLL herr_t H5TS__tinfo_init(void);
-H5_DLL void   H5TS__tinfo_destroy(void *tinfo_node);
+H5_DLL void H5TS__tinfo_destroy(void* tinfo_node);
 H5_DLL herr_t H5TS__tinfo_term(void);
-#endif /* H5_HAVE_THREADSAFE_API */
+        #endif /* H5_HAVE_THREADSAFE_API */
 
 /* Recursive R/W lock related function declarations */
-H5_DLL herr_t H5TS__rec_rwlock_init(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_rdlock(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_wrlock(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_rdunlock(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_wrunlock(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_destroy(H5TS_rec_rwlock_t *lock);
+H5_DLL herr_t H5TS__rec_rwlock_init(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_rdlock(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_wrlock(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_rdunlock(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_wrunlock(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_destroy(H5TS_rec_rwlock_t* lock);
 
-/* 'once' callbacks */
-#ifdef H5_HAVE_THREADSAFE_API
-#ifdef H5_HAVE_C11_THREADS
+        /* 'once' callbacks */
+        #ifdef H5_HAVE_THREADSAFE_API
+            #ifdef H5_HAVE_C11_THREADS
 H5_DLL void H5TS__c11_first_thread_init(void);
-#else
-#ifdef H5_HAVE_WIN_THREADS
-H5_DLL BOOL CALLBACK H5TS__win32_process_enter(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *lpContex);
-#else
+            #else
+                #ifdef H5_HAVE_WIN_THREADS
+H5_DLL BOOL CALLBACK H5TS__win32_process_enter(PINIT_ONCE InitOnce, PVOID Parameter, PVOID* lpContex);
+                #else
 H5_DLL void H5TS__pthread_first_thread_init(void);
-#endif /* H5_HAVE_WIN_THREADS */
-#endif
-#endif /* H5_HAVE_THREADSAFE_API */
+                #endif /* H5_HAVE_WIN_THREADS */
+            #endif
+        #endif         /* H5_HAVE_THREADSAFE_API */
 
-#if H5TS_ENABLE_REC_RWLOCK_STATS
-H5_DLL herr_t H5TS__rec_rwlock_get_stats(H5TS_rec_rwlock_t *lock, H5TS_rec_rwlock_stats_t *stats);
-H5_DLL herr_t H5TS__rec_rwlock_reset_stats(H5TS_rec_rwlock_t *lock);
-H5_DLL herr_t H5TS__rec_rwlock_print_stats(const char *header_str, H5TS_rec_rwlock_stats_t *stats);
-#endif
+        #if H5TS_ENABLE_REC_RWLOCK_STATS
+H5_DLL herr_t H5TS__rec_rwlock_get_stats(H5TS_rec_rwlock_t* lock, H5TS_rec_rwlock_stats_t* stats);
+H5_DLL herr_t H5TS__rec_rwlock_reset_stats(H5TS_rec_rwlock_t* lock);
+H5_DLL herr_t H5TS__rec_rwlock_print_stats(const char* header_str, H5TS_rec_rwlock_stats_t* stats);
+        #endif
 
-#endif /* H5_HAVE_THREADS */
+    #endif /* H5_HAVE_THREADS */
 
-#endif /* H5TSpkg_H */
+#endif     /* H5TSpkg_H */

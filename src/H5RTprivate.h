@@ -22,30 +22,32 @@
 typedef struct H5RT_t H5RT_t;
 
 /* Struct representing a leaf in the r-tree */
-typedef struct H5RT_leaf_t {
-    void    *record;
-    int      rank;
-    hsize_t *min;     /* Points to _coords[0] */
-    hsize_t *max;     /* Points to _coords[rank] */
-    hsize_t *mid;     /* Points to _coords[2*rank] */
-    hsize_t *_coords; /* Private: single allocation for all coordinate arrays */
+typedef struct H5RT_leaf_t
+{
+    void* record;
+    int rank;
+    hsize_t* min;     /* Points to _coords[0] */
+    hsize_t* max;     /* Points to _coords[rank] */
+    hsize_t* mid;     /* Points to _coords[2*rank] */
+    hsize_t* _coords; /* Private: single allocation for all coordinate arrays */
 } H5RT_leaf_t;
 
 /* Dynamic result buffer for efficient search result allocation */
-typedef struct H5RT_result_set_t {
-    H5RT_leaf_t **results;  /* Array of pointers to result leaves */
-    size_t        capacity; /* Current buffer size (power of 2) */
-    size_t        count;    /* Number of results used */
+typedef struct H5RT_result_set_t
+{
+    H5RT_leaf_t** results; /* Array of pointers to result leaves */
+    size_t capacity;       /* Current buffer size (power of 2) */
+    size_t count;          /* Number of results used */
 } H5RT_result_set_t;
 
 /* Leaf helper functions */
-H5_DLL herr_t H5RT_leaf_init(H5RT_leaf_t *leaf, int rank, void *record);
-H5_DLL herr_t H5RT_leaf_cleanup(H5RT_leaf_t *leaf);
+H5_DLL herr_t H5RT_leaf_init(H5RT_leaf_t* leaf, int rank, void* record);
+H5_DLL herr_t H5RT_leaf_cleanup(H5RT_leaf_t* leaf);
 
 /* Main R-tree functions */
-H5_DLL H5RT_t *H5RT_create(int rank, H5RT_leaf_t *leaves, size_t count);
-H5_DLL herr_t  H5RT_search(H5RT_t *rtree, hsize_t min[], hsize_t max[], H5RT_result_set_t **results_out);
-H5_DLL herr_t  H5RT_free_results(H5RT_result_set_t *results);
-H5_DLL herr_t  H5RT_free(H5RT_t *rtree);
-H5_DLL H5RT_t *H5RT_copy(const H5RT_t *rtree);
+H5_DLL H5RT_t* H5RT_create(int rank, H5RT_leaf_t* leaves, size_t count);
+H5_DLL herr_t H5RT_search(H5RT_t* rtree, hsize_t min[], hsize_t max[], H5RT_result_set_t** results_out);
+H5_DLL herr_t H5RT_free_results(H5RT_result_set_t* results);
+H5_DLL herr_t H5RT_free(H5RT_t* rtree);
+H5_DLL H5RT_t* H5RT_copy(const H5RT_t* rtree);
 #endif /* H5RTprivate_H */

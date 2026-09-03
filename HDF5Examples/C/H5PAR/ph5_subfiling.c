@@ -34,28 +34,28 @@
 
 #if defined(H5_HAVE_PARALLEL) && defined(H5_HAVE_SUBFILING_VFD)
 
-#define EXAMPLE_FILE  "h5_subfiling_default_example.h5"
-#define EXAMPLE_FILE2 "h5_subfiling_custom_example.h5"
-#define EXAMPLE_FILE3 "h5_subfiling_precreate_example.h5"
+    #define EXAMPLE_FILE  "h5_subfiling_default_example.h5"
+    #define EXAMPLE_FILE2 "h5_subfiling_custom_example.h5"
+    #define EXAMPLE_FILE3 "h5_subfiling_precreate_example.h5"
 
-#define EXAMPLE_DSET_NAME "DSET"
-#define EXAMPLE_DSET_DIMS 2
+    #define EXAMPLE_DSET_NAME "DSET"
+    #define EXAMPLE_DSET_DIMS 2
 
-/* Have each MPI rank write 16MiB of data */
-#define EXAMPLE_DSET_NY 4194304
+    /* Have each MPI rank write 16MiB of data */
+    #define EXAMPLE_DSET_NY 4'194'304
 
-/* Dataset datatype */
-#define EXAMPLE_DSET_DATATYPE H5T_NATIVE_INT
+    /* Dataset datatype */
+    #define EXAMPLE_DSET_DATATYPE H5T_NATIVE_INT
 typedef int EXAMPLE_DSET_C_DATATYPE;
 
 /* Cleanup created files */
-static void
-cleanup(char *filename, hid_t fapl_id)
+static void cleanup(char* filename, hid_t fapl_id)
 {
     bool do_cleanup = getenv(HDF5_NOCLEANUP) ? false : true;
 
-    if (do_cleanup)
+    if (do_cleanup) {
         H5Fdelete(filename, fapl_id);
+    }
 }
 
 /*
@@ -63,19 +63,18 @@ cleanup(char *filename, hid_t fapl_id)
  * its default settings of 1 subfile per node, with
  * a stripe size of 32MiB
  */
-static void
-subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
+static void subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
 {
-    EXAMPLE_DSET_C_DATATYPE *data;
-    hsize_t                  dset_dims[EXAMPLE_DSET_DIMS];
-    hsize_t                  start[EXAMPLE_DSET_DIMS];
-    hsize_t                  count[EXAMPLE_DSET_DIMS];
-    hid_t                    file_id;
-    hid_t                    subfiling_fapl;
-    hid_t                    dset_id;
-    hid_t                    filespace;
-    char                     filename[512];
-    char                    *par_prefix;
+    EXAMPLE_DSET_C_DATATYPE* data;
+    hsize_t dset_dims[EXAMPLE_DSET_DIMS];
+    hsize_t start[EXAMPLE_DSET_DIMS];
+    hsize_t count[EXAMPLE_DSET_DIMS];
+    hid_t file_id;
+    hid_t subfiling_fapl;
+    hid_t dset_id;
+    hid_t filespace;
+    char filename[512];
+    char* par_prefix;
 
     /*
      * Make a copy of the FAPL so we don't disturb
@@ -108,13 +107,12 @@ subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 33554432); /* Align to default 32MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 33'554'432); /* Align to default 32MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");
 
-    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "",
-             EXAMPLE_FILE);
+    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "", EXAMPLE_FILE);
 
     /*
      * Create a new file collectively
@@ -128,13 +126,12 @@ subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
      */
     dset_dims[0] = mpi_size;
     dset_dims[1] = EXAMPLE_DSET_NY;
-    filespace    = H5Screate_simple(EXAMPLE_DSET_DIMS, dset_dims, NULL);
+    filespace = H5Screate_simple(EXAMPLE_DSET_DIMS, dset_dims, NULL);
 
     /*
      * Create the dataset with default properties
      */
-    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT,
-                         H5P_DEFAULT, H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
      * Each MPI rank writes from a contiguous memory
@@ -178,21 +175,20 @@ subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
  * An example of using the HDF5 Subfiling VFD with
  * custom settings
  */
-static void
-subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
+static void subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
 {
-    EXAMPLE_DSET_C_DATATYPE *data;
-    H5FD_subfiling_config_t  subf_config;
-    H5FD_ioc_config_t        ioc_config;
-    hsize_t                  dset_dims[EXAMPLE_DSET_DIMS];
-    hsize_t                  start[EXAMPLE_DSET_DIMS];
-    hsize_t                  count[EXAMPLE_DSET_DIMS];
-    hid_t                    file_id;
-    hid_t                    subfiling_fapl;
-    hid_t                    dset_id;
-    hid_t                    filespace;
-    char                     filename[512];
-    char                    *par_prefix;
+    EXAMPLE_DSET_C_DATATYPE* data;
+    H5FD_subfiling_config_t subf_config;
+    H5FD_ioc_config_t ioc_config;
+    hsize_t dset_dims[EXAMPLE_DSET_DIMS];
+    hsize_t start[EXAMPLE_DSET_DIMS];
+    hsize_t count[EXAMPLE_DSET_DIMS];
+    hid_t file_id;
+    hid_t subfiling_fapl;
+    hid_t dset_id;
+    hid_t filespace;
+    char filename[512];
+    char* par_prefix;
 
     /*
      * Make a copy of the FAPL so we don't disturb
@@ -214,7 +210,7 @@ subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
      * environment variable, this will use every MPI
      * rank as an I/O concentrator.
      */
-    subf_config.shared_cfg.stripe_size   = 1048576;
+    subf_config.shared_cfg.stripe_size = 1'048'576;
     subf_config.shared_cfg.ioc_selection = SELECT_IOC_EVERY_NTH_RANK;
 
     /*
@@ -252,13 +248,12 @@ subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 1048576); /* Align to custom 1MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 1'048'576); /* Align to custom 1MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");
 
-    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "",
-             EXAMPLE_FILE2);
+    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "", EXAMPLE_FILE2);
 
     /*
      * Create a new file collectively
@@ -272,13 +267,12 @@ subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
      */
     dset_dims[0] = mpi_size;
     dset_dims[1] = EXAMPLE_DSET_NY;
-    filespace    = H5Screate_simple(EXAMPLE_DSET_DIMS, dset_dims, NULL);
+    filespace = H5Screate_simple(EXAMPLE_DSET_DIMS, dset_dims, NULL);
 
     /*
      * Create the dataset with default properties
      */
-    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT,
-                         H5P_DEFAULT, H5P_DEFAULT);
+    dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
      * Each MPI rank writes from a contiguous memory
@@ -325,20 +319,19 @@ subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
  * the subfiling stripe count must be set so that rank
  * 0 knows how many subfiles to pre-create.
  */
-static void
-subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
+static void subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
 {
-    EXAMPLE_DSET_C_DATATYPE *data;
-    H5FD_subfiling_config_t  subf_config;
-    hsize_t                  dset_dims[EXAMPLE_DSET_DIMS];
-    hsize_t                  start[EXAMPLE_DSET_DIMS];
-    hsize_t                  count[EXAMPLE_DSET_DIMS];
-    hid_t                    file_id;
-    hid_t                    subfiling_fapl;
-    hid_t                    dset_id;
-    hid_t                    filespace;
-    char                     filename[512];
-    char                    *par_prefix;
+    EXAMPLE_DSET_C_DATATYPE* data;
+    H5FD_subfiling_config_t subf_config;
+    hsize_t dset_dims[EXAMPLE_DSET_DIMS];
+    hsize_t start[EXAMPLE_DSET_DIMS];
+    hsize_t count[EXAMPLE_DSET_DIMS];
+    hid_t file_id;
+    hid_t subfiling_fapl;
+    hid_t dset_id;
+    hid_t filespace;
+    char filename[512];
+    char* par_prefix;
 
     /*
      * Make a copy of the FAPL so we don't disturb
@@ -375,13 +368,12 @@ subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 1048576); /* Align to custom 1MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 1'048'576); /* Align to custom 1MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");
 
-    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "",
-             EXAMPLE_FILE3);
+    snprintf(filename, sizeof(filename), "%s%s%s", par_prefix ? par_prefix : "", par_prefix ? "/" : "", EXAMPLE_FILE3);
 
     /* Set dataset dimensionality */
     dset_dims[0] = mpi_size;
@@ -414,8 +406,7 @@ subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
         /*
          * Create the dataset with default properties
          */
-        dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT,
-                             H5P_DEFAULT, H5P_DEFAULT);
+        dset_id = H5Dcreate2(file_id, EXAMPLE_DSET_NAME, EXAMPLE_DSET_DATATYPE, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
         /*
          * Initialize data buffer
@@ -490,16 +481,15 @@ subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
     H5Pclose(subfiling_fapl);
 }
 
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
-    hid_t    fapl_id;
-    int      mpi_size;
-    int      mpi_rank;
-    int      mpi_thread_required = MPI_THREAD_MULTIPLE;
-    int      mpi_thread_provided = 0;
+    hid_t fapl_id;
+    int mpi_size;
+    int mpi_rank;
+    int mpi_thread_required = MPI_THREAD_MULTIPLE;
+    int mpi_thread_provided = 0;
 
     /* HDF5 Subfiling VFD requires MPI_Init_thread with MPI_THREAD_MULTIPLE */
     MPI_Init_thread(&argc, &argv, mpi_thread_required, &mpi_thread_provided);
@@ -532,8 +522,9 @@ main(int argc, char **argv)
 
     H5Pclose(fapl_id);
 
-    if (mpi_rank == 0)
+    if (mpi_rank == 0) {
         printf("PHDF5 example finished with no errors\n");
+    }
 
     MPI_Finalize();
 
@@ -543,11 +534,9 @@ main(int argc, char **argv)
 #else
 
 /* dummy program since HDF5 is not parallel-enabled */
-int
-main(void)
+int main(void)
 {
-    printf(
-        "Example program cannot run - HDF5 must be built with parallel support and Subfiling VFD support\n");
+    printf("Example program cannot run - HDF5 must be built with parallel support and Subfiling VFD support\n");
     return 0;
 }
 

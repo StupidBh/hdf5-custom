@@ -6,8 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -23,7 +22,7 @@ main(void)
 #if H5_VERSION_GE(1, 10, 1)
         if (H5Pset_file_space_strategy(fcpl, H5F_FSPACE_STRATEGY_FSM_AGGR, 1, 4096) < 0) {
 #else
-#error HDF5 1.10.1+ required
+    #error HDF5 1.10.1+ required
 #endif
             ret_val = EXIT_FAILURE;
             goto fail_fapl;
@@ -36,7 +35,7 @@ main(void)
 #if H5_VERSION_GE(1, 10, 1)
         if (H5Pset_libver_bounds(fapl, H5F_LIBVER_V110, H5F_LIBVER_LATEST) < 0) {
 #else
-#error HDF5 1.10.x+ required
+    #error HDF5 1.10.x+ required
 #endif
             ret_val = EXIT_FAILURE;
             goto fail_file;

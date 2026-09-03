@@ -28,8 +28,8 @@
 #define H5JAM_FILE8 "twithub.h5"
 #define H5JAM_FILE9 "twithub513.h5"
 
-herr_t gent_ub(const char *filename, size_t ub_size, size_t ub_fill);
-herr_t create_textfile(const char *name, size_t size);
+herr_t gent_ub(const char* filename, size_t ub_size, size_t ub_fill);
+herr_t create_textfile(const char* name, size_t size);
 
 /*
  * This pattern is used to fill text files

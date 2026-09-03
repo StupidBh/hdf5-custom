@@ -22,8 +22,7 @@
 
 static void usage(void);
 
-static void
-usage(void)
+static void usage(void)
 {
     fprintf(stdout, "Usage: h5fc_chk_idx file_name dataset_pathname\n");
 } /* usage() */
@@ -39,13 +38,12 @@ usage(void)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    char             *fname = NULL;
-    char             *dname = NULL;
-    hid_t             fid   = H5I_INVALID_HID;
-    hid_t             did   = H5I_INVALID_HID;
+    char* fname = NULL;
+    char* dname = NULL;
+    hid_t fid = H5I_INVALID_HID;
+    hid_t did = H5I_INVALID_HID;
     H5D_chunk_index_t idx_type;
 
     /* h5fc_chk_idx fname dname */

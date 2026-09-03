@@ -20,15 +20,14 @@
 #define DIM0      4
 #define SDIM      8
 
-int
-main(void)
+int main(void)
 {
     hid_t file, filetype, memtype, space, dset, attr;
     /* Handles */
-    herr_t  status;
-    hsize_t dims[1] = {DIM0};
-    size_t  sdim;
-    char    wdata[DIM0][SDIM] = {"Parting", "is such", "sweet", "sorrow."},
+    herr_t status;
+    hsize_t dims[1] = { DIM0 };
+    size_t sdim;
+    char wdata[DIM0][SDIM] = { "Parting", "is such", "sweet", "sorrow." },
          /* Write buffer */
         **rdata; /* Read buffer */
     int ndims, i;
@@ -44,15 +43,15 @@ main(void)
      * for the null terminator in the file.
      */
     filetype = H5Tcopy(H5T_FORTRAN_S1);
-    status   = H5Tset_size(filetype, SDIM - 1);
-    memtype  = H5Tcopy(H5T_C_S1);
-    status   = H5Tset_size(memtype, SDIM);
+    status = H5Tset_size(filetype, SDIM - 1);
+    memtype = H5Tcopy(H5T_C_S1);
+    status = H5Tset_size(memtype, SDIM);
 
     /*
      * Create dataset with a null dataspace.
      */
-    space  = H5Screate(H5S_NULL);
-    dset   = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    space = H5Screate(H5S_NULL);
+    dset = H5Dcreate(file, DATASET, H5T_STD_I32LE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Sclose(space);
 
     /*
@@ -64,7 +63,7 @@ main(void)
     /*
      * Create the attribute and write the string data to it.
      */
-    attr   = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT, H5P_DEFAULT);
+    attr = H5Acreate(dset, ATTRIBUTE, filetype, space, H5P_DEFAULT, H5P_DEFAULT);
     status = H5Awrite(attr, memtype, wdata[0]);
 
     /*
@@ -95,7 +94,7 @@ main(void)
      * Get the datatype and its size.
      */
     filetype = H5Aget_type(attr);
-    sdim     = H5Tget_size(filetype);
+    sdim = H5Tget_size(filetype);
     sdim++; /* Make room for null terminator */
 
     /*
@@ -109,24 +108,25 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (char **)malloc(dims[0] * sizeof(char *));
+    rdata = (char**)malloc(dims[0] * sizeof(char*));
 
     /*
      * Allocate space for integer data.
      */
-    rdata[0] = (char *)malloc(dims[0] * sdim * sizeof(char));
+    rdata[0] = (char*)malloc(dims[0] * sdim * sizeof(char));
 
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * sdim;
+    }
 
     /*
      * Create the memory datatype.
      */
     memtype = H5Tcopy(H5T_C_S1);
-    status  = H5Tset_size(memtype, sdim);
+    status = H5Tset_size(memtype, sdim);
 
     /*
      * Read the data.
@@ -136,8 +136,9 @@ main(void)
     /*
      * Output the data to the screen.
      */
-    for (i = 0; i < dims[0]; i++)
+    for (i = 0; i < dims[0]; i++) {
         printf("%s[%d]: %s\n", ATTRIBUTE, i, rdata[i]);
+    }
 
     /*
      * Close and release resources.

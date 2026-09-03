@@ -35,17 +35,18 @@
 /******************/
 
 /* Udata struct for calls to H5SM__compare_cb and H5SM__compare_iter_op*/
-typedef struct H5SM_compare_udata_t {
-    const H5SM_mesg_key_t *key; /* Key; compare this against stored message */
-    H5O_msg_crt_idx_t      idx; /* Index of the message in the OH, if applicable */
-    herr_t                 ret; /* Return value; set this to result of memcmp */
+typedef struct H5SM_compare_udata_t
+{
+    const H5SM_mesg_key_t* key; /* Key; compare this against stored message */
+    H5O_msg_crt_idx_t idx;      /* Index of the message in the OH, if applicable */
+    herr_t ret;                 /* Return value; set this to result of memcmp */
 } H5SM_compare_udata_t;
 
 /********************/
 /* Local Prototypes */
 /********************/
-static herr_t H5SM__compare_cb(const void *obj, size_t obj_len, void *udata);
-static herr_t H5SM__compare_iter_op(H5O_t *oh, H5O_mesg_t *mesg, unsigned sequence, void *udata);
+static herr_t H5SM__compare_cb(const void* obj, size_t obj_len, void* udata);
+static herr_t H5SM__compare_iter_op(H5O_t* oh, H5O_mesg_t* mesg, unsigned sequence, void* udata);
 
 /*********************/
 /* Package Variables */
@@ -72,21 +73,23 @@ static herr_t H5SM__compare_iter_op(H5O_t *oh, H5O_mesg_t *mesg, unsigned sequen
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5SM__compare_cb(const void *obj, size_t obj_len, void *_udata)
+static herr_t H5SM__compare_cb(const void* obj, size_t obj_len, void* _udata)
 {
-    H5SM_compare_udata_t *udata = (H5SM_compare_udata_t *)_udata;
+    H5SM_compare_udata_t* udata = (H5SM_compare_udata_t*)_udata;
 
     FUNC_ENTER_PACKAGE_NOERR
 
     /* If the encoding sizes are different, it's not the same object */
-    if (udata->key->encoding_size > obj_len)
+    if (udata->key->encoding_size > obj_len) {
         udata->ret = 1;
-    else if (udata->key->encoding_size < obj_len)
+    }
+    else if (udata->key->encoding_size < obj_len) {
         udata->ret = -1;
-    else
+    }
+    else {
         /* Sizes are the same.  Return result of memcmp */
         udata->ret = memcmp(udata->key->encoding, obj, obj_len);
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5SM__compare_cb() */
@@ -104,11 +107,10 @@ H5SM__compare_cb(const void *obj, size_t obj_len, void *_udata)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5SM__compare_iter_op(H5O_t *oh, H5O_mesg_t *mesg /*in,out*/, unsigned sequence, void *_udata /*in,out*/)
+static herr_t H5SM__compare_iter_op(H5O_t* oh, H5O_mesg_t* mesg /*in,out*/, unsigned sequence, void* _udata /*in,out*/)
 {
-    H5SM_compare_udata_t *udata     = (H5SM_compare_udata_t *)_udata;
-    herr_t                ret_value = H5_ITER_CONT;
+    H5SM_compare_udata_t* udata = (H5SM_compare_udata_t*)_udata;
+    herr_t ret_value = H5_ITER_CONT;
 
     FUNC_ENTER_PACKAGE
 
@@ -126,16 +128,19 @@ H5SM__compare_iter_op(H5O_t *oh, H5O_mesg_t *mesg /*in,out*/, unsigned sequence,
         /* Sanity check the message's length */
         assert(mesg->raw_size > 0);
 
-        if (aligned_encoded_size > mesg->raw_size)
+        if (aligned_encoded_size > mesg->raw_size) {
             udata->ret = 1;
-        else if (aligned_encoded_size < mesg->raw_size)
+        }
+        else if (aligned_encoded_size < mesg->raw_size) {
             udata->ret = -1;
+        }
         else {
             /* Check if the message is dirty & flush it to the object header if so */
-            if (mesg->dirty)
-                if (H5O_msg_flush(udata->key->file, oh, mesg) < 0)
-                    HGOTO_ERROR(H5E_SOHM, H5E_CANTENCODE, H5_ITER_ERROR,
-                                "unable to encode object header message");
+            if (mesg->dirty) {
+                if (H5O_msg_flush(udata->key->file, oh, mesg) < 0) {
+                    HGOTO_ERROR(H5E_SOHM, H5E_CANTENCODE, H5_ITER_ERROR, "unable to encode object header message");
+                }
+            }
 
             assert(udata->key->encoding_size <= mesg->raw_size);
             udata->ret = memcmp(udata->key->encoding, mesg->raw, udata->key->encoding_size);
@@ -162,12 +167,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5SM__message_compare(const void *rec1, const void *rec2, int *result)
+herr_t H5SM__message_compare(const void* rec1, const void* rec2, int* result)
 {
-    const H5SM_mesg_key_t *key       = (const H5SM_mesg_key_t *)rec1;
-    const H5SM_sohm_t     *mesg      = (const H5SM_sohm_t *)rec2;
-    herr_t                 ret_value = SUCCEED;
+    const H5SM_mesg_key_t* key = (const H5SM_mesg_key_t*)rec1;
+    const H5SM_sohm_t* mesg = (const H5SM_sohm_t*)rec2;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
 
@@ -184,8 +188,7 @@ H5SM__message_compare(const void *rec1, const void *rec2, int *result)
         }
     } /* end if */
     else if (mesg->location == H5SM_IN_OH && key->message.location == H5SM_IN_OH) {
-        if (key->message.u.mesg_loc.oh_addr == mesg->u.mesg_loc.oh_addr &&
-            key->message.u.mesg_loc.index == mesg->u.mesg_loc.index &&
+        if (key->message.u.mesg_loc.oh_addr == mesg->u.mesg_loc.oh_addr && key->message.u.mesg_loc.index == mesg->u.mesg_loc.index &&
             key->message.msg_type_id == mesg->msg_type_id) {
             *result = 0;
             HGOTO_DONE(SUCCEED);
@@ -193,10 +196,12 @@ H5SM__message_compare(const void *rec1, const void *rec2, int *result)
     } /* end if */
 
     /* Compare hash values */
-    if (key->message.hash > mesg->hash)
+    if (key->message.hash > mesg->hash) {
         *result = 1;
-    else if (key->message.hash < mesg->hash)
+    }
+    else if (key->message.hash < mesg->hash) {
         *result = -1;
+    }
     /* If the hash values match, make sure the messages are really the same */
     else {
         /* Hash values match; compare the encoded message with the one in
@@ -215,20 +220,22 @@ H5SM__message_compare(const void *rec1, const void *rec2, int *result)
          */
         if (mesg->location == H5SM_IN_HEAP) {
             /* Call heap op routine with comparison callback */
-            if (H5HF_op(key->fheap, &(mesg->u.heap_loc.fheap_id), H5SM__compare_cb, &udata) < 0)
+            if (H5HF_op(key->fheap, &(mesg->u.heap_loc.fheap_id), H5SM__compare_cb, &udata) < 0) {
                 HGOTO_ERROR(H5E_HEAP, H5E_CANTCOMPARE, FAIL, "can't compare btree2 records");
+            }
         } /* end if */
         else {
-            H5O_loc_t           oloc; /* Object owning the message */
-            H5O_mesg_operator_t op;   /* Message operator */
+            H5O_loc_t oloc;         /* Object owning the message */
+            H5O_mesg_operator_t op; /* Message operator */
 
             /* Sanity checks */
             assert(key->file);
             assert(mesg->location == H5SM_IN_OH);
 
             /* Reset the object location */
-            if (H5O_loc_reset(&oloc) < 0)
+            if (H5O_loc_reset(&oloc) < 0) {
                 HGOTO_ERROR(H5E_SYM, H5E_CANTRESET, FAIL, "unable to initialize target location");
+            }
 
             /* Set up object location */
             oloc.file = key->file;
@@ -238,10 +245,11 @@ H5SM__message_compare(const void *rec1, const void *rec2, int *result)
             udata.idx = mesg->u.mesg_loc.index;
 
             /* Locate the right message and compare with it */
-            op.op_type  = H5O_MESG_OP_LIB;
+            op.op_type = H5O_MESG_OP_LIB;
             op.u.lib_op = H5SM__compare_iter_op;
-            if (H5O_msg_iterate(&oloc, mesg->msg_type_id, &op, &udata) < 0)
+            if (H5O_msg_iterate(&oloc, mesg->msg_type_id, &op, &udata) < 0) {
                 HGOTO_ERROR(H5E_SYM, H5E_NOTFOUND, FAIL, "error iterating over links");
+            }
         } /* end else */
 
         *result = udata.ret;
@@ -261,11 +269,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5SM__message_encode(uint8_t *raw, const void *_nrecord, void *_ctx)
+herr_t H5SM__message_encode(uint8_t* raw, const void* _nrecord, void* _ctx)
 {
-    H5SM_bt2_ctx_t    *ctx     = (H5SM_bt2_ctx_t *)_ctx; /* Callback context structure */
-    const H5SM_sohm_t *message = (const H5SM_sohm_t *)_nrecord;
+    H5SM_bt2_ctx_t* ctx = (H5SM_bt2_ctx_t*)_ctx; /* Callback context structure */
+    const H5SM_sohm_t* message = (const H5SM_sohm_t*)_nrecord;
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -301,11 +308,10 @@ H5SM__message_encode(uint8_t *raw, const void *_nrecord, void *_ctx)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5SM__message_decode(const uint8_t *raw, void *_nrecord, void *_ctx)
+herr_t H5SM__message_decode(const uint8_t* raw, void* _nrecord, void* _ctx)
 {
-    H5SM_bt2_ctx_t *ctx     = (H5SM_bt2_ctx_t *)_ctx; /* Callback context structure */
-    H5SM_sohm_t    *message = (H5SM_sohm_t *)_nrecord;
+    H5SM_bt2_ctx_t* ctx = (H5SM_bt2_ctx_t*)_ctx; /* Callback context structure */
+    H5SM_sohm_t* message = (H5SM_sohm_t*)_nrecord;
 
     FUNC_ENTER_PACKAGE_NOERR
 

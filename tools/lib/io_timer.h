@@ -16,7 +16,8 @@
 #include "H5private.h"
 
 /* The different types of timers we can have */
-typedef enum timer_type_ {
+typedef enum timer_type_
+{
     HDF5_FILE_OPENCLOSE,
     HDF5_DATASET_CREATE,
     HDF5_MPI_WRITE,
@@ -34,33 +35,37 @@ typedef enum timer_type_ {
     NUM_TIMERS
 } timer_type;
 
-typedef enum clock_type_ {
+typedef enum clock_type_
+{
     SYS_CLOCK = 0, /* Use system clock to measure time     */
     MPI_CLOCK = 1  /* Use MPI clock to measure time        */
 } clock_type;
 
 /* Miscellaneous identifiers */
-enum {
+enum
+{
     TSTART, /* Start a specified timer              */
     TSTOP   /* Stop a specified timer               */
 };
 
 /* The performance time structure */
-typedef struct io_time_t {
-    clock_type     type;
-    double         total_time[NUM_TIMERS];
-    double         mpi_timer[NUM_TIMERS];
+typedef struct io_time_t
+{
+    clock_type type;
+    double total_time[NUM_TIMERS];
+    double mpi_timer[NUM_TIMERS];
     struct timeval sys_timer[NUM_TIMERS];
 } io_time_t;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-H5TOOLS_DLL io_time_t *io_time_new(clock_type t);
-H5TOOLS_DLL void       io_time_destroy(io_time_t *pt);
-H5TOOLS_DLL io_time_t *io_time_set(io_time_t *pt, timer_type t, int start_stop);
-H5TOOLS_DLL double     io_time_get(io_time_t *pt, timer_type t);
+    H5TOOLS_DLL io_time_t* io_time_new(clock_type t);
+    H5TOOLS_DLL void io_time_destroy(io_time_t* pt);
+    H5TOOLS_DLL io_time_t* io_time_set(io_time_t* pt, timer_type t, int start_stop);
+    H5TOOLS_DLL double io_time_get(io_time_t* pt, timer_type t);
 
 #ifdef __cplusplus
 }

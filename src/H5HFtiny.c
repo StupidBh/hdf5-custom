@@ -55,7 +55,7 @@
 /********************/
 /* Local Prototypes */
 /********************/
-static herr_t H5HF__tiny_op_real(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void *op_data);
+static herr_t H5HF__tiny_op_real(H5HF_hdr_t* hdr, const uint8_t* id, H5HF_operator_t op, void* op_data);
 
 /*********************/
 /* Package Variables */
@@ -78,8 +78,7 @@ static herr_t H5HF__tiny_op_real(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operat
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_init(H5HF_hdr_t *hdr)
+herr_t H5HF__tiny_init(H5HF_hdr_t* hdr)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -96,15 +95,15 @@ H5HF__tiny_init(H5HF_hdr_t *hdr)
      *  unnecessary)
      */
     if ((hdr->id_len - 1) <= H5HF_TINY_LEN_SHORT) {
-        hdr->tiny_max_len      = hdr->id_len - 1;
+        hdr->tiny_max_len = hdr->id_len - 1;
         hdr->tiny_len_extended = false;
     } /* end if */
     else if ((hdr->id_len - 1) == (H5HF_TINY_LEN_SHORT + 1)) {
-        hdr->tiny_max_len      = H5HF_TINY_LEN_SHORT;
+        hdr->tiny_max_len = H5HF_TINY_LEN_SHORT;
         hdr->tiny_len_extended = false;
     } /* end if */
     else {
-        hdr->tiny_max_len      = hdr->id_len - 2;
+        hdr->tiny_max_len = hdr->id_len - 2;
         hdr->tiny_len_extended = true;
     } /* end else */
 
@@ -120,12 +119,11 @@ H5HF__tiny_init(H5HF_hdr_t *hdr)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_insert(H5HF_hdr_t *hdr, size_t obj_size, const void *obj, void *_id)
+herr_t H5HF__tiny_insert(H5HF_hdr_t* hdr, size_t obj_size, const void* obj, void* _id)
 {
-    uint8_t *id = (uint8_t *)_id; /* Pointer to ID buffer */
-    size_t   enc_obj_size;        /* Encoded object size */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    uint8_t* id = (uint8_t*)_id; /* Pointer to ID buffer */
+    size_t enc_obj_size;         /* Encoded object size */
+    herr_t ret_value = SUCCEED;  /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -146,8 +144,7 @@ H5HF__tiny_insert(H5HF_hdr_t *hdr, size_t obj_size, const void *obj, void *_id)
         *id++ = (uint8_t)(H5HF_ID_VERS_CURR | H5HF_ID_TYPE_TINY | (enc_obj_size & H5HF_TINY_MASK_SHORT));
     } /* end if */
     else {
-        *id++ =
-            (uint8_t)(H5HF_ID_VERS_CURR | H5HF_ID_TYPE_TINY | ((enc_obj_size & H5HF_TINY_MASK_EXT_1) >> 8));
+        *id++ = (uint8_t)(H5HF_ID_VERS_CURR | H5HF_ID_TYPE_TINY | ((enc_obj_size & H5HF_TINY_MASK_EXT_1) >> 8));
         *id++ = enc_obj_size & H5HF_TINY_MASK_EXT_2;
     } /* end else */
 
@@ -159,8 +156,9 @@ H5HF__tiny_insert(H5HF_hdr_t *hdr, size_t obj_size, const void *obj, void *_id)
     hdr->tiny_nobjs++;
 
     /* Mark heap header as modified */
-    if (H5HF__hdr_dirty(hdr) < 0)
+    if (H5HF__hdr_dirty(hdr) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTDIRTY, FAIL, "can't mark heap header as dirty");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -175,8 +173,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_get_obj_len(H5HF_hdr_t *hdr, const uint8_t *id, size_t *obj_len_p)
+herr_t H5HF__tiny_get_obj_len(H5HF_hdr_t* hdr, const uint8_t* id, size_t* obj_len_p)
 {
     size_t enc_obj_size; /* Encoded object size */
 
@@ -190,13 +187,15 @@ H5HF__tiny_get_obj_len(H5HF_hdr_t *hdr, const uint8_t *id, size_t *obj_len_p)
     assert(obj_len_p);
 
     /* Check if 'tiny' object ID is in extended form, and retrieve encoded size */
-    if (!hdr->tiny_len_extended)
+    if (!hdr->tiny_len_extended) {
         enc_obj_size = *id & H5HF_TINY_MASK_SHORT;
-    else
+    }
+    else {
         /* (performed in this odd way to avoid compiler bug on tg-login3 with
          *  gcc 3.2.2 - QAK)
          */
-        enc_obj_size = (size_t) * (id + 1) | ((size_t)(*id & H5HF_TINY_MASK_EXT_1) << 8);
+        enc_obj_size = (size_t)*(id + 1) | ((size_t)(*id & H5HF_TINY_MASK_EXT_1) << 8);
+    }
 
     /* Set the object's length */
     *obj_len_p = enc_obj_size + 1;
@@ -213,8 +212,7 @@ H5HF__tiny_get_obj_len(H5HF_hdr_t *hdr, const uint8_t *id, size_t *obj_len_p)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HF__tiny_op_real(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void *op_data)
+static herr_t H5HF__tiny_op_real(H5HF_hdr_t* hdr, const uint8_t* id, H5HF_operator_t op, void* op_data)
 {
     size_t enc_obj_size;        /* Encoded object size */
     herr_t ret_value = SUCCEED; /* Return value */
@@ -233,8 +231,9 @@ H5HF__tiny_op_real(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void 
     ret_value = H5HF__tiny_get_obj_len(hdr, id, &enc_obj_size);
 
     /* Advance past flag byte(s) */
-    if (!hdr->tiny_len_extended)
+    if (!hdr->tiny_len_extended) {
         id++;
+    }
     else {
         /* (performed in two steps to avoid compiler bug on tg-login3 with
          *  gcc 3.2.2 - QAK)
@@ -244,8 +243,9 @@ H5HF__tiny_op_real(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void 
     }
 
     /* Call the user's 'op' callback */
-    if (op(id, enc_obj_size, op_data) < 0)
+    if (op(id, enc_obj_size, op_data) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTOPERATE, FAIL, "application's callback failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -260,8 +260,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_read(H5HF_hdr_t *hdr, const uint8_t *id, void *obj)
+herr_t H5HF__tiny_read(H5HF_hdr_t* hdr, const uint8_t* id, void* obj)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -275,8 +274,9 @@ H5HF__tiny_read(H5HF_hdr_t *hdr, const uint8_t *id, void *obj)
     assert(obj);
 
     /* Call the internal 'op' routine */
-    if (H5HF__tiny_op_real(hdr, id, H5HF__op_read, obj) < 0)
+    if (H5HF__tiny_op_real(hdr, id, H5HF__op_read, obj) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTOPERATE, FAIL, "unable to operate on heap object");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -291,8 +291,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_op(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void *op_data)
+herr_t H5HF__tiny_op(H5HF_hdr_t* hdr, const uint8_t* id, H5HF_operator_t op, void* op_data)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -306,8 +305,9 @@ H5HF__tiny_op(H5HF_hdr_t *hdr, const uint8_t *id, H5HF_operator_t op, void *op_d
     assert(op);
 
     /* Call the internal 'op' routine routine */
-    if (H5HF__tiny_op_real(hdr, id, op, op_data) < 0)
+    if (H5HF__tiny_op_real(hdr, id, op, op_data) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTOPERATE, FAIL, "unable to operate on heap object");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -322,8 +322,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__tiny_remove(H5HF_hdr_t *hdr, const uint8_t *id)
+herr_t H5HF__tiny_remove(H5HF_hdr_t* hdr, const uint8_t* id)
 {
     size_t enc_obj_size;        /* Encoded object size */
     herr_t ret_value = SUCCEED; /* Return value */
@@ -345,8 +344,9 @@ H5HF__tiny_remove(H5HF_hdr_t *hdr, const uint8_t *id)
     hdr->tiny_nobjs--;
 
     /* Mark heap header as modified */
-    if (H5HF__hdr_dirty(hdr) < 0)
+    if (H5HF__hdr_dirty(hdr) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTDIRTY, FAIL, "can't mark heap header as dirty");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

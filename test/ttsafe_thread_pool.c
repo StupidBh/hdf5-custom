@@ -20,20 +20,20 @@
 
 #ifdef H5_HAVE_THREADS
 
-#define NUM_THREADS 16
+    #define NUM_THREADS 16
 
-typedef struct {
+typedef struct
+{
     H5TS_mutex_t mutex;
-    int          val;
+    int val;
 } atomic_counter_t;
 
 static atomic_counter_t counter_g;
 
-static H5TS_THREAD_RETURN_TYPE
-noop_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE noop_task(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     result = H5TS_mutex_lock(&counter->mutex);
@@ -47,11 +47,10 @@ noop_task(void *_counter)
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-incr_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE incr_task(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     result = H5TS_mutex_lock(&counter->mutex);
@@ -66,11 +65,10 @@ incr_task(void *_counter)
     return ret_value;
 }
 
-static H5TS_THREAD_RETURN_TYPE
-decr_task(void *_counter)
+static H5TS_THREAD_RETURN_TYPE decr_task(void* _counter)
 {
-    atomic_counter_t *counter = (atomic_counter_t *)_counter;
-    herr_t            result;
+    atomic_counter_t* counter = (atomic_counter_t*)_counter;
+    herr_t result;
     H5TS_thread_ret_t ret_value = 0;
 
     result = H5TS_mutex_lock(&counter->mutex);
@@ -91,11 +89,10 @@ decr_task(void *_counter)
  *
  **********************************************************************
  */
-void
-tts_thread_pool(void H5_ATTR_UNUSED *params)
+void tts_thread_pool(void H5_ATTR_UNUSED* params)
 {
-    H5TS_pool_t *pool = NULL;
-    herr_t       result;
+    H5TS_pool_t* pool = NULL;
+    herr_t result;
 
     /* Initialize the counter */
     result = H5TS_mutex_init(&counter_g.mutex, H5TS_MUTEX_TYPE_PLAIN);
@@ -147,7 +144,7 @@ tts_thread_pool(void H5_ATTR_UNUSED *params)
 
     /* Create pool, add pair of 'incr' & 'decr' tasks, destroy pool */
     counter_g.val = 10;
-    result        = H5TS_pool_create(&pool, NUM_THREADS);
+    result = H5TS_pool_create(&pool, NUM_THREADS);
     CHECK_I(result, "H5TS_pool_create");
 
     result = H5TS_pool_add_task(pool, incr_task, &counter_g);
@@ -163,7 +160,7 @@ tts_thread_pool(void H5_ATTR_UNUSED *params)
 
     /* Create pool, add many 'incr' & 'decr' tasks, destroy pool */
     counter_g.val = 3;
-    result        = H5TS_pool_create(&pool, NUM_THREADS);
+    result = H5TS_pool_create(&pool, NUM_THREADS);
     CHECK_I(result, "H5TS_pool_create");
 
     for (unsigned u = 0; u < 200; u++) {
@@ -183,7 +180,7 @@ tts_thread_pool(void H5_ATTR_UNUSED *params)
 
     /* Create pool, add *lots* of 'incr' & 'decr' tasks, destroy pool */
     counter_g.val = 5;
-    result        = H5TS_pool_create(&pool, NUM_THREADS);
+    result = H5TS_pool_create(&pool, NUM_THREADS);
     CHECK_I(result, "H5TS_pool_create");
 
     for (unsigned u = 0; u < 2 * 1000 * 1000; u++) {

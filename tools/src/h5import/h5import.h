@@ -359,124 +359,120 @@
 #define H5DT_INT32   int
 #define H5DT_FLOAT32 float
 #define H5DT_FLOAT64 double
-#define VOIDP        void *
+#define VOIDP        void*
 #define H5DT_UINT8   unsigned char
 #define H5DT_UINT16  unsigned short
 #define H5DT_UINT32  unsigned int
 #define H5DT_INT64   long long
 #define H5DT_UINT64  unsigned H5DT_INT64
 
-struct path_info {
+struct path_info
+{
     char group[MAX_GROUPS_IN_PATH][MAX_PATH_NAME_LENGTH];
-    int  count;
+    int count;
 };
 
-struct Input {
-    int              h5dumpInput;
+struct Input
+{
+    int h5dumpInput;
     struct path_info path;
-    int              inputClass;
-    int              inputSize;
-    int              inputArchitecture;
-    int              inputByteOrder;
-    int              rank;
-    hsize_t         *sizeOfDimension;
-    int              outputClass;
-    int              outputSize;
-    int              outputArchitecture;
-    int              outputByteOrder;
-    hsize_t         *sizeOfChunk;
-    hsize_t         *maxsizeOfDimension;
-    int              compressionType;
-    int              compressionParam;
-    char            *externFilename;
-    VOIDP            data;
-    int              configOptionVector[NUM_KEYS];
+    int inputClass;
+    int inputSize;
+    int inputArchitecture;
+    int inputByteOrder;
+    int rank;
+    hsize_t* sizeOfDimension;
+    int outputClass;
+    int outputSize;
+    int outputArchitecture;
+    int outputByteOrder;
+    hsize_t* sizeOfChunk;
+    hsize_t* maxsizeOfDimension;
+    int compressionType;
+    int compressionParam;
+    char* externFilename;
+    VOIDP data;
+    int configOptionVector[NUM_KEYS];
 };
 
-struct infilesformat {
-    char         datafile[MAX_PATH_NAME_LENGTH];
-    char         configfile[MAX_PATH_NAME_LENGTH];
+struct infilesformat
+{
+    char datafile[MAX_PATH_NAME_LENGTH];
+    char configfile[MAX_PATH_NAME_LENGTH];
     struct Input in;
-    int          config; /* Configfile present? No - 0. Yes - 1 */
+    int config; /* Configfile present? No - 0. Yes - 1 */
 };
 
-struct Options {
-    struct infilesformat infiles[30]; /* structure to hold the list of input file names. Limited to 30*/
-    char                 outfile[MAX_PATH_NAME_LENGTH]; /* output file name */
-    int                  fcount;                        /* number of input files */
+struct Options
+{
+    struct infilesformat infiles[30];   /* structure to hold the list of input file names. Limited to 30*/
+    char outfile[MAX_PATH_NAME_LENGTH]; /* output file name */
+    int fcount;                         /* number of input files */
 };
 
-static char keytable[NUM_KEYS][30] = {"PATH",
-                                      "INPUT-CLASS",
-                                      "INPUT-SIZE",
-                                      "RANK",
-                                      "DIMENSION-SIZES",
-                                      "OUTPUT-CLASS",
-                                      "OUTPUT-SIZE",
-                                      "OUTPUT-ARCHITECTURE",
-                                      "OUTPUT-BYTE-ORDER",
-                                      "CHUNKED-DIMENSION-SIZES",
-                                      "COMPRESSION-TYPE",
-                                      "COMPRESSION-PARAM",
-                                      "EXTERNAL-STORAGE",
-                                      "MAXIMUM-DIMENSIONS",
-                                      "INPUT-BYTE-ORDER"};
+static char keytable[NUM_KEYS][30] = { "PATH",
+                                       "INPUT-CLASS",
+                                       "INPUT-SIZE",
+                                       "RANK",
+                                       "DIMENSION-SIZES",
+                                       "OUTPUT-CLASS",
+                                       "OUTPUT-SIZE",
+                                       "OUTPUT-ARCHITECTURE",
+                                       "OUTPUT-BYTE-ORDER",
+                                       "CHUNKED-DIMENSION-SIZES",
+                                       "COMPRESSION-TYPE",
+                                       "COMPRESSION-PARAM",
+                                       "EXTERNAL-STORAGE",
+                                       "MAXIMUM-DIMENSIONS",
+                                       "INPUT-BYTE-ORDER" };
 
 static int state_table[15][8] = {
     /* token ordering: FILNAME      OPT_o   OPT_c  OPT_h  OPT_d  OPT_p  OPT_t  OPT_s   */
 
     /* state 0: start */
-    {1, INVALID_TOKEN, INVALID_TOKEN, 6, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN},
+    { 1, INVALID_TOKEN, INVALID_TOKEN, 6, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 1: input files */
-    {INVALID_TOKEN, INVALID_TOKEN, 2, INVALID_TOKEN, 7, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN},
+    { INVALID_TOKEN, INVALID_TOKEN, 2, INVALID_TOKEN, 7, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 2: -c[onfigfile] */
-    {3, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 3, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 3: configfile */
-    {1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN},
+    { 1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 4: -o[utfile] */
-    {5, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 5, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 5: outfile */
-    {INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 6: -h[elp] */
-    {INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 7: -d[ims] */
-    {8, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 8, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 8: dimensions */
-    {1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 9, 11, 13},
+    { 1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 9, 11, 13 },
 
     /* state 9: -p[ath] */
-    {10, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 10, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 10: path name */
-    {1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 11, 13},
+    { 1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 11, 13 },
 
     /* state 11: -t[ype] */
-    {12, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 12, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 12: data type */
-    {1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 13},
+    { 1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, 13 },
 
     /* state 13: -s[ize] */
-    {14, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN,
-     INVALID_TOKEN},
+    { 14, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN },
 
     /* state 14: data size */
-    {1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN}
+    { 1, 4, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN, INVALID_TOKEN }
 
 };
 
@@ -485,11 +481,11 @@ static int state_table[15][8] = {
  *  Function declarations for h5import
  *
  */
-void usage(char *);
-void setDefaultValues(struct Input *in, int count);
-void help(char *);
+void usage(char*);
+void setDefaultValues(struct Input* in, int count);
+void help(char*);
 
-hid_t createOutputDataType(struct Input *in);
-hid_t createInputDataType(struct Input *in);
+hid_t createOutputDataType(struct Input* in);
+hid_t createInputDataType(struct Input* in);
 
 #endif /* H5IMPORT_H */

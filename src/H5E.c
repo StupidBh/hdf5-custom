@@ -97,25 +97,27 @@ H5FL_EXTERN(H5E_stack_t);
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5Eregister_class(const char *cls_name, const char *lib_name, const char *version)
+hid_t H5Eregister_class(const char* cls_name, const char* lib_name, const char* version)
 {
-    H5E_cls_t *cls;                         /* Pointer to error class */
-    hid_t      ret_value = H5I_INVALID_HID; /* Return value */
+    H5E_cls_t* cls;                    /* Pointer to error class */
+    hid_t ret_value = H5I_INVALID_HID; /* Return value */
 
     FUNC_ENTER_API(H5I_INVALID_HID)
 
     /* Check arguments */
-    if (cls_name == NULL || lib_name == NULL || version == NULL)
+    if (cls_name == NULL || lib_name == NULL || version == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, H5I_INVALID_HID, "invalid string");
+    }
 
     /* Create the new error class object */
-    if (NULL == (cls = H5E__register_class(cls_name, lib_name, version)))
+    if (NULL == (cls = H5E__register_class(cls_name, lib_name, version))) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTCREATE, H5I_INVALID_HID, "can't create error class");
+    }
 
     /* Register the new error class to get an ID for it */
-    if ((ret_value = H5I_register(H5I_ERROR_CLASS, cls, true)) < 0)
+    if ((ret_value = H5I_register(H5I_ERROR_CLASS, cls, true)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTREGISTER, H5I_INVALID_HID, "can't register error class");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -130,23 +132,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eunregister_class(hid_t class_id)
+herr_t H5Eunregister_class(hid_t class_id)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments */
-    if (H5I_ERROR_CLASS != H5I_get_type(class_id))
+    if (H5I_ERROR_CLASS != H5I_get_type(class_id)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an error class");
+    }
 
     /*
      * Decrement the counter on the dataset.  It will be freed if the count
      * reaches zero.
      */
-    if (H5I_dec_app_ref(class_id) < 0)
+    if (H5I_dec_app_ref(class_id) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error class");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -162,21 +165,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5Eget_class_name(hid_t class_id, char *name /*out*/, size_t size)
+ssize_t H5Eget_class_name(hid_t class_id, char* name /*out*/, size_t size)
 {
-    H5E_cls_t *cls;            /* Pointer to error class */
-    ssize_t    ret_value = -1; /* Return value */
+    H5E_cls_t* cls;         /* Pointer to error class */
+    ssize_t ret_value = -1; /* Return value */
 
     FUNC_ENTER_API((-1))
 
     /* Get the error class */
-    if (NULL == (cls = (H5E_cls_t *)H5I_object_verify(class_id, H5I_ERROR_CLASS)))
+    if (NULL == (cls = (H5E_cls_t*)H5I_object_verify(class_id, H5I_ERROR_CLASS))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, (-1), "not a error class ID");
+    }
 
     /* Retrieve the class name */
-    if ((ret_value = H5E__get_class_name(cls, name, size)) < 0)
+    if ((ret_value = H5E__get_class_name(cls, name, size)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, (-1), "can't get error class name");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -191,20 +195,21 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eclose_msg(hid_t err_id)
+herr_t H5Eclose_msg(hid_t err_id)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check arguments */
-    if (H5I_ERROR_MSG != H5I_get_type(err_id))
+    if (H5I_ERROR_MSG != H5I_get_type(err_id)) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an error class");
+    }
 
     /* Decrement the counter.  It will be freed if the count reaches zero. */
-    if (H5I_dec_app_ref(err_id) < 0)
+    if (H5I_dec_app_ref(err_id) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error message");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -220,32 +225,36 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5Ecreate_msg(hid_t class_id, H5E_type_t msg_type, const char *msg_str)
+hid_t H5Ecreate_msg(hid_t class_id, H5E_type_t msg_type, const char* msg_str)
 {
-    H5E_cls_t *cls;                         /* Pointer to error class */
-    H5E_msg_t *msg;                         /* Pointer to new error message */
-    hid_t      ret_value = H5I_INVALID_HID; /* Return value */
+    H5E_cls_t* cls;                    /* Pointer to error class */
+    H5E_msg_t* msg;                    /* Pointer to new error message */
+    hid_t ret_value = H5I_INVALID_HID; /* Return value */
 
     FUNC_ENTER_API(H5I_INVALID_HID)
 
     /* Check arguments */
-    if (msg_type != H5E_MAJOR && msg_type != H5E_MINOR)
+    if (msg_type != H5E_MAJOR && msg_type != H5E_MINOR) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, H5I_INVALID_HID, "not a valid message type");
-    if (msg_str == NULL)
+    }
+    if (msg_str == NULL) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, H5I_INVALID_HID, "message is NULL");
+    }
 
     /* Get the error class */
-    if (NULL == (cls = (H5E_cls_t *)H5I_object_verify(class_id, H5I_ERROR_CLASS)))
+    if (NULL == (cls = (H5E_cls_t*)H5I_object_verify(class_id, H5I_ERROR_CLASS))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, H5I_INVALID_HID, "not an error class ID");
+    }
 
     /* Create the new error message object */
-    if (NULL == (msg = H5E__create_msg(cls, msg_type, msg_str)))
+    if (NULL == (msg = H5E__create_msg(cls, msg_type, msg_str))) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTCREATE, H5I_INVALID_HID, "can't create error message");
+    }
 
     /* Register the new error class to get an ID for it */
-    if ((ret_value = H5I_register(H5I_ERROR_MSG, msg, true)) < 0)
+    if ((ret_value = H5I_register(H5I_ERROR_MSG, msg, true)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTREGISTER, H5I_INVALID_HID, "can't register error message");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -261,21 +270,22 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5Eget_msg(hid_t msg_id, H5E_type_t *type /*out*/, char *msg_str /*out*/, size_t size)
+ssize_t H5Eget_msg(hid_t msg_id, H5E_type_t* type /*out*/, char* msg_str /*out*/, size_t size)
 {
-    H5E_msg_t *msg;            /* Pointer to error message */
-    ssize_t    ret_value = -1; /* Return value */
+    H5E_msg_t* msg;         /* Pointer to error message */
+    ssize_t ret_value = -1; /* Return value */
 
     FUNC_ENTER_API_NOCLEAR((-1))
 
     /* Get the message object */
-    if (NULL == (msg = (H5E_msg_t *)H5I_object_verify(msg_id, H5I_ERROR_MSG)))
+    if (NULL == (msg = (H5E_msg_t*)H5I_object_verify(msg_id, H5I_ERROR_MSG))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, (-1), "not a error message ID");
+    }
 
     /* Get the message's text */
-    if ((ret_value = H5E__get_msg(msg, type, msg_str, size)) < 0)
+    if ((ret_value = H5E__get_msg(msg, type, msg_str, size)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, (-1), "can't get error message text");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -291,24 +301,25 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5Ecreate_stack(void)
+hid_t H5Ecreate_stack(void)
 {
-    H5E_stack_t *stk;                         /* Error stack */
-    hid_t        ret_value = H5I_INVALID_HID; /* Return value */
+    H5E_stack_t* stk;                  /* Error stack */
+    hid_t ret_value = H5I_INVALID_HID; /* Return value */
 
     FUNC_ENTER_API(H5I_INVALID_HID)
 
     /* Allocate a new error stack */
-    if (NULL == (stk = H5FL_CALLOC(H5E_stack_t)))
+    if (NULL == (stk = H5FL_CALLOC(H5E_stack_t))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, H5I_INVALID_HID, "memory allocation failed");
+    }
 
     /* Set the "automatic" error reporting info to the library default */
     H5E__set_default_auto(stk);
 
     /* Register the stack */
-    if ((ret_value = H5I_register(H5I_ERROR_STACK, stk, true)) < 0)
+    if ((ret_value = H5I_register(H5I_ERROR_STACK, stk, true)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTREGISTER, H5I_INVALID_HID, "can't create error stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -325,22 +336,23 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-hid_t
-H5Eget_current_stack(void)
+hid_t H5Eget_current_stack(void)
 {
-    H5E_stack_t *stk;                         /* Error stack */
-    hid_t        ret_value = H5I_INVALID_HID; /* Return value */
+    H5E_stack_t* stk;                  /* Error stack */
+    hid_t ret_value = H5I_INVALID_HID; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(H5I_INVALID_HID)
 
     /* Get the current stack */
-    if (NULL == (stk = H5E__get_current_stack()))
+    if (NULL == (stk = H5E__get_current_stack())) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTCREATE, H5I_INVALID_HID, "can't create error stack");
+    }
 
     /* Register the stack */
-    if ((ret_value = H5I_register(H5I_ERROR_STACK, stk, true)) < 0)
+    if ((ret_value = H5I_register(H5I_ERROR_STACK, stk, true)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTREGISTER, H5I_INVALID_HID, "can't create error stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -356,28 +368,30 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eset_current_stack(hid_t err_stack)
+herr_t H5Eset_current_stack(hid_t err_stack)
 {
-    H5E_stack_t *estack;
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     if (err_stack != H5E_DEFAULT) {
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
 
         /* Set the current error stack */
-        if (H5E__set_current_stack(estack) < 0)
+        if (H5E__set_current_stack(estack) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "unable to set error stack");
+        }
 
         /*
          * Decrement the counter on the error stack.  It will be freed if the count
          * reaches zero.
          */
-        if (H5I_dec_app_ref(err_stack) < 0)
+        if (H5I_dec_app_ref(err_stack) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error stack");
+        }
     } /* end if */
 
 done:
@@ -393,8 +407,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eclose_stack(hid_t stack_id)
+herr_t H5Eclose_stack(hid_t stack_id)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -402,15 +415,17 @@ H5Eclose_stack(hid_t stack_id)
 
     if (H5E_DEFAULT != stack_id) {
         /* Check arguments */
-        if (H5I_ERROR_STACK != H5I_get_type(stack_id))
+        if (H5I_ERROR_STACK != H5I_get_type(stack_id)) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
 
         /*
          * Decrement the counter on the error stack.  It will be freed if the count
          * reaches zero.
          */
-        if (H5I_dec_app_ref(stack_id) < 0)
+        if (H5I_dec_app_ref(stack_id) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on error stack");
+        }
     } /* end if */
 
 done:
@@ -427,32 +442,34 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-ssize_t
-H5Eget_num(hid_t error_stack_id)
+ssize_t H5Eget_num(hid_t error_stack_id)
 {
-    H5E_stack_t *estack;    /* Error stack to operate on */
-    ssize_t      ret_value; /* Return value */
+    H5E_stack_t* estack; /* Error stack to operate on */
+    ssize_t ret_value;   /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR((-1))
 
     /* Need to check for errors */
     if (error_stack_id == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, (-1), "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
         /* Get the error stack to operate on */
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(error_stack_id, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(error_stack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, (-1), "not an error stack ID");
+        }
     } /* end else */
 
     /* Get the number of errors on stack */
-    if ((ret_value = H5E__get_num(estack)) < 0)
+    if ((ret_value = H5E__get_num(estack)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, (-1), "can't get number of errors");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -467,36 +484,39 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Epop(hid_t err_stack, size_t count)
+herr_t H5Epop(hid_t err_stack, size_t count)
 {
-    H5E_stack_t *estack;
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Need to check for errors */
     if (err_stack == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
         /* Get the error stack to operate on */
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Range limit the number of errors to pop off stack */
-    if (count > estack->nused)
+    if (count > estack->nused) {
         count = estack->nused;
+    }
 
     /* Pop the errors off the stack */
-    if (H5E__pop(estack, count) < 0)
+    if (H5E__pop(estack, count) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTRELEASE, FAIL, "can't pop errors from stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -521,36 +541,37 @@ done:
  *-------------------------------------------------------------------------
  */
 H5_ATTR_FORMAT(printf, 8, 9)
-herr_t
-H5Epush2(hid_t err_stack, const char *file, const char *func, unsigned line, hid_t cls_id, hid_t maj_id,
-         hid_t min_id, const char *fmt, ...)
+
+herr_t H5Epush2(hid_t err_stack, const char* file, const char* func, unsigned line, hid_t cls_id, hid_t maj_id, hid_t min_id, const char* fmt, ...)
 {
-    H5E_stack_t *estack;               /* Pointer to error stack to modify */
-    va_list      ap;                   /* Varargs info */
-    htri_t       push_ret   = true;    /* Was an error stack entry actually pushed? */
-    bool         va_started = false;   /* Whether the variable argument list is open */
-    char        *tmp_file   = NULL;    /* Copy of the file name */
-    char        *tmp_func   = NULL;    /* Copy of the function name */
-    bool         inc_cls_id = false;   /* Incremented error class ID ref. count? */
-    bool         inc_maj_id = false;   /* Incremented major error ID ref. count? */
-    bool         inc_min_id = false;   /* Incremented minor error ID ref. count? */
-    herr_t       ret_value  = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Pointer to error stack to modify */
+    va_list ap;                 /* Varargs info */
+    htri_t push_ret = true;     /* Was an error stack entry actually pushed? */
+    bool va_started = false;    /* Whether the variable argument list is open */
+    char* tmp_file = NULL;      /* Copy of the file name */
+    char* tmp_func = NULL;      /* Copy of the function name */
+    bool inc_cls_id = false;    /* Incremented error class ID ref. count? */
+    bool inc_maj_id = false;    /* Incremented major error ID ref. count? */
+    bool inc_min_id = false;    /* Incremented minor error ID ref. count? */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Check for 'default' error stack */
     if (err_stack == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get the default error stack");
+        }
     }
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
         /* Get the error stack to operate on */
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Check if error reporting is paused for this stack */
@@ -560,45 +581,55 @@ H5Epush2(hid_t err_stack, const char *file, const char *func, unsigned line, hid
         va_started = true;
 
         /* Duplicate string information */
-        if (NULL == (tmp_file = strdup(file)))
+        if (NULL == (tmp_file = strdup(file))) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTALLOC, FAIL, "can't duplicate file string");
-        if (NULL == (tmp_func = strdup(func)))
+        }
+        if (NULL == (tmp_func = strdup(func))) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTALLOC, FAIL, "can't duplicate function string");
+        }
 
         /* Increment refcount on non-library IDs */
         if (cls_id != H5E_ERR_CLS_g) {
-            if (H5I_inc_ref(cls_id, false) < 0)
+            if (H5I_inc_ref(cls_id, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "can't increment class ID");
+            }
             inc_cls_id = true;
         }
         if (maj_id < H5E_first_maj_id_g || maj_id > H5E_last_maj_id_g) {
-            if (H5I_inc_ref(maj_id, false) < 0)
+            if (H5I_inc_ref(maj_id, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "can't increment major error ID");
+            }
             inc_maj_id = true;
         }
         if (min_id < H5E_first_min_id_g || min_id > H5E_last_min_id_g) {
-            if (H5I_inc_ref(min_id, false) < 0)
+            if (H5I_inc_ref(min_id, false) < 0) {
                 HGOTO_ERROR(H5E_ERROR, H5E_CANTINC, FAIL, "can't increment minor error ID");
+            }
             inc_min_id = true;
         }
 
         /* Push the error on the stack */
         push_ret = H5E__push_stack(estack, true, tmp_file, tmp_func, line, cls_id, maj_id, min_id, fmt, &ap);
-        if (push_ret < 0)
+        if (push_ret < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't push error on stack");
+        }
     }
 
 done:
-    if (va_started)
+    if (va_started) {
         va_end(ap);
+    }
 
     if (ret_value < 0 || !push_ret) {
-        if (inc_cls_id && H5I_dec_ref(cls_id) < 0)
+        if (inc_cls_id && H5I_dec_ref(cls_id) < 0) {
             HDONE_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "can't decrement class ID");
-        if (inc_maj_id && H5I_dec_ref(maj_id) < 0)
+        }
+        if (inc_maj_id && H5I_dec_ref(maj_id) < 0) {
             HDONE_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "can't decrement major error ID");
-        if (inc_min_id && H5I_dec_ref(min_id) < 0)
+        }
+        if (inc_min_id && H5I_dec_ref(min_id) < 0) {
             HDONE_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "can't decrement minor error ID");
+        }
 
         free(tmp_func);
         free(tmp_file);
@@ -616,29 +647,31 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eclear2(hid_t err_stack)
+herr_t H5Eclear2(hid_t err_stack)
 {
-    H5E_stack_t *estack;              /* Error stack to operate on */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Need to check for errors */
-    if (err_stack == H5E_DEFAULT)
+    if (err_stack == H5E_DEFAULT) {
         estack = NULL;
+    }
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Clear the error stack */
-    if (H5E__destroy_stack(estack) < 0)
+    if (H5E__destroy_stack(estack) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't clear error stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -656,8 +689,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eprint2(hid_t err_stack, FILE *stream)
+herr_t H5Eprint2(hid_t err_stack, FILE* stream)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -665,8 +697,9 @@ H5Eprint2(hid_t err_stack, FILE *stream)
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Print error stack */
-    if ((ret_value = H5E__print2(err_stack, stream)) < 0)
+    if ((ret_value = H5E__print2(err_stack, stream)) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTLIST, FAIL, "can't display error stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -682,34 +715,36 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Ewalk2(hid_t err_stack, H5E_direction_t direction, H5E_walk2_t stack_func, void *client_data)
+herr_t H5Ewalk2(hid_t err_stack, H5E_direction_t direction, H5E_walk2_t stack_func, void* client_data)
 {
-    H5E_stack_t  *estack;              /* Error stack to operate on */
-    H5E_walk_op_t op;                  /* Operator for walking error stack */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    H5E_walk_op_t op;           /* Operator for walking error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Need to check for errors */
     if (err_stack == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(err_stack, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(err_stack, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Walk the error stack */
-    op.vers    = 2;
+    op.vers = 2;
     op.u.func2 = stack_func;
-    if ((ret_value = H5E__walk(estack, direction, &op, client_data)) < 0)
+    if ((ret_value = H5E__walk(estack, direction, &op, client_data)) < 0) {
         HERROR(H5E_ERROR, H5E_CANTLIST, "can't walk error stack");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -727,40 +762,44 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eget_auto2(hid_t estack_id, H5E_auto2_t *func /*out*/, void **client_data /*out*/)
+herr_t H5Eget_auto2(hid_t estack_id, H5E_auto2_t* func /*out*/, void** client_data /*out*/)
 {
-    H5E_stack_t  *estack;              /* Error stack to operate on */
-    H5E_auto_op_t op;                  /* Error stack function */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    H5E_auto_op_t op;           /* Error stack function */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     if (estack_id == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(estack_id, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(estack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Get the automatic error reporting information */
-    if (H5E__get_auto(estack, &op, client_data) < 0)
+    if (H5E__get_auto(estack, &op, client_data) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get automatic error info");
+    }
 
 #ifndef H5_NO_DEPRECATED_SYMBOLS
     /* Fail if the printing function isn't the default(user-set) and set through H5Eset_auto1 */
-    if (!op.is_default && op.vers == 1)
+    if (!op.is_default && op.vers == 1) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "wrong API function, H5Eset_auto1 has been called");
+    }
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
 
-    if (func)
+    if (func) {
         *func = op.func2;
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -785,38 +824,42 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eset_auto2(hid_t estack_id, H5E_auto2_t func, void *client_data)
+herr_t H5Eset_auto2(hid_t estack_id, H5E_auto2_t func, void* client_data)
 {
-    H5E_stack_t  *estack;              /* Error stack to operate on */
-    H5E_auto_op_t op;                  /* Error stack operator */
-    herr_t        ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    H5E_auto_op_t op;           /* Error stack operator */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     if (estack_id == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(estack_id, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(estack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
 #ifndef H5_NO_DEPRECATED_SYMBOLS
     /* Get the automatic error reporting information */
-    if (H5E__get_auto(estack, &op, NULL) < 0)
+    if (H5E__get_auto(estack, &op, NULL) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get automatic error info");
+    }
 
     /* Set the automatic error reporting information */
-    if (func != op.func2_default)
+    if (func != op.func2_default) {
         op.is_default = false;
-    else
+    }
+    else {
         op.is_default = true;
+    }
 
     op.vers = 2;
 #endif /* H5_NO_DEPRECATED_SYMBOLS */
@@ -824,8 +867,9 @@ H5Eset_auto2(hid_t estack_id, H5E_auto2_t func, void *client_data)
     /* Set the automatic error reporting function */
     op.func2 = func;
 
-    if (H5E__set_auto(estack, &op, client_data) < 0)
+    if (H5E__set_auto(estack, &op, client_data) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTSET, FAIL, "can't set automatic error info");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -843,25 +887,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eauto_is_v2(hid_t estack_id, unsigned *is_stack)
+herr_t H5Eauto_is_v2(hid_t estack_id, unsigned* is_stack)
 {
-    H5E_stack_t *estack;              /* Error stack to operate on */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* estack;        /* Error stack to operate on */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     if (estack_id == H5E_DEFAULT) {
-        if (NULL == (estack = H5E__get_my_stack()))
+        if (NULL == (estack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
-        if (NULL == (estack = (H5E_stack_t *)H5I_object_verify(estack_id, H5I_ERROR_STACK)))
+        if (NULL == (estack = (H5E_stack_t*)H5I_object_verify(estack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a error stack ID");
+        }
     } /* end else */
 
     /* Check if the error stack reporting function is the "newer" stack type */
@@ -886,31 +931,35 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eappend_stack(hid_t dst_stack_id, hid_t src_stack_id, bool close_source_stack)
+herr_t H5Eappend_stack(hid_t dst_stack_id, hid_t src_stack_id, bool close_source_stack)
 {
     H5E_stack_t *dst_stack, *src_stack; /* Error stacks */
-    herr_t       ret_value = SUCCEED;   /* Return value */
+    herr_t ret_value = SUCCEED;         /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dst_stack = (H5E_stack_t *)H5I_object_verify(dst_stack_id, H5I_ERROR_STACK)))
+    if (NULL == (dst_stack = (H5E_stack_t*)H5I_object_verify(dst_stack_id, H5I_ERROR_STACK))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "dst_stack_id not a error stack ID");
-    if (NULL == (src_stack = (H5E_stack_t *)H5I_object_verify(src_stack_id, H5I_ERROR_STACK)))
+    }
+    if (NULL == (src_stack = (H5E_stack_t*)H5I_object_verify(src_stack_id, H5I_ERROR_STACK))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "src_stack_id not a error stack ID");
+    }
 
     /* Append the source stack to the destination stack */
-    if (H5E__append_stack(dst_stack, src_stack) < 0)
+    if (H5E__append_stack(dst_stack, src_stack) < 0) {
         HGOTO_ERROR(H5E_ERROR, H5E_CANTAPPEND, FAIL, "can't append stack");
+    }
 
     /* Close source error stack, if requested */
-    if (close_source_stack)
+    if (close_source_stack) {
         /* Decrement the counter on the error stack.  It will be freed if the
          * count reaches zero.
          */
-        if (H5I_dec_app_ref(src_stack_id) < 0)
+        if (H5I_dec_app_ref(src_stack_id) < 0) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTDEC, FAIL, "unable to decrement ref count on source error stack");
+        }
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -925,32 +974,34 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eis_paused(hid_t stack_id, bool *is_paused)
+herr_t H5Eis_paused(hid_t stack_id, bool* is_paused)
 {
-    H5E_stack_t *stack;               /* Error stack */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* stack;         /* Error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     /* Don't clear the error stack! :-) */
     FUNC_ENTER_API_NOCLEAR(FAIL)
 
     /* Get the correct error stack */
     if (stack_id == H5E_DEFAULT) {
-        if (NULL == (stack = H5E__get_my_stack()))
+        if (NULL == (stack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else {
         /* Only clear the error stack if it's not the default stack */
         H5E_clear_stack();
 
         /* Get the error stack to operate on */
-        if (NULL == (stack = (H5E_stack_t *)H5I_object_verify(stack_id, H5I_ERROR_STACK)))
+        if (NULL == (stack = (H5E_stack_t*)H5I_object_verify(stack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an error stack ID");
+        }
     } /* end else */
 
     /* Check arguments */
-    if (NULL == is_paused)
+    if (NULL == is_paused) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "is_paused parameter is NULL");
+    }
 
     /* Check if the stack is paused */
     *is_paused = (stack->paused > 0);
@@ -968,23 +1019,24 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Epause_stack(hid_t stack_id)
+herr_t H5Epause_stack(hid_t stack_id)
 {
-    H5E_stack_t *stack;               /* Error stack */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* stack;         /* Error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the correct error stack */
     if (stack_id == H5E_DEFAULT) {
-        if (NULL == (stack = H5E__get_my_stack()))
+        if (NULL == (stack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else
         /* Get the error stack to operate on */
-        if (NULL == (stack = (H5E_stack_t *)H5I_object_verify(stack_id, H5I_ERROR_STACK)))
+        if (NULL == (stack = (H5E_stack_t*)H5I_object_verify(stack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an error stack ID");
+        }
 
     /* Increment pause counter */
     stack->paused++;
@@ -1002,27 +1054,29 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Eresume_stack(hid_t stack_id)
+herr_t H5Eresume_stack(hid_t stack_id)
 {
-    H5E_stack_t *stack;               /* Error stack */
-    herr_t       ret_value = SUCCEED; /* Return value */
+    H5E_stack_t* stack;         /* Error stack */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the correct error stack */
     if (stack_id == H5E_DEFAULT) {
-        if (NULL == (stack = H5E__get_my_stack()))
+        if (NULL == (stack = H5E__get_my_stack())) {
             HGOTO_ERROR(H5E_ERROR, H5E_CANTGET, FAIL, "can't get current error stack");
+        }
     } /* end if */
     else
         /* Get the error stack to operate on */
-        if (NULL == (stack = (H5E_stack_t *)H5I_object_verify(stack_id, H5I_ERROR_STACK)))
+        if (NULL == (stack = (H5E_stack_t*)H5I_object_verify(stack_id, H5I_ERROR_STACK))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not an error stack ID");
+        }
 
     /* Check for pause/resume imbalance */
-    if (0 == stack->paused)
+    if (0 == stack->paused) {
         HGOTO_ERROR(H5E_ERROR, H5E_BADRANGE, FAIL, "resuming more than paused");
+    }
 
     /* Decrement pause counter */
     stack->paused--;

@@ -78,13 +78,15 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_start(H5HF_hdr_t *hdr, bool may_create)
+herr_t H5HF__space_start(H5HF_hdr_t* hdr, bool may_create)
 {
-    const H5FS_section_class_t *classes[] = {/* Free space section classes implemented for fractal heap */
-                                             H5HF_FSPACE_SECT_CLS_SINGLE, H5HF_FSPACE_SECT_CLS_FIRST_ROW,
-                                             H5HF_FSPACE_SECT_CLS_NORMAL_ROW, H5HF_FSPACE_SECT_CLS_INDIRECT};
-    herr_t                      ret_value = SUCCEED; /* Return value */
+    const H5FS_section_class_t* classes[] = { /* Free space section classes implemented for fractal heap */
+                                              H5HF_FSPACE_SECT_CLS_SINGLE,
+                                              H5HF_FSPACE_SECT_CLS_FIRST_ROW,
+                                              H5HF_FSPACE_SECT_CLS_NORMAL_ROW,
+                                              H5HF_FSPACE_SECT_CLS_INDIRECT
+    };
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -96,9 +98,9 @@ H5HF__space_start(H5HF_hdr_t *hdr, bool may_create)
     /* Check for creating free space info for the heap */
     if (H5_addr_defined(hdr->fs_addr)) {
         /* Open an existing free space structure for the heap */
-        if (NULL == (hdr->fspace = H5FS_open(hdr->f, hdr->fs_addr, NELMTS(classes), classes, hdr,
-                                             (hsize_t)H5HF_FSPACE_THRHD_DEF, (hsize_t)H5HF_FSPACE_ALIGN_DEF)))
+        if (NULL == (hdr->fspace = H5FS_open(hdr->f, hdr->fs_addr, NELMTS(classes), classes, hdr, (hsize_t)H5HF_FSPACE_THRHD_DEF, (hsize_t)H5HF_FSPACE_ALIGN_DEF))) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, FAIL, "can't initialize free space info");
+        }
     } /* end if */
     else {
         /* Check if we are allowed to create the free space manager */
@@ -106,20 +108,26 @@ H5HF__space_start(H5HF_hdr_t *hdr, bool may_create)
             H5FS_create_t fs_create; /* Free space creation parameters */
 
             /* Set the free space creation parameters */
-            fs_create.client         = H5FS_CLIENT_FHEAP_ID;
+            fs_create.client = H5FS_CLIENT_FHEAP_ID;
             fs_create.shrink_percent = H5HF_FSPACE_SHRINK;
             fs_create.expand_percent = H5HF_FSPACE_EXPAND;
-            fs_create.max_sect_size  = hdr->man_dtable.cparam.max_direct_size;
-            fs_create.max_sect_addr  = hdr->man_dtable.cparam.max_index;
+            fs_create.max_sect_size = hdr->man_dtable.cparam.max_direct_size;
+            fs_create.max_sect_addr = hdr->man_dtable.cparam.max_index;
 
             /* Create the free space structure for the heap */
-            if (NULL ==
-                (hdr->fspace = H5FS_create(hdr->f, &hdr->fs_addr, &fs_create, NELMTS(classes), classes, hdr,
-                                           (hsize_t)H5HF_FSPACE_THRHD_DEF, (hsize_t)H5HF_FSPACE_ALIGN_DEF)))
+            if (NULL == (hdr->fspace = H5FS_create(hdr->f,
+                                                   &hdr->fs_addr,
+                                                   &fs_create,
+                                                   NELMTS(classes),
+                                                   classes,
+                                                   hdr,
+                                                   (hsize_t)H5HF_FSPACE_THRHD_DEF,
+                                                   (hsize_t)H5HF_FSPACE_ALIGN_DEF))) {
                 HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, FAIL, "can't initialize free space info");
+            }
             assert(H5_addr_defined(hdr->fs_addr));
         } /* end if */
-    }     /* end else */
+    } /* end else */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -136,11 +144,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_add(H5HF_hdr_t *hdr, H5HF_free_section_t *node, unsigned flags)
+herr_t H5HF__space_add(H5HF_hdr_t* hdr, H5HF_free_section_t* node, unsigned flags)
 {
-    H5HF_sect_add_ud_t udata;               /* User data for free space manager 'add' */
-    herr_t             ret_value = SUCCEED; /* Return value */
+    H5HF_sect_add_ud_t udata;   /* User data for free space manager 'add' */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -151,16 +158,19 @@ H5HF__space_add(H5HF_hdr_t *hdr, H5HF_free_section_t *node, unsigned flags)
     assert(node);
 
     /* Check if the free space for the heap has been initialized */
-    if (!hdr->fspace)
-        if (H5HF__space_start(hdr, true) < 0)
+    if (!hdr->fspace) {
+        if (H5HF__space_start(hdr, true) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, FAIL, "can't initialize heap free space");
+        }
+    }
 
     /* Construct user data */
     udata.hdr = hdr;
 
     /* Add to the free space for the heap */
-    if (H5FS_sect_add(hdr->f, hdr->fspace, (H5FS_section_info_t *)node, flags, &udata, NULL) < 0)
+    if (H5FS_sect_add(hdr->f, hdr->fspace, (H5FS_section_info_t*)node, flags, &udata, NULL) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTINSERT, FAIL, "can't add section to heap free space");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -176,11 +186,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5HF__space_find(H5HF_hdr_t *hdr, hsize_t request, H5HF_free_section_t **node)
+htri_t H5HF__space_find(H5HF_hdr_t* hdr, hsize_t request, H5HF_free_section_t** node)
 {
     htri_t node_found = false; /* Whether an existing free list node was found */
-    htri_t ret_value  = FAIL;  /* Return value */
+    htri_t ret_value = FAIL;   /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -192,14 +201,18 @@ H5HF__space_find(H5HF_hdr_t *hdr, hsize_t request, H5HF_free_section_t **node)
     assert(node);
 
     /* Check if the free space for the heap has been initialized */
-    if (!hdr->fspace)
-        if (H5HF__space_start(hdr, false) < 0)
+    if (!hdr->fspace) {
+        if (H5HF__space_start(hdr, false) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, FAIL, "can't initialize heap free space");
+        }
+    }
 
     /* Search for free space in the heap */
-    if (hdr->fspace)
-        if ((node_found = H5FS_sect_find(hdr->f, hdr->fspace, request, (H5FS_section_info_t **)node)) < 0)
+    if (hdr->fspace) {
+        if ((node_found = H5FS_sect_find(hdr->f, hdr->fspace, request, (H5FS_section_info_t**)node)) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTALLOC, FAIL, "can't locate free space in fractal heap");
+        }
+    }
 
     /* Set return value */
     ret_value = node_found;
@@ -220,11 +233,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HF__space_revert_root_cb(H5FS_section_info_t *_sect, void H5_ATTR_UNUSED *_udata)
+static herr_t H5HF__space_revert_root_cb(H5FS_section_info_t* _sect, void H5_ATTR_UNUSED* _udata)
 {
-    H5HF_free_section_t *sect      = (H5HF_free_section_t *)_sect; /* Section to dump info */
-    herr_t               ret_value = SUCCEED;                      /* Return value */
+    H5HF_free_section_t* sect = (H5HF_free_section_t*)_sect; /* Section to dump info */
+    herr_t ret_value = SUCCEED;                              /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -237,12 +249,12 @@ H5HF__space_revert_root_cb(H5FS_section_info_t *_sect, void H5_ATTR_UNUSED *_uda
     if (sect->sect_info.type == H5HF_FSPACE_SECT_SINGLE && sect->sect_info.state == H5FS_SECT_LIVE) {
         /* Release hold on previous indirect block (we must have one) */
         assert(sect->u.single.parent);
-        if (H5HF__iblock_decr(sect->u.single.parent) < 0)
-            HGOTO_ERROR(H5E_HEAP, H5E_CANTDEC, FAIL,
-                        "can't decrement reference count on section's indirect block");
+        if (H5HF__iblock_decr(sect->u.single.parent) < 0) {
+            HGOTO_ERROR(H5E_HEAP, H5E_CANTDEC, FAIL, "can't decrement reference count on section's indirect block");
+        }
 
         /* Reset parent information */
-        sect->u.single.parent    = NULL;
+        sect->u.single.parent = NULL;
         sect->u.single.par_entry = 0;
     } /* end if */
 
@@ -261,8 +273,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_revert_root(const H5HF_hdr_t *hdr)
+herr_t H5HF__space_revert_root(const H5HF_hdr_t* hdr)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -274,11 +285,12 @@ H5HF__space_revert_root(const H5HF_hdr_t *hdr)
     assert(hdr);
 
     /* Only need to scan the sections if the free space has been initialized */
-    if (hdr->fspace)
+    if (hdr->fspace) {
         /* Iterate over all sections, resetting the parent pointers in 'single' sections */
-        if (H5FS_sect_iterate(hdr->f, hdr->fspace, H5HF__space_revert_root_cb, NULL) < 0)
-            HGOTO_ERROR(H5E_FSPACE, H5E_BADITER, FAIL,
-                        "can't iterate over sections to reset parent pointers");
+        if (H5FS_sect_iterate(hdr->f, hdr->fspace, H5HF__space_revert_root_cb, NULL) < 0) {
+            HGOTO_ERROR(H5E_FSPACE, H5E_BADITER, FAIL, "can't iterate over sections to reset parent pointers");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -296,12 +308,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5HF__space_create_root_cb(H5FS_section_info_t *_sect, void *_udata)
+static herr_t H5HF__space_create_root_cb(H5FS_section_info_t* _sect, void* _udata)
 {
-    H5HF_free_section_t *sect        = (H5HF_free_section_t *)_sect; /* Section to dump info */
-    H5HF_indirect_t     *root_iblock = (H5HF_indirect_t *)_udata;    /* User data for callback */
-    herr_t               ret_value   = SUCCEED;                      /* Return value */
+    H5HF_free_section_t* sect = (H5HF_free_section_t*)_sect; /* Section to dump info */
+    H5HF_indirect_t* root_iblock = (H5HF_indirect_t*)_udata; /* User data for callback */
+    herr_t ret_value = SUCCEED;                              /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -317,16 +328,18 @@ H5HF__space_create_root_cb(H5FS_section_info_t *_sect, void *_udata)
     assert(sect->sect_info.type == H5HF_FSPACE_SECT_SINGLE);
 
     /* Increment ref. count on new root indirect block */
-    if (H5HF__iblock_incr(root_iblock) < 0)
-        HGOTO_ERROR(H5E_HEAP, H5E_CANTINC, FAIL,
-                    "can't increment reference count on section's indirect block");
+    if (H5HF__iblock_incr(root_iblock) < 0) {
+        HGOTO_ERROR(H5E_HEAP, H5E_CANTINC, FAIL, "can't increment reference count on section's indirect block");
+    }
 
     /* Set parent info ("live" section must _NOT_ have a parent right now) */
-    if (sect->sect_info.state == H5FS_SECT_SERIALIZED)
+    if (sect->sect_info.state == H5FS_SECT_SERIALIZED) {
         sect->sect_info.state = H5FS_SECT_LIVE; /* Mark "live" now */
-    else
+    }
+    else {
         assert(!sect->u.single.parent);
-    sect->u.single.parent    = root_iblock;
+    }
+    sect->u.single.parent = root_iblock;
     sect->u.single.par_entry = 0;
 
 done:
@@ -345,8 +358,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_create_root(const H5HF_hdr_t *hdr, H5HF_indirect_t *root_iblock)
+herr_t H5HF__space_create_root(const H5HF_hdr_t* hdr, H5HF_indirect_t* root_iblock)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -359,11 +371,13 @@ H5HF__space_create_root(const H5HF_hdr_t *hdr, H5HF_indirect_t *root_iblock)
     assert(root_iblock);
 
     /* Only need to scan the sections if the free space has been initialized */
-    if (hdr->fspace)
+    if (hdr->fspace) {
         /* Iterate over all sections, setting the parent pointers in 'single' sections to the new indirect
          * block */
-        if (H5FS_sect_iterate(hdr->f, hdr->fspace, H5HF__space_create_root_cb, root_iblock) < 0)
+        if (H5FS_sect_iterate(hdr->f, hdr->fspace, H5HF__space_create_root_cb, root_iblock) < 0) {
             HGOTO_ERROR(H5E_FSPACE, H5E_BADITER, FAIL, "can't iterate over sections to set parent pointers");
+        }
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -379,8 +393,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_size(H5HF_hdr_t *hdr, hsize_t *fs_size)
+herr_t H5HF__space_size(H5HF_hdr_t* hdr, hsize_t* fs_size)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -393,17 +406,21 @@ H5HF__space_size(H5HF_hdr_t *hdr, hsize_t *fs_size)
     assert(fs_size);
 
     /* Check if the free space for the heap has been initialized */
-    if (!hdr->fspace)
-        if (H5HF__space_start(hdr, false) < 0)
+    if (!hdr->fspace) {
+        if (H5HF__space_start(hdr, false) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTINIT, FAIL, "can't initialize heap free space");
+        }
+    }
 
     /* Get free space metadata size */
     if (hdr->fspace) {
-        if (H5FS_size(hdr->fspace, fs_size) < 0)
+        if (H5FS_size(hdr->fspace, fs_size) < 0) {
             HGOTO_ERROR(H5E_FSPACE, H5E_CANTGET, FAIL, "can't retrieve FS meta storage info");
+        }
     } /* end if */
-    else
+    else {
         *fs_size = 0;
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -419,8 +436,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_remove(H5HF_hdr_t *hdr, H5HF_free_section_t *node)
+herr_t H5HF__space_remove(H5HF_hdr_t* hdr, H5HF_free_section_t* node)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -434,8 +450,9 @@ H5HF__space_remove(H5HF_hdr_t *hdr, H5HF_free_section_t *node)
     assert(node);
 
     /* Remove from the free space for the heap */
-    if (H5FS_sect_remove(hdr->f, hdr->fspace, (H5FS_section_info_t *)node) < 0)
+    if (H5FS_sect_remove(hdr->f, hdr->fspace, (H5FS_section_info_t*)node) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTREMOVE, FAIL, "can't remove section from heap free space");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -452,8 +469,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_close(H5HF_hdr_t *hdr)
+herr_t H5HF__space_close(H5HF_hdr_t* hdr)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -469,21 +485,24 @@ H5HF__space_close(H5HF_hdr_t *hdr)
         hsize_t nsects; /* Number of sections for this heap */
 
         /* Retrieve the number of sections for this heap */
-        if (H5FS_sect_stats(hdr->fspace, NULL, &nsects) < 0)
+        if (H5FS_sect_stats(hdr->fspace, NULL, &nsects) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTCOUNT, FAIL, "can't query free space section count");
+        }
 
         /* Close the free space for the heap */
-        if (H5FS_close(hdr->f, hdr->fspace) < 0)
+        if (H5FS_close(hdr->f, hdr->fspace) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTRELEASE, FAIL, "can't release free space info");
+        }
         hdr->fspace = NULL;
 
         /* Check if we can delete the free space manager for this heap */
         if (!nsects) {
-            if (H5FS_delete(hdr->f, hdr->fs_addr) < 0)
+            if (H5FS_delete(hdr->f, hdr->fs_addr) < 0) {
                 HGOTO_ERROR(H5E_HEAP, H5E_CANTDELETE, FAIL, "can't delete free space info");
+            }
             hdr->fs_addr = HADDR_UNDEF;
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -499,8 +518,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_delete(H5HF_hdr_t *hdr)
+herr_t H5HF__space_delete(H5HF_hdr_t* hdr)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -512,8 +530,9 @@ H5HF__space_delete(H5HF_hdr_t *hdr)
     assert(hdr);
 
     /* Delete the free space manager */
-    if (H5FS_delete(hdr->f, hdr->fs_addr) < 0)
+    if (H5FS_delete(hdr->f, hdr->fs_addr) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTFREE, FAIL, "can't delete to free space manager");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -530,8 +549,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__space_sect_change_class(H5HF_hdr_t *hdr, H5HF_free_section_t *sect, uint16_t new_class)
+herr_t H5HF__space_sect_change_class(H5HF_hdr_t* hdr, H5HF_free_section_t* sect, uint16_t new_class)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -545,8 +563,9 @@ H5HF__space_sect_change_class(H5HF_hdr_t *hdr, H5HF_free_section_t *sect, uint16
     assert(sect);
 
     /* Notify the free space manager that a section has changed class */
-    if (H5FS_sect_change_class(hdr->f, hdr->fspace, (H5FS_section_info_t *)sect, new_class) < 0)
+    if (H5FS_sect_change_class(hdr->f, hdr->fspace, (H5FS_section_info_t*)sect, new_class) < 0) {
         HGOTO_ERROR(H5E_HEAP, H5E_CANTMODIFY, FAIL, "can't modify class of free space section");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

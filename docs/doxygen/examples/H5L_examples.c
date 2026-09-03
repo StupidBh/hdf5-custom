@@ -7,31 +7,22 @@
 #include <stdlib.h>
 
 //! <!-- [iter_cb] -->
-herr_t
-iter_cb(hid_t group, const char *name, const H5L_info_t *info, void *op_data)
+herr_t iter_cb(hid_t group, const char* name, const H5L_info_t* info, void* op_data)
 {
     printf("Link \"%s\" is a", name);
     switch (info->type) {
-        case H5L_TYPE_HARD:
-            printf(" hard link.\n");
-            break;
-        case H5L_TYPE_SOFT:
-            printf(" soft link.\n");
-            break;
-        case H5L_TYPE_EXTERNAL:
-            printf("n external link.\n");
-            break;
-        default:
-            printf(" UFO link.\n");
-            break;
+    case H5L_TYPE_HARD    : printf(" hard link.\n"); break;
+    case H5L_TYPE_SOFT    : printf(" soft link.\n"); break;
+    case H5L_TYPE_EXTERNAL: printf("n external link.\n"); break;
+    default               : printf(" UFO link.\n"); break;
     }
 
     return 0;
 }
+
 //! <!-- [iter_cb] -->
 
-int
-main(void)
+int main(void)
 {
     int ret_val = EXIT_SUCCESS;
 
@@ -63,8 +54,7 @@ main(void)
             goto fail_link;
         }
         // create a soft link to nowhere
-        if (H5Lcreate_soft("e1 62 80 87 04 09 43 ba 02 d3", file, "/path/to/nowhere", lcpl, H5P_DEFAULT) <
-            0) {
+        if (H5Lcreate_soft("e1 62 80 87 04 09 43 ba 02 d3", file, "/path/to/nowhere", lcpl, H5P_DEFAULT) < 0) {
             ret_val = EXIT_FAILURE;
             goto fail_link;
         }
@@ -86,7 +76,7 @@ fail_create:;
     //! <!-- [read] -->
     {
         __label__ fail_iterate, fail_read;
-        hid_t   file;
+        hid_t file;
         hsize_t idx = 0;
 
         if ((file = H5Fopen("l1.h5", H5F_ACC_RDONLY, H5P_DEFAULT)) == H5I_INVALID_HID) {

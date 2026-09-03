@@ -71,13 +71,12 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__dtable_init(H5HF_dtable_t *dtable)
+herr_t H5HF__dtable_init(H5HF_dtable_t* dtable)
 {
-    hsize_t tmp_block_size;      /* Temporary block size */
-    hsize_t acc_block_off;       /* Accumulated block offset */
-    size_t  u;                   /* Local index variable */
-    herr_t  ret_value = SUCCEED; /* Return value */
+    hsize_t tmp_block_size;     /* Temporary block size */
+    hsize_t acc_block_off;      /* Accumulated block offset */
+    size_t u;                   /* Local index variable */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -87,33 +86,34 @@ H5HF__dtable_init(H5HF_dtable_t *dtable)
     assert(dtable);
 
     /* Compute/cache some values */
-    dtable->start_bits           = H5VM_log2_of2((uint32_t)dtable->cparam.start_block_size);
-    dtable->first_row_bits       = dtable->start_bits + H5VM_log2_of2(dtable->cparam.width);
-    dtable->max_root_rows        = (dtable->cparam.max_index - dtable->first_row_bits) + 1;
-    dtable->max_direct_bits      = H5VM_log2_of2((uint32_t)dtable->cparam.max_direct_size);
-    dtable->max_direct_rows      = (dtable->max_direct_bits - dtable->start_bits) + 2;
-    dtable->num_id_first_row     = dtable->cparam.start_block_size * dtable->cparam.width;
+    dtable->start_bits = H5VM_log2_of2((uint32_t)dtable->cparam.start_block_size);
+    dtable->first_row_bits = dtable->start_bits + H5VM_log2_of2(dtable->cparam.width);
+    dtable->max_root_rows = (dtable->cparam.max_index - dtable->first_row_bits) + 1;
+    dtable->max_direct_bits = H5VM_log2_of2((uint32_t)dtable->cparam.max_direct_size);
+    dtable->max_direct_rows = (dtable->max_direct_bits - dtable->start_bits) + 2;
+    dtable->num_id_first_row = dtable->cparam.start_block_size * dtable->cparam.width;
     dtable->max_dir_blk_off_size = H5HF_SIZEOF_OFFSET_LEN(dtable->cparam.max_direct_size);
 
     /* Build table of block sizes for each row */
-    if (NULL == (dtable->row_block_size = (hsize_t *)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t))))
+    if (NULL == (dtable->row_block_size = (hsize_t*)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t)))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "can't create doubling table block size table");
-    if (NULL == (dtable->row_block_off = (hsize_t *)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t))))
+    }
+    if (NULL == (dtable->row_block_off = (hsize_t*)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t)))) {
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "can't create doubling table block offset table");
-    if (NULL ==
-        (dtable->row_tot_dblock_free = (hsize_t *)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t))))
-        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL,
-                    "can't create doubling table total direct block free space table");
-    if (NULL == (dtable->row_max_dblock_free = (size_t *)H5MM_malloc(dtable->max_root_rows * sizeof(size_t))))
-        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL,
-                    "can't create doubling table max. direct block free space table");
-    tmp_block_size            = dtable->cparam.start_block_size;
-    acc_block_off             = dtable->cparam.start_block_size * dtable->cparam.width;
+    }
+    if (NULL == (dtable->row_tot_dblock_free = (hsize_t*)H5MM_malloc(dtable->max_root_rows * sizeof(hsize_t)))) {
+        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "can't create doubling table total direct block free space table");
+    }
+    if (NULL == (dtable->row_max_dblock_free = (size_t*)H5MM_malloc(dtable->max_root_rows * sizeof(size_t)))) {
+        HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "can't create doubling table max. direct block free space table");
+    }
+    tmp_block_size = dtable->cparam.start_block_size;
+    acc_block_off = dtable->cparam.start_block_size * dtable->cparam.width;
     dtable->row_block_size[0] = dtable->cparam.start_block_size;
-    dtable->row_block_off[0]  = 0;
+    dtable->row_block_off[0] = 0;
     for (u = 1; u < dtable->max_root_rows; u++) {
         dtable->row_block_size[u] = tmp_block_size;
-        dtable->row_block_off[u]  = acc_block_off;
+        dtable->row_block_off[u] = acc_block_off;
         tmp_block_size *= 2;
         acc_block_off *= 2;
     } /* end for */
@@ -131,8 +131,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__dtable_lookup(const H5HF_dtable_t *dtable, hsize_t off, unsigned *row, unsigned *col)
+herr_t H5HF__dtable_lookup(const H5HF_dtable_t* dtable, hsize_t off, unsigned* row, unsigned* col)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -149,8 +148,8 @@ H5HF__dtable_lookup(const H5HF_dtable_t *dtable, hsize_t off, unsigned *row, uns
         H5_CHECKED_ASSIGN(*col, unsigned, (off / dtable->cparam.start_block_size), hsize_t);
     } /* end if */
     else {
-        unsigned high_bit = H5VM_log2_gen(off);       /* Determine the high bit in the offset */
-        hsize_t  off_mask = ((hsize_t)1) << high_bit; /* Compute mask for determining column */
+        unsigned high_bit = H5VM_log2_gen(off);      /* Determine the high bit in the offset */
+        hsize_t off_mask = ((hsize_t)1) << high_bit; /* Compute mask for determining column */
 
         *row = (high_bit - dtable->first_row_bits) + 1;
         H5_CHECKED_ASSIGN(*col, unsigned, ((off - off_mask) / dtable->row_block_size[*row]), hsize_t);
@@ -168,8 +167,7 @@ H5HF__dtable_lookup(const H5HF_dtable_t *dtable, hsize_t off, unsigned *row, uns
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5HF__dtable_dest(H5HF_dtable_t *dtable)
+herr_t H5HF__dtable_dest(H5HF_dtable_t* dtable)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -202,8 +200,7 @@ H5HF__dtable_dest(H5HF_dtable_t *dtable)
  *
  *-------------------------------------------------------------------------
  */
-unsigned
-H5HF__dtable_size_to_row(const H5HF_dtable_t *dtable, size_t block_size)
+unsigned H5HF__dtable_size_to_row(const H5HF_dtable_t* dtable, size_t block_size)
 {
     unsigned row = 0; /* Row where block will fit */
 
@@ -214,12 +211,12 @@ H5HF__dtable_size_to_row(const H5HF_dtable_t *dtable, size_t block_size)
      */
     assert(dtable);
 
-    if (block_size == dtable->cparam.start_block_size)
+    if (block_size == dtable->cparam.start_block_size) {
         row = 0;
-    else
-        row =
-            (H5VM_log2_of2((uint32_t)block_size) - H5VM_log2_of2((uint32_t)dtable->cparam.start_block_size)) +
-            1;
+    }
+    else {
+        row = (H5VM_log2_of2((uint32_t)block_size) - H5VM_log2_of2((uint32_t)dtable->cparam.start_block_size)) + 1;
+    }
 
     FUNC_LEAVE_NOAPI(row)
 } /* end H5HF__dtable_size_to_row() */
@@ -233,8 +230,7 @@ H5HF__dtable_size_to_row(const H5HF_dtable_t *dtable, size_t block_size)
  *
  *-------------------------------------------------------------------------
  */
-unsigned
-H5HF__dtable_size_to_rows(const H5HF_dtable_t *dtable, hsize_t size)
+unsigned H5HF__dtable_size_to_rows(const H5HF_dtable_t* dtable, hsize_t size)
 {
     unsigned rows = 0; /* # of rows required for indirect block */
 
@@ -259,15 +255,13 @@ H5HF__dtable_size_to_rows(const H5HF_dtable_t *dtable, hsize_t size)
  *
  *-------------------------------------------------------------------------
  */
-hsize_t
-H5HF__dtable_span_size(const H5HF_dtable_t *dtable, unsigned start_row, unsigned start_col,
-                       unsigned num_entries)
+hsize_t H5HF__dtable_span_size(const H5HF_dtable_t* dtable, unsigned start_row, unsigned start_col, unsigned num_entries)
 {
-    unsigned start_entry;       /* Entry for first block covered */
-    unsigned end_row;           /* Row for last block covered */
-    unsigned end_col;           /* Column for last block covered */
-    unsigned end_entry;         /* Entry for last block covered */
-    hsize_t  acc_span_size = 0; /* Accumulated span size */
+    unsigned start_entry;      /* Entry for first block covered */
+    unsigned end_row;          /* Row for last block covered */
+    unsigned end_col;          /* Column for last block covered */
+    unsigned end_entry;        /* Entry for last block covered */
+    hsize_t acc_span_size = 0; /* Accumulated span size */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -282,8 +276,8 @@ H5HF__dtable_span_size(const H5HF_dtable_t *dtable, unsigned start_row, unsigned
 
     /* Compute ending entry, column & row */
     end_entry = (start_entry + num_entries) - 1;
-    end_row   = end_entry / dtable->cparam.width;
-    end_col   = end_entry % dtable->cparam.width;
+    end_row = end_entry / dtable->cparam.width;
+    end_col = end_entry % dtable->cparam.width;
 
     /* Initialize accumulated span size */
     acc_span_size = 0;

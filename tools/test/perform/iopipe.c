@@ -22,16 +22,16 @@
 
 #if 0
 /* Normal testing */
-#define REQUEST_SIZE_X  4579
-#define REQUEST_SIZE_Y  4579
-#define NREAD_REQUESTS  45
-#define NWRITE_REQUESTS 45
+    #define REQUEST_SIZE_X  4579
+    #define REQUEST_SIZE_Y  4579
+    #define NREAD_REQUESTS  45
+    #define NWRITE_REQUESTS 45
 #else
-/* Speedy testing */
-#define REQUEST_SIZE_X  1000
-#define REQUEST_SIZE_Y  1000
-#define NREAD_REQUESTS  45
-#define NWRITE_REQUESTS 45
+    /* Speedy testing */
+    #define REQUEST_SIZE_X  1000
+    #define REQUEST_SIZE_Y  1000
+    #define NREAD_REQUESTS  45
+    #define NWRITE_REQUESTS 45
 #endif
 
 /*-------------------------------------------------------------------------
@@ -43,15 +43,17 @@
  *
  *-------------------------------------------------------------------------
  */
-static void
-print_stats(const char *prefix,
+static void print_stats(const char* prefix,
 #ifdef H5_HAVE_GETRUSAGE
-            struct rusage *r_start, struct rusage *r_stop,
+                        struct rusage* r_start,
+                        struct rusage* r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-            double t_start, double t_stop, size_t nbytes)
+                        double t_start,
+                        double t_stop,
+                        size_t nbytes)
 {
     double e_time;
-    char   bw[16];
+    char bw[16];
 #ifdef H5_HAVE_GETRUSAGE
     double u_time, s_time;
 
@@ -80,8 +82,7 @@ print_stats(const char *prefix,
  *
  *-------------------------------------------------------------------------
  */
-static void
-synchronize(void)
+static void synchronize(void)
 {
 #if defined(H5_HAVE_WIN32_API) && !defined(__CYGWIN__)
     _flushall();
@@ -107,25 +108,24 @@ synchronize(void)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(void)
+int main(void)
 {
-    hsize_t  size[2] = {REQUEST_SIZE_X, REQUEST_SIZE_Y};
+    hsize_t size[2] = { REQUEST_SIZE_X, REQUEST_SIZE_Y };
     unsigned nread = NREAD_REQUESTS, nwrite = NWRITE_REQUESTS;
 
-    unsigned char *the_data = NULL;
-    hid_t          file, dset, file_space = H5I_INVALID_HID;
+    unsigned char* the_data = NULL;
+    hid_t file, dset, file_space = H5I_INVALID_HID;
 #ifdef H5_HAVE_GETRUSAGE
     struct rusage r_start, r_stop;
 #endif
-    double                         t_start, t_stop;
-    int                            fd;
-    unsigned                       u;
-    herr_t H5_ATTR_NDEBUG_UNUSED   status;
+    double t_start, t_stop;
+    int fd;
+    unsigned u;
+    herr_t H5_ATTR_NDEBUG_UNUSED status;
     hssize_t H5_ATTR_NDEBUG_UNUSED n;
-    HDoff_t H5_ATTR_NDEBUG_UNUSED  offset;
-    hsize_t                        start[2];
-    hsize_t                        count[2];
+    HDoff_t H5_ATTR_NDEBUG_UNUSED offset;
+    hsize_t start[2];
+    hsize_t count[2];
 
     /*
      * The extra cast in the following statement is a bug workaround for the
@@ -145,7 +145,7 @@ main(void)
     assert(file_space >= 0);
     dset = H5Dcreate2(file, "dset", H5T_NATIVE_UCHAR, file_space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     assert(dset >= 0);
-    the_data = (unsigned char *)malloc((size_t)(size[0] * size[1]));
+    the_data = (unsigned char*)malloc((size_t)(size[0] * size[1]));
 
     /* initial fill for lazy malloc */
     memset(the_data, 0xAA, (size_t)(size[0] * size[1]));
@@ -169,9 +169,12 @@ main(void)
     putc('\n', stderr);
     print_stats("fill raw",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Fill hdf5 */
     synchronize();
@@ -193,9 +196,12 @@ main(void)
     putc('\n', stderr);
     print_stats("fill hdf5",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Write the raw dataset */
     synchronize();
@@ -219,9 +225,12 @@ main(void)
     putc('\n', stderr);
     print_stats("out raw",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Write the hdf5 dataset */
     synchronize();
@@ -243,9 +252,12 @@ main(void)
     putc('\n', stderr);
     print_stats("out hdf5",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Read the raw dataset */
     synchronize();
@@ -269,9 +281,12 @@ main(void)
     putc('\n', stderr);
     print_stats("in raw",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Read the hdf5 dataset */
     synchronize();
@@ -293,15 +308,18 @@ main(void)
     putc('\n', stderr);
     print_stats("in hdf5",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Read hyperslab */
     assert(size[0] > 20 && size[1] > 20);
     start[0] = start[1] = 10;
     count[0] = count[1] = size[0] - 20;
-    status              = H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL);
+    status = H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL);
     assert(status >= 0);
     synchronize();
 #ifdef H5_HAVE_GETRUSAGE
@@ -322,9 +340,12 @@ main(void)
     putc('\n', stderr);
     print_stats("in hdf5 partial",
 #ifdef H5_HAVE_GETRUSAGE
-                &r_start, &r_stop,
+                &r_start,
+                &r_stop,
 #endif /* H5_HAVE_GETRUSAGE */
-                t_start, t_stop, (size_t)(nread * size[0] * size[1]));
+                t_start,
+                t_stop,
+                (size_t)(nread * size[0] * size[1]));
 
     /* Close everything */
     HDclose(fd);

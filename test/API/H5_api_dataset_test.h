@@ -174,11 +174,10 @@ void H5_api_dataset_test_add(void);
 #define DATASET_SMALL_READ_TEST_POINT_SELECTION_GROUP_NAME      "dataset_small_read_point_selection_test"
 #define DATASET_SMALL_READ_TEST_POINT_SELECTION_DSET_NAME       "dataset_small_read_point_selection_dset"
 
-#define DATASET_MULTI_COUNT                                10
-#define DATASET_SMALL_READ_MULTI_TEST_ALL_GROUP_NAME       "dataset_small_read_multi_all_test"
-#define DATASET_SMALL_READ_MULTI_TEST_HYPERSLAB_GROUP_NAME "dataset_small_read_multi_hyperslab_test"
-#define DATASET_SMALL_READ_MULTI_TEST_POINT_SELECTION_GROUP_NAME                                             \
-    "dataset_small_read_multi_point_selection_test"
+#define DATASET_MULTI_COUNT                                      10
+#define DATASET_SMALL_READ_MULTI_TEST_ALL_GROUP_NAME             "dataset_small_read_multi_all_test"
+#define DATASET_SMALL_READ_MULTI_TEST_HYPERSLAB_GROUP_NAME       "dataset_small_read_multi_hyperslab_test"
+#define DATASET_SMALL_READ_MULTI_TEST_POINT_SELECTION_GROUP_NAME "dataset_small_read_multi_point_selection_test"
 
 #define DATASET_IO_POINT_GROUP_NAME        "dataset_io_point_selection_test"
 #define DATASET_IO_POINT_DSET_NAME_NOCHUNK "dataset_io_point_selection_dset_nochunk"
@@ -222,10 +221,8 @@ void H5_api_dataset_test_add(void);
 #define DATASET_SMALL_WRITE_MULTI_TEST_HYPERSLAB_GROUP_NAME "dataset_small_write_multi_hyperslab_test"
 #define DATASET_SMALL_WRITE_MULTI_TEST_HYPERSLAB_DSET_NAME  "dataset_small_write_multi_hyperslab_dset"
 
-#define DATASET_SMALL_WRITE_MULTI_TEST_POINT_SELECTION_GROUP_NAME                                            \
-    "dataset_small_write_multi_point_selection_test"
-#define DATASET_SMALL_WRITE_MULTI_TEST_POINT_SELECTION_DSET_NAME                                             \
-    "dataset_small_write_multi_point_selection_dset"
+#define DATASET_SMALL_WRITE_MULTI_TEST_POINT_SELECTION_GROUP_NAME "dataset_small_write_multi_point_selection_test"
+#define DATASET_SMALL_WRITE_MULTI_TEST_POINT_SELECTION_DSET_NAME  "dataset_small_write_multi_point_selection_dset"
 
 #define DATASET_DATA_VERIFY_WRITE_MULTI_TEST_GROUP_NAME "dataset_data_write_multi_verification_test"
 #define DATASET_DATA_VERIFY_WRITE_MULTI_TEST_DSET_NAME  "dataset_data_write_multi_verification_dset"
@@ -282,12 +279,11 @@ void H5_api_dataset_test_add(void);
 #define DATASET_SET_EXTENT_DOUBLE_HANDLES_TEST_DSET_NAME  "set_extent_chunked_double_handles_test_dset"
 #define DATASET_SET_EXTENT_DOUBLE_HANDLES_TEST_SPACE_DIM  8
 
-#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_SPACE_RANK        2
-#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_GROUP_NAME        "set_extent_invalid_params_test"
-#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_DSET_NAME         "set_extent_invalid_params_test_dset"
-#define DATASET_SET_EXTENT_INVALID_LAYOUT_TEST_COMPACT_DSET_NAME "set_extent_invalid_layout_test_compact_dset"
-#define DATASET_SET_EXTENT_INVALID_LAYOUT_TEST_CONTIGUOUS_DSET_NAME                                          \
-    "set_extent_invalid_layout_test_contiguous_dset"
+#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_SPACE_RANK           2
+#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_GROUP_NAME           "set_extent_invalid_params_test"
+#define DATASET_SET_EXTENT_INVALID_PARAMS_TEST_DSET_NAME            "set_extent_invalid_params_test_dset"
+#define DATASET_SET_EXTENT_INVALID_LAYOUT_TEST_COMPACT_DSET_NAME    "set_extent_invalid_layout_test_compact_dset"
+#define DATASET_SET_EXTENT_INVALID_LAYOUT_TEST_CONTIGUOUS_DSET_NAME "set_extent_invalid_layout_test_contiguous_dset"
 
 #define DATASET_SINGLE_CHUNK_TEST_SPACE_RANK 2
 #define DATASET_SINGLE_CHUNK_TEST_GROUP_NAME "single_chunk_dataset_test"
@@ -306,32 +302,28 @@ void H5_api_dataset_test_add(void);
 #define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_DSET_SPACE_RANK 2
 #define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_DSET_DTYPESIZE  sizeof(int)
 #define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_DSET_DTYPE      H5T_NATIVE_INT
-#define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_GROUP_NAME                                            \
-    "multi_chunk_dataset_write_same_space_read_test"
-#define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_DSET_NAME "multi_chunk_dataset"
+#define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_GROUP_NAME      "multi_chunk_dataset_write_same_space_read_test"
+#define DATASET_MULTI_CHUNK_WRITE_SAME_SPACE_READ_TEST_DSET_NAME       "multi_chunk_dataset"
 
 #define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_DSET_SPACE_RANK 2
 #define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_DSET_DTYPESIZE  sizeof(int)
 #define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_DSET_DTYPE      H5T_NATIVE_INT
-#define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_GROUP_NAME                                            \
-    "multi_chunk_dataset_write_diff_space_read_test"
-#define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_DSET_NAME "multi_chunk_dataset"
+#define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_GROUP_NAME      "multi_chunk_dataset_write_diff_space_read_test"
+#define DATASET_MULTI_CHUNK_WRITE_DIFF_SPACE_READ_TEST_DSET_NAME       "multi_chunk_dataset"
 
 #define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_DSET_SPACE_RANK 2
 #define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_DSET_DTYPESIZE  sizeof(int)
 #define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_DSET_DTYPE      H5T_NATIVE_INT
-#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_GROUP_NAME                                        \
-    "multi_chunk_dataset_same_space_overwrite_test"
-#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_DSET_NAME "multi_chunk_dataset"
-#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_NITERS    10
+#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_GROUP_NAME      "multi_chunk_dataset_same_space_overwrite_test"
+#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_DSET_NAME       "multi_chunk_dataset"
+#define DATASET_MULTI_CHUNK_OVERWRITE_SAME_SPACE_READ_TEST_NITERS          10
 
 #define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_DSET_SPACE_RANK 2
 #define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_DSET_DTYPESIZE  sizeof(int)
 #define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_DSET_DTYPE      H5T_NATIVE_INT
-#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_GROUP_NAME                                        \
-    "multi_chunk_dataset_diff_space_overwrite_test"
-#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_DSET_NAME "multi_chunk_dataset"
-#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_NITERS    10
+#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_GROUP_NAME      "multi_chunk_dataset_diff_space_overwrite_test"
+#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_DSET_NAME       "multi_chunk_dataset"
+#define DATASET_MULTI_CHUNK_OVERWRITE_DIFF_SPACE_READ_TEST_NITERS          10
 
 #define DATASET_PARTIAL_CHUNK_READ_ALL_SEL_TEST_DSET_SPACE_RANK 2
 #define DATASET_PARTIAL_CHUNK_READ_ALL_SEL_TEST_DSET_DTYPESIZE  sizeof(int)

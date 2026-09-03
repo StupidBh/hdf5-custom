@@ -20,39 +20,44 @@
 
 class H5APITestDriver {
 public:
-    int Main(int argc, char *argv[]);
+    int Main(int argc, char* argv[]);
     H5APITestDriver();
     ~H5APITestDriver();
 
 protected:
-    void SeparateArguments(const char* str, std::vector<std::string> &flags);
+    void SeparateArguments(const char* str, std::vector<std::string>& flags);
 
-    void ReportCommand(const char * const *command, const char *name);
-    int  ReportStatus(h5_api_test_sysProcess *process, const char *name);
-    int  ProcessCommandLine(int argc, char *argv[]);
+    void ReportCommand(const char* const* command, const char* name);
+    int ReportStatus(h5_api_test_sysProcess* process, const char* name);
+    int ProcessCommandLine(int argc, char* argv[]);
     void CollectConfiguredOptions();
-    void CreateCommandLine(std::vector<const char *> &commandLine,
-        const char *cmd, int isServer, int isHelper, const char *numProc,
-        int argStart = 0, int argCount = 0, char *argv[] = 0);
+    void CreateCommandLine(std::vector<const char*>& commandLine,
+                           const char* cmd,
+                           int isServer,
+                           int isHelper,
+                           const char* numProc,
+                           int argStart = 0,
+                           int argCount = 0,
+                           char* argv[] = 0);
 
-    int StartServer(h5_api_test_sysProcess *server, const char *name,
-        std::vector<char> &out, std::vector<char> &err);
-    int StartClientHelper(h5_api_test_sysProcess *client, const char *name,
-        std::vector<char> &out, std::vector<char> &err);
-    int StartClientInit(h5_api_test_sysProcess *client, const char *name,
-        std::vector<char> &out, std::vector<char> &err);
-    int StartClient(h5_api_test_sysProcess *client, const char *name);
-    void Stop(h5_api_test_sysProcess *p, const char *name);
-    int OutputStringHasError(const char *pname, std::string &output);
-    int OutputStringHasToken(const char *pname, const char *regex,
-        std::string &output, std::string &token);
+    int StartServer(h5_api_test_sysProcess* server, const char* name, std::vector<char>& out, std::vector<char>& err);
+    int StartClientHelper(h5_api_test_sysProcess* client, const char* name, std::vector<char>& out, std::vector<char>& err);
+    int StartClientInit(h5_api_test_sysProcess* client, const char* name, std::vector<char>& out, std::vector<char>& err);
+    int StartClient(h5_api_test_sysProcess* client, const char* name);
+    void Stop(h5_api_test_sysProcess* p, const char* name);
+    int OutputStringHasError(const char* pname, std::string& output);
+    int OutputStringHasToken(const char* pname, const char* regex, std::string& output, std::string& token);
 
-    int WaitForLine(h5_api_test_sysProcess *process, std::string &line,
-        double timeout, std::vector<char> &out, std::vector<char> &err);
-    void PrintLine(const char *pname, const char *line);
-    int WaitForAndPrintLine(const char *pname, h5_api_test_sysProcess *process,
-        std::string &line, double timeout, std::vector<char> &out,
-        std::vector<char> &err, const char *waitMsg, int *foundWaiting);
+    int WaitForLine(h5_api_test_sysProcess* process, std::string& line, double timeout, std::vector<char>& out, std::vector<char>& err);
+    void PrintLine(const char* pname, const char* line);
+    int WaitForAndPrintLine(const char* pname,
+                            h5_api_test_sysProcess* process,
+                            std::string& line,
+                            double timeout,
+                            std::vector<char>& out,
+                            std::vector<char>& err,
+                            const char* waitMsg,
+                            int* foundWaiting);
 
     std::string GetDirectory(std::string location);
 
@@ -79,12 +84,12 @@ private:
     std::string MPIServerNumProcessFlag;
     std::string MPIClientNumProcessFlag;
 
-    std::string ClientTokenVar;  // use token to launch client if requested
+    std::string ClientTokenVar; // use token to launch client if requested
 
     std::string CurrentPrintLineName;
 
     double TimeOut;
-    double ServerExitTimeOut;   // time to wait for servers to finish.
+    double ServerExitTimeOut; // time to wait for servers to finish.
     bool ClientHelper;
     bool ClientInit;
     bool TestServer;
@@ -102,4 +107,4 @@ private:
     bool IgnoreServerResult;
 };
 
-#endif //H5_API_TEST_DRIVER_H
+#endif // H5_API_TEST_DRIVER_H

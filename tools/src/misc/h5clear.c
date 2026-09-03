@@ -33,21 +33,19 @@
 /* Default increment is 1 megabytes for the --increment option */
 #define DEFAULT_INCREMENT (1024 * 1024)
 
-static char   *fname_g            = NULL;
-static bool    clear_status_flags = false;
-static bool    remove_cache_image = false;
-static bool    print_filesize     = false;
-static bool    increment_eoa_eof  = false;
-static hsize_t increment          = DEFAULT_INCREMENT;
+static char* fname_g = NULL;
+static bool clear_status_flags = false;
+static bool remove_cache_image = false;
+static bool print_filesize = false;
+static bool increment_eoa_eof = false;
+static hsize_t increment = DEFAULT_INCREMENT;
 
 /*
  * Command-line options: only publicize long options
  */
-static const char            *s_opts   = "hVsmzi*";
-static struct h5_long_options l_opts[] = {
-    {"help", no_arg, 'h'},  {"version", no_arg, 'V'},  {"status", no_arg, 's'},
-    {"image", no_arg, 'm'}, {"filesize", no_arg, 'z'}, {"increment", optional_arg, 'i'},
-    {NULL, 0, '\0'}};
+static const char* s_opts = "hVsmzi*";
+static struct h5_long_options l_opts[] = { { "help", no_arg, 'h' },     { "version", no_arg, 'V' },         { "status", no_arg, 's' }, { "image", no_arg, 'm' },
+                                           { "filesize", no_arg, 'z' }, { "increment", optional_arg, 'i' }, { NULL, 0, '\0' } };
 
 /*-------------------------------------------------------------------------
  * Function:    usage
@@ -58,38 +56,28 @@ static struct h5_long_options l_opts[] = {
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(const char *prog)
+static void usage(const char* prog)
 {
-    fprintf(rawoutstream,
-            "h5clear clears superblock status flag field, removes metadata cache image, prints\n");
-    fprintf(rawoutstream,
-            "EOA and EOF, or sets EOA of a file.  It is not a general repair tool and should not\n");
+    fprintf(rawoutstream, "h5clear clears superblock status flag field, removes metadata cache image, prints\n");
+    fprintf(rawoutstream, "EOA and EOF, or sets EOA of a file.  It is not a general repair tool and should not\n");
     fprintf(rawoutstream, "be used to fix file corruption.  If a process doesn't shut down cleanly, the\n");
     fprintf(rawoutstream, "superblock mark can be left that prevents opening a file without SWMR.  Then,\n");
-    fprintf(rawoutstream,
-            "h5clear can be used to remove this superblock mark so that the file can be inspected\n");
+    fprintf(rawoutstream, "h5clear can be used to remove this superblock mark so that the file can be inspected\n");
     fprintf(rawoutstream, "and appropriate actions can be taken.\n");
     fprintf(rawoutstream, "\n");
     fprintf(rawoutstream, "usage: %s [OPTIONS] file_name\n", prog);
     fprintf(rawoutstream, "  OPTIONS\n");
     fprintf(rawoutstream, "   -h, --help                Print a usage message and exit\n");
     fprintf(rawoutstream, "   -V, --version             Print version number and exit\n");
-    fprintf(rawoutstream,
-            "   -s, --status              Clear the status_flags field in the file's superblock\n");
+    fprintf(rawoutstream, "   -s, --status              Clear the status_flags field in the file's superblock\n");
     fprintf(rawoutstream, "   -m, --image               Remove the metadata cache image from the file\n");
     fprintf(rawoutstream, "   --filesize                Print the file's EOA and EOF\n");
-    fprintf(rawoutstream,
-            "   --increment=C             Set the file's EOA to the maximum of (EOA, EOF) + C for\n");
+    fprintf(rawoutstream, "   --increment=C             Set the file's EOA to the maximum of (EOA, EOF) + C for\n");
     fprintf(rawoutstream, "                             the file <file_name>.\n");
-    fprintf(rawoutstream,
-            "                             C is >= 0; C is optional and will default to 1M when not set.\n");
-    fprintf(rawoutstream,
-            "                             This option helps to repair a crashed SWMR file when the stored\n");
-    fprintf(rawoutstream,
-            "                             EOA in the superblock is different from the actual EOF.\n");
-    fprintf(rawoutstream,
-            "                             The file's EOA and EOF will be the same after applying\n");
+    fprintf(rawoutstream, "                             C is >= 0; C is optional and will default to 1M when not set.\n");
+    fprintf(rawoutstream, "                             This option helps to repair a crashed SWMR file when the stored\n");
+    fprintf(rawoutstream, "                             EOA in the superblock is different from the actual EOF.\n");
+    fprintf(rawoutstream, "                             The file's EOA and EOF will be the same after applying\n");
     fprintf(rawoutstream, "                             this option to the file.\n");
     fprintf(rawoutstream, "\n");
     fprintf(rawoutstream, "Examples of use:\n");
@@ -118,8 +106,7 @@ usage(const char *prog)
  *
  *-------------------------------------------------------------------------
  */
-static int
-parse_command_line(int argc, const char *const *argv)
+static int parse_command_line(int argc, const char* const* argv)
 {
     int opt;
 
@@ -133,45 +120,39 @@ parse_command_line(int argc, const char *const *argv)
     /* parse command line options */
     while ((opt = H5_get_option(argc, argv, s_opts, l_opts)) != EOF) {
         switch ((char)opt) {
-            case 'h':
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto done;
+        case 'h':
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto done;
 
-            case 'V':
-                print_version(h5tools_getprogname());
-                h5tools_setstatus(EXIT_SUCCESS);
-                goto done;
+        case 'V':
+            print_version(h5tools_getprogname());
+            h5tools_setstatus(EXIT_SUCCESS);
+            goto done;
 
-            case 's':
-                clear_status_flags = true;
-                break;
+        case 's': clear_status_flags = true; break;
 
-            case 'm':
-                remove_cache_image = true;
-                break;
+        case 'm': remove_cache_image = true; break;
 
-            case 'z':
-                print_filesize = true;
-                break;
+        case 'z': print_filesize = true; break;
 
-            case 'i':
-                increment_eoa_eof = true;
-                if (H5_optarg != NULL) {
-                    if (atoi(H5_optarg) < 0) {
-                        usage(h5tools_getprogname());
-                        goto done;
-                    }
-                    increment = (hsize_t)atoi(H5_optarg);
+        case 'i':
+            increment_eoa_eof = true;
+            if (H5_optarg != NULL) {
+                if (atoi(H5_optarg) < 0) {
+                    usage(h5tools_getprogname());
+                    goto done;
                 }
-                break;
+                increment = (hsize_t)atoi(H5_optarg);
+            }
+            break;
 
-            default:
-                usage(h5tools_getprogname());
-                h5tools_setstatus(EXIT_FAILURE);
-                goto error;
+        default:
+            usage(h5tools_getprogname());
+            h5tools_setstatus(EXIT_FAILURE);
+            goto error;
         } /* end switch */
-    }     /* end while */
+    } /* end while */
 
     /* check for file name to be processed */
     if (argc <= H5_optind) {
@@ -199,8 +180,7 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static void
-leave(int ret)
+static void leave(int ret)
 {
     h5tools_close();
     exit(ret);
@@ -233,14 +213,13 @@ leave(int ret)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    char    *fname = NULL;            /* File name */
-    hid_t    fapl  = H5I_INVALID_HID; /* File access property list */
-    hid_t    fid   = H5I_INVALID_HID; /* File ID */
-    haddr_t  image_addr;
-    hsize_t  image_len;
+    char* fname = NULL;           /* File name */
+    hid_t fapl = H5I_INVALID_HID; /* File access property list */
+    hid_t fid = H5I_INVALID_HID;  /* File ID */
+    haddr_t image_addr;
+    hsize_t image_len;
     unsigned flags = H5F_ACC_RDWR; /* file access flags */
 
     h5tools_setprogname(PROGRAMNAME);
@@ -250,11 +229,13 @@ main(int argc, char *argv[])
     h5tools_init();
 
     /* Parse command line options */
-    if (parse_command_line(argc, (const char *const *)argv) < 0)
+    if (parse_command_line(argc, (const char* const*)argv) < 0) {
         goto done;
+    }
 
-    if (fname_g == NULL)
+    if (fname_g == NULL) {
         goto done;
+    }
 
     /* enable error reporting if command line option */
     h5tools_error_report();
@@ -330,8 +311,8 @@ main(int argc, char *argv[])
 
     /* --filesize option */
     if (print_filesize) {
-        h5_stat_t st;  /* Stat info call */
-        haddr_t   eoa; /* The EOA value */
+        h5_stat_t st; /* Stat info call */
+        haddr_t eoa;  /* The EOA value */
 
         /* Get the file's EOA and EOF */
         memset(&st, 0, sizeof(h5_stat_t));
@@ -360,17 +341,20 @@ main(int argc, char *argv[])
             h5tools_setstatus(EXIT_FAILURE);
             goto done;
         }
-        if (image_addr == HADDR_UNDEF && image_len == 0)
+        if (image_addr == HADDR_UNDEF && image_len == 0) {
             warn_msg("No cache image in the file\n");
+        }
     }
 
     h5tools_setstatus(EXIT_SUCCESS);
 
 done:
-    if (fname)
+    if (fname) {
         free(fname);
-    if (fname_g)
+    }
+    if (fname_g) {
         free(fname_g);
+    }
 
     H5E_BEGIN_TRY
     {

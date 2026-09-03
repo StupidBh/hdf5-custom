@@ -1,4 +1,3 @@
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Copyright by The HDF Group.                                               *
  * All rights reserved.                                                      *
@@ -39,8 +38,7 @@
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(void)
+static void usage(void)
 {
     fprintf(stderr, "usage: binread FILE_NAME\n");
 }
@@ -53,14 +51,13 @@ usage(void)
  *-------------------------------------------------------------------------
  */
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    FILE  *stream;
+    FILE* stream;
     size_t numread;
-    TYPE   buf[NELMTS];
+    TYPE buf[NELMTS];
     size_t i, nelmts = NELMTS;
-    char  *fname = NULL;
+    char* fname = NULL;
 
     if (argc != 2) {
         usage();
@@ -80,8 +77,9 @@ main(int argc, char *argv[])
 
         fclose(stream);
     }
-    else
+    else {
         printf("File %s could not be opened\n", fname);
+    }
 
     free(fname);
 

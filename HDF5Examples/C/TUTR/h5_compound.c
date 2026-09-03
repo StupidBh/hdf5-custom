@@ -23,35 +23,37 @@
 #define LENGTH      10
 #define RANK        1
 
-int
-main(void)
+int main(void)
 {
-
     /* First structure  and dataset*/
-    typedef struct s1_t {
-        int    a;
-        float  b;
+    typedef struct s1_t
+    {
+        int a;
+        float b;
         double c;
     } s1_t;
-    s1_t  s1[LENGTH];
+
+    s1_t s1[LENGTH];
     hid_t s1_tid; /* File datatype identifier */
 
     /* Second structure (subset of s1_t)  and dataset*/
-    typedef struct s2_t {
+    typedef struct s2_t
+    {
         double c;
-        int    a;
+        int a;
     } s2_t;
-    s2_t  s2[LENGTH];
+
+    s2_t s2[LENGTH];
     hid_t s2_tid; /* Memory datatype handle */
 
     /* Third "structure" ( will be used to read float field of s1) */
     hid_t s3_tid; /* Memory datatype handle */
     float s3[LENGTH];
 
-    int     i;
-    hid_t   file, dataset, space; /* Handles */
-    herr_t  status;
-    hsize_t dim[] = {LENGTH}; /* Dataspace dimensions */
+    int i;
+    hid_t file, dataset, space; /* Handles */
+    herr_t status;
+    hsize_t dim[] = { LENGTH }; /* Dataspace dimensions */
 
     /*
      * Initialize the data
@@ -124,14 +126,16 @@ main(void)
      */
     printf("\n");
     printf("Field c : \n");
-    for (i = 0; i < LENGTH; i++)
+    for (i = 0; i < LENGTH; i++) {
         printf("%.4f ", s2[i].c);
+    }
     printf("\n");
 
     printf("\n");
     printf("Field a : \n");
-    for (i = 0; i < LENGTH; i++)
+    for (i = 0; i < LENGTH; i++) {
         printf("%d ", s2[i].a);
+    }
     printf("\n");
 
     /*
@@ -151,8 +155,9 @@ main(void)
      */
     printf("\n");
     printf("Field b : \n");
-    for (i = 0; i < LENGTH; i++)
+    for (i = 0; i < LENGTH; i++) {
         printf("%.4f ", s3[i]);
+    }
     printf("\n");
 
     /*

@@ -12,22 +12,23 @@
 #ifndef H5DUMP_XML_H
 #define H5DUMP_XML_H
 
-extern const char *xmlnsprefix;
+extern const char* xmlnsprefix;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* The dump functions of the dump_function_table */
-/* XML format:   same interface, alternative output */
+    /* The dump functions of the dump_function_table */
+    /* XML format:   same interface, alternative output */
 
-void   xml_dump_group(hid_t, const char *);
-void   xml_dump_named_datatype(hid_t, const char *);
-void   xml_dump_dataset(hid_t, const char *, struct subset_t *);
-void   xml_dump_dataspace(hid_t space);
-void   xml_dump_datatype(hid_t type);
-herr_t xml_dump_attr(hid_t, const char *, const H5A_info_t *, void *);
-void   xml_dump_data(hid_t, int, struct subset_t *, int);
+    void xml_dump_group(hid_t, const char*);
+    void xml_dump_named_datatype(hid_t, const char*);
+    void xml_dump_dataset(hid_t, const char*, struct subset_t*);
+    void xml_dump_dataspace(hid_t space);
+    void xml_dump_datatype(hid_t type);
+    herr_t xml_dump_attr(hid_t, const char*, const H5A_info_t*, void*);
+    void xml_dump_data(hid_t, int, struct subset_t*, int);
 
 #ifdef __cplusplus
 }

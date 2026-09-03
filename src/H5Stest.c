@@ -77,10 +77,9 @@
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5S__get_rebuild_status_test(hid_t space_id, H5S_diminfo_valid_t *status1, H5S_diminfo_valid_t *status2)
+herr_t H5S__get_rebuild_status_test(hid_t space_id, H5S_diminfo_valid_t* status1, H5S_diminfo_valid_t* status2)
 {
-    H5S_t *space;               /* Pointer to 1st dataspace */
+    H5S_t* space;               /* Pointer to 1st dataspace */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
@@ -89,14 +88,16 @@ H5S__get_rebuild_status_test(hid_t space_id, H5S_diminfo_valid_t *status1, H5S_d
     assert(status2);
 
     /* Get dataspace structures */
-    if (NULL == (space = (H5S_t *)H5I_object_verify(space_id, H5I_DATASPACE)))
+    if (NULL == (space = (H5S_t*)H5I_object_verify(space_id, H5I_DATASPACE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a dataspace");
+    }
 
     *status1 = space->select.sel_info.hslab->diminfo_valid;
 
     /* Fully rebuild diminfo, if necessary */
-    if (*status1 == H5S_DIMINFO_VALID_NO)
+    if (*status1 == H5S_DIMINFO_VALID_NO) {
         H5S__hyper_rebuild(space);
+    }
 
     *status2 = space->select.sel_info.hslab->diminfo_valid;
 
@@ -124,10 +125,9 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-herr_t
-H5S__get_diminfo_status_test(hid_t space_id, H5S_diminfo_valid_t *status)
+herr_t H5S__get_diminfo_status_test(hid_t space_id, H5S_diminfo_valid_t* status)
 {
-    H5S_t *space;               /* Pointer to 1st dataspace */
+    H5S_t* space;               /* Pointer to 1st dataspace */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
@@ -135,8 +135,9 @@ H5S__get_diminfo_status_test(hid_t space_id, H5S_diminfo_valid_t *status)
     assert(status);
 
     /* Get dataspace structures */
-    if (NULL == (space = (H5S_t *)H5I_object_verify(space_id, H5I_DATASPACE)))
+    if (NULL == (space = (H5S_t*)H5I_object_verify(space_id, H5I_DATASPACE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a dataspace");
+    }
 
     *status = space->select.sel_info.hslab->diminfo_valid;
 
@@ -163,12 +164,11 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-static herr_t
-H5S__check_spans_tail_ptr(const H5S_hyper_span_info_t *span_lst)
+static herr_t H5S__check_spans_tail_ptr(const H5S_hyper_span_info_t* span_lst)
 {
-    H5S_hyper_span_t *cur_elem;
-    H5S_hyper_span_t *actual_tail = NULL;
-    htri_t            ret_value   = true; /* Return value */
+    H5S_hyper_span_t* cur_elem;
+    H5S_hyper_span_t* actual_tail = NULL;
+    htri_t ret_value = true; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -179,16 +179,17 @@ H5S__check_spans_tail_ptr(const H5S_hyper_span_info_t *span_lst)
         actual_tail = cur_elem;
 
         /* check the next dimension of lower order */
-        if (NULL != cur_elem->down)
-            if ((ret_value = H5S__check_spans_tail_ptr(cur_elem->down)) < 0)
-                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                            "the selection has inconsistent tail pointers");
+        if (NULL != cur_elem->down) {
+            if ((ret_value = H5S__check_spans_tail_ptr(cur_elem->down)) < 0) {
+                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the selection has inconsistent tail pointers");
+            }
+        }
 
         cur_elem = cur_elem->next;
     } /* end while */
-    if (actual_tail != span_lst->tail)
-        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                    "the selection has inconsistent tail pointers");
+    if (actual_tail != span_lst->tail) {
+        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the selection has inconsistent tail pointers");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -212,12 +213,11 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-static herr_t
-H5S__check_points_tail_ptr(const H5S_pnt_list_t *pnt_lst)
+static herr_t H5S__check_points_tail_ptr(const H5S_pnt_list_t* pnt_lst)
 {
-    H5S_pnt_node_t *cur_elem;
-    H5S_pnt_node_t *actual_tail = NULL;
-    htri_t          ret_value   = true; /* Return value */
+    H5S_pnt_node_t* cur_elem;
+    H5S_pnt_node_t* actual_tail = NULL;
+    htri_t ret_value = true; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -226,11 +226,11 @@ H5S__check_points_tail_ptr(const H5S_pnt_list_t *pnt_lst)
     cur_elem = pnt_lst->head;
     while (cur_elem) {
         actual_tail = cur_elem;
-        cur_elem    = cur_elem->next;
+        cur_elem = cur_elem->next;
     } /* end while */
-    if (actual_tail != pnt_lst->tail)
-        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                    "the selection has inconsistent tail pointers");
+    if (actual_tail != pnt_lst->tail) {
+        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the selection has inconsistent tail pointers");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -255,73 +255,72 @@ done:
  EXAMPLES
  REVISION LOG
 --------------------------------------------------------------------------*/
-static herr_t
-H5S__check_internal_consistency(const H5S_t *space)
+static herr_t H5S__check_internal_consistency(const H5S_t* space)
 {
-    hsize_t  low_bounds[H5S_MAX_RANK];
-    hsize_t  high_bounds[H5S_MAX_RANK];
+    hsize_t low_bounds[H5S_MAX_RANK];
+    hsize_t high_bounds[H5S_MAX_RANK];
     unsigned u;
-    herr_t   ret_value = SUCCEED; /* Return value */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Check args */
     assert(space);
 
-    if (space->select.type->type == H5S_SEL_NONE)
+    if (space->select.type->type == H5S_SEL_NONE) {
         HGOTO_DONE(ret_value);
+    }
 
     /* Initialize the inputs */
     for (u = 0; u < space->extent.rank; u++) {
-        low_bounds[u]  = HSIZET_MAX;
+        low_bounds[u] = HSIZET_MAX;
         high_bounds[u] = 0;
     } /* end for */
 
     /* Check the bound box */
-    if (H5S_get_select_bounds(space, low_bounds, high_bounds) < 0)
+    if (H5S_get_select_bounds(space, low_bounds, high_bounds) < 0) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the bound box could not be retrieved");
+    }
 
     if (space->select.type->type == H5S_SEL_HYPERSLABS) {
-        H5S_hyper_sel_t *hslab = space->select.sel_info.hslab;
+        H5S_hyper_sel_t* hslab = space->select.sel_info.hslab;
 
         if (space->select.sel_info.hslab->diminfo_valid == H5S_DIMINFO_VALID_YES) {
             for (u = 0; u < space->extent.rank; u++) {
-                if ((hsize_t)((hssize_t)hslab->diminfo.low_bounds[u] + space->select.offset[u]) !=
-                    low_bounds[u])
-                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                                "the lower bound box of the selection is inconsistent");
-                if ((hsize_t)((hssize_t)hslab->diminfo.high_bounds[u] + space->select.offset[u]) !=
-                    high_bounds[u])
-                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                                "the higher bound box of the selection is inconsistent");
+                if ((hsize_t)((hssize_t)hslab->diminfo.low_bounds[u] + space->select.offset[u]) != low_bounds[u]) {
+                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the lower bound box of the selection is inconsistent");
+                }
+                if ((hsize_t)((hssize_t)hslab->diminfo.high_bounds[u] + space->select.offset[u]) != high_bounds[u]) {
+                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the higher bound box of the selection is inconsistent");
+                }
             } /* end for */
-        }     /* end if */
+        } /* end if */
         else {
             for (u = 0; u < space->extent.rank; u++) {
-                if ((hsize_t)((hssize_t)hslab->span_lst->low_bounds[u] + space->select.offset[u]) !=
-                    low_bounds[u])
-                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                                "the lower bound box of the selection is inconsistent");
-                if ((hsize_t)((hssize_t)hslab->span_lst->high_bounds[u] + space->select.offset[u]) !=
-                    high_bounds[u])
-                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                                "the higher bound box of the selection is inconsistent");
+                if ((hsize_t)((hssize_t)hslab->span_lst->low_bounds[u] + space->select.offset[u]) != low_bounds[u]) {
+                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the lower bound box of the selection is inconsistent");
+                }
+                if ((hsize_t)((hssize_t)hslab->span_lst->high_bounds[u] + space->select.offset[u]) != high_bounds[u]) {
+                    HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the higher bound box of the selection is inconsistent");
+                }
             } /* end for */
-        }     /* end else */
+        } /* end else */
 
         /* check the tail pointer */
-        if ((NULL != hslab) && (NULL != hslab->span_lst))
-            if (H5S__check_spans_tail_ptr(hslab->span_lst) < 0)
-                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                            "the selection has inconsistent tail pointers");
+        if ((NULL != hslab) && (NULL != hslab->span_lst)) {
+            if (H5S__check_spans_tail_ptr(hslab->span_lst) < 0) {
+                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the selection has inconsistent tail pointers");
+            }
+        }
     } /* end if */
     else if (space->select.type->type == H5S_SEL_POINTS) {
-        H5S_pnt_list_t *pnt_lst = space->select.sel_info.pnt_lst;
+        H5S_pnt_list_t* pnt_lst = space->select.sel_info.pnt_lst;
 
-        if (NULL != pnt_lst)
-            if (H5S__check_points_tail_ptr(pnt_lst) < 0)
-                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                            "the selection has inconsistent tail pointers");
+        if (NULL != pnt_lst) {
+            if (H5S__check_points_tail_ptr(pnt_lst) < 0) {
+                HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "the selection has inconsistent tail pointers");
+            }
+        }
     } /* end else-if */
 
 done:
@@ -342,22 +341,22 @@ done:
     Check the states of internal data structures of the hyperslab, and see
     whether they are consistent or not
 --------------------------------------------------------------------------*/
-htri_t
-H5S__internal_consistency_test(hid_t space_id)
+htri_t H5S__internal_consistency_test(hid_t space_id)
 {
-    H5S_t *space;            /* Pointer to 1st dataspace */
+    H5S_t* space;            /* Pointer to 1st dataspace */
     htri_t ret_value = true; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Get dataspace structures */
-    if (NULL == (space = (H5S_t *)H5I_object_verify(space_id, H5I_DATASPACE)))
+    if (NULL == (space = (H5S_t*)H5I_object_verify(space_id, H5I_DATASPACE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a dataspace");
+    }
 
     /* Check if the dataspace selections are the same shape */
-    if (FAIL == H5S__check_internal_consistency(space))
-        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL,
-                    "The dataspace has inconsistent internal state");
+    if (FAIL == H5S__check_internal_consistency(space)) {
+        HGOTO_ERROR(H5E_DATASPACE, H5E_INCONSISTENTSTATE, FAIL, "The dataspace has inconsistent internal state");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -378,23 +377,24 @@ done:
     This function is necessary because there is no public API call
     that lets you get the offsets
 --------------------------------------------------------------------------*/
-herr_t
-H5S__verify_offsets(hid_t space_id, const hssize_t *offset)
+herr_t H5S__verify_offsets(hid_t space_id, const hssize_t* offset)
 {
-    H5S_t *space;               /* Dataspace to modify */
+    H5S_t* space;               /* Dataspace to modify */
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
-    if (NULL == (space = (H5S_t *)H5I_object_verify(space_id, H5I_DATASPACE)))
+    if (NULL == (space = (H5S_t*)H5I_object_verify(space_id, H5I_DATASPACE))) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_BADID, FAIL, "not a dataspace");
-    if (space->extent.rank == 0 ||
-        (H5S_GET_EXTENT_TYPE(space) == H5S_SCALAR || H5S_GET_EXTENT_TYPE(space) == H5S_NULL))
+    }
+    if (space->extent.rank == 0 || (H5S_GET_EXTENT_TYPE(space) == H5S_SCALAR || H5S_GET_EXTENT_TYPE(space) == H5S_NULL)) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_UNSUPPORTED, FAIL, "can't set offset on scalar or null dataspace");
+    }
 
     /* Check that the internal and passed-in offset data are the same */
-    if (0 != memcmp(space->select.offset, offset, sizeof(hssize_t) * space->extent.rank))
+    if (0 != memcmp(space->select.offset, offset, sizeof(hssize_t) * space->extent.rank)) {
         HGOTO_ERROR(H5E_DATASPACE, H5E_BADVALUE, FAIL, "internal offsets don't match parameters");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

@@ -74,8 +74,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5EA_get_stats(const H5EA_t *ea, H5EA_stat_t *stats)
+herr_t H5EA_get_stats(const H5EA_t* ea, H5EA_stat_t* stats)
 {
     FUNC_ENTER_NOAPI_NOERR
 

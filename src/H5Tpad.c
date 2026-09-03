@@ -15,7 +15,7 @@
  *      the datatype padding for the H5T interface.
  */
 
-#include "H5Tmodule.h" /* This source code file is part of the H5T module */
+#include "H5Tmodule.h"  /* This source code file is part of the H5T module */
 
 #include "H5private.h"  /* Generic Functions			*/
 #include "H5Eprivate.h" /* Error handling		  	*/
@@ -33,27 +33,31 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tget_pad(hid_t type_id, H5T_pad_t *lsb /*out*/, H5T_pad_t *msb /*out*/)
+herr_t H5Tget_pad(hid_t type_id, H5T_pad_t* lsb /*out*/, H5T_pad_t* msb /*out*/)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type_id, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type_id, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    while (dt->shared->parent)
+    }
+    while (dt->shared->parent) {
         dt = dt->shared->parent; /*defer to parent*/
-    if (!H5T_IS_ATOMIC(dt->shared))
+    }
+    if (!H5T_IS_ATOMIC(dt->shared)) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_UNSUPPORTED, FAIL, "operation not defined for specified data type");
+    }
 
     /* Get values */
-    if (lsb)
+    if (lsb) {
         *lsb = dt->shared->u.atomic.lsb_pad;
-    if (msb)
+    }
+    if (msb) {
         *msb = dt->shared->u.atomic.msb_pad;
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -68,27 +72,32 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Tset_pad(hid_t type_id, H5T_pad_t lsb, H5T_pad_t msb)
+herr_t H5Tset_pad(hid_t type_id, H5T_pad_t lsb, H5T_pad_t msb)
 {
-    H5T_t *dt        = NULL;
+    H5T_t* dt = NULL;
     herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Check args */
-    if (NULL == (dt = (H5T_t *)H5I_object_verify(type_id, H5I_DATATYPE)))
+    if (NULL == (dt = (H5T_t*)H5I_object_verify(type_id, H5I_DATATYPE))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a data type");
-    if (H5T_STATE_TRANSIENT != dt->shared->state)
+    }
+    if (H5T_STATE_TRANSIENT != dt->shared->state) {
         HGOTO_ERROR(H5E_ARGS, H5E_CANTINIT, FAIL, "data type is read-only");
-    if (lsb < H5T_PAD_ZERO || lsb >= H5T_NPAD || msb < H5T_PAD_ZERO || msb >= H5T_NPAD)
+    }
+    if (lsb < H5T_PAD_ZERO || lsb >= H5T_NPAD || msb < H5T_PAD_ZERO || msb >= H5T_NPAD) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "invalid pad type");
-    if (H5T_ENUM == dt->shared->type && dt->shared->u.enumer.nmembs > 0)
+    }
+    if (H5T_ENUM == dt->shared->type && dt->shared->u.enumer.nmembs > 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTINIT, FAIL, "operation not allowed after members are defined");
-    while (dt->shared->parent)
+    }
+    while (dt->shared->parent) {
         dt = dt->shared->parent; /*defer to parent*/
-    if (!H5T_IS_ATOMIC(dt->shared))
+    }
+    if (!H5T_IS_ATOMIC(dt->shared)) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_UNSUPPORTED, FAIL, "operation not defined for specified data type");
+    }
 
     /* Commit */
     dt->shared->u.atomic.lsb_pad = lsb;

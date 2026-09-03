@@ -17,8 +17,8 @@
 #include "h5test.h"
 
 #ifdef H5_HAVE_PARALLEL
-#define MAINPROCESS (!mpi_rank) /* define process 0 as main process */
-#endif                          /*H5_HAVE_PARALLEL*/
+    #define MAINPROCESS (!mpi_rank) /* define process 0 as main process */
+#endif                              /*H5_HAVE_PARALLEL*/
 
 /* File_Access_type bits */
 #define FACC_DEFAULT 0x0 /* serial as default */
@@ -26,19 +26,19 @@
 
 /* Which test to run */
 static int RUN_TEST = 0x0; /* all tests as default */
-static int TEST_1   = 0x1; /* Test 1 */
-static int TEST_2   = 0x2; /* Test 2 */
-static int TEST_3   = 0x4; /* Test 3 */
+static int TEST_1 = 0x1;   /* Test 1 */
+static int TEST_2 = 0x2;   /* Test 2 */
+static int TEST_3 = 0x4;   /* Test 3 */
 
-static const char *FILENAME[] = {"meta_perf_1", "meta_perf_2", "meta_perf_3", NULL};
+static const char* FILENAME[] = { "meta_perf_1", "meta_perf_2", "meta_perf_3", NULL };
 
 /* Default values for performance. Can be changed through command line options */
-static int   NUM_DSETS   = 16;
-static int   NUM_ATTRS   = 8;
-static int   BATCH_ATTRS = 2;
-static bool  flush_dset  = false;
-static bool  flush_attr  = false;
-static int   nerrors     = 0; /* errors count */
+static int NUM_DSETS = 16;
+static int NUM_ATTRS = 8;
+static int BATCH_ATTRS = 2;
+static bool flush_dset = false;
+static bool flush_attr = false;
+static int nerrors = 0; /* errors count */
 static hid_t fapl;
 
 /* Data space IDs */
@@ -46,21 +46,22 @@ static hid_t space;
 static hid_t small_space;
 
 /* Performance data */
-typedef struct p_time {
+typedef struct p_time
+{
     double total;
     double avg;
     double max;
     double min;
     double start;
-    char   func[32];
+    char func[32];
 } p_time;
 
 /*Test file access type for parallel.  MPIO as default */
 static int facc_type = FACC_DEFAULT;
 
 double retrieve_time(void);
-void   perf(p_time *perf_t, double start_t, double end_t);
-void   print_perf(p_time, p_time, p_time);
+void perf(p_time* perf_t, double start_t, double end_t);
+void print_perf(p_time, p_time, p_time);
 
 /*-------------------------------------------------------------------------
  * Function:	parse_options
@@ -69,14 +70,14 @@ void   print_perf(p_time, p_time, p_time);
  *
  *-------------------------------------------------------------------------
  */
-static int
-parse_options(int argc, char **argv)
+static int parse_options(int argc, char** argv)
 {
     int t;
 
     /* Use default values */
-    if (argc == 1)
+    if (argc == 1) {
         return (0);
+    }
 
     while (--argc) {
         if (**(++argv) != '-') {
@@ -84,66 +85,66 @@ parse_options(int argc, char **argv)
         }
         else {
             switch (*(*argv + 1)) {
-                case 'h': /* Help page */
-                    return (1);
+            case 'h': /* Help page */ return (1);
 
-                case 'd': /* Number of datasets */
-                    NUM_DSETS = atoi((*argv + 1) + 1);
-                    if (NUM_DSETS < 0) {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-
-                case 'a': /* Number of attributes per dataset */
-                    NUM_ATTRS = atoi((*argv + 1) + 1);
-                    if (NUM_ATTRS < 0) {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-
-                case 'n': /* Number of attributes to be created in batch */
-                    BATCH_ATTRS = atoi((*argv + 1) + 1);
-                    if (BATCH_ATTRS < 0) {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-
-                case 'm': /* Use the MPI-IO driver */
-                    facc_type = FACC_MPIO;
-                    break;
-
-                case 'f': /* Call H5Fflush for each dataset or attribute */
-                    if (!strcmp("a", (*argv + 2)))
-                        flush_attr = true;
-                    else if (!strcmp("d", (*argv + 2)))
-                        flush_dset = true;
-                    else {
-                        nerrors++;
-                        return (1);
-                    }
-                    break;
-
-                case 't': /* Which test to run */
-                    t = atoi((*argv + 1) + 1);
-                    if (t < 1 || t > 3) {
-                        nerrors++;
-                        return (1);
-                    }
-                    if (t == 1)
-                        RUN_TEST |= TEST_1;
-                    else if (t == 2)
-                        RUN_TEST |= TEST_2;
-                    else
-                        RUN_TEST |= TEST_3;
-
-                    break;
-
-                default:
+            case 'd': /* Number of datasets */
+                NUM_DSETS = atoi((*argv + 1) + 1);
+                if (NUM_DSETS < 0) {
                     nerrors++;
                     return (1);
+                }
+                break;
+
+            case 'a': /* Number of attributes per dataset */
+                NUM_ATTRS = atoi((*argv + 1) + 1);
+                if (NUM_ATTRS < 0) {
+                    nerrors++;
+                    return (1);
+                }
+                break;
+
+            case 'n': /* Number of attributes to be created in batch */
+                BATCH_ATTRS = atoi((*argv + 1) + 1);
+                if (BATCH_ATTRS < 0) {
+                    nerrors++;
+                    return (1);
+                }
+                break;
+
+            case 'm': /* Use the MPI-IO driver */ facc_type = FACC_MPIO; break;
+
+            case 'f': /* Call H5Fflush for each dataset or attribute */
+                if (!strcmp("a", (*argv + 2))) {
+                    flush_attr = true;
+                }
+                else if (!strcmp("d", (*argv + 2))) {
+                    flush_dset = true;
+                }
+                else {
+                    nerrors++;
+                    return (1);
+                }
+                break;
+
+            case 't': /* Which test to run */
+                t = atoi((*argv + 1) + 1);
+                if (t < 1 || t > 3) {
+                    nerrors++;
+                    return (1);
+                }
+                if (t == 1) {
+                    RUN_TEST |= TEST_1;
+                }
+                else if (t == 2) {
+                    RUN_TEST |= TEST_2;
+                }
+                else {
+                    RUN_TEST |= TEST_3;
+                }
+
+                break;
+
+            default: nerrors++; return (1);
             }
         }
     } /*while*/
@@ -156,11 +157,13 @@ parse_options(int argc, char **argv)
     }
 #endif /*H5_HAVE_PARALLEL*/
 
-    if (NUM_ATTRS && !BATCH_ATTRS)
+    if (NUM_ATTRS && !BATCH_ATTRS) {
         NUM_ATTRS = 0;
+    }
 
-    if (!NUM_ATTRS && BATCH_ATTRS)
+    if (!NUM_ATTRS && BATCH_ATTRS) {
         BATCH_ATTRS = 0;
+    }
 
     if (!NUM_DSETS) {
         nerrors++;
@@ -184,43 +187,50 @@ parse_options(int argc, char **argv)
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(void)
+static void usage(void)
 {
-    printf("Usage: perf_meta [-h] [-m] [-d<num_datasets>]"
-           "[-a<num_attributes>]\n"
-           "\t[-n<batch_attributes>] [-f<option>] [-t<test>]\n");
-    printf("\t-h"
-           "\t\t\thelp page.\n");
-    printf("\t-m"
-           "\t\t\tset MPIO as the file driver when parallel HDF5\n"
-           "\t\t\t\tis enabled.  -m must be specified\n"
-           "\t\t\t\twhen running parallel program.\n");
-    printf("\t-d<num_datasets>"
-           "\tset number of datasets for meta data \n"
-           "\t\t\t\tperformance test\n");
-    printf("\t-a<num_attributes>"
-           "\tset number of attributes per dataset for meta \n"
-           "\t\t\t\tdata performance test.\n");
-    printf("\t-n<batch_attributes>"
-           "\tset batch number of attributes for dataset \n"
-           "\t\t\t\tfor meta data performance test.\n");
-    printf("\t-f<option>"
-           "\t\tflush data to disk after closing a dataset \n"
-           "\t\t\t\tor attribute.  Valid options are \"d\" for \n"
-           "\t\t\t\tdataset, \"a\" for attribute.  Disabled is \n"
-           "\t\t\t\tthe default.\n");
-    printf("\t-t<tests>"
-           "\t\trun specific test.  Give only one number each \n"
-           "\t\t\t\ttime. i.e. \"-t1 -t3\" will run test 1 and 3. \n"
-           "\t\t\t\tDefault is all three tests.  The 3 tests are: \n\n"
-           "\t\t\t\t1. Create <num_attributes> attributes for each \n"
-           "\t\t\t\t   of <num_datasets> existing datasets.\n"
-           "\t\t\t\t2. Create <num_attributes> attributes for each \n"
-           "\t\t\t\t   of <num_datasets> new datasets.\n"
-           "\t\t\t\t3. Create <batch_attributes> attributes for \n"
-           "\t\t\t\t   each of <num_dataset> new datasets for \n"
-           "\t\t\t\t   <num_attributes>/<batch_attributes> times.\n");
+    printf(
+        "Usage: perf_meta [-h] [-m] [-d<num_datasets>]"
+        "[-a<num_attributes>]\n"
+        "\t[-n<batch_attributes>] [-f<option>] [-t<test>]\n");
+    printf(
+        "\t-h"
+        "\t\t\thelp page.\n");
+    printf(
+        "\t-m"
+        "\t\t\tset MPIO as the file driver when parallel HDF5\n"
+        "\t\t\t\tis enabled.  -m must be specified\n"
+        "\t\t\t\twhen running parallel program.\n");
+    printf(
+        "\t-d<num_datasets>"
+        "\tset number of datasets for meta data \n"
+        "\t\t\t\tperformance test\n");
+    printf(
+        "\t-a<num_attributes>"
+        "\tset number of attributes per dataset for meta \n"
+        "\t\t\t\tdata performance test.\n");
+    printf(
+        "\t-n<batch_attributes>"
+        "\tset batch number of attributes for dataset \n"
+        "\t\t\t\tfor meta data performance test.\n");
+    printf(
+        "\t-f<option>"
+        "\t\tflush data to disk after closing a dataset \n"
+        "\t\t\t\tor attribute.  Valid options are \"d\" for \n"
+        "\t\t\t\tdataset, \"a\" for attribute.  Disabled is \n"
+        "\t\t\t\tthe default.\n");
+    printf(
+        "\t-t<tests>"
+        "\t\trun specific test.  Give only one number each \n"
+        "\t\t\t\ttime. i.e. \"-t1 -t3\" will run test 1 and 3. \n"
+        "\t\t\t\tDefault is all three tests.  The 3 tests are: \n\n"
+        "\t\t\t\t1. Create <num_attributes> attributes for each \n"
+        "\t\t\t\t   of <num_datasets> existing datasets.\n"
+        "\t\t\t\t2. Create <num_attributes> attributes for each \n"
+        "\t\t\t\t   of <num_datasets> new datasets.\n"
+        "\t\t\t\t3. Create <batch_attributes> attributes for \n"
+        "\t\t\t\t   each of <num_dataset> new datasets for \n"
+        "\t\t\t\t   <num_attributes>/<batch_attributes> times.\n");
 }
 
 /*-------------------------------------------------------------------------
@@ -234,8 +244,7 @@ usage(void)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_dspace(void)
+static herr_t create_dspace(void)
 {
     hsize_t dims[2];
     hsize_t small_dims[2];
@@ -243,14 +252,16 @@ create_dspace(void)
     /* Create the data space */
     dims[0] = 256;
     dims[1] = 512;
-    if ((space = H5Screate_simple(2, dims, NULL)) < 0)
+    if ((space = H5Screate_simple(2, dims, NULL)) < 0) {
         goto error;
+    }
 
     /* Create a small data space for attributes */
     small_dims[0] = 16;
     small_dims[1] = 8;
-    if ((small_space = H5Screate_simple(2, small_dims, NULL)) < 0)
+    if ((small_space = H5Screate_simple(2, small_dims, NULL)) < 0) {
         goto error;
+    }
 
     return 0;
 
@@ -269,24 +280,24 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_dsets(hid_t file)
+static herr_t create_dsets(hid_t file)
 {
     hid_t dataset;
-    char  dset_name[32];
-    int   i;
+    char dset_name[32];
+    int i;
 
     /*
      * Create a dataset using the default dataset creation properties.
      */
     for (i = 0; i < NUM_DSETS; i++) {
         snprintf(dset_name, sizeof(dset_name), "dataset %d", i);
-        if ((dataset = H5Dcreate2(file, dset_name, H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, H5P_DEFAULT,
-                                  H5P_DEFAULT)) < 0)
+        if ((dataset = H5Dcreate2(file, dset_name, H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto error;
+        }
 
-        if (H5Dclose(dataset) < 0)
+        if (H5Dclose(dataset) < 0) {
             goto error;
+        }
     } /* end for */
 
     return 0;
@@ -306,32 +317,34 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_attrs_1(void)
+static herr_t create_attrs_1(void)
 {
-    hid_t  file, dataset, attr;
-    char   filename[128];
-    char   dset_name[64];
-    char   attr_name[128];
-    int    i, j;
-    p_time attr_t  = {0, 0, 0, 1000000, 0, ""};
-    p_time open_t  = {0, 0, 0, 1000000, 0, "H5Dopen2"};
-    p_time close_t = {0, 0, 0, 1000000, 0, ""};
+    hid_t file, dataset, attr;
+    char filename[128];
+    char dset_name[64];
+    char attr_name[128];
+    int i, j;
+    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time open_t = { 0, 0, 0, 1'000'000, 0, "H5Dopen2" };
+    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
     int mpi_rank;
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
     h5_fixname(FILENAME[0], fapl, filename, sizeof filename);
 
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
+    }
 
-    if (create_dsets(file) < 0)
+    if (create_dsets(file) < 0) {
         goto error;
+    }
 
     /*
      * Create all(user specifies the number) attributes for each dataset
@@ -339,29 +352,34 @@ create_attrs_1(void)
     for (i = 0; i < NUM_DSETS; i++) {
         snprintf(dset_name, sizeof(dset_name), "dataset %d", i);
         open_t.start = retrieve_time();
-        if ((dataset = H5Dopen2(file, dset_name, H5P_DEFAULT)) < 0)
+        if ((dataset = H5Dopen2(file, dset_name, H5P_DEFAULT)) < 0) {
             goto error;
+        }
         perf(&open_t, open_t.start, retrieve_time());
 
         for (j = 0; j < NUM_ATTRS; j++) {
             snprintf(attr_name, sizeof(attr_name), "all attrs for each dset %d", j);
             attr_t.start = retrieve_time();
-            if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT,
-                                   H5P_DEFAULT)) < 0)
+            if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                 goto error;
-            if (H5Aclose(attr) < 0)
+            }
+            if (H5Aclose(attr) < 0) {
                 goto error;
+            }
             perf(&attr_t, attr_t.start, retrieve_time());
-            if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+            if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
                 goto error;
+            }
         } /* end for */
 
         close_t.start = retrieve_time();
-        if (H5Dclose(dataset) < 0)
+        if (H5Dclose(dataset) < 0) {
             goto error;
+        }
         perf(&close_t, close_t.start, retrieve_time());
-        if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+        if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
             goto error;
+        }
     } /* end for */
 
     if (facc_type == FACC_MPIO) {
@@ -372,21 +390,23 @@ create_attrs_1(void)
 
 #ifdef H5_HAVE_PARALLEL
     if (facc_type == FACC_DEFAULT || (facc_type != FACC_DEFAULT && MAINPROCESS)) /* only process 0 reports */
-#endif                                                                           /*H5_HAVE_PARALLEL*/
+#endif /*H5_HAVE_PARALLEL*/
     {
         /* Calculate the average time */
-        open_t.avg  = open_t.total / NUM_DSETS;
+        open_t.avg = open_t.total / NUM_DSETS;
         close_t.avg = close_t.total / NUM_DSETS;
-        if (NUM_ATTRS)
+        if (NUM_ATTRS) {
             attr_t.avg = attr_t.total / (NUM_ATTRS * NUM_DSETS);
+        }
 
         /* Print out the performance result */
         fprintf(stderr, "1.  Create %d attributes for each of %d existing datasets\n", NUM_ATTRS, NUM_DSETS);
         print_perf(open_t, close_t, attr_t);
     }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     return 0;
 
@@ -405,29 +425,30 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_attrs_2(void)
+static herr_t create_attrs_2(void)
 {
-    hid_t  file, dataset, attr;
-    char   filename[128];
-    char   dset_name[64];
-    char   attr_name[128];
-    int    i, j;
-    p_time attr_t   = {0, 0, 0, 1000000, 0, ""};
-    p_time create_t = {0, 0, 0, 1000000, 0, "H5Dcreate2"};
-    p_time close_t  = {0, 0, 0, 1000000, 0, ""};
+    hid_t file, dataset, attr;
+    char filename[128];
+    char dset_name[64];
+    char attr_name[128];
+    int i, j;
+    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time create_t = { 0, 0, 0, 1'000'000, 0, "H5Dcreate2" };
+    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
     int mpi_rank;
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
     h5_fixname(FILENAME[1], fapl, filename, sizeof filename);
 
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
+    }
 
     /*
      * Create all(user specifies the number) attributes for each new dataset
@@ -435,35 +456,40 @@ create_attrs_2(void)
     for (i = 0; i < NUM_DSETS; i++) {
         snprintf(dset_name, sizeof(dset_name), "dataset %d", i);
         create_t.start = retrieve_time();
-        if ((dataset = H5Dcreate2(file, dset_name, H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, H5P_DEFAULT,
-                                  H5P_DEFAULT)) < 0)
+        if ((dataset = H5Dcreate2(file, dset_name, H5T_NATIVE_DOUBLE, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
             goto error;
+        }
         perf(&create_t, create_t.start, retrieve_time());
 
         for (j = 0; j < NUM_ATTRS; j++) {
             snprintf(attr_name, sizeof(attr_name), "all attrs for each dset %d", j);
             attr_t.start = retrieve_time();
-            if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT,
-                                   H5P_DEFAULT)) < 0)
+            if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                 goto error;
-            if (H5Aclose(attr) < 0)
+            }
+            if (H5Aclose(attr) < 0) {
                 goto error;
+            }
             perf(&attr_t, attr_t.start, retrieve_time());
-            if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+            if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
                 goto error;
+            }
         } /* end for */
 
         close_t.start = retrieve_time();
-        if (H5Dclose(dataset) < 0)
+        if (H5Dclose(dataset) < 0) {
             goto error;
+        }
         perf(&close_t, close_t.start, retrieve_time());
-        if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+        if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
             goto error;
+        }
     } /* end for */
 
 #ifdef H5_HAVE_PARALLEL
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         MPI_Barrier(MPI_COMM_WORLD);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
 #ifdef H5_HAVE_PARALLEL
@@ -473,17 +499,19 @@ create_attrs_2(void)
     {
         /* Calculate the average time */
         create_t.avg = create_t.total / NUM_DSETS;
-        close_t.avg  = close_t.total / NUM_DSETS;
-        if (NUM_ATTRS)
+        close_t.avg = close_t.total / NUM_DSETS;
+        if (NUM_ATTRS) {
             attr_t.avg = attr_t.total / (NUM_ATTRS * NUM_DSETS);
+        }
 
         /* Print out the performance result */
         fprintf(stderr, "2.  Create %d attributes for each of %d new datasets\n", NUM_ATTRS, NUM_DSETS);
         print_perf(create_t, close_t, attr_t);
     }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     return 0;
 
@@ -503,33 +531,35 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-create_attrs_3(void)
+static herr_t create_attrs_3(void)
 {
-    hid_t  file, dataset, attr;
-    char   filename[128];
-    char   dset_name[64];
-    char   attr_name[128];
-    int    loop_num;
-    int    i, j, k;
-    p_time attr_t  = {0, 0, 0, 1000000, 0, ""};
-    p_time open_t  = {0, 0, 0, 1000000, 0, "H5Dopen2"};
-    p_time close_t = {0, 0, 0, 1000000, 0, ""};
+    hid_t file, dataset, attr;
+    char filename[128];
+    char dset_name[64];
+    char attr_name[128];
+    int loop_num;
+    int i, j, k;
+    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time open_t = { 0, 0, 0, 1'000'000, 0, "H5Dopen2" };
+    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
     int mpi_rank;
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
     h5_fixname(FILENAME[2], fapl, filename, sizeof filename);
 
-    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0)
+    if ((file = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
         goto error;
+    }
 
-    if (create_dsets(file) < 0)
+    if (create_dsets(file) < 0) {
         goto error;
+    }
 
     /*
      * Create some(user specifies the number) attributes for each dataset
@@ -541,35 +571,41 @@ create_attrs_3(void)
         for (j = 0; j < NUM_DSETS; j++) {
             snprintf(dset_name, sizeof(dset_name), "dataset %d", j);
             open_t.start = retrieve_time();
-            if ((dataset = H5Dopen2(file, dset_name, H5P_DEFAULT)) < 0)
+            if ((dataset = H5Dopen2(file, dset_name, H5P_DEFAULT)) < 0) {
                 goto error;
+            }
             perf(&open_t, open_t.start, retrieve_time());
 
             for (k = 0; k < BATCH_ATTRS; k++) {
                 snprintf(attr_name, sizeof(attr_name), "some attrs for each dset %d %d", i, k);
                 attr_t.start = retrieve_time();
-                if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT,
-                                       H5P_DEFAULT)) < 0)
+                if ((attr = H5Acreate2(dataset, attr_name, H5T_NATIVE_DOUBLE, small_space, H5P_DEFAULT, H5P_DEFAULT)) < 0) {
                     goto error;
-                if (H5Aclose(attr) < 0)
+                }
+                if (H5Aclose(attr) < 0) {
                     goto error;
+                }
                 perf(&attr_t, attr_t.start, retrieve_time());
-                if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+                if (flush_attr && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
                     goto error;
+                }
             } /* end for */
 
             close_t.start = retrieve_time();
-            if (H5Dclose(dataset) < 0)
+            if (H5Dclose(dataset) < 0) {
                 goto error;
+            }
             perf(&close_t, close_t.start, retrieve_time());
-            if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0)
+            if (flush_dset && H5Fflush(file, H5F_SCOPE_LOCAL) < 0) {
                 goto error;
+            }
         } /* end for */
-    }     /* end for */
+    } /* end for */
 
 #ifdef H5_HAVE_PARALLEL
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         MPI_Barrier(MPI_COMM_WORLD);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
 #ifdef H5_HAVE_PARALLEL
@@ -578,18 +614,18 @@ create_attrs_3(void)
 #endif /*H5_HAVE_PARALLEL*/
     {
         /* Calculate the average time */
-        open_t.avg  = open_t.total / (loop_num * NUM_DSETS);
+        open_t.avg = open_t.total / (loop_num * NUM_DSETS);
         close_t.avg = close_t.total / (loop_num * NUM_DSETS);
-        attr_t.avg  = attr_t.total / (NUM_ATTRS * NUM_DSETS);
+        attr_t.avg = attr_t.total / (NUM_ATTRS * NUM_DSETS);
 
         /* Print out the performance result */
-        fprintf(stderr, "3.  Create %d attributes for each of %d existing datasets for %d times\n",
-                BATCH_ATTRS, NUM_DSETS, loop_num);
+        fprintf(stderr, "3.  Create %d attributes for each of %d existing datasets for %d times\n", BATCH_ATTRS, NUM_DSETS, loop_num);
         print_perf(open_t, close_t, attr_t);
     }
 
-    if (H5Fclose(file) < 0)
+    if (H5Fclose(file) < 0) {
         goto error;
+    }
 
     return 0;
 
@@ -604,15 +640,14 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-double
-retrieve_time(void)
+double retrieve_time(void)
 {
 #ifdef H5_HAVE_PARALLEL
     if (facc_type == FACC_DEFAULT) {
 #endif /*H5_HAVE_PARALLEL*/
         struct timeval t;
         HDgettimeofday(&t, NULL);
-        return ((double)t.tv_sec + (double)t.tv_usec / 1000000);
+        return ((double)t.tv_sec + (double)t.tv_usec / 1'000'000);
 #ifdef H5_HAVE_PARALLEL
     }
     else {
@@ -629,8 +664,7 @@ retrieve_time(void)
  *
  *-------------------------------------------------------------------------
  */
-void
-perf(p_time *perf_t, double start_t, double end_t)
+void perf(p_time* perf_t, double start_t, double end_t)
 {
     double t = end_t - start_t;
 
@@ -638,7 +672,7 @@ perf(p_time *perf_t, double start_t, double end_t)
     if (facc_type == FACC_MPIO) {
         double reduced_t;
         double t_max, t_min;
-        int    mpi_size, mpi_rank;
+        int mpi_size, mpi_rank;
 
         MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
         MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
@@ -653,10 +687,12 @@ perf(p_time *perf_t, double start_t, double end_t)
         if (MAINPROCESS) {
             perf_t->total += reduced_t;
 
-            if (t_max > perf_t->max)
+            if (t_max > perf_t->max) {
                 perf_t->max = t_max;
-            if (t_min < perf_t->min)
+            }
+            if (t_min < perf_t->min) {
                 perf_t->min = t_min;
+            }
         }
     }
     else
@@ -664,10 +700,12 @@ perf(p_time *perf_t, double start_t, double end_t)
     {
         perf_t->total += t;
 
-        if (t > perf_t->max)
+        if (t > perf_t->max) {
             perf_t->max = t;
-        if (t < perf_t->min)
+        }
+        if (t < perf_t->min) {
             perf_t->min = t;
+        }
     }
 }
 
@@ -678,16 +716,13 @@ perf(p_time *perf_t, double start_t, double end_t)
  *
  *-------------------------------------------------------------------------
  */
-void
-print_perf(p_time open_t, p_time close_t, p_time attr_t)
+void print_perf(p_time open_t, p_time close_t, p_time attr_t)
 {
-    fprintf(stderr, "\t%s:\t\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", open_t.func, open_t.avg, open_t.max,
-            open_t.min);
-    fprintf(stderr, "\tH5Dclose:\t\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", close_t.avg, close_t.max,
-            close_t.min);
-    if (NUM_ATTRS)
-        fprintf(stderr, "\tH5A(create & close):\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", attr_t.avg, attr_t.max,
-                attr_t.min);
+    fprintf(stderr, "\t%s:\t\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", open_t.func, open_t.avg, open_t.max, open_t.min);
+    fprintf(stderr, "\tH5Dclose:\t\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", close_t.avg, close_t.max, close_t.min);
+    if (NUM_ATTRS) {
+        fprintf(stderr, "\tH5A(create & close):\tavg=%.6fs;\tmax=%.6fs;\tmin=%.6fs\n", attr_t.avg, attr_t.max, attr_t.min);
+    }
 }
 
 /*-------------------------------------------------------------------------
@@ -701,12 +736,11 @@ print_perf(p_time open_t, p_time close_t, p_time attr_t)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef H5_HAVE_PARALLEL
     int mpi_size, mpi_rank; /* mpi variables */
-#endif                      /*H5_HAVE_PARALLEL*/
+#endif /*H5_HAVE_PARALLEL*/
 
     if (parse_options(argc, argv) != 0) {
         usage();
@@ -728,38 +762,47 @@ main(int argc, char **argv)
 
     fapl = H5Pcreate(H5P_FILE_ACCESS);
 #ifdef H5_HAVE_PARALLEL
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         H5Pset_fapl_mpio(fapl, MPI_COMM_WORLD, MPI_INFO_NULL);
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
     nerrors += create_dspace() < 0 ? 1 : 0;
 
-    if ((RUN_TEST & TEST_1) || !RUN_TEST)
+    if ((RUN_TEST & TEST_1) || !RUN_TEST) {
         nerrors += create_attrs_1() < 0 ? 1 : 0;
-    if ((RUN_TEST & TEST_2) || !RUN_TEST)
+    }
+    if ((RUN_TEST & TEST_2) || !RUN_TEST) {
         nerrors += create_attrs_2() < 0 ? 1 : 0;
-    if (((RUN_TEST & TEST_3) || !RUN_TEST) && BATCH_ATTRS && NUM_ATTRS)
+    }
+    if (((RUN_TEST & TEST_3) || !RUN_TEST) && BATCH_ATTRS && NUM_ATTRS) {
         nerrors += create_attrs_3() < 0 ? 1 : 0;
+    }
 
-    if (H5Sclose(space) < 0)
+    if (H5Sclose(space) < 0) {
         goto error;
-    if (H5Sclose(small_space) < 0)
+    }
+    if (H5Sclose(small_space) < 0) {
         goto error;
+    }
 
     h5_delete_all_test_files(FILENAME, fapl);
     H5Pclose(fapl);
 
 #ifdef H5_HAVE_PARALLEL
-    if (facc_type == FACC_MPIO)
+    if (facc_type == FACC_MPIO) {
         /* MPI_Finalize must be called AFTER H5close which may use MPI calls */
         MPI_Finalize();
+    }
 #endif /*H5_HAVE_PARALLEL*/
 
-    if (nerrors)
+    if (nerrors) {
         goto error;
+    }
 #ifdef H5_HAVE_PARALLEL
-    if (facc_type != FACC_DEFAULT && MAINPROCESS)
+    if (facc_type != FACC_DEFAULT && MAINPROCESS) {
         printf("All metadata performance tests passed.\n");
+    }
 #else
     printf("All metadata performance tests passed.\n");
 #endif /*H5_HAVE_PARALLEL*/

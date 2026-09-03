@@ -21,10 +21,11 @@
 #define NULL_VFD_VALUE ((H5FD_class_value_t)200)
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-H5_DLL hid_t H5FD_null_init(void);
+    H5_DLL hid_t H5FD_null_init(void);
 
 #ifdef __cplusplus
 }

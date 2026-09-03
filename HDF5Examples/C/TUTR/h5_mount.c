@@ -27,15 +27,13 @@
 #define NX   4
 #define NY   5
 
-int
-main(void)
+int main(void)
 {
-
     hid_t fid1, fid2, gid; /* Files and group identifiers */
     hid_t did, tid, sid;   /* Dataset and datatype identifiers */
 
-    herr_t  status;
-    hsize_t dims[] = {NX, NY}; /* Dataset dimensions */
+    herr_t status;
+    hsize_t dims[] = { NX, NY }; /* Dataset dimensions */
 
     int i, j;
     int bm[NX][NY], bm_out[NX][NY]; /* Data buffers */
@@ -43,15 +41,17 @@ main(void)
     /*
      * Initialization of buffer matrix "bm"
      */
-    for (i = 0; i < NX; i++)
-        for (j = 0; j < NY; j++)
+    for (i = 0; i < NX; i++) {
+        for (j = 0; j < NY; j++) {
             bm[i][j] = i + j;
+        }
+    }
 
     /*
      * Create first file and a group in it.
      */
     fid1 = H5Fcreate(FILENAME1, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    gid  = H5Gcreate2(fid1, "/G", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    gid = H5Gcreate2(fid1, "/G", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
      * Close group and file
@@ -62,11 +62,11 @@ main(void)
     /*
      * Create second file and dataset "D" in it.
      */
-    fid2    = H5Fcreate(FILENAME2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    fid2 = H5Fcreate(FILENAME2, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     dims[0] = NX;
     dims[1] = NY;
-    sid     = H5Screate_simple(RANK, dims, NULL);
-    did     = H5Dcreate2(fid2, "D", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    sid = H5Screate_simple(RANK, dims, NULL);
+    did = H5Dcreate2(fid2, "D", H5T_NATIVE_INT, sid, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /*
      * Write data to the dataset.
@@ -94,16 +94,17 @@ main(void)
     /*
      * Access dataset D in the first file under /G/D name.
      */
-    did    = H5Dopen2(fid1, "/G/D", H5P_DEFAULT);
-    tid    = H5Dget_type(did);
+    did = H5Dopen2(fid1, "/G/D", H5P_DEFAULT);
+    tid = H5Dget_type(did);
     status = H5Dread(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, bm_out);
 
     /*
      * Print out the data.
      */
     for (i = 0; i < NX; i++) {
-        for (j = 0; j < NY; j++)
+        for (j = 0; j < NY; j++) {
             printf("  %d", bm_out[i][j]);
+        }
         printf("\n");
     }
 

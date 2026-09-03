@@ -23,25 +23,25 @@
 #define PAL_NAME    "palette"
 #define PAL_ENTRIES 256
 
-static int            read_data(const char *file_name, hsize_t *width, hsize_t *height);
-static unsigned char *gbuf = NULL; /* global buffer for image data */
+static int read_data(const char* file_name, hsize_t* width, hsize_t* height);
+static unsigned char* gbuf = NULL; /* global buffer for image data */
 
-int
-main(void)
+int main(void)
 {
-    hid_t         file_id;                        /* HDF5 file identifier */
-    hsize_t       width;                          /* width of image */
-    hsize_t       height;                         /* height of image */
-    unsigned char pal[PAL_ENTRIES * 3];           /* palette array */
-    hsize_t       pal_dims[2] = {PAL_ENTRIES, 3}; /* palette dimensions */
-    herr_t        i, n;
+    hid_t file_id;                            /* HDF5 file identifier */
+    hsize_t width;                            /* width of image */
+    hsize_t height;                           /* height of image */
+    unsigned char pal[PAL_ENTRIES * 3];       /* palette array */
+    hsize_t pal_dims[2] = { PAL_ENTRIES, 3 }; /* palette dimensions */
+    herr_t i, n;
 
     /* create a new HDF5 file using default properties. */
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* read first data file */
-    if (read_data(DATA_FILE1, &width, &height) < 0)
+    if (read_data(DATA_FILE1, &width, &height) < 0) {
         goto out;
+    }
 
     /* make the image */
     H5IMmake_image_8bit(file_id, IMAGE1_NAME, width, height, gbuf);
@@ -55,7 +55,7 @@ main(void)
      *-------------------------------------------------------------------------
      */
     for (i = 0, n = 0; i < PAL_ENTRIES * 3; i += 3, n++) {
-        pal[i]     = n;       /* red */
+        pal[i] = n;           /* red */
         pal[i + 1] = 0;       /* green */
         pal[i + 2] = 255 - n; /* blue */
     }
@@ -72,8 +72,9 @@ main(void)
      */
 
     /* read second data file */
-    if (read_data(DATA_FILE2, &width, &height) < 0)
+    if (read_data(DATA_FILE2, &width, &height) < 0) {
         goto out;
+    }
 
     /* make dataset */
     H5IMmake_image_24bit(file_id, IMAGE2_NAME, width, height, "INTERLACE_PIXEL", gbuf);
@@ -116,18 +117,17 @@ out:
  *-------------------------------------------------------------------------
  */
 
-static int
-read_data(const char *fname, /*IN*/
-          hsize_t    *width, /*OUT*/
-          hsize_t    *height /*OUT*/)
+static int read_data(const char* fname, /*IN*/
+                     hsize_t* width,    /*OUT*/
+                     hsize_t* height /*OUT*/)
 {
-    int   i, n;
-    int   color_planes;
-    char  str[20];
-    FILE *f;
-    int   w, h;
-    char *srcdir         = getenv("srcdir"); /* the source directory */
-    char  data_file[512] = "";               /* buffer to hold name of existing data file */
+    int i, n;
+    int color_planes;
+    char str[20];
+    FILE* f;
+    int w, h;
+    char* srcdir = getenv("srcdir"); /* the source directory */
+    char data_file[512] = "";        /* buffer to hold name of existing data file */
 
     /*-------------------------------------------------------------------------
      * compose the name of the file to open, using "srcdir", if appropriate
@@ -158,7 +158,7 @@ read_data(const char *fname, /*IN*/
     fscanf(f, "%s", str);
     fscanf(f, "%d", &w);
 
-    *width  = (hsize_t)w;
+    *width = (hsize_t)w;
     *height = (hsize_t)h;
 
     if (gbuf) {
@@ -166,7 +166,7 @@ read_data(const char *fname, /*IN*/
         gbuf = NULL;
     }
 
-    gbuf = (unsigned char *)malloc(w * h * color_planes * sizeof(unsigned char));
+    gbuf = (unsigned char*)malloc(w * h * color_planes * sizeof(unsigned char));
 
     for (i = 0; i < h * w * color_planes; i++) {
         fscanf(f, "%d", &n);

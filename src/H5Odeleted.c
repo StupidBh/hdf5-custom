@@ -26,7 +26,7 @@
 #include "H5Opkg.h"    /* Object headers			*/
 
 /* This message derives from H5O message class */
-const H5O_msg_class_t H5O_MSG_DELETED[1] = {{
+const H5O_msg_class_t H5O_MSG_DELETED[1] = { {
     H5O_DELETED_ID, /*message id number             */
     "deleted",      /*message name for debugging    */
     0,              /*native message size           */
@@ -47,4 +47,4 @@ const H5O_msg_class_t H5O_MSG_DELETED[1] = {{
     NULL,           /*no get creation index		*/
     NULL,           /*no set creation index		*/
     NULL            /*no debug method               */
-}};
+} };

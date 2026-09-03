@@ -15,18 +15,18 @@
  *      datatypes in the H5T interface.
  */
 
-#include "H5Tmodule.h" /* This source code file is part of the H5T module */
-#define H5F_FRIEND     /*suppress error about including H5Fpkg   */
-#define H5R_FRIEND     /*suppress error about including H5Rpkg   */
+#include "H5Tmodule.h"          /* This source code file is part of the H5T module */
+#define H5F_FRIEND              /*suppress error about including H5Fpkg   */
+#define H5R_FRIEND              /*suppress error about including H5Rpkg   */
 
-#include "H5private.h"   /* Generic Functions                        */
-#include "H5CXprivate.h" /* API Contexts                             */
-#include "H5Eprivate.h"  /* Error handling                           */
-#include "H5Iprivate.h"  /* IDs                                      */
-#include "H5Fpkg.h"      /* File                                     */
-#include "H5MMprivate.h" /* Memory management                        */
-#include "H5Rpkg.h"      /* References                               */
-#include "H5Tpkg.h"      /* Datatypes                                */
+#include "H5private.h"          /* Generic Functions                        */
+#include "H5CXprivate.h"        /* API Contexts                             */
+#include "H5Eprivate.h"         /* Error handling                           */
+#include "H5Iprivate.h"         /* IDs                                      */
+#include "H5Fpkg.h"             /* File                                     */
+#include "H5MMprivate.h"        /* Memory management                        */
+#include "H5Rpkg.h"             /* References                               */
+#include "H5Tpkg.h"             /* Datatypes                                */
 
 #include "H5VLnative_private.h" /* Native VOL connector                     */
 
@@ -44,17 +44,17 @@
 /* Debug */
 // #define H5T_REF_DEBUG
 #ifdef H5T_REF_DEBUG
-#define H5T_REF_LOG_DEBUG(...)                                                                               \
-    do {                                                                                                     \
-        fprintf(stdout, " # %s(): ", __func__);                                                              \
-        fprintf(stdout, __VA_ARGS__);                                                                        \
-        fprintf(stdout, "\n");                                                                               \
-        fflush(stdout);                                                                                      \
-    } while (0)
+    #define H5T_REF_LOG_DEBUG(...)                  \
+        do {                                        \
+            fprintf(stdout, " # %s(): ", __func__); \
+            fprintf(stdout, __VA_ARGS__);           \
+            fprintf(stdout, "\n");                  \
+            fflush(stdout);                         \
+        } while (0)
 #else
-#define H5T_REF_LOG_DEBUG(...)                                                                               \
-    do {                                                                                                     \
-    } while (0)
+    #define H5T_REF_LOG_DEBUG(...) \
+        do {                       \
+        } while (0)
 #endif
 
 /******************/
@@ -62,47 +62,50 @@
 /******************/
 
 /* For region compatibility support */
-struct H5Tref_dsetreg {
+struct H5Tref_dsetreg
+{
     H5O_token_t token; /* Object token */
-    H5S_t      *space; /* Dataspace */
+    H5S_t* space;      /* Dataspace */
 };
 
 /********************/
 /* Local Prototypes */
 /********************/
 
-static herr_t H5T__ref_mem_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull);
-static herr_t H5T__ref_mem_setnull(H5VL_object_t *dst_file, void *dst_buf, void *bg_buf);
-static size_t H5T__ref_mem_getsize(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                   H5VL_object_t *dst_file, bool *dst_copy);
-static herr_t H5T__ref_mem_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                H5VL_object_t *dst_file, void *dst_buf, size_t dst_size);
-static herr_t H5T__ref_mem_write(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                 H5R_type_t src_type, H5VL_object_t *dst_file, void *dst_buf, size_t dst_size,
-                                 void *bg_buf);
+static herr_t H5T__ref_mem_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull);
+static herr_t H5T__ref_mem_setnull(H5VL_object_t* dst_file, void* dst_buf, void* bg_buf);
+static size_t H5T__ref_mem_getsize(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, bool* dst_copy);
+static herr_t H5T__ref_mem_read(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, void* dst_buf, size_t dst_size);
+static herr_t H5T__ref_mem_write(H5VL_object_t* src_file,
+                                 const void* src_buf,
+                                 size_t src_size,
+                                 H5R_type_t src_type,
+                                 H5VL_object_t* dst_file,
+                                 void* dst_buf,
+                                 size_t dst_size,
+                                 void* bg_buf);
 
-static herr_t H5T__ref_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull);
-static herr_t H5T__ref_disk_setnull(H5VL_object_t *dst_file, void *dst_buf, void *bg_buf);
-static size_t H5T__ref_disk_getsize(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                    H5VL_object_t *dst_file, bool *dst_copy);
-static herr_t H5T__ref_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                 H5VL_object_t *dst_file, void *dst_buf, size_t dst_size);
-static herr_t H5T__ref_disk_write(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                  H5R_type_t src_type, H5VL_object_t *dst_file, void *dst_buf,
-                                  size_t dst_size, void *bg_buf);
+static herr_t H5T__ref_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull);
+static herr_t H5T__ref_disk_setnull(H5VL_object_t* dst_file, void* dst_buf, void* bg_buf);
+static size_t H5T__ref_disk_getsize(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, bool* dst_copy);
+static herr_t H5T__ref_disk_read(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, void* dst_buf, size_t dst_size);
+static herr_t H5T__ref_disk_write(H5VL_object_t* src_file,
+                                  const void* src_buf,
+                                  size_t src_size,
+                                  H5R_type_t src_type,
+                                  H5VL_object_t* dst_file,
+                                  void* dst_buf,
+                                  size_t dst_size,
+                                  void* bg_buf);
 
 /* For compatibility */
-static herr_t H5T__ref_obj_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull);
-static size_t H5T__ref_obj_disk_getsize(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                        H5VL_object_t *dst_file, bool *dst_copy);
-static herr_t H5T__ref_obj_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                     H5VL_object_t *dst_file, void *dst_buf, size_t dst_size);
+static herr_t H5T__ref_obj_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull);
+static size_t H5T__ref_obj_disk_getsize(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, bool* dst_copy);
+static herr_t H5T__ref_obj_disk_read(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, void* dst_buf, size_t dst_size);
 
-static herr_t H5T__ref_dsetreg_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull);
-static size_t H5T__ref_dsetreg_disk_getsize(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                            H5VL_object_t *dst_file, bool *dst_copy);
-static herr_t H5T__ref_dsetreg_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                                         H5VL_object_t *dst_file, void *dst_buf, size_t dst_size);
+static herr_t H5T__ref_dsetreg_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull);
+static size_t H5T__ref_dsetreg_disk_getsize(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, bool* dst_copy);
+static herr_t H5T__ref_dsetreg_disk_read(H5VL_object_t* src_file, const void* src_buf, size_t src_size, H5VL_object_t* dst_file, void* dst_buf, size_t dst_size);
 
 /*******************/
 /* Local Variables */
@@ -155,8 +158,7 @@ static const H5T_ref_class_t H5T_ref_dsetreg_disk_g = {
  *
  *-------------------------------------------------------------------------
  */
-htri_t
-H5T__ref_set_loc(H5T_t *dt, H5VL_object_t *file, H5T_loc_t loc)
+htri_t H5T__ref_set_loc(H5T_t* dt, H5VL_object_t* file, H5T_loc_t loc)
 {
     htri_t ret_value = false; /* Indicate success, but no location change */
 
@@ -168,176 +170,182 @@ H5T__ref_set_loc(H5T_t *dt, H5VL_object_t *file, H5T_loc_t loc)
     assert(loc >= H5T_LOC_BADLOC && loc < H5T_LOC_MAXLOC);
 
     /* Only change the location if it's different */
-    if (loc == dt->shared->u.atomic.u.r.loc && file == dt->shared->u.atomic.u.r.file)
+    if (loc == dt->shared->u.atomic.u.r.loc && file == dt->shared->u.atomic.u.r.file) {
         HGOTO_DONE(false);
+    }
 
     switch (loc) {
-        case H5T_LOC_MEMORY: /* Memory based reference datatype */
+    case H5T_LOC_MEMORY: /* Memory based reference datatype */
 
-            /* NB. We allow for the file to be non-NULL when doing
-             * memory-to-memory conversion */
+        /* NB. We allow for the file to be non-NULL when doing
+         * memory-to-memory conversion */
 
-            /* Mark this type as being stored in memory */
-            dt->shared->u.atomic.u.r.loc = H5T_LOC_MEMORY;
+        /* Mark this type as being stored in memory */
+        dt->shared->u.atomic.u.r.loc = H5T_LOC_MEMORY;
 
-            /* Release owned file */
-            if (dt->shared->owned_vol_obj) {
-                if (H5VL_free_object(dt->shared->owned_vol_obj) < 0)
-                    HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCLOSEOBJ, FAIL, "unable to close owned VOL object");
-                dt->shared->owned_vol_obj = NULL;
-            } /* end if */
-
-            /* Reset file ID (since this reference is in memory) */
-            dt->shared->u.atomic.u.r.file = file; /* file is NULL */
-
-            if (dt->shared->u.atomic.u.r.opaque) {
-                /* Size in memory, disk size is different */
-                dt->shared->size          = H5T_REF_MEM_SIZE;
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Set up the function pointers to access the reference in memory */
-                dt->shared->u.atomic.u.r.cls = &H5T_ref_mem_g;
-            } /* end if */
-            else if (dt->shared->u.atomic.u.r.rtype == H5R_OBJECT1) {
-                /* Size in memory, disk size is different */
-                dt->shared->size          = H5T_REF_OBJ_MEM_SIZE;
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Unused for now */
-                dt->shared->u.atomic.u.r.cls = NULL;
-            } /* end else-if */
-            else if (dt->shared->u.atomic.u.r.rtype == H5R_DATASET_REGION1) {
-                /* Size in memory, disk size is different */
-                dt->shared->size          = H5T_REF_DSETREG_MEM_SIZE;
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Unused for now */
-                dt->shared->u.atomic.u.r.cls = NULL;
-            } /* end else-if */
-            else
-                HGOTO_ERROR(H5E_DATATYPE, H5E_BADTYPE, FAIL, "invalid location");
-            break;
-
-        case H5T_LOC_DISK: /* Disk based reference datatype */
-            assert(file);
-
-            /* Mark this type as being stored on disk */
-            dt->shared->u.atomic.u.r.loc = H5T_LOC_DISK;
-
-            /* Set file pointer (since this reference is on disk) */
-            dt->shared->u.atomic.u.r.file = file;
-
-            /* dt now owns a reference to file */
-            if (H5T_own_vol_obj(dt, file) < 0)
-                HGOTO_ERROR(H5E_REFERENCE, H5E_CANTINIT, FAIL, "can't give ownership of VOL object");
-
-            if (dt->shared->u.atomic.u.r.rtype == H5R_OBJECT1) {
-                H5F_t *f;
-
-#ifndef NDEBUG
-                {
-                    bool is_native = false; /* Whether the file is using the native VOL connector */
-
-                    /* Check if using native VOL connector */
-                    if (H5VL_object_is_native(file, &is_native) < 0)
-                        HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL,
-                                    "can't query if file uses native VOL connector");
-
-                    /* Must use native VOL connector for this operation */
-                    assert(is_native);
-                }
-#endif /* NDEBUG */
-
-                /* Retrieve file from VOL object */
-                if (NULL == (f = (H5F_t *)H5VL_object_data(file)))
-                    HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
-
-                /* Size on disk, memory size is different */
-                dt->shared->size          = H5T_REF_OBJ_DISK_SIZE(f);
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Set up the function pointers to access the reference in memory */
-                dt->shared->u.atomic.u.r.cls = &H5T_ref_obj_disk_g;
-            } /* end if */
-            else if (dt->shared->u.atomic.u.r.rtype == H5R_DATASET_REGION1) {
-                H5F_t *f;
-
-#ifndef NDEBUG
-                {
-                    bool is_native = false; /* Whether the file is using the native VOL connector */
-
-                    /* Check if using native VOL connector */
-                    if (H5VL_object_is_native(file, &is_native) < 0)
-                        HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL,
-                                    "can't query if file uses native VOL connector");
-
-                    /* Must use native VOL connector for this operation */
-                    assert(is_native);
-                }
-#endif /* NDEBUG */
-
-                /* Retrieve file from VOL object */
-                if (NULL == (f = (H5F_t *)H5VL_object_data(file)))
-                    HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
-
-                /* Size on disk, memory size is different */
-                dt->shared->size          = H5T_REF_DSETREG_DISK_SIZE(f);
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Set up the function pointers to access the reference in memory */
-                dt->shared->u.atomic.u.r.cls = &H5T_ref_dsetreg_disk_g;
-            } /* end else-if */
-            else {
-                H5VL_file_cont_info_t cont_info = {H5VL_CONTAINER_INFO_VERSION, 0, 0, 0};
-                H5VL_file_get_args_t  vol_cb_args; /* Arguments to VOL callback */
-                size_t                ref_encode_size;
-                H5R_ref_priv_t        fixed_ref;
-
-                /* Set up VOL callback arguments */
-                vol_cb_args.op_type                 = H5VL_FILE_GET_CONT_INFO;
-                vol_cb_args.args.get_cont_info.info = &cont_info;
-
-                /* Get container info */
-                if (H5VL_file_get(file, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, H5_REQUEST_NULL) < 0)
-                    HGOTO_ERROR(H5E_DATATYPE, H5E_CANTGET, FAIL, "unable to get container info");
-
-                /* Retrieve min encode size (when references have no vlen part) */
-                memset(&fixed_ref, 0, sizeof(fixed_ref));
-                fixed_ref.type       = (int8_t)H5R_OBJECT2;
-                fixed_ref.token_size = (uint8_t)cont_info.token_size;
-                if (H5R__encode(NULL, &fixed_ref, NULL, &ref_encode_size, 0) < 0)
-                    HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't get encode size");
-
-                /* Size on disk, memory size is different */
-                dt->shared->size =
-                    MAX(sizeof(uint32_t) + H5R_ENCODE_HEADER_SIZE + cont_info.blob_id_size, ref_encode_size);
-                dt->shared->u.atomic.prec = 8 * dt->shared->size;
-
-                /* Set up the function pointers to access the information on
-                 * disk. Region and attribute references are stored identically
-                 * on disk, so use the same functions.
-                 */
-                dt->shared->u.atomic.u.r.cls = &H5T_ref_disk_g;
+        /* Release owned file */
+        if (dt->shared->owned_vol_obj) {
+            if (H5VL_free_object(dt->shared->owned_vol_obj) < 0) {
+                HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCLOSEOBJ, FAIL, "unable to close owned VOL object");
             }
-            break;
+            dt->shared->owned_vol_obj = NULL;
+        } /* end if */
 
-        case H5T_LOC_BADLOC:
-            /* Allow undefined location. In H5Odtype.c, H5O_dtype_decode sets undefined
-             * location for reference type and leaves it for the caller to decide.
-             */
-            dt->shared->u.atomic.u.r.loc = H5T_LOC_BADLOC;
+        /* Reset file ID (since this reference is in memory) */
+        dt->shared->u.atomic.u.r.file = file; /* file is NULL */
 
-            /* Reset file pointer */
-            dt->shared->u.atomic.u.r.file = NULL;
+        if (dt->shared->u.atomic.u.r.opaque) {
+            /* Size in memory, disk size is different */
+            dt->shared->size = H5T_REF_MEM_SIZE;
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
 
-            /* Reset the function pointers */
+            /* Set up the function pointers to access the reference in memory */
+            dt->shared->u.atomic.u.r.cls = &H5T_ref_mem_g;
+        } /* end if */
+        else if (dt->shared->u.atomic.u.r.rtype == H5R_OBJECT1) {
+            /* Size in memory, disk size is different */
+            dt->shared->size = H5T_REF_OBJ_MEM_SIZE;
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
+
+            /* Unused for now */
             dt->shared->u.atomic.u.r.cls = NULL;
+        } /* end else-if */
+        else if (dt->shared->u.atomic.u.r.rtype == H5R_DATASET_REGION1) {
+            /* Size in memory, disk size is different */
+            dt->shared->size = H5T_REF_DSETREG_MEM_SIZE;
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
 
-            break;
+            /* Unused for now */
+            dt->shared->u.atomic.u.r.cls = NULL;
+        } /* end else-if */
+        else {
+            HGOTO_ERROR(H5E_DATATYPE, H5E_BADTYPE, FAIL, "invalid location");
+        }
+        break;
 
-        case H5T_LOC_MAXLOC: /* MAXLOC is invalid */
-        default:
-            HGOTO_ERROR(H5E_DATATYPE, H5E_BADRANGE, FAIL, "invalid reference datatype location");
+    case H5T_LOC_DISK: /* Disk based reference datatype */
+        assert(file);
+
+        /* Mark this type as being stored on disk */
+        dt->shared->u.atomic.u.r.loc = H5T_LOC_DISK;
+
+        /* Set file pointer (since this reference is on disk) */
+        dt->shared->u.atomic.u.r.file = file;
+
+        /* dt now owns a reference to file */
+        if (H5T_own_vol_obj(dt, file) < 0) {
+            HGOTO_ERROR(H5E_REFERENCE, H5E_CANTINIT, FAIL, "can't give ownership of VOL object");
+        }
+
+        if (dt->shared->u.atomic.u.r.rtype == H5R_OBJECT1) {
+            H5F_t* f;
+
+#ifndef NDEBUG
+            {
+                bool is_native = false; /* Whether the file is using the native VOL connector */
+
+                /* Check if using native VOL connector */
+                if (H5VL_object_is_native(file, &is_native) < 0) {
+                    HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+                }
+
+                /* Must use native VOL connector for this operation */
+                assert(is_native);
+            }
+#endif /* NDEBUG */
+
+            /* Retrieve file from VOL object */
+            if (NULL == (f = (H5F_t*)H5VL_object_data(file))) {
+                HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+            }
+
+            /* Size on disk, memory size is different */
+            dt->shared->size = H5T_REF_OBJ_DISK_SIZE(f);
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
+
+            /* Set up the function pointers to access the reference in memory */
+            dt->shared->u.atomic.u.r.cls = &H5T_ref_obj_disk_g;
+        } /* end if */
+        else if (dt->shared->u.atomic.u.r.rtype == H5R_DATASET_REGION1) {
+            H5F_t* f;
+
+#ifndef NDEBUG
+            {
+                bool is_native = false; /* Whether the file is using the native VOL connector */
+
+                /* Check if using native VOL connector */
+                if (H5VL_object_is_native(file, &is_native) < 0) {
+                    HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+                }
+
+                /* Must use native VOL connector for this operation */
+                assert(is_native);
+            }
+#endif /* NDEBUG */
+
+            /* Retrieve file from VOL object */
+            if (NULL == (f = (H5F_t*)H5VL_object_data(file))) {
+                HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+            }
+
+            /* Size on disk, memory size is different */
+            dt->shared->size = H5T_REF_DSETREG_DISK_SIZE(f);
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
+
+            /* Set up the function pointers to access the reference in memory */
+            dt->shared->u.atomic.u.r.cls = &H5T_ref_dsetreg_disk_g;
+        } /* end else-if */
+        else {
+            H5VL_file_cont_info_t cont_info = { H5VL_CONTAINER_INFO_VERSION, 0, 0, 0 };
+            H5VL_file_get_args_t vol_cb_args; /* Arguments to VOL callback */
+            size_t ref_encode_size;
+            H5R_ref_priv_t fixed_ref;
+
+            /* Set up VOL callback arguments */
+            vol_cb_args.op_type = H5VL_FILE_GET_CONT_INFO;
+            vol_cb_args.args.get_cont_info.info = &cont_info;
+
+            /* Get container info */
+            if (H5VL_file_get(file, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, H5_REQUEST_NULL) < 0) {
+                HGOTO_ERROR(H5E_DATATYPE, H5E_CANTGET, FAIL, "unable to get container info");
+            }
+
+            /* Retrieve min encode size (when references have no vlen part) */
+            memset(&fixed_ref, 0, sizeof(fixed_ref));
+            fixed_ref.type = (int8_t)H5R_OBJECT2;
+            fixed_ref.token_size = (uint8_t)cont_info.token_size;
+            if (H5R__encode(NULL, &fixed_ref, NULL, &ref_encode_size, 0) < 0) {
+                HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't get encode size");
+            }
+
+            /* Size on disk, memory size is different */
+            dt->shared->size = MAX(sizeof(uint32_t) + H5R_ENCODE_HEADER_SIZE + cont_info.blob_id_size, ref_encode_size);
+            dt->shared->u.atomic.prec = 8 * dt->shared->size;
+
+            /* Set up the function pointers to access the information on
+             * disk. Region and attribute references are stored identically
+             * on disk, so use the same functions.
+             */
+            dt->shared->u.atomic.u.r.cls = &H5T_ref_disk_g;
+        }
+        break;
+
+    case H5T_LOC_BADLOC:
+        /* Allow undefined location. In H5Odtype.c, H5O_dtype_decode sets undefined
+         * location for reference type and leaves it for the caller to decide.
+         */
+        dt->shared->u.atomic.u.r.loc = H5T_LOC_BADLOC;
+
+        /* Reset file pointer */
+        dt->shared->u.atomic.u.r.file = NULL;
+
+        /* Reset the function pointers */
+        dt->shared->u.atomic.u.r.cls = NULL;
+
+        break;
+
+    case H5T_LOC_MAXLOC: /* MAXLOC is invalid */
+    default            : HGOTO_ERROR(H5E_DATATYPE, H5E_BADRANGE, FAIL, "invalid reference datatype location");
     } /* end switch */
 
     /* Indicate that the location changed */
@@ -356,11 +364,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_mem_isnull(const H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, bool *isnull)
+static herr_t H5T__ref_mem_isnull(const H5VL_object_t H5_ATTR_UNUSED* src_file, const void* src_buf, bool* isnull)
 {
-    const unsigned char zeros[H5T_REF_MEM_SIZE] = {0};
-    herr_t              ret_value               = SUCCEED;
+    const unsigned char zeros[H5T_REF_MEM_SIZE] = { 0 };
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE_NOERR
     H5T_REF_LOG_DEBUG("");
@@ -383,8 +390,7 @@ H5T__ref_mem_isnull(const H5VL_object_t H5_ATTR_UNUSED *src_file, const void *sr
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_mem_setnull(H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf, H5_ATTR_UNUSED void *bg_buf)
+static herr_t H5T__ref_mem_setnull(H5VL_object_t H5_ATTR_UNUSED* dst_file, void* dst_buf, H5_ATTR_UNUSED void* bg_buf)
 {
     herr_t ret_value = SUCCEED;
 
@@ -406,15 +412,13 @@ H5T__ref_mem_setnull(H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf, H5_A
  *-------------------------------------------------------------------------
  */
 static size_t
-H5T__ref_mem_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf,
-                     size_t H5_ATTR_UNUSED src_size, H5VL_object_t *dst_file, bool *dst_copy)
+    H5T__ref_mem_getsize(H5VL_object_t H5_ATTR_UNUSED* src_file, const void* src_buf, size_t H5_ATTR_UNUSED src_size, H5VL_object_t* dst_file, bool* dst_copy)
 {
-    H5VL_object_t        *vol_obj = NULL; /* VOL object for src ref's location */
-    const H5R_ref_priv_t *src_ref = (const H5R_ref_priv_t *)src_buf;
-    char                 *file_name_buf_dyn =
-        NULL; /* Pointer to dynamically allocated buffer for file name, if static buffer is too small */
-    unsigned flags     = 0; /* References flags */
-    size_t   ret_value = 0; /* Return value */
+    H5VL_object_t* vol_obj = NULL;  /* VOL object for src ref's location */
+    const H5R_ref_priv_t* src_ref = (const H5R_ref_priv_t*)src_buf;
+    char* file_name_buf_dyn = NULL; /* Pointer to dynamically allocated buffer for file name, if static buffer is too small */
+    unsigned flags = 0;             /* References flags */
+    size_t ret_value = 0;           /* Return value */
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -427,21 +431,23 @@ H5T__ref_mem_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf
         bool files_equal = true; /* Whether src & dst references are in same file */
 
         /* Retrieve VOL object */
-        if (NULL == (vol_obj = H5VL_vol_object(src_ref->loc_id)))
+        if (NULL == (vol_obj = H5VL_vol_object(src_ref->loc_id))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid location identifier");
+        }
 
         /* Set external flag if referenced file is not destination file */
-        if (H5VL_file_is_same(vol_obj, dst_file, &files_equal) < 0)
+        if (H5VL_file_is_same(vol_obj, dst_file, &files_equal) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCOMPARE, 0, "can't check if files are equal");
+        }
         flags |= !files_equal ? H5R_IS_EXTERNAL : 0;
     }
 
     /* Force re-calculating encoding size if any flags are set */
     if (flags || !src_ref->encode_size) {
-        H5VL_file_get_args_t vol_cb_args;               /* Arguments to VOL callback */
-        char                *file_name = NULL;          /* Actual file name */
-        char                 file_name_buf_static[256]; /* File name */
-        size_t               file_name_len = 0;         /* Length of file name */
+        H5VL_file_get_args_t vol_cb_args; /* Arguments to VOL callback */
+        char* file_name = NULL;           /* Actual file name */
+        char file_name_buf_static[256];   /* File name */
+        size_t file_name_len = 0;         /* Length of file name */
 
         /* Pass the correct encoding version for the selection depending on the
          * file libver bounds, this is later retrieved in H5S hyper encode */
@@ -449,59 +455,68 @@ H5T__ref_mem_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf
             bool is_native = false; /* Whether the dest. file is using the native VOL connector */
 
             /* Check if using native VOL connector */
-            if (H5VL_object_is_native(dst_file, &is_native) < 0)
+            if (H5VL_object_is_native(dst_file, &is_native) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't query if file uses native VOL connector");
+            }
 
             /* Set the file's libver bounds if using the native VOL connector */
             if (is_native) {
-                H5F_t *dst_f; /* Native file struct */
+                H5F_t* dst_f; /* Native file struct */
 
-                if (NULL == (dst_f = (H5F_t *)H5VL_object_data(dst_file)))
+                if (NULL == (dst_f = (H5F_t*)H5VL_object_data(dst_file))) {
                     HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid VOL object");
+                }
                 H5CX_set_libver_bounds(dst_f);
             } /* end if */
-            else
+            else {
                 H5CX_set_libver_bounds(NULL);
+            }
         } /* end if */
 
         /* Set up VOL callback arguments */
-        vol_cb_args.op_type                     = H5VL_FILE_GET_NAME;
-        vol_cb_args.args.get_name.type          = H5I_FILE;
-        vol_cb_args.args.get_name.buf_size      = sizeof(file_name_buf_static);
-        vol_cb_args.args.get_name.buf           = file_name_buf_static;
+        vol_cb_args.op_type = H5VL_FILE_GET_NAME;
+        vol_cb_args.args.get_name.type = H5I_FILE;
+        vol_cb_args.args.get_name.buf_size = sizeof(file_name_buf_static);
+        vol_cb_args.args.get_name.buf = file_name_buf_static;
         vol_cb_args.args.get_name.file_name_len = &file_name_len;
 
         /* Get file name */
-        if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0)
+        if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't get file name");
+        }
 
         /* Check if we need to allocate a buffer for the file name */
         if (file_name_len >= sizeof(file_name_buf_static)) {
             /* Allocate file name buffer */
-            if (NULL == (file_name_buf_dyn = H5MM_malloc(file_name_len + 1)))
+            if (NULL == (file_name_buf_dyn = H5MM_malloc(file_name_len + 1))) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTALLOC, 0, "can't allocate space for file name");
+            }
 
             /* Update VOL callback arguments */
             vol_cb_args.args.get_name.buf_size = file_name_len + 1;
-            vol_cb_args.args.get_name.buf      = file_name_buf_dyn;
+            vol_cb_args.args.get_name.buf = file_name_buf_dyn;
 
             /* Get file name again */
-            if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0)
+            if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't get file name");
+            }
 
             file_name = file_name_buf_dyn;
         } /* end if */
-        else
+        else {
             file_name = file_name_buf_static;
+        }
 
         /* Determine encoding size */
-        if (H5R__encode(file_name, src_ref, NULL, &ret_value, flags) < 0)
+        if (H5R__encode(file_name, src_ref, NULL, &ret_value, flags) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTENCODE, 0, "unable to determine encoding size");
+        }
     } /* end if */
     else {
         /* Can do a direct copy and skip blob decoding */
-        if (src_ref->type == (int8_t)H5R_OBJECT2)
+        if (src_ref->type == (int8_t)H5R_OBJECT2) {
             *dst_copy = true;
+        }
 
         /* Get cached encoding size */
         ret_value = src_ref->encode_size;
@@ -522,19 +537,21 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_mem_read(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, size_t H5_ATTR_UNUSED src_size,
-                  H5VL_object_t *dst_file, void *dst_buf, size_t dst_size)
+static herr_t H5T__ref_mem_read(H5VL_object_t H5_ATTR_UNUSED* src_file,
+                                const void* src_buf,
+                                size_t H5_ATTR_UNUSED src_size,
+                                H5VL_object_t* dst_file,
+                                void* dst_buf,
+                                size_t dst_size)
 {
-    H5VL_object_t        *vol_obj; /* VOL object for src ref's location */
-    const H5R_ref_priv_t *src_ref     = (const H5R_ref_priv_t *)src_buf;
-    bool                  files_equal = true; /* Whether src & dst references are in same file */
-    char                 *file_name   = NULL; /* Actual file name */
-    char                  file_name_buf_static[256] = {'\0'}; /* File name */
-    char                 *file_name_buf_dyn =
-        NULL; /* Pointer to dynamically allocated buffer for file name, if static buffer is too small */
-    unsigned flags     = 0;       /* References flags */
-    herr_t   ret_value = SUCCEED; /* Return value */
+    H5VL_object_t* vol_obj;                    /* VOL object for src ref's location */
+    const H5R_ref_priv_t* src_ref = (const H5R_ref_priv_t*)src_buf;
+    bool files_equal = true;                   /* Whether src & dst references are in same file */
+    char* file_name = NULL;                    /* Actual file name */
+    char file_name_buf_static[256] = { '\0' }; /* File name */
+    char* file_name_buf_dyn = NULL;            /* Pointer to dynamically allocated buffer for file name, if static buffer is too small */
+    unsigned flags = 0;                        /* References flags */
+    herr_t ret_value = SUCCEED;                /* Return value */
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -552,12 +569,14 @@ H5T__ref_mem_read(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, s
     }
 
     /* Retrieve VOL object */
-    if (NULL == (vol_obj = H5VL_vol_object(src_ref->loc_id)))
+    if (NULL == (vol_obj = H5VL_vol_object(src_ref->loc_id))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid location identifier");
+    }
 
     /* Set external flag if referenced file is not destination file */
-    if (H5VL_file_is_same(vol_obj, dst_file, &files_equal) < 0)
+    if (H5VL_file_is_same(vol_obj, dst_file, &files_equal) < 0) {
         HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCOMPARE, FAIL, "can't check if files are equal");
+    }
     flags |= !files_equal ? H5R_IS_EXTERNAL : 0;
 
     /* Pass the correct encoding version for the selection depending on the
@@ -566,60 +585,68 @@ H5T__ref_mem_read(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, s
         bool is_native = false; /* Whether the dest. file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(dst_file, &is_native) < 0)
+        if (H5VL_object_is_native(dst_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't query if file uses native VOL connector");
+        }
 
         /* Set the file's libver bounds if using the native VOL connector */
         if (is_native) {
-            H5F_t *dst_f;
+            H5F_t* dst_f;
 
-            if (NULL == (dst_f = (H5F_t *)H5VL_object_data(dst_file)))
+            if (NULL == (dst_f = (H5F_t*)H5VL_object_data(dst_file))) {
                 HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid VOL object");
+            }
             H5CX_set_libver_bounds(dst_f);
         } /* end if */
-        else
+        else {
             H5CX_set_libver_bounds(NULL);
+        }
     } /* end if */
 
     /* Get file name (if external reference) */
     if (flags) {
-        H5VL_file_get_args_t vol_cb_args;       /* Arguments to VOL callback */
-        size_t               file_name_len = 0; /* Length of file name */
+        H5VL_file_get_args_t vol_cb_args; /* Arguments to VOL callback */
+        size_t file_name_len = 0;         /* Length of file name */
 
         /* Set up VOL callback arguments */
-        vol_cb_args.op_type                     = H5VL_FILE_GET_NAME;
-        vol_cb_args.args.get_name.type          = H5I_FILE;
-        vol_cb_args.args.get_name.buf_size      = sizeof(file_name_buf_static);
-        vol_cb_args.args.get_name.buf           = file_name_buf_static;
+        vol_cb_args.op_type = H5VL_FILE_GET_NAME;
+        vol_cb_args.args.get_name.type = H5I_FILE;
+        vol_cb_args.args.get_name.buf_size = sizeof(file_name_buf_static);
+        vol_cb_args.args.get_name.buf = file_name_buf_static;
         vol_cb_args.args.get_name.file_name_len = &file_name_len;
 
         /* Get file name */
-        if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0)
+        if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't get file name");
+        }
 
         /* Check if we need to allocate a buffer for the file name */
         if (file_name_len >= sizeof(file_name_buf_static)) {
             /* Allocate file name buffer */
-            if (NULL == (file_name_buf_dyn = H5MM_malloc(file_name_len + 1)))
+            if (NULL == (file_name_buf_dyn = H5MM_malloc(file_name_len + 1))) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTALLOC, 0, "can't allocate space for file name");
+            }
 
             /* Update VOL callback arguments */
             vol_cb_args.args.get_name.buf_size = file_name_len + 1;
-            vol_cb_args.args.get_name.buf      = file_name_buf_dyn;
+            vol_cb_args.args.get_name.buf = file_name_buf_dyn;
 
             /* Get file name again */
-            if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0)
+            if (H5VL_file_get(vol_obj, &vol_cb_args, H5P_DATASET_XFER_DEFAULT, NULL) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't get file name");
+            }
 
             file_name = file_name_buf_dyn;
         } /* end if */
-        else
+        else {
             file_name = file_name_buf_static;
+        }
     } /* end if */
 
     /* Encode reference */
-    if (H5R__encode(file_name, src_ref, (unsigned char *)dst_buf, &dst_size, flags) < 0)
+    if (H5R__encode(file_name, src_ref, (unsigned char*)dst_buf, &dst_size, flags) < 0) {
         HGOTO_ERROR(H5E_REFERENCE, H5E_CANTENCODE, FAIL, "Cannot encode reference");
+    }
 
 done:
     H5MM_xfree(file_name_buf_dyn);
@@ -636,15 +663,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_mem_write(H5VL_object_t *src_file, const void *src_buf, size_t src_size, H5R_type_t src_type,
-                   H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf,
-                   size_t H5_ATTR_NDEBUG_UNUSED dst_size, void H5_ATTR_UNUSED *bg_buf)
+static herr_t H5T__ref_mem_write(H5VL_object_t* src_file,
+                                 const void* src_buf,
+                                 size_t src_size,
+                                 H5R_type_t src_type,
+                                 H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                 void* dst_buf,
+                                 size_t H5_ATTR_NDEBUG_UNUSED dst_size,
+                                 void H5_ATTR_UNUSED* bg_buf)
 {
-    H5F_t         *src_f   = NULL;
-    hid_t          file_id = H5I_INVALID_HID;
+    H5F_t* src_f = NULL;
+    hid_t file_id = H5I_INVALID_HID;
     H5R_ref_priv_t tmp_ref; /* Temporary reference to decode into */
-    herr_t         ret_value = SUCCEED;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -666,8 +697,9 @@ H5T__ref_mem_write(H5VL_object_t *src_file, const void *src_buf, size_t src_size
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -675,70 +707,80 @@ H5T__ref_mem_write(H5VL_object_t *src_file, const void *src_buf, size_t src_size
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+    }
 
     /* Make sure reference buffer is correctly initialized */
     memset(&tmp_ref, 0, sizeof(tmp_ref));
 
     switch (src_type) {
-        case H5R_OBJECT1: {
+    case H5R_OBJECT1:
+        {
             size_t token_size = H5F_SIZEOF_ADDR(src_f);
 
-            if (H5R__create_object((const H5O_token_t *)src_buf, token_size, &tmp_ref) < 0)
+            if (H5R__create_object((const H5O_token_t*)src_buf, token_size, &tmp_ref) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCREATE, FAIL, "unable to create object reference");
-        } break;
+            }
+        }
+        break;
 
-        case H5R_DATASET_REGION1: {
-            const struct H5Tref_dsetreg *src_reg    = (const struct H5Tref_dsetreg *)src_buf;
-            size_t                       token_size = H5F_SIZEOF_ADDR(src_f);
+    case H5R_DATASET_REGION1:
+        {
+            const struct H5Tref_dsetreg* src_reg = (const struct H5Tref_dsetreg*)src_buf;
+            size_t token_size = H5F_SIZEOF_ADDR(src_f);
 
-            if (H5R__create_region(&src_reg->token, token_size, src_reg->space, &tmp_ref) < 0)
+            if (H5R__create_region(&src_reg->token, token_size, src_reg->space, &tmp_ref) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTCREATE, FAIL, "unable to create region reference");
+            }
 
             /* create_region creates its internal copy of the space */
-            if (H5S_close(src_reg->space) < 0)
+            if (H5S_close(src_reg->space) < 0) {
                 HGOTO_ERROR(H5E_REFERENCE, H5E_CANTFREE, FAIL, "Cannot close dataspace");
-        } break;
+            }
+        }
+        break;
 
-        case H5R_DATASET_REGION2:
-            /* Pass the correct encoding version for the selection depending on the
-             * file libver bounds, this is later retrieved in H5S hyper decode */
-            H5CX_set_libver_bounds(src_f);
-            /* FALLTHROUGH */
-            H5_ATTR_FALLTHROUGH
-        case H5R_OBJECT2:
-        case H5R_ATTR:
-            /* Decode reference */
-            if (H5R__decode((const unsigned char *)src_buf, &src_size, &tmp_ref) < 0)
-                HGOTO_ERROR(H5E_REFERENCE, H5E_CANTDECODE, FAIL, "Cannot decode reference");
-            break;
+    case H5R_DATASET_REGION2:
+        /* Pass the correct encoding version for the selection depending on the
+         * file libver bounds, this is later retrieved in H5S hyper decode */
+        H5CX_set_libver_bounds(src_f);
+        /* FALLTHROUGH */
+        H5_ATTR_FALLTHROUGH
+    case H5R_OBJECT2:
+    case H5R_ATTR:
+        /* Decode reference */
+        if (H5R__decode((const unsigned char*)src_buf, &src_size, &tmp_ref) < 0) {
+            HGOTO_ERROR(H5E_REFERENCE, H5E_CANTDECODE, FAIL, "Cannot decode reference");
+        }
+        break;
 
-        case H5R_BADTYPE:
-        case H5R_MAXTYPE:
-        default:
-            assert("unknown reference type" && 0);
-            HGOTO_ERROR(H5E_REFERENCE, H5E_UNSUPPORTED, FAIL, "internal error (unknown reference type)");
+    case H5R_BADTYPE:
+    case H5R_MAXTYPE:
+    default         : assert("unknown reference type" && 0); HGOTO_ERROR(H5E_REFERENCE, H5E_UNSUPPORTED, FAIL, "internal error (unknown reference type)");
     } /* end switch */
 
     /* If no filename set, this is not an external reference */
     if (NULL == H5R_REF_FILENAME(&tmp_ref)) {
         /* TODO temporary hack to retrieve file object */
-        if ((file_id = H5F_get_file_id(src_file, H5I_FILE, false)) < 0)
+        if ((file_id = H5F_get_file_id(src_file, H5I_FILE, false)) < 0) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a file or file object");
+        }
 
         /* Attach loc ID to reference and hold reference to it, this is a
          * user exposed reference so set app_ref to true. */
-        if (H5R__set_loc_id(&tmp_ref, file_id, true, true) < 0)
+        if (H5R__set_loc_id(&tmp_ref, file_id, true, true) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTSET, FAIL, "unable to attach location id to reference");
+        }
     } /* end if */
 
     /* Set output info */
     H5MM_memcpy(dst_buf, &tmp_ref, sizeof(tmp_ref));
 
 done:
-    if ((file_id != H5I_INVALID_HID) && (H5I_dec_ref(file_id) < 0))
+    if ((file_id != H5I_INVALID_HID) && (H5I_dec_ref(file_id) < 0)) {
         HDONE_ERROR(H5E_REFERENCE, H5E_CANTDEC, FAIL, "unable to decrement refcount on location id");
+    }
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5T__ref_mem_write() */
 
@@ -759,12 +801,11 @@ done:
  * for this reason.
  */
 H5_WARN_CAST_AWAY_CONST_OFF
-static herr_t
-H5T__ref_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull)
+static herr_t H5T__ref_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull)
 {
-    const uint8_t *p = (const uint8_t *)src_buf;
-    H5R_type_t     ref_type;
-    herr_t         ret_value = SUCCEED;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    H5R_type_t ref_type;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -784,20 +825,22 @@ H5T__ref_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *i
         H5VL_blob_specific_args_t vol_cb_args; /* Arguments to VOL callback */
 
         /* Skip the size / header */
-        p = (const uint8_t *)src_buf + H5R_ENCODE_HEADER_SIZE + sizeof(uint32_t);
+        p = (const uint8_t*)src_buf + H5R_ENCODE_HEADER_SIZE + sizeof(uint32_t);
 
         /* Set up VOL callback arguments */
-        vol_cb_args.op_type             = H5VL_BLOB_ISNULL;
+        vol_cb_args.op_type = H5VL_BLOB_ISNULL;
         vol_cb_args.args.is_null.isnull = isnull;
 
         /* Check if blob ID is "nil" */
-        if (H5VL_blob_specific(src_file, (void *)p, &vol_cb_args) < 0)
+        if (H5VL_blob_specific(src_file, (void*)p, &vol_cb_args) < 0) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_CANTGET, FAIL, "unable to check if a blob ID is 'nil'");
+        }
     }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5T__ref_disk_isnull() */
+
 H5_WARN_CAST_AWAY_CONST_ON
 
 /*-------------------------------------------------------------------------
@@ -809,13 +852,12 @@ H5_WARN_CAST_AWAY_CONST_ON
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_disk_setnull(H5VL_object_t *dst_file, void *dst_buf, void *bg_buf)
+static herr_t H5T__ref_disk_setnull(H5VL_object_t* dst_file, void* dst_buf, void* bg_buf)
 {
     H5VL_blob_specific_args_t vol_cb_args; /* Arguments to VOL callback */
-    uint8_t                  *q         = (uint8_t *)dst_buf;
-    uint8_t                  *p_bg      = (uint8_t *)bg_buf;
-    herr_t                    ret_value = SUCCEED;
+    uint8_t* q = (uint8_t*)dst_buf;
+    uint8_t* p_bg = (uint8_t*)bg_buf;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -832,8 +874,9 @@ H5T__ref_disk_setnull(H5VL_object_t *dst_file, void *dst_buf, void *bg_buf)
         vol_cb_args.op_type = H5VL_BLOB_DELETE;
 
         /* Remove blob for old data */
-        if (H5VL_blob_specific(dst_file, (void *)p_bg, &vol_cb_args) < 0)
+        if (H5VL_blob_specific(dst_file, (void*)p_bg, &vol_cb_args) < 0) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_CANTREMOVE, FAIL, "unable to delete blob");
+        }
     } /* end if */
 
     /* Copy header manually so that it does not get encoded into the blob */
@@ -847,8 +890,9 @@ H5T__ref_disk_setnull(H5VL_object_t *dst_file, void *dst_buf, void *bg_buf)
     vol_cb_args.op_type = H5VL_BLOB_SETNULL;
 
     /* Set blob ID to "nil" */
-    if (H5VL_blob_specific(dst_file, q, &vol_cb_args) < 0)
+    if (H5VL_blob_specific(dst_file, q, &vol_cb_args) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTSET, FAIL, "unable to set a blob ID to 'nil'");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -864,13 +908,12 @@ done:
  *-------------------------------------------------------------------------
  */
 static size_t
-H5T__ref_disk_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, size_t src_size,
-                      H5VL_object_t H5_ATTR_UNUSED *dst_file, bool *dst_copy)
+    H5T__ref_disk_getsize(H5VL_object_t H5_ATTR_UNUSED* src_file, const void* src_buf, size_t src_size, H5VL_object_t H5_ATTR_UNUSED* dst_file, bool* dst_copy)
 {
-    const uint8_t *p = (const uint8_t *)src_buf;
-    unsigned       flags;
-    H5R_type_t     ref_type;
-    size_t         ret_value = 0;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    unsigned flags;
+    H5R_type_t ref_type;
+    size_t ret_value = 0;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -879,8 +922,9 @@ H5T__ref_disk_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_bu
 
     /* Set reference type */
     ref_type = (H5R_type_t)*p++;
-    if (ref_type <= H5R_BADTYPE || ref_type >= H5R_MAXTYPE)
+    if (ref_type <= H5R_BADTYPE || ref_type >= H5R_MAXTYPE) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, 0, "invalid reference type");
+    }
 
     /* Set flags */
     flags = (unsigned)*p++;
@@ -912,14 +956,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t H5_ATTR_NDEBUG_UNUSED src_size,
-                   H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf, size_t dst_size)
+static herr_t H5T__ref_disk_read(H5VL_object_t* src_file,
+                                 const void* src_buf,
+                                 size_t H5_ATTR_NDEBUG_UNUSED src_size,
+                                 H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                 void* dst_buf,
+                                 size_t dst_size)
 {
-    const uint8_t *p         = (const uint8_t *)src_buf;
-    uint8_t       *q         = (uint8_t *)dst_buf;
-    size_t         blob_size = dst_size;
-    herr_t         ret_value = SUCCEED;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    uint8_t* q = (uint8_t*)dst_buf;
+    size_t blob_size = dst_size;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -940,8 +987,9 @@ H5T__ref_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t H5_ATTR_
     assert(src_size > (H5R_ENCODE_HEADER_SIZE + sizeof(uint32_t)));
 
     /* Retrieve blob */
-    if (H5VL_blob_get(src_file, p, q, blob_size, NULL) < 0)
+    if (H5VL_blob_get(src_file, p, q, blob_size, NULL) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTGET, FAIL, "unable to get blob");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -956,15 +1004,19 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_disk_write(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf, size_t src_size,
-                    H5R_type_t H5_ATTR_UNUSED src_type, H5VL_object_t *dst_file, void *dst_buf,
-                    size_t H5_ATTR_NDEBUG_UNUSED dst_size, void *bg_buf)
+static herr_t H5T__ref_disk_write(H5VL_object_t H5_ATTR_UNUSED* src_file,
+                                  const void* src_buf,
+                                  size_t src_size,
+                                  H5R_type_t H5_ATTR_UNUSED src_type,
+                                  H5VL_object_t* dst_file,
+                                  void* dst_buf,
+                                  size_t H5_ATTR_NDEBUG_UNUSED dst_size,
+                                  void* bg_buf)
 {
-    const uint8_t *p         = (const uint8_t *)src_buf;
-    uint8_t       *q         = (uint8_t *)dst_buf;
-    uint8_t       *p_bg      = (uint8_t *)bg_buf;
-    herr_t         ret_value = SUCCEED;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    uint8_t* q = (uint8_t*)dst_buf;
+    uint8_t* p_bg = (uint8_t*)bg_buf;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -990,8 +1042,9 @@ H5T__ref_disk_write(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf,
         vol_cb_args.op_type = H5VL_BLOB_DELETE;
 
         /* Remove blob for old data */
-        if (H5VL_blob_specific(dst_file, (void *)p_bg, &vol_cb_args) < 0)
+        if (H5VL_blob_specific(dst_file, (void*)p_bg, &vol_cb_args) < 0) {
             HGOTO_ERROR(H5E_DATATYPE, H5E_CANTREMOVE, FAIL, "unable to delete blob");
+        }
     } /* end if */
 
     /* Copy header manually so that it does not get encoded into the blob */
@@ -1011,8 +1064,9 @@ H5T__ref_disk_write(H5VL_object_t H5_ATTR_UNUSED *src_file, const void *src_buf,
     UINT32ENCODE(q, src_size);
 
     /* Store blob */
-    if (H5VL_blob_put(dst_file, p, src_size, q, NULL) < 0)
+    if (H5VL_blob_put(dst_file, p, src_size, q, NULL) < 0) {
         HGOTO_ERROR(H5E_DATATYPE, H5E_CANTSET, FAIL, "unable to put blob");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1027,13 +1081,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_obj_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull)
+static herr_t H5T__ref_obj_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull)
 {
-    H5F_t         *src_f;
-    const uint8_t *p = (const uint8_t *)src_buf;
-    haddr_t        addr;
-    herr_t         ret_value = SUCCEED;
+    H5F_t* src_f;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    haddr_t addr;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -1048,8 +1101,9 @@ H5T__ref_obj_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, boo
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -1057,8 +1111,9 @@ H5T__ref_obj_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, boo
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+    }
 
     /* Get the object address */
     H5F_addr_decode(src_f, &p, &addr);
@@ -1079,12 +1134,13 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-H5T__ref_obj_disk_getsize(H5VL_object_t *src_file, const void H5_ATTR_UNUSED *src_buf,
-                          size_t H5_ATTR_UNUSED src_size, H5VL_object_t H5_ATTR_UNUSED *dst_file,
-                          bool H5_ATTR_UNUSED *dst_copy)
+static size_t H5T__ref_obj_disk_getsize(H5VL_object_t* src_file,
+                                        const void H5_ATTR_UNUSED* src_buf,
+                                        size_t H5_ATTR_UNUSED src_size,
+                                        H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                        bool H5_ATTR_UNUSED* dst_copy)
 {
-    H5F_t *src_f;
+    H5F_t* src_f;
     size_t ret_value = 0;
 
     FUNC_ENTER_PACKAGE
@@ -1098,8 +1154,9 @@ H5T__ref_obj_disk_getsize(H5VL_object_t *src_file, const void H5_ATTR_UNUSED *sr
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -1107,8 +1164,9 @@ H5T__ref_obj_disk_getsize(H5VL_object_t *src_file, const void H5_ATTR_UNUSED *sr
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid VOL object");
+    }
 
     assert(src_size == H5T_REF_OBJ_DISK_SIZE(src_f));
 
@@ -1127,11 +1185,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_obj_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                       H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf, size_t H5_ATTR_UNUSED dst_size)
+static herr_t H5T__ref_obj_disk_read(H5VL_object_t* src_file,
+                                     const void* src_buf,
+                                     size_t src_size,
+                                     H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                     void* dst_buf,
+                                     size_t H5_ATTR_UNUSED dst_size)
 {
-    H5F_t *src_f;
+    H5F_t* src_f;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
@@ -1146,8 +1207,9 @@ H5T__ref_obj_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -1155,16 +1217,17 @@ H5T__ref_obj_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+    }
 
     assert(src_size == H5T_REF_OBJ_DISK_SIZE(src_f));
     assert(dst_size == H5F_SIZEOF_ADDR(src_f));
 
     /* Get object address */
-    if (H5R__decode_token_obj_compat((const unsigned char *)src_buf, &src_size, (H5O_token_t *)dst_buf,
-                                     H5F_SIZEOF_ADDR(src_f)) < 0)
+    if (H5R__decode_token_obj_compat((const unsigned char*)src_buf, &src_size, (H5O_token_t*)dst_buf, H5F_SIZEOF_ADDR(src_f)) < 0) {
         HGOTO_ERROR(H5E_REFERENCE, H5E_CANTDECODE, FAIL, "unable to get object address");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1179,13 +1242,12 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_dsetreg_disk_isnull(const H5VL_object_t *src_file, const void *src_buf, bool *isnull)
+static herr_t H5T__ref_dsetreg_disk_isnull(const H5VL_object_t* src_file, const void* src_buf, bool* isnull)
 {
-    H5F_t         *src_f;
-    const uint8_t *p = (const uint8_t *)src_buf;
-    haddr_t        addr;
-    herr_t         ret_value = SUCCEED;
+    H5F_t* src_f;
+    const uint8_t* p = (const uint8_t*)src_buf;
+    haddr_t addr;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -1200,8 +1262,9 @@ H5T__ref_dsetreg_disk_isnull(const H5VL_object_t *src_file, const void *src_buf,
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -1209,8 +1272,9 @@ H5T__ref_dsetreg_disk_isnull(const H5VL_object_t *src_file, const void *src_buf,
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+    }
 
     /* Get the heap address */
     H5F_addr_decode(src_f, &p, &addr);
@@ -1231,10 +1295,11 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static size_t
-H5T__ref_dsetreg_disk_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void H5_ATTR_UNUSED *src_buf,
-                              size_t H5_ATTR_UNUSED src_size, H5VL_object_t H5_ATTR_UNUSED *dst_file,
-                              bool H5_ATTR_UNUSED *dst_copy)
+static size_t H5T__ref_dsetreg_disk_getsize(H5VL_object_t H5_ATTR_UNUSED* src_file,
+                                            const void H5_ATTR_UNUSED* src_buf,
+                                            size_t H5_ATTR_UNUSED src_size,
+                                            H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                            bool H5_ATTR_UNUSED* dst_copy)
 {
     size_t ret_value = sizeof(struct H5Tref_dsetreg);
 
@@ -1249,19 +1314,21 @@ H5T__ref_dsetreg_disk_getsize(H5VL_object_t H5_ATTR_UNUSED *src_file, const void
 
 #ifndef NDEBUG
     {
-        H5F_t *src_f;
-        bool   is_native = false; /* Whether the src file is using the native VOL connector */
+        H5F_t* src_f;
+        bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, 0, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
 
         /* Retrieve file from VOL object */
-        if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+        if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
             HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, 0, "invalid VOL object");
+        }
 
         assert(src_size == H5T_REF_DSETREG_DISK_SIZE(src_f));
     }
@@ -1282,14 +1349,16 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5T__ref_dsetreg_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t src_size,
-                           H5VL_object_t H5_ATTR_UNUSED *dst_file, void *dst_buf,
-                           size_t H5_ATTR_UNUSED dst_size)
+static herr_t H5T__ref_dsetreg_disk_read(H5VL_object_t* src_file,
+                                         const void* src_buf,
+                                         size_t src_size,
+                                         H5VL_object_t H5_ATTR_UNUSED* dst_file,
+                                         void* dst_buf,
+                                         size_t H5_ATTR_UNUSED dst_size)
 {
-    H5F_t                 *src_f;
-    struct H5Tref_dsetreg *dst_reg   = (struct H5Tref_dsetreg *)dst_buf;
-    herr_t                 ret_value = SUCCEED;
+    H5F_t* src_f;
+    struct H5Tref_dsetreg* dst_reg = (struct H5Tref_dsetreg*)dst_buf;
+    herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE
     H5T_REF_LOG_DEBUG("");
@@ -1304,8 +1373,9 @@ H5T__ref_dsetreg_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t 
         bool is_native = false; /* Whether the src file is using the native VOL connector */
 
         /* Check if using native VOL connector */
-        if (H5VL_object_is_native(src_file, &is_native) < 0)
+        if (H5VL_object_is_native(src_file, &is_native) < 0) {
             HGOTO_ERROR(H5E_REFERENCE, H5E_CANTGET, FAIL, "can't query if file uses native VOL connector");
+        }
 
         /* Must use native VOL connector for this operation */
         assert(is_native);
@@ -1313,15 +1383,16 @@ H5T__ref_dsetreg_disk_read(H5VL_object_t *src_file, const void *src_buf, size_t 
 #endif /* NDEBUG */
 
     /* Retrieve file from VOL object */
-    if (NULL == (src_f = (H5F_t *)H5VL_object_data(src_file)))
+    if (NULL == (src_f = (H5F_t*)H5VL_object_data(src_file))) {
         HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid VOL object");
+    }
 
     assert(src_size == H5T_REF_DSETREG_DISK_SIZE(src_f));
 
     /* Retrieve object address and space */
-    if (H5R__decode_token_region_compat(src_f, (const unsigned char *)src_buf, &src_size, &dst_reg->token,
-                                        H5F_SIZEOF_ADDR(src_f), &dst_reg->space) < 0)
+    if (H5R__decode_token_region_compat(src_f, (const unsigned char*)src_buf, &src_size, &dst_reg->token, H5F_SIZEOF_ADDR(src_f), &dst_reg->space) < 0) {
         HGOTO_ERROR(H5E_REFERENCE, H5E_CANTDECODE, FAIL, "unable to get object address");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1336,8 +1407,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5T__ref_reclaim(void *elem, const H5T_t *dt)
+herr_t H5T__ref_reclaim(void* elem, const H5T_t* dt)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -1348,8 +1418,9 @@ H5T__ref_reclaim(void *elem, const H5T_t *dt)
     assert(elem);
     assert(dt && (dt->shared->type == H5T_REFERENCE));
 
-    if (dt->shared->u.atomic.u.r.opaque && H5R__destroy((H5R_ref_priv_t *)elem) < 0)
+    if (dt->shared->u.atomic.u.r.opaque && H5R__destroy((H5R_ref_priv_t*)elem) < 0) {
         HGOTO_ERROR(H5E_REFERENCE, H5E_CANTFREE, FAIL, "cannot free reference");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

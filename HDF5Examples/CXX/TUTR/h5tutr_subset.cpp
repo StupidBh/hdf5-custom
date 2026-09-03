@@ -26,14 +26,13 @@ using namespace H5;
 const H5std_string FILE_NAME("h5tutr_subset.h5");
 const H5std_string DATASET_NAME("IntArray");
 
-const int RANK     = 2;
+const int RANK = 2;
 const int DIM0_SUB = 3; // subset dimensions
 const int DIM1_SUB = 4;
-const int DIM0     = 8; // size of dataset
-const int DIM1     = 10;
+const int DIM0 = 8;     // size of dataset
+const int DIM1 = 10;
 
-int
-main(void)
+int main(void)
 {
     int i, j;
     int data[DIM0][DIM1], sdata[DIM0_SUB][DIM1_SUB], rdata[DIM0][DIM1];
@@ -53,26 +52,30 @@ main(void)
         H5File file(FILE_NAME, H5F_ACC_TRUNC);
 
         hsize_t dims[2];
-        dims[0]             = DIM0;
-        dims[1]             = DIM1;
+        dims[0] = DIM0;
+        dims[1] = DIM1;
         DataSpace dataspace = DataSpace(RANK, dims);
 
         DataSet dataset(file.createDataSet(DATASET_NAME, PredType::STD_I32BE, dataspace));
 
         for (j = 0; j < DIM0; j++) {
-            for (i = 0; i < DIM1; i++)
-                if (i < (DIM1 / 2))
+            for (i = 0; i < DIM1; i++) {
+                if (i < (DIM1 / 2)) {
                     data[j][i] = 1;
-                else
+                }
+                else {
                     data[j][i] = 2;
+                }
+            }
         }
 
         dataset.write(data, PredType::NATIVE_INT);
 
         cout << endl << "Data Written to File:" << endl;
         for (j = 0; j < DIM0; j++) {
-            for (i = 0; i < DIM1; i++)
+            for (i = 0; i < DIM1; i++) {
                 cout << " " << data[j][i];
+            }
             cout << endl;
         }
 
@@ -122,8 +125,9 @@ main(void)
         cout << endl << "Write subset to file specifying: " << endl;
         cout << "  offset=1x2 stride=1x1 count=3x4 block=1x1" << endl;
         for (j = 0; j < DIM0_SUB; j++) {
-            for (i = 0; i < DIM1_SUB; i++)
+            for (i = 0; i < DIM1_SUB; i++) {
                 sdata[j][i] = 5;
+            }
         }
 
         dataset.write(sdata, PredType::NATIVE_INT, memspace, dataspace);
@@ -131,8 +135,9 @@ main(void)
 
         cout << endl << "Data in File after Subset is Written:" << endl;
         for (i = 0; i < DIM0; i++) {
-            for (j = 0; j < DIM1; j++)
+            for (j = 0; j < DIM1; j++) {
                 cout << " " << rdata[i][j];
+            }
             cout << endl;
         }
         cout << endl;

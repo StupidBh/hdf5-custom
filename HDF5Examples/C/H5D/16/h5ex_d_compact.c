@@ -19,26 +19,27 @@
 #define DIM0     4
 #define DIM1     7
 
-int
-main(void)
+int main(void)
 {
-    hid_t        file  = H5I_INVALID_HID;
-    hid_t        space = H5I_INVALID_HID;
-    hid_t        dset  = H5I_INVALID_HID;
-    hid_t        dcpl  = H5I_INVALID_HID;
-    herr_t       status;
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    herr_t status;
     H5D_layout_t layout;
-    hsize_t      dims[2] = {DIM0, DIM1};
-    int          wdata[DIM0][DIM1]; /* Write buffer */
-    int          rdata[DIM0][DIM1]; /* Read buffer */
-    hsize_t      i, j;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    int wdata[DIM0][DIM1]; /* Write buffer */
+    int rdata[DIM0][DIM1]; /* Read buffer */
+    hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -55,7 +56,7 @@ main(void)
      * Create the dataset creation property list, set the layout to
      * compact.
      */
-    dcpl   = H5Pcreate(H5P_DATASET_CREATE);
+    dcpl = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_layout(dcpl, H5D_COMPACT);
 
     /*
@@ -91,18 +92,13 @@ main(void)
      * Retrieve the dataset creation property list, and print the
      * storage layout.
      */
-    dcpl   = H5Dget_create_plist(dset);
+    dcpl = H5Dget_create_plist(dset);
     layout = H5Pget_layout(dcpl);
     printf("Storage layout for %s is: ", DATASET);
     switch (layout) {
-        case H5D_COMPACT:
-            printf("H5D_COMPACT\n");
-            break;
-        case H5D_CONTIGUOUS:
-            printf("H5D_CONTIGUOUS\n");
-            break;
-        case H5D_CHUNKED:
-            printf("H5D_CHUNKED\n");
+    case H5D_COMPACT   : printf("H5D_COMPACT\n"); break;
+    case H5D_CONTIGUOUS: printf("H5D_CONTIGUOUS\n"); break;
+    case H5D_CHUNKED   : printf("H5D_CHUNKED\n");
     }
 
     /*
@@ -116,8 +112,9 @@ main(void)
     printf("%s:\n", DATASET);
     for (i = 0; i < DIM0; i++) {
         printf(" [");
-        for (j = 0; j < DIM1; j++)
+        for (j = 0; j < DIM1; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 

@@ -27,30 +27,31 @@
 #define CHUNK1   4
 #define FILLVAL  99
 
-int
-main(void)
+int main(void)
 {
-    hid_t   file  = H5I_INVALID_HID;
-    hid_t   space = H5I_INVALID_HID;
-    hid_t   dset  = H5I_INVALID_HID;
-    hid_t   dcpl  = H5I_INVALID_HID;
-    herr_t  status;
-    hsize_t dims[2]    = {DIM0, DIM1};
-    hsize_t extdims[2] = {EDIM0, EDIM1};
-    hsize_t maxdims[2] = {H5S_UNLIMITED, H5S_UNLIMITED};
-    hsize_t chunk[2]   = {CHUNK0, CHUNK1};
-    int     wdata[DIM0][DIM1];    /* Write buffer */
-    int     rdata[DIM0][DIM1];    /* Read buffer */
-    int     rdata2[EDIM0][EDIM1]; /* Read buffer for extension */
-    int     fillval;
+    hid_t file = H5I_INVALID_HID;
+    hid_t space = H5I_INVALID_HID;
+    hid_t dset = H5I_INVALID_HID;
+    hid_t dcpl = H5I_INVALID_HID;
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    hsize_t extdims[2] = { EDIM0, EDIM1 };
+    hsize_t maxdims[2] = { H5S_UNLIMITED, H5S_UNLIMITED };
+    hsize_t chunk[2] = { CHUNK0, CHUNK1 };
+    int wdata[DIM0][DIM1];    /* Write buffer */
+    int rdata[DIM0][DIM1];    /* Read buffer */
+    int rdata2[EDIM0][EDIM1]; /* Read buffer for extension */
+    int fillval;
     hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
-        for (j = 0; j < DIM1; j++)
+    for (i = 0; i < DIM0; i++) {
+        for (j = 0; j < DIM1; j++) {
             wdata[i][j] = i * j - j;
+        }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -66,14 +67,14 @@ main(void)
      * Create the dataset creation property list, and set the chunk
      * size.
      */
-    dcpl   = H5Pcreate(H5P_DATASET_CREATE);
+    dcpl = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(dcpl, 2, chunk);
 
     /*
      * Set the fill value for the dataset.
      */
     fillval = FILLVAL;
-    status  = H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval);
+    status = H5Pset_fill_value(dcpl, H5T_NATIVE_INT, &fillval);
 
     /*
      * Set the allocation time to "early".  This way we can be sure
@@ -98,8 +99,9 @@ main(void)
     printf("Dataset before being written to:\n");
     for (i = 0; i < dims[0]; i++) {
         printf(" [");
-        for (j = 0; j < dims[1]; j++)
+        for (j = 0; j < dims[1]; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 
@@ -119,8 +121,9 @@ main(void)
     printf("\nDataset after being written to:\n");
     for (i = 0; i < dims[0]; i++) {
         printf(" [");
-        for (j = 0; j < dims[1]; j++)
+        for (j = 0; j < dims[1]; j++) {
             printf(" %3d", rdata[i][j]);
+        }
         printf("]\n");
     }
 
@@ -140,8 +143,9 @@ main(void)
     printf("\nDataset after extension:\n");
     for (i = 0; i < extdims[0]; i++) {
         printf(" [");
-        for (j = 0; j < extdims[1]; j++)
+        for (j = 0; j < extdims[1]; j++) {
             printf(" %3d", rdata2[i][j]);
+        }
         printf("]\n");
     }
 

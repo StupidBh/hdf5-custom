@@ -24,7 +24,7 @@
 #define TEST_INT16_VALUE  (-7641)
 #define TEST_UINT16_VALUE 45002
 #define TEST_INT32_VALUE  (-981236)
-#define TEST_UINT32_VALUE 3476589
+#define TEST_UINT32_VALUE 3'476'589
 
 static uint8_t compar_buffer[] = {
     /* Little-endian encoded version of the 16-bit signed integer */
@@ -52,18 +52,17 @@ static uint8_t encode_buffer[sizeof(compar_buffer)];
 **  test_metadata(): Main meta-data encode/decode testing routine.
 **
 ****************************************************************/
-void
-test_metadata(void H5_ATTR_UNUSED *params)
+void test_metadata(void H5_ATTR_UNUSED* params)
 {
-    int16_t  ei16 = TEST_INT16_VALUE; /* variables to hold the values to encode */
+    int16_t ei16 = TEST_INT16_VALUE; /* variables to hold the values to encode */
     uint16_t eu16 = TEST_UINT16_VALUE;
-    int32_t  ei32 = TEST_INT32_VALUE;
+    int32_t ei32 = TEST_INT32_VALUE;
     uint32_t eu32 = TEST_UINT32_VALUE;
-    int16_t  di16; /* variables to hold the decoded values */
+    int16_t di16; /* variables to hold the decoded values */
     uint16_t du16;
-    int32_t  di32;
+    int32_t di32;
     uint32_t du32;
-    uint8_t *p; /* pointer into the buffer being en/de-coded */
+    uint8_t* p; /* pointer into the buffer being en/de-coded */
 
     /* Output message about test being performed */
     MESSAGE(5, ("Testing Metadata Encoding/decoding\n"));
@@ -80,11 +79,11 @@ test_metadata(void H5_ATTR_UNUSED *params)
         unsigned u; /* local counting variable */
 
         for (u = 0; u < sizeof(compar_buffer); u++) {
-            if (compar_buffer[u] != encode_buffer[u])
-                TestErrPrintf("Error encoding meta-data at offset %u, wanted: %u, got: %u\n", (unsigned)u,
-                              (unsigned)compar_buffer[u], (unsigned)encode_buffer[u]);
+            if (compar_buffer[u] != encode_buffer[u]) {
+                TestErrPrintf("Error encoding meta-data at offset %u, wanted: %u, got: %u\n", (unsigned)u, (unsigned)compar_buffer[u], (unsigned)encode_buffer[u]);
+            }
         } /* end for */
-    }     /* end if */
+    } /* end if */
     /* Test decoding macros */
     p = encode_buffer;
     INT16DECODE(p, di16);  /* Decode the int16 value */
@@ -93,22 +92,42 @@ test_metadata(void H5_ATTR_UNUSED *params)
     UINT32DECODE(p, du32); /* Decode the uint32 value */
 
     /* Check the values decoded */
-    if (di16 != TEST_INT16_VALUE)
-        TestErrPrintf("Error decoding int16 meta-data wanted: %d, got: %d "
-                      "at %s:%d\n",
-                      (int)TEST_INT16_VALUE, (int)di16, __FILE__, __LINE__);
-    if (du16 != TEST_UINT16_VALUE)
-        TestErrPrintf("Error decoding uint16 meta-data wanted: %u, got: %u "
-                      "at %s:%d\n",
-                      (unsigned)TEST_UINT16_VALUE, (unsigned)du16, __FILE__, __LINE__);
-    if (di32 != TEST_INT32_VALUE)
-        TestErrPrintf("Error decoding int32 meta-data wanted: %ld, got: %ld "
-                      "at %s:%d\n",
-                      (long)TEST_INT32_VALUE, (long)di32, __FILE__, __LINE__);
-    if (du32 != TEST_UINT32_VALUE)
-        TestErrPrintf("Error decoding uint32 meta-data wanted: %lu, got: %lu "
-                      "at %s:%d\n",
-                      (unsigned long)TEST_UINT32_VALUE, (unsigned long)du32, __FILE__, __LINE__);
+    if (di16 != TEST_INT16_VALUE) {
+        TestErrPrintf(
+            "Error decoding int16 meta-data wanted: %d, got: %d "
+            "at %s:%d\n",
+            (int)TEST_INT16_VALUE,
+            (int)di16,
+            __FILE__,
+            __LINE__);
+    }
+    if (du16 != TEST_UINT16_VALUE) {
+        TestErrPrintf(
+            "Error decoding uint16 meta-data wanted: %u, got: %u "
+            "at %s:%d\n",
+            (unsigned)TEST_UINT16_VALUE,
+            (unsigned)du16,
+            __FILE__,
+            __LINE__);
+    }
+    if (di32 != TEST_INT32_VALUE) {
+        TestErrPrintf(
+            "Error decoding int32 meta-data wanted: %ld, got: %ld "
+            "at %s:%d\n",
+            (long)TEST_INT32_VALUE,
+            (long)di32,
+            __FILE__,
+            __LINE__);
+    }
+    if (du32 != TEST_UINT32_VALUE) {
+        TestErrPrintf(
+            "Error decoding uint32 meta-data wanted: %lu, got: %lu "
+            "at %s:%d\n",
+            (unsigned long)TEST_UINT32_VALUE,
+            (unsigned long)du32,
+            __FILE__,
+            __LINE__);
+    }
 } /* test_metadata() */
 
 /*-------------------------------------------------------------------------
@@ -120,8 +139,7 @@ test_metadata(void H5_ATTR_UNUSED *params)
  *
  *-------------------------------------------------------------------------
  */
-void
-cleanup_metadata(void H5_ATTR_UNUSED *params)
+void cleanup_metadata(void H5_ATTR_UNUSED* params)
 {
     /* no file to clean */
 }

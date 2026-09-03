@@ -21,26 +21,26 @@
 #define DIM0     4
 #define DIM1     7
 
-int
-main(void)
+int main(void)
 {
-    float _Complex wdata[DIM0][DIM1];          /* Write buffer */
-    float _Complex **rdata;                    /* Read buffer */
-    hid_t            file, space, dset, dtype; /* Handles */
-    herr_t           status;
-    hsize_t          dims[2] = {DIM0, DIM1};
-    int              ndims;
-    hsize_t          i, j;
+    float _Complex wdata[DIM0][DIM1]; /* Write buffer */
+    float _Complex** rdata;           /* Read buffer */
+    hid_t file, space, dset, dtype;   /* Handles */
+    herr_t status;
+    hsize_t dims[2] = { DIM0, DIM1 };
+    int ndims;
+    hsize_t i, j;
 
     /*
      * Initialize data.
      */
-    for (i = 0; i < DIM0; i++)
+    for (i = 0; i < DIM0; i++) {
         for (j = 0; j < DIM1; j++) {
-            float real      = (float)i / (j + 0.5) + j;
+            float real = (float)i / (j + 0.5) + j;
             float imaginary = (float)i / (j + 0.5) + j + 1;
-            wdata[i][j]     = real + imaginary * I;
+            wdata[i][j] = real + imaginary * I;
         }
+    }
 
     /*
      * Create a new file using the default properties.
@@ -101,7 +101,7 @@ main(void)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = malloc(dims[0] * sizeof(float _Complex *));
+    rdata = malloc(dims[0] * sizeof(float _Complex*));
 
     /*
      * Allocate space for complex number data.
@@ -111,8 +111,9 @@ main(void)
     /*
      * Set the rest of the pointers to rows to the correct addresses.
      */
-    for (i = 1; i < dims[0]; i++)
+    for (i = 1; i < dims[0]; i++) {
         rdata[i] = rdata[0] + i * dims[1];
+    }
 
     /*
      * Read the data.

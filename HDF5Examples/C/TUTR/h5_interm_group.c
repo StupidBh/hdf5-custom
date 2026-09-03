@@ -19,18 +19,16 @@
 
 #define H5FILE_NAME "interm_group.h5"
 
-int
-main(void)
+int main(void)
 {
-
-    hid_t      file;
-    hid_t      g1_id, g2_id, g3_id;
-    hid_t      grp_crt_plist;
+    hid_t file;
+    hid_t g1_id, g2_id, g3_id;
+    hid_t grp_crt_plist;
     H5G_info_t g2_info;
-    char       name[3];
+    char name[3];
 
     herr_t status;
-    int    i;
+    int i;
 
     /*
      * Create a file using the default properties.
@@ -53,8 +51,9 @@ main(void)
     /*
      * Check if group /G1 exists in the file.
      */
-    if (H5Lexists(file, "/G1", H5P_DEFAULT) != false)
+    if (H5Lexists(file, "/G1", H5P_DEFAULT) != false) {
         printf("Group /G1 exists in the file\n");
+    }
 
     /*
      * Check that group G2/G3 exists in /G1 and if not create it using
@@ -66,12 +65,11 @@ main(void)
      */
     /*  if (H5Lexists(g1_id, "G2/G3", H5P_DEFAULT) !=true) { */
     if (H5Lexists(g1_id, "G2", H5P_DEFAULT) != true) {
-
         grp_crt_plist = H5Pcreate(H5P_LINK_CREATE);
 
         /* Set flag for intermediate group creation */
         status = H5Pset_create_intermediate_group(grp_crt_plist, true);
-        g3_id  = H5Gcreate2(g1_id, "G2/G3", grp_crt_plist, H5P_DEFAULT, H5P_DEFAULT);
+        g3_id = H5Gcreate2(g1_id, "G2/G3", grp_crt_plist, H5P_DEFAULT, H5P_DEFAULT);
         H5Gclose(g3_id);
     }
     H5Gclose(g1_id);
@@ -80,8 +78,7 @@ main(void)
      * its members names
      */
     if (H5Lexists(file, "/G1/G2", H5P_DEFAULT)) {
-
-        g2_id  = H5Gopen2(file, "/G1/G2", H5P_DEFAULT);
+        g2_id = H5Gopen2(file, "/G1/G2", H5P_DEFAULT);
         status = H5Gget_info(g2_id, &g2_info);
         printf("Group /G1/G2 has %d member(s)\n", (int)g2_info.nlinks);
 

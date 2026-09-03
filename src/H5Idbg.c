@@ -48,7 +48,7 @@
 /* Local Prototypes */
 /********************/
 
-static int H5I__id_dump_cb(void *_item, void *_key, void *_udata);
+static int H5I__id_dump_cb(void* _item, void* _key, void* _udata);
 
 /*********************/
 /* Package Variables */
@@ -71,14 +71,13 @@ static int H5I__id_dump_cb(void *_item, void *_key, void *_udata);
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5I__id_dump_cb(void *_item, void H5_ATTR_UNUSED *_key, void *_udata)
+static int H5I__id_dump_cb(void* _item, void H5_ATTR_UNUSED* _key, void* _udata)
 {
-    H5I_id_info_t    *info   = (H5I_id_info_t *)_item; /* Pointer to the ID node */
-    H5I_type_t        type   = *(H5I_type_t *)_udata;  /* User data */
-    const H5G_name_t *path   = NULL;                   /* Path to file object */
-    void             *object = NULL;                   /* Pointer to VOL connector object */
-    bool              is_native;                       /* Whether an object using the native VOL connector */
+    H5I_id_info_t* info = (H5I_id_info_t*)_item; /* Pointer to the ID node */
+    H5I_type_t type = *(H5I_type_t*)_udata;      /* User data */
+    const H5G_name_t* path = NULL;               /* Path to file object */
+    void* object = NULL;                         /* Pointer to VOL connector object */
+    bool is_native;                              /* Whether an object using the native VOL connector */
 
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -89,63 +88,69 @@ H5I__id_dump_cb(void *_item, void H5_ATTR_UNUSED *_key, void *_udata)
 
     /* Get the group location, so we get get the name */
     switch (type) {
-        case H5I_GROUP: {
-            const H5VL_object_t *vol_obj = (const H5VL_object_t *)info->u.c_object;
+    case H5I_GROUP:
+        {
+            const H5VL_object_t* vol_obj = (const H5VL_object_t*)info->u.c_object;
 
             is_native = false;
             H5VL_object_is_native(vol_obj, &is_native);
-            if (is_native)
+            if (is_native) {
                 path = H5G_nameof(object);
+            }
             break;
         }
 
-        case H5I_DATASET: {
-            const H5VL_object_t *vol_obj = (const H5VL_object_t *)info->u.c_object;
+    case H5I_DATASET:
+        {
+            const H5VL_object_t* vol_obj = (const H5VL_object_t*)info->u.c_object;
 
             is_native = false;
             H5VL_object_is_native(vol_obj, &is_native);
-            if (is_native)
+            if (is_native) {
                 path = H5D_nameof(object);
+            }
             break;
         }
 
-        case H5I_DATATYPE: {
-            H5T_t *dt = info->u.object;
+    case H5I_DATATYPE:
+        {
+            H5T_t* dt = info->u.object;
 
-            object = H5T_get_actual_type((H5T_t *)dt);
-            path   = H5T_nameof(object);
+            object = H5T_get_actual_type((H5T_t*)dt);
+            path = H5T_nameof(object);
             break;
         }
 
-        /* TODO: Maps will have to be added when they are supported in the
-         *       native VOL connector.
-         */
-        case H5I_MAP:
+    /* TODO: Maps will have to be added when they are supported in the
+     *       native VOL connector.
+     */
+    case H5I_MAP:
 
-        case H5I_UNINIT:
-        case H5I_BADID:
-        case H5I_FILE:
-        case H5I_DATASPACE:
-        case H5I_ATTR:
-        case H5I_VFL:
-        case H5I_VOL:
-        case H5I_GENPROP_CLS:
-        case H5I_GENPROP_LST:
-        case H5I_ERROR_CLASS:
-        case H5I_ERROR_MSG:
-        case H5I_ERROR_STACK:
-        case H5I_SPACE_SEL_ITER:
-        case H5I_EVENTSET:
-        case H5I_NTYPES:
-        default:
-            break; /* Other types of IDs are not stored in files */
+    case H5I_UNINIT:
+    case H5I_BADID:
+    case H5I_FILE:
+    case H5I_DATASPACE:
+    case H5I_ATTR:
+    case H5I_VFL:
+    case H5I_VOL:
+    case H5I_GENPROP_CLS:
+    case H5I_GENPROP_LST:
+    case H5I_ERROR_CLASS:
+    case H5I_ERROR_MSG:
+    case H5I_ERROR_STACK:
+    case H5I_SPACE_SEL_ITER:
+    case H5I_EVENTSET:
+    case H5I_NTYPES:
+    default                : break; /* Other types of IDs are not stored in files */
     }
 
     if (path) {
-        if (path->user_path_r)
+        if (path->user_path_r) {
             fprintf(stderr, "                user_path = %s\n", H5RS_get_str(path->user_path_r));
-        if (path->full_path_r)
+        }
+        if (path->full_path_r) {
             fprintf(stderr, "                full_path = %s\n", H5RS_get_str(path->full_path_r));
+        }
     }
 
     FUNC_LEAVE_NOAPI(H5_ITER_CONT)
@@ -160,10 +165,9 @@ H5I__id_dump_cb(void *_item, void H5_ATTR_UNUSED *_key, void *_udata)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5I_dump_ids_for_type(H5I_type_t type)
+herr_t H5I_dump_ids_for_type(H5I_type_t type)
 {
-    H5I_type_info_t *type_info = NULL;
+    H5I_type_info_t* type_info = NULL;
 
     FUNC_ENTER_NOAPI_NOERR
 
@@ -171,9 +175,8 @@ H5I_dump_ids_for_type(H5I_type_t type)
     type_info = H5I_type_info_array_g[type];
 
     if (type_info) {
-
-        H5I_id_info_t *item = NULL;
-        H5I_id_info_t *tmp  = NULL;
+        H5I_id_info_t* item = NULL;
+        H5I_id_info_t* tmp = NULL;
 
         /* Header */
         fprintf(stderr, "     init_count = %u\n", type_info->init_count);
@@ -193,12 +196,13 @@ H5I_dump_ids_for_type(H5I_type_t type)
             fprintf(stderr, "     (HASH TABLE)\n");
             HASH_ITER(hh, type_info->hash_table, item, tmp)
             {
-                H5I__id_dump_cb((void *)item, NULL, (void *)&type);
+                H5I__id_dump_cb((void*)item, NULL, (void*)&type);
             }
         }
     }
-    else
+    else {
         fprintf(stderr, "Global type info/tracking pointer for that type is NULL\n");
+    }
 
     FUNC_LEAVE_NOAPI(SUCCEED)
 } /* end H5I_dump_ids_for_type() */

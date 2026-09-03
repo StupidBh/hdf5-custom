@@ -33,26 +33,26 @@
 
 #if !defined(WIN32) && !defined(__MINGW32__) && !defined(_WIN32)
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
 
 /****************/
 /* Local Macros */
 /****************/
 
-#define FILENAME   "atomic_data"
-#define READ_TRIES 20
-#define OPEN_TRIES 50
+    #define FILENAME   "atomic_data"
+    #define READ_TRIES 20
+    #define OPEN_TRIES 50
 
 /********************/
 /* Local Prototypes */
 /********************/
 
 static void usage(void);
-int         verify(int fd, unsigned int k);
-void        print_info(int *info, unsigned int lastr, unsigned iteration);
+int verify(int fd, unsigned int k);
+void print_info(int* info, unsigned int lastr, unsigned iteration);
 
 /*-------------------------------------------------------------------------
  * Function:    usage
@@ -65,8 +65,7 @@ void        print_info(int *info, unsigned int lastr, unsigned iteration);
  *
  *-------------------------------------------------------------------------
  */
-static void
-usage(void)
+static void usage(void)
 {
     printf("\n");
     printf("Usage error!\n");
@@ -100,15 +99,14 @@ usage(void)
  *
  *-------------------------------------------------------------------------
  */
-int
-verify(int fd, unsigned int k)
+int verify(int fd, unsigned int k)
 {
-    unsigned int  i;          /* local index variable */
-    ssize_t       bytes_read; /* the number of bytes read */
-    unsigned int *buf = NULL; /* buffer to hold data read */
+    unsigned int i;           /* local index variable */
+    ssize_t bytes_read;       /* the number of bytes read */
+    unsigned int* buf = NULL; /* buffer to hold data read */
 
     /* Allocate buffer for data read */
-    if ((buf = (unsigned int *)malloc(k * sizeof(unsigned int))) == NULL) {
+    if ((buf = (unsigned int*)malloc(k * sizeof(unsigned int))) == NULL) {
         printf("READER: error from malloc\n");
         goto error;
     } /* end if */
@@ -133,8 +131,9 @@ verify(int fd, unsigned int k)
 
     /* Verify data read */
     for (i = 0; i < k; i++) {
-        if (buf[i] != i)
+        if (buf[i] != i) {
             break;
+        }
     } /* end for */
 
     if (i < k) {
@@ -147,17 +146,19 @@ verify(int fd, unsigned int k)
             printf("FAIL IN READER: ...ending sentinel value=%u\n", buf[k - 1]);
             goto error;
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
     /* Free the buffer */
-    if (buf)
+    if (buf) {
         free(buf);
+    }
     return 0;
 
 error:
     /* Free the buffer */
-    if (buf)
+    if (buf) {
         free(buf);
+    }
     return -1;
 } /* end verify() */
 
@@ -175,15 +176,15 @@ error:
  *
  *-------------------------------------------------------------------------
  */
-void
-print_info(int *info, unsigned int lastr, unsigned iteration)
+void print_info(int* info, unsigned int lastr, unsigned iteration)
 {
     unsigned j; /* local index variable */
 
     printf("--------statistics for %u reads (iteration %u)--------\n", lastr, iteration);
 
-    for (j = 0; j <= READ_TRIES; j++)
+    for (j = 0; j <= READ_TRIES; j++) {
         printf("# of %u re-tries = %u\n", j, info[j]);
+    }
 
     printf("--------end statistics for %u reads (iteration %u)--------\n", lastr, iteration);
 } /* print_info() */
@@ -213,16 +214,15 @@ print_info(int *info, unsigned int lastr, unsigned iteration)
  *
  *-------------------------------------------------------------------------
  */
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    int          fd = -1;              /* file descriptor                      */
-    unsigned int j = 0, i = 0, m = 0;  /* local index variables                */
-    int          temp;                 /* temporary variable                   */
-    unsigned int iterations = 0;       /* the input for "-i"                   */
-    unsigned     num        = 0;       /* the input for "-n"                   */
-    int          opt        = 0;       /* option char                          */
-    int          info[READ_TRIES + 1]; /* re-tries statistics                  */
+    int fd = -1;                      /* file descriptor                      */
+    unsigned int j = 0, i = 0, m = 0; /* local index variables                */
+    int temp;                         /* temporary variable                   */
+    unsigned int iterations = 0;      /* the input for "-i"                   */
+    unsigned num = 0;                 /* the input for "-n"                   */
+    int opt = 0;                      /* option char                          */
+    int info[READ_TRIES + 1];         /* re-tries statistics                  */
 
     /* Ensure the expected # of arguments */
     if (argc != 5) {
@@ -233,25 +233,23 @@ main(int argc, char *argv[])
     /* Parse command line options */
     while ((opt = getopt(argc, argv, "n:i:")) != -1) {
         switch (opt) {
-            case 'n':
-                if ((temp = atoi(optarg)) < 0) {
-                    usage();
-                    exit(EXIT_FAILURE);
-                } /* end if */
-                num = (unsigned int)temp;
-                break;
-            case 'i':
-                if ((temp = atoi(optarg)) < 0) {
-                    usage();
-                    exit(EXIT_FAILURE);
-                } /* end if */
-                iterations = (unsigned int)temp;
-                break;
-            default:
-                printf("Invalid option encountered\n");
-                break;
+        case 'n':
+            if ((temp = atoi(optarg)) < 0) {
+                usage();
+                exit(EXIT_FAILURE);
+            } /* end if */
+            num = (unsigned int)temp;
+            break;
+        case 'i':
+            if ((temp = atoi(optarg)) < 0) {
+                usage();
+                exit(EXIT_FAILURE);
+            } /* end if */
+            iterations = (unsigned int)temp;
+            break;
+        default: printf("Invalid option encountered\n"); break;
         } /* end switch */
-    }     /* end while */
+    } /* end while */
 
     printf("READER: number of integers to read = %u; # of iterations = %d\n", num, iterations);
 
@@ -278,8 +276,7 @@ main(int argc, char *argv[])
                     break;
                 } /* end if */
 
-                printf("READER: error from fstat or file size of %u is incorrect--retry open again\n",
-                       (unsigned int)sinfo.st_size);
+                printf("READER: error from fstat or file size of %u is incorrect--retry open again\n", (unsigned int)sinfo.st_size);
                 if (close(fd) < 0) {
                     printf("READER: error from close\n");
                     return EXIT_FAILURE;
@@ -290,9 +287,10 @@ main(int argc, char *argv[])
         } /* end while */
 
         if (fd < 0) {
-            printf("READER: *****open failure/incorrect file size for all %u tries, continue next "
-                   "iteration*****\n\n",
-                   OPEN_TRIES);
+            printf(
+                "READER: *****open failure/incorrect file size for all %u tries, continue next "
+                "iteration*****\n\n",
+                OPEN_TRIES);
             continue;
         } /* end if */
 
@@ -300,7 +298,6 @@ main(int argc, char *argv[])
 
         /* Read and verify data */
         for (j = 1; j <= num; j++) {
-
             printf("READER: doing read %u\n", j);
             if (verify(fd, num) < 0) {
                 printf("READER: error from read %u\n", j);
@@ -308,14 +305,15 @@ main(int argc, char *argv[])
                 /* Perform re-read to see if correct data is obtained */
                 for (m = 1; m <= READ_TRIES; m++) {
                     printf("READER: ===============going to do re-read try %u\n", m);
-                    if (verify(fd, num) < 0)
+                    if (verify(fd, num) < 0) {
                         printf("READER: ===============error from re-read try %u\n", m);
+                    }
                     else {
                         ++info[m];
                         printf("READER: ===============SUCCESS from re-read try %u\n", m);
                         break;
                     } /* end else */
-                }     /* end for */
+                } /* end for */
 
                 if (m > READ_TRIES) {
                     printf("READER: ===============error from all re-read tries: %u\n", READ_TRIES);
@@ -346,10 +344,9 @@ main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-#else /* WIN32 / MINGW32 */
+#else  /* WIN32 / MINGW32 */
 
-int
-main(void)
+int main(void)
 {
     printf("Non-POSIX platform. Exiting.\n");
     return EXIT_FAILURE;

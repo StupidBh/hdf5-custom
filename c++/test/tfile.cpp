@@ -30,29 +30,29 @@ using namespace H5;
 #include "h5test.h"
 #include "h5cpputil.h" // C++ utilility header file
 
-const hsize_t      F1_USERBLOCK_SIZE = 0;
-const size_t       F1_OFFSET_SIZE    = sizeof(haddr_t);
-const size_t       F1_LENGTH_SIZE    = sizeof(hsize_t);
-const unsigned     F1_SYM_LEAF_K     = 4;
-const unsigned     F1_SYM_INTERN_K   = 16;
+const hsize_t F1_USERBLOCK_SIZE = 0;
+const size_t F1_OFFSET_SIZE = sizeof(haddr_t);
+const size_t F1_LENGTH_SIZE = sizeof(hsize_t);
+const unsigned F1_SYM_LEAF_K = 4;
+const unsigned F1_SYM_INTERN_K = 16;
 const H5std_string FILE1("tfile1.h5");
 
-const hsize_t      F2_USERBLOCK_SIZE = 512;
-const size_t       F2_OFFSET_SIZE    = 8;
-const size_t       F2_LENGTH_SIZE    = 8;
-const unsigned     F2_SYM_LEAF_K     = 8;
-const unsigned     F2_SYM_INTERN_K   = 32;
-const unsigned     F2_ISTORE         = 64;
+const hsize_t F2_USERBLOCK_SIZE = 512;
+const size_t F2_OFFSET_SIZE = 8;
+const size_t F2_LENGTH_SIZE = 8;
+const unsigned F2_SYM_LEAF_K = 8;
+const unsigned F2_SYM_INTERN_K = 32;
+const unsigned F2_ISTORE = 64;
 const H5std_string FILE2("tfile2.h5");
 
-const hsize_t      F3_USERBLOCK_SIZE = 0;
-const size_t       F3_OFFSET_SIZE    = F2_OFFSET_SIZE;
-const size_t       F3_LENGTH_SIZE    = F2_LENGTH_SIZE;
-const unsigned     F3_SYM_LEAF_K     = F2_SYM_LEAF_K;
-const unsigned     F3_SYM_INTERN_K   = F2_SYM_INTERN_K;
+const hsize_t F3_USERBLOCK_SIZE = 0;
+const size_t F3_OFFSET_SIZE = F2_OFFSET_SIZE;
+const size_t F3_LENGTH_SIZE = F2_LENGTH_SIZE;
+const unsigned F3_SYM_LEAF_K = F2_SYM_LEAF_K;
+const unsigned F3_SYM_INTERN_K = F2_SYM_INTERN_K;
 const H5std_string FILE3("tfile3.h5");
 
-const int          KB = 1024;
+const int KB = 1024;
 const H5std_string FILE4("tfile4.h5");
 
 /*-------------------------------------------------------------------------
@@ -63,8 +63,7 @@ const H5std_string FILE4("tfile4.h5");
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_file_create()
+static void test_file_create()
 {
     // Output message about test being performed
     SUBTEST("File Creation I/O");
@@ -77,7 +76,7 @@ test_file_create()
     remove(FILE1.c_str());
 
     // Setting this to NULL for cleaning up in failure situations
-    H5File *file1 = NULL;
+    H5File* file1 = NULL;
     try {
         // Create file FILE1
         file1 = new H5File(FILE1, H5F_ACC_TRUNC);
@@ -90,7 +89,7 @@ test_file_create()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("H5File constructor", "Attempted to create an existing file.");
         }
-        catch (FileIException &E) // catch truncating existing file
+        catch (FileIException& E) // catch truncating existing file
         {
         } // do nothing, FAIL expected
 
@@ -106,7 +105,7 @@ test_file_create()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("H5File constructor", "File already exists.");
         }
-        catch (FileIException &E) // catching creating existing file
+        catch (FileIException& E) // catching creating existing file
         {
         } // do nothing, FAIL expected
 
@@ -121,7 +120,7 @@ test_file_create()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("H5File constructor", "H5F_ACC_TRUNC attempt on an opened file.");
         }
-        catch (FileIException &E) // catching truncating opened file
+        catch (FileIException& E) // catching truncating opened file
         {
         } // do nothing, FAIL expected
 
@@ -133,7 +132,7 @@ test_file_create()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("H5File constructor", "H5F_ACC_EXCL attempt on an existing file.");
         }
-        catch (FileIException &E) // catching H5F_ACC_EXCL on existing file
+        catch (FileIException& E) // catching H5F_ACC_EXCL on existing file
         {
         } // do nothing, FAIL expected
 
@@ -141,8 +140,7 @@ test_file_create()
         FileCreatPropList tmpl1 = file1->getCreatePlist();
 
         hsize_t ublock = tmpl1.getUserblock();
-        verify_val(static_cast<long>(ublock), static_cast<long>(F1_USERBLOCK_SIZE),
-                   "FileCreatPropList::getUserblock", __LINE__, __FILE__);
+        verify_val(static_cast<long>(ublock), static_cast<long>(F1_USERBLOCK_SIZE), "FileCreatPropList::getUserblock", __LINE__, __FILE__);
 
         size_t parm1, parm2; // file-creation parameters
         tmpl1.getSizes(parm1, parm2);
@@ -160,21 +158,21 @@ test_file_create()
         // Close first file
         delete file1;
     }
-    catch (InvalidActionException &E) {
+    catch (InvalidActionException& E) {
         cerr << " *FAILED*" << endl;
         cerr << "    <<<  " << E.getDetailMsg() << "  >>>" << endl << endl;
         // clean up
         delete file1;
     }
     // catch all other exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_create()", __LINE__, __FILE__, E.getCDetailMsg());
         // clean up
         delete file1;
     }
 
     // Setting this to NULL for cleaning up in failure situations
-    FileCreatPropList *tmpl1 = NULL;
+    FileCreatPropList* tmpl1 = NULL;
     try {
         // Create a new file with a non-standard file-creation template
         tmpl1 = new FileCreatPropList;
@@ -197,8 +195,7 @@ test_file_create()
 
         // Get the file-creation parameters
         hsize_t ublock = tmpl1->getUserblock();
-        verify_val(static_cast<long>(ublock), static_cast<long>(F2_USERBLOCK_SIZE),
-                   "FileCreatPropList::getUserblock", __LINE__, __FILE__);
+        verify_val(static_cast<long>(ublock), static_cast<long>(F2_USERBLOCK_SIZE), "FileCreatPropList::getUserblock", __LINE__, __FILE__);
 
         size_t parm1, parm2; // file-creation parameters
         tmpl1->getSizes(parm1, parm2);
@@ -230,8 +227,7 @@ test_file_create()
 
         // Get the file-creation parameters
         ublock = tmpl1->getUserblock();
-        verify_val(static_cast<long>(ublock), static_cast<long>(F3_USERBLOCK_SIZE),
-                   "FileCreatPropList::getUserblock", __LINE__, __FILE__);
+        verify_val(static_cast<long>(ublock), static_cast<long>(F3_USERBLOCK_SIZE), "FileCreatPropList::getUserblock", __LINE__, __FILE__);
 
         tmpl1->getSizes(parm1, parm2);
         verify_val(parm1, F3_OFFSET_SIZE, "FileCreatPropList::getSizes", __LINE__, __FILE__);
@@ -246,7 +242,7 @@ test_file_create()
         PASSED();
     }
     // catch all exceptions
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_create()", __LINE__, __FILE__, E.getCDetailMsg());
         // clean up
         delete tmpl1;
@@ -261,14 +257,12 @@ test_file_create()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_file_open()
+static void test_file_open()
 {
     // Output message about test being performed
     SUBTEST("File Opening I/O");
 
     try {
-
         // Open first file
         H5File file1(FILE2, H5F_ACC_RDWR);
 
@@ -277,8 +271,7 @@ test_file_open()
 
         // Get the file-creation parameters
         hsize_t ublock = tmpl1.getUserblock();
-        verify_val(static_cast<long>(ublock), static_cast<long>(F2_USERBLOCK_SIZE),
-                   "FileCreatPropList::getUserblock", __LINE__, __FILE__);
+        verify_val(static_cast<long>(ublock), static_cast<long>(F2_USERBLOCK_SIZE), "FileCreatPropList::getUserblock", __LINE__, __FILE__);
 
         size_t parm1, parm2; // file-creation parameters
         tmpl1.getSizes(parm1, parm2);
@@ -302,7 +295,7 @@ test_file_open()
             // Should FAIL but didn't, so throw an invalid action exception
             throw InvalidActionException("H5File constructor", "Attempt truncating an opened file.");
         }
-        catch (FileIException &E) // catching H5F_ACC_TRUNC on opened file
+        catch (FileIException& E) // catching H5F_ACC_TRUNC on opened file
         {
         } // do nothing, FAIL expected
 
@@ -320,7 +313,7 @@ test_file_open()
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_open()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_file_open()
@@ -333,8 +326,7 @@ test_file_open()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_file_size()
+static void test_file_size()
 {
     // Output message about test being performed
     SUBTEST("File Size");
@@ -359,29 +351,30 @@ test_file_size()
         hsize_t file_size = file4.getFileSize();
 
         // Check if file size is reasonable.  It's supposed to be 2KB now.
-        if (file_size < 1 * KB || file_size > 4 * KB)
-            issue_fail_msg("test_file_size()", __LINE__, __FILE__,
-                           "getFileSize() returned unreasonable value");
+        if (file_size < 1 * KB || file_size > 4 * KB) {
+            issue_fail_msg("test_file_size()", __LINE__, __FILE__, "getFileSize() returned unreasonable value");
+        }
 
         // Get the amount of free space in the file
         hssize_t free_space = file4.getFreeSpace();
 
         // Check if it's reasonable.  It's 0 now.
-        if (free_space < 0 || free_space > 4 * KB)
-            issue_fail_msg("test_file_size()", __LINE__, __FILE__,
-                           "getFreeSpace returned unreasonable value");
+        if (free_space < 0 || free_space > 4 * KB) {
+            issue_fail_msg("test_file_size()", __LINE__, __FILE__, "getFreeSpace returned unreasonable value");
+        }
 
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_size()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
     // use C test utility routine to close property list.
     herr_t ret = H5Pclose(fapl_id);
-    if (ret < 0)
+    if (ret < 0) {
         issue_fail_msg("test_file_size()", __LINE__, __FILE__, "H5Pclose failed");
+    }
 
 } // test_file_size()
 
@@ -393,8 +386,7 @@ test_file_size()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_file_num()
+static void test_file_num()
 {
     // Output message about test being performed
     SUBTEST("File Number");
@@ -420,22 +412,25 @@ test_file_num()
         unsigned long file_num3 = file3.getFileNum();
 
         // Check file numbers
-        if (file_num1 == file_num2)
+        if (file_num1 == file_num2) {
             issue_fail_msg("test_file_num()", __LINE__, __FILE__, "getFileNum() returned wrong value");
-        if (file_num1 != file_num3)
+        }
+        if (file_num1 != file_num3) {
             issue_fail_msg("test_file_num()", __LINE__, __FILE__, "getFileNum() returned wrong value");
+        }
 
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_num()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
     // use C test utility routine to close property list.
     herr_t ret = H5Pclose(fapl_id);
-    if (ret < 0)
+    if (ret < 0) {
         issue_fail_msg("test_file_num()", __LINE__, __FILE__, "H5Pclose failed");
+    }
 
 } // test_file_num()
 
@@ -447,9 +442,9 @@ test_file_num()
  * Return       None
  *-------------------------------------------------------------------------
  */
-const int          RANK = 2;
-const int          NX   = 4;
-const int          NY   = 5;
+const int RANK = 2;
+const int NX = 4;
+const int NY = 5;
 const H5std_string GROUPNAME("group");
 const H5std_string DSETNAME("dataset");
 const H5std_string DATTRNAME("dataset attribute");
@@ -457,13 +452,13 @@ const H5std_string FATTRNAME("file attribute");
 const H5std_string DTYPENAME("compound");
 
 // Compound datatype
-typedef struct s1_t {
+typedef struct s1_t
+{
     unsigned int a;
-    float        b;
+    float b;
 } s1_t;
 
-static void
-test_file_name()
+static void test_file_name()
 {
     // Output message about test being performed.
     SUBTEST("File Name");
@@ -485,7 +480,7 @@ test_file_name()
         verify_val(file_name, FILE4, "Group::getFileName", __LINE__, __FILE__);
 
         // Create the data space.
-        hsize_t   dims[RANK] = {NX, NY};
+        hsize_t dims[RANK] = { NX, NY };
         DataSpace space(RANK, dims);
 
         // Create a new dataset.
@@ -518,7 +513,7 @@ test_file_name()
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_name()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_file_name()
@@ -532,16 +527,15 @@ test_file_name()
  * Return       None
  *-------------------------------------------------------------------------
  */
-const int          RANK1      = 1;
-const int          ATTR1_DIM1 = 3;
+const int RANK1 = 1;
+const int ATTR1_DIM1 = 3;
 const H5std_string FILE5("tfattrs.h5");
 const H5std_string FATTR1_NAME("file attribute 1");
 const H5std_string FATTR2_NAME("file attribute 2");
-int                fattr_data[ATTR1_DIM1] = {512, -234, 98123}; // Test data for file attribute
-int                dattr_data[ATTR1_DIM1] = {256, -123, 1000};  // Test data for dataset attribute
+int fattr_data[ATTR1_DIM1] = { 512, -234, 98123 }; // Test data for file attribute
+int dattr_data[ATTR1_DIM1] = { 256, -123, 1000 };  // Test data for dataset attribute
 
-static void
-test_file_attribute()
+static void test_file_attribute()
 {
     int rdata[ATTR1_DIM1];
     int i;
@@ -555,7 +549,7 @@ test_file_attribute()
         H5File file5(FILE5, H5F_ACC_TRUNC);
 
         // Create the data space
-        hsize_t   dims[RANK1] = {ATTR1_DIM1};
+        hsize_t dims[RANK1] = { ATTR1_DIM1 };
         DataSpace space(RANK1, dims);
 
         // Create two attributes for the file
@@ -568,10 +562,9 @@ test_file_attribute()
             // Try to create the same attribute again (should fail)
             Attribute fattr_dup(file5.createAttribute(FATTR2_NAME, PredType::NATIVE_INT, space));
             // Should FAIL but didn't, so throw an invalid action exception
-            throw InvalidActionException("H5File createAttribute",
-                                         "Attempted to create an existing attribute.");
+            throw InvalidActionException("H5File createAttribute", "Attempted to create an existing attribute.");
         }
-        catch (AttributeIException &E) // catch creating existing attribute
+        catch (AttributeIException& E) // catch creating existing attribute
         {
         } // do nothing, FAIL expected
 
@@ -613,8 +606,7 @@ test_file_attribute()
 
         // Get the class of a file attribute's datatype
         H5T_class_t atclass = fattr1.getTypeClass();
-        verify_val(static_cast<long>(atclass), static_cast<long>(H5T_FLOAT), "Attribute::getTypeClass()",
-                   __LINE__, __FILE__);
+        verify_val(static_cast<long>(atclass), static_cast<long>(H5T_FLOAT), "Attribute::getTypeClass()", __LINE__, __FILE__);
 
         // Get and verify the number of attributes attached to a file
         int n_attrs = file5.getNumAttrs();
@@ -633,14 +625,13 @@ test_file_attribute()
             if (rdata[i] != dattr_data[i]) {
                 H5_FAILED();
                 cerr << endl;
-                cerr << "element [" << i << "] is " << rdata[i] << "but should have been " << dattr_data[i]
-                     << endl;
+                cerr << "element [" << i << "] is " << rdata[i] << "but should have been " << dattr_data[i] << endl;
             }
         }
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_file_attribute()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } // test_file_attribute()
@@ -660,12 +651,9 @@ const H5std_string ROOTGROUP("/");
 const H5std_string GROUP1("/G1");
 const H5std_string SUBGROUP3("/G1/G3");
 
-static void
-test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F_libver_t libver_mod,
-                        unsigned oh_vers_mod)
+static void test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F_libver_t libver_mod, unsigned oh_vers_mod)
 {
     try {
-
         /*
          * Create a new file using the default creation property and access property
          * with latest library version.
@@ -735,7 +723,7 @@ test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F
         // Everything should be closed as they go out of scope
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_libver_bounds_real()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
@@ -751,8 +739,7 @@ test_libver_bounds_real(H5F_libver_t libver_create, unsigned oh_vers_create, H5F
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_libver_bounds()
+static void test_libver_bounds()
 {
     // Output message about test being performed
     SUBTEST("Setting library version bounds");
@@ -771,8 +758,7 @@ test_libver_bounds()
  * Return       None
  *-------------------------------------------------------------------------
  */
-static void
-test_commonfg()
+static void test_commonfg()
 {
     // Output message about test being performed
     SUBTEST("Root group");
@@ -788,7 +774,7 @@ test_commonfg()
         Group group(rootgroup.createGroup(GROUPNAME, 0));
 
         // Create the data space.
-        hsize_t   dims[RANK] = {NX, NY};
+        hsize_t dims[RANK] = { NX, NY };
         DataSpace space(RANK, dims);
 
         // Create a new dataset.
@@ -815,7 +801,7 @@ test_commonfg()
         PASSED();
     } // end of try block
 
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_commonfg()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 
@@ -832,17 +818,16 @@ test_commonfg()
  *-------------------------------------------------------------------------
  */
 const H5std_string FILE7("tfile7.h5");
-const hsize_t      FSP_SIZE_DEF = 4096;
-const hsize_t      FSP_SIZE512  = 512;
+const hsize_t FSP_SIZE_DEF = 4096;
+const hsize_t FSP_SIZE512 = 512;
 
-static void
-test_file_info()
+static void test_file_info()
 {
     // Output message about test being performed
     SUBTEST("File general information");
 
-    hsize_t out_threshold = 0;     // Free space section threshold to get
-    bool    out_persist   = false; // Persist free-space read
+    hsize_t out_threshold = 0; // Free space section threshold to get
+    bool out_persist = false;  // Persist free-space read
     // File space handling strategy
     H5F_fspace_strategy_t out_strategy = H5F_FSPACE_STRATEGY_FSM_AGGR;
 
@@ -869,15 +854,13 @@ test_file_info()
         fcpl.getFileSpaceStrategy(out_strategy, out_persist, out_threshold);
 
         // Verify file space information.
-        verify_val(static_cast<long>(out_strategy), static_cast<long>(H5F_FSPACE_STRATEGY_FSM_AGGR),
-                   "H5File::getFileInfo", __LINE__, __FILE__);
+        verify_val(static_cast<long>(out_strategy), static_cast<long>(H5F_FSPACE_STRATEGY_FSM_AGGR), "H5File::getFileInfo", __LINE__, __FILE__);
         verify_val(out_persist, false, "H5File::getFileInfo", __LINE__, __FILE__);
         verify_val(static_cast<long>(out_threshold), 1, "H5File::getFileInfo", __LINE__, __FILE__);
 
         /* Retrieve file space page size */
         hsize_t out_fsp_psize = fcpl.getFileSpacePagesize();
-        verify_val(out_fsp_psize, FSP_SIZE_DEF, "FileCreatPropList::getFileSpacePagesize", __LINE__,
-                   __FILE__);
+        verify_val(out_fsp_psize, FSP_SIZE_DEF, "FileCreatPropList::getFileSpacePagesize", __LINE__, __FILE__);
 
         // Set various file information.
         fcpl.setUserblock(F2_USERBLOCK_SIZE);
@@ -885,9 +868,9 @@ test_file_info()
         fcpl.setSymk(F2_SYM_INTERN_K, F2_SYM_LEAF_K);
         fcpl.setIstorek(F2_ISTORE);
 
-        hsize_t               threshold = 5;    // Free space section threshold to set
-        bool                  persist   = true; // Persist free-space to set
-        H5F_fspace_strategy_t strategy  = H5F_FSPACE_STRATEGY_PAGE;
+        hsize_t threshold = 5; // Free space section threshold to set
+        bool persist = true;   // Persist free-space to set
+        H5F_fspace_strategy_t strategy = H5F_FSPACE_STRATEGY_PAGE;
 
         fcpl.setFileSpaceStrategy(strategy, persist, threshold);
         fcpl.setFileSpacePagesize(FSP_SIZE512);
@@ -946,8 +929,7 @@ test_file_info()
 
         // Get and verify the file space info from the creation property list */
         fcpl2.getFileSpaceStrategy(out_strategy, out_persist, out_threshold);
-        verify_val(static_cast<long>(out_strategy), static_cast<long>(strategy),
-                   "FileCreatPropList::getFileSpaceStrategy", __LINE__, __FILE__);
+        verify_val(static_cast<long>(out_strategy), static_cast<long>(strategy), "FileCreatPropList::getFileSpaceStrategy", __LINE__, __FILE__);
         verify_val(out_persist, persist, "FileCreatPropList::getFileSpaceStrategy", __LINE__, __FILE__);
         verify_val(out_threshold, threshold, "FileCreatPropList::getFileSpaceStrategy", __LINE__, __FILE__);
 
@@ -956,7 +938,7 @@ test_file_info()
 
         PASSED();
     } // end of try block
-    catch (Exception &E) {
+    catch (Exception& E) {
         issue_fail_msg("test_filespace_info()", __LINE__, __FILE__, E.getCDetailMsg());
     }
 } /* test_file_info() */
@@ -969,8 +951,7 @@ test_file_info()
  * Return       None
  *-------------------------------------------------------------------------
  */
-extern "C" void
-test_file(void *params)
+extern "C" void test_file(void* params)
 {
     (void)params;
 
@@ -996,8 +977,7 @@ test_file(void *params)
  * Return       none
  *-------------------------------------------------------------------------
  */
-extern "C" void
-cleanup_file(void *params)
+extern "C" void cleanup_file(void* params)
 {
     (void)params;
 

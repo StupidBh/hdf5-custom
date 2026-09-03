@@ -26,49 +26,53 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-reset_raw_data_files(bool is_env)
+herr_t reset_raw_data_files(bool is_env)
 {
-    int      fd = 0;          /* external file descriptor             */
-    size_t   i, j;            /* iterators                            */
-    char     filename[1024];  /* file name                            */
-    int      data[PART_SIZE]; /* raw data buffer                      */
-    uint8_t *garbage = NULL;  /* buffer of garbage data               */
-    size_t   garbage_count;   /* size of garbage buffer               */
-    size_t   garbage_bytes;   /* # of garbage bytes written to file   */
+    int fd = 0;              /* external file descriptor             */
+    size_t i, j;             /* iterators                            */
+    char filename[1024];     /* file name                            */
+    int data[PART_SIZE];     /* raw data buffer                      */
+    uint8_t* garbage = NULL; /* buffer of garbage data               */
+    size_t garbage_count;    /* size of garbage buffer               */
+    size_t garbage_bytes;    /* # of garbage bytes written to file   */
 
-    h5_posix_io_ret_t n; /* bytes of I/O - use our platform-independent POSIX
-                          * I/O return type to avoid warnings on platforms
-                          * where the return type isn't ssize_t (e.g., Windows)
-                          */
+    h5_posix_io_ret_t n;     /* bytes of I/O - use our platform-independent POSIX
+                              * I/O return type to avoid warnings on platforms
+                              * where the return type isn't ssize_t (e.g., Windows)
+                              */
 
     /* Set up garbage buffer */
     garbage_count = N_EXT_FILES * GARBAGE_PER_FILE;
-    if (NULL == (garbage = (uint8_t *)calloc(garbage_count, sizeof(uint8_t))))
+    if (NULL == (garbage = (uint8_t*)calloc(garbage_count, sizeof(uint8_t)))) {
         goto error;
-    for (i = 0; i < garbage_count; i++)
+    }
+    for (i = 0; i < garbage_count; i++) {
         garbage[i] = 0xFF;
+    }
 
     /* The *r files are pre-filled with data and are used to
      * verify that read operations work correctly.
      */
     for (i = 0; i < N_EXT_FILES; i++) {
-
         /* Open file */
-        if (is_env)
+        if (is_env) {
             snprintf(filename, sizeof(filename), "extern_env_%lur.raw", (unsigned long)i + 1);
-        else
+        }
+        else {
             snprintf(filename, sizeof(filename), "extern_%lur.raw", (unsigned long)i + 1);
-        if ((fd = HDopen(filename, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0)
+        }
+        if ((fd = HDopen(filename, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0) {
             goto error;
+        }
 
         /* Write garbage data to the file. This allows us to test the
          * the ability to set an offset in the raw data file.
          */
         garbage_bytes = i * 10;
-        n             = HDwrite(fd, garbage, garbage_bytes);
-        if (n < 0 || (size_t)n != garbage_bytes)
+        n = HDwrite(fd, garbage, garbage_bytes);
+        if (n < 0 || (size_t)n != garbage_bytes) {
             goto error;
+        }
 
         /* Fill array with data */
         for (j = 0; j < PART_SIZE; j++) {
@@ -77,8 +81,9 @@ reset_raw_data_files(bool is_env)
 
         /* Write raw data to the file. */
         n = HDwrite(fd, data, sizeof(data));
-        if (n != sizeof(data))
+        if (n != sizeof(data)) {
             goto error;
+        }
 
         /* Close this file */
         HDclose(fd);
@@ -89,22 +94,25 @@ reset_raw_data_files(bool is_env)
      * tests fill in the actual data.
      */
     for (i = 0; i < N_EXT_FILES; i++) {
-
         /* Open file */
-        if (is_env)
+        if (is_env) {
             snprintf(filename, sizeof(filename), "extern_env_%luw.raw", (unsigned long)i + 1);
-        else
+        }
+        else {
             snprintf(filename, sizeof(filename), "extern_%luw.raw", (unsigned long)i + 1);
-        if ((fd = HDopen(filename, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0)
+        }
+        if ((fd = HDopen(filename, O_RDWR | O_CREAT | O_TRUNC, H5_POSIX_CREATE_MODE_RW)) < 0) {
             goto error;
+        }
 
         /* Write garbage data to the file. This allows us to test the
          * the ability to set an offset in the raw data file.
          */
         garbage_bytes = i * 10;
-        n             = HDwrite(fd, garbage, garbage_bytes);
-        if (n < 0 || (size_t)n != garbage_bytes)
+        n = HDwrite(fd, garbage, garbage_bytes);
+        if (n < 0 || (size_t)n != garbage_bytes) {
             goto error;
+        }
 
         /* Close this file */
         HDclose(fd);
@@ -114,9 +122,11 @@ reset_raw_data_files(bool is_env)
     return SUCCEED;
 
 error:
-    if (fd)
+    if (fd) {
         HDclose(fd);
-    if (garbage)
+    }
+    if (garbage) {
         free(garbage);
+    }
     return FAIL;
 }

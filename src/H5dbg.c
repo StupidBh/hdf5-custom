@@ -62,9 +62,7 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5_buffer_dump(FILE *stream, int indent, const uint8_t *buf, const uint8_t *marker, size_t buf_offset,
-               size_t buf_size)
+herr_t H5_buffer_dump(FILE* stream, int indent, const uint8_t* buf, const uint8_t* marker, size_t buf_offset, size_t buf_size)
 {
     size_t u, v; /* Local index variable */
 
@@ -91,38 +89,45 @@ H5_buffer_dump(FILE *stream, int indent, const uint8_t *buf, const uint8_t *mark
         /* Print the hex values */
         for (v = 0; v < 16; v++) {
             if (u + v < buf_size) {
-                if (marker[u + v])
+                if (marker[u + v]) {
                     fprintf(stream, "__ ");
+                }
                 else {
                     c = buf[buf_offset + u + v];
                     fprintf(stream, "%02x ", c);
                 } /* end else */
-            }     /* end if */
-            else
+            } /* end if */
+            else {
                 fprintf(stream, "   ");
+            }
 
-            if (7 == v)
+            if (7 == v) {
                 fputc(' ', stream);
+            }
         } /* end for */
         fputc(' ', stream);
 
         /* Print the character values */
         for (v = 0; v < 16; v++) {
             if (u + v < buf_size) {
-                if (marker[u + v])
+                if (marker[u + v]) {
                     fputc(' ', stream);
+                }
                 else {
                     c = buf[buf_offset + u + v];
 
-                    if (isprint(c))
+                    if (isprint(c)) {
                         fputc(c, stream);
-                    else
+                    }
+                    else {
                         fputc('.', stream);
+                    }
                 } /* end else */
-            }     /* end if */
+            } /* end if */
 
-            if (7 == v)
+            if (7 == v) {
                 fputc(' ', stream);
+            }
         } /* end for */
 
         fputc('\n', stream);

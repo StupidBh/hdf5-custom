@@ -28,46 +28,50 @@
 #define TABLE2_NAME  "table2"
 #define FILENAME     "h5ex_table_09.h5"
 
-int
-main(void)
+int main(void)
 {
-    typedef struct Particle {
-        char   name[16];
-        int    lati;
-        int    longi;
-        float  pressure;
+    typedef struct Particle
+    {
+        char name[16];
+        int lati;
+        int longi;
+        float pressure;
         double temperature;
     } Particle;
 
     Particle dst_buf[NRECORDS + NRECORDS_INS];
 
     /* Calculate the size and the offsets of our struct members in memory */
-    size_t dst_size            = sizeof(Particle);
-    size_t dst_offset[NFIELDS] = {HOFFSET(Particle, name), HOFFSET(Particle, lati), HOFFSET(Particle, longi),
-                                  HOFFSET(Particle, pressure), HOFFSET(Particle, temperature)};
-    size_t dst_sizes[NFIELDS]  = {sizeof(dst_buf[0].name), sizeof(dst_buf[0].lati), sizeof(dst_buf[0].longi),
-                                  sizeof(dst_buf[0].pressure), sizeof(dst_buf[0].temperature)};
+    size_t dst_size = sizeof(Particle);
+    size_t dst_offset[NFIELDS] = { HOFFSET(Particle, name),
+                                   HOFFSET(Particle, lati),
+                                   HOFFSET(Particle, longi),
+                                   HOFFSET(Particle, pressure),
+                                   HOFFSET(Particle, temperature) };
+    size_t dst_sizes[NFIELDS] = { sizeof(dst_buf[0].name),
+                                  sizeof(dst_buf[0].lati),
+                                  sizeof(dst_buf[0].longi),
+                                  sizeof(dst_buf[0].pressure),
+                                  sizeof(dst_buf[0].temperature) };
 
     /* Define an array of Particles */
-    Particle p_data[NRECORDS] = {{"zero", 0, 1, 0.2F, 3.0},    {"one", 10, 11, 1.2F, 13.0},
-                                 {"two", 20, 21, 2.2F, 23.0},  {"three", 30, 31, 3.2F, 33.0},
-                                 {"four", 40, 41, 4.2F, 43.0}, {"five", 50, 51, 5.2F, 53.0},
-                                 {"six", 60, 61, 6.2F, 63.0},  {"seven", 70, 71, 7.2F, 73.0}};
+    Particle p_data[NRECORDS] = { { "zero", 0, 1, 0.2F, 3.0 },    { "one", 10, 11, 1.2F, 13.0 },  { "two", 20, 21, 2.2F, 23.0 }, { "three", 30, 31, 3.2F, 33.0 },
+                                  { "four", 40, 41, 4.2F, 43.0 }, { "five", 50, 51, 5.2F, 53.0 }, { "six", 60, 61, 6.2F, 63.0 }, { "seven", 70, 71, 7.2F, 73.0 } };
 
     /* Define field information */
-    const char *field_names[NFIELDS] = {"Name", "Latitude", "Longitude", "Pressure", "Temperature"};
-    hid_t       field_type[NFIELDS];
-    hid_t       string_type;
-    hid_t       file_id;
-    hsize_t     chunk_size   = 10;
-    int         compress     = 0;
-    Particle    fill_data[1] = {{"no data", -1, -2, -99.0F, -98.0}}; /* Fill value particle */
-    hsize_t     start1;   /* Record to start reading from 1st table */
-    hsize_t     nrecords; /* Number of records to insert */
-    hsize_t     start2;   /* Record to start writing in 2nd table */
-    int         i;
-    hsize_t     nfields_out;
-    hsize_t     nrecords_out;
+    const char* field_names[NFIELDS] = { "Name", "Latitude", "Longitude", "Pressure", "Temperature" };
+    hid_t field_type[NFIELDS];
+    hid_t string_type;
+    hid_t file_id;
+    hsize_t chunk_size = 10;
+    int compress = 0;
+    Particle fill_data[1] = { { "no data", -1, -2, -99.0F, -98.0 } }; /* Fill value particle */
+    hsize_t start1;                                                   /* Record to start reading from 1st table */
+    hsize_t nrecords;                                                 /* Number of records to insert */
+    hsize_t start2;                                                   /* Record to start writing in 2nd table */
+    int i;
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
 
     /* Initialize the field field_type */
     string_type = H5Tcopy(H5T_C_S1);
@@ -82,16 +86,14 @@ main(void)
     file_id = H5Fcreate(FILENAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Make 2 tables: TABLE2_NAME is empty  */
-    H5TBmake_table("Table Title", file_id, TABLE1_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, compress, p_data);
+    H5TBmake_table("Table Title", file_id, TABLE1_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset, field_type, chunk_size, fill_data, compress, p_data);
 
-    H5TBmake_table("Table Title", file_id, TABLE2_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset,
-                   field_type, chunk_size, fill_data, compress, NULL);
+    H5TBmake_table("Table Title", file_id, TABLE2_NAME, NFIELDS, NRECORDS, dst_size, field_names, dst_offset, field_type, chunk_size, fill_data, compress, NULL);
 
     /* Add 2 records from TABLE1_NAME to TABLE2_NAME  */
-    start1   = 3;
+    start1 = 3;
     nrecords = NRECORDS_INS;
-    start2   = 6;
+    start2 = 6;
     H5TBadd_records_from(file_id, TABLE1_NAME, start1, nrecords, TABLE2_NAME, start2);
 
     /* read TABLE2_NAME: it should have 2 more records now */
@@ -105,8 +107,7 @@ main(void)
 
     /* print it by rows */
     for (i = 0; i < nrecords_out; i++) {
-        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi,
-               dst_buf[i].pressure, dst_buf[i].temperature);
+        printf("%-5s %-5d %-5d %-5f %-5f", dst_buf[i].name, dst_buf[i].lati, dst_buf[i].longi, dst_buf[i].pressure, dst_buf[i].temperature);
         printf("\n");
     }
 

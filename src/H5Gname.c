@@ -28,14 +28,14 @@
 /***********/
 /* Headers */
 /***********/
-#include "H5private.h"   /* Generic Functions			*/
-#include "H5Dprivate.h"  /* Datasets				*/
-#include "H5Eprivate.h"  /* Error handling		  	*/
-#include "H5Fprivate.h"  /* File access				*/
-#include "H5Gpkg.h"      /* Groups		  		*/
-#include "H5Iprivate.h"  /* IDs			  		*/
-#include "H5Lprivate.h"  /* Links                                */
-#include "H5MMprivate.h" /* Memory wrappers			*/
+#include "H5private.h"          /* Generic Functions			*/
+#include "H5Dprivate.h"         /* Datasets				*/
+#include "H5Eprivate.h"         /* Error handling		  	*/
+#include "H5Fprivate.h"         /* File access				*/
+#include "H5Gpkg.h"             /* Groups		  		*/
+#include "H5Iprivate.h"         /* IDs			  		*/
+#include "H5Lprivate.h"         /* Links                                */
+#include "H5MMprivate.h"        /* Memory wrappers			*/
 
 #include "H5VLnative_private.h" /* Native VOL connector                     */
 
@@ -48,21 +48,23 @@
 /******************/
 
 /* Struct used by change name callback function */
-typedef struct H5G_names_t {
-    H5G_names_op_t op;              /* Operation performed on file */
-    H5F_t         *src_file;        /* Top file in src location's mounted file hier. */
-    H5RS_str_t    *src_full_path_r; /* Source location's full path */
-    H5F_t         *dst_file;        /* Destination location's file */
-    H5RS_str_t    *dst_full_path_r; /* Destination location's full path */
+typedef struct H5G_names_t
+{
+    H5G_names_op_t op;           /* Operation performed on file */
+    H5F_t* src_file;             /* Top file in src location's mounted file hier. */
+    H5RS_str_t* src_full_path_r; /* Source location's full path */
+    H5F_t* dst_file;             /* Destination location's file */
+    H5RS_str_t* dst_full_path_r; /* Destination location's full path */
 } H5G_names_t;
 
 /* Info to pass to the iteration function when building name */
-typedef struct H5G_gnba_iter_t {
+typedef struct H5G_gnba_iter_t
+{
     /* In */
-    const H5O_loc_t *loc; /* The location of the object we're looking for */
+    const H5O_loc_t* loc; /* The location of the object we're looking for */
 
     /* Out */
-    char *path; /* Name of the object */
+    char* path; /* Name of the object */
 } H5G_gnba_iter_t;
 
 /********************/
@@ -73,11 +75,10 @@ typedef struct H5G_gnba_iter_t {
 /* Local Prototypes */
 /********************/
 
-static htri_t      H5G__common_path(const H5RS_str_t *fullpath_r, const H5RS_str_t *prefix_r);
-static H5RS_str_t *H5G__build_fullpath(const char *prefix, const char *name);
-static herr_t      H5G__name_move_path(H5RS_str_t **path_r_ptr, const char *full_suffix, const char *src_path,
-                                       const char *dst_path);
-static int         H5G__name_replace_cb(void *obj_ptr, hid_t obj_id, void *key);
+static htri_t H5G__common_path(const H5RS_str_t* fullpath_r, const H5RS_str_t* prefix_r);
+static H5RS_str_t* H5G__build_fullpath(const char* prefix, const char* name);
+static herr_t H5G__name_move_path(H5RS_str_t** path_r_ptr, const char* full_suffix, const char* src_path, const char* dst_path);
+static int H5G__name_replace_cb(void* obj_ptr, hid_t obj_id, void* key);
 
 /*********************/
 /* Package Variables */
@@ -105,17 +106,18 @@ static int         H5G__name_replace_cb(void *obj_ptr, hid_t obj_id, void *key);
  *
  *-------------------------------------------------------------------------
  */
-const char *
-H5G__component(const char *name, size_t *size_p)
+const char* H5G__component(const char* name, size_t* size_p)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
     assert(name);
 
-    while ('/' == *name)
+    while ('/' == *name) {
         name++;
-    if (size_p)
+    }
+    if (size_p) {
         *size_p = strcspn(name, "/");
+    }
 
     FUNC_LEAVE_NOAPI(name)
 } /* end H5G__component() */
@@ -131,13 +133,12 @@ H5G__component(const char *name, size_t *size_p)
  *
  *-------------------------------------------------------------------------
  */
-char *
-H5G_normalize(const char *name)
+char* H5G_normalize(const char* name)
 {
-    char  *norm;             /* Pointer to the normalized string */
-    size_t s, d;             /* Positions within the strings */
-    bool   last_slash;       /* Flag to indicate last character was a slash */
-    char  *ret_value = NULL; /* Return value */
+    char* norm;             /* Pointer to the normalized string */
+    size_t s, d;            /* Positions within the strings */
+    bool last_slash;        /* Flag to indicate last character was a slash */
+    char* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT
 
@@ -145,22 +146,24 @@ H5G_normalize(const char *name)
     assert(name);
 
     /* Duplicate the name, to return */
-    if (NULL == (norm = H5MM_strdup(name)))
+    if (NULL == (norm = H5MM_strdup(name))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, NULL, "memory allocation failed for normalized string");
+    }
 
     /* Walk through the characters, omitting duplicated '/'s */
-    s = d      = 0;
+    s = d = 0;
     last_slash = false;
     while (name[s] != '\0') {
-        if (name[s] == '/')
+        if (name[s] == '/') {
             if (last_slash)
                 ;
             else {
-                norm[d++]  = name[s];
+                norm[d++] = name[s];
                 last_slash = true;
             } /* end else */
+        }
         else {
-            norm[d++]  = name[s];
+            norm[d++] = name[s];
             last_slash = false;
         } /* end else */
         s++;
@@ -170,8 +173,9 @@ H5G_normalize(const char *name)
     norm[d] = '\0';
 
     /* Check for final '/' on normalized name & eliminate it */
-    if (d > 1 && last_slash)
+    if (d > 1 && last_slash) {
         norm[d - 1] = '\0';
+    }
 
     /* Set return value */
     ret_value = norm;
@@ -191,31 +195,36 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static htri_t
-H5G__common_path(const H5RS_str_t *fullpath_r, const H5RS_str_t *prefix_r)
+static htri_t H5G__common_path(const H5RS_str_t* fullpath_r, const H5RS_str_t* prefix_r)
 {
-    const char *fullpath;          /* Pointer to actual fullpath string */
-    const char *prefix;            /* Pointer to actual prefix string */
-    size_t      nchars1, nchars2;  /* Number of characters in components */
-    htri_t      ret_value = false; /* Return value */
+    const char* fullpath;     /* Pointer to actual fullpath string */
+    const char* prefix;       /* Pointer to actual prefix string */
+    size_t nchars1, nchars2;  /* Number of characters in components */
+    htri_t ret_value = false; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Get component of each name */
-    if (NULL == (fullpath = H5RS_get_str(fullpath_r)))
+    if (NULL == (fullpath = H5RS_get_str(fullpath_r))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve full path");
+    }
     nchars1 = SIZE_MAX;
-    if (NULL == (fullpath = H5G__component(fullpath, &nchars1)))
+    if (NULL == (fullpath = H5G__component(fullpath, &nchars1))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve pointer to path component");
-    if (SIZE_MAX == nchars1)
+    }
+    if (SIZE_MAX == nchars1) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve component length");
-    if (NULL == (prefix = H5RS_get_str(prefix_r)))
+    }
+    if (NULL == (prefix = H5RS_get_str(prefix_r))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve path prefix");
+    }
     nchars2 = SIZE_MAX;
-    if (NULL == (prefix = H5G__component(prefix, &nchars2)))
+    if (NULL == (prefix = H5G__component(prefix, &nchars2))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve pointer to path component");
-    if (SIZE_MAX == nchars2)
+    }
+    if (SIZE_MAX == nchars2) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve component length");
+    }
 
     /* Check if we have a real string for each component */
     while (*fullpath && *prefix) {
@@ -232,26 +241,33 @@ H5G__common_path(const H5RS_str_t *fullpath_r, const H5RS_str_t *prefix_r)
                 assert(fullpath);
                 prefix = H5G__component(prefix, &nchars2);
                 assert(prefix);
-                if (NULL == (fullpath = H5G__component(fullpath, &nchars1)))
+                if (NULL == (fullpath = H5G__component(fullpath, &nchars1))) {
                     HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve pointer to path component");
-                if (SIZE_MAX == nchars1)
+                }
+                if (SIZE_MAX == nchars1) {
                     HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve component length");
+                }
                 nchars2 = SIZE_MAX;
-                if (NULL == (prefix = H5G__component(prefix, &nchars2)))
+                if (NULL == (prefix = H5G__component(prefix, &nchars2))) {
                     HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve pointer to path component");
-                if (SIZE_MAX == nchars2)
+                }
+                if (SIZE_MAX == nchars2) {
                     HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't retrieve component length");
+                }
             } /* end if */
-            else
+            else {
                 HGOTO_DONE(false);
+            }
         } /* end if */
-        else
+        else {
             HGOTO_DONE(false);
+        }
     } /* end while */
 
     /* If we reached the end of the prefix path to check, it must be a valid prefix */
-    if (*prefix == '\0')
+    if (*prefix == '\0') {
         ret_value = true;
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -266,10 +282,9 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static H5RS_str_t *
-H5G__build_fullpath(const char *prefix, const char *name)
+static H5RS_str_t* H5G__build_fullpath(const char* prefix, const char* name)
 {
-    H5RS_str_t *ret_value = NULL; /* Return value */
+    H5RS_str_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -278,10 +293,12 @@ H5G__build_fullpath(const char *prefix, const char *name)
     assert(name);
 
     /* Create full path */
-    if (NULL == (ret_value = H5RS_create(prefix)))
+    if (NULL == (ret_value = H5RS_create(prefix))) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, NULL, "can't create ref-counted string");
-    if (prefix[strlen(prefix) - 1] != '/')
+    }
+    if (prefix[strlen(prefix) - 1] != '/') {
         H5RS_aputc(ret_value, '/'); /* Add separator, if the prefix doesn't end in one */
+    }
     H5RS_acat(ret_value, name);
 
 done:
@@ -298,11 +315,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-H5RS_str_t *
-H5G_build_fullpath_refstr_str(H5RS_str_t *prefix_r, const char *name)
+H5RS_str_t* H5G_build_fullpath_refstr_str(H5RS_str_t* prefix_r, const char* name)
 {
-    const char *prefix;           /* Pointer to raw string for path */
-    H5RS_str_t *ret_value = NULL; /* Return value */
+    const char* prefix;           /* Pointer to raw string for path */
+    H5RS_str_t* ret_value = NULL; /* Return value */
 
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -329,8 +345,7 @@ H5G_build_fullpath_refstr_str(H5RS_str_t *prefix_r, const char *name)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G__name_init(H5G_name_t *name, const char *path)
+herr_t H5G__name_init(H5G_name_t* name, const char* path)
 {
     FUNC_ENTER_PACKAGE_NOERR
 
@@ -357,8 +372,7 @@ H5G__name_init(H5G_name_t *name, const char *path)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_name_set(const H5G_name_t *loc, H5G_name_t *obj, const char *name)
+herr_t H5G_name_set(const H5G_name_t* loc, H5G_name_t* obj, const char* name)
 {
     herr_t ret_value = SUCCEED;
 
@@ -374,15 +388,17 @@ H5G_name_set(const H5G_name_t *loc, H5G_name_t *obj, const char *name)
     /* Create the object's full path, if a full path exists in the location */
     if (loc->full_path_r) {
         /* Go build the new full path */
-        if ((obj->full_path_r = H5G_build_fullpath_refstr_str(loc->full_path_r, name)) == NULL)
+        if ((obj->full_path_r = H5G_build_fullpath_refstr_str(loc->full_path_r, name)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_PATH, FAIL, "can't build user path name");
+        }
     } /* end if */
 
     /* Create the object's user path, if a user path exists in the location */
     if (loc->user_path_r) {
         /* Go build the new user path */
-        if ((obj->user_path_r = H5G_build_fullpath_refstr_str(loc->user_path_r, name)) == NULL)
+        if ((obj->user_path_r = H5G_build_fullpath_refstr_str(loc->user_path_r, name)) == NULL) {
             HGOTO_ERROR(H5E_SYM, H5E_PATH, FAIL, "can't build user path name");
+        }
     } /* end if */
 
 done:
@@ -409,8 +425,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_name_copy(H5G_name_t *dst, const H5G_name_t *src, H5_copy_depth_t depth)
+herr_t H5G_name_copy(H5G_name_t* dst, const H5G_name_t* src, H5_copy_depth_t depth)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -433,7 +448,7 @@ H5G_name_copy(H5G_name_t *dst, const H5G_name_t *src, H5_copy_depth_t depth)
     }
     else {
         H5_WARN_CAST_AWAY_CONST_OFF
-        H5G_name_reset((H5G_name_t *)src);
+        H5G_name_reset((H5G_name_t*)src);
         H5_WARN_CAST_AWAY_CONST_ON
     }
 
@@ -452,8 +467,7 @@ H5G_name_copy(H5G_name_t *dst, const H5G_name_t *src, H5_copy_depth_t depth)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_get_name(const H5G_loc_t *loc, char *name /*out*/, size_t size, size_t *name_len, bool *cached)
+herr_t H5G_get_name(const H5G_loc_t* loc, char* name /*out*/, size_t size, size_t* name_len, bool* cached)
 {
     herr_t ret_value = SUCCEED; /* Return value */
 
@@ -470,28 +484,33 @@ H5G_get_name(const H5G_loc_t *loc, char *name /*out*/, size_t size, size_t *name
 
         if (name) {
             strncpy(name, H5RS_get_str(loc->path->user_path_r), MIN((len + 1), size));
-            if (len >= size)
+            if (len >= size) {
                 name[size - 1] = '\0';
+            }
         } /* end if */
 
         /* Set name length, if requested */
-        if (name_len)
+        if (name_len) {
             *name_len = len;
+        }
 
         /* Indicate that the name is cached, if requested */
         /* (Currently only used for testing - QAK, 2010/07/26) */
-        if (cached)
+        if (cached) {
             *cached = true;
+        }
     } /* end if */
     else if (!loc->path->obj_hidden) {
         /* Search for name of object */
-        if (H5G_get_name_by_addr(loc->oloc->file, loc->oloc, name, size, name_len) < 0)
+        if (H5G_get_name_by_addr(loc->oloc->file, loc->oloc, name, size, name_len) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't determine name");
+        }
 
         /* Indicate that the name is _not_ cached, if requested */
         /* (Currently only used for testing - QAK, 2010/07/26) */
-        if (cached)
+        if (cached) {
             *cached = false;
+        }
     } /* end else */
 
 done:
@@ -508,8 +527,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_name_reset(H5G_name_t *name)
+herr_t H5G_name_reset(H5G_name_t* name)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -531,8 +549,7 @@ H5G_name_reset(H5G_name_t *name)
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_name_free(H5G_name_t *name)
+herr_t H5G_name_free(H5G_name_t* name)
 {
     FUNC_ENTER_NOAPI_NOINIT_NOERR
 
@@ -562,14 +579,12 @@ H5G_name_free(H5G_name_t *name)
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__name_move_path(H5RS_str_t **path_r_ptr, const char *full_suffix, const char *src_path,
-                    const char *dst_path)
+static herr_t H5G__name_move_path(H5RS_str_t** path_r_ptr, const char* full_suffix, const char* src_path, const char* dst_path)
 {
-    const char *path;                /* Path to update */
-    size_t      path_len;            /* Length of path */
-    size_t      full_suffix_len;     /* Length of full suffix */
-    herr_t      ret_value = SUCCEED; /* Return value */
+    const char* path;           /* Path to update */
+    size_t path_len;            /* Length of path */
+    size_t full_suffix_len;     /* Length of full suffix */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -585,15 +600,15 @@ H5G__name_move_path(H5RS_str_t **path_r_ptr, const char *full_suffix, const char
 
     /* Check if path needs to be updated */
     full_suffix_len = strlen(full_suffix);
-    path_len        = strlen(path);
+    path_len = strlen(path);
     if (full_suffix_len < path_len) {
-        const char *dst_suffix;        /* Destination suffix that changes */
-        const char *src_suffix;        /* Source suffix that changes */
-        size_t      path_prefix_len;   /* Length of path prefix */
-        const char *path_prefix2;      /* 2nd prefix for path */
-        size_t      path_prefix2_len;  /* Length of 2nd path prefix */
-        size_t      common_prefix_len; /* Length of common prefix */
-        H5RS_str_t *rs;                /* Ref-counted string for new path */
+        const char* dst_suffix;   /* Destination suffix that changes */
+        const char* src_suffix;   /* Source suffix that changes */
+        size_t path_prefix_len;   /* Length of path prefix */
+        const char* path_prefix2; /* 2nd prefix for path */
+        size_t path_prefix2_len;  /* Length of 2nd path prefix */
+        size_t common_prefix_len; /* Length of common prefix */
+        H5RS_str_t* rs;           /* Ref-counted string for new path */
 
         /* Compute path prefix before full suffix */
         path_prefix_len = path_len - full_suffix_len;
@@ -601,11 +616,13 @@ H5G__name_move_path(H5RS_str_t **path_r_ptr, const char *full_suffix, const char
         /* Determine the common prefix for src & dst paths */
         common_prefix_len = 0;
         /* Find first character that is different */
-        while (*(src_path + common_prefix_len) == *(dst_path + common_prefix_len))
+        while (*(src_path + common_prefix_len) == *(dst_path + common_prefix_len)) {
             common_prefix_len++;
+        }
         /* Back up to previous '/' */
-        while (*(src_path + common_prefix_len) != '/')
+        while (*(src_path + common_prefix_len) != '/') {
             common_prefix_len--;
+        }
         /* Include '/' */
         common_prefix_len++;
 
@@ -616,19 +633,22 @@ H5G__name_move_path(H5RS_str_t **path_r_ptr, const char *full_suffix, const char
         dst_suffix = dst_path + (common_prefix_len - 1);
 
         /* Compute path prefix before src suffix */
-        path_prefix2     = path;
+        path_prefix2 = path;
         path_prefix2_len = path_prefix_len - strlen(src_suffix);
 
         /* Allocate new ref-counted string */
-        if (NULL == (rs = H5RS_create(NULL)))
+        if (NULL == (rs = H5RS_create(NULL))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
+        }
 
         /* Create the new path */
-        if (path_prefix2_len > 0)
+        if (path_prefix2_len > 0) {
             H5RS_ancat(rs, path_prefix2, path_prefix2_len);
+        }
         H5RS_acat(rs, dst_suffix);
-        if (full_suffix_len > 0)
+        if (full_suffix_len > 0) {
             H5RS_acat(rs, full_suffix);
+        }
 
         /* Release previous path */
         H5RS_decr(*path_r_ptr);
@@ -650,15 +670,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static int
-H5G__name_replace_cb(void *obj_ptr, hid_t obj_id, void *key)
+static int H5G__name_replace_cb(void* obj_ptr, hid_t obj_id, void* key)
 {
-    const H5G_names_t *names = (const H5G_names_t *)key; /* Get operation's information */
-    H5O_loc_t         *oloc;         /* Object location for object that the ID refers to */
-    H5G_name_t        *obj_path;     /* Pointer to group hier. path for obj */
-    H5F_t             *top_obj_file; /* Top file in object's mounted file hier. */
-    bool   obj_in_child = false;     /* Flag to indicate that the object is in the child mount hier. */
-    herr_t ret_value    = SUCCEED;   /* Return value */
+    const H5G_names_t* names = (const H5G_names_t*)key; /* Get operation's information */
+    H5O_loc_t* oloc;                                    /* Object location for object that the ID refers to */
+    H5G_name_t* obj_path;                               /* Pointer to group hier. path for obj */
+    H5F_t* top_obj_file;                                /* Top file in object's mounted file hier. */
+    bool obj_in_child = false;                          /* Flag to indicate that the object is in the child mount hier. */
+    herr_t ret_value = SUCCEED;                         /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -666,224 +685,231 @@ H5G__name_replace_cb(void *obj_ptr, hid_t obj_id, void *key)
 
     /* Get the symbol table entry */
     switch (H5I_get_type(obj_id)) {
-        case H5I_GROUP:
-            oloc     = H5G_oloc((H5G_t *)obj_ptr);
-            obj_path = H5G_nameof((H5G_t *)obj_ptr);
-            break;
+    case H5I_GROUP:
+        oloc = H5G_oloc((H5G_t*)obj_ptr);
+        obj_path = H5G_nameof((H5G_t*)obj_ptr);
+        break;
 
-        case H5I_DATASET:
-            oloc     = H5D_oloc((H5D_t *)obj_ptr);
-            obj_path = H5D_nameof((H5D_t *)obj_ptr);
-            break;
+    case H5I_DATASET:
+        oloc = H5D_oloc((H5D_t*)obj_ptr);
+        obj_path = H5D_nameof((H5D_t*)obj_ptr);
+        break;
 
-        case H5I_DATATYPE:
-            /* Avoid non-named datatypes */
-            if (!H5T_is_named((H5T_t *)obj_ptr))
-                HGOTO_DONE(SUCCEED); /* Do not exit search over IDs */
+    case H5I_DATATYPE:
+        /* Avoid non-named datatypes */
+        if (!H5T_is_named((H5T_t*)obj_ptr)) {
+            HGOTO_DONE(SUCCEED); /* Do not exit search over IDs */
+        }
 
-            oloc     = H5T_oloc((H5T_t *)obj_ptr);
-            obj_path = H5T_nameof((H5T_t *)obj_ptr);
-            break;
+        oloc = H5T_oloc((H5T_t*)obj_ptr);
+        obj_path = H5T_nameof((H5T_t*)obj_ptr);
+        break;
 
-        case H5I_MAP:
-            HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "maps not supported in native VOL connector");
+    case H5I_MAP: HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "maps not supported in native VOL connector");
 
-        case H5I_UNINIT:
-        case H5I_BADID:
-        case H5I_FILE:
-        case H5I_DATASPACE:
-        case H5I_ATTR:
-        case H5I_VFL:
-        case H5I_VOL:
-        case H5I_GENPROP_CLS:
-        case H5I_GENPROP_LST:
-        case H5I_ERROR_CLASS:
-        case H5I_ERROR_MSG:
-        case H5I_ERROR_STACK:
-        case H5I_SPACE_SEL_ITER:
-        case H5I_EVENTSET:
-        case H5I_NTYPES:
-        default:
-            HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "unknown data object");
+    case H5I_UNINIT:
+    case H5I_BADID:
+    case H5I_FILE:
+    case H5I_DATASPACE:
+    case H5I_ATTR:
+    case H5I_VFL:
+    case H5I_VOL:
+    case H5I_GENPROP_CLS:
+    case H5I_GENPROP_LST:
+    case H5I_ERROR_CLASS:
+    case H5I_ERROR_MSG:
+    case H5I_ERROR_STACK:
+    case H5I_SPACE_SEL_ITER:
+    case H5I_EVENTSET:
+    case H5I_NTYPES:
+    default                : HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "unknown data object");
     } /* end switch */
     assert(oloc);
     assert(obj_path);
 
     /* Check if the object has a full path still */
-    if (!obj_path->full_path_r)
+    if (!obj_path->full_path_r) {
         HGOTO_DONE(SUCCEED); /* No need to look at object, it's path is already invalid */
+    }
 
     /* Find the top file in object's mount hier. */
     if (H5F_PARENT(oloc->file)) {
         /* Check if object is in child file (for mount & unmount operations) */
-        if (names->dst_file && H5F_SAME_SHARED(oloc->file, names->dst_file))
+        if (names->dst_file && H5F_SAME_SHARED(oloc->file, names->dst_file)) {
             obj_in_child = true;
+        }
 
         /* Find the "top" file in the chain of mounted files */
         top_obj_file = H5F_PARENT(oloc->file);
         while (H5F_PARENT(top_obj_file) != NULL) {
             /* Check if object is in child mount hier. (for mount & unmount operations) */
-            if (names->dst_file && H5F_SAME_SHARED(top_obj_file, names->dst_file))
+            if (names->dst_file && H5F_SAME_SHARED(top_obj_file, names->dst_file)) {
                 obj_in_child = true;
+            }
 
             top_obj_file = H5F_PARENT(top_obj_file);
         } /* end while */
-    }     /* end if */
-    else
+    } /* end if */
+    else {
         top_obj_file = oloc->file;
+    }
 
     /* Check if object is in top of child mount hier. (for mount & unmount operations) */
-    if (names->dst_file && H5F_SAME_SHARED(top_obj_file, names->dst_file))
+    if (names->dst_file && H5F_SAME_SHARED(top_obj_file, names->dst_file)) {
         obj_in_child = true;
+    }
 
     /* Check if the object is in same file mount hier. */
-    if (!H5F_SAME_SHARED(top_obj_file, names->src_file))
+    if (!H5F_SAME_SHARED(top_obj_file, names->src_file)) {
         HGOTO_DONE(SUCCEED); /* No need to look at object, it's path is already invalid */
+    }
 
     switch (names->op) {
-        /*-------------------------------------------------------------------------
-         * H5G_NAME_MOUNT
-         *-------------------------------------------------------------------------
-         */
-        case H5G_NAME_MOUNT:
-            /* Check if object is in child mount hier. */
-            if (obj_in_child) {
-                const char *full_path; /* Full path of current object */
-                const char *src_path;  /* Full path of source object */
-                H5RS_str_t *rs;        /* Ref-counted string for new path */
+    /*-------------------------------------------------------------------------
+     * H5G_NAME_MOUNT
+     *-------------------------------------------------------------------------
+     */
+    case H5G_NAME_MOUNT:
+        /* Check if object is in child mount hier. */
+        if (obj_in_child) {
+            const char* full_path; /* Full path of current object */
+            const char* src_path;  /* Full path of source object */
+            H5RS_str_t* rs;        /* Ref-counted string for new path */
 
-                /* Get pointers to paths of interest */
-                full_path = H5RS_get_str(obj_path->full_path_r);
-                src_path  = H5RS_get_str(names->src_full_path_r);
+            /* Get pointers to paths of interest */
+            full_path = H5RS_get_str(obj_path->full_path_r);
+            src_path = H5RS_get_str(names->src_full_path_r);
 
-                /* Create new full path */
-                if (NULL == (rs = H5RS_create(src_path)))
-                    HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
-                H5RS_acat(rs, full_path);
+            /* Create new full path */
+            if (NULL == (rs = H5RS_create(src_path))) {
+                HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
+            }
+            H5RS_acat(rs, full_path);
 
-                /* Release previous full path */
-                H5RS_decr(obj_path->full_path_r);
+            /* Release previous full path */
+            H5RS_decr(obj_path->full_path_r);
 
-                /* Take ownership of the new full path */
-                obj_path->full_path_r = rs;
+            /* Take ownership of the new full path */
+            obj_path->full_path_r = rs;
+        } /* end if */
+        /* Object must be in parent mount file hier. */
+        else {
+            /* Check if the source is along the entry's path */
+            /* (But not actually the entry itself) */
+            if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r) && H5RS_cmp(obj_path->full_path_r, names->src_full_path_r)) {
+                /* Hide the user path */
+                (obj_path->obj_hidden)++;
             } /* end if */
-            /* Object must be in parent mount file hier. */
-            else {
-                /* Check if the source is along the entry's path */
-                /* (But not actually the entry itself) */
-                if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r) &&
-                    H5RS_cmp(obj_path->full_path_r, names->src_full_path_r)) {
-                    /* Hide the user path */
-                    (obj_path->obj_hidden)++;
-                } /* end if */
-            }     /* end else */
-            break;
+        } /* end else */
+        break;
 
-        /*-------------------------------------------------------------------------
-         * H5G_NAME_UNMOUNT
-         *-------------------------------------------------------------------------
-         */
-        case H5G_NAME_UNMOUNT:
-            if (obj_in_child) {
-                const char *full_path;   /* Full path of current object */
-                const char *full_suffix; /* Full path after source path */
-                const char *src_path;    /* Full path of source object */
-                H5RS_str_t *rs;          /* Ref-counted string for new path */
+    /*-------------------------------------------------------------------------
+     * H5G_NAME_UNMOUNT
+     *-------------------------------------------------------------------------
+     */
+    case H5G_NAME_UNMOUNT:
+        if (obj_in_child) {
+            const char* full_path;   /* Full path of current object */
+            const char* full_suffix; /* Full path after source path */
+            const char* src_path;    /* Full path of source object */
+            H5RS_str_t* rs;          /* Ref-counted string for new path */
 
-                /* Get pointers to paths of interest */
-                full_path = H5RS_get_str(obj_path->full_path_r);
-                src_path  = H5RS_get_str(names->src_full_path_r);
+            /* Get pointers to paths of interest */
+            full_path = H5RS_get_str(obj_path->full_path_r);
+            src_path = H5RS_get_str(names->src_full_path_r);
 
-                /* Construct full path suffix */
-                full_suffix = full_path + strlen(src_path);
+            /* Construct full path suffix */
+            full_suffix = full_path + strlen(src_path);
 
-                /* Create new full path suffix */
-                if (NULL == (rs = H5RS_create(full_suffix)))
-                    HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
+            /* Create new full path suffix */
+            if (NULL == (rs = H5RS_create(full_suffix))) {
+                HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
+            }
 
-                /* Release previous full path */
-                H5RS_decr(obj_path->full_path_r);
+            /* Release previous full path */
+            H5RS_decr(obj_path->full_path_r);
 
-                /* Take ownership of the new full path */
-                obj_path->full_path_r = rs;
+            /* Take ownership of the new full path */
+            obj_path->full_path_r = rs;
 
-                /* Check if the object's user path should be invalidated */
-                if (obj_path->user_path_r && H5RS_len(rs) < H5RS_len(obj_path->user_path_r)) {
-                    /* Free user path */
-                    H5RS_decr(obj_path->user_path_r);
-                    obj_path->user_path_r = NULL;
-                } /* end if */
-            }     /* end if */
-            else {
-                /* Check if file being unmounted was hiding the object */
-                if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r) &&
-                    H5RS_cmp(obj_path->full_path_r, names->src_full_path_r)) {
-                    /* Un-hide the user path */
-                    (obj_path->obj_hidden)--;
-                } /* end if */
-            }     /* end else */
-            break;
-
-        /*-------------------------------------------------------------------------
-         * H5G_NAME_DELETE
-         *-------------------------------------------------------------------------
-         */
-        case H5G_NAME_DELETE:
-            /* Check if the location being unlinked is in the path for the current object */
-            if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r)) {
-                /* Free paths for object */
-                H5G_name_free(obj_path);
+            /* Check if the object's user path should be invalidated */
+            if (obj_path->user_path_r && H5RS_len(rs) < H5RS_len(obj_path->user_path_r)) {
+                /* Free user path */
+                H5RS_decr(obj_path->user_path_r);
+                obj_path->user_path_r = NULL;
             } /* end if */
-            break;
-
-        /*-------------------------------------------------------------------------
-         * H5G_NAME_MOVE
-         *-------------------------------------------------------------------------
-         */
-        case H5G_NAME_MOVE: /* Link move case, check for relative names case */
-            /* Check if the src object moved is in the current object's path */
-            if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r)) {
-                const char *full_path;   /* Full path of current object */
-                const char *full_suffix; /* Suffix of full path, after src_path */
-                const char *src_path;    /* Full path of source object */
-                const char *dst_path;    /* Full path of destination object */
-                H5RS_str_t *rs;          /* Ref-counted string for new path */
-
-                /* Sanity check */
-                assert(names->dst_full_path_r);
-
-                /* Get pointers to paths of interest */
-                full_path = H5RS_get_str(obj_path->full_path_r);
-                src_path  = H5RS_get_str(names->src_full_path_r);
-                dst_path  = H5RS_get_str(names->dst_full_path_r);
-
-                /* Make certain that the source and destination names are full (not relative) paths */
-                assert(*src_path == '/');
-                assert(*dst_path == '/');
-
-                /* Get pointer to "full suffix" */
-                full_suffix = full_path + strlen(src_path);
-
-                /* Update the user path, if one exists */
-                if (obj_path->user_path_r)
-                    if (H5G__name_move_path(&(obj_path->user_path_r), full_suffix, src_path, dst_path) < 0)
-                        HGOTO_ERROR(H5E_SYM, H5E_PATH, FAIL, "can't build user path name");
-
-                /* Create new full path */
-                if (NULL == (rs = H5RS_create(dst_path)))
-                    HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
-                H5RS_acat(rs, full_suffix);
-
-                /* Release previous full path */
-                H5RS_decr(obj_path->full_path_r);
-
-                /* Take ownership of the new full path */
-                obj_path->full_path_r = rs;
+        } /* end if */
+        else {
+            /* Check if file being unmounted was hiding the object */
+            if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r) && H5RS_cmp(obj_path->full_path_r, names->src_full_path_r)) {
+                /* Un-hide the user path */
+                (obj_path->obj_hidden)--;
             } /* end if */
-            break;
+        } /* end else */
+        break;
 
-        default:
-            HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid operation");
+    /*-------------------------------------------------------------------------
+     * H5G_NAME_DELETE
+     *-------------------------------------------------------------------------
+     */
+    case H5G_NAME_DELETE:
+        /* Check if the location being unlinked is in the path for the current object */
+        if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r)) {
+            /* Free paths for object */
+            H5G_name_free(obj_path);
+        } /* end if */
+        break;
+
+    /*-------------------------------------------------------------------------
+     * H5G_NAME_MOVE
+     *-------------------------------------------------------------------------
+     */
+    case H5G_NAME_MOVE: /* Link move case, check for relative names case */
+        /* Check if the src object moved is in the current object's path */
+        if (H5G__common_path(obj_path->full_path_r, names->src_full_path_r)) {
+            const char* full_path;   /* Full path of current object */
+            const char* full_suffix; /* Suffix of full path, after src_path */
+            const char* src_path;    /* Full path of source object */
+            const char* dst_path;    /* Full path of destination object */
+            H5RS_str_t* rs;          /* Ref-counted string for new path */
+
+            /* Sanity check */
+            assert(names->dst_full_path_r);
+
+            /* Get pointers to paths of interest */
+            full_path = H5RS_get_str(obj_path->full_path_r);
+            src_path = H5RS_get_str(names->src_full_path_r);
+            dst_path = H5RS_get_str(names->dst_full_path_r);
+
+            /* Make certain that the source and destination names are full (not relative) paths */
+            assert(*src_path == '/');
+            assert(*dst_path == '/');
+
+            /* Get pointer to "full suffix" */
+            full_suffix = full_path + strlen(src_path);
+
+            /* Update the user path, if one exists */
+            if (obj_path->user_path_r) {
+                if (H5G__name_move_path(&(obj_path->user_path_r), full_suffix, src_path, dst_path) < 0) {
+                    HGOTO_ERROR(H5E_SYM, H5E_PATH, FAIL, "can't build user path name");
+                }
+            }
+
+            /* Create new full path */
+            if (NULL == (rs = H5RS_create(dst_path))) {
+                HGOTO_ERROR(H5E_SYM, H5E_CANTCREATE, FAIL, "can't create ref-counted string");
+            }
+            H5RS_acat(rs, full_suffix);
+
+            /* Release previous full path */
+            H5RS_decr(obj_path->full_path_r);
+
+            /* Take ownership of the new full path */
+            obj_path->full_path_r = rs;
+        } /* end if */
+        break;
+
+    default: HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid operation");
     } /* end switch */
 
 done:
@@ -904,9 +930,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_name_replace(const H5O_link_t *lnk, H5G_names_op_t op, H5F_t *src_file, H5RS_str_t *src_full_path_r,
-                 H5F_t *dst_file, H5RS_str_t *dst_full_path_r)
+herr_t H5G_name_replace(const H5O_link_t* lnk, H5G_names_op_t op, H5F_t* src_file, H5RS_str_t* src_full_path_r, H5F_t* dst_file, H5RS_str_t* dst_full_path_r)
 {
     herr_t ret_value = SUCCEED;
 
@@ -917,16 +941,17 @@ H5G_name_replace(const H5O_link_t *lnk, H5G_names_op_t op, H5F_t *src_file, H5RS
 
     /* Check if the object we are manipulating has a path */
     if (src_full_path_r) {
-        bool search_group    = false; /* Flag to indicate that groups are to be searched */
-        bool search_dataset  = false; /* Flag to indicate that datasets are to be searched */
+        bool search_group = false;    /* Flag to indicate that groups are to be searched */
+        bool search_dataset = false;  /* Flag to indicate that datasets are to be searched */
         bool search_datatype = false; /* Flag to indicate that datatypes are to be searched */
 
         /* Check for particular link to operate on */
         if (lnk) {
             /* Look up the object type for each type of link */
             switch (lnk->type) {
-                case H5L_TYPE_HARD: {
-                    H5O_loc_t  tmp_oloc; /* Temporary object location */
+            case H5L_TYPE_HARD:
+                {
+                    H5O_loc_t tmp_oloc;  /* Temporary object location */
                     H5O_type_t obj_type; /* Type of object at location */
 
                     /* Build temporary object location */
@@ -934,59 +959,58 @@ H5G_name_replace(const H5O_link_t *lnk, H5G_names_op_t op, H5F_t *src_file, H5RS
                     tmp_oloc.addr = lnk->u.hard.addr;
 
                     /* Get the type of the object */
-                    if (H5O_obj_type(&tmp_oloc, &obj_type) < 0)
+                    if (H5O_obj_type(&tmp_oloc, &obj_type) < 0) {
                         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't get object type");
+                    }
 
                     /* Determine which type of objects to operate on */
                     switch (obj_type) {
-                        case H5O_TYPE_GROUP:
-                            /* Search and replace names through group IDs */
-                            search_group = true;
-                            break;
+                    case H5O_TYPE_GROUP:
+                        /* Search and replace names through group IDs */
+                        search_group = true;
+                        break;
 
-                        case H5O_TYPE_DATASET:
-                            /* Search and replace names through dataset IDs */
-                            search_dataset = true;
-                            break;
+                    case H5O_TYPE_DATASET:
+                        /* Search and replace names through dataset IDs */
+                        search_dataset = true;
+                        break;
 
-                        case H5O_TYPE_NAMED_DATATYPE:
-                            /* Search and replace names through datatype IDs */
-                            search_datatype = true;
-                            break;
+                    case H5O_TYPE_NAMED_DATATYPE:
+                        /* Search and replace names through datatype IDs */
+                        search_datatype = true;
+                        break;
 
-                        case H5O_TYPE_MAP:
-                            HGOTO_ERROR(H5E_SYM, H5E_BADTYPE, FAIL,
-                                        "maps not supported in native VOL connector");
+                    case H5O_TYPE_MAP: HGOTO_ERROR(H5E_SYM, H5E_BADTYPE, FAIL, "maps not supported in native VOL connector");
 
-                        case H5O_TYPE_UNKNOWN:
-                        case H5O_TYPE_NTYPES:
-                            /* Search and replace names through datatype IDs */
-                        default:
-                            HGOTO_ERROR(H5E_SYM, H5E_BADTYPE, FAIL, "not valid object type");
+                    case H5O_TYPE_UNKNOWN:
+                    case H5O_TYPE_NTYPES:
+                        /* Search and replace names through datatype IDs */
+                    default: HGOTO_ERROR(H5E_SYM, H5E_BADTYPE, FAIL, "not valid object type");
                     } /* end switch */
-                }     /* end case */
+                } /* end case */
                 break;
 
-                case H5L_TYPE_SOFT:
-                    /* Symbolic links might resolve to any object, so we need to search all IDs */
-                    search_group = search_dataset = search_datatype = true;
-                    break;
+            case H5L_TYPE_SOFT:
+                /* Symbolic links might resolve to any object, so we need to search all IDs */
+                search_group = search_dataset = search_datatype = true;
+                break;
 
-                case H5L_TYPE_ERROR:
-                case H5L_TYPE_EXTERNAL:
-                case H5L_TYPE_MAX:
-                default: /* User-defined link */
-                    /* Check for unknown library-defined link type */
-                    if (lnk->type < H5L_TYPE_UD_MIN)
-                        HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, FAIL, "unknown link type");
+            case H5L_TYPE_ERROR:
+            case H5L_TYPE_EXTERNAL:
+            case H5L_TYPE_MAX:
+            default: /* User-defined link */
+                /* Check for unknown library-defined link type */
+                if (lnk->type < H5L_TYPE_UD_MIN) {
+                    HGOTO_ERROR(H5E_SYM, H5E_BADVALUE, FAIL, "unknown link type");
+                }
 
-                    /* User-defined & external links automatically wipe out
-                     * names (because it would be too much work to track them),
-                     * so there's no point in searching them.
-                     */
-                    break;
+                /* User-defined & external links automatically wipe out
+                 * names (because it would be too much work to track them),
+                 * so there's no point in searching them.
+                 */
+                break;
             } /* end switch */
-        }     /* end if */
+        } /* end if */
         else {
             /* We pass NULL as link pointer when we need to search all IDs */
             search_group = search_dataset = search_datatype = true;
@@ -997,32 +1021,39 @@ H5G_name_replace(const H5O_link_t *lnk, H5G_names_op_t op, H5F_t *src_file, H5RS
             H5G_names_t names; /* Structure to hold operation information for callback */
 
             /* Find top file in src location's mount hierarchy */
-            while (H5F_PARENT(src_file))
+            while (H5F_PARENT(src_file)) {
                 src_file = H5F_PARENT(src_file);
+            }
 
             /* Set up common information for callback */
-            names.src_file        = src_file;
+            names.src_file = src_file;
             names.src_full_path_r = src_full_path_r;
-            names.dst_file        = dst_file;
+            names.dst_file = dst_file;
             names.dst_full_path_r = dst_full_path_r;
-            names.op              = op;
+            names.op = op;
 
             /* Search through group IDs */
-            if (search_group)
-                if (H5I_iterate(H5I_GROUP, H5G__name_replace_cb, &names, false) < 0)
+            if (search_group) {
+                if (H5I_iterate(H5I_GROUP, H5G__name_replace_cb, &names, false) < 0) {
                     HGOTO_ERROR(H5E_SYM, H5E_BADITER, FAIL, "can't iterate over groups");
+                }
+            }
 
             /* Search through dataset IDs */
-            if (search_dataset)
-                if (H5I_iterate(H5I_DATASET, H5G__name_replace_cb, &names, false) < 0)
+            if (search_dataset) {
+                if (H5I_iterate(H5I_DATASET, H5G__name_replace_cb, &names, false) < 0) {
                     HGOTO_ERROR(H5E_SYM, H5E_BADITER, FAIL, "can't iterate over datasets");
+                }
+            }
 
             /* Search through datatype IDs */
-            if (search_datatype)
-                if (H5I_iterate(H5I_DATATYPE, H5G__name_replace_cb, &names, false) < 0)
+            if (search_datatype) {
+                if (H5I_iterate(H5I_DATATYPE, H5G__name_replace_cb, &names, false) < 0) {
                     HGOTO_ERROR(H5E_SYM, H5E_BADITER, FAIL, "can't iterate over datatypes");
+                }
+            }
         } /* end if */
-    }     /* end if */
+    } /* end if */
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -1039,11 +1070,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5G__get_name_by_addr_cb(hid_t H5_ATTR_UNUSED gid, const char *path, const H5O_loc_t *obj_oloc, void *_udata)
+static herr_t H5G__get_name_by_addr_cb(hid_t H5_ATTR_UNUSED gid, const char* path, const H5O_loc_t* obj_oloc, void* _udata)
 {
-    H5G_gnba_iter_t *udata     = (H5G_gnba_iter_t *)_udata; /* User data for iteration */
-    herr_t           ret_value = H5_ITER_CONT;              /* Return value */
+    H5G_gnba_iter_t* udata = (H5G_gnba_iter_t*)_udata; /* User data for iteration */
+    herr_t ret_value = H5_ITER_CONT;                   /* Return value */
 
     FUNC_ENTER_PACKAGE
 
@@ -1057,8 +1087,9 @@ H5G__get_name_by_addr_cb(hid_t H5_ATTR_UNUSED gid, const char *path, const H5O_l
     /* Check for object in same file (handles mounted files) */
     /* (re-verify address, in case we traversed a file mount) */
     if (udata->loc->addr == obj_oloc->addr && udata->loc->file == obj_oloc->file) {
-        if (NULL == (udata->path = H5MM_strdup(path)))
+        if (NULL == (udata->path = H5MM_strdup(path))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, H5_ITER_ERROR, "can't duplicate path string");
+        }
 
         /* We found a match so we return immediately */
         HGOTO_DONE(H5_ITER_STOP);
@@ -1081,15 +1112,14 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5G_get_name_by_addr(H5F_t *f, const H5O_loc_t *loc, char *name, size_t size, size_t *name_len)
+herr_t H5G_get_name_by_addr(H5F_t* f, const H5O_loc_t* loc, char* name, size_t size, size_t* name_len)
 {
-    H5G_gnba_iter_t udata;               /* User data for iteration  */
-    size_t          len;                 /* Length of path name */
-    H5G_loc_t       root_loc;            /* Root group's location    */
-    bool            found_obj = false;   /* If we found the object   */
-    herr_t          status;              /* Status from iteration    */
-    herr_t          ret_value = SUCCEED; /* Return value             */
+    H5G_gnba_iter_t udata;      /* User data for iteration  */
+    size_t len;                 /* Length of path name */
+    H5G_loc_t root_loc;         /* Root group's location    */
+    bool found_obj = false;     /* If we found the object   */
+    herr_t status;              /* Status from iteration    */
+    herr_t ret_value = SUCCEED; /* Return value             */
 
     /* Portably clear udata struct (before FUNC_ENTER) */
     memset(&udata, 0, sizeof(udata));
@@ -1097,26 +1127,29 @@ H5G_get_name_by_addr(H5F_t *f, const H5O_loc_t *loc, char *name, size_t size, si
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Construct a group location for root group of the file */
-    if (H5G_root_loc(f, &root_loc) < 0)
+    if (H5G_root_loc(f, &root_loc) < 0) {
         HGOTO_ERROR(H5E_SYM, H5E_CANTGET, FAIL, "can't get root group's location");
+    }
 
     /* Check for root group being the object looked for */
     if (root_loc.oloc->addr == loc->addr && root_loc.oloc->file == loc->file) {
-        if (NULL == (udata.path = H5MM_strdup("")))
+        if (NULL == (udata.path = H5MM_strdup(""))) {
             HGOTO_ERROR(H5E_SYM, H5E_CANTALLOC, FAIL, "can't duplicate path string");
+        }
         found_obj = true;
     } /* end if */
     else {
         /* Set up user data for iterator */
-        udata.loc  = loc;
+        udata.loc = loc;
         udata.path = NULL;
 
         /* Visit all the links in the file */
-        if ((status = H5G_visit(&root_loc, "/", H5_INDEX_NAME, H5_ITER_NATIVE, NULL, H5G__get_name_by_addr_cb,
-                                &udata)) < 0)
+        if ((status = H5G_visit(&root_loc, "/", H5_INDEX_NAME, H5_ITER_NATIVE, NULL, H5G__get_name_by_addr_cb, &udata)) < 0) {
             HGOTO_ERROR(H5E_SYM, H5E_BADITER, FAIL, "group traversal failed while looking for object name");
-        else if (status > 0)
+        }
+        else if (status > 0) {
             found_obj = true;
+        }
     } /* end else */
 
     /* Check for finding the object */
@@ -1132,16 +1165,19 @@ H5G_get_name_by_addr(H5F_t *f, const H5O_loc_t *loc, char *name, size_t size, si
             /* Append the rest of the path */
             /* (less one character, for the initial path separator) */
             strncat(name, udata.path, (size - 2));
-            if (len >= size)
+            if (len >= size) {
                 name[size - 1] = '\0';
+            }
         } /* end if */
-    }     /* end if */
-    else
+    } /* end if */
+    else {
         len = 0;
+    }
 
     /* Set path name length, if given */
-    if (name_len)
+    if (name_len) {
         *name_len = len;
+    }
 
 done:
     /* Release resources */

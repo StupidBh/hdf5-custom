@@ -60,16 +60,16 @@
 /********************/
 
 /* Property class callbacks */
-static herr_t H5P__macc_reg_prop(H5P_genclass_t *pclass);
+static herr_t H5P__macc_reg_prop(H5P_genclass_t* pclass);
 
 /*********************/
 /* Package Variables */
 /*********************/
 
 /* Map access property list class library initialization object */
-const H5P_libclass_t H5P_CLS_MACC[1] = {{
-    "map access",        /* Class name for debugging     */
-    H5P_TYPE_MAP_ACCESS, /* Class type                   */
+const H5P_libclass_t H5P_CLS_MACC[1] = { {
+    "map access",             /* Class name for debugging     */
+    H5P_TYPE_MAP_ACCESS,      /* Class type                   */
 
     &H5P_CLS_LINK_ACCESS_g,   /* Parent class                 */
     &H5P_CLS_MAP_ACCESS_g,    /* Pointer to class             */
@@ -77,13 +77,13 @@ const H5P_libclass_t H5P_CLS_MACC[1] = {{
     &H5P_LST_MAP_ACCESS_ID_g, /* Pointer to default property list ID */
     H5P__macc_reg_prop,       /* Default property registration routine */
 
-    NULL, /* Class creation callback      */
-    NULL, /* Class creation callback info */
-    NULL, /* Class copy callback          */
-    NULL, /* Class copy callback info     */
-    NULL, /* Class close callback         */
-    NULL  /* Class close callback info    */
-}};
+    NULL,                     /* Class creation callback      */
+    NULL,                     /* Class creation callback info */
+    NULL,                     /* Class copy callback          */
+    NULL,                     /* Class copy callback info     */
+    NULL,                     /* Class close callback         */
+    NULL                      /* Class close callback info    */
+} };
 
 /*****************************/
 /* Library Private Variables */
@@ -102,27 +102,47 @@ const H5P_libclass_t H5P_CLS_MACC[1] = {{
  * Return:      Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-static herr_t
-H5P__macc_reg_prop(H5P_genclass_t *pclass)
+static herr_t H5P__macc_reg_prop(H5P_genclass_t* pclass)
 {
     size_t key_prefetch_size = H5M_ACS_KEY_PREFETCH_SIZE_DEF; /* Default key prefetch size for iteration */
-    size_t key_alloc_size =
-        H5M_ACS_KEY_ALLOC_SIZE_DEF; /* Default key prefetch allocation size for iteration */
-    herr_t ret_value = SUCCEED;     /* Return value */
+    size_t key_alloc_size = H5M_ACS_KEY_ALLOC_SIZE_DEF;       /* Default key prefetch allocation size for iteration */
+    herr_t ret_value = SUCCEED;                               /* Return value */
 
     FUNC_ENTER_PACKAGE
 
     /* Register the key prefetch size for iteration */
-    if (H5P__register_real(pclass, H5M_ACS_KEY_PREFETCH_SIZE_NAME, H5M_ACS_KEY_PREFETCH_SIZE_SIZE,
-                           &key_prefetch_size, NULL, NULL, NULL, H5M_ACS_KEY_PREFETCH_SIZE_ENC,
-                           H5M_ACS_KEY_PREFETCH_SIZE_DEC, NULL, NULL, NULL, NULL) < 0)
+    if (H5P__register_real(pclass,
+                           H5M_ACS_KEY_PREFETCH_SIZE_NAME,
+                           H5M_ACS_KEY_PREFETCH_SIZE_SIZE,
+                           &key_prefetch_size,
+                           NULL,
+                           NULL,
+                           NULL,
+                           H5M_ACS_KEY_PREFETCH_SIZE_ENC,
+                           H5M_ACS_KEY_PREFETCH_SIZE_DEC,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTINSERT, FAIL, "can't insert property into class");
+    }
 
     /* Register the key prefetch allocation size for iteration */
-    if (H5P__register_real(pclass, H5M_ACS_KEY_ALLOC_SIZE_NAME, H5M_ACS_KEY_ALLOC_SIZE_SIZE, &key_alloc_size,
-                           NULL, NULL, NULL, H5M_ACS_KEY_ALLOC_SIZE_ENC, H5M_ACS_KEY_ALLOC_SIZE_DEC, NULL,
-                           NULL, NULL, NULL) < 0)
+    if (H5P__register_real(pclass,
+                           H5M_ACS_KEY_ALLOC_SIZE_NAME,
+                           H5M_ACS_KEY_ALLOC_SIZE_SIZE,
+                           &key_alloc_size,
+                           NULL,
+                           NULL,
+                           NULL,
+                           H5M_ACS_KEY_ALLOC_SIZE_ENC,
+                           H5M_ACS_KEY_ALLOC_SIZE_DEC,
+                           NULL,
+                           NULL,
+                           NULL,
+                           NULL) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTINSERT, FAIL, "can't insert property into class");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -147,23 +167,25 @@ done:
  * Return:      Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pset_map_iterate_hints(hid_t mapl_id, size_t key_prefetch_size, size_t key_alloc_size)
+herr_t H5Pset_map_iterate_hints(hid_t mapl_id, size_t key_prefetch_size, size_t key_alloc_size)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(mapl_id, H5P_MAP_ACCESS, false)))
+    if (NULL == (plist = H5P_object_verify(mapl_id, H5P_MAP_ACCESS, false))) {
         HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Set sizes */
-    if (H5P_set(plist, H5M_ACS_KEY_PREFETCH_SIZE_NAME, &key_prefetch_size) < 0)
+    if (H5P_set(plist, H5M_ACS_KEY_PREFETCH_SIZE_NAME, &key_prefetch_size) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "can't set key prefetch size");
-    if (H5P_set(plist, H5M_ACS_KEY_ALLOC_SIZE_NAME, &key_alloc_size) < 0)
+    }
+    if (H5P_set(plist, H5M_ACS_KEY_ALLOC_SIZE_NAME, &key_alloc_size) < 0) {
         HGOTO_ERROR(H5E_PLIST, H5E_CANTSET, FAIL, "can't set key allocation size");
+    }
 
 done:
     FUNC_LEAVE_API(ret_value)
@@ -178,26 +200,28 @@ done:
  * Return:      Non-negative on success/Negative on failure
  *-------------------------------------------------------------------------
  */
-herr_t
-H5Pget_map_iterate_hints(hid_t mapl_id, size_t *key_prefetch_size /*out*/, size_t *key_alloc_size /*out*/)
+herr_t H5Pget_map_iterate_hints(hid_t mapl_id, size_t* key_prefetch_size /*out*/, size_t* key_alloc_size /*out*/)
 {
-    H5P_genplist_t *plist;               /* Property list pointer */
-    herr_t          ret_value = SUCCEED; /* return value */
+    H5P_genplist_t* plist;      /* Property list pointer */
+    herr_t ret_value = SUCCEED; /* return value */
 
     FUNC_ENTER_API(FAIL)
 
     /* Get the plist structure */
-    if (NULL == (plist = H5P_object_verify(mapl_id, H5P_MAP_ACCESS, true)))
+    if (NULL == (plist = H5P_object_verify(mapl_id, H5P_MAP_ACCESS, true))) {
         HGOTO_ERROR(H5E_ID, H5E_BADID, FAIL, "can't find object for ID");
+    }
 
     /* Get the properties */
     if (key_prefetch_size) {
-        if (H5P_get(plist, H5M_ACS_KEY_PREFETCH_SIZE_NAME, key_prefetch_size) < 0)
+        if (H5P_get(plist, H5M_ACS_KEY_PREFETCH_SIZE_NAME, key_prefetch_size) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get key prefetch size");
+        }
     } /* end if */
     if (key_alloc_size) {
-        if (H5P_get(plist, H5M_ACS_KEY_ALLOC_SIZE_NAME, key_alloc_size) < 0)
+        if (H5P_get(plist, H5M_ACS_KEY_ALLOC_SIZE_NAME, key_alloc_size) < 0) {
             HGOTO_ERROR(H5E_PLIST, H5E_CANTGET, FAIL, "can't get key allocation size");
+        }
     } /* end if */
 
 done:

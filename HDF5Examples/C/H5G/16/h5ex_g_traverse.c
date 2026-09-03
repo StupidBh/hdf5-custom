@@ -24,37 +24,37 @@
  * linked list that can be searched for duplicate groups,
  * preventing infinite recursion.
  */
-struct opdata {
-    unsigned       recurs;     /* recursion level.  0=root */
-    struct opdata *prev;       /* pointer to previous opdata */
-    unsigned long  groupno[2]; /* unique group number */
+struct opdata
+{
+    unsigned recurs;          /* recursion level.  0=root */
+    struct opdata* prev;      /* pointer to previous opdata */
+    unsigned long groupno[2]; /* unique group number */
 };
 
 /*
  * Operator function to be called by H5Giterate.
  */
-herr_t op_func(hid_t loc_id, const char *name, void *operator_data);
+herr_t op_func(hid_t loc_id, const char* name, void* operator_data);
 
 /*
  * Function to check for duplicate groups in a path.
  */
-int group_check(struct opdata *od, unsigned long target_groupno[2]);
+int group_check(struct opdata* od, unsigned long target_groupno[2]);
 
-int
-main(void)
+int main(void)
 {
-    hid_t         file; /* Handle */
-    herr_t        status;
-    H5G_stat_t    statbuf;
+    hid_t file; /* Handle */
+    herr_t status;
+    H5G_stat_t statbuf;
     struct opdata od;
 
     /*
      * Open file and initialize the operator data structure.
      */
-    file          = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
-    status        = H5Gget_objinfo(file, "/", 0, &statbuf);
-    od.recurs     = 0;
-    od.prev       = NULL;
+    file = H5Fopen(FILENAME, H5F_ACC_RDONLY, H5P_DEFAULT);
+    status = H5Gget_objinfo(file, "/", 0, &statbuf);
+    od.recurs = 0;
+    od.prev = NULL;
     od.groupno[0] = statbuf.objno[0];
     od.groupno[1] = statbuf.objno[1];
 
@@ -62,7 +62,7 @@ main(void)
      * Print the root group and formatting, begin iteration.
      */
     printf("/ {\n");
-    status = H5Giterate(file, "/", NULL, op_func, (void *)&od);
+    status = H5Giterate(file, "/", NULL, op_func, (void*)&od);
     printf("}\n");
 
     /*
@@ -84,12 +84,11 @@ main(void)
   circular path in the file.
 
  ************************************************************/
-herr_t
-op_func(hid_t loc_id, const char *name, void *operator_data)
+herr_t op_func(hid_t loc_id, const char* name, void* operator_data)
 {
-    herr_t         status, return_val = 0;
-    H5G_stat_t     statbuf;
-    struct opdata *od = (struct opdata *)operator_data;
+    herr_t status, return_val = 0;
+    H5G_stat_t statbuf;
+    struct opdata* od = (struct opdata*)operator_data;
     /* Type conversion */
     unsigned spaces = 2 * (od->recurs + 1);
     /* Number of whitespaces to prepend
@@ -103,42 +102,36 @@ op_func(hid_t loc_id, const char *name, void *operator_data)
     status = H5Gget_objinfo(loc_id, name, 0, &statbuf);
     printf("%*s", spaces, ""); /* Format output */
     switch (statbuf.type) {
-        case H5G_GROUP:
-            printf("Group: %s {\n", name);
+    case H5G_GROUP:
+        printf("Group: %s {\n", name);
 
+        /*
+         * Check group objno against linked list of operator
+         * data structures.  Only necessary if there is more
+         * than 1 link to the group.
+         */
+        if ((statbuf.nlink > 1) && group_check(od, statbuf.objno)) {
+            printf("%*s  Warning: Loop detected!\n", spaces, "");
+        }
+        else {
             /*
-             * Check group objno against linked list of operator
-             * data structures.  Only necessary if there is more
-             * than 1 link to the group.
+             * Initialize new operator data structure and
+             * begin recursive iteration on the discovered
+             * group.  The new opdata structure is given a
+             * pointer to the current one.
              */
-            if ((statbuf.nlink > 1) && group_check(od, statbuf.objno)) {
-                printf("%*s  Warning: Loop detected!\n", spaces, "");
-            }
-            else {
-
-                /*
-                 * Initialize new operator data structure and
-                 * begin recursive iteration on the discovered
-                 * group.  The new opdata structure is given a
-                 * pointer to the current one.
-                 */
-                struct opdata nextod;
-                nextod.recurs     = od->recurs + 1;
-                nextod.prev       = od;
-                nextod.groupno[0] = statbuf.objno[0];
-                nextod.groupno[1] = statbuf.objno[1];
-                return_val        = H5Giterate(loc_id, name, NULL, op_func, (void *)&nextod);
-            }
-            printf("%*s}\n", spaces, "");
-            break;
-        case H5G_DATASET:
-            printf("Dataset: %s\n", name);
-            break;
-        case H5G_TYPE:
-            printf("Datatype: %s\n", name);
-            break;
-        default:
-            printf("Unknown: %s\n", name);
+            struct opdata nextod;
+            nextod.recurs = od->recurs + 1;
+            nextod.prev = od;
+            nextod.groupno[0] = statbuf.objno[0];
+            nextod.groupno[1] = statbuf.objno[1];
+            return_val = H5Giterate(loc_id, name, NULL, op_func, (void*)&nextod);
+        }
+        printf("%*s}\n", spaces, "");
+        break;
+    case H5G_DATASET: printf("Dataset: %s\n", name); break;
+    case H5G_TYPE   : printf("Datatype: %s\n", name); break;
+    default         : printf("Unknown: %s\n", name);
     }
 
     return return_val;
@@ -152,14 +145,16 @@ op_func(hid_t loc_id, const char *name, void *operator_data)
   otherwise.
 
  ************************************************************/
-int
-group_check(struct opdata *od, unsigned long target_groupno[2])
+int group_check(struct opdata* od, unsigned long target_groupno[2])
 {
-    if ((od->groupno[0] == target_groupno[0]) && (od->groupno[1] == target_groupno[1]))
+    if ((od->groupno[0] == target_groupno[0]) && (od->groupno[1] == target_groupno[1])) {
         return 1; /* Group numbers match */
-    else if (!od->recurs)
+    }
+    else if (!od->recurs) {
         return 0; /* Root group reached with no matches */
-    else
+    }
+    else {
         return group_check(od->prev, target_groupno);
+    }
     /* Recursively examine the next node */
 }

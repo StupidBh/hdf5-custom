@@ -33,23 +33,22 @@
 #define NEXTARRAYS   10
 #define NDATAOBJECTS 100000
 
-int
-main(void)
+int main(void)
 {
-    hid_t    file_id, prop_id, memspace_id, type_id;
-    hid_t    group_id;
-    hid_t    dataset_id, dataspace_id;
-    herr_t   status;
-    hsize_t  dims[1];
-    hsize_t  maxdims[1];
-    float    data[NPOINTS];
-    float    floatval;
+    hid_t file_id, prop_id, memspace_id, type_id;
+    hid_t group_id;
+    hid_t dataset_id, dataspace_id;
+    herr_t status;
+    hsize_t dims[1];
+    hsize_t maxdims[1];
+    float data[NPOINTS];
+    float floatval;
     unsigned numdataobj = 0;
     unsigned i, j;
-    char     name[80];
-    hsize_t  start[1]  = {0};
-    hsize_t  stride[1] = {1};
-    hsize_t  count[1]  = {1};
+    char name[80];
+    hsize_t start[1] = { 0 };
+    hsize_t stride[1] = { 1 };
+    hsize_t count[1] = { 1 };
 
     /* Create a file */
     file_id = H5Fcreate(FILEN, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -59,8 +58,7 @@ main(void)
     dataspace_id = H5Screate(H5S_SCALAR);
 
     /* Create dataset */
-    dataset_id = H5Dcreate2(file_id, "/NumDataObj", H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT,
-                            H5P_DEFAULT);
+    dataset_id = H5Dcreate2(file_id, "/NumDataObj", H5T_NATIVE_UINT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
     /* Write value to NumDataObj dataset */
     status = H5Dwrite(dataset_id, H5T_NATIVE_UINT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &numdataobj);
@@ -73,18 +71,17 @@ main(void)
     /* Set up for extendible dataset */
     prop_id = H5Pcreate(H5P_DATASET_CREATE);
     dims[0] = CHUNK_SIZE;
-    status  = H5Pset_chunk(prop_id, 1, dims);
+    status = H5Pset_chunk(prop_id, 1, dims);
 
     /* Create dataspace */
-    dims[0]      = 1;
-    maxdims[0]   = H5S_UNLIMITED;
+    dims[0] = 1;
+    maxdims[0] = H5S_UNLIMITED;
     dataspace_id = H5Screate_simple(1, dims, maxdims);
 
     for (i = 0; i < NEXTARRAYS; i++) {
         /* Create dataset */
         snprintf(name, sizeof(name), "/ExtArray%06d", i);
-        dataset_id =
-            H5Dcreate2(file_id, name, H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, prop_id, H5P_DEFAULT);
+        dataset_id = H5Dcreate2(file_id, name, H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, prop_id, H5P_DEFAULT);
 
         /* Close the identifier */
         status = H5Dclose(dataset_id);
@@ -118,14 +115,13 @@ main(void)
         /* Loop over data arrays */
         for (i = 0; i < NDATAARRAYS; i++) {
             /* Create dataspace */
-            dims[0]      = NPOINTS;
-            maxdims[0]   = NPOINTS;
+            dims[0] = NPOINTS;
+            maxdims[0] = NPOINTS;
             dataspace_id = H5Screate_simple(1, dims, maxdims);
 
             /* Create dataset */
             snprintf(name, sizeof(name), "DataArray%06d", i);
-            dataset_id = H5Dcreate2(group_id, name, H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT,
-                                    H5P_DEFAULT);
+            dataset_id = H5Dcreate2(group_id, name, H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             if (dataset_id < 0) {
                 fprintf(stderr, "Failed to create DataArray dataset.\n");
                 status = H5Fclose(file_id);
@@ -155,7 +151,7 @@ main(void)
 
         /* Write value to NumDataObj dataset */
         numdataobj = j + 1;
-        status     = H5Dwrite(dataset_id, H5T_NATIVE_UINT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &numdataobj);
+        status = H5Dwrite(dataset_id, H5T_NATIVE_UINT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &numdataobj);
         if (status < 0) {
             fprintf(stderr, "Failed to write NumDataObj dataset.\n");
             status = H5Fclose(file_id);
@@ -179,7 +175,7 @@ main(void)
 
             /* Extend attribute dataset */
             dims[0] = (hsize_t)j + 1;
-            status  = H5Dset_extent(dataset_id, dims);
+            status = H5Dset_extent(dataset_id, dims);
             if (status < 0) {
                 fprintf(stderr, "Failed to extend DataArray dataset.\n");
                 status = H5Fclose(file_id);
@@ -187,16 +183,16 @@ main(void)
             } /* end if */
 
             /* Select element and write value to attribute dataset */
-            dims[0]      = 1;
-            memspace_id  = H5Screate_simple(1, dims, dims);
+            dims[0] = 1;
+            memspace_id = H5Screate_simple(1, dims, dims);
             dataspace_id = H5Dget_space(dataset_id);
-            type_id      = H5Dget_type(dataset_id);
+            type_id = H5Dget_type(dataset_id);
 
             start[0] = 0;
-            status   = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, start, stride, count, NULL);
+            status = H5Sselect_hyperslab(memspace_id, H5S_SELECT_SET, start, stride, count, NULL);
             start[0] = (hsize_t)j;
-            status   = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, start, stride, count, NULL);
-            status   = H5Dwrite(dataset_id, type_id, memspace_id, dataspace_id, H5P_DEFAULT, &floatval);
+            status = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, start, stride, count, NULL);
+            status = H5Dwrite(dataset_id, type_id, memspace_id, dataspace_id, H5P_DEFAULT, &floatval);
             if (status < 0) {
                 fprintf(stderr, "Failed to write DataArray dataset.\n");
                 status = H5Fclose(file_id);

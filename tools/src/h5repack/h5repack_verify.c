@@ -16,11 +16,11 @@
 
 /* number of members in an array */
 #ifndef NELMTS
-#define NELMTS(X) (sizeof(X) / sizeof(X[0]))
+    #define NELMTS(X) (sizeof(X) / sizeof(X[0]))
 #endif
 
-static int verify_layout(hid_t pid, pack_info_t *obj);
-static int verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t *filter);
+static int verify_layout(hid_t pid, pack_info_t* obj);
+static int verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t* filter);
 
 /*-------------------------------------------------------------------------
  * Function: h5repack_verify
@@ -34,77 +34,88 @@ static int verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t *fil
  *-------------------------------------------------------------------------
  */
 
-int
-h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options)
+int h5repack_verify(const char* in_fname, const char* out_fname, pack_opt_t* options)
 {
-    hid_t                 fidin  = H5I_INVALID_HID; /* file ID for input file*/
-    hid_t                 fidout = H5I_INVALID_HID; /* file ID for output file*/
-    hid_t                 did    = H5I_INVALID_HID; /* dataset ID */
-    hid_t                 pid    = H5I_INVALID_HID; /* dataset creation property list ID */
-    hid_t                 sid    = H5I_INVALID_HID; /* space ID */
-    hid_t                 tid    = H5I_INVALID_HID; /* type ID */
-    int                   ok     = 1;               /* step results */
-    unsigned int          i;
-    trav_table_t         *travt    = NULL;
-    hid_t                 fcpl_in  = H5I_INVALID_HID;  /* file creation property for input file */
-    hid_t                 fcpl_out = H5I_INVALID_HID;  /* file creation property for output file */
-    H5F_fspace_strategy_t in_strategy, out_strategy;   /* file space handling strategy for in/output file */
-    bool                  in_persist, out_persist;     /* free-space persist status for in/output file */
-    hsize_t               in_threshold, out_threshold; /* free-space section threshold for in/output file */
-    hsize_t               in_pagesize, out_pagesize;   /* file space page size for input/output file */
-    pack_info_t          *pack_info = NULL;            /* repack options */
-    int                   ret_value = 0;
+    hid_t fidin = H5I_INVALID_HID;  /* file ID for input file*/
+    hid_t fidout = H5I_INVALID_HID; /* file ID for output file*/
+    hid_t did = H5I_INVALID_HID;    /* dataset ID */
+    hid_t pid = H5I_INVALID_HID;    /* dataset creation property list ID */
+    hid_t sid = H5I_INVALID_HID;    /* space ID */
+    hid_t tid = H5I_INVALID_HID;    /* type ID */
+    int ok = 1;                     /* step results */
+    unsigned int i;
+    trav_table_t* travt = NULL;
+    hid_t fcpl_in = H5I_INVALID_HID;                 /* file creation property for input file */
+    hid_t fcpl_out = H5I_INVALID_HID;                /* file creation property for output file */
+    H5F_fspace_strategy_t in_strategy, out_strategy; /* file space handling strategy for in/output file */
+    bool in_persist, out_persist;                    /* free-space persist status for in/output file */
+    hsize_t in_threshold, out_threshold;             /* free-space section threshold for in/output file */
+    hsize_t in_pagesize, out_pagesize;               /* file space page size for input/output file */
+    pack_info_t* pack_info = NULL;                   /* repack options */
+    int ret_value = 0;
 
-    if (NULL == (pack_info = (pack_info_t *)calloc(1, sizeof(pack_info_t))))
+    if (NULL == (pack_info = (pack_info_t*)calloc(1, sizeof(pack_info_t)))) {
         H5TOOLS_GOTO_ERROR((-1), "unable to allocate memory");
+    }
 
     /* open the output file */
-    if ((fidout = H5Fopen(out_fname, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0)
+    if ((fidout = H5Fopen(out_fname, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Fopen failed on <%s>", out_fname);
+    }
 
     for (i = 0; i < options->op_tbl->nelems; i++) {
-        char        *name = options->op_tbl->objs[i].path;
-        pack_info_t *obj  = &options->op_tbl->objs[i];
+        char* name = options->op_tbl->objs[i].path;
+        pack_info_t* obj = &options->op_tbl->objs[i];
 
         /*-------------------------------------------------------------------------
          * open
          *-------------------------------------------------------------------------
          */
-        if ((did = H5Dopen2(fidout, name, H5P_DEFAULT)) < 0)
+        if ((did = H5Dopen2(fidout, name, H5P_DEFAULT)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Dopen2 failed on <%s>", name);
-        if ((sid = H5Dget_space(did)) < 0)
+        }
+        if ((sid = H5Dget_space(did)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Dget_space failed");
-        if ((pid = H5Dget_create_plist(did)) < 0)
+        }
+        if ((pid = H5Dget_create_plist(did)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Dget_create_plist failed");
-        if ((tid = H5Dget_type(did)) < 0)
+        }
+        if ((tid = H5Dget_type(did)) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Dget_type failed");
+        }
 
         /*-------------------------------------------------------------------------
          * filter check
          *-------------------------------------------------------------------------
          */
-        if (verify_filters(pid, tid, obj->nfilters, obj->filter) <= 0)
+        if (verify_filters(pid, tid, obj->nfilters, obj->filter) <= 0) {
             ok = 0;
+        }
 
         /*-------------------------------------------------------------------------
          * layout check
          *-------------------------------------------------------------------------
          */
-        if ((obj->layout != -1) && (verify_layout(pid, obj) == 0))
+        if ((obj->layout != -1) && (verify_layout(pid, obj) == 0)) {
             ok = 0;
+        }
 
         /*-------------------------------------------------------------------------
          * close
          *-------------------------------------------------------------------------
          */
-        if (H5Pclose(pid) < 0)
+        if (H5Pclose(pid) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-        if (H5Sclose(sid) < 0)
+        }
+        if (H5Sclose(sid) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Sclose failed");
-        if (H5Dclose(did) < 0)
+        }
+        if (H5Dclose(did) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Dclose failed");
-        if (H5Tclose(tid) < 0)
+        }
+        if (H5Tclose(tid) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "H5Tclose failed");
+        }
     }
 
     /*-------------------------------------------------------------------------
@@ -119,33 +130,39 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
         trav_table_init(fidout, &travt);
 
         /* get the list of objects in the file */
-        if (h5trav_gettable(fidout, travt) < 0)
+        if (h5trav_gettable(fidout, travt) < 0) {
             H5TOOLS_GOTO_ERROR((-1), "h5trav_gettable failed");
+        }
 
         for (i = 0; i < travt->nobjs; i++) {
-            char *name = travt->objs[i].name;
+            char* name = travt->objs[i].name;
 
             if (travt->objs[i].type == H5TRAV_TYPE_DATASET) {
                 /*-------------------------------------------------------------------------
                  * open
                  *-------------------------------------------------------------------------
                  */
-                if ((did = H5Dopen2(fidout, name, H5P_DEFAULT)) < 0)
+                if ((did = H5Dopen2(fidout, name, H5P_DEFAULT)) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Dopen2 failed on <%s>", name);
-                if ((sid = H5Dget_space(did)) < 0)
+                }
+                if ((sid = H5Dget_space(did)) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Dget_space failed");
-                if ((pid = H5Dget_create_plist(did)) < 0)
+                }
+                if ((pid = H5Dget_create_plist(did)) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Dget_create_plist failed");
-                if ((tid = H5Dget_type(did)) < 0)
+                }
+                if ((tid = H5Dget_type(did)) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Dget_type failed");
+                }
 
                 /*-------------------------------------------------------------------------
                  * filter check
                  *-------------------------------------------------------------------------
                  */
                 if (options->all_filter == 1) {
-                    if (verify_filters(pid, tid, options->n_filter_g, options->filter_g) <= 0)
+                    if (verify_filters(pid, tid, options->n_filter_g, options->filter_g) <= 0) {
                         ok = 0;
+                    }
                 }
 
                 /*-------------------------------------------------------------------------
@@ -153,30 +170,34 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
                  *-------------------------------------------------------------------------
                  */
                 if (options->all_layout == 1) {
-
                     memset(pack_info, 0, sizeof(pack_info_t));
 
                     init_packobject(pack_info);
                     pack_info->layout = options->layout_g;
-                    pack_info->chunk  = options->chunk_g;
-                    if (verify_layout(pid, pack_info) == 0)
+                    pack_info->chunk = options->chunk_g;
+                    if (verify_layout(pid, pack_info) == 0) {
                         ok = 0;
+                    }
                 }
 
                 /*-------------------------------------------------------------------------
                  * close
                  *-------------------------------------------------------------------------
                  */
-                if (H5Pclose(pid) < 0)
+                if (H5Pclose(pid) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-                if (H5Sclose(sid) < 0)
+                }
+                if (H5Sclose(sid) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Sclose failed");
-                if (H5Dclose(did) < 0)
+                }
+                if (H5Dclose(did) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Dclose failed");
-                if (H5Tclose(tid) < 0)
+                }
+                if (H5Tclose(tid) < 0) {
                     H5TOOLS_GOTO_ERROR((-1), "H5Tclose failed");
+                }
             } /* if */
-        }     /* i */
+        } /* i */
 
         /* free table */
         trav_table_free(travt);
@@ -189,35 +210,40 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
      */
 
     /* open the input file */
-    if ((fidin = H5Fopen(in_fname, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0)
+    if ((fidin = H5Fopen(in_fname, H5F_ACC_RDONLY, H5P_DEFAULT)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Fopen failed on file <%s>", in_fname);
+    }
 
     /* Get file creation property list for input file */
-    if ((fcpl_in = H5Fget_create_plist(fidin)) < 0)
+    if ((fcpl_in = H5Fget_create_plist(fidin)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Fget_create_plist failed to retrieve file creation property list");
+    }
 
     /* Get file space info for input file */
-    if (H5Pget_file_space_strategy(fcpl_in, &in_strategy, &in_persist, &in_threshold) < 0)
-        H5TOOLS_GOTO_ERROR((-1),
-                           "H5Pget_file_space_strategy failed to retrieve file space strategy & threshold");
+    if (H5Pget_file_space_strategy(fcpl_in, &in_strategy, &in_persist, &in_threshold) < 0) {
+        H5TOOLS_GOTO_ERROR((-1), "H5Pget_file_space_strategy failed to retrieve file space strategy & threshold");
+    }
 
     /* Get file space page size for input file */
-    if (H5Pget_file_space_page_size(fcpl_in, &in_pagesize) < 0)
+    if (H5Pget_file_space_page_size(fcpl_in, &in_pagesize) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Pget_file_space_page_size failed to retrieve file space page size");
+    }
 
     /* Output file is already opened */
     /* Get file creation property list for output file */
-    if ((fcpl_out = H5Fget_create_plist(fidout)) < 0)
+    if ((fcpl_out = H5Fget_create_plist(fidout)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Fget_create_plist failed to retrieve file creation property list");
+    }
 
     /* Get file space info for output file */
-    if (H5Pget_file_space_strategy(fcpl_out, &out_strategy, &out_persist, &out_threshold) < 0)
-        H5TOOLS_GOTO_ERROR((-1),
-                           "H5Pget_file_space_strategy failed to retrieve file space strategy & threshold");
+    if (H5Pget_file_space_strategy(fcpl_out, &out_strategy, &out_persist, &out_threshold) < 0) {
+        H5TOOLS_GOTO_ERROR((-1), "H5Pget_file_space_strategy failed to retrieve file space strategy & threshold");
+    }
 
     /* Get file space page size for output file */
-    if (H5Pget_file_space_page_size(fcpl_out, &out_pagesize) < 0)
+    if (H5Pget_file_space_page_size(fcpl_out, &out_pagesize) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "H5Pget_file_space_page_size failed to retrieve file space page size");
+    }
 
     /*
      * If -S option is set, the file space handling strategy should be set as specified.
@@ -225,12 +251,14 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
      * the same as the input file's strategy.
      */
     if (options->fs_strategy) {
-        if (out_strategy != (options->fs_strategy == (H5F_fspace_strategy_t)-1 ? 0 : options->fs_strategy))
+        if (out_strategy != (options->fs_strategy == (H5F_fspace_strategy_t)-1 ? 0 : options->fs_strategy)) {
             H5TOOLS_GOTO_ERROR((-1), "file space strategy not set as unexpected");
+        }
     }
     else {
-        if (out_strategy != in_strategy)
+        if (out_strategy != in_strategy) {
             H5TOOLS_GOTO_ERROR((-1), "file space strategy not set as unexpected");
+        }
     }
 
     /*
@@ -239,12 +267,14 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
      * the same as the input file's free-space persist status
      */
     if (options->fs_persist) {
-        if (out_persist != (bool)(options->fs_persist == (-1) ? false : options->fs_persist))
+        if (out_persist != (bool)(options->fs_persist == (-1) ? false : options->fs_persist)) {
             H5TOOLS_GOTO_ERROR((-1), "free-space persist status not set as unexpected");
+        }
     }
     else {
-        if (out_persist != in_persist)
+        if (out_persist != in_persist) {
             H5TOOLS_GOTO_ERROR((-1), "free-space persist status not set as unexpected");
+        }
     }
 
     /*
@@ -253,12 +283,14 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
      * input file's threshold size.
      */
     if (options->fs_threshold) {
-        if (out_threshold != (hsize_t)(options->fs_threshold == (-1) ? 0 : options->fs_threshold))
+        if (out_threshold != (hsize_t)(options->fs_threshold == (-1) ? 0 : options->fs_threshold)) {
             H5TOOLS_GOTO_ERROR((-1), "threshold not set as unexpected");
+        }
     }
     else {
-        if (out_threshold != in_threshold)
+        if (out_threshold != in_threshold) {
             H5TOOLS_GOTO_ERROR((-1), "threshold not set as unexpected");
+        }
     }
 
     /*
@@ -267,12 +299,14 @@ h5repack_verify(const char *in_fname, const char *out_fname, pack_opt_t *options
      * the same as the input file's file space page size.
      */
     if (options->fs_pagesize) {
-        if (out_pagesize != (hsize_t)(options->fs_pagesize == (-1) ? 0 : options->fs_pagesize))
+        if (out_pagesize != (hsize_t)(options->fs_pagesize == (-1) ? 0 : options->fs_pagesize)) {
             H5TOOLS_GOTO_ERROR((-1), "file space page size not set as unexpected");
+        }
     }
     else { /* "-G" is not set */
-        if (out_pagesize != in_pagesize)
+        if (out_pagesize != in_pagesize) {
             H5TOOLS_GOTO_ERROR((-1), "file space page size not set as unexpected");
+        }
     }
 
     ret_value = ok;
@@ -288,8 +322,9 @@ done:
         H5Tclose(tid);
         H5Fclose(fidin);
         H5Fclose(fidout);
-        if (travt)
+        if (travt) {
             trav_table_free(travt);
+        }
     }
     H5E_END_TRY
 
@@ -313,38 +348,45 @@ done:
  *-------------------------------------------------------------------------
  */
 
-int
-verify_layout(hid_t pid, pack_info_t *obj)
+int verify_layout(hid_t pid, pack_info_t* obj)
 {
-    hsize_t      chsize[64]; /* chunk size in elements */
-    H5D_layout_t layout;     /* layout */
-    int          nfilters;   /* number of filters */
-    int          rank;       /* rank */
-    int          i;          /* index */
+    hsize_t chsize[64];  /* chunk size in elements */
+    H5D_layout_t layout; /* layout */
+    int nfilters;        /* number of filters */
+    int rank;            /* rank */
+    int i;               /* index */
 
     /* check if we have filters in the input object */
-    if ((nfilters = H5Pget_nfilters(pid)) < 0)
+    if ((nfilters = H5Pget_nfilters(pid)) < 0) {
         return -1;
+    }
 
     /* a non chunked layout was requested on a filtered object */
-    if (nfilters && obj->layout != H5D_CHUNKED)
+    if (nfilters && obj->layout != H5D_CHUNKED) {
         return 0;
+    }
 
     /* get layout */
-    if ((layout = H5Pget_layout(pid)) < 0)
+    if ((layout = H5Pget_layout(pid)) < 0) {
         return -1;
+    }
 
-    if (obj->layout != layout)
+    if (obj->layout != layout) {
         return 0;
+    }
 
     if (layout == H5D_CHUNKED) {
-        if ((rank = H5Pget_chunk(pid, NELMTS(chsize), chsize /*out*/)) < 0)
+        if ((rank = H5Pget_chunk(pid, NELMTS(chsize), chsize /*out*/)) < 0) {
             return -1;
-        if (obj->chunk.rank != rank)
+        }
+        if (obj->chunk.rank != rank) {
             return 0;
-        for (i = 0; i < rank; i++)
-            if (chsize[i] != obj->chunk.chunk_lengths[i])
+        }
+        for (i = 0; i < rank; i++) {
+            if (chsize[i] != obj->chunk.chunk_lengths[i]) {
                 return 0;
+            }
+        }
     }
 
     return 1;
@@ -362,34 +404,33 @@ verify_layout(hid_t pid, pack_info_t *obj)
  *-------------------------------------------------------------------------
  */
 
-int
-h5repack_cmp_pl(const char *fname1, const char *fname2, pack_opt_t *options)
+int h5repack_cmp_pl(const char* fname1, const char* fname2, pack_opt_t* options)
 {
-    hid_t         fid1   = H5I_INVALID_HID; /* file ID */
-    hid_t         fid2   = H5I_INVALID_HID; /* file ID */
-    hid_t         dset1  = H5I_INVALID_HID; /* dataset ID */
-    hid_t         dset2  = H5I_INVALID_HID; /* dataset ID */
-    hid_t         gid    = H5I_INVALID_HID; /* group ID */
-    hid_t         dcpl1  = H5I_INVALID_HID; /* dataset creation property list ID */
-    hid_t         dcpl2  = H5I_INVALID_HID; /* dataset creation property list ID */
-    hid_t         gcplid = H5I_INVALID_HID; /* group creation property list */
-    unsigned      crt_order_flag1;          /* group creation order flag */
-    unsigned      crt_order_flag2;          /* group creation order flag */
-    trav_table_t *trav = NULL;
-    unsigned int  i;
-    int           ret_value = 1;
+    hid_t fid1 = H5I_INVALID_HID;   /* file ID */
+    hid_t fid2 = H5I_INVALID_HID;   /* file ID */
+    hid_t dset1 = H5I_INVALID_HID;  /* dataset ID */
+    hid_t dset2 = H5I_INVALID_HID;  /* dataset ID */
+    hid_t gid = H5I_INVALID_HID;    /* group ID */
+    hid_t dcpl1 = H5I_INVALID_HID;  /* dataset creation property list ID */
+    hid_t dcpl2 = H5I_INVALID_HID;  /* dataset creation property list ID */
+    hid_t gcplid = H5I_INVALID_HID; /* group creation property list */
+    unsigned crt_order_flag1;       /* group creation order flag */
+    unsigned crt_order_flag2;       /* group creation order flag */
+    trav_table_t* trav = NULL;
+    unsigned int i;
+    int ret_value = 1;
 
     /*-------------------------------------------------------------------------
      * open the files
      *-------------------------------------------------------------------------
      */
     /* Open the files */
-    if ((fid1 = h5tools_fopen(fname1, H5F_ACC_RDONLY, options->fin_fapl,
-                              (options->fin_vol || options->fin_vfd), NULL, 0)) < 0)
+    if ((fid1 = h5tools_fopen(fname1, H5F_ACC_RDONLY, options->fin_fapl, (options->fin_vol || options->fin_vfd), NULL, 0)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "h5tools_fopen failed <%s>: %s", fname1, H5FOPENERROR);
-    if ((fid2 = h5tools_fopen(fname2, H5F_ACC_RDONLY, options->fout_fapl,
-                              (options->fout_vol || options->fout_vfd), NULL, 0)) < 0)
+    }
+    if ((fid2 = h5tools_fopen(fname2, H5F_ACC_RDONLY, options->fout_fapl, (options->fout_vol || options->fout_vfd), NULL, 0)) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "h5tools_fopen failed <%s>: %s", fname2, H5FOPENERROR);
+    }
 
     /*-------------------------------------------------------------------------
      * get file table list of objects
@@ -399,8 +440,9 @@ h5repack_cmp_pl(const char *fname1, const char *fname2, pack_opt_t *options)
     h5trav_set_index(sort_by, sort_order);
     /* init table */
     trav_table_init(fid1, &trav);
-    if (h5trav_gettable(fid1, trav) < 0)
+    if (h5trav_gettable(fid1, trav) < 0) {
         H5TOOLS_GOTO_ERROR((-1), "h5trav_gettable failed");
+    }
 
     /*-------------------------------------------------------------------------
      * traverse the supplied object list
@@ -408,65 +450,86 @@ h5repack_cmp_pl(const char *fname1, const char *fname2, pack_opt_t *options)
      */
     for (i = 0; i < trav->nobjs; i++) {
         if (trav->objs[i].type == H5TRAV_TYPE_GROUP) {
-            if ((gid = H5Gopen2(fid1, trav->objs[i].name, H5P_DEFAULT)) < 0)
+            if ((gid = H5Gopen2(fid1, trav->objs[i].name, H5P_DEFAULT)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gopen2 failed on first <%s>", trav->objs[i].name);
-            if ((gcplid = H5Gget_create_plist(gid)) < 0)
+            }
+            if ((gcplid = H5Gget_create_plist(gid)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gget_create_plist failed");
-            if (H5Pget_link_creation_order(gcplid, &crt_order_flag1) < 0)
+            }
+            if (H5Pget_link_creation_order(gcplid, &crt_order_flag1) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pget_link_creation_order failed");
-            if (H5Pclose(gcplid) < 0)
+            }
+            if (H5Pclose(gcplid) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-            if (H5Gclose(gid) < 0)
+            }
+            if (H5Gclose(gid) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gclose failed");
+            }
 
-            if ((gid = H5Gopen2(fid2, trav->objs[i].name, H5P_DEFAULT)) < 0)
+            if ((gid = H5Gopen2(fid2, trav->objs[i].name, H5P_DEFAULT)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gopen2 failed on second <%s>", trav->objs[i].name);
-            if ((gcplid = H5Gget_create_plist(gid)) < 0)
+            }
+            if ((gcplid = H5Gget_create_plist(gid)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gget_create_plist failed");
-            if (H5Pget_link_creation_order(gcplid, &crt_order_flag2) < 0)
+            }
+            if (H5Pget_link_creation_order(gcplid, &crt_order_flag2) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pget_link_creation_order failed");
-            if (H5Pclose(gcplid) < 0)
+            }
+            if (H5Pclose(gcplid) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-            if (H5Gclose(gid) < 0)
+            }
+            if (H5Gclose(gid) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Gclose failed");
+            }
 
-            if (crt_order_flag1 != crt_order_flag2)
+            if (crt_order_flag1 != crt_order_flag2) {
                 H5TOOLS_GOTO_ERROR(0, "property lists failed for <%s> are different", trav->objs[i].name);
+            }
         }
         else if (trav->objs[i].type == H5TRAV_TYPE_DATASET) {
-            if ((dset1 = H5Dopen2(fid1, trav->objs[i].name, H5P_DEFAULT)) < 0)
+            if ((dset1 = H5Dopen2(fid1, trav->objs[i].name, H5P_DEFAULT)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dopen2 failed on first <%s>", trav->objs[i].name);
-            if ((dset2 = H5Dopen2(fid2, trav->objs[i].name, H5P_DEFAULT)) < 0)
+            }
+            if ((dset2 = H5Dopen2(fid2, trav->objs[i].name, H5P_DEFAULT)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dopen2 failed on second <%s>", trav->objs[i].name);
-            if ((dcpl1 = H5Dget_create_plist(dset1)) < 0)
+            }
+            if ((dcpl1 = H5Dget_create_plist(dset1)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dget_create_plist failed");
-            if ((dcpl2 = H5Dget_create_plist(dset2)) < 0)
+            }
+            if ((dcpl2 = H5Dget_create_plist(dset2)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dget_create_plist failed");
+            }
 
             /*-------------------------------------------------------------------------
              * compare the property lists
              *-------------------------------------------------------------------------
              */
-            if ((ret_value = H5Pequal(dcpl1, dcpl2)) < 0)
+            if ((ret_value = H5Pequal(dcpl1, dcpl2)) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pequal failed");
+            }
 
-            if (ret_value == 0)
+            if (ret_value == 0) {
                 H5TOOLS_GOTO_ERROR(0, "property lists failed for <%s> are different", trav->objs[i].name);
+            }
 
             /*-------------------------------------------------------------------------
              * close
              *-------------------------------------------------------------------------
              */
-            if (H5Pclose(dcpl1) < 0)
+            if (H5Pclose(dcpl1) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-            if (H5Pclose(dcpl2) < 0)
+            }
+            if (H5Pclose(dcpl2) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Pclose failed");
-            if (H5Dclose(dset1) < 0)
+            }
+            if (H5Dclose(dset1) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dclose failed");
-            if (H5Dclose(dset2) < 0)
+            }
+            if (H5Dclose(dset2) < 0) {
                 H5TOOLS_GOTO_ERROR((-1), "H5Dclose failed");
+            }
         } /*if*/
-    }     /*for*/
+    } /*for*/
 
 done:
     H5E_BEGIN_TRY
@@ -479,8 +542,9 @@ done:
         H5Fclose(fid2);
         H5Pclose(gcplid);
         H5Gclose(gid);
-        if (trav)
+        if (trav) {
             trav_table_free(trav);
+        }
     }
     H5E_END_TRY
 
@@ -501,30 +565,32 @@ done:
  *-------------------------------------------------------------------------
  */
 
-static int
-verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t *filter)
+static int verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t* filter)
 {
-    int          nfilters_dcpl;               /* number of filters in DCPL*/
-    unsigned     filt_flags;                  /* filter flags */
-    H5Z_filter_t filtn;                       /* filter identification number */
-    unsigned     cd_values[DEFAULT_CDELEMTS]; /* filter client data values */
-    size_t       cd_nelmts;                   /* filter client number of values */
-    char         f_name[256];                 /* filter name */
-    size_t       size;                        /* type size */
-    int          i;                           /* index */
-    unsigned     j;                           /* index */
+    int nfilters_dcpl;                    /* number of filters in DCPL*/
+    unsigned filt_flags;                  /* filter flags */
+    H5Z_filter_t filtn;                   /* filter identification number */
+    unsigned cd_values[DEFAULT_CDELEMTS]; /* filter client data values */
+    size_t cd_nelmts;                     /* filter client number of values */
+    char f_name[256];                     /* filter name */
+    size_t size;                          /* type size */
+    int i;                                /* index */
+    unsigned j;                           /* index */
 
     /* get information about filters */
-    if ((nfilters_dcpl = H5Pget_nfilters(pid)) < 0)
+    if ((nfilters_dcpl = H5Pget_nfilters(pid)) < 0) {
         return -1;
+    }
 
     /* if we do not have filters and the requested filter is NONE, return 1 */
-    if (!nfilters_dcpl && nfilters == 1 && filter[0].filtn == H5Z_FILTER_NONE)
+    if (!nfilters_dcpl && nfilters == 1 && filter[0].filtn == H5Z_FILTER_NONE) {
         return 1;
+    }
 
     /* else the numbers of filters must match */
-    if (nfilters_dcpl != nfilters)
+    if (nfilters_dcpl != nfilters) {
         return 0;
+    }
 
     /*-------------------------------------------------------------------------
      * build a list with DCPL filters
@@ -533,80 +599,94 @@ verify_filters(hid_t pid, hid_t tid, int nfilters, filter_info_t *filter)
 
     for (i = 0; i < nfilters_dcpl; i++) {
         cd_nelmts = NELMTS(cd_values);
-        filtn = H5Pget_filter2(pid, (unsigned)i, &filt_flags, &cd_nelmts, cd_values, sizeof(f_name), f_name,
-                               NULL);
+        filtn = H5Pget_filter2(pid, (unsigned)i, &filt_flags, &cd_nelmts, cd_values, sizeof(f_name), f_name, NULL);
 
         /* filter ID */
-        if (filtn < 0)
+        if (filtn < 0) {
             return -1;
-        if (filtn != filter[i].filtn)
+        }
+        if (filtn != filter[i].filtn) {
             return 0;
+        }
 
         /* compare client data values. some filters do return local values */
         switch (filtn) {
-            case H5Z_FILTER_NONE:
-                break;
+        case H5Z_FILTER_NONE: break;
 
-            case H5Z_FILTER_SHUFFLE:
-                /* 1 private client value is returned by DCPL */
-                if (cd_nelmts != H5Z_SHUFFLE_TOTAL_NPARMS && filter[i].cd_nelmts != H5Z_SHUFFLE_USER_NPARMS)
+        case H5Z_FILTER_SHUFFLE:
+            /* 1 private client value is returned by DCPL */
+            if (cd_nelmts != H5Z_SHUFFLE_TOTAL_NPARMS && filter[i].cd_nelmts != H5Z_SHUFFLE_USER_NPARMS) {
+                return 0;
+            }
+
+            /* get dataset's type size */
+            if ((size = H5Tget_size(tid)) <= 0) {
+                return -1;
+            }
+
+            /* the private client value holds the dataset's type size */
+            if (size != cd_values[0]) {
+                return 0;
+            }
+
+            break;
+
+        case H5Z_FILTER_SZIP:
+            /* 4 private client values are returned by DCPL */
+            if (cd_nelmts != H5Z_SZIP_TOTAL_NPARMS && filter[i].cd_nelmts != H5Z_SZIP_USER_NPARMS) {
+                return 0;
+            }
+
+            /* "User" parameter for pixels-per-block (index 1) */
+            if (cd_values[H5Z_SZIP_PARM_PPB] != filter[i].cd_values[H5Z_SZIP_PARM_PPB]) {
+                return 0;
+            }
+
+            break;
+
+        case H5Z_FILTER_NBIT:
+            /* only client data values number of values checked */
+            if (H5Z_NBIT_USER_NPARMS != filter[i].cd_nelmts) {
+                return 0;
+            }
+            break;
+
+        case H5Z_FILTER_SCALEOFFSET:
+            /* only client data values checked */
+            for (j = 0; j < H5Z_SCALEOFFSET_USER_NPARMS; j++) {
+                if (cd_values[j] != filter[i].cd_values[j]) {
                     return 0;
+                }
+            }
+            break;
 
-                /* get dataset's type size */
-                if ((size = H5Tget_size(tid)) <= 0)
-                    return -1;
+        /* for these filters values must match, no local values set in DCPL */
+        case H5Z_FILTER_FLETCHER32:
+        case H5Z_FILTER_DEFLATE:
 
-                /* the private client value holds the dataset's type size */
-                if (size != cd_values[0])
+            if (cd_nelmts != filter[i].cd_nelmts) {
+                return 0;
+            }
+
+            for (j = 0; j < cd_nelmts; j++) {
+                if (cd_values[j] != filter[i].cd_values[j]) {
                     return 0;
+                }
+            }
 
-                break;
+            break;
 
-            case H5Z_FILTER_SZIP:
-                /* 4 private client values are returned by DCPL */
-                if (cd_nelmts != H5Z_SZIP_TOTAL_NPARMS && filter[i].cd_nelmts != H5Z_SZIP_USER_NPARMS)
+        default:
+            if (cd_nelmts != filter[i].cd_nelmts) {
+                return 0;
+            }
+
+            for (j = 0; j < cd_nelmts; j++) {
+                if (cd_values[j] != filter[i].cd_values[j]) {
                     return 0;
-
-                /* "User" parameter for pixels-per-block (index 1) */
-                if (cd_values[H5Z_SZIP_PARM_PPB] != filter[i].cd_values[H5Z_SZIP_PARM_PPB])
-                    return 0;
-
-                break;
-
-            case H5Z_FILTER_NBIT:
-                /* only client data values number of values checked */
-                if (H5Z_NBIT_USER_NPARMS != filter[i].cd_nelmts)
-                    return 0;
-                break;
-
-            case H5Z_FILTER_SCALEOFFSET:
-                /* only client data values checked */
-                for (j = 0; j < H5Z_SCALEOFFSET_USER_NPARMS; j++)
-                    if (cd_values[j] != filter[i].cd_values[j])
-                        return 0;
-                break;
-
-            /* for these filters values must match, no local values set in DCPL */
-            case H5Z_FILTER_FLETCHER32:
-            case H5Z_FILTER_DEFLATE:
-
-                if (cd_nelmts != filter[i].cd_nelmts)
-                    return 0;
-
-                for (j = 0; j < cd_nelmts; j++)
-                    if (cd_values[j] != filter[i].cd_values[j])
-                        return 0;
-
-                break;
-
-            default:
-                if (cd_nelmts != filter[i].cd_nelmts)
-                    return 0;
-
-                for (j = 0; j < cd_nelmts; j++)
-                    if (cd_values[j] != filter[i].cd_values[j])
-                        return 0;
-                break;
+                }
+            }
+            break;
 
         } /* switch */
     }

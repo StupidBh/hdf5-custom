@@ -43,18 +43,18 @@
 #define UC_5_VDS_DATATYPE    H5T_STD_I32LE
 
 /* Starting size of datasets, both source and VDS */
-static hsize_t UC_5_SOURCE_DIMS[RANK] = {0, UC_5_HEIGHT, UC_5_WIDTH};
-static hsize_t UC_5_VDS_DIMS[RANK]    = {0, UC_5_HEIGHT, UC_5_WIDTH};
+static hsize_t UC_5_SOURCE_DIMS[RANK] = { 0, UC_5_HEIGHT, UC_5_WIDTH };
+static hsize_t UC_5_VDS_DIMS[RANK] = { 0, UC_5_HEIGHT, UC_5_WIDTH };
 
 /* Max size of datasets, both source and VDS */
-static hsize_t UC_5_SOURCE_MAX_DIMS[RANK] = {UC_5_MAX_PLANES, UC_5_HEIGHT, UC_5_WIDTH};
-static hsize_t UC_5_VDS_MAX_DIMS[RANK]    = {UC_5_MAX_PLANES, UC_5_HEIGHT, UC_5_WIDTH};
+static hsize_t UC_5_SOURCE_MAX_DIMS[RANK] = { UC_5_MAX_PLANES, UC_5_HEIGHT, UC_5_WIDTH };
+static hsize_t UC_5_VDS_MAX_DIMS[RANK] = { UC_5_MAX_PLANES, UC_5_HEIGHT, UC_5_WIDTH };
 
 /* Planes (both source and VDS) */
-static hsize_t UC_5_PLANE[RANK] = {1, UC_5_HEIGHT, UC_5_WIDTH};
+static hsize_t UC_5_PLANE[RANK] = { 1, UC_5_HEIGHT, UC_5_WIDTH };
 
 /* File names for source datasets */
-static char UC_5_FILE_NAMES[UC_5_N_SOURCES][NAME_LEN] = {{"5_a.h5"}, {"5_b.h5"}, {"5_c.h5"}};
+static char UC_5_FILE_NAMES[UC_5_N_SOURCES][NAME_LEN] = { { "5_a.h5" }, { "5_b.h5" }, { "5_c.h5" } };
 
 /* VDS file name */
 static char UC_5_VDS_FILE_NAME[NAME_LEN] = "5_vds.h5";
@@ -62,10 +62,10 @@ static char UC_5_VDS_FILE_NAME[NAME_LEN] = "5_vds.h5";
 /* Dataset names */
 static char UC_5_SOURCE_DSET_NAME[NAME_LEN] = "source_dset";
 static char UC_5_SOURCE_DSET_PATH[NAME_LEN] = "/source_dset";
-static char UC_5_VDS_DSET_NAME[NAME_LEN]    = "vds_dset";
+static char UC_5_VDS_DSET_NAME[NAME_LEN] = "vds_dset";
 
 /* Fill values */
-static int UC_5_FILL_VALUES[UC_5_N_SOURCES] = {-1, -2, -3};
-static int UC_5_VDS_FILL_VALUE              = -9;
+static int UC_5_FILL_VALUES[UC_5_N_SOURCES] = { -1, -2, -3 };
+static int UC_5_VDS_FILL_VALUE = -9;
 
 #endif /* UC_5_H */

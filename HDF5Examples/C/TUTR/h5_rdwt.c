@@ -19,18 +19,18 @@
 
 #define FILENAME "dset.h5"
 
-int
-main(void)
+int main(void)
 {
-
-    hid_t  file_id, dataset_id; /* identifiers */
+    hid_t file_id, dataset_id; /* identifiers */
     herr_t status;
-    int    i, j, dset_data[4][6];
+    int i, j, dset_data[4][6];
 
     /* Initialize the dataset. */
-    for (i = 0; i < 4; i++)
-        for (j = 0; j < 6; j++)
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 6; j++) {
             dset_data[i][j] = i * 6 + j + 1;
+        }
+    }
 
     /* Open an existing file. */
     file_id = H5Fopen(FILENAME, H5F_ACC_RDWR, H5P_DEFAULT);

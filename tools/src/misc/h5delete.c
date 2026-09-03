@@ -22,34 +22,28 @@
 
 static void usage(void);
 
-static void
-usage(void)
+static void usage(void)
 {
     fprintf(stderr, "usage: h5delete [-f] <filename>\n");
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    bool        quiet = false;
-    const char *name  = NULL;
-    int         ret   = 0;
+    bool quiet = false;
+    const char* name = NULL;
+    int ret = 0;
 
     switch (argc) {
-        case 3:
-            if (strcmp(argv[1], "-f") != 0) {
-                usage();
-                return EXIT_FAILURE;
-            }
-            quiet = true;
-            name  = argv[2];
-            break;
-        case 2:
-            name = argv[1];
-            break;
-        default:
+    case 3:
+        if (strcmp(argv[1], "-f") != 0) {
             usage();
             return EXIT_FAILURE;
+        }
+        quiet = true;
+        name = argv[2];
+        break;
+    case 2 : name = argv[1]; break;
+    default: usage(); return EXIT_FAILURE;
     }
 
     H5E_BEGIN_TRY
@@ -59,8 +53,9 @@ main(int argc, char *argv[])
     }
     H5E_END_TRY
 
-    if (ret < 0 && !quiet)
+    if (ret < 0 && !quiet) {
         fprintf(stderr, "Unable to delete storage at: %s\n", name);
+    }
 
     return ret < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }

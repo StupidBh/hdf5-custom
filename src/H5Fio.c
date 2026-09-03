@@ -73,11 +73,10 @@
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_block_read(H5F_shared_t *f_sh, H5FD_mem_t type, haddr_t addr, size_t size, void *buf /*out*/)
+herr_t H5F_shared_block_read(H5F_shared_t* f_sh, H5FD_mem_t type, haddr_t addr, size_t size, void* buf /*out*/)
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -87,15 +86,17 @@ H5F_shared_block_read(H5F_shared_t *f_sh, H5FD_mem_t type, haddr_t addr, size_t 
     assert(H5_addr_defined(addr));
 
     /* Check for attempting I/O on 'temporary' file address */
-    if (H5_addr_le(f_sh->tmp_addr, (addr + size)))
+    if (H5_addr_le(f_sh->tmp_addr, (addr + size))) {
         HGOTO_ERROR(H5E_IO, H5E_BADRANGE, FAIL, "attempting I/O in temporary file space");
+    }
 
     /* Treat global heap as raw data */
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass through page buffer layer */
-    if (H5PB_read(f_sh, map_type, addr, size, buf) < 0)
+    if (H5PB_read(f_sh, map_type, addr, size, buf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_READERROR, FAIL, "read through page buffer failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -112,11 +113,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_block_read(H5F_t *f, H5FD_mem_t type, haddr_t addr, size_t size, void *buf /*out*/)
+herr_t H5F_block_read(H5F_t* f, H5FD_mem_t type, haddr_t addr, size_t size, void* buf /*out*/)
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -127,15 +127,17 @@ H5F_block_read(H5F_t *f, H5FD_mem_t type, haddr_t addr, size_t size, void *buf /
     assert(H5_addr_defined(addr));
 
     /* Check for attempting I/O on 'temporary' file address */
-    if (H5_addr_le(f->shared->tmp_addr, (addr + size)))
+    if (H5_addr_le(f->shared->tmp_addr, (addr + size))) {
         HGOTO_ERROR(H5E_IO, H5E_BADRANGE, FAIL, "attempting I/O in temporary file space");
+    }
 
     /* Treat global heap as raw data */
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass through page buffer layer */
-    if (H5PB_read(f->shared, map_type, addr, size, buf) < 0)
+    if (H5PB_read(f->shared, map_type, addr, size, buf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_READERROR, FAIL, "read through page buffer failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -152,11 +154,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_block_write(H5F_shared_t *f_sh, H5FD_mem_t type, haddr_t addr, size_t size, const void *buf)
+herr_t H5F_shared_block_write(H5F_shared_t* f_sh, H5FD_mem_t type, haddr_t addr, size_t size, const void* buf)
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -167,15 +168,17 @@ H5F_shared_block_write(H5F_shared_t *f_sh, H5FD_mem_t type, haddr_t addr, size_t
     assert(H5_addr_defined(addr));
 
     /* Check for attempting I/O on 'temporary' file address */
-    if (H5_addr_le(f_sh->tmp_addr, (addr + size)))
+    if (H5_addr_le(f_sh->tmp_addr, (addr + size))) {
         HGOTO_ERROR(H5E_IO, H5E_BADRANGE, FAIL, "attempting I/O in temporary file space");
+    }
 
     /* Treat global heap as raw data */
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass through page buffer layer */
-    if (H5PB_write(f_sh, map_type, addr, size, buf) < 0)
+    if (H5PB_write(f_sh, map_type, addr, size, buf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "write through page buffer failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -192,11 +195,10 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_block_write(H5F_t *f, H5FD_mem_t type, haddr_t addr, size_t size, const void *buf)
+herr_t H5F_block_write(H5F_t* f, H5FD_mem_t type, haddr_t addr, size_t size, const void* buf)
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -208,15 +210,17 @@ H5F_block_write(H5F_t *f, H5FD_mem_t type, haddr_t addr, size_t size, const void
     assert(H5_addr_defined(addr));
 
     /* Check for attempting I/O on 'temporary' file address */
-    if (H5_addr_le(f->shared->tmp_addr, (addr + size)))
+    if (H5_addr_le(f->shared->tmp_addr, (addr + size))) {
         HGOTO_ERROR(H5E_IO, H5E_BADRANGE, FAIL, "attempting I/O in temporary file space");
+    }
 
     /* Treat global heap as raw data */
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass through page buffer layer */
-    if (H5PB_write(f->shared, map_type, addr, size, buf) < 0)
+    if (H5PB_write(f->shared, map_type, addr, size, buf) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "write through page buffer failed");
+    }
 done:
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5F_block_write() */
@@ -234,12 +238,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_select_read(H5F_shared_t *f_sh, H5FD_mem_t type, uint32_t count, H5S_t **mem_spaces,
-                       H5S_t **file_spaces, haddr_t offsets[], size_t element_sizes[], void *bufs[] /* out */)
+herr_t H5F_shared_select_read(H5F_shared_t* f_sh,
+                              H5FD_mem_t type,
+                              uint32_t count,
+                              H5S_t** mem_spaces,
+                              H5S_t** file_spaces,
+                              haddr_t offsets[],
+                              size_t element_sizes[],
+                              void* bufs[] /* out */)
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -255,9 +264,9 @@ H5F_shared_select_read(H5F_shared_t *f_sh, H5FD_mem_t type, uint32_t count, H5S_
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass down to file driver layer (bypass page buffer for now) */
-    if (H5FD_read_selection(f_sh->lf, map_type, count, mem_spaces, file_spaces, offsets, element_sizes,
-                            bufs) < 0)
+    if (H5FD_read_selection(f_sh->lf, map_type, count, mem_spaces, file_spaces, offsets, element_sizes, bufs) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_READERROR, FAIL, "selection read through file driver failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -276,12 +285,17 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_select_write(H5F_shared_t *f_sh, H5FD_mem_t type, uint32_t count, H5S_t **mem_spaces,
-                        H5S_t **file_spaces, haddr_t offsets[], size_t element_sizes[], const void *bufs[])
+herr_t H5F_shared_select_write(H5F_shared_t* f_sh,
+                               H5FD_mem_t type,
+                               uint32_t count,
+                               H5S_t** mem_spaces,
+                               H5S_t** file_spaces,
+                               haddr_t offsets[],
+                               size_t element_sizes[],
+                               const void* bufs[])
 {
-    H5FD_mem_t map_type;            /* Mapped memory type */
-    herr_t     ret_value = SUCCEED; /* Return value */
+    H5FD_mem_t map_type;        /* Mapped memory type */
+    herr_t ret_value = SUCCEED; /* Return value */
 
     FUNC_ENTER_NOAPI(FAIL)
 
@@ -297,9 +311,9 @@ H5F_shared_select_write(H5F_shared_t *f_sh, H5FD_mem_t type, uint32_t count, H5S
     map_type = (type == H5FD_MEM_GHEAP) ? H5FD_MEM_DRAW : type;
 
     /* Pass down to file driver layer (bypass page buffer for now) */
-    if (H5FD_write_selection(f_sh->lf, map_type, count, mem_spaces, file_spaces, offsets, element_sizes,
-                             bufs) < 0)
+    if (H5FD_write_selection(f_sh->lf, map_type, count, mem_spaces, file_spaces, offsets, element_sizes, bufs) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "selection write through file driver failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -318,9 +332,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_vector_read(H5F_shared_t *f_sh, uint32_t count, H5FD_mem_t types[], haddr_t addrs[],
-                       size_t sizes[], void *bufs[])
+herr_t H5F_shared_vector_read(H5F_shared_t* f_sh, uint32_t count, H5FD_mem_t types[], haddr_t addrs[], size_t sizes[], void* bufs[])
 {
     herr_t ret_value = SUCCEED;
 
@@ -345,16 +357,18 @@ H5F_shared_vector_read(H5F_shared_t *f_sh, uint32_t count, H5FD_mem_t types[], h
          * since a full 'count'-sized array may not
          * have been passed for 'types'
          */
-        if (i > 0 && types[i] == H5FD_MEM_NOLIST)
+        if (i > 0 && types[i] == H5FD_MEM_NOLIST) {
             break;
+        }
 
         assert(types[i] != H5FD_MEM_GHEAP);
     }
 #endif
 
     /* Pass down to file driver layer (bypass page buffer for now) */
-    if (H5FD_read_vector(f_sh->lf, count, types, addrs, sizes, bufs) < 0)
+    if (H5FD_read_vector(f_sh->lf, count, types, addrs, sizes, bufs) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_READERROR, FAIL, "vector read through file driver failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -371,9 +385,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_shared_vector_write(H5F_shared_t *f_sh, uint32_t count, H5FD_mem_t types[], haddr_t addrs[],
-                        size_t sizes[], const void *bufs[])
+herr_t H5F_shared_vector_write(H5F_shared_t* f_sh, uint32_t count, H5FD_mem_t types[], haddr_t addrs[], size_t sizes[], const void* bufs[])
 {
     herr_t ret_value = SUCCEED;
 
@@ -398,16 +410,18 @@ H5F_shared_vector_write(H5F_shared_t *f_sh, uint32_t count, H5FD_mem_t types[], 
          * since a full 'count'-sized array may not
          * have been passed for 'types'
          */
-        if (i > 0 && types[i] == H5FD_MEM_NOLIST)
+        if (i > 0 && types[i] == H5FD_MEM_NOLIST) {
             break;
+        }
 
         assert(types[i] != H5FD_MEM_GHEAP);
     }
 #endif
 
     /* Pass down to file driver layer (bypass page buffer for now) */
-    if (H5FD_write_vector(f_sh->lf, count, types, addrs, sizes, bufs) < 0)
+    if (H5FD_write_vector(f_sh->lf, count, types, addrs, sizes, bufs) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "vector write through file driver failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -423,24 +437,26 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_flush_tagged_metadata(H5F_t *f, haddr_t tag)
+herr_t H5F_flush_tagged_metadata(H5F_t* f, haddr_t tag)
 {
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_NOAPI(FAIL)
 
     /* Use tag to search for and flush associated metadata */
-    if (H5AC_flush_tagged_metadata(f, tag) < 0)
+    if (H5AC_flush_tagged_metadata(f, tag) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTFLUSH, FAIL, "unable to flush tagged metadata");
+    }
 
     /* Flush and reset the accumulator */
-    if (H5F__accum_reset(f->shared, true, false) < 0)
+    if (H5F__accum_reset(f->shared, true, false) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_CANTRESET, FAIL, "can't reset accumulator");
+    }
 
     /* Flush file buffers to disk. */
-    if (H5FD_flush(f->shared->lf, false) < 0)
+    if (H5FD_flush(f->shared->lf, false) < 0) {
         HGOTO_ERROR(H5E_IO, H5E_WRITEERROR, FAIL, "low level flush failed");
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -455,8 +471,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F__evict_cache_entries(H5F_t *f)
+herr_t H5F__evict_cache_entries(H5F_t* f)
 {
     herr_t ret_value = SUCCEED;
 
@@ -466,8 +481,9 @@ H5F__evict_cache_entries(H5F_t *f)
     assert(f->shared);
 
     /* Evict all except pinned entries in the cache */
-    if (H5AC_evict(f) < 0)
+    if (H5AC_evict(f) < 0) {
         HGOTO_ERROR(H5E_CACHE, H5E_CANTEXPUNGE, FAIL, "unable to evict all except pinned entries");
+    }
 
 #ifndef NDEBUG
     {
@@ -475,20 +491,24 @@ H5F__evict_cache_entries(H5F_t *f)
         uint32_t cur_num_entries;
 
         /* Retrieve status of the superblock */
-        if (H5AC_get_entry_status(f, (haddr_t)0, &status) < 0)
+        if (H5AC_get_entry_status(f, (haddr_t)0, &status) < 0) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTGET, FAIL, "unable to get entry status");
+        }
 
         /* Verify status of the superblock entry in the cache */
-        if (!(status & H5AC_ES__IN_CACHE) || !(status & H5AC_ES__IS_PINNED))
+        if (!(status & H5AC_ES__IN_CACHE) || !(status & H5AC_ES__IS_PINNED)) {
             HGOTO_ERROR(H5E_HEAP, H5E_CANTGET, FAIL, "unable to get entry status");
+        }
 
         /* Get the number of cache entries */
-        if (H5AC_get_cache_size(f->shared->cache, NULL, NULL, NULL, &cur_num_entries) < 0)
+        if (H5AC_get_cache_size(f->shared->cache, NULL, NULL, NULL, &cur_num_entries) < 0) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "H5AC_get_cache_size() failed.");
+        }
 
         /* Should be the only one left in the cache (the superblock) */
-        if (cur_num_entries != 1)
+        if (cur_num_entries != 1) {
             HGOTO_ERROR(H5E_CACHE, H5E_SYSTEM, FAIL, "number of cache entries is not correct");
+        }
     }
 #endif /* NDEBUG */
 
@@ -508,8 +528,7 @@ done:
  *
  *-------------------------------------------------------------------------
  */
-herr_t
-H5F_get_checksums(const uint8_t *buf, size_t buf_size, uint32_t *s_chksum /*out*/, uint32_t *c_chksum /*out*/)
+herr_t H5F_get_checksums(const uint8_t* buf, size_t buf_size, uint32_t* s_chksum /*out*/, uint32_t* c_chksum /*out*/)
 {
     herr_t ret_value = SUCCEED;
 
@@ -520,12 +539,13 @@ H5F_get_checksums(const uint8_t *buf, size_t buf_size, uint32_t *s_chksum /*out*
     assert(buf_size);
 
     /* Check for buffer size smaller than H5_SIZEOF_CHKSUM */
-    if (buf_size < H5_SIZEOF_CHKSUM)
+    if (buf_size < H5_SIZEOF_CHKSUM) {
         HGOTO_ERROR(H5E_IO, H5E_BADVALUE, FAIL, "checksum buffer is smaller than expected");
+    }
 
     /* Return the stored checksum */
     if (s_chksum) {
-        const uint8_t *chk_p; /* Pointer into raw data buffer */
+        const uint8_t* chk_p; /* Pointer into raw data buffer */
 
         /* Offset to the checksum in the buffer */
         chk_p = buf + buf_size - H5_SIZEOF_CHKSUM;
@@ -535,8 +555,9 @@ H5F_get_checksums(const uint8_t *buf, size_t buf_size, uint32_t *s_chksum /*out*
     } /* end if */
 
     /* Return the computed checksum for the buffer */
-    if (c_chksum)
+    if (c_chksum) {
         *c_chksum = H5_checksum_metadata(buf, buf_size - H5_SIZEOF_CHKSUM, 0);
+    }
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)

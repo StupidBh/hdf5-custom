@@ -265,7 +265,11 @@ endif ()
 if (H5_HAVE_PARALLEL)
   list (APPEND LINK_PUB_LIBS MPI::MPI_C)
   if (MPI_C_LINK_FLAGS)
-    set (CMAKE_EXE_LINKER_FLAGS "${MPI_C_LINK_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
+    # Keep the legacy extra copy separate from MPI::MPI_C so CMake does not
+    # deduplicate identical options provided by the imported target.
+    set_property (TARGET hdf5_platform APPEND PROPERTY HDF5_PLATFORM_EXECUTABLE_LINK_FLAGS
+        "${MPI_C_LINK_FLAGS}"
+    )
   endif ()
 endif ()
 

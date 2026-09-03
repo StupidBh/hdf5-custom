@@ -69,6 +69,25 @@ if (HDF5_EXPORTED_TARGETS AND NOT HDF5_EXTERNALLY_CONFIGURED)
       NAMESPACE ${HDF_PACKAGE_NAMESPACE}
       COMPONENT configinstall
   )
+
+  # Make the generated package directly consumable from the build tree.
+  set (_hdf5_export_namespace_args)
+  if (HDF_PACKAGE_NAMESPACE)
+    set (_hdf5_export_namespace_args NAMESPACE ${HDF_PACKAGE_NAMESPACE})
+  endif ()
+  export (
+      EXPORT ${HDF5_EXPORTED_TARGETS}
+      FILE ${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+      ${_hdf5_export_namespace_args}
+  )
+  if (BUILD_STATIC_LIBS AND BUILD_SHARED_LIBS)
+    export (
+        EXPORT ${HDF5_EXPORTED_TARGETS}_static
+        FILE ${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}_static-targets.cmake
+        ${_hdf5_export_namespace_args}
+    )
+  endif ()
+  unset (_hdf5_export_namespace_args)
 endif ()
 
 #-----------------------------------------------------------------------------
@@ -95,13 +114,13 @@ set (HDF5_INCLUDES_BUILD_TIME
 #-----------------------------------------------------------------------------
 # Configure the hdf5-config.cmake file for the build directory
 #-----------------------------------------------------------------------------
-set (INCLUDE_INSTALL_DIR ${HDF5_INSTALL_INCLUDE_DIR})
-set (SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${HDF5_INSTALL_CMAKE_DIR}" )
+set (INCLUDE_INSTALL_DIR "${HDF5_INCLUDES_BUILD_TIME}")
+set (SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set (CURRENT_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 configure_package_config_file (
     ${HDF_CONFIG_DIR}/install/hdf5-config.cmake.in
     "${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
-    INSTALL_DESTINATION "${HDF5_INSTALL_CMAKE_DIR}"
+    INSTALL_DESTINATION "."
     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
     INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
 )
@@ -131,6 +150,11 @@ endif ()
 # Configure the hdf5-config-version .cmake file for the install directory
 #-----------------------------------------------------------------------------
 if (NOT HDF5_EXTERNALLY_CONFIGURED)
+  write_basic_package_version_file (
+    "${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config-version.cmake"
+    VERSION ${HDF5_PACKAGE_VERSION}
+    COMPATIBILITY SameMajorVersion
+  )
   write_basic_package_version_file (
     "${HDF5_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config-version.cmake"
     VERSION ${HDF5_PACKAGE_VERSION}

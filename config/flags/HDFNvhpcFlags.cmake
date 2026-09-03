@@ -18,11 +18,11 @@
 #-----------------------------------------------------------------------------
 # Compiler specific flags
 #-----------------------------------------------------------------------------
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Minform=warn")
+HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -Minform=warn)
 if (NOT ${HDF_CFG_NAME} MATCHES "Debug" AND NOT ${HDF_CFG_NAME} MATCHES "Developer")
   if (NOT ${HDF_CFG_NAME} MATCHES "RelWithDebInfo")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s")
+    HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -s)
   endif ()
 else ()
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Mbounds -gopt")
+  HDF5_ADD_COMPILER_OPTIONS (C SUFFIX -Mbounds -gopt)
 endif ()

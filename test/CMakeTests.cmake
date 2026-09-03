@@ -1146,7 +1146,7 @@ endif ()
 ##############################################################################
 macro (ADD_H5_GENERATOR genfile)
   add_executable (${genfile} ${HDF5_TEST_SOURCE_DIR}/${genfile}.c)
-  target_include_directories (${genfile} PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR};$<$<BOOL:${HDF5_ENABLE_PARALLEL}>:${MPI_C_INCLUDE_DIRS}>")
+  target_include_directories (${genfile} PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
   hdf5_target_use_platform (${genfile})
   if (NOT BUILD_SHARED_LIBS)
     TARGET_C_PROPERTIES (${genfile} STATIC)

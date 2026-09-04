@@ -124,15 +124,15 @@ typedef struct H5FD_stdio_t
 /* Platform-independent names for some file-oriented functions */
 
 #ifdef H5_HAVE_WIN32_API
-    /* Windows and MinGW */
+    /* Windows */
     #define file_ftell _ftelli64
 #else
     /* Everyone else */
     #define file_ftell ftello
 #endif
 
-#if defined(H5_HAVE_WIN32_API) && !defined(H5_HAVE_MINGW)
-    /* Windows (but NOT MinGW) */
+#if defined(H5_HAVE_WIN32_API)
+    /* Windows */
     #define file_fseek     _fseeki64
     #define file_ftruncate _chsize_s
 #else

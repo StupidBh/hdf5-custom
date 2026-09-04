@@ -304,7 +304,7 @@ typedef int htri_t;
  *
  * Use of ssize_t should be discouraged in new code.
  */
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32)
     #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
     /* This will have been defined to 0 in configure */

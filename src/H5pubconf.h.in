@@ -17,9 +17,6 @@
 /* Define if this is a Windows machine */
 #cmakedefine H5_HAVE_WINDOWS @H5_HAVE_WINDOWS@
 
-/* Define if using MinGW */
-#cmakedefine H5_HAVE_MINGW @H5_HAVE_MINGW@
-
 /* Define if on the Windows platform and using the Win32 API */
 #cmakedefine H5_HAVE_WIN32_API @H5_HAVE_WIN32_API@
 

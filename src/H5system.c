@@ -322,7 +322,6 @@ int Wsetenv(const char* name, const char* value, int overwrite)
      * value is non-zero), then return an error code.
      */
     if (!overwrite) {
-    #ifndef H5_HAVE_MINGW
         size_t bufsize;
         errno_t err;
 
@@ -330,13 +329,6 @@ int Wsetenv(const char* name, const char* value, int overwrite)
         if (err || bufsize) {
             return (int)err;
         }
-    #else
-        /* MinGW doesn't have getenv_s() */
-        char* test = getenv(name);
-        if (*test) {
-            return FAIL;
-        }
-    #endif
     }
 
     return (int)_putenv_s(name, value);

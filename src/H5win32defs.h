@@ -83,10 +83,8 @@ static __inline struct tm* H5_localtime_r(const time_t* timep, struct tm* result
 
     #define HDlocaltime_r(T, R) H5_localtime_r(T, R)
 
-    #ifndef H5_HAVE_MINGW
-        #define HDftruncate(F, L) _chsize_s(F, L)
-        #define HDfseek(F, O, W)  _fseeki64(F, O, W)
-    #endif
+    #define HDftruncate(F, L) _chsize_s(F, L)
+    #define HDfseek(F, O, W)  _fseeki64(F, O, W)
 
     #if defined(H5_HAVE_COMPLEX_NUMBERS) && !defined(H5_HAVE_C99_COMPLEX_NUMBERS)
 /*

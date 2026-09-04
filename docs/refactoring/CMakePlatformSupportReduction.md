@@ -11,6 +11,10 @@
 - Last landed documentation commit: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
 - Current delivery stage: Stage 2 - awaiting a trusted native Linux/GCC validator
+- Stage 2 execution plan:
+  [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
+- Stage 2 execution scope approved: 2026-09-04
+- Stages 3 and 4 detailed planning: deferred until Stage 2 results are available
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Unavailable local environment: native Linux x86_64 with GCC/G++
@@ -43,23 +47,27 @@ validated before the next one changes:
 1. Stage 1 completes the CMake support-matrix reduction and Windows/MSVC
    validation. Linux/GCC CMake behavior is preserved by logical reduction, but
    native Linux/GCC validation is deferred.
-2. Stage 2 validates the retained CMake and product behavior on native
-   Linux/GCC using a trusted external environment.
-3. Stage 3 removes source and header compatibility code for unsupported
-   platforms and compilers, with every batch validated on both release
-   baselines.
-4. Stage 4 audits the whole repository against the final project-level support
-   contract.
+2. Stage 2 validates that the Stage 1 CMake reduction preserved the core
+   Linux/GCC build. It then discovers which optional configurations the
+   supplied environment can support, validates every available row, and
+   presents missing prerequisites to the user for a scope decision.
+3. Stage 3 will remove source and header compatibility code for unsupported
+   platforms and compilers. Its detailed work packages and validation matrix
+   will be planned after Stage 2 results are available.
+4. Stage 4 will perform the final project-level support audit. Its detailed
+   scope and exit criteria will be planned after the source-reduction work is
+   defined.
 
 Stage 1 may be completed without a native Linux environment. That milestone
 means the CMake firewall and cleanup have landed, retained Windows behavior has
 been validated, and the Linux/GCC path has been preserved by static reasoning.
 It does not mean Linux/GCC has been tested or that the overall plan is complete.
 
-Stages 2, 3, and 4 are mandatory. The overall direction is not complete when
-the CMake layer has been reduced, or when its first Linux validation passes.
-It is complete only after the source-level reduction and final dual-platform
-audit pass.
+Stages 2, 3, and 4 remain mandatory direction-level milestones. The overall
+direction is not complete when the CMake layer has been reduced, or when its
+first Linux validation passes. Detailed approval of the later stages is
+deliberately deferred; their current direction does not authorize source or
+header edits before a later plan review.
 
 ## Approved Policy
 
@@ -326,6 +334,11 @@ trees and downloaded third-party content.
    the corresponding product feature.
 10. Stage 1 can close with Linux validation deferred. The overall plan cannot
     close until Stages 2 through 4 pass.
+11. Record every repository modification made while executing this plan as an
+    atomic local Git commit after its required checks pass. Each commit has one
+    reviewable purpose, is independently revertible, and excludes unrelated
+    edits and generated artifacts. Pure validation produces no commit; portable
+    evidence updates use focused `docs:` checkpoints.
 
 ## Completed Prerequisite: Support Contract
 
@@ -804,160 +817,46 @@ pinned Linux baseline. Stage 2, Stage 3, and Stage 4 have not started.
 
 ## Stage 2: Deferred Native Linux/GCC Validation
 
-Stage 2 runs on the pinned native Linux baseline or a trusted equivalent CI
-runner. Record distribution, architecture, CMake, GCC, G++, generator/build
-tool, MPI, and optional dependency versions before testing.
+The self-contained execution plan is
+[`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md).
+Future execution should read that document together with
+`REFACTORING_PROGRESS.md`; the Stage 1 sections above remain the compatibility
+contract and historical rationale rather than the Stage 2 runbook.
 
-### Required configurations
+Stage 2 has two validation layers:
 
-- Default static plus shared Debug and Release builds.
-- Static-only and shared-only Release builds.
-- C++ enabled with both retained library forms across the exercised rows.
-- Parallel HDF5 with a supported OpenMPI or MPICH configuration.
-- Thread-safe and multi-thread concurrency configurations within documented
-  constraints.
-- Available system and bundled compression configurations.
-- Install tree, pkg-config, CMake package, and external consumer builds.
-- Standalone retained C and C++ examples.
-- Both Ninja and Unix Makefiles configure/build coverage.
+1. A fixed native Linux/GCC core gate covering the default Release and Debug
+   builds, static/shared forms, the directly affected optional C++ entry path,
+   retained generators and examples, installation, packaging, consumers, and
+   normalized CMake-contract review.
+2. Environment-driven optional validation. Probe the supplied validator without
+   changing it, execute every legal optional row whose prerequisites are
+   already available, and present every missing prerequisite to the user for a
+   test-or-defer decision.
 
-### Required checks
+Every available selected row must pass. A code failure is not an environment
+gap; a Stage 1 regression must be corrected, while an independent defect needs
+an explicit user scope decision. Every repository modification is an atomic,
+independently revertible local commit. Passing Stage 2 establishes the
+repeatable Linux/GCC validator required for later source-level work but does not
+authorize that work or complete the overall direction.
 
-- Full default Release CTest suite at the recorded `HDF_TEST_EXPRESS` level.
-- Focused tests for every optional row.
-- Build-tree and install-tree `find_package` consumers.
-- `add_subdirectory()` and FetchContent consumers.
-- Installed wrapper scripts and pkg-config metadata.
-- Static/shared SONAME, RPATH, PIC, system-library, and installation behavior.
-- A real unsupported Linux compiler rejection when such a compiler is
-  available.
+## Stage 3: Future Source-Level Reduction
 
-### Failure handling
+The approved direction is to remove project-owned source and header
+compatibility code used only by rejected platform/compiler pairs while
+preserving retained ABI and file-format behavior. Detailed scope, work
+packages, commit boundaries, validation, stop conditions, and exit criteria are
+intentionally deferred until Stage 2 results and optional-environment decisions
+are available. Stage 3 requires a separate plan update and user review before
+any source or header edit begins.
 
-If Stage 2 exposes a lost GCC path, fix it in a focused commit and rerun the
-affected Windows/MSVC contract checks. Restore retained GNU behavior, not the
-removed unsupported platform or compiler family. Record every failure, root
-cause, correction, and rerun result in the progress handoff.
+## Stage 4: Future Final Project Audit
 
-### Stage 2 exit criteria
-
-- All required Linux/GCC rows have recorded results.
-- No Linux/GCC failure remains deferred without an owner.
-- MSVC remains green after cross-platform corrections.
-- The CMake-layer audit passes on both retained platforms.
-
-Passing Stage 2 establishes the validator required for source-level work. It
-does not complete the overall project platform-reduction direction.
-
-## Stage 3: Mandatory Source-Level Reduction
-
-Stage 3 removes project-owned source compatibility paths that cannot be reached
-by either accepted pair. It starts only after Stage 2 provides a repeatable
-Linux/GCC validation environment. That environment may be remote; it need not
-run on the primary Windows development machine. Every behavior-changing batch
-must pass the affected checks on Windows/MSVC and Linux/GCC before the next
-source family is removed.
-
-### Work Package 3A: Source Inventory and Baselines
-
-Inventory project-owned C and C++ sources, private headers, installed headers,
-generated-header templates, tests, tools, utilities, and retained examples for
-at least the unsupported platform and compiler macros identified by the CMake
-inventory. For every match, record:
-
-- its truth value on the Windows/MSVC and Linux/GCC pairs, including whether
-  architecture or generator changes that result;
-- whether it changes compiled code, declarations, layout, calling convention,
-  serialization, file interpretation, or only diagnostics;
-- its public-header, ABI, or file-format impact;
-- the focused tests and consumers that cover the retained behavior; and
-- the Windows and Linux contract baseline used for its removal batch.
-
-Classify generic `_WIN32`/POSIX selectors, architecture-specific behavior
-reachable within an accepted pair, generator-specific build behavior, and
-cross-platform file-reading logic as retained behavior. A macro name associated
-with a removed platform is not by itself evidence that the surrounding
-declaration or constant is removable.
-
-### Work Package 3B: Internal Implementations and Tests
-
-Remove unsupported-only conditions, shims, workarounds, and alternate
-implementations from private headers, C and C++ implementation files, tests,
-tools, utilities, and retained examples. Process one platform or compiler
-family at a time. Unwrap branches that are always true across both accepted
-pairs and their admitted architecture/generator variants, delete branches that
-are always false, and keep explicit Windows/Linux selectors where both retained
-implementations differ.
-
-Update or remove tests that exist only for a rejected environment, but retain
-portable behavior tests that still exercise a supported row. Add focused
-coverage when removing a conditional would otherwise leave retained behavior
-unverified.
-
-### Work Package 3C: Installed and Generated Headers
-
-Review installed headers and generated public-header templates separately from
-private implementation cleanup. Remove unsupported compiler attributes,
-calling-convention alternatives, type shims, and preprocessor paths only after
-confirming that neither accepted pair nor the installed-package consumer
-contract uses them.
-
-Public-header edits require an explicit source-compatibility statement and a
-`release_docs/CHANGELOG.md` entry. They must not change retained ABI layout,
-symbol visibility, exported declarations, file-format constants, or the
-ability to read valid files produced on other systems.
-
-### Stage 3 Validation
-
-- Format every touched C and C++ file with the repository formatter.
-- Build affected static and shared libraries on Windows/MSVC and Linux/GCC.
-- Run focused positive and failure-path tests on both release baselines.
-- Re-run public-header compile consumers for C and C++ when installed or
-  generated headers change.
-- Compare affected ABI, exported-symbol, generated-header, install, and package
-  contracts.
-- Run the full default Release CTest suite on both release baselines after the final
-  source batch, recording `HDF_TEST_EXPRESS`.
-- Run `git diff --check` and classify every remaining unsupported macro match.
-
-Windows GCC, MinGW, cross-compilation, and synthetic preprocessor definitions
-do not satisfy any Stage 3 Linux validation requirement.
-
-### Stage 3 Exit Criteria
-
-1. No project-owned source or header branch exists solely to support a rejected
-   platform or compiler.
-2. Every remaining unsupported keyword match is historical text, developer
-   tooling, third-party content, an interoperability requirement, or an
-   explicitly justified retained contract.
-3. Generic Windows/POSIX separation and file-format interoperability remain
-   intact.
-4. All affected Windows/MSVC and Linux/GCC builds, tests, installed-header
-   consumers, and contract comparisons pass.
-5. User-visible source portability changes are recorded in the changelog.
-
-## Stage 4: Final Project Audit
-
-Search active CMake, workflows, current documentation, project-owned sources,
-headers, tests, tools, utilities, and examples for removed platform and compiler
-families. Confirm that:
-
-1. Windows/MSVC and Linux/GCC are the only advertised and accepted
-   target-system/compiler pairs, while release-qualified architectures and
-   generators are identified separately as validation baselines.
-2. No repository entry point or project-owned implementation path exists solely
-   for a rejected environment.
-3. Both release baselines pass the final configure, build, test, install,
-   package, and consumer gates after the last source change.
-4. Current documentation and package metadata agree with the project-level
-   policy, while historical release notes remain intact.
-5. All remaining matches have a written classification and no retained-platform
-   failure is deferred.
-6. `REFACTORING_PROGRESS.md` records final implementation anchors and exact
-   validation evidence.
-
-Only after Stage 4 may the overall project platform-reduction direction be
-marked complete.
+The approved direction is a final repository-wide audit against the two-pair
+support contract after source reduction. Its detailed checks and completion
+criteria are intentionally deferred until Stage 3 is planned and executed.
+Stage 4 requires a separate plan update and user review before it begins.
 
 ## Stage 1 Planned Commit Sequence
 
@@ -978,21 +877,6 @@ marked complete.
 Adjust ordering for proven dependencies, but keep each checkpoint buildable on
 its stated validation environment. Do not combine all mechanical reductions in
 one repository-wide commit.
-
-## Stage 3 Planned Commit Sequence
-
-The exact families depend on the Stage 3 inventory, but the minimum reviewable
-sequence is:
-
-1. `docs: Record source platform reduction inventory`
-2. Focused `src:`, `test:`, `tools:`, `hl:`, `c++:`, or `examples:` commits for
-   each unsupported platform/compiler family
-3. A separate public-header compatibility commit when installed declarations
-   change
-4. `docs: Record project platform-reduction validation`
-
-Do not combine private implementation cleanup, installed-header changes, and
-unrelated platform families in one commit.
 
 ## Stage 1 Stop Conditions
 
@@ -1016,33 +900,18 @@ explicit validation deferral. When a Linux-sensitive batch cannot be proven
 statically, defer that batch rather than guessing or weakening the Stage 2
 gate.
 
-## Stage 3 Stop Conditions
-
-Stop only the affected source batch when:
-
-- the repeatable Linux/GCC validator required by Stage 2 is unavailable;
-- retained behavior, ABI, file-format interpretation, or public declarations
-  cannot be distinguished from unsupported portability code;
-- architecture- or generator-specific behavior remains reachable within an
-  accepted target-system/compiler pair;
-- an unsupported macro also selects behavior used by a retained compiler;
-- focused coverage cannot establish the retained behavior before deletion; or
-- either release baseline has an unexplained contract or test regression.
-
-These conditions require narrower analysis or restored validation capacity;
-they do not authorize Windows GCC as substitute evidence or removal by textual
-search alone.
-
 ## Progress and Evidence Rules
 
 After each coherent batch:
 
 1. Update `REFACTORING_PROGRESS.md` with the newest implementation anchor.
 2. Move only landed work into completed status.
-3. Record exact Windows configure/build/test evidence and the test express
-   level.
-4. Retain a visible list of Linux-sensitive commits awaiting Stage 2.
-5. Record optional dependency gaps without treating them as removed features.
+3. Record exact configure/build/test evidence and the test express level for
+   every executed retained-platform row.
+4. Retain a visible list of Linux-sensitive commits awaiting Stage 2 until the
+   core and selected optional evidence closes their validation ownership.
+5. Record optional capability probes, missing prerequisites, and the user's
+   test-or-defer decision without treating an unavailable feature as removed.
 6. Do not include absolute local paths, transient build directories, generated
    logs, or machine-specific temporary files.
 7. Use "Stage 1 complete", "CMake layer validated on both release baselines",

@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(WIN32) && !defined(__MINGW32__) && !defined(_WIN32)
+#if !defined(_WIN32)
 
     #include <fcntl.h>
     #include <unistd.h>
@@ -344,7 +344,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-#else  /* WIN32 / MINGW32 */
+#else  /* _WIN32 */
 
 int main(void)
 {
@@ -352,4 +352,4 @@ int main(void)
     return EXIT_FAILURE;
 } /* end main() */
 
-#endif /* WIN32 / MINGW32 */
+#endif /* _WIN32 */

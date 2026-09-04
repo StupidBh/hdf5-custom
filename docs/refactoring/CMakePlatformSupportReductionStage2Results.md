@@ -2,11 +2,13 @@
 
 ## Status
 
-- State: core gate, bundled compression, system compression, and coverage
-  passed; six missing-environment decisions pending
+- State: complete
+- Completion decision: 2026-09-04; the user explicitly deferred six
+  unavailable optional configurations because they are not required
 - Core matrix implementation: `6ee2f392e`
 - Bundled-compression repair implementation: `81e96c889`
 - Coverage-contract correction: `d39cd5fa0`
+- System-compression validation record: `4fb87c374`
 - Execution date: 2026-09-04
 - Parent plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
@@ -14,10 +16,15 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and test parallelism: 6
 
-Stage 2 is not closed. The fixed core gate, bundled- and system-compression
-rows, and corrected coverage contract are green, but six missing-environment
-rows remain under the parent plan's exit criteria. Stage 3 source/header
-reduction remains unauthorized.
+Stage 2 is closed. The fixed core gate, bundled- and system-compression rows,
+and corrected coverage contract are green. Every optional row supported by the
+supplied environment passed, and the user explicitly deferred all six
+unavailable optional configurations. Stage 3 source/header reduction remains
+unauthorized pending a separate plan and review.
+
+The Linux/GCC core path and every optional row supported by the supplied
+environment pass; unavailable optional prerequisites have explicit user
+decisions; the Stage 1 CMake layer is validated on both retained baselines.
 
 ## Qualified Validator
 
@@ -172,18 +179,18 @@ instrumentation failure:
 
 ## Missing-Environment Decisions
 
-No packages or services were added during discovery. Each row below remains
-open until the user supplies the prerequisite for another pass or explicitly
-defers it.
+No packages or services were added for the rows below during discovery. Their
+result state remains `SKIP_MISSING_ENV`; on 2026-09-04, the user explicitly
+deferred all six because these optional configurations are not required.
 
-| Row | Missing prerequisite and evidence | Coverage unlocked and environment change | Recommendation |
-| --- | --- | --- | --- |
-| `LNX-PARALLEL-TOOLS` | mpiFileUtils, libcircle, and DTCMP development packages; all pkg-config probes failed. | Install a compatible dependency stack, then build and test the optional parallel tools. | Medium value; MPI and subfiling core behavior already pass. |
-| `LNX-ROS3` | aws-c-s3 development package and any test service configuration; discovery failed. | Install/configure the SDK and service inputs, then build and run permitted ROS3 tests. | Low value for the platform-reduction boundary. |
-| `LNX-HDFS` | JDK/JNI, Hadoop/libhdfs, and runtime configuration; commands and runtime were absent. | Install and configure the complete HDFS stack, then build and run focused VFD tests. | Low value for the platform-reduction boundary. |
-| `LNX-SIGNED-PLUGINS` | OpenSSL development metadata/headers and signing inputs; only the runtime executable was present. | Install development files and provide signing inputs, then run positive and failure-path plugin tests. | Low to medium value; ordinary external plugin loading already passes. |
-| `LNX-PACKAGE-RPM` | `rpmbuild`; command lookup failed. | Install RPM build tooling and inspect a generated RPM. | Low value; TGZ, STGZ, and DEB already pass. |
-| `LNX-UNSUPPORTED-COMPILER` | A native unsupported compiler; Clang, Intel, and NVIDIA compiler lookups failed. | Install one compiler and run real root/C++ rejection checks. | Low value; all 12 synthetic firewall cases pass. |
+| Row | Missing prerequisite and evidence | Coverage unlocked and environment change | Recommendation | User decision |
+| --- | --- | --- | --- | --- |
+| `LNX-PARALLEL-TOOLS` | mpiFileUtils, libcircle, and DTCMP development packages; all pkg-config probes failed. | Install a compatible dependency stack, then build and test the optional parallel tools. | Medium value; MPI and subfiling core behavior already pass. | Deferred; not a required configuration. |
+| `LNX-ROS3` | aws-c-s3 development package and any test service configuration; discovery failed. | Install/configure the SDK and service inputs, then build and run permitted ROS3 tests. | Low value for the platform-reduction boundary. | Deferred; not a required configuration. |
+| `LNX-HDFS` | JDK/JNI, Hadoop/libhdfs, and runtime configuration; commands and runtime were absent. | Install and configure the complete HDFS stack, then build and run focused VFD tests. | Low value for the platform-reduction boundary. | Deferred; not a required configuration. |
+| `LNX-SIGNED-PLUGINS` | OpenSSL development metadata/headers and signing inputs; only the runtime executable was present. | Install development files and provide signing inputs, then run positive and failure-path plugin tests. | Low to medium value; ordinary external plugin loading already passes. | Deferred; not a required configuration. |
+| `LNX-PACKAGE-RPM` | `rpmbuild`; command lookup failed. | Install RPM build tooling and inspect a generated RPM. | Low value; TGZ, STGZ, and DEB already pass. | Deferred; not a required configuration. |
+| `LNX-UNSUPPORTED-COMPILER` | A native unsupported compiler; Clang, Intel, and NVIDIA compiler lookups failed. | Install one compiler and run real root/C++ rejection checks. | Low value; all 12 synthetic firewall cases pass. | Deferred; not a required configuration. |
 
 ## Windows Recheck
 
@@ -205,7 +212,8 @@ warnings; no compile or link errors occurred.
 
 ## Continuation Point
 
-Obtain explicit user decisions for the six missing-environment rows. Execute
-any rows for which prerequisites are supplied and update this record together
-with `REFACTORING_PROGRESS.md`. Do not edit source/header compatibility branches
-before Stage 2 closes and a separate Stage 3 plan is reviewed.
+Stage 2 is complete. The six unavailable optional configurations remain
+explicitly deferred and may be validated later if their product paths become
+necessary. The next continuation point is preparation of a detailed Stage 3
+source/header reduction plan. Do not edit source/header compatibility branches
+until that separate plan is reviewed and approved.

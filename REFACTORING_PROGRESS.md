@@ -26,9 +26,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 complete; Stage 2 Linux/GCC core gate, bundled compression,
-  system compression, and coverage pass; six missing-environment decisions
-  pending.
+- Status: Stage 1 and Stage 2 complete; Stage 3 planning has not started.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -36,12 +34,14 @@ behavior-preserving modernization state remain recorded in
 - Stage 2 C11 literal repair anchor: `6ee2f392e`
 - Coverage documentation correction anchor: `d39cd5fa0`
 - Current implementation anchor: `81e96c889`
-- Last preceding documentation anchor: `d39cd5fa0`
+- Last preceding documentation anchor: `4fb87c374`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
-- Stage 2 execution scope: approved; core gate, bundled compression, system
-  compression, and coverage passed; six missing-environment rows remain
-- Later-stage detailed planning: deferred until Stage 2 closes
+- Stage 2 execution scope: complete; core gate, bundled compression, system
+  compression, and coverage passed; six non-required optional rows were
+  explicitly deferred by the user
+- Later-stage detailed planning: Stage 3 requires separate preparation and
+  review
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -53,7 +53,8 @@ reduction have landed, the over-constrained admission policy is corrected, and
 the required Windows/MSVC Stage 1 validation gate has passed. The Stage 2
 Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
-2 awaits the remaining decisions; Stage 3 source/header reduction and Stage 4
+2 is complete after the user explicitly deferred the six unavailable optional
+configurations as non-required. Stage 3 source/header reduction and Stage 4
 final audit have not started.
 
 ## Completed
@@ -123,9 +124,11 @@ final audit have not started.
   development packages staged in an isolated external prefix. The full build,
   29 focused tests, install metadata, and static/shared consumers against both
   package locations passed without a FetchContent dependency build.
-- Recorded the exact Stage 2 evidence, remaining validation decisions, missing
-  prerequisites, recommendations, and continuation point in the portable
-  results document.
+- Recorded the user's decision to defer the six unavailable optional
+  configurations because they are not required, satisfying the last Stage 2
+  exit gate.
+- Recorded the exact Stage 2 evidence, deferred prerequisites, and continuation
+  point in the portable results document.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -151,29 +154,24 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Obtain explicit test-or-defer decisions for missing parallel-tool, ROS3,
-  HDFS, signed-plugin, RPM, and real unsupported-compiler prerequisites. Run
-  any row whose prerequisites the user elects to supply.
-- Close Stage 2 only after those decisions and any selected reruns are recorded.
-- After Stage 2 passes, prepare the detailed source/header reduction plan for
-  separate review; the later source-removal and final-audit execution details
-  are intentionally not approved yet.
+- Prepare the detailed Stage 3 source/header reduction plan for separate
+  review; the later source-removal and final-audit execution details are
+  intentionally not approved yet.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Stop at the Stage 2 decision gate. Review
-`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, record
-explicit decisions for the six missing-environment rows, and execute any
-newly selected validation. Do not begin source/header cleanup. Stage 3 remains
-unplanned and requires separate review after Stage 2 closes.
+Stop after the completed Stage 2 gate. The next permitted action is to prepare
+the detailed Stage 3 source/header reduction plan for separate review. Do not
+begin source/header cleanup until that plan is reviewed and approved.
 
 ## Validation State
 
-- Current status: Stage 2 core gate, bundled compression, system compression,
-  and coverage pass, and all optional rows supported by the supplied Linux/GCC
-  environment have executed. Six missing-environment rows remain.
+- Current status: Stage 2 complete. The core gate, bundled compression, system
+  compression, and coverage pass, and all optional rows supported by the
+  supplied Linux/GCC environment executed successfully. The six unavailable,
+  non-required optional rows are explicitly deferred.
 - The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
   glibc 2.43, GCC/G++ 15.2.0 targeting `x86_64-linux-gnu`, CMake/CTest/CPack
   4.2.3, Ninja 1.13.2, GNU Make 4.4.1, `HDF_TEST_EXPRESS=3`, and at most six
@@ -205,8 +203,8 @@ unplanned and requires separate review after Stage 2 closes.
   dependency metadata, and four static/shared build/install consumers.
 - Missing-environment rows are mpiFileUtils/libcircle/DTCMP, ROS3 aws-c-s3,
   JDK/Hadoop/libhdfs, OpenSSL development/signing inputs, `rpmbuild`, and a real
-  unsupported native Linux compiler. These rows have been presented for
-  explicit test-or-defer decisions.
+  unsupported native Linux compiler. The user explicitly deferred every row
+  because these configurations are not required.
 - A fresh post-repair Windows x64 default Release build passed with CMake 4.4.3,
   Visual Studio 18 2026, MSVC 19.51.36256.0/toolset 14.51.36231, and
   `CL=/utf-8`; its focused selection passed 7/7 with fixtures.
@@ -304,9 +302,10 @@ unplanned and requires separate review after Stage 2 closes.
   helpers baseline-scoped.
 
 The qualified Linux/GCC validator is repeatable for later work. Preserve its
-versioned, normalized Stage 2 record and resolve the pending user decisions
-before declaring dual-platform CMake validation complete. Source-level removal
-must wait for Stage 2 closure and a separately reviewed Stage 3 plan.
+versioned, normalized Stage 2 record; dual-platform CMake validation is
+complete, with the six non-required unavailable configurations explicitly
+deferred. Source-level removal must wait for a separately reviewed and approved
+Stage 3 plan.
 
 ## Handoff Updates
 

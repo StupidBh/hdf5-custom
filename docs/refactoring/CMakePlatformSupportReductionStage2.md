@@ -2,8 +2,9 @@
 
 ## Status
 
-- State: core gate, bundled compression, system compression, and coverage
-  passed; six missing-environment decisions pending
+- State: complete
+- Completion decision: 2026-09-04; the user explicitly deferred six
+  unavailable optional configurations because they are not required
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
   [`CMakePlatformSupportReduction.md`](CMakePlatformSupportReduction.md)
@@ -265,6 +266,12 @@ After every currently available optional row has run, present all
 The user then chooses whether to supply the prerequisite for another validation
 pass or explicitly defer the row. Do not infer that choice from the feature's
 default value or from its availability on another platform.
+
+On 2026-09-04, the user explicitly deferred `LNX-PARALLEL-TOOLS`, `LNX-ROS3`,
+`LNX-HDFS`, `LNX-SIGNED-PLUGINS`, `LNX-PACKAGE-RPM`, and
+`LNX-UNSUPPORTED-COMPILER` because these optional configurations are not
+required. Their result state remains `SKIP_MISSING_ENV`; the explicit decisions
+satisfy the missing-environment exit criterion.
 
 ## Evidence Record
 

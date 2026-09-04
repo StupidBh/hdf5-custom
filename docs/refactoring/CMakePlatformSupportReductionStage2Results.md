@@ -2,10 +2,11 @@
 
 ## Status
 
-- State: core gate, bundled compression, and coverage passed; missing-
-  environment decisions pending
+- State: core gate, bundled compression, system compression, and coverage
+  passed; six missing-environment decisions pending
 - Core matrix implementation: `6ee2f392e`
 - Bundled-compression repair implementation: `81e96c889`
+- Coverage-contract correction: `d39cd5fa0`
 - Execution date: 2026-09-04
 - Parent plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
@@ -13,16 +14,18 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and test parallelism: 6
 
-Stage 2 is not closed. The fixed core gate, repaired bundled-compression row,
-and corrected coverage contract are green, but seven missing-environment rows
-remain under the parent plan's exit criteria. Stage 3 source/header reduction
-remains unauthorized.
+Stage 2 is not closed. The fixed core gate, bundled- and system-compression
+rows, and corrected coverage contract are green, but six missing-environment
+rows remain under the parent plan's exit criteria. Stage 3 source/header
+reduction remains unauthorized.
 
 ## Qualified Validator
 
 The broad matrix used implementation `6ee2f392e`; the bundled-compression
 repair validation used implementation `81e96c889`. Build, install, download,
 package, log, and consumer directories were outside the tracked source tree.
+The coverage-contract correction and system-compression validation used
+`d39cd5fa0`.
 
 | Component | Qualified value |
 | --- | --- |
@@ -76,6 +79,7 @@ already shown in their result entry.
 | `LNX-CPP` | `-DHDF5_BUILD_CPP_LIB=ON` |
 | Installed examples and `find_package` consumers | `-DHDF5_DIR=<build-package>` or `-DHDF5_DIR=<install-package>` |
 | Source-tree consumers | `-DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DHDF5_BUILD_HL_LIB=OFF -DHDF5_BUILD_TOOLS=OFF -DHDF5_BUILD_EXAMPLES=OFF` |
+| `LNX-SYSTEM-COMPRESSION` | `-DHDF5_ENABLE_ZLIB_SUPPORT=ON -DHDF5_ENABLE_SZIP_SUPPORT=ON -DZLIB_USE_EXTERNAL=OFF -DSZIP_USE_EXTERNAL=OFF -DHDF5_ALLOW_EXTERNAL_SUPPORT=NO -DCMAKE_PREFIX_PATH=<system-compression-prefix>` |
 | `LNX-PARALLEL` | `-DHDF5_ENABLE_PARALLEL=ON` |
 | `LNX-SUBFILING` | `-DBUILD_STATIC_LIBS=OFF -DHDF5_ENABLE_PARALLEL=ON -DHDF5_ENABLE_SUBFILING_VFD=ON -DHDF5_BUILD_HL_LIB=OFF -DHDF5_BUILD_TOOLS=OFF -DHDF5_BUILD_EXAMPLES=OFF` |
 | `LNX-THREADSAFE` | `-DBUILD_STATIC_LIBS=OFF -DHDF5_ENABLE_THREADSAFE=ON -DHDF5_BUILD_HL_LIB=OFF -DHDF5_BUILD_TOOLS=OFF -DHDF5_BUILD_EXAMPLES=OFF` |
@@ -120,7 +124,7 @@ no generated-product effect.
 | Row | Configuration or prerequisite | Evidence | State |
 | --- | --- | --- | --- |
 | `LNX-WRAPPERS` | C++-enabled isolated install; pkg-config 2.5.1 | All four installed `.pc` files reported 2.3.0. The supported `h5cc` and `h5c++` wrappers passed `-show`, `-showconfig`, compile, link, and run checks with default high-level linkage; `-nohl` correctly omitted the high-level libraries. | `PASS` |
-| `LNX-SYSTEM-COMPRESSION` | System zlib and libaec | Development packages were absent; pkg-config found neither `zlib` nor `libaec`. | `SKIP_MISSING_ENV` |
+| `LNX-SYSTEM-COMPRESSION` | Ubuntu zlib 1.3.1 and libaec/libsz 1.1.5 development packages, staged in an isolated prefix | CMake found both dependencies with external fetching disabled, and no dependency build tree was created. The full 3,161-step build and 29 focused filter tests passed. Installation passed; its CMake exports contained symbolic dependency targets and no staged-prefix path. Static and shared consumers configured, linked, and ran against both build-tree and install-tree packages, finding DEFLATE and SZIP. | `PASS` |
 | `LNX-BUNDLED-COMPRESSION` | Retained `ci-StdShar-GNUC` preset with outbound download | zlib 1.3.2 and libaec 1.1.6 downloaded; configure and the full build passed. Compression and Blosc2 focused tests passed 49/49. Static build-tree and install-tree consumers linked and found DEFLATE/SZIP, and the 798-entry TGZ contained HDF5, zlib, libaec, and their CMake exports. A separate shared-dependency build and both consumers also passed. | `PASS` |
 | `LNX-PARALLEL` | `HDF5_ENABLE_PARALLEL=ON`; OpenMPI 5.0.10 | Full 3,532-step build passed. Focused serial, MPI, parallel-tool, and parallel-example selection passed 11/11 with fixtures. | `PASS` |
 | `LNX-PARALLEL-TOOLS` | mpiFileUtils, libcircle, and DTCMP | Development packages were not discoverable by pkg-config. | `SKIP_MISSING_ENV` |
@@ -174,7 +178,6 @@ defers it.
 
 | Row | Missing prerequisite and evidence | Coverage unlocked and environment change | Recommendation |
 | --- | --- | --- | --- |
-| `LNX-SYSTEM-COMPRESSION` | zlib and libaec development packages; both pkg-config probes failed. | Install both development packages, then run separate system-library configure/build, filter, install/export, and consumer checks. | High value because it is the retained non-download compression path. |
 | `LNX-PARALLEL-TOOLS` | mpiFileUtils, libcircle, and DTCMP development packages; all pkg-config probes failed. | Install a compatible dependency stack, then build and test the optional parallel tools. | Medium value; MPI and subfiling core behavior already pass. |
 | `LNX-ROS3` | aws-c-s3 development package and any test service configuration; discovery failed. | Install/configure the SDK and service inputs, then build and run permitted ROS3 tests. | Low value for the platform-reduction boundary. |
 | `LNX-HDFS` | JDK/JNI, Hadoop/libhdfs, and runtime configuration; commands and runtime were absent. | Install and configure the complete HDFS stack, then build and run focused VFD tests. | Low value for the platform-reduction boundary. |
@@ -202,7 +205,7 @@ warnings; no compile or link errors occurred.
 
 ## Continuation Point
 
-Obtain explicit user decisions for the seven missing-environment rows. Execute
+Obtain explicit user decisions for the six missing-environment rows. Execute
 any rows for which prerequisites are supplied and update this record together
 with `REFACTORING_PROGRESS.md`. Do not edit source/header compatibility branches
 before Stage 2 closes and a separate Stage 3 plan is reviewed.

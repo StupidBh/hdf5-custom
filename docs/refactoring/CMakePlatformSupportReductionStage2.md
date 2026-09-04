@@ -2,8 +2,8 @@
 
 ## Status
 
-- State: core gate, bundled compression, and coverage passed; missing-
-  environment decisions pending
+- State: core gate, bundled compression, system compression, and coverage
+  passed; six missing-environment decisions pending
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
   [`CMakePlatformSupportReduction.md`](CMakePlatformSupportReduction.md)

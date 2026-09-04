@@ -28,8 +28,9 @@ Unix Makefiles are release-validation baselines.
 
 The support contract is anchored at `912fb436b`, its Stage 1 CMake
 implementation at `b317dedc9`, and its current support-documentation update at
-`6ad3399ec`. The CMake reduction is implemented, but Windows/MSVC validation is
-blocked by pre-existing C syntax errors and native Linux/GCC validation is
+`614dd74c0`. The CMake reduction and admission-policy correction are
+implemented. A C++-enabled Windows/MSVC Release build and full CTest pass;
+remaining Windows validation is incomplete and native Linux/GCC validation is
 deferred. The modernization remains paused; this status does not start the
 platform plan's source-reduction stages.
 

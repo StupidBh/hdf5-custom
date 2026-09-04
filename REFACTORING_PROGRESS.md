@@ -27,10 +27,10 @@ behavior-preserving modernization state remain recorded in
   remaining Windows/MSVC rows are incomplete and Linux/GCC native validation is
   deferred.
 - Original support-contract anchor: `912fb436b`
-- Admission-policy correction anchor: pending
+- Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
 - Source compilation repair anchor: `a68b4cae4e`
-- Current documentation anchor: `6ad3399ec`
+- Current documentation anchor: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: in progress at the remaining Windows/MSVC validation
   gates

@@ -5,10 +5,10 @@
 - State: Stage 1 implementation complete; admission-policy correction implemented; Windows validation in progress
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
-- Admission-policy correction commit: pending
+- Admission-policy correction commit: `614dd74c0`
 - CMake implementation commit: `b317dedc9`
 - Source compilation repair commit: `a68b4cae4e`
-- Current documentation commit: `6ad3399ec`
+- Current documentation commit: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
 - Current delivery stage: Stage 1 - remaining Windows/MSVC validation
 - Primary available environment: Windows x64 with MSVC 18
@@ -647,11 +647,10 @@ The current status is:
 > deferred.
 
 The implementation consists of the 19 focused CMake/CI commits from
-`0adb08f4a` through `b317dedc9`; current support-documentation cleanup is
-anchored at `6ad3399ec`. No Stage 1 commit changes a C/C++ implementation file
-or header. The separate source repair is anchored at `a68b4cae4e`. The
-admission-policy correction is implemented in the current working tree; its
-commit anchor remains pending.
+`0adb08f4a` through `b317dedc9`; the admission-policy correction and current
+support-documentation update are anchored at `614dd74c0`. No Stage 1 CMake
+commit changes a C/C++ implementation file or header. The separate source
+repair is anchored at `a68b4cae4e`.
 
 #### Admission-policy correction
 

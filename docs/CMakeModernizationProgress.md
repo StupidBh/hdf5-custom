@@ -31,7 +31,7 @@ by the HDFS VFD remains in scope.
 
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
 CMake implementation at `b317dedc9`, and its current documentation at
-`6ad3399ec`. Its current status is: CMake platform reduction implemented;
+`614dd74c0`. Its current status is: CMake platform reduction implemented;
 admission-policy correction implemented; a C++-enabled Windows/MSVC Release
 build and full CTest pass; remaining Windows validation is incomplete and
 Linux/GCC native validation is deferred. Stages 2 through 4 have not started.

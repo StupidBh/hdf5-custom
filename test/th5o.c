@@ -385,7 +385,7 @@ static void test_h5o_open_by_addr(void)
 
     /* Likewise, an objectno larger than the size of the file should fail */
     grp_addr = 0;
-    grp_addr = 1'000'000'000;
+    grp_addr = 1000000000;
     H5E_BEGIN_TRY
     {
         grp = H5Oopen_by_addr(fid, grp_addr);
@@ -1707,7 +1707,7 @@ static void test_h5o_open_by_addr_deprec(void)
 
     /* Likewise, an objectno larger than the size of the file should fail */
     grp_addr = 0;
-    grp_addr = 1'000'000'000;
+    grp_addr = 1000000000;
     H5E_BEGIN_TRY
     {
         grp = H5Oopen_by_addr(fid, grp_addr);

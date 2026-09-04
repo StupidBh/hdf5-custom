@@ -103,7 +103,7 @@ void test_plist_ed(void H5_ATTR_UNUSED* params)
     hsize_t chunk_size = 16384; /* chunk size */
     double fill = 2.7;          /* Fill value */
     size_t nslots = 521 * 2;
-    size_t nbytes = 1'048'576 * 10;
+    size_t nbytes = 1048576 * 10;
     double w0 = 0.5;
     unsigned max_compact;
     unsigned min_dense;
@@ -351,19 +351,19 @@ void test_plist_ed(void H5_ATTR_UNUSED* params)
     ret = H5Pset_family_offset(fapl, 1024);
     VRFY((ret >= 0), "H5Pset_family_offset succeeded");
 
-    ret = H5Pset_meta_block_size(fapl, 2'098'452);
+    ret = H5Pset_meta_block_size(fapl, 2098452);
     VRFY((ret >= 0), "H5Pset_meta_block_size succeeded");
 
-    ret = H5Pset_sieve_buf_size(fapl, 1'048'576);
+    ret = H5Pset_sieve_buf_size(fapl, 1048576);
     VRFY((ret >= 0), "H5Pset_sieve_buf_size succeeded");
 
     ret = H5Pset_alignment(fapl, 2, 1024);
     VRFY((ret >= 0), "H5Pset_alignment succeeded");
 
-    ret = H5Pset_cache(fapl, 1024, 128, 10'485'760, 0.3);
+    ret = H5Pset_cache(fapl, 1024, 128, 10485760, 0.3);
     VRFY((ret >= 0), "H5Pset_cache succeeded");
 
-    ret = H5Pset_elink_file_cache_size(fapl, 10'485'760);
+    ret = H5Pset_elink_file_cache_size(fapl, 10485760);
     VRFY((ret >= 0), "H5Pset_elink_file_cache_size succeeded");
 
     ret = H5Pset_gc_references(fapl, 1);

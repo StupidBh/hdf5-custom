@@ -22,9 +22,9 @@
 static const char* FILENAME[] = { "mtime", NULL };
 
 #define TESTFILE1 "tmtimeo.h5"
-#define MTIME1    1'055'531'866
+#define MTIME1    1055531866
 #define TESTFILE2 "tmtimen.h5"
-#define MTIME2    1'041'606'478
+#define MTIME2    1041606478
 
 /*-------------------------------------------------------------------------
  * Function:    main

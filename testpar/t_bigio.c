@@ -1801,7 +1801,7 @@ static void coll_chunktest(const char* filename, int chunk_factor, int select_fa
 
 int main(int argc, char** argv)
 {
-    hsize_t newsize = 1'048'576;
+    hsize_t newsize = 1048576;
     /* Set the bigio processing limit to be 'newsize' bytes */
     hsize_t oldsize = H5_mpi_set_bigio_count(newsize);
     hid_t acc_plist = H5I_INVALID_HID;

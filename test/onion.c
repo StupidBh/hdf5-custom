@@ -1017,7 +1017,7 @@ static int test_header_encode_decode(void)
 
     hdr.version = H5FD_ONION_HEADER_VERSION_CURR;
     hdr.flags = 12;
-    hdr.origin_eof = 8'589'934'609ull;
+    hdr.origin_eof = 8589934609ull;
     hdr.page_size = 4096;
     hdr.history_addr = 123456;
     hdr.history_size = 88;
@@ -1365,7 +1365,7 @@ static int test_history_encode_decode(void)
     history.record_locs[0].record_size = 238ull;
     history.record_locs[1].phys_addr = 241017ull;
     history.record_locs[1].record_size = 4555ull;
-    history.record_locs[2].phys_addr = 918'153'371'232ull;
+    history.record_locs[2].phys_addr = 918153371232ull;
     history.record_locs[2].record_size = 240ull;
 
     /* Populate revision pointer sums in exp */
@@ -1532,7 +1532,7 @@ static int test_revision_record_encode_decode(void)
         5,                                          /* revision ID */
         2,                                          /* parent revision ID */
         { '\0' },                                   /* time of creation - populated below */
-        8'589'934'609ull,                           /* logical file size */
+        8589934609ull,                           /* logical file size */
         {
             H5FD_ONION_ARCHIVAL_INDEX_VERSION_CURR, /* version */
             12,                                     /* page_size_log2 */
@@ -1562,8 +1562,8 @@ static int test_revision_record_encode_decode(void)
     record.archival_index.list[0].phys_addr = 587ull;
     record.archival_index.list[1].logical_page = 751ull;
     record.archival_index.list[1].phys_addr = 167ull;
-    record.archival_index.list[2].logical_page = 8'589'934'933ull;
-    record.archival_index.list[2].phys_addr = 8'589'934'609ull;
+    record.archival_index.list[2].logical_page = 8589934933ull;
+    record.archival_index.list[2].phys_addr = 8589934609ull;
     record.archival_index.list[3].logical_page = 590ull;
     record.archival_index.list[3].phys_addr = 433ull;
 

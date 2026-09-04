@@ -211,7 +211,7 @@ int HDF_NO_UBSAN main(void)
             ll = (long long)ld;
             ull = (unsigned long long)ld;
 
-            if (ll != 20'041'683'600'089'728 || ull != 20'041'683'600'089'728) {
+            if (ll != 20041683600089728 || ull != 20041683600089728) {
                 ret = 1;
             }
         }

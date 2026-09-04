@@ -431,7 +431,7 @@ static herr_t H5O__cache_serialize(const H5F_t* f, void* image, size_t len, void
 
         case 2: /* 4 byte size */
             /* use <= 2**32 -1 to stay within 4 bytes integer range */
-            assert(chunk0_size <= 4'294'967'295UL);
+            assert(chunk0_size <= 4294967295UL);
             UINT32ENCODE(chunk_image, chunk0_size);
             break;
 

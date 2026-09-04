@@ -537,7 +537,7 @@ static htri_t H5O__alloc_extend_chunk(H5F_t* f, H5O_t* oh, unsigned chunkno, siz
         chunk0_size = oh->chunk[0].size - (size_t)H5O_SIZEOF_HDR(oh);
 
         /* Check for moving to a 8-byte size encoding */
-        if (orig_prfx_size < 8 && (chunk0_size + delta) > 4'294'967'295) {
+        if (orig_prfx_size < 8 && (chunk0_size + delta) > 4294967295) {
             extra_prfx_size = 8 - orig_prfx_size;
             new_size_flags = H5O_HDR_CHUNK0_8;
             adjust_size_flags = true;
@@ -2486,7 +2486,7 @@ static herr_t H5O__alloc_shrink_chunk(H5F_t* f, H5O_t* oh, unsigned chunkno)
             adjust_size_flags = true;
         } /* end if */
         /* Check for moving to a 4-byte size encoding */
-        else if (orig_prfx_size > 4 && chunk0_newsize <= 4'294'967'295) {
+        else if (orig_prfx_size > 4 && chunk0_newsize <= 4294967295) {
             less_prfx_size = orig_prfx_size - 4;
             new_size_flags = H5O_HDR_CHUNK0_4;
             adjust_size_flags = true;

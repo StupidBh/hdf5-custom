@@ -130,10 +130,10 @@ functionality.
 ### Preserved C-compatible integer literals during formatting
 
    Disable binary and decimal literal separators in the clang-format
-   configuration and restore the metadata-cache epoch limit to an undecorated
-   decimal literal. The separator syntax is not valid in the C11 mode used by
-   MPI-enabled tools, which prevented that supported Linux/GCC configuration
-   from compiling.
+   configuration and restore undecorated integer literals throughout C sources,
+   headers, tests, and C++11 tests. The separator syntax introduced by an earlier
+   formatting pass is not valid in the C and C++ language modes used by supported
+   Linux/GCC configurations, which prevented them from compiling.
 
 ### Excluded local build data from source packages
 

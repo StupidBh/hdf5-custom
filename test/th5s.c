@@ -105,7 +105,7 @@ static struct space4_struct
 #define CONFIG_32 3
 #define POWER8    256           /* 2^8 */
 #define POWER16   65536         /* 2^16 */
-#define POWER32   4'294'967'296 /* 2^32 */
+#define POWER32   4294967296 /* 2^32 */
 
 /****************************************************************
 **
@@ -1734,7 +1734,7 @@ static void test_h5s_encode_regular_hyper(H5F_libver_t low, H5F_libver_t high)
 {
     hid_t fapl = H5I_INVALID_HID;             /* File access property list ID */
     hid_t sid = H5I_INVALID_HID;              /* Dataspace ID */
-    hsize_t numparticles = 8'388'608;         /* Used to calculate dimension size */
+    hsize_t numparticles = 8388608;         /* Used to calculate dimension size */
     unsigned num_dsets = 513;                 /* Used to calculate dimension size */
     hsize_t total_particles = numparticles * num_dsets;
     hsize_t vdsdims[1] = { total_particles }; /* Dimension size */
@@ -1922,7 +1922,7 @@ static void test_h5s_encode_irregular_hyper(H5F_libver_t low, H5F_libver_t high)
 {
     hid_t fapl = H5I_INVALID_HID;             /* File access property list ID */
     hid_t sid;                                /* Dataspace ID */
-    hsize_t numparticles = 8'388'608;         /* Used to calculate dimension size */
+    hsize_t numparticles = 8388608;         /* Used to calculate dimension size */
     unsigned num_dsets = 513;                 /* Used to calculate dimension size */
     hsize_t total_particles = numparticles * num_dsets;
     hsize_t vdsdims[1] = { total_particles }; /* Dimension size */
@@ -2038,7 +2038,7 @@ static void test_h5s_encode_points(H5F_libver_t low, H5F_libver_t high)
 {
     hid_t fapl = H5I_INVALID_HID;             /* File access property list ID */
     hid_t sid;                                /* Dataspace ID */
-    hsize_t numparticles = 8'388'608;         /* Used to calculate dimension size */
+    hsize_t numparticles = 8388608;         /* Used to calculate dimension size */
     unsigned num_dsets = 513;                 /* used to calculate dimension size */
     hsize_t total_particles = numparticles * num_dsets;
     hsize_t vdsdims[1] = { total_particles }; /* Dimension size */

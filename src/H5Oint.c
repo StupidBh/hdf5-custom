@@ -473,7 +473,7 @@ herr_t H5O_apply_ohdr(H5F_t* f, H5O_t* oh, hid_t ocpl_id, size_t size_hint, size
         /* Determine correct value for chunk #0 size bits */
 /* Avoid compiler warning on 32-bit machines */
 #if H5_SIZEOF_SIZE_T > H5_SIZEOF_INT32_T
-        if (size_hint > 4'294'967'295UL) {
+        if (size_hint > 4294967295UL) {
             oh->flags |= H5O_HDR_CHUNK0_8;
         }
         else if (size_hint > 65535) {

@@ -1018,7 +1018,7 @@ static int test_remove_clear_type(void)
 
     for (i = 0; i < RCT_NITER; i++) {
         /* The number of members in the type, according to the HDF5 library */
-        hsize_t nmembers = 1'234'567; /* (init to fake number) */
+        hsize_t nmembers = 1234567; /* (init to fake number) */
 
         /* The number of objects found while scanning through the object list */
         int found;

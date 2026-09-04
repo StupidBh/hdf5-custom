@@ -17,7 +17,7 @@
 #include "h5tools.h"
 #include "h5tools_utils.h"
 
-#define UIMAX    4'294'967'295u /*Maximum value for a variable of type unsigned int */
+#define UIMAX    4294967295u /*Maximum value for a variable of type unsigned int */
 #define STR_SIZE 3
 #define GBLL     ((unsigned long long)1024 * 1024 * 1024)
 

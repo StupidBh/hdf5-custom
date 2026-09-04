@@ -356,7 +356,7 @@ static int test_table(hid_t fid, int do_write)
 
     const char* field_names4[NFIELDS + 1] = { "F1", "F2", "F3", "F4", "F5", "F6" };
     hid_t field_type4[NFIELDS + 1];
-    particle4_t fill_data[1] = { { 9'999'999, -9'999'999, 999999, { 999, 999, 999 }, { 999, 999, 999 }, { 999, 999 } } };
+    particle4_t fill_data[1] = { { 9999999, -9999999, 999999, { 999, 999, 999 }, { 999, 999, 999 }, { 999, 999 } } };
 
     hsize_t nfields_out;
     hsize_t nrecords_out;

@@ -48,7 +48,7 @@
  */
 
 #ifndef BIG_X_FACTOR
-    #define BIG_X_FACTOR 1'048'576
+    #define BIG_X_FACTOR 1048576
 #endif
 #ifndef BIG_Y_FACTOR
     #define BIG_Y_FACTOR 32
@@ -2579,7 +2579,7 @@ int main(int argc, char** argv)
     test_params_t test_params;
     int express_test;
     int mpi_size, mpi_rank; /* mpi variables */
-    hsize_t oldsize, newsize = 1'048'576;
+    hsize_t oldsize, newsize = 1048576;
 
 #ifndef H5_HAVE_WIN32_API
     /* Un-buffer the stdout and stderr */

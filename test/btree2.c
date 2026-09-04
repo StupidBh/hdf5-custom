@@ -3288,7 +3288,7 @@ static unsigned test_insert_lots(hid_t fapl, const H5B2_create_t* cparam, const 
     /* Initialize random number seed */
     curr_time = time(NULL);
 #if 0
-curr_time=1'109'170'019;
+curr_time=1109170019;
 fprintf(stderr,"curr_time=%lu\n",(unsigned long)curr_time);
 #endif
     srand((unsigned)curr_time);
@@ -5722,7 +5722,7 @@ static unsigned test_update_lots(hid_t fapl, const H5B2_create_t* cparam, const 
     /* Initialize random number seed */
     curr_time = time(NULL);
 #if 0
-curr_time = 1'451'342'093;
+curr_time = 1451342093;
 fprintf(stderr, "curr_time = %lu\n", (unsigned long)curr_time);
 #endif
     srand((unsigned)curr_time);
@@ -9915,7 +9915,7 @@ static unsigned test_remove_lots(const char* driver_name, hid_t fapl, const H5B2
     /* Initialize random number seed */
     curr_time = time(NULL);
 #if 0
-curr_time = 1'163'537'969;
+curr_time = 1163537969;
 fprintf(stderr, "curr_time = %lu\n", (unsigned long)curr_time);
 #endif
     srand((unsigned)curr_time);

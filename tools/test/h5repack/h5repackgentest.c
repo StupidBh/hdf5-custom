@@ -3212,7 +3212,7 @@ static int write_dset_in(hid_t loc_id,
         size = (TEST_BUFSIZE / sizeof(double) + 1) * sizeof(double);
         dbuf = (double*)malloc(size);
         if (NULL == dbuf) {
-            printf("\nError: Cannot allocate memory for \"arrayd\" data buffer size %dMB.\n", (int)size / 1'000'000);
+            printf("\nError: Cannot allocate memory for \"arrayd\" data buffer size %dMB.\n", (int)size / 1000000);
             goto out;
         }
 

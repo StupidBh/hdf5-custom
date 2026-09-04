@@ -389,7 +389,7 @@ herr_t H5C_stats(H5C_t* cache_ptr,
     int64_t total_pinned_flushes = 0;
     int64_t total_pinned_clears = 0;
     int32_t aggregate_max_accesses = 0;
-    int32_t aggregate_min_accesses = 1'000'000;
+    int32_t aggregate_min_accesses = 1000000;
     int32_t aggregate_max_clears = 0;
     int32_t aggregate_max_flushes = 0;
     size_t aggregate_max_size = 0;
@@ -863,7 +863,7 @@ H5C_stats__reset(H5C_t H5_ATTR_UNUSED *cache_ptr)
     #if H5C_COLLECT_CACHE_ENTRY_STATS
     for (i = 0; i <= cache_ptr->max_type_id; i++) {
         cache_ptr->max_accesses[i] = 0;
-        cache_ptr->min_accesses[i] = 1'000'000;
+        cache_ptr->min_accesses[i] = 1000000;
         cache_ptr->max_clears[i] = 0;
         cache_ptr->max_flushes[i] = 0;
         cache_ptr->max_size[i] = (size_t)0;

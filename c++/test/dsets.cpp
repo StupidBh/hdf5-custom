@@ -320,15 +320,15 @@ static herr_t test_tconv(H5File& file)
 {
     // Prepare buffers for input/output
     char *out = NULL, *in = NULL;
-    out = new char[4 * 1'000'000];
+    out = new char[4 * 1000000];
     // assert (out); - should use exception handler for new - BMR
-    in = new char[4 * 1'000'000];
+    in = new char[4 * 1000000];
     // assert (in);
 
     SUBTEST("Data type conversion");
 
     // Initialize the dataset
-    for (int i = 0; i < 1'000'000; i++) {
+    for (int i = 0; i < 1000000; i++) {
         out[i * 4 + 0] = 0x11;
         out[i * 4 + 1] = 0x22;
         out[i * 4 + 2] = 0x33;
@@ -338,7 +338,7 @@ static herr_t test_tconv(H5File& file)
     try {
         // Create the data space
         hsize_t dims[1];
-        dims[0] = 1'000'000;
+        dims[0] = 1000000;
         DataSpace space(1, dims, NULL);
 
         // Create the data set
@@ -351,7 +351,7 @@ static herr_t test_tconv(H5File& file)
         dataset.read(static_cast<void*>(in), PredType::STD_I32BE);
 
         // Check
-        for (int i = 0; i < 1'000'000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             if (in[4 * i + 0] != out[4 * i + 3] || in[4 * i + 1] != out[4 * i + 2] || in[4 * i + 2] != out[4 * i + 1] || in[4 * i + 3] != out[4 * i + 0]) {
                 throw Exception("DataSet::read", "Read with byte order conversion failed");
             }

@@ -235,7 +235,7 @@ static int without_hardware_g = 0;
         }                                                                                                            \
         else { /*for long double*/                                                                                   \
             factor = 3;                                                                                              \
-            multiply = 100'000'000;                                                                                  \
+            multiply = 100000000;                                                                                  \
         }                                                                                                            \
                                                                                                                      \
         /*The number of values if multiplied by 10 for each step.*/                                                  \

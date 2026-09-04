@@ -333,7 +333,7 @@ static herr_t H5O__link_encode(H5F_t* f, bool H5_ATTR_UNUSED disable_shared, siz
     *p++ = H5O_LINK_VERSION;
 
     /* The encoding flags for the link */
-    if (len > 4'294'967'295) {
+    if (len > 4294967295) {
         link_flags = H5O_LINK_NAME_8;
     }
     else if (len > 65535) {
@@ -515,7 +515,7 @@ static size_t H5O__link_size(const H5F_t* f, bool H5_ATTR_UNUSED disable_shared,
     name_len = (uint64_t)strlen(lnk->name);
 
     /* Determine correct value for name size bits */
-    if (name_len > 4'294'967'295) {
+    if (name_len > 4294967295) {
         name_size = 8;
     }
     else if (name_len > 65535) {

@@ -606,10 +606,10 @@ typedef unsigned char uint8_t;
     do {                                                            \
         unsigned _fn_i;                                             \
         const unsigned char* _hf_key = (const unsigned char*)(key); \
-        (hashv) = 2'166'136'261U;                                   \
+        (hashv) = 2166136261U;                                   \
         for (_fn_i = 0; _fn_i < keylen; _fn_i++) {                  \
             hashv = hashv ^ _hf_key[_fn_i];                         \
-            hashv = hashv * 16'777'619U;                            \
+            hashv = hashv * 16777619U;                            \
         }                                                           \
     } while (0)
 

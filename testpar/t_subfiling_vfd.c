@@ -1610,7 +1610,7 @@ static void test_iovec_translation(void)
     /* I/O only needs to be done from a single rank */
     if (MAINPROCESS && !skip) {
         /* Use a fixed configuration for these tests */
-        stripe_size = 1'048'576;
+        stripe_size = 1048576;
         num_subfiles = 4;
         num_digits = (int)(log10(num_subfiles) + 1);
 
@@ -2528,7 +2528,7 @@ static void test_read_different_stripe_size(void)
 
     /* Use a 1MiB stripe size and a subfile for each IOC */
     cfg.ioc_selection = SELECT_IOC_ONE_PER_NODE;
-    cfg.stripe_size = (stripe_size_g > 0) ? stripe_size_g : 1'048'576;
+    cfg.stripe_size = (stripe_size_g > 0) ? stripe_size_g : 1048576;
     cfg.stripe_count = num_iocs_g;
 
     fapl_id = create_subfiling_ioc_fapl(comm_g, info_g, true, &cfg, H5FD_IOC_DEFAULT_THREAD_POOL_SIZE);
@@ -3291,7 +3291,7 @@ static void test_subfiling_vector_io_extension(void)
      * I/O vectors within the VFD.
      */
     cfg.ioc_selection = SELECT_IOC_ONE_PER_NODE;
-    cfg.stripe_size = (stripe_size_g > 0) ? stripe_size_g : 1'048'576;
+    cfg.stripe_size = (stripe_size_g > 0) ? stripe_size_g : 1048576;
     cfg.stripe_count = num_iocs_g > 1 ? num_iocs_g : 2;
 
     fapl_id = create_subfiling_ioc_fapl(comm_g, info_g, true, &cfg, H5FD_IOC_DEFAULT_THREAD_POOL_SIZE);

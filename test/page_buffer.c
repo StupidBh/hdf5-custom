@@ -522,7 +522,7 @@ static unsigned test_args(hid_t orig_fapl, const char* driver_name)
         TEST_ERROR;
     }
 
-    if (set_multi_split(driver_name, fapl, 4'194'304) != 0) {
+    if (set_multi_split(driver_name, fapl, 4194304) != 0) {
         TEST_ERROR;
     }
 
@@ -531,11 +531,11 @@ static unsigned test_args(hid_t orig_fapl, const char* driver_name)
         TEST_ERROR;
     }
 
-    if (H5Pset_file_space_page_size(fcpl, 4'194'304) < 0) {
+    if (H5Pset_file_space_page_size(fcpl, 4194304) < 0) {
         TEST_ERROR;
     }
 
-    if (H5Pset_page_buffer_size(fapl, 16'777'216, 0, 0) < 0) {
+    if (H5Pset_page_buffer_size(fapl, 16777216, 0, 0) < 0) {
         TEST_ERROR;
     }
 
@@ -543,7 +543,7 @@ static unsigned test_args(hid_t orig_fapl, const char* driver_name)
         TEST_ERROR;
     }
 
-    if (open_file(filename, fapl, 4'194'304, 16'777'216) != 0) {
+    if (open_file(filename, fapl, 4194304, 16777216) != 0) {
         TEST_ERROR;
     }
 

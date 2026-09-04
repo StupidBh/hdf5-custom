@@ -42,7 +42,7 @@
     #define EXAMPLE_DSET_DIMS 2
 
     /* Have each MPI rank write 16MiB of data */
-    #define EXAMPLE_DSET_NY 4'194'304
+    #define EXAMPLE_DSET_NY 4194304
 
     /* Dataset datatype */
     #define EXAMPLE_DSET_DATATYPE H5T_NATIVE_INT
@@ -107,7 +107,7 @@ static void subfiling_write_default(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 33'554'432); /* Align to default 32MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 33554432); /* Align to default 32MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");
@@ -210,7 +210,7 @@ static void subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
      * environment variable, this will use every MPI
      * rank as an I/O concentrator.
      */
-    subf_config.shared_cfg.stripe_size = 1'048'576;
+    subf_config.shared_cfg.stripe_size = 1048576;
     subf_config.shared_cfg.ioc_selection = SELECT_IOC_EVERY_NTH_RANK;
 
     /*
@@ -248,7 +248,7 @@ static void subfiling_write_custom(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 1'048'576); /* Align to custom 1MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 1048576); /* Align to custom 1MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");
@@ -368,7 +368,7 @@ static void subfiling_write_precreate(hid_t fapl_id, int mpi_size, int mpi_rank)
      *           files, so it is a good idea to keep an eye
      *           on this.
      */
-    H5Pset_alignment(subfiling_fapl, 0, 1'048'576); /* Align to custom 1MiB stripe size */
+    H5Pset_alignment(subfiling_fapl, 0, 1048576); /* Align to custom 1MiB stripe size */
 
     /* Parse any parallel prefix and create filename */
     par_prefix = getenv("HDF5_PARAPREFIX");

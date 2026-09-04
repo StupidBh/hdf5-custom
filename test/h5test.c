@@ -2327,7 +2327,7 @@ static unsigned int next_g = 1;
 
 int h5_local_rand(void)
 {
-    next_g = next_g * 1'103'515'245 + 12345;
+    next_g = next_g * 1103515245 + 12345;
     return next_g & RAND_MAX;
 }
 

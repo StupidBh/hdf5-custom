@@ -952,21 +952,21 @@ static int test_eof_eoa(void)
 
     /* verify as found
      */
-    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EOF mismatch")
+    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EOF mismatch")
     JSVERIFY(H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), H5FDget_eof(fd_shakespeare, H5FD_MEM_DRAW), "mismatch between DEFAULT and RAW memory types")
     JSVERIFY(0, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA should be unset by H5FDopen")
 
     /* set EoA below EoF
      */
-    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 44'442'202), "unable to set EoA (lower)")
-    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
-    JSVERIFY(44'442'202, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
+    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 44442202), "unable to set EoA (lower)")
+    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
+    JSVERIFY(44442202, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
 
     /* set EoA above EoF
      */
-    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 6'789'012), "unable to set EoA (higher)")
-    JSVERIFY(5'458'199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
-    JSVERIFY(6'789'012, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
+    JSVERIFY(SUCCEED, H5FDset_eoa(fd_shakespeare, H5FD_MEM_DEFAULT, 6789012), "unable to set EoA (higher)")
+    JSVERIFY(5458199, H5FDget_eof(fd_shakespeare, H5FD_MEM_DEFAULT), "EoF changed")
+    JSVERIFY(6789012, H5FDget_eoa(fd_shakespeare, H5FD_MEM_DEFAULT), "EoA unchanged")
 
     /************
      * TEARDOWN *
@@ -1059,7 +1059,7 @@ static int test_H5FDread_without_eoa_set_fails(void)
 
     H5E_BEGIN_TRY {
         /* mute stack trace on expected failure */
-        JSVERIFY(FAIL, H5FDread(file_shakespeare, H5FD_MEM_DRAW, H5P_DEFAULT, 1'200'699, 102, buffer), "cannot read before eoa is set")
+        JSVERIFY(FAIL, H5FDread(file_shakespeare, H5FD_MEM_DRAW, H5P_DEFAULT, 1200699, 102, buffer), "cannot read before eoa is set")
     } H5E_END_TRY for (i = 0; i < HDFS_TEST_MAX_BUF_SIZE; i++) { JSVERIFY(0, (unsigned)buffer[i], "buffer was modified by write!") } /************
                                                                                                                                       * TEARDOWN *
                                                                                                                                       ************/

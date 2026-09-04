@@ -180,10 +180,10 @@ static int test_mpio_overlap_writes(char* filename)
     return (nerrs);
 }
 
-#define MB            1'048'576      /* 1024*1024 == 2**20 */
-#define GB            1'073'741'824  /* 1024**3 == 2**30 */
-#define TWO_GB_LESS1  2'147'483'647  /* 2**31 - 1 */
-#define FOUR_GB_LESS1 4'294'967'295L /* 2**32 - 1 */
+#define MB            1048576      /* 1024*1024 == 2**20 */
+#define GB            1073741824  /* 1024**3 == 2**30 */
+#define TWO_GB_LESS1  2147483647  /* 2**31 - 1 */
+#define FOUR_GB_LESS1 4294967295L /* 2**32 - 1 */
 
 #ifndef H5_HAVE_WIN32_API
 /*

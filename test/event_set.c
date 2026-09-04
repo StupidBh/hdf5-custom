@@ -825,7 +825,7 @@ static int test_es_get_requests(void)
     }
 
     /* Close the event set */
-    if (H5ESwait(es_id, 10'000'000, &count, &op_failed) < 0) {
+    if (H5ESwait(es_id, 10000000, &count, &op_failed) < 0) {
         TEST_ERROR;
     }
     if (H5ESclose(es_id) < 0) {

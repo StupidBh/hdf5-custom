@@ -30861,7 +30861,7 @@ static void check_stats__smoke_check_1(H5F_t* file_ptr)
     #if H5C_COLLECT_CACHE_ENTRY_STATS
     if (pass) {
         /* Note that most entry level stats are only updated on entry eviction */
-        if ((cache_ptr->max_accesses[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->min_accesses[MONSTER_ENTRY_TYPE] != 1'000'000) || /* initial value */
+        if ((cache_ptr->max_accesses[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->min_accesses[MONSTER_ENTRY_TYPE] != 1000000) || /* initial value */
             (cache_ptr->max_clears[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->max_flushes[MONSTER_ENTRY_TYPE] != 0) ||
             (cache_ptr->max_size[MONSTER_ENTRY_TYPE] != 64 * 1024) || (cache_ptr->max_pins[MONSTER_ENTRY_TYPE] != 0)) {
             pass = false;
@@ -30915,7 +30915,7 @@ static void check_stats__smoke_check_1(H5F_t* file_ptr)
     #if H5C_COLLECT_CACHE_ENTRY_STATS
     if (pass) {
         /* Note that most entry level stats are only updated on entry eviction */
-        if ((cache_ptr->max_accesses[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->min_accesses[MONSTER_ENTRY_TYPE] != 1'000'000) || /* initial value */
+        if ((cache_ptr->max_accesses[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->min_accesses[MONSTER_ENTRY_TYPE] != 1000000) || /* initial value */
             (cache_ptr->max_clears[MONSTER_ENTRY_TYPE] != 0) || (cache_ptr->max_flushes[MONSTER_ENTRY_TYPE] != 0) ||
             (cache_ptr->max_size[MONSTER_ENTRY_TYPE] != 64 * 1024) || (cache_ptr->max_pins[MONSTER_ENTRY_TYPE] != 0)) {
             pass = false;

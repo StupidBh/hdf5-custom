@@ -502,8 +502,8 @@ static void test_multiple_ends(hid_t file, bool is_chunked)
                     for (m = 0; m < 2; m++) {
                         for (n = 0; n < 3; n++) {
                             for (p = 0; p < 6; p++) {
-                                data_buf->arr[i][j][k][l][m][n][p][0] = i * 1'000'000 + j * 100000 + k * 10000 + l * 1000 + m * 100 + n * 10 + p;
-                                data_buf->arr[i][j][k][l][m][n][p][1] = i * 1'000'000 + j * 100000 + k * 10000 + l * 1000 + m * 100 + n * 10 + p + 1;
+                                data_buf->arr[i][j][k][l][m][n][p][0] = i * 1000000 + j * 100000 + k * 10000 + l * 1000 + m * 100 + n * 10 + p;
+                                data_buf->arr[i][j][k][l][m][n][p][1] = i * 1000000 + j * 100000 + k * 10000 + l * 1000 + m * 100 + n * 10 + p + 1;
                             }
                         }
                     }

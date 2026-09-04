@@ -1979,7 +1979,7 @@ static void test_attr_duplicate_ids(hid_t fapl)
     hsize_t dims1[] = { SPACE1_DIM1, SPACE1_DIM2, SPACE1_DIM3 };
     hsize_t dims2[] = { ATTR1_DIM1 };
     int read_data1[ATTR1_DIM1] = { 0 };                       /* Buffer for reading 1st attribute */
-    int rewrite_data[ATTR1_DIM1] = { 1234, -423, 9'907'256 }; /* Test data for rewrite */
+    int rewrite_data[ATTR1_DIM1] = { 1234, -423, 9907256 }; /* Test data for rewrite */
     int i;
     herr_t ret;                                               /* Generic return value        */
 
@@ -3392,7 +3392,7 @@ static void test_attr_dense_dup_ids(hid_t fcpl, hid_t fapl)
     char attrname[NAME_BUF_SIZE];                             /* Name of attribute */
     hsize_t dims[] = { ATTR1_DIM1 };
     int read_data1[ATTR1_DIM1] = { 0 };                       /* Buffer for reading attribute */
-    int rewrite_data[ATTR1_DIM1] = { 1234, -423, 9'907'256 }; /* Test data for rewrite */
+    int rewrite_data[ATTR1_DIM1] = { 1234, -423, 9907256 }; /* Test data for rewrite */
     unsigned scalar_data = 1317;                              /* scalar data for attribute */
     unsigned read_scalar;                                     /* variable for reading attribute*/
     unsigned max_compact;                                     /* Maximum # of attributes to store compactly */

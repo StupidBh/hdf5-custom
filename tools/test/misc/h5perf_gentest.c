@@ -276,7 +276,7 @@ herr_t create_perf_test_file(const char* fname, int ngrps, int ndsets, int nattr
     /* fill buffer values */
     len = 1;
     for (i = 0; i < dims[0]; i++) {
-        buf_comp[i].i = buf_int[i] = i - 2'147'483'648;
+        buf_comp[i].i = buf_int[i] = i - 2147483648;
         buf_comp[i].l = 0xffffffffffffffff - i;
         buf_comp[i].f = 1.0 / (i + 1.0);
         buf_comp[i].d = 987654321.0 * i + 1.0 / (i + 1.0);
@@ -312,7 +312,7 @@ herr_t create_perf_test_file(const char* fname, int ngrps, int ndsets, int nattr
     }
 
     for (i = 0; i < nrows; i++) {
-        buf_comp_large[i].i = i - 2'147'483'648;
+        buf_comp_large[i].i = i - 2147483648;
         buf_comp_large[i].l = 0xffffffffffffffff - i;
         buf_comp_large[i].f = 1.0 / (i + 1.0);
         buf_comp_large[i].d = 987654321.0 * i + 1.0 / (i + 1.0);
@@ -576,7 +576,7 @@ int add_attrs(hid_t oid, int idx)
     hobj_ref_t ref;
     zipcode_t cmp_data[4];
     unsigned int i = 0xffffffff;
-    long long l = -2'147'483'647;
+    long long l = -2147483647;
     float f = 123456789.987654321;
     double d = 987654321.123456789;
     char* s[7] = { "Parting", "is such", "sweeter", "sorrow." };

@@ -40,7 +40,7 @@
 #define FILE_NAME    "chunk_non_contig_mem_io.h5"
 #define DATASET_NAME "chunked_dataset"
 #define DATASET_TYPE int
-#define CHUNK_DIM_0  4'194'304
+#define CHUNK_DIM_0  4194304
 
 static void chunk_non_contig_mem_io(void H5_ATTR_UNUSED* params)
 {

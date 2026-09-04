@@ -281,22 +281,22 @@ static int gen_enhance_files(bool user)
         switch (i) {
         case 1: /* stored EOA is > EOF */
             eoa = 3048;
-            chksum = 268'376'587;
+            chksum = 268376587;
             break;
 
         case 2: /* stored EOA is < EOF */
             eoa = 512;
-            chksum = 372'920'305;
+            chksum = 372920305;
             break;
 
         case 4: /* with userblock, stored EOA > EOF */
             eoa = 4000;
-            chksum = 4'168'810'027;
+            chksum = 4168810027;
             break;
 
         case 5: /* with userblock, stored EOA < EOF */
             eoa = 3000;
-            chksum = 3'716'054'346;
+            chksum = 3716054346;
             break;
 
         default: break;

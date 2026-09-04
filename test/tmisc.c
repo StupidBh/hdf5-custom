@@ -34,8 +34,8 @@
 
 /* Definitions for misc. test #1 */
 #define MISC1_FILE      "tmisc1.h5"
-#define MISC1_VAL       (13'417'386) /* 0xccbbaa */
-#define MISC1_VAL2      (15'654'348) /* 0xeeddcc */
+#define MISC1_VAL       (13417386) /* 0xccbbaa */
+#define MISC1_VAL2      (15654348) /* 0xeeddcc */
 #define MISC1_DSET_NAME "/scalar_set"
 
 /* Definitions for misc. test #2 */
@@ -73,9 +73,9 @@ typedef struct
 #define MISC5_DBGNELM1   2
 #define MISC5_DBGNELM2   1
 #define MISC5_DBGNELM3   1
-#define MISC5_DBGELVAL1  999'999'999
-#define MISC5_DBGELVAL2  888'888'888
-#define MISC5_DBGELVAL3  777'777'777
+#define MISC5_DBGELVAL1  999999999
+#define MISC5_DBGELVAL2  888888888
+#define MISC5_DBGELVAL3  777777777
 
 typedef struct
 {

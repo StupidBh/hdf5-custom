@@ -136,7 +136,7 @@ typedef enum
 
 /* Definitions used by test_bug_optimized_bufs() and test_bug_api_library() */
 #define DIMS         10000
-#define BIG_X_FACTOR 1'048'576
+#define BIG_X_FACTOR 1048576
 #define BIG_Y_FACTOR 32
 
 /*

@@ -39,7 +39,7 @@ int main(void)
     int fill = 2;               /* Fill value */
     hsize_t max_size[1];        /* data space maximum size */
     size_t nslots = 521 * 2;
-    size_t nbytes = 1'048'576 * 10;
+    size_t nbytes = 1048576 * 10;
     double w0 = 0.5;
     unsigned max_compact;
     unsigned min_dense;
@@ -405,19 +405,19 @@ int main(void)
     if ((ret = H5Pset_family_offset(fapl1, 1024)) < 0) {
         assert(ret > 0);
     }
-    if ((ret = H5Pset_meta_block_size(fapl1, 2'098'452)) < 0) {
+    if ((ret = H5Pset_meta_block_size(fapl1, 2098452)) < 0) {
         assert(ret > 0);
     }
-    if ((ret = H5Pset_sieve_buf_size(fapl1, 1'048'576)) < 0) {
+    if ((ret = H5Pset_sieve_buf_size(fapl1, 1048576)) < 0) {
         assert(ret > 0);
     }
     if ((ret = H5Pset_alignment(fapl1, 2, 1024)) < 0) {
         assert(ret > 0);
     }
-    if ((ret = H5Pset_cache(fapl1, 1024, 128, 10'485'760, 0.3)) < 0) {
+    if ((ret = H5Pset_cache(fapl1, 1024, 128, 10485760, 0.3)) < 0) {
         assert(ret > 0);
     }
-    if ((ret = H5Pset_elink_file_cache_size(fapl1, 10'485'760)) < 0) {
+    if ((ret = H5Pset_elink_file_cache_size(fapl1, 10485760)) < 0) {
         assert(ret > 0);
     }
     if ((ret = H5Pset_gc_references(fapl1, 1)) < 0) {

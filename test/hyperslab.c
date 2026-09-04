@@ -601,21 +601,21 @@ static herr_t test_multifill(size_t nx)
     }
 
     for (i = 0; i < nx; i++) {
-        src[i].left = 1'111'111;
+        src[i].left = 1111111;
         src[i].mid = 12345.6789;
-        src[i].right = 2'222'222;
-        dst[i].left = 3'333'333;
+        src[i].right = 2222222;
+        dst[i].left = 3333333;
         dst[i].mid = 98765.4321;
-        dst[i].right = 4'444'444;
+        dst[i].right = 4444444;
     } /* end for */
 
     /*
      * Describe the fill value.     The zero stride says to read the same thing
      * over and over again.
      */
-    fill.left = 55'555'555;
+    fill.left = 55555555;
     fill.mid = 3.1415927;
-    fill.right = 66'666'666;
+    fill.right = 66666666;
     src_stride = 0;
 
     /*
@@ -634,7 +634,7 @@ static herr_t test_multifill(size_t nx)
      */
     s[0] = '\0';
     for (i = 0; i < nx; i++) {
-        if (dst[i].left != 3'333'333) {
+        if (dst[i].left != 3333333) {
             snprintf(s, sizeof(s), "bad dst[%lu].left", (unsigned long)i);
         }
         else if (!H5_DBL_ABS_EQUAL(dst[i].mid, fill.mid)) {
@@ -644,7 +644,7 @@ static herr_t test_multifill(size_t nx)
              */
             snprintf(s, sizeof(s), "bad dst[%lu].mid", (unsigned long)i);
         }
-        else if (dst[i].right != 4'444'444) {
+        else if (dst[i].right != 4444444) {
             snprintf(s, sizeof(s), "bad dst[%lu].right", (unsigned long)i);
         }
         if (s[0]) {

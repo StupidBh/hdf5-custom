@@ -324,9 +324,9 @@ static herr_t create_attrs_1(void)
     char dset_name[64];
     char attr_name[128];
     int i, j;
-    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
-    p_time open_t = { 0, 0, 0, 1'000'000, 0, "H5Dopen2" };
-    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time attr_t = { 0, 0, 0, 1000000, 0, "" };
+    p_time open_t = { 0, 0, 0, 1000000, 0, "H5Dopen2" };
+    p_time close_t = { 0, 0, 0, 1000000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
@@ -432,9 +432,9 @@ static herr_t create_attrs_2(void)
     char dset_name[64];
     char attr_name[128];
     int i, j;
-    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
-    p_time create_t = { 0, 0, 0, 1'000'000, 0, "H5Dcreate2" };
-    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time attr_t = { 0, 0, 0, 1000000, 0, "" };
+    p_time create_t = { 0, 0, 0, 1000000, 0, "H5Dcreate2" };
+    p_time close_t = { 0, 0, 0, 1000000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
@@ -539,9 +539,9 @@ static herr_t create_attrs_3(void)
     char attr_name[128];
     int loop_num;
     int i, j, k;
-    p_time attr_t = { 0, 0, 0, 1'000'000, 0, "" };
-    p_time open_t = { 0, 0, 0, 1'000'000, 0, "H5Dopen2" };
-    p_time close_t = { 0, 0, 0, 1'000'000, 0, "" };
+    p_time attr_t = { 0, 0, 0, 1000000, 0, "" };
+    p_time open_t = { 0, 0, 0, 1000000, 0, "H5Dopen2" };
+    p_time close_t = { 0, 0, 0, 1000000, 0, "" };
 
 #ifdef H5_HAVE_PARALLEL
     /* need the rank for printing data */
@@ -647,7 +647,7 @@ double retrieve_time(void)
 #endif /*H5_HAVE_PARALLEL*/
         struct timeval t;
         HDgettimeofday(&t, NULL);
-        return ((double)t.tv_sec + (double)t.tv_usec / 1'000'000);
+        return ((double)t.tv_sec + (double)t.tv_usec / 1000000);
 #ifdef H5_HAVE_PARALLEL
     }
     else {

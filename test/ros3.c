@@ -52,7 +52,7 @@
      */
     #define S3_TEST_RESOURCE_H5_HIVE_KEY "src=h5test/fmt=hive+style@cloud/charsets.h5"
 
-    #define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5'458'199
+    #define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5458199
     #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE     6464
     #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEOVER 6400
     #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEQUOT 5691
@@ -865,7 +865,7 @@ static int test_vfl_read_without_eoa_set_fails(void)
     memset(buffer, 0, 256);
     H5E_BEGIN_TRY
     {
-        ret = H5FDread(fd, H5FD_MEM_DRAW, H5P_DEFAULT, 1'200'699, 102, buffer);
+        ret = H5FDread(fd, H5FD_MEM_DRAW, H5P_DEFAULT, 1200699, 102, buffer);
     }
     H5E_END_TRY
     if (ret != FAIL) {
@@ -1336,13 +1336,13 @@ static int test_ros3_block_caching_apis(void)
     }
 
     /* Set block cache size to 0 - should disable block caching */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'576, 0, true) < 0) {
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048576, 0, true) < 0) {
         TEST_ERROR;
     }
     if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
     }
-    if (block_size != 1'048'576) {
+    if (block_size != 1048576) {
         TEST_ERROR;
     }
     if (block_cache_size != 0) {
@@ -1361,16 +1361,16 @@ static int test_ros3_block_caching_apis(void)
     }
 
     /* Set block size to slightly larger than block cache size - should round block size down */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'580, 1'048'576, true) < 0) {
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048580, 1048576, true) < 0) {
         TEST_ERROR;
     }
     if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
     }
-    if (block_size != 1'048'576) {
+    if (block_size != 1048576) {
         TEST_ERROR;
     }
-    if (block_cache_size != 1'048'576) {
+    if (block_cache_size != 1048576) {
         TEST_ERROR;
     }
     if (!lock_superblock) {
@@ -1386,16 +1386,16 @@ static int test_ros3_block_caching_apis(void)
     }
 
     /* Disable locking of the superblock block into the block cache */
-    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1'048'576, 4'194'304, false) < 0) {
+    if (H5Pset_fapl_ros3_block_caching(fapl_id, 1048576, 4194304, false) < 0) {
         TEST_ERROR;
     }
     if (H5Pget_fapl_ros3_block_caching(fapl_id, &block_size, &block_cache_size, &lock_superblock) < 0) {
         TEST_ERROR;
     }
-    if (block_size != 1'048'576) {
+    if (block_size != 1048576) {
         TEST_ERROR;
     }
-    if (block_cache_size != 4'194'304) {
+    if (block_cache_size != 4194304) {
         TEST_ERROR;
     }
     if (lock_superblock) {

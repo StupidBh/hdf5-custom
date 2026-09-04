@@ -1951,7 +1951,7 @@ static herr_t test_tconv(hid_t file)
     TESTING("data type conversion");
 
     /* Initialize the dataset */
-    for (i = 0; i < 1'000'000; i++) {
+    for (i = 0; i < 1000000; i++) {
         out[i * 4 + 0] = 0x11;
         out[i * 4 + 1] = 0x22;
         out[i * 4 + 2] = 0x33;
@@ -1959,7 +1959,7 @@ static herr_t test_tconv(hid_t file)
     } /* end for */
 
     /* Create the data space */
-    dims[0] = 1'000'000;
+    dims[0] = 1000000;
     if ((space = H5Screate_simple(1, dims, NULL)) < 0) {
         goto error;
     }
@@ -1980,7 +1980,7 @@ static herr_t test_tconv(hid_t file)
     }
 
     /* Check */
-    for (i = 0; i < 1'000'000; i++) {
+    for (i = 0; i < 1000000; i++) {
         if (in[4 * i + 0] != out[4 * i + 3] || in[4 * i + 1] != out[4 * i + 2] || in[4 * i + 2] != out[4 * i + 1] || in[4 * i + 3] != out[4 * i + 0]) {
             H5_FAILED();
             puts("    Read with byte order conversion failed.");
@@ -5619,7 +5619,7 @@ static herr_t test_nbit_flt_size(hid_t file)
      */
     for (i = 0; i < DSET_DIM1; i++) {
         for (j = 0; j < DSET_DIM2; j++) {
-            orig[i][j] = (float)(rand() % 1'234'567) / 2;
+            orig[i][j] = (float)(rand() % 1234567) / 2;
         }
     }
 
@@ -6349,7 +6349,7 @@ static herr_t test_scaleoffset_double(hid_t file)
     /* Initialize data */
     for (i = 0; i < (size_t)size[0]; i++) {
         for (j = 0; j < (size_t)size[1]; j++) {
-            orig_data[i][j] = (rand() % 10'000'000) / 10000000.0;
+            orig_data[i][j] = (rand() % 10000000) / 10000000.0;
 
             /* even-numbered values are negative */
             if ((i * size[1] + j + 1) % 2 == 0) {
@@ -6507,7 +6507,7 @@ static herr_t test_scaleoffset_double_2(hid_t file)
 
     /* Initialize data of hyperslab */
     for (j = 0; j < (size_t)size[1]; j++) {
-        orig_data[0][j] = (rand() % 10'000'000) / 10000000.0;
+        orig_data[0][j] = (rand() % 10000000) / 10000000.0;
 
         /* even-numbered values are negative */
         if ((j + 1) % 2 == 0) {
@@ -11453,7 +11453,7 @@ static herr_t test_chunk_fast(const char* driver_name, hid_t fapl)
         if (H5Pget_cache(my_fapl, &mdc_nelmts, &rdcc_nelmts, &rdcc_nbytes, &rdcc_w0) < 0) {
             FAIL_STACK_ERROR;
         }
-        rdcc_nbytes = 1'048'576;
+        rdcc_nbytes = 1048576;
         if (H5Pset_cache(my_fapl, mdc_nelmts, rdcc_nelmts, rdcc_nbytes, rdcc_w0) < 0) {
             FAIL_STACK_ERROR;
         }

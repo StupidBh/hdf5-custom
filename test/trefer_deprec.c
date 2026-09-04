@@ -337,7 +337,7 @@ static void test_reference_obj(void)
     hobj_ref_t *wbuf,                                 /* buffer to write to disk */
         *rbuf,                                        /* buffer read from disk */
         *tbuf;                                        /* temp. buffer read from disk */
-    hobj_ref_t nvrbuf[3] = { 0, 101, 1'000'000'000 }; /* buffer with non-valid refs */
+    hobj_ref_t nvrbuf[3] = { 0, 101, 1000000000 }; /* buffer with non-valid refs */
     unsigned* tu32;                                   /* Temporary pointer to uint32 data */
     int i, j;                                         /* counting variables */
     const char* write_comment = "Foo!";               /* Comments for group */

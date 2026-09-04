@@ -45,7 +45,7 @@
 
 #include "hdf5.h"
 
-#define BUF_SIZE 1'048'576
+#define BUF_SIZE 1048576
 #define N_LOOPS  64
 
 #define TESTFILE "h5_debug_trace_out.h5"

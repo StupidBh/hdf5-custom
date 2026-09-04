@@ -36,7 +36,7 @@ static const char* FILENAME[] = { "istore", NULL };
 #define TEST_DATATYPE H5T_NATIVE_UCHAR
 
 #define TEST_CHUNK_SIZE  50
-#define TEST_SPARSE_SIZE 1'000'000
+#define TEST_SPARSE_SIZE 1000000
 
 static hsize_t chunk_dims[H5O_LAYOUT_NDIMS];
 

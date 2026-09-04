@@ -1374,7 +1374,7 @@ error:
 unsigned test_accum_adjust(H5F_t* f)
 {
     int i = 0;
-    int s = 1'048'576; /* size of buffer */
+    int s = 1048576; /* size of buffer */
     int32_t *wbuf, *rbuf;
 
     TESTING("accumulator adjustments after append/prepend of data");
@@ -1458,17 +1458,17 @@ unsigned test_accum_adjust(H5F_t* f)
     }
 
     /* Read back and verify both pieces of data */
-    if (accum_read(1'048'576, 1'048'575, rbuf) < 0) {
+    if (accum_read(1048576, 1048575, rbuf) < 0) {
         FAIL_STACK_ERROR;
     }
-    if (memcmp(wbuf, rbuf, (size_t)1'048'576) != 0) {
+    if (memcmp(wbuf, rbuf, (size_t)1048576) != 0) {
         TEST_ERROR;
     }
 
-    if (accum_read(5, 1'048'571, rbuf) < 0) {
+    if (accum_read(5, 1048571, rbuf) < 0) {
         FAIL_STACK_ERROR;
     }
-    if (memcmp(wbuf, rbuf, (size_t)1'048'571) != 0) {
+    if (memcmp(wbuf, rbuf, (size_t)1048571) != 0) {
         TEST_ERROR;
     }
 
@@ -1558,19 +1558,19 @@ unsigned test_accum_adjust(H5F_t* f)
     /* ==> Max Buffer Size - (dirty offset + adjust size) >= 2 * size) */
     /* ==> Need to adjust location of accumulator while appending */
     /* ==> Accumulator will need to be reallocated */
-    if (accum_write(1'048'571, 349523, wbuf) < 0) {
+    if (accum_write(1048571, 349523, wbuf) < 0) {
         FAIL_STACK_ERROR;
     }
 
     /* Write a piece of metadata outside current accumulator to force write
         to disk */
-    if (accum_write(1'398'900, 1, wbuf) < 0) {
+    if (accum_write(1398900, 1, wbuf) < 0) {
         FAIL_STACK_ERROR;
     }
 
     /* Read in the piece we wrote to disk above, and then verify that
         the data is as expected */
-    if (accum_read(1'048'571, 349523, rbuf) < 0) {
+    if (accum_read(1048571, 349523, rbuf) < 0) {
         FAIL_STACK_ERROR;
     }
     if (memcmp(wbuf, rbuf, (size_t)349523) != 0) {
@@ -1655,19 +1655,19 @@ unsigned test_accum_adjust(H5F_t* f)
     /* ==> We cannot slide dirty region down, it's all dirty */
     /* ==> Dirty region overlaps region to eliminate from accumulator */
     /* ==> Need to adjust location of accumulator while appending */
-    if (accum_write(1'048'571, 349523, wbuf) < 0) {
+    if (accum_write(1048571, 349523, wbuf) < 0) {
         FAIL_STACK_ERROR;
     }
 
     /* Write a piece of metadata outside current accumulator to force write
         to disk */
-    if (accum_write(1'398'900, 1, wbuf) < 0) {
+    if (accum_write(1398900, 1, wbuf) < 0) {
         FAIL_STACK_ERROR;
     }
 
     /* Read in the piece we wrote to disk above, and then verify that
         the data is as expected */
-    if (accum_read(1'048'571, 349523, rbuf) < 0) {
+    if (accum_read(1048571, 349523, rbuf) < 0) {
         FAIL_STACK_ERROR;
     }
     if (memcmp(wbuf, rbuf, (size_t)349523) != 0) {

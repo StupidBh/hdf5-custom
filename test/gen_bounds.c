@@ -64,7 +64,7 @@
 #define GROUP   "Group"
 #define ATTR    "Attr"
 #define DATASET "Dataset"
-#define POWER32 4'294'967'296 /* 2^32 */
+#define POWER32 4294967296 /* 2^32 */
 
 /*
  * Defines for gen_sel_files()
@@ -880,7 +880,7 @@ static herr_t gen_sel_files(const char* filename, H5F_libver_t low_bound, H5F_li
     hid_t fapl = H5I_INVALID_HID; /* File access property list */
     hid_t sid = H5I_INVALID_HID;  /* Dataspace ID */
     hid_t did = H5I_INVALID_HID;  /* Dataset ID */
-    hsize_t numparticles = 8'388'608;
+    hsize_t numparticles = 8388608;
     hsize_t total_particles = numparticles * 513;
     hsize_t vdsdims[1] = { total_particles }; /* Dataset dimension size */
     hsize_t coord[4];                         /* Point selection */

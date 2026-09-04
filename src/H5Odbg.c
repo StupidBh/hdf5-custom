@@ -158,7 +158,7 @@ herr_t H5O__assert(const H5O_t* oh)
         else if (chunk0_size <= 65535) {
             assert((oh->flags & H5O_HDR_CHUNK0_SIZE) == H5O_HDR_CHUNK0_2);
         }
-        else if (chunk0_size <= 4'294'967'295) {
+        else if (chunk0_size <= 4294967295) {
             assert((oh->flags & H5O_HDR_CHUNK0_SIZE) == H5O_HDR_CHUNK0_4);
         }
         else {

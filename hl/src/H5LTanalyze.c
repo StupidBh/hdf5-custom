@@ -356,7 +356,7 @@ typedef unsigned int flex_uint32_t;
             #define INT16_MIN (-32767 - 1)
         #endif
         #ifndef INT32_MIN
-            #define INT32_MIN (-2'147'483'647 - 1)
+            #define INT32_MIN (-2147483647 - 1)
         #endif
         #ifndef INT8_MAX
             #define INT8_MAX (127)
@@ -365,7 +365,7 @@ typedef unsigned int flex_uint32_t;
             #define INT16_MAX (32767)
         #endif
         #ifndef INT32_MAX
-            #define INT32_MAX (2'147'483'647)
+            #define INT32_MAX (2147483647)
         #endif
         #ifndef UINT8_MAX
             #define UINT8_MAX (255U)
@@ -374,7 +374,7 @@ typedef unsigned int flex_uint32_t;
             #define UINT16_MAX (65535U)
         #endif
         #ifndef UINT32_MAX
-            #define UINT32_MAX (4'294'967'295U)
+            #define UINT32_MAX (4294967295U)
         #endif
 
         #ifndef SIZE_MAX

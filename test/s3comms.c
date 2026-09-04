@@ -31,7 +31,7 @@
     #define S3_TEST_RESOURCE_TEXT_PUBLIC     "Poe_Raven.txt"
     #define S3_TEST_RESOURCE_MISSING         "missing.csv"
 
-    #define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5'458'199
+    #define S3_TEST_RESOURCE_TEXT_RESTRICTED_SIZE 5458199
     #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE     6464
     #define S3_TEST_RESOURCE_TEXT_PUBLIC_SIZEOVER 6400
 
@@ -412,7 +412,7 @@ static int test_s3r_read(void)
     H5E_BEGIN_TRY
     {
         ret = H5FD__s3comms_s3r_read(handle,
-                                     (haddr_t)1'200'699,
+                                     (haddr_t)1200699,
                                      /* 1200699 > S3_TEST_RESOURCE_TEXT_PUBLIC_SIZE */ (size_t)100,
                                      buffer,
                                      S3COMMS_READ_BUFFER_SIZE);

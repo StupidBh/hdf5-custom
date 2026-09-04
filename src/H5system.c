@@ -250,7 +250,7 @@ void H5_get_localtime_str(char* buf, size_t buf_size)
 #ifdef H5_HAVE_WIN32_API
 
     /* Offset between 1/1/1601 and 1/1/1970 in 100 nanosecond units */
-    #define _W32_FT_OFFSET (116'444'736'000'000'000ULL)
+    #define _W32_FT_OFFSET (116444736000000000ULL)
 
 /*-------------------------------------------------------------------------
  * Function:  Wgettimeofday
@@ -282,8 +282,8 @@ int Wgettimeofday(struct timeval* tv, struct timezone* tz)
 
     if (tv) {
         GetSystemTimeAsFileTime(&_now.ft);
-        tv->tv_usec = (long)((_now.ns100 / 10ULL) % 1'000'000ULL);
-        tv->tv_sec = (long)((_now.ns100 - _W32_FT_OFFSET) / 10'000'000ULL);
+        tv->tv_usec = (long)((_now.ns100 / 10ULL) % 1000000ULL);
+        tv->tv_sec = (long)((_now.ns100 - _W32_FT_OFFSET) / 10000000ULL);
     }
 
     if (tz) {

@@ -102,7 +102,7 @@ static herr_t test_cont(char* filename, hid_t fapl)
         FAIL_STACK_ERROR;
     }
 
-    time_new = 11'111'111;
+    time_new = 11111111;
 
     if (H5O_msg_create(&oh_locA, H5O_NAME_ID, 0, 0, &long_name) < 0) {
         FAIL_STACK_ERROR;
@@ -288,7 +288,7 @@ static herr_t test_ohdr_cache(char* filename, hid_t fapl)
     }
 
     /* Create object header message in new object header */
-    time_new = 11'111'111;
+    time_new = 11111111;
     if (H5O_msg_create(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new) < 0) {
         FAIL_STACK_ERROR;
     }
@@ -2196,7 +2196,7 @@ int main(void)
 
             /* create a new message */
             TESTING("message creation");
-            time_new = 11'111'111;
+            time_new = 11111111;
             if (H5O_msg_create(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new) < 0) {
                 FAIL_STACK_ERROR;
             }
@@ -2227,7 +2227,7 @@ int main(void)
              * Test modification of an existing message.
              */
             TESTING("message modification");
-            time_new = 33'333'333;
+            time_new = 33333333;
             if (H5O_msg_write(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new) < 0) {
                 FAIL_STACK_ERROR;
             }
@@ -2270,7 +2270,7 @@ int main(void)
              */
             TESTING("object header overflow in memory");
             for (i = 0; i < 40; i++) {
-                time_new = (i + 1) * 1000 + 1'000'000;
+                time_new = (i + 1) * 1000 + 1000000;
                 if (H5O_msg_create(&oh_loc, H5O_MTIME_ID, 0, 0, &time_new) < 0) {
                     FAIL_STACK_ERROR;
                 }
@@ -2373,7 +2373,7 @@ int main(void)
              * (can't write to them, but should be able to remove them)
              */
             TESTING("constant message handling");
-            time_new = 22'222'222;
+            time_new = 22222222;
             if (H5O_msg_create(&oh_loc, H5O_MTIME_NEW_ID, H5O_MSG_FLAG_CONSTANT, 0, &time_new) < 0) {
                 FAIL_STACK_ERROR;
             }
@@ -2395,7 +2395,7 @@ int main(void)
             if (ro != time_new) {
                 TEST_ERROR;
             }
-            time_new = 33'333'333;
+            time_new = 33333333;
             H5E_BEGIN_TRY
             {
                 ret = H5O_msg_write(&oh_loc, H5O_MTIME_NEW_ID, 0, 0, &time_new);

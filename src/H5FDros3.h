@@ -158,7 +158,7 @@
      *
      * \since 2.2.0
      */
-    #define HDF5_ROS3_VFD_DEFAULT_BLOCK_SIZE 16'777'216
+    #define HDF5_ROS3_VFD_DEFAULT_BLOCK_SIZE 16777216
     /**
      * \def HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE
      * The default size, in bytes, of the #H5FD_ROS3 driver's I/O block cache.
@@ -170,7 +170,7 @@
      *
      * \since 2.2.0
      */
-    #define HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE 134'217'728
+    #define HDF5_ROS3_VFD_DEFAULT_BLOCK_CACHE_SIZE 134217728
 
 /**
  * \struct H5FD_ros3_fapl_t

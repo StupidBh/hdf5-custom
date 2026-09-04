@@ -111,7 +111,7 @@ void reportTime(struct timeval start, double mbytes)
     timeval_diff.tv_sec = timeval_stop.tv_sec - start.tv_sec;
 
     if (timeval_diff.tv_usec < 0) {
-        timeval_diff.tv_usec += 1'000'000;
+        timeval_diff.tv_usec += 1000000;
         timeval_diff.tv_sec--;
     } /* end if */
 

@@ -84,7 +84,7 @@ static void print_stats(const char* prefix,
  */
 static void synchronize(void)
 {
-#if defined(H5_HAVE_WIN32_API) && !defined(__CYGWIN__)
+#if defined(H5_HAVE_WIN32_API)
     _flushall();
 #else
     int H5_ATTR_NDEBUG_UNUSED status;

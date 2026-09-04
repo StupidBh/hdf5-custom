@@ -2,9 +2,10 @@
 
 ## Status
 
-- State: core gate passed; available optional rows executed; user decisions
-  pending
-- Tested implementation: `6ee2f392e`
+- State: core gate and bundled-compression rerun passed; coverage and missing-
+  environment decisions pending
+- Core matrix implementation: `6ee2f392e`
+- Bundled-compression repair implementation: `81e96c889`
 - Execution date: 2026-09-04
 - Parent plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
@@ -12,16 +13,16 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and test parallelism: 6
 
-Stage 2 is not closed. The fixed core gate is green, but one independent
-pre-existing defect, one Stage 1 documentation regression, and seven missing-
+Stage 2 is not closed. The fixed core gate and repaired bundled-compression row
+are green, but one Stage 1 documentation regression and seven missing-
 environment rows remain under the parent plan's exit criteria. Stage 3
 source/header reduction remains unauthorized.
 
 ## Qualified Validator
 
-The tracked validation checkout was clean at `6ee2f392e`. Build, install,
-download, package, log, and consumer directories were outside the tracked
-source tree.
+The broad matrix used implementation `6ee2f392e`; the bundled-compression
+repair validation used implementation `81e96c889`. Build, install, download,
+package, log, and consumer directories were outside the tracked source tree.
 
 | Component | Qualified value |
 | --- | --- |
@@ -120,7 +121,7 @@ no generated-product effect.
 | --- | --- | --- | --- |
 | `LNX-WRAPPERS` | C++-enabled isolated install; pkg-config 2.5.1 | All four installed `.pc` files reported 2.3.0. The supported `h5cc` and `h5c++` wrappers passed `-show`, `-showconfig`, compile, link, and run checks with default high-level linkage; `-nohl` correctly omitted the high-level libraries. | `PASS` |
 | `LNX-SYSTEM-COMPRESSION` | System zlib and libaec | Development packages were absent; pkg-config found neither `zlib` nor `libaec`. | `SKIP_MISSING_ENV` |
-| `LNX-BUNDLED-COMPRESSION` | Retained `ci-StdShar-GNUC` preset with outbound download | zlib 1.3.2 and libaec 1.1.6 downloaded and configured, but HDF5 generation failed because its export sets reference `zlibstatic`, `aec-static`, and `sz-static` targets absent from the export set. | `FAIL` |
+| `LNX-BUNDLED-COMPRESSION` | Retained `ci-StdShar-GNUC` preset with outbound download | zlib 1.3.2 and libaec 1.1.6 downloaded; configure and the full build passed. Compression and Blosc2 focused tests passed 49/49. Static build-tree and install-tree consumers linked and found DEFLATE/SZIP, and the 798-entry TGZ contained HDF5, zlib, libaec, and their CMake exports. A separate shared-dependency build and both consumers also passed. | `PASS` |
 | `LNX-PARALLEL` | `HDF5_ENABLE_PARALLEL=ON`; OpenMPI 5.0.10 | Full 3,532-step build passed. Focused serial, MPI, parallel-tool, and parallel-example selection passed 11/11 with fixtures. | `PASS` |
 | `LNX-PARALLEL-TOOLS` | mpiFileUtils, libcircle, and DTCMP | Development packages were not discoverable by pkg-config. | `SKIP_MISSING_ENV` |
 | `LNX-SUBFILING` | Parallel and subfiling on; shared only; C++/HL/tools/examples off | The dedicated target and dependencies built; focused subfiling VFD selection passed 3/3 with fixtures. | `PASS` |
@@ -144,12 +145,25 @@ mechanically restored C11-compatible integer literals. The complete Linux core
 matrix and a fresh Windows/MSVC default Release build then passed; this defect
 is closed and was not caused by the Stage 1 platform reduction.
 
-The two remaining failed rows have different ownership:
+The bundled-compression failure was a Stage 1 regression. Commit `99fbd083b`
+enabled normal standalone build-tree package exports, but fetched zlib and
+libaec targets were not added to a loadable export. Static HDF5 therefore
+referenced missing dependency targets. The retained plugin preset also exposed
+a second collision: Blosc2's private zlib-ng used the same target and archive
+names as HDF5's fetched zlib.
 
-| Row | Failing phase and root cause | Relationship to Stage 1 | Pending decision |
+Commit `81e96c889` added dedicated build-tree dependency exports, loaded them
+before HDF5 targets, isolated fetched-zlib outputs, and let bundled subprojects
+reuse that zlib. Static and shared GCC consumers passed against build and
+install trees; the retained preset, focused filters, TGZ package, and a fresh
+Windows/MSVC static-dependency build and consumers also passed.
+
+The coverage row is the only remaining `FAIL`:
+
+| Row | Failing phase and root cause | Relationship to Stage 1 | Resolution or pending decision |
 | --- | --- | --- | --- |
-| `LNX-BUNDLED-COMPRESSION` | CMake generation: downloaded dependency targets are required by HDF5 export sets but are not exported. | Reproduces the defect already diagnosed before Stage 2; not a platform-reduction regression. | Repair the bundled export/install integration or exclude it from selected Stage 2 scope. |
-| `LNX-COVERAGE` | Report generation: the project never registers an executable with the coverage module, so it creates no `ccov` target. | The implementation gap predates Stage 1, but Stage 1 commit `6ad3399ec` added documentation that instructs users to build the nonexistent target. | Implement and validate the documented report target or correct the Stage 1 documentation contract. |
+| `LNX-BUNDLED-COMPRESSION` | CMake generation: downloaded dependency targets were required by HDF5 export sets but were not exported; the plugin build also introduced colliding zlib target and archive names. | Stage 1 regression introduced by build-tree export commit `99fbd083b`. | Fixed by `81e96c889`; rerun `PASS`. |
+| `LNX-COVERAGE` | Report generation: the project never registers an executable with the coverage module, so it creates no `ccov` target. | The implementation gap predates Stage 1, but Stage 1 commit `6ad3399ec` added documentation that instructs users to build the nonexistent target. | The user classified report generation as lower priority than bundled compression; implementation or documentation correction remains open. |
 
 ## Missing-Environment Decisions
 
@@ -176,10 +190,19 @@ focused C, high-level, and tool selection passed 7/7 with fixtures at
 `HDF_TEST_EXPRESS=3` and six parallel jobs. Only existing numeric-conversion
 warnings were emitted.
 
+After the bundled-compression repair, a fresh minimal Windows x64 configuration
+with the same CMake, Visual Studio, and MSVC versions fetched static zlib and
+libaec, generated all dependency exports, and completed a full Release build.
+Static consumers configured, linked, and ran successfully against both the
+build-tree and installed packages. The generated dependency imports used the
+expected per-configuration MSVC library paths. This repair-specific build was
+launched through WSL without `CL` propagation, so it emitted existing code-page
+warnings; no compile or link errors occurred.
+
 ## Continuation Point
 
-Resolve the bundled-compression scope and the GCC coverage contract, then
-obtain explicit user decisions for the seven missing-environment rows. Execute
-any rows for which prerequisites are supplied and update this record together
-with `REFACTORING_PROGRESS.md`. Do not edit source/header compatibility
-branches before Stage 2 closes and a separate Stage 3 plan is reviewed.
+Resolve the lower-priority GCC coverage contract, then obtain explicit user
+decisions for the seven missing-environment rows. Execute any rows for which
+prerequisites are supplied and update this record together with
+`REFACTORING_PROGRESS.md`. Do not edit source/header compatibility branches
+before Stage 2 closes and a separate Stage 3 plan is reviewed.

@@ -26,20 +26,20 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 complete; Stage 2 Linux/GCC core gate passed and all currently
-  available optional rows executed; user scope decisions pending.
+- Status: Stage 1 complete; Stage 2 Linux/GCC core gate and bundled-compression
+  rerun passed; coverage and missing-environment decisions pending.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
 - Stage 1 source compilation repair anchor: `a68b4cae4e`
 - Stage 2 C11 literal repair anchor: `6ee2f392e`
-- Current implementation anchor: `6ee2f392e`
-- Last preceding documentation anchor: `d89db2996`
+- Current implementation anchor: `81e96c889`
+- Last preceding documentation anchor: `1ce4383c2`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
-- Stage 2 execution scope: approved; core gate passed; available optional rows
-  executed; one independent defect, one Stage 1 documentation regression, and
-  seven missing-environment rows remain
+- Stage 2 execution scope: approved; core gate and bundled-compression rerun
+  passed; one Stage 1 documentation regression and seven missing-environment
+  rows remain
 - Later-stage detailed planning: deferred until Stage 2 closes
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -50,9 +50,10 @@ and a Visual Studio generator, plus Linux x86_64 with GCC/G++ and Ninja, with a
 focused Unix Makefiles check. The CMake firewall and unsupported CMake-path
 reduction have landed, the over-constrained admission policy is corrected, and
 the required Windows/MSVC Stage 1 validation gate has passed. The Stage 2
-Linux/GCC core gate and all optional rows supported by the unchanged validator
-have run. Stage 2 awaits scope decisions; Stage 3 source/header reduction and
-Stage 4 final audit have not started.
+Linux/GCC core gate and the repaired bundled-compression row pass, and all
+optional rows supported by the unchanged validator have run. Stage 2 awaits
+the remaining decisions; Stage 3 source/header reduction and Stage 4 final
+audit have not started.
 
 ## Completed
 
@@ -107,6 +108,12 @@ Stage 4 final audit have not started.
 - Corrected the compiler-wrapper contract to the intentionally consolidated
   `h5cc` and `h5c++` interface and marked its fully exercised Stage 2 row as
   passed.
+- Repaired the Stage 1 bundled-compression export regression. Fetched zlib and
+  libaec targets are now available to build-tree package consumers, bundled
+  plugins reuse HDF5's zlib without target or archive collisions, and static
+  and shared build/install consumers pass on Linux/GCC. The retained preset,
+  focused compression tests, TGZ package, and fresh Windows/MSVC static path
+  also pass.
 - Recorded the exact Stage 2 evidence, remaining defects, missing
   prerequisites, recommendations, and continuation point in the portable
   results document.
@@ -135,10 +142,10 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Resolve the independent bundled-compression export defect or explicitly
-  remove it from the selected Stage 2 scope.
 - Resolve the GCC coverage mismatch by implementing the documented `ccov`
-  target or correcting the Stage 1 documentation contract.
+  target or correcting the Stage 1 documentation contract. The user has
+  classified this report-generation path as lower priority than bundled
+  compression, but has not yet selected its final resolution.
 - Obtain explicit test-or-defer decisions for missing system compression,
   parallel-tool, ROS3, HDFS, signed-plugin, RPM, and real unsupported-compiler
   prerequisites. Run any row whose prerequisites the user elects to supply.
@@ -152,17 +159,18 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Continuation Point
 
 Stop at the Stage 2 decision gate. Review
-`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, record the
-user's resolution for bundled compression, GCC coverage, and the seven missing-
-environment rows, and execute any newly selected validation. Do not begin
-source/header cleanup. Stage 3 remains unplanned and requires separate review
-after Stage 2 closes.
+`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, resolve the
+lower-priority GCC coverage contract, record explicit decisions for the seven
+missing-environment rows, and execute any newly selected validation. Do not
+begin source/header cleanup. Stage 3 remains unplanned and requires separate
+review after Stage 2 closes.
 
 ## Validation State
 
-- Current status: Stage 2 core gate passed and all optional rows supported by
-  the unchanged Linux/GCC validator have executed. One independent defect, one
-  Stage 1 documentation regression, and seven missing-environment rows remain.
+- Current status: Stage 2 core gate and bundled-compression rerun passed, and
+  all optional rows supported by the unchanged Linux/GCC validator have
+  executed. One Stage 1 documentation regression and seven missing-environment
+  rows remain.
 - The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
   glibc 2.43, GCC/G++ 15.2.0 targeting `x86_64-linux-gnu`, CMake/CTest/CPack
   4.2.3, Ninja 1.13.2, GNU Make 4.4.1, `HDF_TEST_EXPRESS=3`, and at most six
@@ -182,9 +190,13 @@ after Stage 2 closes.
   Stage 2 results document.
 - The supported `h5cc` and `h5c++` wrappers passed, including default high-level
   linkage and `-nohl`; obsolete four-wrapper documentation was corrected. The
-  remaining failures are the pre-existing bundled-compression export defect and
-  a pre-existing coverage registration gap exposed by incorrect Stage 1 `ccov`
-  documentation.
+  bundled-compression export regression is fixed and its rerun passed. The only
+  remaining failure is a pre-existing coverage registration gap exposed by
+  incorrect Stage 1 `ccov` documentation.
+- Bundled zlib 1.3.2 and libaec 1.1.6 passed the retained preset build and 49
+  focused compression/plugin tests. Static and shared build-tree/install-tree
+  consumers found DEFLATE and SZIP, and the TGZ package contained the expected
+  libraries and CMake exports.
 - Missing-environment rows are system zlib/libaec, mpiFileUtils/libcircle/DTCMP,
   ROS3 aws-c-s3, JDK/Hadoop/libhdfs, OpenSSL development/signing inputs,
   `rpmbuild`, and a real unsupported native Linux compiler. These rows have
@@ -192,6 +204,10 @@ after Stage 2 closes.
 - A fresh post-repair Windows x64 default Release build passed with CMake 4.4.3,
   Visual Studio 18 2026, MSVC 19.51.36256.0/toolset 14.51.36231, and
   `CL=/utf-8`; its focused selection passed 7/7 with fixtures.
+- A fresh Windows/MSVC bundled-compression configuration and Release build also
+  passed after `81e96c889`. Static consumers configured, linked, and ran against
+  both build-tree and installed packages; multi-config dependency imports used
+  the expected configuration-specific library paths.
 - The completed local baseline was Windows NT `10.0.26100` x64, Visual Studio
   18 2026 Insiders, MSVC `19.51.36256.0` from toolset `14.51.36231`, Windows
   SDK `10.0.26100.0`, and CMake `4.4.3`. Configures used the Visual Studio 18

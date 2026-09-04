@@ -2,8 +2,8 @@
 
 ## Status
 
-- State: core gate passed; available optional rows executed; user decisions
-  pending
+- State: core gate and bundled-compression rerun passed; coverage and missing-
+  environment decisions pending
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
   [`CMakePlatformSupportReduction.md`](CMakePlatformSupportReduction.md)
@@ -242,6 +242,11 @@ to Stage 1, and rerun result.
 The known bundled zlib/libaec export-set generation defect is a code defect,
 not a missing environment. If bundled prerequisites are available and that
 behavior reproduces, report it as `FAIL` under these rules.
+
+The defect reproduced and was repaired in `81e96c889`. It was ultimately
+classified as a Stage 1 regression introduced when `99fbd083b` enabled normal
+standalone build-tree exports without exporting their fetched dependencies.
+The repaired row is recorded as `PASS` in the execution results.
 
 ## Missing-Environment Decision
 

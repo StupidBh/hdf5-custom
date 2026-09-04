@@ -30,11 +30,10 @@ baselines. Java and Fortran remain unsupported, and the JNI discovery required
 by the HDFS VFD remains in scope.
 
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
-CMake implementation at `b317dedc9`, and its current documentation at
-`614dd74c0`. Its current status is: CMake platform reduction implemented;
-admission-policy correction implemented; a C++-enabled Windows/MSVC Release
-build and full CTest pass; remaining Windows validation is incomplete and
-Linux/GCC native validation is deferred. Stages 2 through 4 have not started.
+CMake implementation at `b317dedc9`, and its last landed documentation at
+`614dd74c0`. Its current status is: Stage 1 complete; CMake platform/compiler
+reduction implemented and Windows/MSVC validated; native Linux/GCC validation
+is deferred. Stages 2 through 4 have not started.
 
 ## Stage Status
 
@@ -211,11 +210,31 @@ C++-enabled MSVC configurations, a 17,323-record no-delta File API comparison,
 and clean source-package generation pass. Formatting commit `b22b55872` had
 removed four `HDONE_ERROR(...)` statement terminators, but source repair
 `a68b4cae4e` restored them before the current `HEAD`; the earlier blocker record
-was stale. A current C++-enabled MSVC Release build with both library forms,
-tests, tools, and examples succeeds, and full CTest at `HDF_TEST_EXPRESS=3`
-passes all 2,851 enabled tests with 37 disabled out of 2,888 registered tests
-using six parallel jobs. Install, binary-package, standalone installed-example,
-and external-consumer validation remains outstanding.
+was stale. Stage 1 is now complete on Windows/MSVC. Fresh default combined,
+static-only, shared-only, and Debug builds pass. The default full CTest run at
+`HDF_TEST_EXPRESS=3` passes 2,816 enabled tests with 37 disabled out of 2,853
+registered; the C++-enabled combined Release build passes 2,851 enabled tests
+with 37 disabled out of 2,888 registered. Release and Debug installation,
+static/shared exports, PDB placement, and a 164-entry CPack ZIP pass. Standalone
+C, C++, and high-level examples pass 279 tests against both build-tree and
+install-tree packages, and minimal `add_subdirectory()` and FetchContent
+consumers build and run. All builds and tests use at most six parallel jobs.
+Fresh thread-safe and multi-thread concurrency configurations each pass their
+focused three-test fixture group. A vcpkg-exported Microsoft MPI SDK and the
+installed runtime support a complete parallel Release build and a nine-test
+focused MPI selection. Perl `5.42.3` is found after refreshing the process
+environment.
+
+The remaining optional environment gaps are pkg-config, system zlib/libaec,
+external HDF5 filter plugins, `aws-c-s3`, JDK/JNI plus Hadoop/libhdfs, OpenSSL,
+mpiFileUtils/libcircle/DTCMP, and NSIS or WiX. Bundled zlib/libaec retrieval
+works, but generation exposes a separate export-set defect for the bundled
+dependency targets. These results are platform-reduction baseline evidence;
+the affected rows still require repetition after modernization changes them.
+
+This evidence freezes the current install, package, and consumer behavior for
+the paused modernization. It does not complete modernization stages 7 and 8;
+those checks must be repeated after their implementation changes.
 
 MSVC 18 is the retained Windows validation toolchain. The earlier MinGW-w64
 results are historical baseline evidence only; MinGW is no longer a supported
@@ -229,19 +248,22 @@ copy used to preserve historical MPI executable propagation. That check used
 the generated Visual Studio projects and an actual link instead of relying on
 the normalized File API contract alone.
 
-Still required before review or declaration of completion:
+Still required before review or declaration of modernization completion:
 
-- completion of the platform-reduction Windows gate after its source blocker is
-  resolved, followed by the deferred native Linux/GCC gate;
-- static-only, shared-only, and combined-library configurations;
-- Debug and Release coverage on MSVC and GCC;
+- the deferred platform-reduction native Linux/GCC gate and later source-level
+  reduction stages;
+- static-only, shared-only, combined-library, Debug, and Release coverage on
+  GCC, plus repetition of the Windows rows after affected modernization work;
 - native Linux/GCC coverage;
-- thread-safe, multi-thread concurrency, and broader MPI test configurations;
-- system and bundled compression, plugins, VOL, ROS3, HDFS, and subfiling where
-  the required environment is available;
-- install/export/package artifact comparison; and
-- external build-tree, install-tree, FetchContent, `add_subdirectory()`, and
-  pkg-config consumer validation.
+- repeat thread-safe and multi-thread concurrency configurations, and run a
+  broader MPI matrix, after affected modernization changes;
+- system and bundled compression, plugins, VOL, ROS3, HDFS, and subfiling after
+  their modernization changes and where the required environment is available;
+- install/export/package artifact comparison after those modernization stages
+  change the implementation; and
+- repeat external build-tree, install-tree, FetchContent, `add_subdirectory()`,
+  and pkg-config consumer validation after affected changes. Direct pkg-config
+  consumption is currently unavailable because the executable is not installed.
 
 Passing a focused contract comparison does not mark an untested matrix row as
 complete.

@@ -22,18 +22,15 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: CMake platform/compiler reduction and admission-policy correction
-  implemented; a C++-enabled Windows/MSVC Release build and full CTest pass;
-  remaining Windows/MSVC rows are incomplete and Linux/GCC native validation is
-  deferred.
+- Status: Stage 1 complete; CMake platform/compiler reduction implemented and
+  Windows/MSVC validated; native Linux/GCC validation is deferred.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
 - Source compilation repair anchor: `a68b4cae4e`
-- Current documentation anchor: `614dd74c0`
+- Last landed documentation anchor: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
-- Stage 1 completion state: in progress at the remaining Windows/MSVC validation
-  gates
+- Stage 1 completion state: complete
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -41,9 +38,10 @@ and exact compiler release are validation dimensions rather than central
 firewall inputs. The release-qualified baselines remain Windows x64 with MSVC
 18 and Visual Studio 18 2026, plus Linux x86_64 with GCC/G++ and Ninja, with a
 focused Unix Makefiles check. The CMake firewall and unsupported CMake-path
-reduction have landed, and the over-constrained admission policy is corrected
-in the current working tree. Stage 2 native Linux validation, Stage 3
-source/header reduction, and Stage 4 final audit have not started.
+reduction have landed, the over-constrained admission policy is corrected, and
+the required Windows/MSVC Stage 1 validation gate has passed. Stage 2 native
+Linux validation, Stage 3 source/header reduction, and Stage 4 final audit have
+not started.
 
 ## Completed
 
@@ -74,6 +72,9 @@ source/header reduction, and Stage 4 final audit have not started.
   the narrower release-validation matrix.
 - Kept Stage 1 out of C/C++ implementation files and headers. Their remaining
   compatibility references are classified for mandatory Stage 3 work.
+- Completed Work Package 1G on the retained Windows/MSVC baseline: default,
+  static-only, shared-only, Debug, C++, full CTest, install, binary package,
+  standalone example, and external-consumer rows all passed.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -99,9 +100,6 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Complete the remaining Stage 1 Windows/MSVC matrix, including the default,
-  static-only, shared-only, and Debug rows plus install, binary-package,
-  standalone-example, and external-consumer validation.
 - Establish a trusted native Linux x86_64 GCC/G++ validator for Stage 2;
   Windows GCC or MinGW is not substitute evidence.
 - Inventory and remove source/header compatibility code used only by rejected
@@ -116,18 +114,21 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-Stop at Stage 1. Do not begin native Linux validation or source/header cleanup.
-Resume at Work Package 1G and run the remaining Windows/MSVC validation matrix.
+Stop after the completed Stage 1 milestone. Do not begin source/header cleanup.
 When the user supplies a trusted native Linux/GCC environment, begin Stage 2
-only after recording the complete Windows result; Stage 3 remains gated on
-repeatable validation on both release baselines.
+with the pinned Ninja matrix and focused Unix Makefiles check. Stage 3 remains
+gated on repeatable validation on both release baselines.
 
 ## Validation State
 
-- Current status: CMake platform/compiler reduction and admission-policy
-  correction implemented; a C++-enabled Windows/MSVC Release build and full
-  CTest pass; remaining Windows/MSVC rows are incomplete and Linux/GCC native
-  validation is deferred.
+- Current status: Stage 1 complete; CMake platform/compiler reduction
+  implemented and Windows/MSVC validated; native Linux/GCC validation is
+  deferred.
+- The completed local baseline was Windows NT `10.0.26100` x64, Visual Studio
+  18 2026 Insiders, MSVC `19.51.36256.0` from toolset `14.51.36231`, Windows
+  SDK `10.0.26100.0`, and CMake `4.4.3`. Configures used the Visual Studio 18
+  2026 generator without an explicit platform, `CL=/utf-8`,
+  `HDF_TEST_EXPRESS=3`, and at most six parallel jobs.
 - All 12 corrected synthetic firewall cases passed. They cover both accepted
   compiler pairs, generator and architecture variation, rejected target
   systems and compilers, optional C++, and the non-bypass behavior of
@@ -159,10 +160,52 @@ repeatable validation on both release baselines.
   Studio 18 2026 generator without an explicit `-A` argument.
 - Full CTest at `HDF_TEST_EXPRESS=3` passed all 2,851 enabled tests with 37
   disabled out of 2,888 registered tests, using six parallel jobs.
-- Install, binary-package, standalone installed-example, and external-consumer
-  rows have not yet been rerun. The older full default result of 2,817 passed
-  and 37 disabled tests remains historical baseline evidence rather than proof
-  for those outstanding rows.
+- A fresh default Release configure and complete build passed with static and
+  shared libraries, tests, tools, high-level libraries, and examples enabled
+  and C++ disabled. Full CTest passed all 2,816 enabled tests with 37 disabled
+  out of 2,853 registered tests.
+- Fresh static-only Release, shared-only Release, and default Debug builds
+  passed. Each configuration passed the same focused C, high-level, and tool
+  smoke selection plus its fixtures: seven tests per configuration.
+- Artifact checks confirmed the default Release build emits `hdf5.dll`, its
+  `hdf5.lib` import library, and `libhdf5.lib`; static-only omits the DLL and
+  import library; shared-only omits the static library. The high-level library
+  follows the same pattern. Debug emits and installs HDF5 and tool PDB files in
+  `bin`.
+- Release installation of the C++-enabled combined build passed and installed
+  C, high-level, C++, and C++ high-level static and shared libraries, runtime
+  DLLs, tools, headers, package configuration, and static/shared export sets.
+  CPack ZIP generation passed; the archive contains 164 entries, including the
+  expected C/C++ runtime and library artifacts.
+- Standalone retained C, C++, and high-level examples configured, built, and
+  passed all 279 registered tests against both the build-tree package and the
+  installed package.
+- Minimal external `add_subdirectory()` and local-source FetchContent consumers
+  each configured, built, linked to `hdf5-static`, and passed their execution
+  test.
+- A user-provided vcpkg-exported Microsoft MPI SDK was paired with the installed
+  Microsoft MPI runtime. Parallel HDF5 configured and completed a full Release
+  build with 3,108 registered tests. A focused core-library, MPI, parallel-tool,
+  and parallel-example selection passed all nine tests and fixtures.
+- Fresh thread-safe and multi-thread concurrency configurations each built the
+  shared library and `testhdf5`; the focused base test and its fixtures passed
+  three of three tests in each configuration.
+- After refreshing the process environment, CMake found Strawberry Perl
+  `5.42.3`; Perl is not a remaining environment gap.
+- The default full suite already exercised the enabled in-tree plugin and VOL
+  tests. Environment-limited optional rows are direct pkg-config consumption,
+  system zlib and libaec, external filter plugins, ROS3, HDFS, signed plugins,
+  parallel tools based on mpiFileUtils, and extra Windows installer formats.
+  The missing prerequisites are respectively `pkg-config`, the system
+  compression development packages, an HDF5 filter-plugin installation,
+  `aws-c-s3`, a JDK/JNI plus Hadoop/libhdfs, OpenSSL development files,
+  mpiFileUtils/libcircle/DTCMP, and NSIS or WiX.
+- Bundled zlib and libaec downloads and dependency configuration succeeded, but
+  CMake generation failed because the HDF5 export sets reference bundled
+  `zlib`, `aec-shared`, and `sz-shared` targets that are not in an export set.
+  This is a non-environment optional-path defect, not a Stage 1 platform-
+  reduction regression. Subfiling remains a Stage 2 Linux/parallel row because
+  its option is intentionally unavailable on Windows.
 - Historical MinGW-w64 results are baseline evidence only; MinGW is now outside
   the support contract and cannot substitute for native Linux/GCC validation.
 - Installing GCC on Windows is not planned as a validation step because it does

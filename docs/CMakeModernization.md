@@ -27,12 +27,12 @@ firewall; Windows x64/Visual Studio 18 2026 and Linux x86_64/GCC with Ninja and
 Unix Makefiles are release-validation baselines.
 
 The support contract is anchored at `912fb436b`, its Stage 1 CMake
-implementation at `b317dedc9`, and its current support-documentation update at
+implementation at `b317dedc9`, and its last landed support-documentation update at
 `614dd74c0`. The CMake reduction and admission-policy correction are
-implemented. A C++-enabled Windows/MSVC Release build and full CTest pass;
-remaining Windows validation is incomplete and native Linux/GCC validation is
-deferred. The modernization remains paused; this status does not start the
-platform plan's source-reduction stages.
+implemented, and Stage 1 is complete after the Windows/MSVC build, test,
+install, package, standalone-example, and external-consumer gates passed.
+Native Linux/GCC validation is deferred. The modernization remains paused;
+this status does not start the platform plan's source-reduction stages.
 
 - Cache options keep their names, types, defaults, allowed values, and advanced/non-advanced status unless a
   separately approved compatibility change says otherwise.

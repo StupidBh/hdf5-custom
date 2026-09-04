@@ -205,11 +205,13 @@ cmake -S . -B build-gcc-coverage -G Ninja \
   -DCODE_COVERAGE=ON
 cmake --build build-gcc-coverage --parallel 6
 ctest --test-dir build-gcc-coverage --output-on-failure -j 6
-cmake --build build-gcc-coverage --target ccov --parallel 6
 ```
 
-The generated HTML coverage output is under the build tree's `ccov`
-directory. See [the instrumentation README](../config/sanitizer/README.md) for the lower-level helper targets.
+The build instruments HDF5 targets and test execution writes GCC coverage
+counter data beside their object files. The top-level HDF5 build provides the
+`ccov-clean` target to reset those counters, but it does not provide an HTML
+report target. Use an external gcov/lcov workflow when a report is required.
+See [the instrumentation README](../config/sanitizer/README.md) for details.
 
 `HDF5_ENABLE_DEV_WARNINGS=ON` enables the repository's stricter compiler diagnostics. There is no
 `HDF5_ENABLE_DEVELOPER_MODE` option and the default Visual Studio configuration list does not contain a `Developer`

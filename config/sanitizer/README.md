@@ -41,28 +41,27 @@ cmake -S . -B build-gcc-coverage -G Ninja \
   -DCODE_COVERAGE=ON
 cmake --build build-gcc-coverage --parallel 6
 ctest --test-dir build-gcc-coverage --output-on-failure -j 6
-cmake --build build-gcc-coverage --target ccov --parallel 6
 ```
 
-Configuration fails when `lcov` or `genhtml` is unavailable. Coverage output
-is written to `<build-dir>/ccov`.
+Configuration fails when `lcov` or `genhtml` is unavailable. HDF5 applies the
+module's GCC coverage options to its targets, test execution writes `.gcda`
+counter files beside the instrumented object files, and `ccov-clean` resets
+those counters. The HDF5 top-level build does not register executables with the
+module's report helpers, so it does not create `ccov`, `ccov-all`, or HTML
+report output. Run gcov/lcov externally when a report is required.
 
-The module exposes these helpers to CMake code:
+The module also exposes generic helpers for caller-owned CMake targets:
 
 - `add_code_coverage()` instruments targets in the current directory and
   below.
 - `target_code_coverage(<target> ...)` instruments one target and can add it
   to report targets with `AUTO` or `ALL`.
 - `add_code_coverage_all_targets(...)` creates the merged report targets.
-- `ccov-clean` resets counters.
-- `ccov` generates reports for targets registered with `AUTO`.
-- `ccov-all` generates a merged HTML report for targets registered with
-  `ALL`.
-- `ccov-all-capture` creates the merged lcov data file.
 
-`target_code_coverage` accepts visibility selection and exclusion patterns;
-refer to the comments in `code-coverage.cmake` for the complete function
-contract.
+Those helpers create report targets only when a caller explicitly registers
+executable targets. `target_code_coverage` accepts visibility selection and
+exclusion patterns; refer to the comments in `code-coverage.cmake` for the
+complete function contract.
 
 ## Dependency Graphs
 

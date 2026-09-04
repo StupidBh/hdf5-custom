@@ -378,7 +378,7 @@ These options enable sanitizers, code coverage and code formatting tools
 | `HDF5_USE_SANITIZER` | `STRING` | `""` (empty string) | Set to `Address` to use AddressSanitizer with MSVC. See the sanitizers [README.md](../config/sanitizer/README.md). |
 | `HDF5_ENABLE_USING_MEMCHECKER` | `BOOL` | `OFF` | If `ON`, indicates that a memory checker such as Valgrind will be used when testing HDF5. This fixes up some code and testing to prevent false positives and other issues. |
 | `HDF5_ENABLE_ANALYZER_TOOLS` | `BOOL` | `OFF` | If `ON`, enables the use of some Clang tools, such as `clang-tidy` and `include-what-you-use`. See [README.md](../config/sanitizer/README.md) for information on how to use these tools. |
-| `HDF5_ENABLE_COVERAGE` / `CODE_COVERAGE` | `BOOL` | `OFF` | If `ON`, enables GCC coverage instrumentation and lcov report targets on Linux. See [README.md](../config/sanitizer/README.md). Both options should be simultaneously enabled or disabled. |
+| `HDF5_ENABLE_COVERAGE` / `CODE_COVERAGE` | `BOOL` | `OFF` | If `ON`, enables GCC coverage instrumentation on Linux and the `ccov-clean` counter-reset target. Report generation is external. See [README.md](../config/sanitizer/README.md). Both options should be simultaneously enabled or disabled. |
 | `HDF5_ENABLE_FORMATTERS` | `BOOL` | `OFF` | If `ON`, enables code formatting with `clang-format`. |
 
 ## Deprecated options

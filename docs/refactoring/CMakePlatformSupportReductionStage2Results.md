@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: core gate and bundled-compression rerun passed; coverage and missing-
+- State: core gate, bundled compression, and coverage passed; missing-
   environment decisions pending
 - Core matrix implementation: `6ee2f392e`
 - Bundled-compression repair implementation: `81e96c889`
@@ -13,10 +13,10 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and test parallelism: 6
 
-Stage 2 is not closed. The fixed core gate and repaired bundled-compression row
-are green, but one Stage 1 documentation regression and seven missing-
-environment rows remain under the parent plan's exit criteria. Stage 3
-source/header reduction remains unauthorized.
+Stage 2 is not closed. The fixed core gate, repaired bundled-compression row,
+and corrected coverage contract are green, but seven missing-environment rows
+remain under the parent plan's exit criteria. Stage 3 source/header reduction
+remains unauthorized.
 
 ## Qualified Validator
 
@@ -131,7 +131,7 @@ no generated-product effect.
 | `LNX-ROS3` | aws-c-s3 | No aws-c-s3 development package was discoverable. | `SKIP_MISSING_ENV` |
 | `LNX-HDFS` | JDK/JNI, Hadoop, and libhdfs | `javac` and `hadoop` were absent and no `libhdfs` runtime was registered. | `SKIP_MISSING_ENV` |
 | `LNX-SIGNED-PLUGINS` | OpenSSL development files and signing inputs | OpenSSL 3.5.5 runtime was present, but pkg-config metadata and development headers were absent. | `SKIP_MISSING_ENV` |
-| `LNX-COVERAGE` | Debug, static only, coverage options on; lcov/genhtml 2.0-1 | Configure, full build, and focused base tests 3/3 passed. Only `ccov-clean` exists; the documented `ccov` report target is absent. | `FAIL` |
+| `LNX-COVERAGE` | Debug, static only, coverage options on; lcov/genhtml 2.0-1 | Configure, full build, and focused base tests 3/3 passed. Instrumented objects produced `.gcno` and 343 `.gcda` files; `ccov-clean` reduced the counter-file count to zero, and the same tests regenerated all 343. Documentation now states that report generation is external. | `PASS` |
 | `LNX-PACKAGE-STGZ` | STGZ | Self-extracting package generation and help inspection passed. | `PASS` |
 | `LNX-PACKAGE-DEB` | DEB | The amd64 2.3.0 package generated successfully; 122 content entries and expected artifacts were verified. | `PASS` |
 | `LNX-PACKAGE-RPM` | RPM | `rpmbuild` was absent. | `SKIP_MISSING_ENV` |
@@ -158,12 +158,13 @@ reuse that zlib. Static and shared GCC consumers passed against build and
 install trees; the retained preset, focused filters, TGZ package, and a fresh
 Windows/MSVC static-dependency build and consumers also passed.
 
-The coverage row is the only remaining `FAIL`:
+The coverage discrepancy was a documentation-contract error, not an
+instrumentation failure:
 
-| Row | Failing phase and root cause | Relationship to Stage 1 | Resolution or pending decision |
+| Row | Original failing phase and root cause | Relationship to Stage 1 | Resolution |
 | --- | --- | --- | --- |
 | `LNX-BUNDLED-COMPRESSION` | CMake generation: downloaded dependency targets were required by HDF5 export sets but were not exported; the plugin build also introduced colliding zlib target and archive names. | Stage 1 regression introduced by build-tree export commit `99fbd083b`. | Fixed by `81e96c889`; rerun `PASS`. |
-| `LNX-COVERAGE` | Report generation: the project never registers an executable with the coverage module, so it creates no `ccov` target. | The implementation gap predates Stage 1, but Stage 1 commit `6ad3399ec` added documentation that instructs users to build the nonexistent target. | The user classified report generation as lower priority than bundled compression; implementation or documentation correction remains open. |
+| `LNX-COVERAGE` | Report generation: the project does not register an executable with the coverage module, so it creates no `ccov` target. | Stage 1 commit `6ad3399ec` incorrectly documented the generic module target as part of the HDF5 top-level contract. | Documentation corrected to promise only target instrumentation, generated GCC counter data, and `ccov-clean`; external tools own report generation. Existing configure, build, test, artifact, and target evidence is `PASS`. |
 
 ## Missing-Environment Decisions
 
@@ -201,8 +202,7 @@ warnings; no compile or link errors occurred.
 
 ## Continuation Point
 
-Resolve the lower-priority GCC coverage contract, then obtain explicit user
-decisions for the seven missing-environment rows. Execute any rows for which
-prerequisites are supplied and update this record together with
-`REFACTORING_PROGRESS.md`. Do not edit source/header compatibility branches
+Obtain explicit user decisions for the seven missing-environment rows. Execute
+any rows for which prerequisites are supplied and update this record together
+with `REFACTORING_PROGRESS.md`. Do not edit source/header compatibility branches
 before Stage 2 closes and a separate Stage 3 plan is reviewed.

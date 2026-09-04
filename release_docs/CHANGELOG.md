@@ -127,6 +127,13 @@ functionality.
 
 ## Configuration
 
+### Corrected GCC coverage target documentation
+
+   The Linux/GCC coverage instructions incorrectly told users to build an
+   unregistered `ccov` report target. The documented workflow now matches the
+   implementation: HDF5 targets are instrumented, tests produce GCC coverage
+   counters, `ccov-clean` resets them, and report generation is external.
+
 ### Fixed bundled zlib and libaec CMake package exports
 
    Builds that fetched zlib or libaec could fail during CMake generation after

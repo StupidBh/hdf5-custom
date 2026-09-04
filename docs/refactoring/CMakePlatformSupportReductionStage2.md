@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: core gate and bundled-compression rerun passed; coverage and missing-
+- State: core gate, bundled compression, and coverage passed; missing-
   environment decisions pending
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
@@ -184,7 +184,7 @@ Probe at least the following groups:
 | ROS3 | Required aws-c-s3 development package and any test service configuration are available | ROS3 configure/build and focused tests that the available service permits. |
 | HDFS | JDK/JNI, Hadoop/libhdfs, and required runtime configuration are available | HDFS configure/build and focused VFD tests. |
 | Signed plugins | OpenSSL development files and required signing inputs are available | Signed-plugin configure/build and focused positive/failure tests. |
-| GCC coverage | `lcov`, `genhtml`, and the documented GCC coverage prerequisites are executable | Debug coverage configure/build, focused tests, and report-target generation. |
+| GCC coverage | `lcov`, `genhtml`, and the documented GCC coverage prerequisites are executable | Debug coverage configure/build, focused tests, generated counter data, and counter-reset target checks. |
 | Additional packages | The generator-specific external tools are executable | STGZ and, when available, DEB or RPM generation and archive-content checks. |
 | Unsupported compiler rejection | An unsupported native Linux compiler is already installed | Real root and, where useful, optional C++ firewall rejection without an `HDF5_ALLOW_UNSUPPORTED` bypass. |
 

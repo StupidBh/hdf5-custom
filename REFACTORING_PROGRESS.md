@@ -26,20 +26,19 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 complete; Stage 2 Linux/GCC core gate and bundled-compression
-  rerun passed; coverage and missing-environment decisions pending.
+- Status: Stage 1 complete; Stage 2 Linux/GCC core gate, bundled compression,
+  and coverage pass; missing-environment decisions pending.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
 - Stage 1 source compilation repair anchor: `a68b4cae4e`
 - Stage 2 C11 literal repair anchor: `6ee2f392e`
 - Current implementation anchor: `81e96c889`
-- Last preceding documentation anchor: `1ce4383c2`
+- Last preceding documentation anchor: `23b3837f6`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
-- Stage 2 execution scope: approved; core gate and bundled-compression rerun
-  passed; one Stage 1 documentation regression and seven missing-environment
-  rows remain
+- Stage 2 execution scope: approved; core gate, bundled compression, and
+  coverage passed; seven missing-environment rows remain
 - Later-stage detailed planning: deferred until Stage 2 closes
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -114,7 +113,11 @@ audit have not started.
   and shared build/install consumers pass on Linux/GCC. The retained preset,
   focused compression tests, TGZ package, and fresh Windows/MSVC static path
   also pass.
-- Recorded the exact Stage 2 evidence, remaining defects, missing
+- Corrected the Stage 1 GCC coverage documentation to match the implemented
+  contract: target instrumentation, generated GCC counter data, and the
+  `ccov-clean` reset target are supported; report generation is external. The
+  validated coverage row now passes.
+- Recorded the exact Stage 2 evidence, remaining validation decisions, missing
   prerequisites, recommendations, and continuation point in the portable
   results document.
 
@@ -142,10 +145,6 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Resolve the GCC coverage mismatch by implementing the documented `ccov`
-  target or correcting the Stage 1 documentation contract. The user has
-  classified this report-generation path as lower priority than bundled
-  compression, but has not yet selected its final resolution.
 - Obtain explicit test-or-defer decisions for missing system compression,
   parallel-tool, ROS3, HDFS, signed-plugin, RPM, and real unsupported-compiler
   prerequisites. Run any row whose prerequisites the user elects to supply.
@@ -159,18 +158,16 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Continuation Point
 
 Stop at the Stage 2 decision gate. Review
-`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, resolve the
-lower-priority GCC coverage contract, record explicit decisions for the seven
-missing-environment rows, and execute any newly selected validation. Do not
-begin source/header cleanup. Stage 3 remains unplanned and requires separate
-review after Stage 2 closes.
+`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, record
+explicit decisions for the seven missing-environment rows, and execute any
+newly selected validation. Do not begin source/header cleanup. Stage 3 remains
+unplanned and requires separate review after Stage 2 closes.
 
 ## Validation State
 
-- Current status: Stage 2 core gate and bundled-compression rerun passed, and
-  all optional rows supported by the unchanged Linux/GCC validator have
-  executed. One Stage 1 documentation regression and seven missing-environment
-  rows remain.
+- Current status: Stage 2 core gate, bundled compression, and coverage pass,
+  and all optional rows supported by the unchanged Linux/GCC validator have
+  executed. Seven missing-environment rows remain.
 - The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
   glibc 2.43, GCC/G++ 15.2.0 targeting `x86_64-linux-gnu`, CMake/CTest/CPack
   4.2.3, Ninja 1.13.2, GNU Make 4.4.1, `HDF_TEST_EXPRESS=3`, and at most six
@@ -190,9 +187,9 @@ review after Stage 2 closes.
   Stage 2 results document.
 - The supported `h5cc` and `h5c++` wrappers passed, including default high-level
   linkage and `-nohl`; obsolete four-wrapper documentation was corrected. The
-  bundled-compression export regression is fixed and its rerun passed. The only
-  remaining failure is a pre-existing coverage registration gap exposed by
-  incorrect Stage 1 `ccov` documentation.
+  bundled-compression export regression is fixed and its rerun passed. The
+  coverage documentation now matches the implemented instrumentation and
+  counter-reset behavior; no failed Stage 2 row remains.
 - Bundled zlib 1.3.2 and libaec 1.1.6 passed the retained preset build and 49
   focused compression/plugin tests. Static and shared build-tree/install-tree
   consumers found DEFLATE and SZIP, and the TGZ package contained the expected

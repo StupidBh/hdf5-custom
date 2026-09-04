@@ -4852,11 +4852,9 @@ H5_ATTR_PURE bool resize_configs_are_equal(const H5C_auto_size_ctl_t* a, const H
     else if ((a->rpt_fcn == NULL) != (b->rpt_fcn == NULL)) {
         return (false);
     }
-#ifndef H5_HAVE_MINGW
     else if (a->rpt_fcn != b->rpt_fcn) {
         return (false);
     }
-#endif
     else if (compare_init && (a->set_initial_size != b->set_initial_size)) {
         return (false);
     }

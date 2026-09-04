@@ -25,7 +25,7 @@ behavior-preserving modernization state remain recorded in
 
 - Direction: Project supported-platform reduction
 - Status: Stage 1 complete; CMake platform/compiler reduction implemented and
-  Windows/MSVC validated; native Linux/GCC validation is deferred.
+  Windows/MSVC validated; Stage 2 Linux/GCC validator prepared.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -33,15 +33,15 @@ behavior-preserving modernization state remain recorded in
 - Last landed documentation anchor: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
-- Stage 2 execution scope: approved; awaiting a trusted native Linux/GCC
-  validator
+- Stage 2 execution scope: approved; trusted native Linux/GCC validator
+  available; execution not started
 - Later-stage detailed planning: deferred until Stage 2 results are available
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
 and exact compiler release are validation dimensions rather than central
 firewall inputs. The release-qualified baselines remain Windows x64 with MSVC
-18 and Visual Studio 18 2026, plus Linux x86_64 with GCC/G++ and Ninja, with a
+and a Visual Studio generator, plus Linux x86_64 with GCC/G++ and Ninja, with a
 focused Unix Makefiles check. The CMake firewall and unsupported CMake-path
 reduction have landed, the over-constrained admission policy is corrected, and
 the required Windows/MSVC Stage 1 validation gate has passed. Stage 2 native
@@ -52,10 +52,10 @@ not started.
 
 - Approved the Windows/MSVC and Linux/GCC support contract and documented the
   unsupported target-system/compiler combinations.
-- Fixed the deferred Linux validation baseline at Ubuntu 24.04 LTS x86_64,
-  CMake 4.0.3, GCC/G++ 13.3.0, and Ninja 1.11.1, with a separate Unix
-  Makefiles configure/build check.
-- Retained Visual Studio 18 2026 and Linux Ninja/Unix Makefiles as validation
+- Defined the Linux validation baseline as Linux x86_64 with GCC/G++ and Ninja,
+  with a separate Unix Makefiles configure/build check; exact validator versions
+  are result evidence rather than baseline requirements.
+- Retained a Visual Studio generator and Linux Ninja/Unix Makefiles as validation
   baselines without using generator or architecture as a configure-time gate.
 - Defined source-level removal as a required follow-on stage rather than an
   optional review after CMake reduction.
@@ -112,8 +112,8 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Establish a trusted native Linux x86_64 GCC/G++ validator for Stage 2;
-  Windows GCC or MinGW is not substitute evidence.
+- Qualify and record the prepared native Linux x86_64 GCC/G++ validator for
+  Stage 2; Windows GCC or MinGW is not substitute evidence.
 - Run the fixed Stage 2 core gate, then probe the supplied environment and run
   every optional row whose complete prerequisite set is already available.
 - Present every missing optional prerequisite and the coverage it would unlock
@@ -127,18 +127,18 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Continuation Point
 
 Stop after the completed Stage 1 milestone. Do not begin source/header cleanup.
-When the user supplies a trusted native Linux/GCC environment, begin Stage 2
-from `docs/refactoring/CMakePlatformSupportReductionStage2.md`: qualify the
-validator, complete the fixed core gate, discover optional capabilities without
-changing the environment, and validate every available legal row. Then present
-missing prerequisites to the user for a test-or-defer decision. Stage 3 remains
+Begin Stage 2 from `docs/refactoring/CMakePlatformSupportReductionStage2.md`:
+qualify the prepared validator, complete the fixed core gate, discover optional
+capabilities, and validate every available legal row. Then present missing
+prerequisites to the user for a test-or-defer decision. Stage 3 remains
 unplanned and requires a separate review after Stage 2 passes.
 
 ## Validation State
 
 - Current status: Stage 1 complete; CMake platform/compiler reduction
-  implemented and Windows/MSVC validated; native Linux/GCC validation is
-  deferred.
+  implemented and Windows/MSVC validated; the native Linux/GCC validator and
+  selected optional prerequisites are prepared, but formal Stage 2 rows have
+  not started.
 - The completed local baseline was Windows NT `10.0.26100` x64, Visual Studio
   18 2026 Insiders, MSVC `19.51.36256.0` from toolset `14.51.36231`, Windows
   SDK `10.0.26100.0`, and CMake `4.4.3`. Configures used the Visual Studio 18
@@ -227,10 +227,25 @@ unplanned and requires a separate review after Stage 2 passes.
   and thread prerequisites; otherwise it is presented for user decision.
 - Historical MinGW-w64 results are baseline evidence only; MinGW is now outside
   the support contract and cannot substitute for native Linux/GCC validation.
+- Linux capability preparation confirmed usable Ninja, OpenMPI, system zlib and
+  libaec development files, mpiFileUtils/libcircle/DTCMP parallel-tool
+  dependencies, OpenSSL development files, GCC coverage report tools, and native
+  Linux `pkg-config`. A minimal GCC coverage run generated an HTML report, and
+  an HDF5 coverage configure without examples found `lcov` and `genhtml`.
+  `pkg-config` supplied valid OpenMPI compile/link flags to a GCC smoke program,
+  and the HDF5 configure found the native command instead of the incompatible
+  Windows Strawberry script also present in `PATH`.
+- Pre-gate integration probes exposed two repository code failures rather than
+  environment gaps: the parallel-tool build reaches a C11 compilation error at
+  digit-separated integer literals in `src/H5Cprivate.h`, and the default GCC
+  coverage configure reaches mixed keyword/plain `target_link_libraries`
+  signatures in retained examples. The reduced coverage configure succeeds but
+  exposes only `ccov-clean`, because no executable target is registered with
+  the coverage module to create the documented `ccov` report target. These
+  probes are not formal optional-row results; reproduce and classify them only
+  after the fixed core gate runs.
 - Installing GCC on Windows is not planned as a validation step because it does
   not exercise the Linux ABI or Linux CMake platform state.
-- Native Linux/GCC validation remains deferred until the user supplies the
-  required environment.
 
 ## Residual Audit
 

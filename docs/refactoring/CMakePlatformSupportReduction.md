@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stage 1 complete; Windows/MSVC validated; native Linux/GCC validation deferred
+- State: Stage 1 complete; Windows/MSVC validated; Stage 2 Linux/GCC validator prepared
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -10,14 +10,14 @@
 - Source compilation repair commit: `a68b4cae4e`
 - Last landed documentation commit: `614dd74c0`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 2 - awaiting a trusted native Linux/GCC validator
+- Current delivery stage: Stage 2 - validator available; execution not started
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution scope approved: 2026-09-04
 - Stages 3 and 4 detailed planning: deferred until Stage 2 results are available
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
-- Unavailable local environment: native Linux x86_64 with GCC/G++
+- Available local environment: native Linux x86_64 with GCC/G++
 - Maximum local build and test parallelism: 6
 
 ## Objective
@@ -35,8 +35,8 @@ platforms and compilers.
 | Windows | `MSVC` |
 | Linux | `GNU` |
 
-The release-qualified validation baselines remain Windows x64 with the MSVC
-toolset supplied by Visual Studio 18 2026 and Linux x86_64 with GCC/G++. The
+The release-qualified validation baselines remain Windows x64 with MSVC using
+a Visual Studio generator and Linux x86_64 with GCC/G++ using Ninja. The
 baseline generators are not an exhaustive list of accepted CMake generators.
 An architecture or generator outside those baselines may remain unvalidated,
 but it is not rejected solely for that reason.
@@ -90,33 +90,34 @@ the compiler-pair check.
 
 The initial firewall does not impose an exact GCC release or an additional
 MSVC compiler-version comparison. Compiler family and target system are the
-compatibility boundary. The pinned tool versions, architectures, and generators
-below define validation baselines rather than the complete accepted surface.
+compatibility boundary. The selected architectures and generators below define
+validation baselines rather than the complete accepted surface.
 Use exact `CMAKE_<LANG>_COMPILER_ID` comparisons: CMake's broader `MSVC`
 boolean can also describe compilers that merely simulate the `cl` command-line
 syntax.
 
 ### Validation baselines
 
-The retained Windows baseline is Windows x64 with the MSVC 18 toolset supplied
-by Visual Studio 18 2026, the `Visual Studio 18 2026` generator, and the Windows
-SDK selected by that environment. Ninja, Ninja Multi-Config, IDE-managed CMake
-profiles, and other generators are not rejected when they detect compiler ID
-`MSVC`; they do not replace the Visual Studio baseline unless separately
-validated and recorded.
+The retained Windows baseline is Windows x64 with MSVC using a Visual Studio
+generator and the SDK selected by that environment. Ninja, Ninja Multi-Config,
+IDE-managed CMake profiles, and other generators are not rejected when they
+detect compiler ID `MSVC`; they do not replace the Visual Studio baseline
+unless separately validated and recorded.
 
-The deferred Linux baseline is Ubuntu 24.04 LTS on x86_64, CMake 4.0.3,
-GCC/G++ 13.3.0, and Ninja 1.11.1. Unix Makefiles receives a focused
-configure/build check during Stage 2. Later patch releases and other
-architectures or generators within the accepted pair may be recorded, but they
-do not become release-qualified merely because the firewall admits them.
+The Linux baseline is Linux x86_64 with GCC/G++ and Ninja. Unix Makefiles
+receives a focused configure/build check during Stage 2. Exact distribution
+and tool versions must be recorded with the results but are not baseline
+requirements. Other architectures or generators within the accepted pair may
+be recorded, but they do not become release-qualified merely because the
+firewall admits them.
 
-The current local machine does not provide native Linux/GCC. Installing a
-Windows GCC or MinGW toolchain does not close this gap: it targets the Windows
-ABI, exposes Windows platform state, and is itself outside the supported
-matrix. Linux validation may run on a trusted CI runner, Linux virtual machine,
-or Linux container that reports a native Linux x86_64 target and uses GCC/G++.
-The exact environment and versions must be recorded with the results.
+A trusted native Linux/GCC validator is now available for Stage 2. A Windows
+GCC or MinGW toolchain would not provide equivalent evidence: it targets the
+Windows ABI, exposes Windows platform state, and is itself outside the
+supported matrix. Linux validation may also run on a trusted CI runner, Linux
+virtual machine, or Linux container that reports a native Linux x86_64 target
+and uses GCC/G++. The exact environment and versions must be recorded with the
+results.
 
 ### Consumer boundary
 
@@ -237,7 +238,7 @@ always-true or always-false reduction.
 | `UNIX` | false | true |
 | `MSVC` | true | false |
 | `MINGW`, `MSYS`, `CYGWIN`, `APPLE` | false | false |
-| Release-validation generator | Visual Studio 18 2026 | Ninja; Unix Makefiles focused check |
+| Release-validation generator | Visual Studio generator | Ninja; Unix Makefiles focused check |
 | Release-validation architecture | x64 | x86_64 |
 
 The last two rows are baselines, not fixed truth values for accepted builds.
@@ -343,7 +344,7 @@ trees and downloaded third-party content.
 ## Completed Prerequisite: Support Contract
 
 Commit `912fb436b` established the original support matrix, recorded the
-breaking build change, selected the Windows validation generator, pinned the
+breaking build change, selected the Windows validation generator, defined the
 deferred Linux baseline, and updated the CMake modernization compatibility
 contract. The 2026-09-04 admission-policy correction supersedes its generator
 and architecture restrictions while retaining the two target-system/compiler
@@ -617,7 +618,7 @@ CMake-layer milestone when the affected logic was not changed.
 - Build-tree, install-tree, `add_subdirectory()`, and FetchContent behavior that
   can be exercised locally.
 
-Use out-of-source MSVC 18 builds, set `CL=/utf-8`, and keep build and CTest
+Use out-of-source MSVC builds, set `CL=/utf-8`, and keep build and CTest
 parallelism at or below 6. Record exact options and test express level.
 
 ### Stage 1 Completion Criteria
@@ -811,9 +812,10 @@ validation. The logical-review groups are:
   `81097024f`, `67c2bae01`;
 - packaging and residual CMake paths: `7c9e4b0da`, `b317dedc9`.
 
-Native execution of these groups waits for the user-provided Linux environment.
+Native execution of these groups can proceed in the prepared Linux environment.
 The admission-policy correction also requires Stage 2 confirmation with the
-pinned Linux baseline. Stage 2, Stage 3, and Stage 4 have not started.
+release-qualified Linux baseline. Stage 2, Stage 3, and Stage 4 have not
+started.
 
 ## Stage 2: Deferred Native Linux/GCC Validation
 

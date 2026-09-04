@@ -2,15 +2,14 @@
 
 ## Status
 
-- State: approved and ready to execute when a trusted native Linux/GCC
-  validator is available
+- State: approved; trusted native Linux/GCC validator available; execution not
+  started
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
   [`CMakePlatformSupportReduction.md`](CMakePlatformSupportReduction.md)
 - Portable handoff: [`../../REFACTORING_PROGRESS.md`](../../REFACTORING_PROGRESS.md)
 - Required target pair: Linux with compiler ID `GNU`
-- Release-qualified baseline: Ubuntu 24.04 LTS x86_64, CMake 4.0.3,
-  GCC/G++ 13.3.0, and Ninja 1.11.1
+- Release-qualified baseline: Linux x86_64 with GCC/G++ and Ninja
 - Secondary generator check: Unix Makefiles
 - Maximum build and CTest parallelism: 6
 
@@ -102,10 +101,11 @@ Before configuring any row, record:
 - the configured `HDF_TEST_EXPRESS` level; and
 - the build and test parallelism.
 
-The compiler target triples must describe a native Linux/GNU target. A trusted
-equivalent environment may execute Stage 2, but every deviation from the pinned
-versions must be recorded and does not silently redefine the release-qualified
-baseline. The validator must remain accessible and repeatable for later work.
+The compiler target triples must describe a native Linux/GNU target. Any
+trusted environment satisfying the release-qualified baseline may execute
+Stage 2. Record its exact distribution and tool versions as result evidence;
+those observations do not redefine the version-independent baseline. The
+validator must remain accessible and repeatable for later work.
 
 ## Core Gate
 

@@ -629,15 +629,8 @@ static herr_t H5PL__path_table_iterate_process_path(const char* plugin_path, H5P
 
     /* Iterate through all entries in the directory */
     while (NULL != (dp = HDreaddir(dirp))) {
-        /* The library we are looking for should be called libxxx.so... on Unix
-         * or libxxx.xxx.dylib on Mac.
-         */
-    #ifndef __CYGWIN__
-        if (!strncmp(dp->d_name, "lib", (size_t)3) && (strstr(dp->d_name, ".so") || strstr(dp->d_name, ".dylib"))) {
-    #else
-        if (!strncmp(dp->d_name, "cyg", (size_t)3) && strstr(dp->d_name, ".dll")) {
-    #endif
-
+        /* Linux shared libraries are named libxxx.so... */
+        if (!strncmp(dp->d_name, "lib", (size_t)3) && strstr(dp->d_name, ".so")) {
             bool plugin_matches;
             h5_stat_t my_stat;
             size_t len;
@@ -871,15 +864,8 @@ static herr_t H5PL__find_plugin_in_path(const H5PL_search_params_t* search_param
 
     /* Iterate through all entries in the directory */
     while (NULL != (dp = HDreaddir(dirp))) {
-        /* The library we are looking for should be called libxxx.so... on Unix
-         * or libxxx.xxx.dylib on Mac.
-         */
-    #ifndef __CYGWIN__
-        if (!strncmp(dp->d_name, "lib", (size_t)3) && (strstr(dp->d_name, ".so") || strstr(dp->d_name, ".dylib"))) {
-    #else
-        if (!strncmp(dp->d_name, "cyg", (size_t)3) && strstr(dp->d_name, ".dll")) {
-    #endif
-
+        /* Linux shared libraries are named libxxx.so... */
+        if (!strncmp(dp->d_name, "lib", (size_t)3) && strstr(dp->d_name, ".so")) {
             h5_stat_t my_stat;
             size_t len;
 

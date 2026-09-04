@@ -127,6 +127,14 @@ functionality.
 
 ## Configuration
 
+### Preserved C-compatible integer literals during formatting
+
+   Disable binary and decimal literal separators in the clang-format
+   configuration and restore the metadata-cache epoch limit to an undecorated
+   decimal literal. The separator syntax is not valid in the C11 mode used by
+   MPI-enabled tools, which prevented that supported Linux/GCC configuration
+   from compiling.
+
 ### Excluded local build data from source packages
 
    CPack source archives could include in-tree build directories and local IDE

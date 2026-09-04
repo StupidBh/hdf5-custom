@@ -122,7 +122,7 @@
 #define H5C__DEF_AR_EMPTY_RESERVE    0.05
 #define H5C__MIN_AR_EPOCH_LENGTH     100
 #define H5C__DEF_AR_EPOCH_LENGTH     50000
-#define H5C__MAX_AR_EPOCH_LENGTH     1'000'000
+#define H5C__MAX_AR_EPOCH_LENGTH     1000000
 
 /* #defines of flags used in the flags parameters in some of the
  * following function calls.  Note that not all flags are applicable

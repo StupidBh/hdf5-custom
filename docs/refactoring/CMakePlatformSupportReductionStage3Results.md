@@ -2,10 +2,12 @@
 
 ## Status
 
-- State: in progress; Work Package 3A complete
+- State: complete
 - Baseline execution date: 2026-09-04
+- Completion date: 2026-09-05
 - Source implementation anchor: `81e96c889`
-- Clean validation tree: `c305c9bfc`
+- Final implementation anchor: `74288cbaa`
+- Clean final validation tree: `74288cbaa`
 - Stage 3 plan:
   [CMakePlatformSupportReductionStage3.md](CMakePlatformSupportReductionStage3.md)
 - Parent plan:
@@ -14,11 +16,12 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and CTest parallelism: 4
 
-Work Package 3A is complete. Both retained target/compiler pairs were qualified
-at the same clean tracked tree, the pre-implementation product contract was
-captured, and every source/header inventory family has a non-investigative
-classification. No source or header compatibility edit had started when this
-baseline was recorded.
+Stage 3 is complete. Both retained target/compiler pairs were qualified at the
+same clean tracked tree, the pre-implementation product contract was captured,
+and every source/header inventory family received a non-investigative
+classification before implementation. Fourteen independently revertible source
+reduction commits then removed unsupported-only behavior. The complete final
+gate passed at `74288cbaa` without an unexplained product-contract delta.
 
 ## Qualified Validators
 
@@ -83,7 +86,8 @@ associated setup and cleanup fixtures. Focused C++ coverage used
 
 The Stage 2 full Linux result recorded 2,856 registrations at its earlier
 matrix checkpoint. Stage 3 uses the freshly captured 2,855-registration tree as
-its before/after comparison anchor; no Stage 3 test has yet been removed.
+its before/after comparison anchor; at capture time no Stage 3 test had been
+removed.
 Standalone public C/C++/high-level examples and build/install/source-tree
 consumers already passed at the inherited Stage 1 and Stage 2 implementation
 anchors. The fresh Stage 3 default and C++ rows compile and link representative
@@ -191,7 +195,7 @@ covered by one of the rows below; there are no `INVESTIGATE` items.
 | `__MINGW32__` in `src/H5public.h` | Installed Windows headers keep the present MSVC `ssize_t` definition; Linux declaration is unchanged | `SIMPLIFY_RETAINED` | Dedicated installed-header commit; C/C++ consumers, layout and export comparison |
 | MinGW exclusions in atomic reader/writer and direct-write performance sources | Windows keeps the current stub path; Linux keeps the POSIX implementation | `SIMPLIFY_RETAINED` | Test and performance-tool commits; build affected targets and run registered tests |
 | MinGW/Cygwin provenance and file-identity comments in VFD/system/test sources | Factual rationale for shared structures or imported implementations; no selector | `KEEP_TOOLING_HISTORY` | Preserve unless an edited block makes a comment false |
-| `H5TSprivate.h` pthread-rwlock and semaphore fallbacks | Feature-probe fallbacks remain part of accepted Linux/GNU variants | `KEEP_RETAINED_VARIANT` | No platform-keyword removal |
+| macOS rwlock and semaphore fallbacks in `src/H5TSprivate.h`, `src/H5TSrwlock.*`, and `src/H5TSsemaphore.*` | Windows keeps native synchronization and Linux keeps POSIX rwlocks and semaphores | `SIMPLIFY_RETAINED` | Dedicated H5TS commit; full thread-safe and concurrency builds and tests |
 | macOS alignment examples in `src/H5Tconv_macros.h`, BSD/Cygwin conversion history in `src/H5Tpkg.h`, and NetBSD overlap/argv history in `src/H5private.h` and `test/accum.c` | The guarded code is generic conversion or valid process behavior on retained pairs | `KEEP_TOOLING_HISTORY` | No edit |
 | `H5T_INTEL_*`, C++ `PredType` Intel constants, and matching datatype/conversion/tests | Public little-endian API and on-disk interoperability names on both pairs | `KEEP_API_FORMAT` | Locked; compare headers, symbols, datatype and conversion tests |
 | Intel CPU/endianness terminology and h5import/h5dump data-generation paths | Describes byte order or produces deterministic interoperability data | `KEEP_API_FORMAT` | Preserve; datatype, h5import, and h5dump tests |
@@ -206,22 +210,184 @@ The protected qsort fallback remains because it is controlled by a feature
 probe and may be reachable within Linux/GNU even though the qualified baseline
 has GNU `qsort_r`.
 
-## Planned Atomic Boundaries
+## Implemented Atomic Boundaries
 
-The resolved ledger fixes the implementation order:
+The LF checkout policy was fixed separately at `0d854b2df`. Stage 3 source and
+header reduction then landed in these 14 implementation commits:
 
-1. Remove Clang-only diagnostics and attributes, including regenerated
-   high-level parser prologues.
-2. Remove Intel-compiler exclusions from retained GCC attributes.
-3. Remove the PGI native-type storage workaround.
-4. Reduce qsort and POSIX runtime selection to the retained systems.
-5. Remove Apple generated-header overrides.
-6. Remove Cygwin plugin-path behavior.
-7. Simplify installed and private Windows guards to MSVC behavior.
-8. Remove remaining unsupported-only test, performance-tool, and h5watch
-   branches.
-9. Run the residual audit, full dual-platform matrix, contract comparison, and
-   final Stage 3 documentation checkpoint.
+| Commit | Boundary |
+| --- | --- |
+| `21f41719b` | Remove unsupported Clang diagnostics, attributes, and generated parser prologues |
+| `8ed9d19b1` | Remove Intel compiler exclusions from retained GCC attributes |
+| `025481c70` | Remove the PGI 19.10 native-type storage workaround |
+| `7ce525912` | Retain Windows `qsort_s`, GNU `qsort_r`, and the feature-probe fallback |
+| `d4047a525` | Remove Apple generated-header overrides and the Darwin I/O limit |
+| `ba5d60ca4` | Restrict plugin filename traversal to Windows PE and Linux ELF conventions |
+| `f94c96b01` | Collapse installed and private Windows guards onto MSVC behavior |
+| `98be08478` | Remove MinGW atomic reader/writer branches |
+| `782656779` | Remove the MinGW cache callback-comparison workaround |
+| `d5c9fef2f` | Remove the MinGW direct-write performance branch |
+| `8916745d0` | Remove Cygwin process and pipe branches |
+| `6ccaa7b0c` | Limit plugin-signature support wording to retained binary formats |
+| `2b4bb2e77` | Remove macOS-only rwlock and semaphore implementations |
+| `74288cbaa` | Remove the Darwin h5watch shell-test branch |
 
-Each boundary inherits the exact validation and commit rules in the Stage 3
-plan. Work Package 3B is the next continuation point.
+Each source commit passed its focused Windows/MSVC and Linux/GCC gate before it
+was created. Compiler-family batches used developer-warning C and C++ builds.
+The generated parser inputs and outputs traveled in the same commit.
+
+## Final Dual-Platform Matrix
+
+All rows below used clean source trees at `74288cbaa`,
+`HDF_TEST_EXPRESS=3` where applicable, and no more than four build or CTest
+jobs.
+
+### Windows/MSVC
+
+| Row | Final evidence | State |
+| --- | --- | --- |
+| Default Release | Full build and all 2,816 enabled tests passed; 37 disabled, 2,853 registered | `PASS` |
+| Debug | Full build and focused C/high-level/tool smoke 7/7 passed | `PASS` |
+| Static-only Release | Full build and focused smoke 7/7 passed | `PASS` |
+| Shared-only Release | Full build and focused smoke 7/7 passed | `PASS` |
+| C++ Release | Full combined C/C++ build passed; `CPP_testhdf5` and `HL_CPP_ptableTest` passed | `PASS` |
+| Install and ZIP | Default and C++ installs passed; the default ZIP retained 120 entries | `PASS` |
+| Standalone examples | C, C++, and high-level examples passed 279/279 against both build and install packages | `PASS` |
+| Consumers | Build/install `find_package` consumers passed 3/3 each; `add_subdirectory` and FetchContent passed 1/1 each | `PASS` |
+| Admission policy | All 12 synthetic accepted/rejected-pair cases passed | `PASS` |
+| Thread modes | Thread-safe and concurrency builds passed their focused selections 6/6 each | `PASS` |
+
+The default build produced both `libhdf5.lib` and `hdf5.dll` with its
+`hdf5.lib` import library. Static-only omitted the DLL and import library;
+shared-only omitted the static archive. High-level artifacts followed the same
+shape.
+
+### Linux/GCC
+
+| Row | Final evidence | State |
+| --- | --- | --- |
+| Default Ninja Release | Full 3,153-step build and all 2,818 enabled tests passed; 37 disabled, 2,855 registered | `PASS` |
+| Debug | Full build and focused C/high-level/tool smoke 7/7 passed | `PASS` |
+| Static-only Release | Full 2,702-step build and focused smoke 7/7 passed | `PASS` |
+| Shared-only Release | Full 2,748-step build and focused smoke 7/7 passed | `PASS` |
+| C++ Release | Full 3,277-step combined build passed; two named C++ tests and their fixtures passed 4/4 | `PASS` |
+| Unix Makefiles | Fresh default Release build passed; required core/high-level/tool selections passed | `PASS` |
+| Install and TGZ | Default and C++ installs passed; the default TGZ retained 122 entries | `PASS` |
+| Standalone examples | C, C++, and high-level examples passed 279/279 against both build and install packages | `PASS` |
+| Consumers | Build/install `find_package` consumers passed 3/3 each; `add_subdirectory` and FetchContent passed 1/1 each | `PASS` |
+| Wrappers | `h5cc` and `h5c++` passed show/configure, compile, link, and run checks; `-nohl` omitted HL; four `.pc` files report 2.3.0 | `PASS` |
+| Admission policy | All 12 synthetic accepted/rejected-pair cases passed | `PASS` |
+| Thread modes | Thread-safe and concurrency builds passed their focused selections 6/6 each | `PASS` |
+
+Static-only emitted `libhdf5.a` without a shared library. Shared-only emitted
+the versioned shared library without the static archive.
+
+The Stage 2 count of 2,856 registrations came from a reused cache containing
+`HDF5_BUILD_UTILS=ON` before `test/` was processed, which enabled
+`H5TEST-mirror_vfd`. A fresh first configure registers 2,855 tests and exactly
+matches the Stage 3 before/after baseline. Stage 3 did not change CMake test
+registration.
+
+## Contract and Compatibility Results
+
+The final first-configure normalized contracts reproduce all four Stage 3
+baselines exactly by record count:
+
+| Contract | Baseline | Final |
+| --- | ---: | ---: |
+| Windows default | 17,446 | 17,446 |
+| Windows C++ | 19,566 | 19,566 |
+| Linux default | 28,323 | 28,323 |
+| Linux C++ | 30,771 | 30,771 |
+
+A second configure sees the pre-existing `HDF5_BUILD_UTILS` ordering issue and
+adds `H5TEST-mirror_vfd`; contracts were therefore captured from fresh trees
+with the File API query registered before their first configure, matching the
+3A method.
+
+The 65 default installed headers match the 3A header set byte for byte on each
+platform. The complete 101-header C++ installs also match their corresponding
+3A installs. All five exported-symbol sets have zero additions or removals:
+C core, C high-level, tools, C++ core, and C++ high-level. The recorded 3A
+symbol counts and hashes remain the comparison baseline in the table above.
+
+Windows library and import-library names are unchanged. Linux libraries retain
+version `1000.0.0`, `SONAME` suffix `.so.1000`, and installed RUNPATH
+`$ORIGIN/../lib:$ORIGIN/`. Build-tree and install-tree package consumers prove
+both static and shared export sets. The full default suites cover datatype,
+conversion, object-copy/reference, and cross-platform compatibility tests; no
+public `H5T_INTEL_*` name or file-format path changed.
+
+The final Linux binary-package manifest matches the pre-Stage-3 122-entry
+manifest name for name, and the Windows binary package retains its 120-entry
+shape. The clean source TGZ has 4,096 entries: the only path added to the 4,095
+entry baseline is this Stage 3 results document. No local build tree, IDE data,
+or validation log is present.
+
+The high-level parser was regenerated with Flex 2.6.4, Bison 3.8.2, and M4
+1.4.21. `H5LTparse.c` and its header reproduced exactly after repository
+formatting; the Flex output differed only in six generated `#line` counters,
+with executable lexer content unchanged. This is a normalized reproducibility
+pass.
+
+## Optional-Row Disposition
+
+Thread-safe and concurrency modes required dedicated optional reconfigures;
+both were rebuilt and tested on Windows and Linux. Plugin traversal was also
+affected, and default full builds plus plugin-focused tests cover the retained
+Windows and Linux `H5PLpath` branches. System and bundled compression, parallel,
+subfiling, remote external-plugin dependency builds, coverage, STGZ, and DEB
+own no changed Stage 3 behavior and retain their passing Stage 2 evidence. The
+six user-deferred, unavailable Stage 2 rows remain untouched, so no new
+prerequisite decision is required.
+
+`tools/test/perform/direct_write_perf.c` has no CMake target or CTest
+registration; forced MSVC and GCC syntax checks covered its retained Windows
+stub and Linux implementation. The optional API driver has pre-existing local
+include-directory and `H5API_CLEAN_PROCESSES` spelling defects in its standalone
+target path. Validation-only corrections allowed both native branches to build;
+registered API tests and `PERFORM_iopipe` passed on both platforms. Repairing
+those independent build-definition defects is outside Stage 3.
+
+Two validation invocations needed environment corrections rather than source
+changes. A CLion terminal timeout left a Make process active, so a concurrent
+retry briefly linked an incomplete test object; a new Unix Makefiles tree built
+cleanly. Windows build-tree examples initially lacked the multi-config DLL
+directory in `PATH`; the documented runtime path was added and all 279 tests
+passed. Direct non-login WSL calls also omitted the user-local `pkg-config`, so
+wrapper checks used the qualified login-shell environment.
+
+## Final Residual Audit
+
+The repeated case-insensitive scan over the original 1,358-file scope produced:
+
+| Family | Matches | Files |
+| --- | ---: | ---: |
+| `APPLE` | 3 | 3 |
+| `CLANG` | 225 | 37 |
+| `CYGWIN` | 6 | 5 |
+| `DARWIN` | 0 | 0 |
+| `FREEBSD` | 1 | 1 |
+| `INTEL` | 179 | 14 |
+| `MACOS` | 4 | 1 |
+| `MINGW` | 7 | 6 |
+| `NETBSD` | 2 | 2 |
+| `PGI` | 17 | 2 |
+
+Exact active-selector review found no project-owned unsupported implementation.
+The remaining HP-UX, AIX, and `__ICC` tests in `hl/src/H5LTparse.c` are emitted
+by the Bison skeleton. Remaining compiler branches in `src/uthash.h` are vendored
+third-party code. Other lexical matches are protected formatter directives,
+public/file-format `H5T_INTEL_*` names, historical or interoperability comments,
+and substring false positives. No item remains `INVESTIGATE`.
+
+## Completion and Handoff
+
+> Source and header compatibility code now implements the Windows/MSVC and
+> Linux/GNU support contract; protected API, ABI, file-format, and
+> supported-pair variants remain intact; affected Stage 1 and Stage 2 validation
+> rows pass on both baselines.
+
+Stage 3 is complete at implementation anchor `74288cbaa`. Stage 4 remains a
+separate, unplanned and unexecuted final project audit that requires its own
+plan and approval.

@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-04
+Last updated: 2026-09-05
 
 ## Purpose
 
@@ -16,9 +16,9 @@ The self-contained execution plan for the completed Linux validation stage is
 [`docs/refactoring/CMakePlatformSupportReductionStage2.md`](docs/refactoring/CMakePlatformSupportReductionStage2.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`](docs/refactoring/CMakePlatformSupportReductionStage2Results.md).
-The active self-contained Stage 3 source/header reduction plan is
+The completed self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
-Its in-progress execution record is
+Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
 It intentionally changes the compatibility contract by first reducing the
 CMake matrix and then removing source-level support outside Windows/MSVC and
@@ -30,7 +30,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 and Stage 2 complete; Stage 3 Work Package 3B in progress.
+- Status: Stage 1, Stage 2, and Stage 3 complete; Stage 4 remains unplanned.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -38,15 +38,17 @@ behavior-preserving modernization state remain recorded in
 - Stage 2 C11 literal repair anchor: `6ee2f392e`
 - Coverage documentation correction anchor: `d39cd5fa0`
 - Stage 3 plan anchor: `31cf74435`
-- Current implementation anchor: `81e96c889`
-- Last preceding documentation anchor: `31cf74435`
+- Stage 3 implementation anchor: `74288cbaa`
+- Current implementation anchor: `74288cbaa`
+- Last preceding documentation anchor: `4b6b228c4`
 - Stage 1 CMake implementation commits: 19
+- Stage 3 source/header implementation commits: 14
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
   explicitly deferred by the user
-- Stage 3 execution state: approved; Work Package 3A baseline and inventory
-  complete, with Work Package 3B compiler reduction next
+- Stage 3 execution state: complete; all work packages and the final
+  dual-platform gate passed
 - Later-stage detailed planning: Stage 4 remains unplanned
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -60,9 +62,9 @@ the required Windows/MSVC Stage 1 validation gate has passed. The Stage 2
 Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
 2 is complete after the user explicitly deferred the six unavailable optional
-configurations as non-required. The Stage 3 source/header reduction plan is
-approved and Work Package 3A is complete; source/header edits have not started,
-and the Stage 4 final audit remains unplanned.
+configurations as non-required. Stage 3 source/header reduction is complete at
+`74288cbaa`; protected API, ABI, file-format, and accepted-pair behavior remain
+intact. The Stage 4 final audit remains unplanned and unexecuted.
 
 ## Completed
 
@@ -148,6 +150,15 @@ and the Stage 4 final audit remains unplanned.
 - Regenerated the tracked source/header inventory and resolved every candidate
   into an implementation or protected-compatibility classification. No
   `INVESTIGATE` item remains, so Work Package 3A is complete.
+- Fixed the tracked text checkout contract to LF, then removed unsupported
+  Clang, Intel, PGI, Apple/Darwin, BSD, Cygwin, and MinGW source/header branches
+  in 14 atomic implementation commits.
+- Preserved supported Windows/MSVC and Linux/GNU behavior for qsort, plugin
+  loading, Win32/POSIX process handling, generated configuration, installed
+  public headers, and thread synchronization.
+- Completed the Stage 3 Windows/MSVC and Linux/GCC default, Debug, static-only,
+  shared-only, C++, install, package, example, consumer, contract, ABI, and
+  residual-audit gates at `74288cbaa`.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -173,23 +184,36 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Execute Stage 3 Work Packages 3B through 3F using their atomic commit and
-  dual-platform validation boundaries.
-- Prepare the Stage 4 final-audit plan only after Stage 3 completes.
+- Prepare the Stage 4 final-audit plan for separate user review and approval.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Execute Stage 3 Work Package 3B from the completed pre-implementation contract.
-Begin with the Clang-only compiler branches, preserve the protected keep set,
-and create each atomic implementation commit only after its focused
-Windows/MSVC and Linux/GCC checks pass.
+Stop at the completed Stage 3 implementation anchor `74288cbaa`. The next work
+is to draft and review the separate Stage 4 final project-audit plan; do not
+begin Stage 4 implementation without explicit approval.
 
 ## Validation State
 
-- Current status: Stage 2 complete. The core gate, bundled compression, system
-  compression, and coverage pass, and all optional rows supported by the
+- Current status: Stage 3 complete. Final evidence came from clean Windows/MSVC
+  and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
+- Windows default Release passed all 2,816 enabled tests with 37 disabled out of
+  2,853 registered. Debug, static-only, shared-only, C++, install, ZIP,
+  standalone examples, and build/install/source-tree consumers passed.
+- Linux default Ninja Release passed all 2,818 enabled tests with 37 disabled
+  out of 2,855 registered. Debug, static-only, shared-only, C++, Unix Makefiles,
+  install, TGZ, wrappers, standalone examples, and all consumer modes passed.
+- The four normalized default/C++ contracts reproduced their 3A counts:
+  Windows 17,446/19,566 and Linux 28,323/30,771. Installed headers, five C/C++
+  symbol sets, library names, import libraries, Linux SONAME/RUNPATH, and binary
+  package manifests have no unexplained delta.
+- Thread-safe and concurrency configurations passed focused tests on both
+  platforms. Default and plugin-focused tests cover the changed `H5PLpath`
+  branches. Other Stage 2 optional rows own no changed Stage 3 behavior and
+  retain their prior passing or user-deferred disposition.
+- Historical Stage 2 status: complete. The core gate, bundled compression,
+  system compression, and coverage pass, and all optional rows supported by the
   supplied Linux/GCC environment executed successfully. The six unavailable,
   non-required optional rows are explicitly deferred.
 - The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
@@ -303,29 +327,22 @@ Windows/MSVC and Linux/GCC checks pass.
 
 ## Residual Audit
 
-- Active CMake keyword matches are limited to firewall rejection tests,
-  `clang-format`/`clang-tidy` developer tooling, and AppleClang/macOS comments
-  that explain retained generic `_Float16` feature probes.
-- Current-documentation matches are explicit unsupported-platform declarations,
-  historical release or HPC descriptions, developer analyzer/formatter names,
-  and Intel native-datatype or file-format interoperability documentation.
-- Sixty tracked C/C++ source or header files remain as candidates for the future
-  source-reduction inventory:
-  `APPLE=4`, `CLANG=234`, `CYGWIN=6`, `DARWIN=3`, `FREEBSD=4`, `INTEL=43`,
-  `MACOS=12`, `MINGW=10`, `NETBSD=2`, and `PGI=4`.
-- All 19 commits in `0adb08f4a..b317dedc9` and the admission-policy correction
-  passed their Stage 2 native Linux/GCC ownership checks. Their static proofs
-  reduce removed selectors according to the Windows/MSVC and Linux/GCC pair
-  table in the detailed plan. The architecture/generator re-audit restored
-  product behavior needed by admitted Windows/MSVC variants while leaving
-  release-validation presets, CI, dashboards, and bundled cross-toolchain
-  helpers baseline-scoped.
+- The final source/header scan reports `APPLE=3/3`, `CLANG=225/37`,
+  `CYGWIN=6/5`, `DARWIN=0/0`, `FREEBSD=1/1`, `INTEL=179/14`, `MACOS=4/1`,
+  `MINGW=7/6`, `NETBSD=2/2`, and `PGI=17/2`, expressed as matches/files.
+- Exact active unsupported selectors remain only in Bison-generated skeleton
+  code in `hl/src/H5LTparse.c` and vendored compiler handling in
+  `src/uthash.h`; both are protected third-party/generated content.
+- All other matches are public or file-format compatibility names, retained
+  feature/architecture behavior, formatter directives, factual history, or
+  lexical false positives. No project-owned unsupported-only implementation or
+  `INVESTIGATE` item remains.
+- The clean source package adds only the Stage 3 results document to the 3A
+  path manifest and excludes local build, IDE, and validation artifacts.
 
-The qualified Linux/GCC validator is repeatable for later work. Preserve its
-versioned, normalized Stage 2 record; dual-platform CMake validation is
-complete, with the six non-required unavailable configurations explicitly
-deferred. Stage 3 is approved, but source-level removal must wait for the Work
-Package 3A baseline and classification gate.
+The qualified Windows/MSVC and Linux/GCC validators are repeatable for Stage 4.
+Preserve the versioned Stage 1 through Stage 3 records and do not reinterpret
+the six non-required Stage 2 environment deferrals as removed functionality.
 
 ## Handoff Updates
 

@@ -48,7 +48,9 @@ version do not cause firewall rejection. Release validation remains based on
 Windows x64 with MSVC 18 and Visual Studio 18 2026, plus Linux x86_64 with
 GCC/G++ and Ninja or Unix Makefiles. MinGW, MSYS2, Cygwin, Clang and clang-cl,
 Intel, NVHPC, AOCC, macOS, BSD, Emscripten, and other target-system/compiler
-pairs are no longer supported and fail during CMake configuration.
+pairs are no longer supported and fail during CMake configuration. Source and
+header compatibility implementations used only by those rejected pairs have
+also been removed.
 
 The MinGW-only `HDF5_MINGW_STATIC_GCC_LIBS` option is removed. The ineffective
 `HDF5_MSVC_NAMING_CONVENTION` option is also removed; it was exposed only for

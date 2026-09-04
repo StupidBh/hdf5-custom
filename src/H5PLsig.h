@@ -19,14 +19,14 @@
  *
  * Plugin files use an appended signature format:
  *
- *   [ Binary Data (ELF/DLL/Mach-O) ] [ RSA Signature ] [ Footer ]
+ *   [ Binary Data (ELF/PE) ] [ RSA Signature ] [ Footer ]
  *
  * The footer contains metadata about the signature and a magic number
  * to identify signed plugins. The binary loader ignores trailing data,
  * so the plugin loads normally.
  *
  * This approach:
- *   - Works on all platforms (Linux, Windows, macOS)
+ *   - Works on supported platforms (Linux and Windows)
  *   - No ELF parsing required
  *   - No external tools needed (objcopy, etc.)
  *   - Simple append operation for signing

@@ -179,32 +179,7 @@ typedef INIT_ONCE H5TS_once_t;
 typedef PINIT_ONCE_FN H5TS_once_init_func_t;
         #else
 
-            /* Non-recursive readers/writer lock */
-            #if defined(__MACH__)
-/*
- * Emulated pthread rwlock for MacOS
- *
- * Can't use pthread rwlock on MacOS due to: "The results [of calling
- *      pthread_rwlock_wrlock] are undefined if the calling thread already
- *      holds the lock at the time the call is made."
- *  but the pthread standard says: "If a deadlock condition occurs or the
- *      calling thread already owns the read-write lock for writing or reading,
- *      the call shall either deadlock or return [EDEADLK]."
- *
- * The net result of this is that the current version of MacOS (v15.x) allows
- * the same thread to recursively acquire a write lock, violating the pthread
- * guarantee of deadlocking or failing.
- *
- */
-typedef struct H5TS_rwlock_t
-{
-    pthread_mutex_t mutex;
-    pthread_cond_t read_cv, write_cv;
-    unsigned readers, writers, read_waiters, write_waiters;
-} H5TS_rwlock_t;
-            #else
 typedef pthread_rwlock_t H5TS_rwlock_t;
-            #endif
 
 typedef pthread_t H5TS_thread_t;
 typedef void* (*H5TS_thread_start_func_t)(void*);
@@ -266,7 +241,7 @@ typedef struct H5TS_barrier_t
 /* System semaphore */
 typedef HANDLE H5TS_semaphore_t;
 
-    #elif defined(__unix__) && !defined(__MACH__)
+    #else
         /*
          * POSIX semaphores
          */
@@ -274,22 +249,6 @@ typedef HANDLE H5TS_semaphore_t;
 
 /* System semaphore */
 typedef sem_t H5TS_semaphore_t;
-
-    #else
-/*
- * Emulated semaphores, for MacOS and unknown platforms
- * Can't use POSIX semaphores on MacOS due to:
- *      http://lists.apple.com/archives/darwin-kernel/2009/Apr/msg00010.html
- */
-
-/* Emulate semaphore w/mutex & condition variable */
-typedef struct H5TS_semaphore_t
-{
-    H5TS_mutex_t mutex;
-    H5TS_cond_t cond;
-    unsigned waiters;
-    int counter;
-} H5TS_semaphore_t;
     #endif
 
     #if defined(H5_HAVE_STDATOMIC_H) && !defined(__cplusplus)

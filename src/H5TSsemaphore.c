@@ -110,7 +110,7 @@ herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
     return SUCCEED;
 } /* end H5TS_semaphore_destroy() */
 
-    #elif defined(__unix__) && !defined(__MACH__)
+    #else
 /*
  * POSIX semaphores
  */
@@ -159,67 +159,6 @@ herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
     }
 
     return SUCCEED;
-} /* end H5TS_semaphore_destroy() */
-    #else
-/*
- * Emulate semaphore w/mutex & condition variable
- */
-
-/*-------------------------------------------------------------------------
- * Function: H5TS_semaphore_init
- *
- * Purpose:  Initialize a H5TS_semaphore_t (does not allocate it)
- *
- * Return:   Non-negative on success / Negative on failure
- *
- *-------------------------------------------------------------------------
- */
-herr_t H5TS_semaphore_init(H5TS_semaphore_t* sem, unsigned initial_count)
-{
-    /* Check argument */
-    if (H5_UNLIKELY(NULL == sem)) {
-        return FAIL;
-    }
-
-    if (H5_UNLIKELY(H5TS_mutex_init(&sem->mutex, H5TS_MUTEX_TYPE_PLAIN) < 0)) {
-        return FAIL;
-    }
-    if (H5_UNLIKELY(H5TS_cond_init(&sem->cond) < 0)) {
-        H5TS_mutex_destroy(&sem->mutex);
-        return FAIL;
-    }
-    sem->waiters = 0;
-    sem->counter = (int)initial_count;
-
-    return SUCCEED;
-} /* end H5TS_semaphore_init() */
-
-/*-------------------------------------------------------------------------
- * Function: H5TS_semaphore_destroy
- *
- * Purpose:  Destroy a H5TS_semaphore_t (does not free it)
- *
- * Return:   Non-negative on success / Negative on failure
- *
- *-------------------------------------------------------------------------
- */
-herr_t H5TS_semaphore_destroy(H5TS_semaphore_t* sem)
-{
-    herr_t ret_value = SUCCEED;
-
-    /* Check argument */
-    if (H5_UNLIKELY(NULL == sem)) {
-        return FAIL;
-    }
-
-    if (H5_UNLIKELY(H5TS_mutex_destroy(&sem->mutex) < 0)) {
-        ret_value = FAIL;
-    }
-    if (H5_UNLIKELY(H5TS_cond_destroy(&sem->cond) < 0)) {
-        return FAIL;
-    }
-
-    return ret_value;
 } /* end H5TS_semaphore_destroy() */
     #endif
 

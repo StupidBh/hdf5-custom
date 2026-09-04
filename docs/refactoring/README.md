@@ -17,4 +17,12 @@ plan in this directory.
 ## Plans
 
 - [CMake supported platform reduction](CMakePlatformSupportReduction.md):
-  reduce the supported CMake build matrix to Windows/MSVC and Linux/GCC.
+  reduce the supported project implementation to Windows/MSVC and Linux/GCC
+  through staged CMake and source/header work.
+- [Stage 2 native Linux/GCC validation](CMakePlatformSupportReductionStage2.md):
+  validate the reduced CMake layer on the retained Linux/GCC baseline; complete.
+- [Stage 2 validation results](CMakePlatformSupportReductionStage2Results.md):
+  record the completed core, optional, deferred, and cross-platform evidence.
+- [Stage 3 source/header reduction](CMakePlatformSupportReductionStage3.md):
+  proposed execution plan for removing unsupported-only source compatibility
+  while preserving API, ABI, file-format, and retained-pair behavior.

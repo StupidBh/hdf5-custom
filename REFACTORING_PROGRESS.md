@@ -12,10 +12,12 @@ artifacts.
 
 The detailed implementation plan for the current direction is
 [`docs/refactoring/CMakePlatformSupportReduction.md`](docs/refactoring/CMakePlatformSupportReduction.md).
-The self-contained execution plan for the active Linux validation stage is
+The self-contained execution plan for the completed Linux validation stage is
 [`docs/refactoring/CMakePlatformSupportReductionStage2.md`](docs/refactoring/CMakePlatformSupportReductionStage2.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`](docs/refactoring/CMakePlatformSupportReductionStage2Results.md).
+The proposed self-contained Stage 3 source/header reduction plan is
+[`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
 It intentionally changes the compatibility contract by first reducing the
 CMake matrix and then removing source-level support outside Windows/MSVC and
 Linux/GCC. The underlying target architecture and the paused
@@ -26,7 +28,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 and Stage 2 complete; Stage 3 planning has not started.
+- Status: Stage 1 and Stage 2 complete; Stage 3 plan proposed and awaiting review.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -40,8 +42,8 @@ behavior-preserving modernization state remain recorded in
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
   explicitly deferred by the user
-- Later-stage detailed planning: Stage 3 requires separate preparation and
-  review
+- Later-stage detailed planning: Stage 3 is proposed but not approved for
+  execution; Stage 4 remains unplanned
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -54,8 +56,9 @@ the required Windows/MSVC Stage 1 validation gate has passed. The Stage 2
 Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
 2 is complete after the user explicitly deferred the six unavailable optional
-configurations as non-required. Stage 3 source/header reduction and Stage 4
-final audit have not started.
+configurations as non-required. The Stage 3 source/header reduction plan is
+proposed and awaiting review; implementation and the Stage 4 final audit have
+not started.
 
 ## Completed
 
@@ -129,6 +132,9 @@ final audit have not started.
   exit gate.
 - Recorded the exact Stage 2 evidence, deferred prerequisites, and continuation
   point in the portable results document.
+- Drafted the self-contained Stage 3 source/header reduction plan with
+  compatibility protections, atomic commit boundaries, dual-platform gates,
+  stop conditions, and explicit exit criteria.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -154,17 +160,17 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Prepare the detailed Stage 3 source/header reduction plan for separate
-  review; the later source-removal and final-audit execution details are
-  intentionally not approved yet.
+- Review and approve or revise the proposed Stage 3 source/header reduction
+  plan; source-removal execution is not authorized yet.
+- Prepare the Stage 4 final-audit plan only after Stage 3 completes.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Stop after the completed Stage 2 gate. The next permitted action is to prepare
-the detailed Stage 3 source/header reduction plan for separate review. Do not
-begin source/header cleanup until that plan is reviewed and approved.
+Stop after drafting the Stage 3 plan. The next permitted action is to review,
+revise, and approve that plan. Do not begin source/header cleanup until its
+state is explicitly changed from `Proposed` to `In progress`.
 
 ## Validation State
 

@@ -2,22 +2,28 @@
 
 ## Status
 
-- State: Stage 1 complete; Stage 2 core gate passed; optional-scope decisions pending
+- State: Stage 1 and Stage 2 complete; Stage 3 plan proposed; execution has not started
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
 - CMake implementation commit: `b317dedc9`
-- Source compilation repair commits: `a68b4cae4e`, `6ee2f392e`
-- Current implementation commit: `6ee2f392e`
-- Last preceding documentation commit: `d89db2996`
+- Stage 1 source compilation repair commit: `a68b4cae4e`
+- Stage 2 C11 literal repair commit: `6ee2f392e`
+- Bundled-compression repair implementation: `81e96c889`
+- Coverage documentation correction: `d39cd5fa0`
+- Current implementation commit: `81e96c889`
+- Last preceding documentation commit: `4fb87c374`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 2 - available rows executed; user decisions pending
+- Current delivery stage: Stage 3 plan review
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
   [`CMakePlatformSupportReductionStage2Results.md`](CMakePlatformSupportReductionStage2Results.md)
+- Stage 3 execution plan:
+  [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md)
 - Stage 2 execution scope approved: 2026-09-04
-- Stages 3 and 4 detailed planning: deferred until Stage 2 closes
+- Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
+- Stages 3 and 4 detailed planning: Stage 3 proposed and awaiting review; Stage 4 remains deferred
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -816,9 +822,9 @@ validation. The logical-review groups were:
 - packaging and residual CMake paths: `7c9e4b0da`, `b317dedc9`.
 
 Native execution of these groups and the admission-policy correction passed on
-the release-qualified Linux baseline. Stage 2 remains open only for the scope
-decisions recorded in its results document. Stage 3 and Stage 4 have not
-started.
+the release-qualified Linux baseline. Stage 2 is complete after the user
+explicitly deferred the six unavailable non-required optional configurations.
+Stage 3 and Stage 4 have not started.
 
 ## Stage 2: Native Linux/GCC Validation
 
@@ -848,15 +854,14 @@ independently revertible local commit. Passing Stage 2 establishes the
 repeatable Linux/GCC validator required for later source-level work but does not
 authorize that work or complete the overall direction.
 
-## Stage 3: Future Source-Level Reduction
+## Stage 3: Source-Level Reduction
 
-The approved direction is to remove project-owned source and header
-compatibility code used only by rejected platform/compiler pairs while
-preserving retained ABI and file-format behavior. Detailed scope, work
-packages, commit boundaries, validation, stop conditions, and exit criteria are
-intentionally deferred until Stage 2 results and optional-environment decisions
-are available. Stage 3 requires a separate plan update and user review before
-any source or header edit begins.
+The proposed self-contained execution plan is
+[`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md).
+It removes project-owned source and header compatibility code used only by
+rejected platform/compiler pairs while preserving retained API, ABI,
+file-format, architecture, and runtime behavior. The plan is awaiting review
+and approval; no source or header edit is authorized yet.
 
 ## Stage 4: Future Final Project Audit
 

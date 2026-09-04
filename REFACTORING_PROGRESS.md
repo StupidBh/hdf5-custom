@@ -38,8 +38,8 @@ behavior-preserving modernization state remain recorded in
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
 - Stage 2 execution scope: approved; core gate passed; available optional rows
-  executed; three independent defects and seven missing-environment rows await
-  explicit user decisions
+  executed; one independent defect, one Stage 1 documentation regression, and
+  seven missing-environment rows remain
 - Later-stage detailed planning: deferred until Stage 2 closes
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -104,7 +104,10 @@ Stage 4 final audit have not started.
   plugin, STGZ, and DEB optional rows. A fresh Windows/MSVC default Release
   build and the matching seven-test smoke selection also passed after the C11
   repair.
-- Recorded the exact Stage 2 evidence, independent defects, missing
+- Corrected the compiler-wrapper contract to the intentionally consolidated
+  `h5cc` and `h5c++` interface and marked its fully exercised Stage 2 row as
+  passed.
+- Recorded the exact Stage 2 evidence, remaining defects, missing
   prerequisites, recommendations, and continuation point in the portable
   results document.
 
@@ -132,9 +135,10 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Obtain explicit user decisions for the independent wrapper, bundled
-  compression, and GCC coverage defects: fix/correct their contracts or remove
-  them from the selected Stage 2 scope.
+- Resolve the independent bundled-compression export defect or explicitly
+  remove it from the selected Stage 2 scope.
+- Resolve the GCC coverage mismatch by implementing the documented `ccov`
+  target or correcting the Stage 1 documentation contract.
 - Obtain explicit test-or-defer decisions for missing system compression,
   parallel-tool, ROS3, HDFS, signed-plugin, RPM, and real unsupported-compiler
   prerequisites. Run any row whose prerequisites the user elects to supply.
@@ -149,7 +153,7 @@ implementation anchor `0b9e21c34` and is detailed in
 
 Stop at the Stage 2 decision gate. Review
 `docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, record the
-user's resolution for its three independent defects and seven missing-
+user's resolution for bundled compression, GCC coverage, and the seven missing-
 environment rows, and execute any newly selected validation. Do not begin
 source/header cleanup. Stage 3 remains unplanned and requires separate review
 after Stage 2 closes.
@@ -157,8 +161,8 @@ after Stage 2 closes.
 ## Validation State
 
 - Current status: Stage 2 core gate passed and all optional rows supported by
-  the unchanged Linux/GCC validator have executed. Three independent defects
-  and seven missing-environment rows remain at the required user-decision gate.
+  the unchanged Linux/GCC validator have executed. One independent defect, one
+  Stage 1 documentation regression, and seven missing-environment rows remain.
 - The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
   glibc 2.43, GCC/G++ 15.2.0 targeting `x86_64-linux-gnu`, CMake/CTest/CPack
   4.2.3, Ninja 1.13.2, GNU Make 4.4.1, `HDF_TEST_EXPRESS=3`, and at most six
@@ -176,10 +180,11 @@ after Stage 2 closes.
   thread-safe and concurrency modes, remotely retrieved external plugins,
   STGZ, and DEB. Detailed commands, counts, artifacts, and versions are in the
   Stage 2 results document.
-- Independent pre-existing failures remain in the planned high-level wrapper
-  surface (`h5hlcc` and `h5hlc++` absent), bundled compression export sets, and
-  the documented GCC `ccov` report target. None is caused by the Stage 1
-  platform reduction.
+- The supported `h5cc` and `h5c++` wrappers passed, including default high-level
+  linkage and `-nohl`; obsolete four-wrapper documentation was corrected. The
+  remaining failures are the pre-existing bundled-compression export defect and
+  a pre-existing coverage registration gap exposed by incorrect Stage 1 `ccov`
+  documentation.
 - Missing-environment rows are system zlib/libaec, mpiFileUtils/libcircle/DTCMP,
   ROS3 aws-c-s3, JDK/Hadoop/libhdfs, OpenSSL development/signing inputs,
   `rpmbuild`, and a real unsupported native Linux compiler. These rows have

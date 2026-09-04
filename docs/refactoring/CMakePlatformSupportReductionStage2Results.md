@@ -12,10 +12,10 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and test parallelism: 6
 
-Stage 2 is not closed. The fixed core gate is green and no Stage 1 Linux/GCC
-regression remains open, but three independent pre-existing defects and seven
-missing-environment rows require explicit user decisions under the parent
-plan's exit criteria. Stage 3 source/header reduction remains unauthorized.
+Stage 2 is not closed. The fixed core gate is green, but one independent
+pre-existing defect, one Stage 1 documentation regression, and seven missing-
+environment rows remain under the parent plan's exit criteria. Stage 3
+source/header reduction remains unauthorized.
 
 ## Qualified Validator
 
@@ -118,7 +118,7 @@ no generated-product effect.
 
 | Row | Configuration or prerequisite | Evidence | State |
 | --- | --- | --- | --- |
-| `LNX-WRAPPERS` | C++-enabled isolated install; pkg-config 2.5.1 | All four installed `.pc` files reported 2.3.0. `h5cc` and `h5c++` passed `-show`, `-showconfig`, compile, link, and run checks, including high-level libraries. The planned `h5hlcc` and `h5hlc++` files were not generated. | `FAIL` |
+| `LNX-WRAPPERS` | C++-enabled isolated install; pkg-config 2.5.1 | All four installed `.pc` files reported 2.3.0. The supported `h5cc` and `h5c++` wrappers passed `-show`, `-showconfig`, compile, link, and run checks with default high-level linkage; `-nohl` correctly omitted the high-level libraries. | `PASS` |
 | `LNX-SYSTEM-COMPRESSION` | System zlib and libaec | Development packages were absent; pkg-config found neither `zlib` nor `libaec`. | `SKIP_MISSING_ENV` |
 | `LNX-BUNDLED-COMPRESSION` | Retained `ci-StdShar-GNUC` preset with outbound download | zlib 1.3.2 and libaec 1.1.6 downloaded and configured, but HDF5 generation failed because its export sets reference `zlibstatic`, `aec-static`, and `sz-static` targets absent from the export set. | `FAIL` |
 | `LNX-PARALLEL` | `HDF5_ENABLE_PARALLEL=ON`; OpenMPI 5.0.10 | Full 3,532-step build passed. Focused serial, MPI, parallel-tool, and parallel-example selection passed 11/11 with fixtures. | `PASS` |
@@ -144,13 +144,12 @@ mechanically restored C11-compatible integer literals. The complete Linux core
 matrix and a fresh Windows/MSVC default Release build then passed; this defect
 is closed and was not caused by the Stage 1 platform reduction.
 
-The remaining failed rows are independent pre-existing defects:
+The two remaining failed rows have different ownership:
 
 | Row | Failing phase and root cause | Relationship to Stage 1 | Pending decision |
 | --- | --- | --- | --- |
-| `LNX-WRAPPERS` | Install artifact check: CMake generates only `h5cc` and `h5c++`, while current documentation and the Stage 2 plan promise separate high-level wrappers. | No Stage 1 removal accounts for the files; the pre-Stage-1 tree likewise contains only documentation and contract references to them. | Repair the CMake wrapper surface, correct the documented contract, or exclude it from selected Stage 2 scope. |
 | `LNX-BUNDLED-COMPRESSION` | CMake generation: downloaded dependency targets are required by HDF5 export sets but are not exported. | Reproduces the defect already diagnosed before Stage 2; not a platform-reduction regression. | Repair the bundled export/install integration or exclude it from selected Stage 2 scope. |
-| `LNX-COVERAGE` | Report generation: the project never registers an executable with the coverage module, so it creates no `ccov` target. | The option and module remain; no Stage 1 change removed the target. | Repair coverage target registration, change the documented contract, or exclude it from selected Stage 2 scope. |
+| `LNX-COVERAGE` | Report generation: the project never registers an executable with the coverage module, so it creates no `ccov` target. | The implementation gap predates Stage 1, but Stage 1 commit `6ad3399ec` added documentation that instructs users to build the nonexistent target. | Implement and validate the documented report target or correct the Stage 1 documentation contract. |
 
 ## Missing-Environment Decisions
 
@@ -179,9 +178,8 @@ warnings were emitted.
 
 ## Continuation Point
 
-Obtain explicit user decisions for the three independent defects and seven
-missing-environment rows. Execute any rows for which prerequisites are
-supplied, then update this record and `REFACTORING_PROGRESS.md`. If the user
-excludes or defers all remaining rows, close Stage 2 with that exact scope and
-prepare a separate Stage 3 source/header reduction plan for review. Do not edit
-source/header compatibility branches before that review.
+Resolve the bundled-compression scope and the GCC coverage contract, then
+obtain explicit user decisions for the seven missing-environment rows. Execute
+any rows for which prerequisites are supplied and update this record together
+with `REFACTORING_PROGRESS.md`. Do not edit source/header compatibility
+branches before Stage 2 closes and a separate Stage 3 plan is reviewed.

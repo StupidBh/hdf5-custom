@@ -7,8 +7,11 @@ The bin folder contains the tools and the build scripts. Additionally, CMake cre
    ```
    build scripts
    /-------------
-   CMake: h5c++, h5cc, h5hlc++, h5hlcc
+   CMake: h5c++, h5cc
    ```
+
+When the corresponding high-level library is built, `h5cc` and `h5c++` link it
+by default. Pass `-nohl` to either wrapper to omit the high-level library.
 
 The include folder holds the public header files. Because CMake produces a tools library, the header files for tools will appear in the include folder.
 

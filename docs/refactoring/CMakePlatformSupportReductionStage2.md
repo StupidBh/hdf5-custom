@@ -172,7 +172,7 @@ Probe at least the following groups:
 
 | Capability group | Availability evidence | Coverage unlocked |
 | --- | --- | --- |
-| pkg-config wrappers | `pkg-config` is executable and the installed `.pc` files are discoverable | Compile and run representative programs with `h5cc`, `h5c++`, `h5hlcc`, and `h5hlc++`; exercise `-show` and `-showconfig`. |
+| pkg-config wrappers | `pkg-config` is executable and the installed C, C++, and high-level `.pc` files are discoverable | Compile and run representative programs with `h5cc` and `h5c++`; exercise `-show`, `-showconfig`, default high-level linkage, and `-nohl`. |
 | System compression | CMake can find usable zlib and libaec development packages | Separate system zlib/libaec configure, build, focused filter tests, install metadata, and consumer checks. |
 | Bundled compression | Required archives are locally available or outbound retrieval succeeds under the validator's network policy | Bundled zlib/libaec configure, build, focused filter tests, package/export, and consumer checks. |
 | Parallel HDF5 | A supported OpenMPI or MPICH compiler wrapper, launcher, headers, and libraries are usable | Parallel configure/build and focused MPI tests. |

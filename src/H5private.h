@@ -383,17 +383,10 @@
 
 #endif /* H5_HAVE_PARALLEL */
 
-/*
- * Types and max sizes for POSIX I/O.
- * OS X (Darwin) is odd since the max I/O size does not match the types.
- */
+/* Types and maximum transfer sizes for system I/O. */
 #if defined(H5_HAVE_WIN32_API)
     #define h5_posix_io_t         unsigned int
     #define h5_posix_io_ret_t     int
-    #define H5_POSIX_MAX_IO_BYTES INT_MAX
-#elif defined(H5_HAVE_DARWIN)
-    #define h5_posix_io_t         size_t
-    #define h5_posix_io_ret_t     ssize_t
     #define H5_POSIX_MAX_IO_BYTES INT_MAX
 #else
     #define h5_posix_io_t         size_t

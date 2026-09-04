@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stage 1 and Stage 2 complete; Stage 3 Work Package 3A in progress
+- State: Stage 1 and Stage 2 complete; Stage 3 Work Package 3B in progress
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -15,20 +15,22 @@
 - Current implementation commit: `81e96c889`
 - Last preceding documentation commit: `31cf74435`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 3 Work Package 3A baseline and inventory
+- Current delivery stage: Stage 3 Work Package 3B compiler branches
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
   [`CMakePlatformSupportReductionStage2Results.md`](CMakePlatformSupportReductionStage2Results.md)
 - Stage 3 execution plan:
   [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md)
+- Stage 3 execution results:
+  [`CMakePlatformSupportReductionStage3Results.md`](CMakePlatformSupportReductionStage3Results.md)
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
 - Stages 3 and 4 detailed planning: Stage 3 approved and in progress; Stage 4 remains deferred
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
-- Maximum local build and test parallelism: 6
+- Maximum Stage 3 build and test parallelism: 4
 
 ## Objective
 
@@ -61,9 +63,9 @@ validated before the next one changes:
    Linux/GCC build. It then discovers which optional configurations the
    supplied environment can support, validates every available row, and
    presents missing prerequisites to the user for a scope decision.
-3. Stage 3 will remove source and header compatibility code for unsupported
-   platforms and compilers. Its detailed work packages and validation matrix
-   will be planned after Stage 2 results are available.
+3. Stage 3 removes source and header compatibility code for unsupported
+   platforms and compilers. Its detailed work packages are approved, and its
+   pre-implementation contract and classification ledger are complete.
 4. Stage 4 will perform the final project-level support audit. Its detailed
    scope and exit criteria will be planned after the source-reduction work is
    defined.

@@ -16,8 +16,10 @@ The self-contained execution plan for the completed Linux validation stage is
 [`docs/refactoring/CMakePlatformSupportReductionStage2.md`](docs/refactoring/CMakePlatformSupportReductionStage2.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`](docs/refactoring/CMakePlatformSupportReductionStage2Results.md).
-The proposed self-contained Stage 3 source/header reduction plan is
+The active self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
+Its in-progress execution record is
+[`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
 It intentionally changes the compatibility contract by first reducing the
 CMake matrix and then removing source-level support outside Windows/MSVC and
 Linux/GCC. The underlying target architecture and the paused
@@ -28,7 +30,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 and Stage 2 complete; Stage 3 Work Package 3A in progress.
+- Status: Stage 1 and Stage 2 complete; Stage 3 Work Package 3B in progress.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -43,8 +45,8 @@ behavior-preserving modernization state remain recorded in
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
   explicitly deferred by the user
-- Stage 3 execution state: approved; Work Package 3A baseline and inventory in
-  progress with build and CTest parallelism limited to four
+- Stage 3 execution state: approved; Work Package 3A baseline and inventory
+  complete, with Work Package 3B compiler reduction next
 - Later-stage detailed planning: Stage 4 remains unplanned
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -59,8 +61,8 @@ Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
 2 is complete after the user explicitly deferred the six unavailable optional
 configurations as non-required. The Stage 3 source/header reduction plan is
-approved and Work Package 3A is in progress; source/header edits have not
-started, and the Stage 4 final audit remains unplanned.
+approved and Work Package 3A is complete; source/header edits have not started,
+and the Stage 4 final audit remains unplanned.
 
 ## Completed
 
@@ -139,6 +141,13 @@ started, and the Stage 4 final audit remains unplanned.
   stop conditions, and explicit exit criteria.
 - Approved the Stage 3 plan and fixed its maximum build and CTest parallelism
   at four jobs.
+- Qualified fresh Windows/MSVC and WSL Linux/GCC validators at the same tracked
+  Stage 3 baseline, then captured default and C++ builds, focused tests,
+  installs, package manifests, normalized contracts, installed-header hashes,
+  and C/C++ exported-symbol baselines.
+- Regenerated the tracked source/header inventory and resolved every candidate
+  into an implementation or protected-compatibility classification. No
+  `INVESTIGATE` item remains, so Work Package 3A is complete.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -164,20 +173,18 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Complete Stage 3 Work Package 3A: qualify both validators, capture the
-  pre-implementation contract, regenerate the candidate inventory, and resolve
-  every `INVESTIGATE` classification before editing source or headers.
+- Execute Stage 3 Work Packages 3B through 3F using their atomic commit and
+  dual-platform validation boundaries.
 - Prepare the Stage 4 final-audit plan only after Stage 3 completes.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Execute Stage 3 Work Package 3A at plan commit `31cf74435`. Qualify the
-Windows/MSVC and WSL Linux/GCC validators at the same source state, capture the
-pre-implementation contract, and complete the source/header classification
-ledger. Do not begin compatibility edits until the Work Package 3A exit
-criteria pass.
+Execute Stage 3 Work Package 3B from the completed pre-implementation contract.
+Begin with the Clang-only compiler branches, preserve the protected keep set,
+and create each atomic implementation commit only after its focused
+Windows/MSVC and Linux/GCC checks pass.
 
 ## Validation State
 

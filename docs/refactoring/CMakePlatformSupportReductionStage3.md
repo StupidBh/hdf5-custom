@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: In progress; Work Package 3A baseline and inventory
+- State: In progress; Work Package 3B compiler branches
 - Plan drafted: 2026-09-04
 - Scope approved: 2026-09-04
 - Execution started: 2026-09-04
@@ -13,6 +13,8 @@
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Completed prerequisite:
   [CMakePlatformSupportReductionStage2Results.md](CMakePlatformSupportReductionStage2Results.md)
+- Execution results:
+  [CMakePlatformSupportReductionStage3Results.md](CMakePlatformSupportReductionStage3Results.md)
 - Source implementation baseline: `81e96c889`
 - Required target pairs: Windows with compiler ID `MSVC`, and Linux with
   compiler ID `GNU`
@@ -21,8 +23,8 @@
 - Secondary Linux generator check: Unix Makefiles
 - Maximum build and CTest parallelism: 4
 
-The user approved execution on 2026-09-04. Work Package 3A must complete before
-the first source or header edit.
+The user approved execution on 2026-09-04. Work Package 3A completed on the
+same date; Work Package 3B is the next implementation boundary.
 
 ## Purpose
 
@@ -264,6 +266,11 @@ The portable ledger records:
 
 No implementation work package may start with an `INVESTIGATE` item in
 its scope. Resolve the item or stop and request review.
+
+The regenerated inventory, protected keep set, and resolved classification
+ledger are recorded in
+[CMakePlatformSupportReductionStage3Results.md](CMakePlatformSupportReductionStage3Results.md).
+Work Package 3A closed with no `INVESTIGATE` items.
 
 ## Pre-Implementation Contract Capture
 

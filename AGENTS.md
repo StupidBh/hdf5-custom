@@ -4,17 +4,6 @@
 
 Core C code is in `src/`; the high-level API is in `hl/`, C++ wrappers in `c++/`, and command-line programs in `tools/`. Tests live in `test/` and `testpar/`, examples in `HDF5Examples/`, CMake support in `config/`, and documentation in `docs/` and `release_docs/`.
 
-## CLion MCP Workflow
-
-- At the start of each task, check whether the CLion MCP tools are available.
-- Prefer CLion MCP for symbol lookup, declaration and definition navigation, reference searches, refactoring,
-  inspections, diagnostics, and IDE run configurations.
-- Use `rg` and shell tools for plain-text searches, file enumeration, and operations that CLion MCP does not
-  support or would handle less efficiently.
-- If CLion MCP is unavailable or a call fails, report that briefly and fall back to local tools without repeated
-  retries.
-- Do not claim that CLion MCP verified a result unless an MCP tool call actually succeeded.
-
 ## Repository Profile & Sources of Truth
 
 This is a CMake-only fork of upstream `develop` with a minimum CMake version of 4.0. The supported product
@@ -139,9 +128,9 @@ Java and Fortran modules are unsupported. Do not restore their sources, options,
 The CMake build accepts exactly two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
 and exact compiler version are not central-firewall inputs. The
-release-validation baselines are Windows x64 with the MSVC toolset from Visual
-Studio 18 2026 using the Visual Studio 18 2026 generator, and Linux x86_64 with
-GCC/G++ using Ninja plus a focused Unix Makefiles check. MinGW, MSYS2, Cygwin,
+release-validation baselines are Windows x64 with MSVC using a Visual Studio
+generator, and Linux x86_64 with GCC/G++ using Ninja plus a focused Unix
+Makefiles check. MinGW, MSYS2, Cygwin,
 Clang and clang-cl, Intel, NVHPC, AOCC, macOS, BSD, Emscripten, and all other
 target-system/compiler combinations are unsupported. `HDF5_ALLOW_UNSUPPORTED`
 applies only to documented HDF5 feature combinations; it does not bypass the

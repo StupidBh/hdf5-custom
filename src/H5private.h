@@ -213,13 +213,13 @@
 #   define H5_ATTR_CONST    __attribute__((const))
 #   define H5_ATTR_PURE     __attribute__((pure))
 
-#   if defined(__GNUC__) && __GNUC__ >= 7 && !defined(__INTEL_COMPILER)
+#   if defined(__GNUC__) && __GNUC__ >= 7
 #       define H5_ATTR_FALLTHROUGH __attribute__((fallthrough));
 #   else
 #       define H5_ATTR_FALLTHROUGH /* FALLTHROUGH */
 #   endif
 
-#  if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#  if defined(__GNUC__)
 #       define H5_ATTR_MALLOC __attribute__((malloc))
 #  else
 #       define H5_ATTR_MALLOC /*void*/

@@ -11,11 +11,9 @@
         #pragma GCC diagnostic ignored "-Wstrict-overflow"
         #pragma GCC diagnostic ignored "-Wstrict-prototypes"
         #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-        #if !defined(__clang__)
-            #pragma GCC diagnostic ignored "-Wlarger-than="
-            #pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
-            #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
-        #endif
+        #pragma GCC diagnostic ignored "-Wlarger-than="
+        #pragma GCC diagnostic ignored "-Wsuggest-attribute=const"
+        #pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
         #pragma GCC diagnostic ignored "-Wswitch-default"
         #pragma GCC diagnostic ignored "-Wunused-function"
         #pragma GCC diagnostic ignored "-Wunused-macros"

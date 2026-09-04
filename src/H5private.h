@@ -213,7 +213,7 @@
 #   define H5_ATTR_CONST    __attribute__((const))
 #   define H5_ATTR_PURE     __attribute__((pure))
 
-#   if defined(__clang__) || defined(__GNUC__) && __GNUC__ >= 7 && !defined(__INTEL_COMPILER)
+#   if defined(__GNUC__) && __GNUC__ >= 7 && !defined(__INTEL_COMPILER)
 #       define H5_ATTR_FALLTHROUGH __attribute__((fallthrough));
 #   else
 #       define H5_ATTR_FALLTHROUGH /* FALLTHROUGH */
@@ -225,24 +225,8 @@
 #       define H5_ATTR_MALLOC /*void*/
 #  endif
 
-/* Turns off optimizations for a function. Goes after the return type.
- * Not generally needed in the library, but ancient versions of clang
- * (7.3.3, possibly others) have trouble with some of the onion VFD decode
- * functions and need the optimizer turned off. This macro can go away when
- * we figure out what's going on and can engineer another solution.
- */
-#  if defined(__clang__)
-#       define H5_ATTR_NO_OPTIMIZE __attribute__((optnone))
-#  else
-#       define H5_ATTR_NO_OPTIMIZE /*void*/
-#  endif
-
-/* Enable thread-safety annotations when built with clang */
-#  if defined(__clang__)
-#       define H5_ATTR_THREAD_ANNOT(X) __attribute__((X))
-#  else
-#       define H5_ATTR_THREAD_ANNOT(X) /*void*/
-#  endif
+#   define H5_ATTR_NO_OPTIMIZE    /*void*/
+#   define H5_ATTR_THREAD_ANNOT(X) /*void*/
 
 #else
 #   define H5_ATTR_FORMAT(X, Y, Z) /*void*/

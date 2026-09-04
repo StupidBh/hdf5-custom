@@ -61,10 +61,8 @@
  * - The macro name should reflect the actual problem, not the name of the
  *   compiler warning option. Names are of the form H5_WARN_<THING>_(ON|OFF).
  *
- * - Be careful with the ifdefs. clang defines __GNUC__, for example, so
- *   you can't simply check for that if you have a gcc-specific warning.
- *   Check for compiler version numbers in the macros to avoid warnings
- *   about undefined diagnostics in older compilers.
+ * - Check compiler version numbers in the macros to avoid warnings about
+ *   undefined diagnostics in older compilers.
  *
  * - Add the new macro to the list in the .clang-format file.
  */
@@ -72,7 +70,7 @@
 #ifndef H5warnings_H
 #define H5warnings_H
 
-/* Macros for enabling/disabling particular gcc / clang warnings
+/* Macros for enabling/disabling particular GCC warnings
  *
  * (see the following web-sites for more info:
  *      http://www.dbp-consulting.com/tutorials/SuppressingGCCWarnings.html
@@ -81,7 +79,6 @@
  * _Pragma is C99 and should work with all compilers, though permitted
  * placement may vary
  *
- * "GCC" in the pragma works for both clang/llvm and gcc
  */
 #define H5_WARN_JOINSTR(x, y) x y
 #define H5_WARN_DO_PRAGMA(x)  _Pragma(#x)
@@ -95,8 +92,8 @@
     #define H5_WARN_OFF(x)
     #define H5_WARN_ON(x)
 #else
-    #if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || defined(__clang__)
-        /* gcc 4.6+ /clang */
+    #if defined(__GNUC__) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
+        /* GCC 4.6+ */
         #define H5_WARN_OFF(x) H5_WARN_PRAGMA(push) H5_WARN_PRAGMA(ignored H5_WARN_JOINSTR("-W", x))
         #define H5_WARN_ON(x)  H5_WARN_PRAGMA(pop)
     #endif
@@ -107,19 +104,14 @@
  * SPECIFIC WARNINGS *
  *********************/
 
-/* Suppress warnings about C11 extensions */
-#if defined(__clang__)
-    #define H5_WARN_C11_EXTENSIONS_OFF H5_WARN_OFF("c11-extensions")
-    #define H5_WARN_C11_EXTENSIONS_ON  H5_WARN_ON("c11-extensions")
-#else
-    #define H5_WARN_C11_EXTENSIONS_OFF
-    #define H5_WARN_C11_EXTENSIONS_ON
-#endif
+/* Retained for source compatibility; GCC needs no C11-extension suppression. */
+#define H5_WARN_C11_EXTENSIONS_OFF
+#define H5_WARN_C11_EXTENSIONS_ON
 
 /* Suppress warnings about bad cast alignment. These should be corrected,
  * not suppressed in the main library, but might appear in test code.
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_CAST_ALIGNMENT_OFF H5_WARN_OFF("cast-align")
     #define H5_WARN_CAST_ALIGNMENT_ON  H5_WARN_ON("cast-align")
 #else
@@ -128,7 +120,7 @@
 #endif
 
 /* Suppress warnings about casting away const */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_CAST_AWAY_CONST_OFF H5_WARN_OFF("cast-qual")
     #define H5_WARN_CAST_AWAY_CONST_ON  H5_WARN_ON("cast-qual")
 #else
@@ -141,7 +133,7 @@
  * On some platforms, the type sizes will be the same, leading
  * to the warning.
  */
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
     #define H5_WARN_DUPLICATED_BRANCHES_OFF H5_WARN_OFF("duplicated-branches")
     #define H5_WARN_DUPLICATED_BRANCHES_ON  H5_WARN_ON("duplicated-branches")
 #else
@@ -153,7 +145,7 @@
  * precision. This is only a problem in a few places in the tests
  * where we do some number munging.
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_FLOAT_CONVERSION_OFF H5_WARN_OFF("float-conversion")
     #define H5_WARN_FLOAT_CONVERSION_ON  H5_WARN_ON("float-conversion")
 #else
@@ -165,7 +157,7 @@
  * typically where we are comparing a floating point value to
  * an exact value like 0.
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_FLOAT_EQUAL_OFF H5_WARN_OFF("float-equal")
     #define H5_WARN_FLOAT_EQUAL_ON  H5_WARN_ON("float-equal")
 #else
@@ -176,7 +168,7 @@
 /* Suppress warnings about using format strings that aren't string
  * literals
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_FORMAT_NONLITERAL_OFF H5_WARN_OFF("format-nonliteral")
     #define H5_WARN_FORMAT_NONLITERAL_ON  H5_WARN_ON("format-nonliteral")
 #else
@@ -185,7 +177,7 @@
 #endif
 
 /* Suppress warnings about possible truncation in format strings */
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
     #define H5_WARN_FORMAT_TRUNCATION_OFF H5_WARN_OFF("format-truncation")
     #define H5_WARN_FORMAT_TRUNCATION_ON  H5_WARN_ON("format-truncation")
 #else
@@ -193,27 +185,16 @@
     #define H5_WARN_FORMAT_TRUNCATION_ON
 #endif
 
-/* Suppress warnings about implicit fallthrough. Currently,
- * clang is the only compiler that has trouble with this.
- */
-#if defined(__clang__)
-    #define H5_WARN_IMPLICIT_FALLTHROUGH_OFF H5_WARN_OFF("implicit-fallthrough")
-    #define H5_WARN_IMPLICIT_FALLTHROUGH_ON  H5_WARN_ON("implicit-fallthrough")
-#else
-    #define H5_WARN_IMPLICIT_FALLTHROUGH_OFF
-    #define H5_WARN_IMPLICIT_FALLTHROUGH_ON
-#endif
+/* Retained for source compatibility; GCC needs no suppression here. */
+#define H5_WARN_IMPLICIT_FALLTHROUGH_OFF
+#define H5_WARN_IMPLICIT_FALLTHROUGH_ON
 
 /* Suppress warnings about large stack and frame objects. We
  * could also include -Wframe-larger-than, but all those warnings
  * have been squashed so it's not necessary at this time.
  */
-#if defined(__clang__)
-    /* clang can only suppress warnings about oversize strings */
-    #define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("overlength-strings")
-    #define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("overlength-strings")
-#elif defined(__GNUC__)
-    /* gcc can suppress warnings about any oversize object */
+#if defined(__GNUC__)
+    /* GCC can suppress warnings about any oversize object */
     #define H5_WARN_LARGE_STACK_OBJECTS_OFF H5_WARN_OFF("larger-than=")
     #define H5_WARN_LARGE_STACK_OBJECTS_ON  H5_WARN_ON("larger-than=")
 #else
@@ -228,7 +209,7 @@
  *
  * https://github.com/pmodels/mpich/issues/5687
  */
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
     #define H5_WARN_MPI_STATUSES_IGNORE_OFF H5_WARN_OFF("stringop-overflow")
     #define H5_WARN_MPI_STATUSES_IGNORE_ON  H5_WARN_ON("stringop-overflow")
 #else
@@ -237,15 +218,11 @@
 #endif
 
 /* Disable warnings concerning non-standard extensions, like F16 */
-/* clang */
-#if defined(__clang__)
-    #define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("pedantic")
-    #define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("pedantic")
-/* gcc 14+ */
-#elif defined(__GNUC__) && __GNUC__ >= 14
+/* GCC 14+ */
+#if defined(__GNUC__) && __GNUC__ >= 14
     #define H5_WARN_NONSTD_SUFFIX_OFF H5_WARN_OFF("c11-c23-compat")
     #define H5_WARN_NONSTD_SUFFIX_ON  H5_WARN_ON("c11-c23-compat")
-/* gcc 9-13 */
+/* GCC 9-13 */
 #elif defined(__GNUC__) && __GNUC__ >= 9
     #define H5_WARN_NONSTD_SUFFIX_OFF \
         H5_WARN_OFF("pedantic")       \
@@ -264,7 +241,7 @@
  * plugin code, since it uses dlsym() to load plugins. POSIX allows
  * this, so it's fine.
  */
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__)
     #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_OFF H5_WARN_OFF("pedantic")
     #define H5_WARN_OBJ_FXN_POINTER_CONVERSION_ON  H5_WARN_ON("pedantic")
 #else
@@ -276,7 +253,7 @@
  * false, typically when checking for negative values w/ unsigned
  * types.
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_USELESS_COMPARISON_OFF H5_WARN_OFF("type-limits")
     #define H5_WARN_USELESS_COMPARISON_ON  H5_WARN_ON("type-limits")
 #else
@@ -288,7 +265,7 @@
  * warning should only be suppressed when it's known that the
  * structures are very small.
  */
-#if defined(__clang__) || defined(__GNUC__)
+#if defined(__GNUC__)
     #define H5_WARN_AGGREGATE_RETURN_OFF H5_WARN_OFF("aggregate-return")
     #define H5_WARN_AGGREGATE_RETURN_ON  H5_WARN_ON("aggregate-return")
 #else

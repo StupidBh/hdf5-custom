@@ -14,6 +14,8 @@ The detailed implementation plan for the current direction is
 [`docs/refactoring/CMakePlatformSupportReduction.md`](docs/refactoring/CMakePlatformSupportReduction.md).
 The self-contained execution plan for the active Linux validation stage is
 [`docs/refactoring/CMakePlatformSupportReductionStage2.md`](docs/refactoring/CMakePlatformSupportReductionStage2.md).
+Its portable execution record is
+[`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`](docs/refactoring/CMakePlatformSupportReductionStage2Results.md).
 It intentionally changes the compatibility contract by first reducing the
 CMake matrix and then removing source-level support outside Windows/MSVC and
 Linux/GCC. The underlying target architecture and the paused
@@ -24,18 +26,21 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 complete; CMake platform/compiler reduction implemented and
-  Windows/MSVC validated; Stage 2 Linux/GCC validator prepared.
+- Status: Stage 1 complete; Stage 2 Linux/GCC core gate passed and all currently
+  available optional rows executed; user scope decisions pending.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
-- Source compilation repair anchor: `a68b4cae4e`
-- Last landed documentation anchor: `614dd74c0`
+- Stage 1 source compilation repair anchor: `a68b4cae4e`
+- Stage 2 C11 literal repair anchor: `6ee2f392e`
+- Current implementation anchor: `6ee2f392e`
+- Last preceding documentation anchor: `d89db2996`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
-- Stage 2 execution scope: approved; trusted native Linux/GCC validator
-  available; execution not started
-- Later-stage detailed planning: deferred until Stage 2 results are available
+- Stage 2 execution scope: approved; core gate passed; available optional rows
+  executed; three independent defects and seven missing-environment rows await
+  explicit user decisions
+- Later-stage detailed planning: deferred until Stage 2 closes
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -44,9 +49,10 @@ firewall inputs. The release-qualified baselines remain Windows x64 with MSVC
 and a Visual Studio generator, plus Linux x86_64 with GCC/G++ and Ninja, with a
 focused Unix Makefiles check. The CMake firewall and unsupported CMake-path
 reduction have landed, the over-constrained admission policy is corrected, and
-the required Windows/MSVC Stage 1 validation gate has passed. Stage 2 native
-Linux validation, Stage 3 source/header reduction, and Stage 4 final audit have
-not started.
+the required Windows/MSVC Stage 1 validation gate has passed. The Stage 2
+Linux/GCC core gate and all optional rows supported by the unchanged validator
+have run. Stage 2 awaits scope decisions; Stage 3 source/header reduction and
+Stage 4 final audit have not started.
 
 ## Completed
 
@@ -87,6 +93,20 @@ not started.
   atomic, independently revertible local commit after its checks pass; pure
   validation produces no commit, while portable evidence uses focused `docs:`
   checkpoints.
+- Qualified an Ubuntu 26.04.1 x86_64 WSL2 validator with GCC/G++ 15.2.0,
+  CMake/CTest 4.2.3, Ninja 1.13.2, GNU Make 4.4.1, and native GNU target
+  triples.
+- Repaired pre-Stage-1 C++ integer separators left in C sources, then passed
+  every fixed Stage 2 core row: full default Release CTest, Debug, static-only,
+  shared-only, C++, Unix Makefiles, examples, consumers, install, TGZ package,
+  and normalized contract comparison.
+- Passed available parallel, subfiling, thread-safe, concurrency, external
+  plugin, STGZ, and DEB optional rows. A fresh Windows/MSVC default Release
+  build and the matching seven-test smoke selection also passed after the C11
+  repair.
+- Recorded the exact Stage 2 evidence, independent defects, missing
+  prerequisites, recommendations, and continuation point in the portable
+  results document.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -112,12 +132,13 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Qualify and record the prepared native Linux x86_64 GCC/G++ validator for
-  Stage 2; Windows GCC or MinGW is not substitute evidence.
-- Run the fixed Stage 2 core gate, then probe the supplied environment and run
-  every optional row whose complete prerequisite set is already available.
-- Present every missing optional prerequisite and the coverage it would unlock
-  to the user, then run or explicitly defer each row according to that decision.
+- Obtain explicit user decisions for the independent wrapper, bundled
+  compression, and GCC coverage defects: fix/correct their contracts or remove
+  them from the selected Stage 2 scope.
+- Obtain explicit test-or-defer decisions for missing system compression,
+  parallel-tool, ROS3, HDFS, signed-plugin, RPM, and real unsupported-compiler
+  prerequisites. Run any row whose prerequisites the user elects to supply.
+- Close Stage 2 only after those decisions and any selected reruns are recorded.
 - After Stage 2 passes, prepare the detailed source/header reduction plan for
   separate review; the later source-removal and final-audit execution details
   are intentionally not approved yet.
@@ -126,19 +147,46 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-Stop after the completed Stage 1 milestone. Do not begin source/header cleanup.
-Begin Stage 2 from `docs/refactoring/CMakePlatformSupportReductionStage2.md`:
-qualify the prepared validator, complete the fixed core gate, discover optional
-capabilities, and validate every available legal row. Then present missing
-prerequisites to the user for a test-or-defer decision. Stage 3 remains
-unplanned and requires a separate review after Stage 2 passes.
+Stop at the Stage 2 decision gate. Review
+`docs/refactoring/CMakePlatformSupportReductionStage2Results.md`, record the
+user's resolution for its three independent defects and seven missing-
+environment rows, and execute any newly selected validation. Do not begin
+source/header cleanup. Stage 3 remains unplanned and requires separate review
+after Stage 2 closes.
 
 ## Validation State
 
-- Current status: Stage 1 complete; CMake platform/compiler reduction
-  implemented and Windows/MSVC validated; the native Linux/GCC validator and
-  selected optional prerequisites are prepared, but formal Stage 2 rows have
-  not started.
+- Current status: Stage 2 core gate passed and all optional rows supported by
+  the unchanged Linux/GCC validator have executed. Three independent defects
+  and seven missing-environment rows remain at the required user-decision gate.
+- The qualified validator was Ubuntu 26.04.1 LTS under WSL2 on x86_64 with
+  glibc 2.43, GCC/G++ 15.2.0 targeting `x86_64-linux-gnu`, CMake/CTest/CPack
+  4.2.3, Ninja 1.13.2, GNU Make 4.4.1, `HDF_TEST_EXPRESS=3`, and at most six
+  parallel jobs. The tracked validation checkout was clean at `6ee2f392e`.
+- The default Ninja Release build passed its full suite: 2,819 passed, zero
+  failed, and 37 disabled out of 2,856 registered tests. Debug, static-only,
+  shared-only, C++, and Unix Makefiles builds plus their focused selections all
+  passed. Standalone examples passed 279/279 tests against both build-tree and
+  installed packages; install, TGZ, and four consumer modes passed.
+- The normalized pre-Stage-1/current contracts differed only by approved
+  MinGW and Linux-irrelevant MSVC cache removal plus sanitizer help wording;
+  retained Linux targets, flags, tests, generated files, and package metadata
+  had no unexplained delta.
+- Available optional rows passed for OpenMPI parallel HDF5, subfiling,
+  thread-safe and concurrency modes, remotely retrieved external plugins,
+  STGZ, and DEB. Detailed commands, counts, artifacts, and versions are in the
+  Stage 2 results document.
+- Independent pre-existing failures remain in the planned high-level wrapper
+  surface (`h5hlcc` and `h5hlc++` absent), bundled compression export sets, and
+  the documented GCC `ccov` report target. None is caused by the Stage 1
+  platform reduction.
+- Missing-environment rows are system zlib/libaec, mpiFileUtils/libcircle/DTCMP,
+  ROS3 aws-c-s3, JDK/Hadoop/libhdfs, OpenSSL development/signing inputs,
+  `rpmbuild`, and a real unsupported native Linux compiler. These rows have
+  been presented for explicit test-or-defer decisions.
+- A fresh post-repair Windows x64 default Release build passed with CMake 4.4.3,
+  Visual Studio 18 2026, MSVC 19.51.36256.0/toolset 14.51.36231, and
+  `CL=/utf-8`; its focused selection passed 7/7 with fixtures.
 - The completed local baseline was Windows NT `10.0.26100` x64, Visual Studio
   18 2026 Insiders, MSVC `19.51.36256.0` from toolset `14.51.36231`, Windows
   SDK `10.0.26100.0`, and CMake `4.4.3`. Configures used the Visual Studio 18
@@ -207,45 +255,6 @@ unplanned and requires a separate review after Stage 2 passes.
   three of three tests in each configuration.
 - After refreshing the process environment, CMake found Strawberry Perl
   `5.42.3`; Perl is not a remaining environment gap.
-- The default full suite already exercised the enabled in-tree plugin and VOL
-  tests. Environment-limited optional rows are direct pkg-config consumption,
-  system zlib and libaec, external filter plugins, ROS3, HDFS, signed plugins,
-  parallel tools based on mpiFileUtils, and extra Windows installer formats.
-  The missing prerequisites are respectively `pkg-config`, the system
-  compression development packages, an HDF5 filter-plugin installation,
-  `aws-c-s3`, a JDK/JNI plus Hadoop/libhdfs, OpenSSL development files,
-  mpiFileUtils/libcircle/DTCMP, and NSIS or WiX.
-  These are Stage 1 Windows-environment results and must be probed again rather
-  than assumed missing on the supplied Linux validator.
-- Bundled zlib and libaec downloads and dependency configuration succeeded, but
-  CMake generation failed because the HDF5 export sets reference bundled
-  `zlib`, `aec-shared`, and `sz-shared` targets that are not in an export set.
-  This is a non-environment optional-path defect, not a Stage 1 platform-
-  reduction regression. If bundled compression prerequisites are available on
-  Linux, Stage 2 records a reproduced failure as `FAIL`, not missing
-  environment. Subfiling is tested when Stage 2 discovery finds its Linux MPI
-  and thread prerequisites; otherwise it is presented for user decision.
-- Historical MinGW-w64 results are baseline evidence only; MinGW is now outside
-  the support contract and cannot substitute for native Linux/GCC validation.
-- Linux capability preparation confirmed usable Ninja, OpenMPI, system zlib and
-  libaec development files, mpiFileUtils/libcircle/DTCMP parallel-tool
-  dependencies, OpenSSL development files, GCC coverage report tools, and native
-  Linux `pkg-config`. A minimal GCC coverage run generated an HTML report, and
-  an HDF5 coverage configure without examples found `lcov` and `genhtml`.
-  `pkg-config` supplied valid OpenMPI compile/link flags to a GCC smoke program,
-  and the HDF5 configure found the native command instead of the incompatible
-  Windows Strawberry script also present in `PATH`.
-- Pre-gate integration probes exposed two repository code failures rather than
-  environment gaps: the parallel-tool build reaches a C11 compilation error at
-  digit-separated integer literals in `src/H5Cprivate.h`, and the default GCC
-  coverage configure reaches mixed keyword/plain `target_link_libraries`
-  signatures in retained examples. The reduced coverage configure succeeds but
-  exposes only `ccov-clean`, because no executable target is registered with
-  the coverage module to create the documented `ccov` report target. These
-  probes are not formal optional-row results; reproduce and classify them only
-  after the fixed core gate runs.
-- Installing GCC on Windows is not planned as a validation step because it does
-  not exercise the Linux ABI or Linux CMake platform state.
 
 ## Residual Audit
 
@@ -259,20 +268,18 @@ unplanned and requires a separate review after Stage 2 passes.
   source-reduction inventory:
   `APPLE=4`, `CLANG=234`, `CYGWIN=6`, `DARWIN=3`, `FREEBSD=4`, `INTEL=43`,
   `MACOS=12`, `MINGW=10`, `NETBSD=2`, and `PGI=4`.
-- All 19 commits in `0adb08f4a..b317dedc9` retain a Stage 2 native Linux/GCC
-  validation owner. Their static proofs reduce removed selectors according to
-  the Windows/MSVC and Linux/GCC pair table in the detailed plan. The
-  admission-policy correction also remains owned by Stage 2 baseline
-  validation. The architecture/generator re-audit restored product behavior
-  needed by admitted Windows/MSVC variants while leaving release-validation
-  presets, CI, dashboards, and bundled cross-toolchain helpers baseline-scoped.
+- All 19 commits in `0adb08f4a..b317dedc9` and the admission-policy correction
+  passed their Stage 2 native Linux/GCC ownership checks. Their static proofs
+  reduce removed selectors according to the Windows/MSVC and Linux/GCC pair
+  table in the detailed plan. The architecture/generator re-audit restored
+  product behavior needed by admitted Windows/MSVC variants while leaving
+  release-validation presets, CI, dashboards, and bundled cross-toolchain
+  helpers baseline-scoped.
 
-Native Linux/GCC validation may run on a trusted CI runner, Linux virtual
-machine, or native-target Linux container. Record the exact environment and
-versions here. Run the fixed core gate before optional discovery, test every
-available optional row, and record the user's decision for every missing
-prerequisite. Source-level removal must wait until that validator is repeatable
-and a later-stage plan has received separate review.
+The qualified Linux/GCC validator is repeatable for later work. Preserve its
+versioned, normalized Stage 2 record and resolve the pending user decisions
+before declaring dual-platform CMake validation complete. Source-level removal
+must wait for Stage 2 closure and a separately reviewed Stage 3 plan.
 
 ## Handoff Updates
 

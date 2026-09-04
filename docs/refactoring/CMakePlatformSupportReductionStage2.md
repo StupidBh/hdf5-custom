@@ -2,12 +2,14 @@
 
 ## Status
 
-- State: approved; trusted native Linux/GCC validator available; execution not
-  started
+- State: core gate passed; available optional rows executed; user decisions
+  pending
 - Scope approved: 2026-09-04
 - Parent compatibility plan:
   [`CMakePlatformSupportReduction.md`](CMakePlatformSupportReduction.md)
 - Portable handoff: [`../../REFACTORING_PROGRESS.md`](../../REFACTORING_PROGRESS.md)
+- Execution results:
+  [`CMakePlatformSupportReductionStage2Results.md`](CMakePlatformSupportReductionStage2Results.md)
 - Required target pair: Linux with compiler ID `GNU`
 - Release-qualified baseline: Linux x86_64 with GCC/G++ and Ninja
 - Secondary generator check: Unix Makefiles

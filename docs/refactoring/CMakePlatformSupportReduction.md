@@ -2,19 +2,22 @@
 
 ## Status
 
-- State: Stage 1 complete; Windows/MSVC validated; Stage 2 Linux/GCC validator prepared
+- State: Stage 1 complete; Stage 2 core gate passed; optional-scope decisions pending
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
 - CMake implementation commit: `b317dedc9`
-- Source compilation repair commit: `a68b4cae4e`
-- Last landed documentation commit: `614dd74c0`
+- Source compilation repair commits: `a68b4cae4e`, `6ee2f392e`
+- Current implementation commit: `6ee2f392e`
+- Last preceding documentation commit: `d89db2996`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 2 - validator available; execution not started
+- Current delivery stage: Stage 2 - available rows executed; user decisions pending
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
+- Stage 2 execution results:
+  [`CMakePlatformSupportReductionStage2Results.md`](CMakePlatformSupportReductionStage2Results.md)
 - Stage 2 execution scope approved: 2026-09-04
-- Stages 3 and 4 detailed planning: deferred until Stage 2 results are available
+- Stages 3 and 4 detailed planning: deferred until Stage 2 closes
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -796,10 +799,10 @@ Linux/GCC validation.
   3 review: `APPLE=4`, `CLANG=234`, `CYGWIN=6`, `DARWIN=3`, `FREEBSD=4`,
   `INTEL=43`, `MACOS=12`, `MINGW=10`, `NETBSD=2`, and `PGI=4`.
 
-#### Deferred Linux/GCC owners
+#### Linux/GCC owner disposition
 
-Every Stage 1 implementation commit remains owned by Stage 2 native Linux/GCC
-validation. The logical-review groups are:
+Every Stage 1 implementation commit was covered by Stage 2 native Linux/GCC
+validation. The logical-review groups were:
 
 - firewall and optional C++ enforcement: `0adb08f4a`, `865065e7b`;
 - presets, toolchains, dashboards, and CI: `7263d8fde`, `49970ae08`,
@@ -812,18 +815,20 @@ validation. The logical-review groups are:
   `81097024f`, `67c2bae01`;
 - packaging and residual CMake paths: `7c9e4b0da`, `b317dedc9`.
 
-Native execution of these groups can proceed in the prepared Linux environment.
-The admission-policy correction also requires Stage 2 confirmation with the
-release-qualified Linux baseline. Stage 2, Stage 3, and Stage 4 have not
+Native execution of these groups and the admission-policy correction passed on
+the release-qualified Linux baseline. Stage 2 remains open only for the scope
+decisions recorded in its results document. Stage 3 and Stage 4 have not
 started.
 
-## Stage 2: Deferred Native Linux/GCC Validation
+## Stage 2: Native Linux/GCC Validation
 
 The self-contained execution plan is
 [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md).
-Future execution should read that document together with
-`REFACTORING_PROGRESS.md`; the Stage 1 sections above remain the compatibility
-contract and historical rationale rather than the Stage 2 runbook.
+Execution results are recorded in
+[`CMakePlatformSupportReductionStage2Results.md`](CMakePlatformSupportReductionStage2Results.md).
+Read both documents together with `REFACTORING_PROGRESS.md`; the Stage 1
+sections above remain the compatibility contract and historical rationale
+rather than the Stage 2 runbook.
 
 Stage 2 has two validation layers:
 

@@ -210,9 +210,9 @@ function (external_szip_library)
 
   set (LINK_COMP_LIBS ${LINK_COMP_LIBS} ${H5_SZIP_LIBRARY} PARENT_SCOPE)
 
-  # If built as a sub-project or if cross-compiling, export all exported
-  # targets to the build tree. Append to main targets file but keep
-  # "libaec::" namespace from upstream.
+  # Preserve the existing combined export used by subprojects and cross builds.
+  # Standalone build-tree packages export these targets after all subprojects
+  # have been configured.
   if (HDF5_EXTERNALLY_CONFIGURED OR CMAKE_CROSSCOMPILING)
     export (
       TARGETS ${libaec_targets}

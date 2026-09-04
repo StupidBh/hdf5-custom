@@ -206,6 +206,13 @@ function (external_zlib_library)
   else ()
     set (zlib_base_target zlib)
   endif ()
+  # Do not let HDF5's global output directories merge this fetched zlib with
+  # private zlib implementations from other bundled subprojects.
+  set_target_properties (${zlib_base_target} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${hdf5_zlib_BINARY_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${hdf5_zlib_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${hdf5_zlib_BINARY_DIR}"
+  )
   if (HDF_PACKAGE_NAMESPACE AND NOT TARGET ${HDF_PACKAGE_NAMESPACE}${zlib_base_target})
     get_target_property (_aliased_target ${zlib_base_target} ALIASED_TARGET)
     if (_aliased_target)
@@ -214,6 +221,9 @@ function (external_zlib_library)
       add_library (${HDF_PACKAGE_NAMESPACE}${zlib_base_target} ALIAS ${zlib_base_target})
     endif ()
     unset (_aliased_target)
+  endif ()
+  if (NOT TARGET ZLIB::ZLIB)
+    add_library (ZLIB::ZLIB ALIAS ${zlib_base_target})
   endif ()
 
   set (H5_ZLIB_HEADER "zlib.h" PARENT_SCOPE)
@@ -226,11 +236,18 @@ function (external_zlib_library)
   set (H5_ZLIB_LIBRARY "${HDF_PACKAGE_NAMESPACE}${zlib_base_target}")
   set (LINK_COMP_LIBS ${LINK_COMP_LIBS} ${H5_ZLIB_LIBRARY} PARENT_SCOPE)
 
-  # If built as a sub-project or if cross-compiling, export all exported
-  # targets to the build tree. Append to main targets file but keep
-  # namespace from upstream.
+  # Let bundled subprojects reuse this zlib through FindZLIB instead of
+  # creating private targets with the same names later in the configure.
+  set (ZLIB_FOUND TRUE PARENT_SCOPE)
+  set (ZLIB_INCLUDE_DIR "${hdf5_zlib_SOURCE_DIR}" PARENT_SCOPE)
+  set (ZLIB_INCLUDE_DIRS "${hdf5_zlib_BINARY_DIR};${hdf5_zlib_SOURCE_DIR}" PARENT_SCOPE)
+  set (ZLIB_LIBRARY ${zlib_base_target} PARENT_SCOPE)
+  set (ZLIB_LIBRARIES ZLIB::ZLIB PARENT_SCOPE)
+
+  # Preserve the existing combined export used by subprojects and cross builds.
+  # Standalone build-tree packages export this target after all subprojects have
+  # been configured, so later local aliases cannot affect target-name lookup.
   if (HDF5_EXTERNALLY_CONFIGURED OR CMAKE_CROSSCOMPILING)
-    # NOTE: The export namespace should be maintained with upstream zlib
     export (
       TARGETS ${zlib_base_target}
       FILE ${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake

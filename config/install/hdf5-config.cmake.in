@@ -151,9 +151,13 @@ set (${HDF5_PACKAGE_NAME}_VERSION_MINOR  @HDF5_VERSION_MINOR@)
 #-----------------------------------------------------------------------------
 if (NOT TARGET "@HDF5_PACKAGE@")
   # If zlib support was enabled and zlib was built from an external source,
-  # include the installed CMake targets file so the targets are available
+  # include the matching CMake targets file so the targets are available
   if (${HDF5_PACKAGE_NAME}_PROVIDES_ZLIB_SUPPORT AND @ZLIB_USE_EXTERNAL@)
-    if (@HDF5_USE_ZLIB_NG@)
+    if (@HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS@ AND NOT @HDF5_USE_ZLIB_NG@)
+      set (_zlib_targets_file_name
+          "${PACKAGE_PREFIX_DIR}/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@-zlib-targets.cmake"
+      )
+    elseif (@HDF5_USE_ZLIB_NG@)
       set (_zlib_targets_file_name "${PACKAGE_PREFIX_DIR}/@HDF5_ZLIBNG_INSTALL_CMAKEDIR@/@HDF5_ZLIBNG_INSTALL_NAME@@HDF_PACKAGE_EXT@-targets.cmake")
     else ()
       string (TOUPPER "@HDF5_ZLIB_INSTALL_NAME@" ${HDF5_PACKAGE_NAME}_ZLIB_INSTALL_NAME_UPPER)
@@ -168,7 +172,6 @@ if (NOT TARGET "@HDF5_PACKAGE@")
     endif ()
     include ("${_zlib_targets_file_name}" OPTIONAL RESULT_VARIABLE _zlib_loaded)
     unset (ZLIB_FIND_COMPONENTS)
-    unset (_zlib_targets_file_name)
     if (NOT _zlib_loaded)
       if (@HDF5_USE_ZLIB_NG@)
         set (_zlib_name "zlib-ng")
@@ -181,12 +184,17 @@ if (NOT TARGET "@HDF5_PACKAGE@")
       unset (_zlib_loaded)
       return ()
     endif ()
+    unset (_zlib_targets_file_name)
     unset (_zlib_loaded)
   endif ()
   # If szip/libaec support was enabled and libaec was built from an external source,
-  # include the installed CMake targets file so the targets are available
+  # include the matching CMake targets file so the targets are available
   if (${HDF5_PACKAGE_NAME}_PROVIDES_SZIP_SUPPORT AND @SZIP_USE_EXTERNAL@)
-    if (@HDF5_USE_LIBAEC_STATIC@)
+    if (@HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS@)
+      set (_libaec_targets_file_name
+          "${PACKAGE_PREFIX_DIR}/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@-libaec-targets.cmake"
+      )
+    elseif (@HDF5_USE_LIBAEC_STATIC@)
       set (_libaec_targets_file_name "@PACKAGE_SHARE_INSTALL_DIR@/@LIBAEC_PACKAGE_NAME@@HDF_PACKAGE_EXT@_static-targets.cmake")
     else ()
       set (_libaec_targets_file_name "@PACKAGE_SHARE_INSTALL_DIR@/@LIBAEC_PACKAGE_NAME@@HDF_PACKAGE_EXT@_shared-targets.cmake")

@@ -90,6 +90,39 @@ if (HDF5_EXPORTED_TARGETS AND NOT HDF5_EXTERNALLY_CONFIGURED)
   unset (_hdf5_export_namespace_args)
 endif ()
 
+# Keep fetched compression targets available to standalone build-tree package
+# consumers. These exports must run after all subprojects have been configured:
+# bundled plugins can introduce directory-scoped aliases with zlib target names.
+if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT CMAKE_CROSSCOMPILING)
+  if (HDF5_ENABLE_ZLIB_SUPPORT AND ZLIB_USE_EXTERNAL AND NOT HDF5_USE_ZLIB_NG)
+    if (HDF5_USE_ZLIB_STATIC)
+      set (_hdf5_zlib_export_target zlibstatic)
+    else ()
+      set (_hdf5_zlib_export_target zlib)
+    endif ()
+    export (
+        TARGETS ${_hdf5_zlib_export_target}
+        FILE ${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-zlib-targets.cmake
+        NAMESPACE ZLIB::
+    )
+    unset (_hdf5_zlib_export_target)
+  endif ()
+
+  if (HDF5_ENABLE_SZIP_SUPPORT AND SZIP_USE_EXTERNAL)
+    if (HDF5_USE_LIBAEC_STATIC)
+      set (_hdf5_libaec_export_targets aec-static aec-static-objects sz-static sz-static-objects)
+    else ()
+      set (_hdf5_libaec_export_targets aec-shared aec-shared-objects sz-shared sz-shared-objects)
+    endif ()
+    export (
+        TARGETS ${_hdf5_libaec_export_targets}
+        FILE ${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-libaec-targets.cmake
+        NAMESPACE libaec::
+    )
+    unset (_hdf5_libaec_export_targets)
+  endif ()
+endif ()
+
 #-----------------------------------------------------------------------------
 # If built as a sub-project or if cross-compiling, export all exported targets
 # to the build tree
@@ -117,6 +150,11 @@ set (HDF5_INCLUDES_BUILD_TIME
 set (INCLUDE_INSTALL_DIR "${HDF5_INCLUDES_BUILD_TIME}")
 set (SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set (CURRENT_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
+if (NOT HDF5_EXTERNALLY_CONFIGURED AND NOT CMAKE_CROSSCOMPILING)
+  set (HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS TRUE)
+else ()
+  set (HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS FALSE)
+endif ()
 configure_package_config_file (
     ${HDF_CONFIG_DIR}/install/hdf5-config.cmake.in
     "${HDF5_BINARY_DIR}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
@@ -131,12 +169,14 @@ configure_package_config_file (
 set (INCLUDE_INSTALL_DIR ${HDF5_INSTALL_INCLUDE_DIR})
 set (SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${HDF5_INSTALL_CMAKE_DIR}" )
 set (CURRENT_BUILD_DIR "${CMAKE_INSTALL_PREFIX}" )
+set (HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS FALSE)
 configure_package_config_file (
     ${HDF_CONFIG_DIR}/install/hdf5-config.cmake.in
     "${HDF5_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${HDF5_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
     INSTALL_DESTINATION "${HDF5_INSTALL_CMAKE_DIR}"
     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
 )
+unset (HDF5_CONFIG_HAS_BUNDLED_TARGET_EXPORTS)
 
 if (NOT HDF5_EXTERNALLY_CONFIGURED)
   install (

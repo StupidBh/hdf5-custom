@@ -127,6 +127,16 @@ functionality.
 
 ## Configuration
 
+### Fixed bundled zlib and libaec CMake package exports
+
+   Builds that fetched zlib or libaec could fail during CMake generation after
+   build-tree package exports were enabled, because static HDF5 targets referred
+   to dependency targets that were not exported. Build-tree packages now load
+   dedicated exports for fetched compression targets before loading HDF5, and
+   bundled subprojects reuse HDF5's fetched zlib instead of defining conflicting
+   targets and output files. Static and shared consumers can use both build-tree
+   and installed packages with bundled compression enabled.
+
 ### Preserved C-compatible integer literals during formatting
 
    Disable binary and decimal literal separators in the clang-format

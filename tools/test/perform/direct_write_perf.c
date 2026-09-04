@@ -25,7 +25,7 @@
         #include H5_ZLIB_HEADER /* "zlib.h" */
     #endif
 
-    #if !defined(WIN32) && !defined(__MINGW32__) && !defined(_WIN32)
+    #if !defined(_WIN32)
 
         #include <errno.h>
         #include <fcntl.h>
@@ -702,7 +702,7 @@ int main(void)
     return 0;
 }
 
-    #else  /* WIN32 / MINGW32 */
+    #else  /* _WIN32 */
 
 int main(void)
 {
@@ -710,7 +710,7 @@ int main(void)
     return EXIT_FAILURE;
 } /* end main() */
 
-    #endif /* WIN32 / MINGW32 */
+    #endif /* _WIN32 */
 
 #else      /* !H5_HAVE_FILTER_DEFLATE */
 

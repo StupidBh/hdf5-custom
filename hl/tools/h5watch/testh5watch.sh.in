@@ -55,12 +55,7 @@ CMP='cmp -s'
 DIFF='diff -c'
 NLINES=20            # Max. lines of output to display if test fails
 #
-# Mac OS: just to make sure echo "backslash backslash" behaves properly
-if test `uname -s` = 'Darwin'; then
-    ECHO='/bin/echo'
-else
-    ECHO='echo'
-fi
+ECHO='echo'
 #
 # Global variables
 nerrors=0

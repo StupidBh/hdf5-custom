@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stage 1 and Stage 2 complete; Stage 3 plan proposed; execution has not started
+- State: Stage 1 and Stage 2 complete; Stage 3 Work Package 3A in progress
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -11,10 +11,11 @@
 - Stage 2 C11 literal repair commit: `6ee2f392e`
 - Bundled-compression repair implementation: `81e96c889`
 - Coverage documentation correction: `d39cd5fa0`
+- Stage 3 plan commit: `31cf74435`
 - Current implementation commit: `81e96c889`
-- Last preceding documentation commit: `4fb87c374`
+- Last preceding documentation commit: `31cf74435`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 3 plan review
+- Current delivery stage: Stage 3 Work Package 3A baseline and inventory
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
@@ -23,7 +24,7 @@
   [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md)
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
-- Stages 3 and 4 detailed planning: Stage 3 proposed and awaiting review; Stage 4 remains deferred
+- Stages 3 and 4 detailed planning: Stage 3 approved and in progress; Stage 4 remains deferred
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -860,8 +861,8 @@ The proposed self-contained execution plan is
 [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md).
 It removes project-owned source and header compatibility code used only by
 rejected platform/compiler pairs while preserving retained API, ABI,
-file-format, architecture, and runtime behavior. The plan is awaiting review
-and approval; no source or header edit is authorized yet.
+file-format, architecture, and runtime behavior. Execution is approved and
+Work Package 3A baseline and inventory work is in progress.
 
 ## Stage 4: Future Final Project Audit
 

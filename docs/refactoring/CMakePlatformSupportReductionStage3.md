@@ -2,9 +2,12 @@
 
 ## Status
 
-- State: Proposed; awaiting review and approval
+- State: In progress; Work Package 3A baseline and inventory
 - Plan drafted: 2026-09-04
-- Execution authorized: no
+- Scope approved: 2026-09-04
+- Execution started: 2026-09-04
+- Execution authorized: yes
+- Plan commit: `31cf74435`
 - Parent compatibility plan:
   [CMakePlatformSupportReduction.md](CMakePlatformSupportReduction.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -16,10 +19,10 @@
 - Release-qualified baselines: Windows x64 with MSVC and a Visual Studio
   generator; Linux x86_64 with GCC/G++ and Ninja
 - Secondary Linux generator check: Unix Makefiles
-- Maximum build and CTest parallelism: 6
+- Maximum build and CTest parallelism: 4
 
-No source or header change is authorized merely by this document. Execution
-begins only after the plan is reviewed, approved, and marked `In progress`.
+The user approved execution on 2026-09-04. Work Package 3A must complete before
+the first source or header edit.
 
 ## Purpose
 
@@ -203,7 +206,7 @@ same tested Git commit.
 - Do not share CMake caches, build trees, install prefixes, dependency trees, or
   package directories between Windows and Linux.
 - Use a fresh out-of-source build and install directory for every matrix row.
-- Keep build and CTest parallelism at or below six.
+- Keep build and CTest parallelism at or below four.
 - Record the exact Git commit, clean-checkout state, target triple, operating
   system, CMake, compiler, generator, and `HDF_TEST_EXPRESS` value.
 

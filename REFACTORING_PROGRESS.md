@@ -28,22 +28,24 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1 and Stage 2 complete; Stage 3 plan proposed and awaiting review.
+- Status: Stage 1 and Stage 2 complete; Stage 3 Work Package 3A in progress.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
 - Stage 1 source compilation repair anchor: `a68b4cae4e`
 - Stage 2 C11 literal repair anchor: `6ee2f392e`
 - Coverage documentation correction anchor: `d39cd5fa0`
+- Stage 3 plan anchor: `31cf74435`
 - Current implementation anchor: `81e96c889`
-- Last preceding documentation anchor: `4fb87c374`
+- Last preceding documentation anchor: `31cf74435`
 - Stage 1 CMake implementation commits: 19
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
   explicitly deferred by the user
-- Later-stage detailed planning: Stage 3 is proposed but not approved for
-  execution; Stage 4 remains unplanned
+- Stage 3 execution state: approved; Work Package 3A baseline and inventory in
+  progress with build and CTest parallelism limited to four
+- Later-stage detailed planning: Stage 4 remains unplanned
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -57,8 +59,8 @@ Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
 2 is complete after the user explicitly deferred the six unavailable optional
 configurations as non-required. The Stage 3 source/header reduction plan is
-proposed and awaiting review; implementation and the Stage 4 final audit have
-not started.
+approved and Work Package 3A is in progress; source/header edits have not
+started, and the Stage 4 final audit remains unplanned.
 
 ## Completed
 
@@ -135,6 +137,8 @@ not started.
 - Drafted the self-contained Stage 3 source/header reduction plan with
   compatibility protections, atomic commit boundaries, dual-platform gates,
   stop conditions, and explicit exit criteria.
+- Approved the Stage 3 plan and fixed its maximum build and CTest parallelism
+  at four jobs.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -160,17 +164,20 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Review and approve or revise the proposed Stage 3 source/header reduction
-  plan; source-removal execution is not authorized yet.
+- Complete Stage 3 Work Package 3A: qualify both validators, capture the
+  pre-implementation contract, regenerate the candidate inventory, and resolve
+  every `INVESTIGATE` classification before editing source or headers.
 - Prepare the Stage 4 final-audit plan only after Stage 3 completes.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
-Stop after drafting the Stage 3 plan. The next permitted action is to review,
-revise, and approve that plan. Do not begin source/header cleanup until its
-state is explicitly changed from `Proposed` to `In progress`.
+Execute Stage 3 Work Package 3A at plan commit `31cf74435`. Qualify the
+Windows/MSVC and WSL Linux/GCC validators at the same source state, capture the
+pre-implementation contract, and complete the source/header classification
+ledger. Do not begin compatibility edits until the Work Package 3A exit
+criteria pass.
 
 ## Validation State
 
@@ -310,8 +317,8 @@ state is explicitly changed from `Proposed` to `In progress`.
 The qualified Linux/GCC validator is repeatable for later work. Preserve its
 versioned, normalized Stage 2 record; dual-platform CMake validation is
 complete, with the six non-required unavailable configurations explicitly
-deferred. Source-level removal must wait for a separately reviewed and approved
-Stage 3 plan.
+deferred. Stage 3 is approved, but source-level removal must wait for the Work
+Package 3A baseline and classification gate.
 
 ## Handoff Updates
 

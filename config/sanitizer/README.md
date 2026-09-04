@@ -1,8 +1,8 @@
 # HDF5 CMake Developer Instrumentation
 
 The modules in this directory provide compiler instrumentation and developer
-helper targets. HDF5 source builds still follow the repository's supported
-matrix:
+helper targets. HDF5 source builds accept Windows/MSVC and Linux/GNU. The
+instrumentation release-validation baselines are:
 
 - Windows x64 with MSVC 18 and Visual Studio 18 2026.
 - Linux x86_64 with GCC/G++ and Ninja or Unix Makefiles.

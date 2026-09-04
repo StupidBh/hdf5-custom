@@ -6,7 +6,7 @@
 >
 > CMake uses the command line; however, the visual CMake tool is available for the configuration step.
 >
-> 1. HDF5 source builds support Windows x64 with MSVC and Linux x86_64 with GCC. A downstream application may use another toolchain only when it is ABI-compatible with the installed HDF5 package.
+> 1. HDF5 source builds accept Windows with compiler ID `MSVC` and Linux with compiler ID `GNU`. Generator and architecture are not source-build firewall inputs. A downstream application may use another toolchain only when it is ABI-compatible with the installed HDF5 package.
 > 2. See the appendix at the bottom of this file for an example of using a `ctest` script for building and testing. See [INSTALL_CMake.md](./INSTALL_CMake.md) for more information.
 > 3. See the [CMake Config Mode Search Procedure](https://cmake.org/cmake/help/latest/command/find_package.html) for more information on finding packages.
 

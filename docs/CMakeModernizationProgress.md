@@ -7,7 +7,7 @@ actually landed, what is being worked on, and what remains unverified.
 
 ## Current Snapshot
 
-- Last updated: 2026-09-03
+- Last updated: 2026-09-04
 - Progress anchor: `0b9e21c34` (`cmake: Use MPI target includes for parallel tests`)
 - Implementation commits after the plan was accepted: 123
 - Current stage: paused at the target-scoped build infrastructure milestone
@@ -23,15 +23,18 @@ remain compatibility requirements except where the separately approved
 [project supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
 first removes unsupported CMake toolchains and private options, then removes
 source-level compatibility paths that exist only for rejected environments.
-The retained build matrix is Windows x64/MSVC 18 and Linux x86_64/GCC. Java and
-Fortran remain unsupported, and the JNI discovery required by the HDFS VFD
-remains in scope.
+The retained target-system/compiler pairs are Windows/MSVC and Linux/GCC.
+Generator, architecture, and exact compiler version are not central-firewall
+inputs; Windows x64/MSVC 18 and Linux x86_64/GCC remain the release-validation
+baselines. Java and Fortran remain unsupported, and the JNI discovery required
+by the HDFS VFD remains in scope.
 
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
 CMake implementation at `b317dedc9`, and its current documentation at
 `6ad3399ec`. Its current status is: CMake platform reduction implemented;
-Windows/MSVC validation blocked by pre-existing C syntax errors; Linux/GCC
-native validation deferred. Stages 2 through 4 have not started.
+admission-policy correction implemented; a C++-enabled Windows/MSVC Release
+build and full CTest pass; remaining Windows validation is incomplete and
+Linux/GCC native validation is deferred. Stages 2 through 4 have not started.
 
 ## Stage Status
 
@@ -205,11 +208,14 @@ and standalone example builds. Recent checkpoints specifically verified:
 The intervening platform-reduction Stage 1 validation established that all 12
 firewall cases, root and standalone-example preset listing, default and
 C++-enabled MSVC configurations, a 17,323-record no-delta File API comparison,
-and clean source-package generation pass. The current default Release build is
-blocked by missing semicolons in four C source files attributed to pre-Stage 1
-commit `b22b55872`; consequently current CTest, install, binary-package,
-example, and consumer evidence is unavailable. This does not supersede the
-older successful modernization baseline above.
+and clean source-package generation pass. Formatting commit `b22b55872` had
+removed four `HDONE_ERROR(...)` statement terminators, but source repair
+`a68b4cae4e` restored them before the current `HEAD`; the earlier blocker record
+was stale. A current C++-enabled MSVC Release build with both library forms,
+tests, tools, and examples succeeds, and full CTest at `HDF_TEST_EXPRESS=3`
+passes all 2,851 enabled tests with 37 disabled out of 2,888 registered tests
+using six parallel jobs. Install, binary-package, standalone installed-example,
+and external-consumer validation remains outstanding.
 
 MSVC 18 is the retained Windows validation toolchain. The earlier MinGW-w64
 results are historical baseline evidence only; MinGW is no longer a supported

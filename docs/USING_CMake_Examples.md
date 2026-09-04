@@ -56,7 +56,7 @@
 <a id="using-presets"></a>
 ### 1. Using presets
 
-> **NOTE:** The supplied presets use Visual Studio 18 2026 on Windows and Ninja on Linux.
+> **NOTE:** The supplied release-validation presets use Visual Studio 18 2026 on Windows and Ninja on Linux. Other generators may be used when they select MSVC on Windows or GNU on Linux.
 
 Files in the `HDF5 install/HDF5Examples` directory:
 * `CMakePresets.json`

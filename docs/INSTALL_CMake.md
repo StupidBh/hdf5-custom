@@ -4,19 +4,27 @@ This repository uses CMake as its only build system and requires CMake 4.0 or la
 
 ## Supported Source-Build Environments
 
-The HDF5 source tree accepts exactly these platform, compiler, architecture, and generator combinations:
+The HDF5 source tree accepts exactly these target-system/compiler pairs:
 
-| Target       | Compiler                           | Generators              |
-|--------------|------------------------------------|-------------------------|
-| Windows x64  | MSVC 18 from Visual Studio 18 2026 | Visual Studio 18 2026   |
-| Linux x86_64 | GCC/G++                            | Ninja or Unix Makefiles |
+| Target system | Required CMake compiler ID |
+|---------------|----------------------------|
+| Windows       | `MSVC`                     |
+| Linux         | `GNU`                      |
 
-Ninja with MSVC is not supported. MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel compilers, NVHPC, AOCC, macOS, BSD,
-Emscripten, other architectures, and other combinations are outside the source-build contract.
+Generator, target architecture, and exact compiler version are not checked by
+the source-build firewall. The release-validation baselines are Windows x64
+with the MSVC toolset from Visual Studio 18 2026 using the Visual Studio 18
+2026 generator, and Linux x86_64 with GCC/G++ using Ninja plus a focused Unix
+Makefiles check. Other generators and architectures within an accepted pair
+may be unvalidated; admission does not make them release-qualified.
+
+MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel compilers, NVHPC, AOCC, macOS,
+BSD, Emscripten, and other target-system/compiler pairs are outside the
+source-build contract.
 
 The check uses the CMake target system, so a toolchain file or cross-compilation does not bypass it.
-`HDF5_ALLOW_UNSUPPORTED` applies only to documented HDF5 feature combinations; it cannot override the platform,
-compiler, architecture, or generator policy.
+`HDF5_ALLOW_UNSUPPORTED` applies only to documented HDF5 feature combinations;
+it cannot override the target-system/compiler policy.
 
 This policy governs building HDF5 itself and the retained standalone HDF5 example projects. An independent application
 may consume an installed HDF5 package with another toolchain when that toolchain is compatible with the package's ABI.
@@ -24,8 +32,9 @@ may consume an installed HDF5 package with another toolchain when that toolchain
 ## Prerequisites
 
 - CMake 4.0 or later.
-- Visual Studio 18 2026 with the MSVC 18 x64 toolset on Windows.
-- GCC and G++ on Linux, plus Ninja or Make for the selected generator.
+- An MSVC toolchain on Windows. Visual Studio 18 2026 x64 is the release baseline.
+- GCC and G++ on Linux. Ninja on x86_64 is the release baseline, with an
+  additional Unix Makefiles check.
 - Optional dependencies required by enabled features, such as MPI, zlib, libaec, AWS CRT libraries, or Java/JNI for the
   HDFS VFD.
 
@@ -83,8 +92,11 @@ Use `ci-StdShar-MSVC` in the same commands on Windows.
 
 ## Manual Windows Build
 
-Use a PowerShell or Visual Studio developer shell with the Visual Studio 18 2026 toolchain available. Setting `CL` to
-`/utf-8` prevents locale-dependent test failures on Windows systems whose active code page is not UTF-8.
+Use a PowerShell or Visual Studio developer shell with an MSVC toolchain
+available. The following command is the release-validation baseline, not a
+generator or architecture requirement. Setting `CL` to `/utf-8` prevents
+locale-dependent test failures on Windows systems whose active code page is
+not UTF-8.
 
 ```powershell
 $env:CL = "/utf-8"
@@ -94,6 +106,10 @@ ctest --test-dir build-msvc18 -C Release --output-on-failure -j 6
 cmake --install build-msvc18 --config Release
 cpack --config build-msvc18/CPackConfig.cmake -C Release
 ```
+
+IDE-managed profiles such as CLion may use another CMake generator or omit
+`-A x64`; configuration is accepted when CMake detects target system Windows
+and compiler ID `MSVC`.
 
 Visual Studio is a multi-configuration generator. Use the same configuration name for build, test, install, and package
 commands.

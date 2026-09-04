@@ -10,13 +10,14 @@ You want a repeatable configure, build, test, and package command for a
 supported HDF5 source-build environment.
 
 \par Supported environments
-The HDF5 source tree accepts these combinations:
-\li Windows x64 with MSVC 18 and the Visual Studio 18 2026 generator.
-\li Linux x86_64 with GCC/G++ and the Ninja or Unix Makefiles generator.
+The HDF5 source tree accepts these target-system/compiler pairs:
+\li Windows with compiler ID <tt>MSVC</tt>.
+\li Linux with compiler ID <tt>GNU</tt>.
 
 The presets supplied by the project use Visual Studio 18 2026 on Windows and
-Ninja on Linux. Other platform, compiler, architecture, and generator
-combinations are not supported for building HDF5.
+Ninja on Linux as release-validation baselines. Generator, architecture, and
+exact compiler version are not source-build firewall inputs. Other target
+systems and compiler families are not supported for building HDF5.
 
 \par Available root workflows
 The root <a href="https://\SRCURL/CMakePresets.json"><tt>CMakePresets.json</tt></a>

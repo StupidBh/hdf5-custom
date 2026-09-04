@@ -4,7 +4,7 @@ cmake_path (GET CMAKE_CURRENT_LIST_DIR PARENT_PATH test_parent_dir)
 set (policy_module "${test_parent_dir}/HDF5PlatformSupport.cmake")
 set (case_script "${CMAKE_CURRENT_LIST_DIR}/HDF5PlatformSupportCase.cmake")
 set (supported_message
-  "Supported HDF5 source-build configurations are Windows x64 with MSVC and the Visual Studio 18 2026 generator, or Linux x86_64 with GNU and the Ninja or Unix Makefiles generator."
+  "Supported HDF5 source-build compiler pairs are Windows with MSVC, or Linux with GNU."
 )
 
 function (run_policy_case
@@ -41,20 +41,21 @@ function (run_policy_case
   endif ()
 endfunction ()
 
-# The Linux cases validate policy branching only. They are not native Linux
-# configure, build, or test evidence.
+# These cases validate policy branching only. Generator and architecture
+# variations prove that neither field is part of the admission firewall.
+# Synthetic Linux cases are not native Linux configure, build, or test evidence.
 run_policy_case (windows-c PASS Windows AMD64 "Visual Studio 18 2026" x64 C MSVC "")
-run_policy_case (windows-cxx PASS Windows AMD64 "Visual Studio 18 2026" x64 CXX MSVC "")
+run_policy_case (windows-cxx-default-platform PASS Windows AMD64 "Visual Studio 18 2026" "" CXX MSVC "")
+run_policy_case (windows-ninja-arm64 PASS Windows ARM64 Ninja "" C MSVC "")
+run_policy_case (windows-vs-win32 PASS Windows x86 "Visual Studio 18 2026" Win32 C MSVC "")
 run_policy_case (linux-ninja-c PASS Linux x86_64 Ninja "" C GNU "")
 run_policy_case (linux-make-cxx PASS Linux x86_64 "Unix Makefiles" "" CXX GNU "")
+run_policy_case (linux-ninja-multi-aarch64 PASS Linux aarch64 "Ninja Multi-Config" "" C GNU "")
 
 run_policy_case (unsupported-system FAIL Darwin arm64 Ninja "" C AppleClang "target system")
 run_policy_case (windows-gnu FAIL Windows AMD64 "Visual Studio 18 2026" x64 C GNU "C compiler ID")
 run_policy_case (windows-clang FAIL Windows AMD64 "Visual Studio 18 2026" x64 C Clang "C compiler ID")
 run_policy_case (linux-clang FAIL Linux x86_64 Ninja "" C Clang "C compiler ID")
-run_policy_case (windows-generator FAIL Windows AMD64 Ninja x64 C MSVC generator)
-run_policy_case (linux-generator FAIL Linux x86_64 "Ninja Multi-Config" "" C GNU generator)
-run_policy_case (windows-architecture FAIL Windows x86 "Visual Studio 18 2026" Win32 C MSVC "target architecture")
-run_policy_case (linux-architecture FAIL Linux aarch64 Ninja "" C GNU "target architecture")
+run_policy_case (linux-msvc FAIL Linux x86_64 Ninja "" C MSVC "C compiler ID")
 
 message (STATUS "All HDF5 platform-support policy cases passed")

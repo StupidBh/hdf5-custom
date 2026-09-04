@@ -19,11 +19,12 @@ The following behavior is frozen before build logic is changed:
 
 The separately approved
 [project supported-platform reduction](refactoring/CMakePlatformSupportReduction.md)
-supersedes this contract for platform/compiler support, generator support, and
-cache options and source compatibility paths used only by removed toolchains.
-The retained matrix is Windows x64 with MSVC 18 and the Visual Studio 18 2026
-generator, plus Linux x86_64 with GCC/G++ and Ninja or Unix Makefiles. Other
-combinations are no longer compatibility requirements.
+supersedes this contract for target-system/compiler support, cache options, and
+source compatibility paths used only by removed toolchains. The retained pairs
+are Windows with compiler ID `MSVC` and Linux with compiler ID `GNU`.
+Generator, architecture, and exact compiler version remain outside the central
+firewall; Windows x64/Visual Studio 18 2026 and Linux x86_64/GCC with Ninja and
+Unix Makefiles are release-validation baselines.
 
 The support contract is anchored at `912fb436b`, its Stage 1 CMake
 implementation at `b317dedc9`, and its current support-documentation update at
@@ -177,7 +178,7 @@ Per-commit checks are selected according to the affected behavior. Milestone che
 | --- | --- |
 | Library form | static only, shared only, static and shared |
 | Components | C, HL, C++, tools, utilities, tests, examples |
-| Toolchain | Windows x64/MSVC 18 with Visual Studio 18 2026; Linux x86_64/GCC and G++ with Ninja or Unix Makefiles |
+| Release toolchain baseline | Windows x64/MSVC 18 with Visual Studio 18 2026; Linux x86_64/GCC and G++ with Ninja or Unix Makefiles |
 | Configuration | Debug and Release |
 | Concurrency | default serial, thread-safe, multi-thread concurrency, MPI |
 | Dependencies | system and bundled zlib/libaec where available, plugins, VOL |

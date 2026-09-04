@@ -2,29 +2,39 @@
 
 ## Status
 
-- State: Stage 1 implementation complete; Windows validation blocked
+- State: Stage 1 implementation complete; admission-policy correction implemented; Windows validation in progress
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
+- Admission-policy correction commit: pending
 - CMake implementation commit: `b317dedc9`
+- Source compilation repair commit: `a68b4cae4e`
 - Current documentation commit: `6ad3399ec`
 - Stage 1 CMake implementation commits: 19
-- Current delivery stage: Stage 1 - Windows/MSVC validation blocked
+- Current delivery stage: Stage 1 - remaining Windows/MSVC validation
 - Primary available environment: Windows x64 with MSVC 18
 - Unavailable local environment: native Linux x86_64 with GCC/G++
 - Maximum local build and test parallelism: 6
 
 ## Objective
 
-Reduce the supported project implementation to two platform/compiler pairs.
-First, reduce the CMake build surface and mechanically reject every other build
-environment before project logic can use an unsupported compatibility path.
+Reduce the supported project implementation to two target-system/compiler
+pairs. First, reduce the CMake build surface and mechanically reject every
+other target-system/compiler pair before project logic can use an unsupported
+compatibility path. Generator, target architecture, and exact compiler release
+are validation dimensions, not central-firewall inputs.
 Then remove source-level compatibility code that exists only for the rejected
 platforms and compilers.
 
-| Target platform | Compiler family | Supported generators |
-| --- | --- | --- |
-| Windows x64 | MSVC | Visual Studio 18 2026 |
-| Linux x86_64 | GCC/G++ | Ninja or Unix Makefiles |
+| Target system | Required compiler ID |
+| --- | --- |
+| Windows | `MSVC` |
+| Linux | `GNU` |
+
+The release-qualified validation baselines remain Windows x64 with the MSVC
+toolset supplied by Visual Studio 18 2026 and Linux x86_64 with GCC/G++. The
+baseline generators are not an exhaustive list of accepted CMake generators.
+An architecture or generator outside those baselines may remain unvalidated,
+but it is not rejected solely for that reason.
 
 The delivery is intentionally split so each compatibility boundary can be
 validated before the next one changes:
@@ -35,7 +45,8 @@ validated before the next one changes:
 2. Stage 2 validates the retained CMake and product behavior on native
    Linux/GCC using a trusted external environment.
 3. Stage 3 removes source and header compatibility code for unsupported
-   platforms and compilers, with every batch validated on both retained rows.
+   platforms and compilers, with every batch validated on both release
+   baselines.
 4. Stage 4 audits the whole repository against the final project-level support
    contract.
 
@@ -53,43 +64,43 @@ audit pass.
 
 ### Hard build boundary
 
-The HDF5 source build accepts only the two rows in the supported matrix. The
-policy uses the target system reported by `CMAKE_SYSTEM_NAME`, not the host
-system, so cross-compilation does not bypass the check.
+The HDF5 source build accepts only the two target-system/compiler pairs in the
+supported matrix. The policy uses the target system reported by
+`CMAKE_SYSTEM_NAME`, not the host system, so cross-compilation does not bypass
+the compiler-pair check.
 
-- Windows requires compiler ID `MSVC`, the `Visual Studio 18 2026` generator,
-  and x64 as the generator platform.
-- Linux requires compiler ID `GNU`, an x86_64 target, and either the `Ninja` or
-  `Unix Makefiles` generator.
+- Windows requires compiler ID `MSVC`.
+- Linux requires compiler ID `GNU`.
 - C is validated immediately after the root `project()` call has completed
   language detection.
 - C++ is validated whenever an optional entry point first enables C++.
 - `HDF5_ALLOW_UNSUPPORTED` applies only to documented HDF5 feature
-  combinations. It cannot bypass the platform, compiler, architecture, or
-  generator policy.
+  combinations. It cannot bypass the target-system/compiler policy.
 - Unsupported configurations fail with one diagnostic that names both accepted
-  combinations and identifies the rejected target system, compiler, generator,
-  or architecture.
+  pairs and identifies the rejected target system or compiler.
 
 The initial firewall does not impose an exact GCC release or an additional
-MSVC compiler-version comparison. Compiler family, target platform,
-architecture, and generator are the compatibility boundary. The pinned tool
-versions below define validation baselines rather than a maximum accepted
-version.
+MSVC compiler-version comparison. Compiler family and target system are the
+compatibility boundary. The pinned tool versions, architectures, and generators
+below define validation baselines rather than the complete accepted surface.
+Use exact `CMAKE_<LANG>_COMPILER_ID` comparisons: CMake's broader `MSVC`
+boolean can also describe compilers that merely simulate the `cl` command-line
+syntax.
 
 ### Validation baselines
 
 The retained Windows baseline is Windows x64 with the MSVC 18 toolset supplied
 by Visual Studio 18 2026, the `Visual Studio 18 2026` generator, and the Windows
-SDK selected by that environment. Ninja with MSVC is not supported under the
-approved contract.
+SDK selected by that environment. Ninja, Ninja Multi-Config, IDE-managed CMake
+profiles, and other generators are not rejected when they detect compiler ID
+`MSVC`; they do not replace the Visual Studio baseline unless separately
+validated and recorded.
 
 The deferred Linux baseline is Ubuntu 24.04 LTS on x86_64, CMake 4.0.3,
-GCC/G++ 13.3.0, and Ninja 1.11.1. Unix Makefiles is also supported and receives
-a focused configure/build check during Stage 2. Later patch releases in the
-same toolchain families may be recorded, but another operating system,
-architecture, compiler family, or generator does not become supported
-implicitly.
+GCC/G++ 13.3.0, and Ninja 1.11.1. Unix Makefiles receives a focused
+configure/build check during Stage 2. Later patch releases and other
+architectures or generators within the accepted pair may be recorded, but they
+do not become release-qualified merely because the firewall admits them.
 
 The current local machine does not provide native Linux/GCC. Installing a
 Windows GCC or MinGW toolchain does not close this gap: it targets the Windows
@@ -113,22 +124,25 @@ contracts.
 After the CMake reduction has passed both retained platform gates,
 project-owned C and C++ sources, private headers, installed headers,
 generated-header templates, tests, and retained examples are reduced to the
-same two-row contract. Conditions, shims, and alternate implementations used
+same two-pair contract. Conditions, shims, and alternate implementations used
 only by rejected platforms or compilers are removed.
 
 Generic `_WIN32` versus POSIX implementation separation remains when it serves
-the retained Windows/MSVC and Linux/GCC rows. File-format constants, serialized
-representations, public ABI definitions required on a retained row, and code
-needed to read files created on another platform are compatibility behavior,
-not unsupported build support, and are preserved.
+the retained Windows/MSVC and Linux/GCC pairs. Architecture- and
+generator-specific code reachable within either accepted pair is not
+unsupported-only code and must be preserved or separately justified.
+File-format constants, serialized representations, public ABI definitions
+required on an accepted pair, and code needed to read files created on another
+platform are compatibility behavior, not unsupported build support, and are
+preserved.
 
 ## Compatibility Impact
 
 This is an intentional breaking build and source portability change:
 
 - MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel, IntelLLVM, NVHPC, PGI,
-  AOCC, Emscripten, macOS, BSD, and all other unlisted combinations stop at
-  configuration or lose their repository-provided entry point.
+  AOCC, Emscripten, macOS, BSD, and all other unlisted target-system/compiler
+  pairs stop at configuration or lose their repository-provided entry point.
 - Unsupported toolchain files, presets, cache options, dashboards, workflows,
   compiler dispatch, flags, platform packaging, and active documentation are
   removed.
@@ -163,7 +177,7 @@ matrix.
 ### Stage 1 scope
 
 - Central validation for the root source build and retained standalone example
-  entry points.
+  entry points, limited to target-system/compiler pairs.
 - Active `CMakeLists.txt`, `.cmake` modules, CMake package templates, presets,
   toolchain files, cache initialization, CTest/dashboard scripts, and CMake
   documentation.
@@ -179,6 +193,8 @@ matrix.
 - Changes to C or C++ implementation files and tests.
 - Removal or rewriting of `__MINGW32__` or other platform guards in installed
   headers, public headers, private headers, or source files.
+- Removal of architecture- or generator-specific behavior that remains
+  reachable with MSVC on Windows or GNU on Linux.
 - Removal of file-format constants, ABI compatibility definitions, generic
   `_WIN32`/POSIX source separation, or generated public-header placeholders.
 - C17 or C++20 language migration.
@@ -196,12 +212,14 @@ establishes a repeatable Linux/GCC validator. If that validator is unavailable,
 the project may stop at the explicitly incomplete Stage 1 handoff rather than
 substituting Windows GCC evidence or making unvalidated source changes.
 
-## Retained-State Model
+## Retained-Pair Model
 
-All mechanical CMake reductions use these two states. A condition is simplified
-only after its result is recorded for both rows.
+Mechanical CMake reductions use these two platform/compiler pairs. A condition
+is simplified only after its result is recorded for both pairs. Architecture
+and generator values vary within each pair and therefore cannot justify an
+always-true or always-false reduction.
 
-| CMake state | Windows/MSVC | Linux/GCC |
+| CMake state | Windows/MSVC pair | Linux/GCC pair |
 | --- | --- | --- |
 | `CMAKE_SYSTEM_NAME` | `Windows` | `Linux` |
 | C compiler ID | `MSVC` | `GNU` |
@@ -210,8 +228,11 @@ only after its result is recorded for both rows.
 | `UNIX` | false | true |
 | `MSVC` | true | false |
 | `MINGW`, `MSYS`, `CYGWIN`, `APPLE` | false | false |
-| Generator | Visual Studio 18 2026 | Ninja or Unix Makefiles |
-| Target architecture | x64 | x86_64 |
+| Release-validation generator | Visual Studio 18 2026 | Ninja; Unix Makefiles focused check |
+| Release-validation architecture | x64 | x86_64 |
+
+The last two rows are baselines, not fixed truth values for accepted builds.
+Conditions depending on them require separate classification.
 
 ### Mechanical reduction classes
 
@@ -222,7 +243,7 @@ Every active match is assigned to one of these classes before editing:
 3. **Retained selector:** rewrite the condition to an explicit Windows or Linux
    selector.
 4. **Mixed feature semantics:** remove unsupported alternatives but retain the
-   feature probe or dependency decision needed by one retained row.
+   feature probe or dependency decision needed by one accepted pair.
 5. **Deferred source reference:** preserve and classify source guards during
    Stages 1 and 2 so Stage 3 can remove or justify them with source-level
    validation.
@@ -290,7 +311,8 @@ trees and downloaded third-party content.
    front ends must be distinguished.
 3. Reduce conditions against both retained states instead of performing a
    repository-wide keyword replacement.
-4. Preserve Linux/GCC logic structurally when native execution is unavailable.
+4. Preserve Linux/GCC logic and architecture/generator variants within both
+   accepted pairs structurally when native execution is unavailable.
 5. Do not infer Linux correctness from Windows, MinGW, cross-compilation, or
    synthetic variable tests.
 6. Keep one condition family, compiler family, entry-surface family, or
@@ -306,19 +328,22 @@ trees and downloaded third-party content.
 
 ## Completed Prerequisite: Support Contract
 
-Commit `912fb436b` established the support matrix, recorded the breaking build
-change, selected the Windows generator, pinned the deferred Linux baseline, and
-updated the CMake modernization compatibility contract. No CMake behavior or
-source code changed in that prerequisite.
+Commit `912fb436b` established the original support matrix, recorded the
+breaking build change, selected the Windows validation generator, pinned the
+deferred Linux baseline, and updated the CMake modernization compatibility
+contract. The 2026-09-04 admission-policy correction supersedes its generator
+and architecture restrictions while retaining the two target-system/compiler
+pairs. No source code changes are part of either contract definition.
 
 ## Stage 1: CMake Reduction and Windows/MSVC Validation
 
 ### Work Package 1A: Central CMake Firewall
 
 Create one focused module under `config/cmake/`. Its public function validates
-one or more enabled languages using the detected target system, compiler ID,
-generator, and architecture. Call it only after the relevant `project()` or
-language-enabling operation has completed.
+one or more enabled languages using the detected target system and exact
+compiler ID. Call it only after the relevant `project()` or language-enabling
+operation has completed. It must not reject a configuration based only on its
+generator, architecture, or compiler version.
 
 Apply the same implementation to:
 
@@ -340,15 +365,16 @@ targets, or generated files.
 
 #### Firewall tests
 
-- Script-level positive cases for the two retained state models. The synthetic
-  Linux case proves policy branching only; label it explicitly as not a Linux
-  configure/build validation.
+- Script-level positive cases for the two retained compiler pairs, including
+  variations in generator and architecture. The synthetic Linux cases prove
+  policy branching only; label them explicitly as not Linux configure/build
+  validation.
 - Script-level negative cases for unsupported operating systems, Windows with
-  GNU or Clang, Linux with Clang, unsupported generators, and unsupported
-  architectures.
+  GNU or Clang, and Linux with MSVC or Clang.
 - C and C++ compiler-ID cases.
 - A check that `HDF5_ALLOW_UNSUPPORTED=ON` does not bypass rejection.
-- A real default Windows/MSVC x64 configuration.
+- A real default Windows/MSVC configuration, including an IDE-style profile
+  that does not explicitly set `CMAKE_GENERATOR_PLATFORM`.
 - A real unsupported compiler configuration only when such a compiler is
   installed and reaches language detection reliably.
 - A before/after default MSVC File API comparison. The normalized contract must
@@ -358,7 +384,7 @@ targets, or generated files.
 
 - Every supported source-build entry point reaches the same policy function.
 - Accepted MSVC configuration behavior is unchanged.
-- Negative diagnostics name both retained combinations and the rejected field.
+- Negative diagnostics name both retained pairs and the rejected field.
 - No unsupported compatibility implementation is deleted in this commit.
 
 #### Commit boundary
@@ -373,10 +399,13 @@ builds:
 - MinGW, Clang, Intel, PGI/NVHPC, and other unsupported toolchain files under
   both root and example configuration trees;
 - Wine launchers and MinGW/MSYS cross-compilation helpers;
-- 32-bit and non-x64 toolchain entry points, because the approved matrix is
-  x64/x86_64;
-- unsupported root and example configure, build, test, package, and workflow
-  presets, including Windows ARM and macOS presets;
+- repository-provided cross-compilation helpers that combine accepted and
+  rejected compiler/platform paths and are not part of a retained validation
+  workflow; their removal does not make architecture a firewall input;
+- root and example configure, build, test, package, and workflow presets outside
+  the retained release workflows, including Windows ARM and macOS presets; the
+  removal of a convenience preset does not make its architecture a firewall
+  rejection;
 - unsupported CTest/dashboard selection paths; and
 - unsupported CI build jobs and callers, without deleting formatter/analyzer
   workflows that remain useful.
@@ -403,7 +432,7 @@ toolchain must reach the central firewall and report the supported matrix.
 
 Remove declarations, cache initialization, preset assignments, generated cache
 documentation, and all consumers of options that have no behavior on the two
-retained rows. This includes at least:
+accepted pairs. This includes at least:
 
 - `HDF5_MINGW_STATIC_GCC_LIBS`;
 - the ineffective `HDF5_MSVC_NAMING_CONVENTION`, whose declaration requires
@@ -412,7 +441,7 @@ retained rows. This includes at least:
   retained consumer.
 
 Do not retain ignored compatibility aliases. Do not delete an option merely
-because its name is platform-oriented if either retained row still consumes it.
+because its name is platform-oriented if either accepted pair still consumes it.
 
 #### Validation
 
@@ -439,11 +468,12 @@ Process active CMake conditions in bounded ownership groups:
 5. CTest/dashboard platform behavior.
 6. Standalone example platform behavior.
 
-For each group, record the two retained truth values, classify the rewrite,
-then change only that group. Replace broad negative selectors such as
-`NOT WINDOWS` with explicit Linux selectors where the policy makes Linux the
-only possible result. Do not replace actual feature detection with a platform
-assumption merely to reduce the number of checks.
+For each group, record the two retained-pair truth values, classify the rewrite,
+then change only that group. Preserve conditions whose result can vary by
+architecture or generator within an accepted pair. Replace broad negative
+selectors such as `NOT WINDOWS` with explicit Linux selectors where the policy
+makes Linux the only possible result. Do not replace actual feature detection
+with a platform assumption merely to reduce the number of checks.
 
 #### Validation
 
@@ -506,9 +536,10 @@ family. Do not combine compiler cleanup with unrelated platform packaging.
 ### Work Package 1F: Current Documentation and Packaging Metadata
 
 Update current installation, option, usage, example, preset, CI, and packaging
-documentation to advertise only the retained build matrix. Remove unsupported
-package names, generators, framework/DMG paths, and toolchain instructions from
-active documentation and CMake packaging logic.
+documentation to advertise only the retained target-system/compiler pairs and
+to distinguish them from the narrower release-validation baselines. Remove
+unsupported compiler/platform package names, framework/DMG paths, and
+toolchain instructions from active documentation and CMake packaging logic.
 
 Preserve:
 
@@ -579,8 +610,9 @@ parallelism at or below 6. Record exact options and test express level.
 
 Stage 1 is complete when all of the following are true:
 
-1. The central firewall accepts only the two approved state models and covers C
-   and optional C++ entry points.
+1. The central firewall accepts only the two approved target-system/compiler
+   pairs, covers C and optional C++ entry points, and does not reject only on
+   generator, architecture, or compiler version.
 2. Active CMake source-build logic has only Windows/MSVC and Linux/GCC outcomes.
 3. Unsupported toolchains, presets, build workflows, private options, compiler
    modules, platform packaging, and current support claims are removed.
@@ -589,16 +621,18 @@ Stage 1 is complete when all of the following are true:
    defect with an owner.
 5. Required Windows/MSVC core rows pass, with all retained-contract differences
    explained.
-6. Linux/GCC-sensitive rewrites have explicit two-row logical proofs and a
+6. Linux/GCC-sensitive rewrites have explicit two-pair logical proofs and a
    Stage 2 validation checklist.
 7. No C/C++ source or header compatibility guard was changed.
-8. `REFACTORING_PROGRESS.md` states exactly: CMake reduction implemented and
-   Windows/MSVC validated; Linux/GCC native validation deferred.
+8. `REFACTORING_PROGRESS.md` distinguishes the accepted compiler pairs from
+   the release-validation architectures and generators, and states exactly
+   which Windows/MSVC and Linux/GCC gates remain incomplete.
 
 The accepted Stage 1 status is:
 
-> CMake platform reduction implemented; Windows/MSVC validated; Linux/GCC
-> retained by logical reduction but not yet validated.
+> CMake platform/compiler reduction implemented; Windows/MSVC validated;
+> Linux/GCC retained by logical reduction but not yet validated; architecture
+> and generator remain outside the central firewall.
 
 It must not be shortened to "platform reduction complete."
 
@@ -607,22 +641,56 @@ It must not be shortened to "platform reduction complete."
 Stage 1 is not marked complete because completion criterion 5 has not passed.
 The current status is:
 
-> CMake platform reduction implemented; Windows/MSVC validation blocked by
-> pre-existing C syntax errors; Linux/GCC native validation deferred.
+> CMake platform/compiler reduction and admission-policy correction
+> implemented; a C++-enabled Windows/MSVC Release build and full CTest pass;
+> remaining Windows/MSVC rows are incomplete and Linux/GCC native validation is
+> deferred.
 
 The implementation consists of the 19 focused CMake/CI commits from
 `0adb08f4a` through `b317dedc9`; current support-documentation cleanup is
 anchored at `6ad3399ec`. No Stage 1 commit changes a C/C++ implementation file
-or header.
+or header. The separate source repair is anchored at `a68b4cae4e`. The
+admission-policy correction is implemented in the current working tree; its
+commit anchor remains pending.
+
+#### Admission-policy correction
+
+The 2026-09-04 correction separates source-build admission from release
+qualification:
+
+- the central firewall checks only target system and exact compiler ID;
+- generator, architecture, and compiler version do not cause firewall
+  rejection;
+- the existing x64 Visual Studio and x86_64 Linux workflows remain the
+  release-validation baselines;
+- synthetic cases prove that generator and architecture variations within an
+  accepted compiler pair reach normal project configuration; and
+- previously removed architecture- or generator-specific CMake behavior is
+  re-audited before Stage 3 and restored when it is still reachable within an
+  accepted pair and affects product correctness.
+
+The correction restored the MSVC ARM64 Debug option, ARM64 package naming, and
+32-bit NSIS install-root selection. Architecture-specific presets, CI,
+dashboard choices, and bundled cross-toolchain helpers remain outside the
+release-validation surface; users may still supply another generator or
+toolchain file that resolves to an accepted target-system/compiler pair.
 
 #### Completed validation
 
-- All 12 synthetic firewall cases pass, including both accepted state models,
-  C and optional C++ compiler checks, rejected fields, and confirmation that
+- All 12 corrected synthetic firewall cases pass. They cover both accepted
+  compiler pairs, generator and architecture variation, C and optional C++
+  compiler checks, rejected target systems and compilers, and confirmation that
   `HDF5_ALLOW_UNSUPPORTED` cannot bypass the firewall.
 - Root and standalone-example preset listing passes.
-- Default and C++-enabled Windows x64 configurations pass with the Visual Studio
-  18 2026 generator and MSVC `19.51.36256.0`.
+- Two Windows/MSVC CLion-style configures using the Visual Studio 18 2026
+  generator without `-A x64` pass configure and generation with MSVC
+  `19.51.36256.0`: the default C configuration and a configuration with
+  `HDF5_BUILD_CPP_LIB=ON`. An empty `CMAKE_GENERATOR_PLATFORM` is no longer
+  interpreted as an unsupported target architecture, and the optional C++
+  compiler check follows the same pair-only policy.
+- CLion reports no inspection problems in the firewall, its script-level
+  tests, the restored MSVC architecture flags, or the restored installation
+  architecture handling.
 - The default cache retains `HDF5_BUILD_CPP_LIB=OFF` and
   `HDF_TEST_EXPRESS=3`.
 - Clean before/after File API contracts contain 17,323 identical records.
@@ -630,16 +698,24 @@ or header.
   contains neither local build/IDE metadata nor deleted Cygwin documentation or
   unsupported-toolchain paths.
 - Generated package metadata reports `Windows x64, using VISUAL STUDIO 2026`.
+- A C++-enabled Windows/MSVC Release build with static and shared libraries,
+  tests, tools, and retained examples completes using the Visual Studio 18 2026
+  generator without an explicit `-A` argument.
+- Full CTest at `HDF_TEST_EXPRESS=3` passes all 2,851 enabled tests with 37
+  disabled out of 2,888 registered tests, using six parallel jobs.
 
-#### Windows blocker
+#### Resolved Windows blocker
 
-The default Release build fails because `HDONE_ERROR(...)` lacks a trailing
-semicolon in `src/H5ESint.c:676`, `src/H5FAdblock.c:306`,
-`src/H5HFiblock.c:936`, and `src/H5T.c:2966`. Git attributes those lines to the
-pre-Stage 1 formatting commit `b22b55872`. Correcting C source is explicitly
-outside Stage 1, so this batch does not modify the files. Until a separately
-authorized fix lands, the required static/shared builds, CTest, install,
-binary-package, standalone-example, and external-consumer gates remain blocked.
+Formatting commit `b22b55872` removed four trailing semicolons after
+`HDONE_ERROR(...)` calls. The failure was recorded while it was current, but
+source repair `a68b4cae4e` restored all four terminators before the current
+`HEAD`. CLion now reports no errors in the four files, the static library target
+builds, and the complete C++-enabled Release build and CTest pass. The previous
+claim that current validation was blocked by those lines was stale.
+
+The remaining Windows work is the rest of the Work Package 1G matrix, including
+default, static-only, shared-only, and Debug rows plus install, binary-package,
+standalone installed-example, and external-consumer validation.
 
 #### Residual classification
 
@@ -670,7 +746,8 @@ validation. The logical-review groups are:
 - packaging and residual CMake paths: `7c9e4b0da`, `b317dedc9`.
 
 Native execution of these groups waits for the user-provided Linux environment.
-Stage 2, Stage 3, and Stage 4 have not started.
+The admission-policy correction also requires Stage 2 confirmation with the
+pinned Linux baseline. Stage 2, Stage 3, and Stage 4 have not started.
 
 ## Stage 2: Deferred Native Linux/GCC Validation
 
@@ -722,7 +799,7 @@ does not complete the overall project platform-reduction direction.
 ## Stage 3: Mandatory Source-Level Reduction
 
 Stage 3 removes project-owned source compatibility paths that cannot be reached
-by either retained row. It starts only after Stage 2 provides a repeatable
+by either accepted pair. It starts only after Stage 2 provides a repeatable
 Linux/GCC validation environment. That environment may be remote; it need not
 run on the primary Windows development machine. Every behavior-changing batch
 must pass the affected checks on Windows/MSVC and Linux/GCC before the next
@@ -735,25 +812,29 @@ generated-header templates, tests, tools, utilities, and retained examples for
 at least the unsupported platform and compiler macros identified by the CMake
 inventory. For every match, record:
 
-- its truth value on Windows/MSVC and Linux/GCC;
+- its truth value on the Windows/MSVC and Linux/GCC pairs, including whether
+  architecture or generator changes that result;
 - whether it changes compiled code, declarations, layout, calling convention,
   serialization, file interpretation, or only diagnostics;
 - its public-header, ABI, or file-format impact;
 - the focused tests and consumers that cover the retained behavior; and
 - the Windows and Linux contract baseline used for its removal batch.
 
-Classify generic `_WIN32`/POSIX selectors and cross-platform file-reading logic
-as retained behavior. A macro name associated with a removed platform is not
-by itself evidence that the surrounding declaration or constant is removable.
+Classify generic `_WIN32`/POSIX selectors, architecture-specific behavior
+reachable within an accepted pair, generator-specific build behavior, and
+cross-platform file-reading logic as retained behavior. A macro name associated
+with a removed platform is not by itself evidence that the surrounding
+declaration or constant is removable.
 
 ### Work Package 3B: Internal Implementations and Tests
 
 Remove unsupported-only conditions, shims, workarounds, and alternate
 implementations from private headers, C and C++ implementation files, tests,
 tools, utilities, and retained examples. Process one platform or compiler
-family at a time. Unwrap branches that are always true on both retained rows,
-delete branches that are always false, and keep explicit Windows/Linux
-selectors where both retained implementations differ.
+family at a time. Unwrap branches that are always true across both accepted
+pairs and their admitted architecture/generator variants, delete branches that
+are always false, and keep explicit Windows/Linux selectors where both retained
+implementations differ.
 
 Update or remove tests that exist only for a rejected environment, but retain
 portable behavior tests that still exercise a supported row. Add focused
@@ -765,7 +846,7 @@ unverified.
 Review installed headers and generated public-header templates separately from
 private implementation cleanup. Remove unsupported compiler attributes,
 calling-convention alternatives, type shims, and preprocessor paths only after
-confirming that neither retained row nor the installed-package consumer
+confirming that neither accepted pair nor the installed-package consumer
 contract uses them.
 
 Public-header edits require an explicit source-compatibility statement and a
@@ -777,12 +858,12 @@ ability to read valid files produced on other systems.
 
 - Format every touched C and C++ file with the repository formatter.
 - Build affected static and shared libraries on Windows/MSVC and Linux/GCC.
-- Run focused positive and failure-path tests on both retained rows.
+- Run focused positive and failure-path tests on both release baselines.
 - Re-run public-header compile consumers for C and C++ when installed or
   generated headers change.
 - Compare affected ABI, exported-symbol, generated-header, install, and package
   contracts.
-- Run the full default Release CTest suite on both retained rows after the final
+- Run the full default Release CTest suite on both release baselines after the final
   source batch, recording `HDF_TEST_EXPRESS`.
 - Run `git diff --check` and classify every remaining unsupported macro match.
 
@@ -808,11 +889,12 @@ Search active CMake, workflows, current documentation, project-owned sources,
 headers, tests, tools, utilities, and examples for removed platform and compiler
 families. Confirm that:
 
-1. Windows/MSVC and Linux/GCC are the only advertised and accepted source-build
-   combinations.
+1. Windows/MSVC and Linux/GCC are the only advertised and accepted
+   target-system/compiler pairs, while release-qualified architectures and
+   generators are identified separately as validation baselines.
 2. No repository entry point or project-owned implementation path exists solely
    for a rejected environment.
-3. Both retained platforms pass the final configure, build, test, install,
+3. Both release baselines pass the final configure, build, test, install,
    package, and consumer gates after the last source change.
 4. Current documentation and package metadata agree with the project-level
    policy, while historical release notes remain intact.
@@ -888,9 +970,11 @@ Stop only the affected source batch when:
 - the repeatable Linux/GCC validator required by Stage 2 is unavailable;
 - retained behavior, ABI, file-format interpretation, or public declarations
   cannot be distinguished from unsupported portability code;
+- architecture- or generator-specific behavior remains reachable within an
+  accepted target-system/compiler pair;
 - an unsupported macro also selects behavior used by a retained compiler;
 - focused coverage cannot establish the retained behavior before deletion; or
-- either retained row has an unexplained contract or test regression.
+- either release baseline has an unexplained contract or test regression.
 
 These conditions require narrower analysis or restored validation capacity;
 they do not authorize Windows GCC as substitute evidence or removal by textual
@@ -908,5 +992,5 @@ After each coherent batch:
 5. Record optional dependency gaps without treating them as removed features.
 6. Do not include absolute local paths, transient build directories, generated
    logs, or machine-specific temporary files.
-7. Use "Stage 1 complete", "CMake layer validated on both retained rows",
+7. Use "Stage 1 complete", "CMake layer validated on both release baselines",
    "source reduction complete", and "overall plan complete" as distinct states.

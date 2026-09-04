@@ -2,11 +2,13 @@
 
 The tables below document the CMake options that can be set to control how HDF5 is built. Options are typically set by passing them in the form of `-D<OPTION>=<VALUE>` when configuring HDF5. For example, `-DHDF5_BUILD_CPP_LIB=ON` will enable building of the HDF5 C++ wrapper. See [the CMake documentation](https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry) for a short description of option types and their associated values.
 
-The CMake build supports Windows x64 with MSVC 18 and the Visual Studio 18
-2026 generator, and Linux x86_64 with GCC/G++ using Ninja or Unix Makefiles.
-Other platform/compiler combinations are unsupported. The platform policy is
-independent of `HDF5_ALLOW_UNSUPPORTED`, which controls only documented HDF5
-feature combinations.
+The CMake build accepts Windows with compiler ID `MSVC` and Linux with compiler
+ID `GNU`. Generator, architecture, and exact compiler version are not firewall
+inputs. Release validation uses Windows x64 with Visual Studio 18 2026 and
+Linux x86_64 with GCC/G++ and Ninja, plus a focused Unix Makefiles check. Other
+target-system/compiler combinations are unsupported. The compiler-pair policy
+is independent of `HDF5_ALLOW_UNSUPPORTED`, which controls only documented
+HDF5 feature combinations.
 
 Options settings for typical HDF5 configurations can be found in the [cacheinit.cmake](../config/cmake/cacheinit.cmake) and [CMakePresets.json](../CMakePresets.json) files. 
 

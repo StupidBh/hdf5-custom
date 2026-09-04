@@ -165,8 +165,10 @@ II. Building HDF5 Examples with CMake
 
         cmake -G "<generator>"  [-D<options>]  <sourcepath>
 
-        Where <generator> is Visual Studio 18 2026 with -A x64 on
-        Windows, or Ninja or Unix Makefiles on Linux.
+        The release-validation examples use Visual Studio 18 2026 with
+        -A x64 on Windows, and Ninja or Unix Makefiles on Linux. Other
+        generators may be used when they select MSVC on Windows or GNU on
+        Linux.
 
         <options> is:
             * H5EXAMPLE_BUILD_TESTING:BOOL=ON

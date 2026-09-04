@@ -4,6 +4,17 @@
 
 Core C code is in `src/`; the high-level API is in `hl/`, C++ wrappers in `c++/`, and command-line programs in `tools/`. Tests live in `test/` and `testpar/`, examples in `HDF5Examples/`, CMake support in `config/`, and documentation in `docs/` and `release_docs/`.
 
+## CLion MCP Workflow
+
+- At the start of each task, check whether the CLion MCP tools are available.
+- Prefer CLion MCP for symbol lookup, declaration and definition navigation, reference searches, refactoring,
+  inspections, diagnostics, and IDE run configurations.
+- Use `rg` and shell tools for plain-text searches, file enumeration, and operations that CLion MCP does not
+  support or would handle less efficiently.
+- If CLion MCP is unavailable or a call fails, report that briefly and fall back to local tools without repeated
+  retries.
+- Do not claim that CLion MCP verified a result unless an MCP tool call actually succeeded.
+
 ## Repository Profile & Sources of Truth
 
 This is a CMake-only fork of upstream `develop` with a minimum CMake version of 4.0. The supported product
@@ -40,14 +51,15 @@ Use an out-of-source MSVC 18 build:
 ```powershell
 cmake -S . -B build-msvc18 -G "Visual Studio 18 2026" -A x64
 $env:CL = "/utf-8"
-cmake --build build-msvc18 --config Release
-ctest --test-dir build-msvc18 -C Release --output-on-failure -j 4
+cmake --build build-msvc18 --config Release --parallel 6
+ctest --test-dir build-msvc18 -C Release --output-on-failure -j 6
 ```
 
 `/utf-8` prevents Unicode test failures on non-UTF-8 Windows locales. For stricter diagnostics in this MSVC
 workflow, configure with `-DHDF5_ENABLE_DEV_WARNINGS=ON`; there is no `HDF5_ENABLE_DEVELOPER_MODE` CMake
 option, and the default Visual Studio configuration list does not contain `Developer`. Never commit generated
-build or install trees.
+build or install trees. Prefer six parallel jobs for local build and CTest validation unless a specific workload
+or tool requires a lower limit.
 
 ## Architecture & Code Navigation
 
@@ -75,8 +87,8 @@ Release version macros live in `src/H5public.h` and feed the top-level CMake pac
 Use `rg` to start at a public symbol and follow it through VOL/native and package-private implementations.
 Prefer the modern `h5test.h` harness for new tests; `testhdf5` is a legacy aggregate and should not receive new
 cases. Inspect registered tests with `ctest --test-dir build-msvc18 -C Release -N -R <pattern>`, then run the
-narrowest matching set with the same `-R` pattern and `--output-on-failure`. `HDF_TEST_EXPRESS` ranges from `0`
-(exhaustive) to `3` (quickest, the default), so report the configured level with test results.
+narrowest matching set with the same `-R` pattern, `--output-on-failure`, and `-j 6`. `HDF_TEST_EXPRESS` ranges
+from `0` (exhaustive) to `3` (quickest, the default), so report the configured level with test results.
 
 Useful design references are `CONTRIBUTING.md` for code and test conventions, `docs/INSTALL_CMake_options.md`
 for explanations of build options and unsupported combinations, `docs/doxygen/dox/TechnicalNotes.dox` for the
@@ -124,11 +136,13 @@ Target `develop` and open an issue except for minor edits. Complete the PR templ
 
 Java and Fortran modules are unsupported. Do not restore their sources, options, examples, CI, install components, or targets. Preserve format-level C compatibility constants and required HDFS VFD JNI discovery.
 
-The CMake build supports exactly two platform/compiler combinations: Windows
-x64 with MSVC 18 from Visual Studio 18 2026, and Linux x86_64 with GCC/G++.
-The supported Windows generator is Visual Studio 18 2026; Ninja with MSVC is
-not supported. The supported Linux generators are Ninja and Unix Makefiles.
-MinGW, MSYS2, Cygwin, Clang and clang-cl, Intel, NVHPC, AOCC, macOS, BSD,
-Emscripten, and all other platform/compiler combinations are unsupported.
-`HDF5_ALLOW_UNSUPPORTED` applies only to documented HDF5 feature combinations;
-it does not bypass the platform/compiler policy.
+The CMake build accepts exactly two target-system/compiler pairs: Windows with
+compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
+and exact compiler version are not central-firewall inputs. The
+release-validation baselines are Windows x64 with the MSVC toolset from Visual
+Studio 18 2026 using the Visual Studio 18 2026 generator, and Linux x86_64 with
+GCC/G++ using Ninja plus a focused Unix Makefiles check. MinGW, MSYS2, Cygwin,
+Clang and clang-cl, Intel, NVHPC, AOCC, macOS, BSD, Emscripten, and all other
+target-system/compiler combinations are unsupported. `HDF5_ALLOW_UNSUPPORTED`
+applies only to documented HDF5 feature combinations; it does not bypass the
+target-system/compiler policy.

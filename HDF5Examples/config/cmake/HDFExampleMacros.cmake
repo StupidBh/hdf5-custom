@@ -31,9 +31,6 @@ macro (BASIC_SETTINGS varname)
     set (CMAKE_MFC_FLAG 0)
   endif ()
 
-  set (CMAKE_C_STANDARD 99)
-  set (CMAKE_C_STANDARD_REQUIRED TRUE)
-
   if (H5EXAMPLE_BUILD_CXX)
     ENABLE_LANGUAGE (CXX)
     hdf5_validate_platform_support (LANGUAGES CXX)

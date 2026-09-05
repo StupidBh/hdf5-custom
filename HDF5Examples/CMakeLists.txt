@@ -9,6 +9,9 @@
 cmake_minimum_required (VERSION 4.0)
 project (H5EXAMPLES C)
 
+include (${CMAKE_CURRENT_LIST_DIR}/config/cmake/HDF5LanguageStandards.cmake)
+hdf5_configure_c_language_standard ()
+
 include (${CMAKE_CURRENT_LIST_DIR}/config/cmake/HDF5PlatformSupport.cmake)
 hdf5_validate_platform_support (LANGUAGES C)
 

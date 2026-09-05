@@ -170,7 +170,9 @@ function (external_zlib_library)
   endif ()
 
   # Make zlib available for the build
+  hdf5_begin_dependency_c_standard_scope ()
   FetchContent_MakeAvailable (HDF5_ZLIB)
+  hdf5_end_dependency_c_standard_scope ()
 
   # Hide zlib-ng-specific items from the GUI by default
   mark_as_advanced (ZLIB_BUILD_ADA)
@@ -457,7 +459,9 @@ function (external_zlib_ng_library)
   endif ()
 
   # Make zlib-ng available for the build
+  hdf5_begin_dependency_c_standard_scope ()
   FetchContent_MakeAvailable (HDF5_ZLIB)
+  hdf5_end_dependency_c_standard_scope ()
 
   # Hide zlib-ng-specific items from the GUI by default
   mark_as_advanced (WITH_AVX512)

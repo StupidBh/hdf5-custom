@@ -40,6 +40,16 @@ We would like to thank the many HDF5 community members who contributed to this r
 
 # ⚠️ Breaking Changes
 
+## CMake builds now require C17 for project-owned C sources
+
+The CMake build now compiles HDF5-owned C libraries, tools, tests, plugins, and
+examples in strict C17 mode. `CMAKE_C_STANDARD` defaults to `17`; an explicit
+older value is rejected, while a compiler-supported later value is retained.
+Configure-time feature checks use the same mode as the HDF5 targets. Bundled
+third-party projects keep their own language settings, and installed targets do
+not pass a C17 requirement to applications. The installed C headers retain
+their C99 consumer compatibility baseline.
+
 ## CMake builds now support only Windows/MSVC and Linux/GCC
 
 The CMake source-build firewall now accepts Windows with compiler ID `MSVC`

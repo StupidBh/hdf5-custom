@@ -281,9 +281,8 @@ if (Threads_FOUND)
   set (CMAKE_REQUIRED_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 
   # Determine which threading package to use
-  # Comment out check for C11 threads for now, since it conflicts with the
-  # current --std=c99 compile flags at configuration time.  When we switch to
-  # --std=c11, this can be uncommented.
+  # Keep the C11 threads check disabled until that implementation is qualified
+  # independently from the project language baseline.
   #CHECK_INCLUDE_FILE("threads.h" HAVE_THREADS_H)
   if (WIN32)
     # When Win32 is available, we use those threads

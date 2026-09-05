@@ -51,6 +51,13 @@ These are some common options that come from CMake itself and are not specific t
 |:-------------|:-----|:--------|:------------|
 | `CMAKE_INSTALL_PREFIX` | `STRING` | Varies by platform | HDF5 installation directory prefix. See [CMAKE_INSTALL_PREFIX](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html). |
 | `CMAKE_BUILD_TYPE` | `STRING` | `Release` | HDF5 build type. See [CMAKE_BUILD_TYPE](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html). Valid values are `Release`, `Debug`, `RelWithDebInfo`, `MinSizeRel` and `Developer`. |
+| `CMAKE_C_STANDARD` | `STRING` | `17` | Selects the ISO C standard for project-owned HDF5 sources. Values below C17 are rejected; a supported later value is retained but does not replace the exact C17 release-validation baseline. |
+
+HDF5 requires the selected C standard and disables C language extensions for
+its own libraries, tools, tests, plugins, and examples. This source-build
+requirement is kept private: bundled third-party projects retain their own
+language settings, and installed HDF5 targets do not impose C17 on consumers.
+Installed C headers continue to support the documented C99 consumer baseline.
 
 ## General options
 

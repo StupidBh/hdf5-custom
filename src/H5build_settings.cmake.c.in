@@ -52,6 +52,7 @@ const char H5build_settings[]=
     "----------\n"
     "                              C: YES\n"
     "                     C Compiler: @CMAKE_C_COMPILER@ @CMAKE_C_COMPILER_VERSION@\n"
+    "                     C Standard: C@CMAKE_C_STANDARD@\n"
     "                       CPPFLAGS: @CPPFLAGS@\n"
     "                    H5_CPPFLAGS: @H5_CPPFLAGS@\n"
     "                    AM_CPPFLAGS: @AM_CPPFLAGS@\n"

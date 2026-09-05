@@ -32,10 +32,6 @@ macro (HDF5_ADD_COMPILER_OPTIONS language report_position)
   unset (compiler_option)
 endmacro ()
 
-set (CMAKE_C_STANDARD 11)
-set (CMAKE_C_STANDARD_REQUIRED TRUE)
-
-set (CMAKE_C_FLAGS "${CMAKE_C11_STANDARD_COMPILE_OPTION} ${CMAKE_C_FLAGS}")
 set (CMAKE_C_FLAGS "${CMAKE_C_SANITIZER_FLAGS} ${CMAKE_C_FLAGS}")
 message (VERBOSE "Warnings Configuration: C default: ${CMAKE_C_FLAGS}")
 #-----------------------------------------------------------------------------

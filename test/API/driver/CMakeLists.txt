@@ -23,7 +23,9 @@ if(NOT kwsys_POPULATED)
   set(KWSYS_USE_Process 1)
   set(KWSYS_USE_RegularExpression 1)
 endif()
+hdf5_begin_dependency_c_standard_scope ()
 FetchContent_MakeAvailable(KWSYS)
+hdf5_end_dependency_c_standard_scope ()
 
 add_executable(h5_api_test_driver h5_api_test_driver.cpp)
 target_include_directories(h5_api_test_driver

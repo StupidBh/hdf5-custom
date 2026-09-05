@@ -24,5 +24,11 @@ plan in this directory.
 - [Stage 2 validation results](CMakePlatformSupportReductionStage2Results.md):
   record the completed core, optional, deferred, and cross-platform evidence.
 - [Stage 3 source/header reduction](CMakePlatformSupportReductionStage3.md):
-  proposed execution plan for removing unsupported-only source compatibility
-  while preserving API, ABI, file-format, and retained-pair behavior.
+  Completed; source compatibility reduction with the accepted Linux plugin
+  filename restriction and preserved API, ABI, and file-format behavior.
+- [Stage 3 validation results](CMakePlatformSupportReductionStage3Results.md):
+  record the completed dual-platform gate, corrected header evidence, and
+  accepted completion review on 2026-09-05.
+
+Stage 4 remains unplanned and unexecuted. Its separate plan is the next
+continuation point; Stage 3 completion does not complete the overall direction.

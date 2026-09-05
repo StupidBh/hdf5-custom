@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stage 1, Stage 2, and Stage 3 complete; Stage 4 remains unplanned
+- State: Stages 1 through 3 completed; Stage 4 remains unplanned
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -17,7 +17,9 @@
 - Last preceding documentation commit: `4b6b228c4`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
-- Current delivery stage: Stage 3 complete; stop before Stage 4 planning
+- Stage 3 status: Completed
+- Stage 3 completion review accepted: 2026-09-05
+- Current delivery stage: Stage 3 Completed; next is the separate Stage 4 plan
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
@@ -28,7 +30,7 @@
   [`CMakePlatformSupportReductionStage3Results.md`](CMakePlatformSupportReductionStage3Results.md)
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
-- Stages 3 and 4 detailed planning: Stage 3 complete; Stage 4 remains deferred and requires a separate plan
+- Stages 3 and 4 detailed planning: Stage 3 Completed; Stage 4 remains unplanned and requires a separate plan
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -868,13 +870,16 @@ rejected platform/compiler pairs while preserving retained API, ABI,
 file-format, architecture, and runtime behavior. All work packages and the
 dual-platform final gate passed; detailed evidence is in
 [`CMakePlatformSupportReductionStage3Results.md`](CMakePlatformSupportReductionStage3Results.md).
+The completion review closed on 2026-09-05 with the Linux plugin filename
+restriction explicitly accepted and the header-comparison evidence corrected.
+Stage 3 is marked Completed.
 
 ## Stage 4: Future Final Project Audit
 
 The approved direction is a final repository-wide audit against the two-pair
-support contract after source reduction. Its detailed checks and completion
-criteria are intentionally deferred until Stage 3 is planned and executed.
-Stage 4 requires a separate plan update and user review before it begins.
+support contract after source reduction. Stage 3 is Completed; the next work
+is to define the Stage 4 checks and completion criteria in a separate plan.
+Stage 4 remains unplanned and requires user review before execution begins.
 
 ## Stage 1 Planned Commit Sequence
 

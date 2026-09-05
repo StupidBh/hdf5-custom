@@ -2,11 +2,12 @@
 
 ## Status
 
-- State: Complete
+- State: Completed
 - Plan drafted: 2026-09-04
 - Scope approved: 2026-09-04
 - Execution started: 2026-09-04
 - Execution completed: 2026-09-05
+- Completion review accepted: 2026-09-05
 - Execution authorized: yes
 - Plan commit: `31cf74435`
 - Parent compatibility plan:
@@ -28,7 +29,9 @@
 The user approved execution on 2026-09-04. Work Packages 3A through 3F and the
 complete dual-platform validation gate finished on 2026-09-05. Detailed
 implementation, compatibility, and validation evidence is recorded in the
-Stage 3 results document. Stage 4 remains unplanned and unexecuted.
+Stage 3 results document. The completion review is closed after confirming the
+Linux plugin filename restriction and correcting the header comparison
+evidence. Stage 4 remains unplanned and unexecuted.
 
 ## Purpose
 
@@ -157,6 +160,12 @@ An installed header may lose an unsupported compiler branch only when its
 declarations, layout, and expansion on both accepted pairs are unchanged or the
 change is an explicitly approved part of this breaking portability direction.
 No public symbol deletion or file-format change is approved by this plan.
+
+On 2026-09-05, the user explicitly confirmed retaining the Stage 3 Linux
+plugin filename restriction: discovery accepts the retained `lib*.so`
+convention and skips `.dylib` filenames, including ELF plugins renamed with
+that suffix. This is an accepted filename-contract narrowing, not a change
+to the generated Linux plugin format or a requirement to restore macOS support.
 
 ## Atomic Local Commit Discipline
 

@@ -19,8 +19,10 @@
 Stage 2 is closed. The fixed core gate, bundled- and system-compression rows,
 and corrected coverage contract are green. Every optional row supported by the
 supplied environment passed, and the user explicitly deferred all six
-unavailable optional configurations. Stage 3 source/header reduction remains
-unauthorized pending a separate plan and review.
+unavailable optional configurations. At the Stage 2 close, Stage 3 source/header
+reduction awaited a separate plan and review. It has since been authorized,
+executed, and marked Completed; the current result is recorded in
+[Stage 3 results](CMakePlatformSupportReductionStage3Results.md).
 
 The Linux/GCC core path and every optional row supported by the supplied
 environment pass; unavailable optional prerequisites have explicit user
@@ -214,6 +216,8 @@ warnings; no compile or link errors occurred.
 
 Stage 2 is complete. The six unavailable optional configurations remain
 explicitly deferred and may be validated later if their product paths become
-necessary. The next continuation point is preparation of a detailed Stage 3
-source/header reduction plan. Do not edit source/header compatibility branches
-until that separate plan is reviewed and approved.
+necessary. The historical continuation point was preparation and approval of
+the Stage 3 source/header reduction plan. Stage 3 is now Completed, with its
+completion review accepted on 2026-09-05. The current continuation point is
+the separate Stage 4 plan, as recorded in
+[REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md).

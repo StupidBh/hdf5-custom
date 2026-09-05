@@ -7,7 +7,7 @@ actually landed, what is being worked on, and what remains unverified.
 
 ## Current Snapshot
 
-- Last updated: 2026-09-04
+- Last updated: 2026-09-05
 - Progress anchor: `0b9e21c34` (`cmake: Use MPI target includes for parallel tests`)
 - Implementation commits after the plan was accepted: 123
 - Current stage: paused at the target-scoped build infrastructure milestone
@@ -30,10 +30,15 @@ baselines. Java and Fortran remain unsupported, and the JNI discovery required
 by the HDFS VFD remains in scope.
 
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
-CMake implementation at `b317dedc9`, and its last landed documentation at
-`614dd74c0`. Its current status is: Stage 1 complete; CMake platform/compiler
-reduction implemented and Windows/MSVC validated; native Linux/GCC validation
-is deferred. Stages 2 through 4 have not started.
+CMake implementation at `b317dedc9`, and its Stage 3 source implementation at
+`74288cbaa`. Stages 1 and 2 are complete; platform-reduction Stage 3 is
+Completed, with its completion review accepted on 2026-09-05. Stage 4 remains
+unplanned. The
+[Stage 3 results](refactoring/CMakePlatformSupportReductionStage3Results.md)
+record the accepted Linux plugin filename restriction and the corrected
+header comparison: expected text changes preserve effective declarations,
+rather than leaving installed files byte-identical. This does not advance
+the paused modernization work recorded below.
 
 ## Stage Status
 

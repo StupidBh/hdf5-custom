@@ -2,9 +2,10 @@
 
 ## Status
 
-- State: complete
+- State: Completed
 - Baseline execution date: 2026-09-04
 - Completion date: 2026-09-05
+- Completion review accepted: 2026-09-05
 - Source implementation anchor: `81e96c889`
 - Final implementation anchor: `74288cbaa`
 - Clean final validation tree: `74288cbaa`
@@ -16,12 +17,16 @@
 - `HDF_TEST_EXPRESS`: `3`
 - Maximum build and CTest parallelism: 4
 
-Stage 3 is complete. Both retained target/compiler pairs were qualified at the
+Stage 3 is Completed. Both retained target/compiler pairs were qualified at the
 same clean tracked tree, the pre-implementation product contract was captured,
 and every source/header inventory family received a non-investigative
 classification before implementation. Fourteen independently revertible source
 reduction commits then removed unsupported-only behavior. The complete final
 gate passed at `74288cbaa` without an unexplained product-contract delta.
+
+The completion review is closed. The Linux plugin filename restriction is
+explicitly accepted, and the corrected header evidence below supersedes the
+earlier byte-identical comparison claims. No Stage 3 review item remains open.
 
 ## Qualified Validators
 
@@ -123,6 +128,10 @@ path-and-content SHA-256 values are:
 The hashes are intentionally platform-specific because generated configuration
 headers describe different retained systems. Each platform is compared only
 with its own Stage 3 baseline.
+
+These are historical pre-implementation hashes, not a claim that final header
+bytes are identical. The corrected comparison and its limits are recorded in
+the header evidence correction below.
 
 ### Library and symbol contract
 
@@ -290,8 +299,9 @@ registration.
 
 ## Contract and Compatibility Results
 
-The final first-configure normalized contracts reproduce all four Stage 3
-baselines exactly by record count:
+The recorded final contracts have the following counts. Counts alone do not
+establish content equality: generated-header text changes require the semantic
+comparison below, and installation records must use equivalent capture inputs.
 
 | Contract | Baseline | Final |
 | --- | ---: | ---: |
@@ -305,11 +315,18 @@ adds `H5TEST-mirror_vfd`; contracts were therefore captured from fresh trees
 with the File API query registered before their first configure, matching the
 3A method.
 
-The 65 default installed headers match the 3A header set byte for byte on each
-platform. The complete 101-header C++ installs also match their corresponding
-3A installs. All five exported-symbol sets have zero additions or removals:
-C core, C high-level, tools, C++ core, and C++ high-level. The recorded 3A
-symbol counts and hashes remain the comparison baseline in the table above.
+The retained build-only first-configure captures have 17,323 Windows default
+records and 28,204 Linux default records. The default totals in the table also
+include 123 and 119 installation-related records, respectively. Installation
+and CPack staging prefixes must be normalized to the same logical prefix before
+comparing these records; their different local paths are not product changes.
+
+Default installs retain the 65-header name set, and final C++ installs contain
+101 headers. Header bytes do change as detailed below; the former statements
+that both sets matched their baselines byte for byte are withdrawn. The
+previous execution recorded zero additions or removals in all five exported
+symbol sets: C core, C high-level, tools, C++ core, and C++ high-level. Those
+symbol counts and hashes remain separate evidence from header-text comparison.
 
 Windows library and import-library names are unchanged. Linux libraries retain
 version `1000.0.0`, `SONAME` suffix `.so.1000`, and installed RUNPATH
@@ -329,6 +346,80 @@ The high-level parser was regenerated with Flex 2.6.4, Bison 3.8.2, and M4
 formatting; the Flex output differed only in six generated `#line` counters,
 with executable lexer content unchanged. This is a normalized reproducibility
 pass.
+
+### Header evidence correction, 2026-09-05
+
+The review compared the retained Windows default install at `c305c9bfc` with
+the final default install at `74288cbaa`. Both contain the same 65 header
+names. Raw bytes differ in all 65 files. After converting only CRLF to LF,
+63 files match, consistent with the LF checkout change in `0d854b2df`;
+exactly `H5public.h` and `H5pubconf.h` still differ in content.
+
+The following SHA-256 values hash UTF-8 text after CRLF-to-LF conversion,
+without removing comments, whitespace, or configuration values:
+
+| Windows header | Baseline | Final |
+| --- | --- | --- |
+| `H5public.h` | `8ba7e54cce13ce88a0ebfd0383d4998fe1dfbe9359c35be386ccb36899ab71d3` | `fb8929706f28b2134e1283f452f87c2f789c558e7aeda3a64803504dc6fd110e` |
+| `H5pubconf.h` | `13ee95c49249d416e9369b2cef95ec41074187a17dfea37e1bc9b1e037645638` | `333295e885a358ddb5ca6411b3bdb383a8367091402659b274ce9b4926dea470` |
+
+The content deltas are expected:
+
+- `H5public.h` removes the MinGW exclusion from the Windows `ssize_t` guard.
+  MSVC still selects `SSIZE_T`; Linux/GNU still selects the existing POSIX path.
+- `H5pubconf.h` removes unused MinGW/Darwin entries and Apple-only size and
+  endianness alternatives. The configured values used on both retained pairs
+  remain the selected values.
+
+A supplemental Linux comparison used the retained default install from
+`6ee2f392e` and the final install from `74288cbaa`. It found the same 65 header
+names and only the same two changed files. This is not relabeled as the
+original 3A install: Git confirms that `H5public.h` and `H5pubconf.h.in` are
+unchanged between `6ee2f392e` and `c305c9bfc`, but the retained installs have
+different configured prefixes in `H5_DEFAULT_PLUGINDIR`. That configuration
+delta is distinct from the source reduction and is not silently discarded.
+
+Fresh preprocessing checks of a translation unit containing only
+`#include "hdf5.h"` passed against both before/after default include trees:
+
+| Compiler and mode | Comparison | Result |
+| --- | --- | --- |
+| MSVC 19.51, C11 | `/EP /utf-8 /TC /std:c11`; ignore blank lines and trim each remaining line | Identical effective declarations |
+| MSVC 19.51, C++14 | `/EP /utf-8 /TP /std:c++14`; same whitespace normalization | Identical effective declarations |
+| GCC 15.2, C11 | `-E -P -std=c11 -x c`; exact output comparison | Identical effective declarations |
+| G++ 15.2, C++11 | `-E -P -std=c++11 -x c++`; exact output comparison | Identical effective declarations |
+
+To reproduce, run each compiler twice with `-I <before-install>/include` and
+`-I <after-install>/include` (`/I` for MSVC), using the same compiler and system
+include paths within a pair. Capture standard output and compare it in order
+using the normalization specified above. Preprocessing is evidence about
+effective declarations, not a replacement for linking, ABI-layout checks,
+exported-symbol checks, or the prior consumer tests.
+
+The retained Windows C++ baseline install is incomplete: it has 57 headers,
+not 101. A complete 101-to-101 installed-file comparison is therefore not
+established by that artifact. Git confirms no changes to C++ wrapper headers
+under `c++/src/` or `hl/c++/src/` between `c305c9bfc` and `74288cbaa`;
+the C++ preprocessing checks above cover the changed C public headers. The
+previously recorded C++ build, consumer, and symbol checks remain the
+compatibility evidence. This correction did not rerun the full CTest matrix
+or a comprehensive ABI audit and does not claim a new one.
+
+### Linux plugin filename clarification, 2026-09-05
+
+Commit `ba5d60ca4` changed filename filtering in both POSIX plugin-discovery
+loops in `src/H5PLpath.c`, from accepting `.so` or `.dylib` to accepting `.so`.
+It did not change plugin compilation, output filenames, or binary formats.
+A valid ELF filter with ID 257 was accepted under either suffix before Stage
+3; after Stage 3 it is accepted as `libprobe.so` and skipped as
+`libprobe.dylib`. The earlier implementation's file blob is identical at
+`6ee2f392e` and `c305c9bfc`, and the final test used `74288cbaa`.
+
+The user explicitly confirmed keeping this restriction on 2026-09-05.
+Preserving Linux plugins under macOS-style filenames is not required by the
+agreed product scope. This is an accepted filename-contract narrowing, not
+evidence of a failure to produce Linux shared libraries, and it is not an
+outstanding Stage 3 blocker.
 
 ## Optional-Row Disposition
 
@@ -388,6 +479,7 @@ and substring false positives. No item remains `INVESTIGATE`.
 > supported-pair variants remain intact; affected Stage 1 and Stage 2 validation
 > rows pass on both baselines.
 
-Stage 3 is complete at implementation anchor `74288cbaa`. Stage 4 remains a
-separate, unplanned and unexecuted final project audit that requires its own
-plan and approval.
+Stage 3 is Completed at implementation anchor `74288cbaa`, with its completion
+review accepted on 2026-09-05. The next continuation point is preparation and
+review of the Stage 4 plan. Stage 4 remains a separate, unplanned and unexecuted
+final project audit that requires its own plan and approval.

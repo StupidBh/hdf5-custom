@@ -52,6 +52,10 @@ pairs are no longer supported and fail during CMake configuration. Source and
 header compatibility implementations used only by those rejected pairs have
 also been removed.
 
+Linux plugin discovery now uses the `lib*.so` filename convention. Files named
+with the macOS-style `.dylib` suffix are no longer discovered, even if their
+contents are valid Linux ELF plugins. Linux plugin build outputs are unchanged.
+
 The MinGW-only `HDF5_MINGW_STATIC_GCC_LIBS` option is removed. The ineffective
 `HDF5_MSVC_NAMING_CONVENTION` option is also removed; it was exposed only for
 MSVC while its implementation required MinGW, so it could not affect a

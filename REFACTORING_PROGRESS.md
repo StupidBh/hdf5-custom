@@ -30,7 +30,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stage 1, Stage 2, and Stage 3 complete; Stage 4 remains unplanned.
+- Status: Stages 1 through 3 completed; Stage 4 remains unplanned.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -47,8 +47,10 @@ behavior-preserving modernization state remain recorded in
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
   explicitly deferred by the user
-- Stage 3 execution state: complete; all work packages and the final
+- Stage 3 execution state: Completed; all work packages and the final
   dual-platform gate passed
+- Stage 3 completion review: accepted on 2026-09-05 with the confirmed Linux
+  plugin filename restriction and corrected header evidence
 - Later-stage detailed planning: Stage 4 remains unplanned
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -63,8 +65,11 @@ Linux/GCC core gate and the bundled- and system-compression rows pass, and all
 optional rows supported by the supplied validator environment have run. Stage
 2 is complete after the user explicitly deferred the six unavailable optional
 configurations as non-required. Stage 3 source/header reduction is complete at
-`74288cbaa`; protected API, ABI, file-format, and accepted-pair behavior remain
-intact. The Stage 4 final audit remains unplanned and unexecuted.
+`74288cbaa`; protected API, ABI, and file-format behavior remain intact. The
+user confirmed the Linux plugin filename restriction to `lib*.so` during the
+2026-09-05 review. Corrected header evidence records expected text changes and
+preserved effective declarations, rather than byte-identical files. The Stage
+4 final audit remains unplanned and unexecuted.
 
 ## Completed
 
@@ -153,12 +158,18 @@ intact. The Stage 4 final audit remains unplanned and unexecuted.
 - Fixed the tracked text checkout contract to LF, then removed unsupported
   Clang, Intel, PGI, Apple/Darwin, BSD, Cygwin, and MinGW source/header branches
   in 14 atomic implementation commits.
-- Preserved supported Windows/MSVC and Linux/GNU behavior for qsort, plugin
-  loading, Win32/POSIX process handling, generated configuration, installed
-  public headers, and thread synchronization.
+- Preserved supported Windows/MSVC and Linux/GNU behavior for qsort,
+  Win32/POSIX process handling, generated configuration, public declarations,
+  and thread synchronization. Plugin discovery retains Windows DLL and Linux
+  `lib*.so` conventions; skipping `.dylib` names is explicitly accepted.
 - Completed the Stage 3 Windows/MSVC and Linux/GCC default, Debug, static-only,
   shared-only, C++, install, package, example, consumer, contract, ABI, and
   residual-audit gates at `74288cbaa`.
+- Corrected the Stage 3 header evidence after review: default header names are
+  unchanged, while LF normalization and the two edited headers explain text
+  deltas. Four fresh C/C++ preprocessing comparisons pass on MSVC and GCC/G++.
+  Withdrew the unsupported complete C++ installed-header byte comparison;
+  retained source, build, consumer, and symbol evidence remains distinct.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -190,13 +201,14 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-Stop at the completed Stage 3 implementation anchor `74288cbaa`. The next work
-is to draft and review the separate Stage 4 final project-audit plan; do not
-begin Stage 4 implementation without explicit approval.
+Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
+review is closed. The next work is to draft and review the separate Stage 4
+final project-audit plan. Stage 4 remains unplanned and unexecuted; do not
+begin its implementation without explicit approval.
 
 ## Validation State
 
-- Current status: Stage 3 complete. Final evidence came from clean Windows/MSVC
+- Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of
   2,853 registered. Debug, static-only, shared-only, C++, install, ZIP,
@@ -204,10 +216,12 @@ begin Stage 4 implementation without explicit approval.
 - Linux default Ninja Release passed all 2,818 enabled tests with 37 disabled
   out of 2,855 registered. Debug, static-only, shared-only, C++, Unix Makefiles,
   install, TGZ, wrappers, standalone examples, and all consumer modes passed.
-- The four normalized default/C++ contracts reproduced their 3A counts:
-  Windows 17,446/19,566 and Linux 28,323/30,771. Installed headers, five C/C++
-  symbol sets, library names, import libraries, Linux SONAME/RUNPATH, and binary
-  package manifests have no unexplained delta.
+- The recorded default/C++ contract totals are Windows 17,446/19,566 and Linux
+  28,323/30,771, including installation records in the default totals. Counts
+  alone do not prove equality. Header text and capture-prefix deltas are
+  explained in the corrected Stage 3 results; public declarations compare
+  equal. Prior symbol, library-name, import-library, SONAME/RUNPATH, package,
+  and consumer evidence remains recorded separately from header-byte checks.
 - Thread-safe and concurrency configurations passed focused tests on both
   platforms. Default and plugin-focused tests cover the changed `H5PLpath`
   branches. Other Stage 2 optional rows own no changed Stage 3 behavior and

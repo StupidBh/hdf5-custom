@@ -5,12 +5,13 @@
 - State: In progress
 - Plan approval: 2026-09-05
 - Execution baseline: `a1adbc32b7604d6a57d6dcab1a965258ff48f148`
-- Implementation anchor: `310fb4323`
+- Implementation anchor: `8c177f31b45fad1b1d18042b939b9bde5737623f`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
 - Work Package 2D: Complete
-- Work Packages 2E through 2H: Not started
+- Work Package 2E: Complete
+- Work Packages 2F through 2H: Not started
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -31,7 +32,7 @@ was changed.
 | 2B Freeze the pre-migration contract | `PASS` | Fresh product, interface, package, consumer, and file-format evidence passed at `a1adbc32b`. |
 | 2C External standard probe | `PASS` | Both strict-mode product matrices built; one C readiness defect and two retained deltas are classified below. |
 | 2D C17 readiness repairs | `PASS` | `310fb4323` preserves MSVC complex support in both C11 and strict C17. |
-| 2E Establish C17 | `NOT_STARTED` | Move C probe and target ownership to the strict C17 minimum. |
+| 2E Establish C17 | `PASS` | `8c177f31b` establishes strict C17 for all project-owned C targets without dependency or consumer leakage. |
 | 2F C++20 readiness repairs | `NOT_STARTED` | Wait for the C17 switch and classified C++ findings. |
 | 2G Establish C++20 | `NOT_STARTED` | Wait for the 2F dual-mode gate. |
 | 2H Full product and handoff gate | `NOT_STARTED` | Wait for the tested C17/C++20 implementation anchor. |
@@ -380,6 +381,56 @@ standalone test and test-data targets and was discarded; after those targets
 were built, the accepted rerun passed. No build, CTest, CMake, Ninja, or MSBuild
 worker remains active.
 
+## C17 CMake Baseline
+
+Commit `8c177f31b` completes Work Package 2E. The root and standalone-example
+entry points now establish the C standard immediately after `project()`, before
+platform validation or feature probes. An absent request selects C17; explicit
+C90, C99, and C11 requests fail with a direct diagnostic; C23 is retained. The
+selected standard is required and extensions are disabled.
+
+The prior late C11 assignment and raw compiler-option injection are removed.
+`libhdf5.settings` and the embedded build settings report `C Standard: C17`
+without representing the standard as a global C flag. FetchContent projects,
+external VOL connectors, and KWSYS are configured within a saved/restored
+language-variable scope, so they do not inherit the HDF5 minimum. Installed
+targets remain free of a C standard usage requirement.
+
+| Work Package 2E gate | Windows/MSVC | Linux/GCC |
+| --- | --- | --- |
+| CMake standard contract | `PASS`: 317 C compile groups at `/std:c17` | `PASS`: 317 C compile groups at exact `-std=c17` |
+| Default Release build | `PASS` with at most four jobs | `PASS`: 3,153 steps with at most four jobs |
+| Focused core/HL/tool tests | 7/7 at `HDF_TEST_EXPRESS=3` | 7/7 at `HDF_TEST_EXPRESS=3` |
+| Standalone C examples | 85/85 targets built in strict C17 | 85/85 targets built in exact strict C17 |
+| Install and export scan | `PASS`: no C standard requirement leaked | `PASS`: no C standard requirement leaked |
+| Installed C99 consumer | Configure/build/run `PASS`; output 2.3.0 | Exact `-std=c99` compile/link/run `PASS`; output 2.3.0 |
+
+The focused CMake script performs fresh default and C23 configures, repeats the
+default configure, and compares sorted target/header/export contracts exactly.
+Both validators pass all cases with 317 C compile groups. It also proves lower
+request rejection for the root and standalone examples and exercises a
+dependency fixture in both default and C23 parent modes. An undeclared
+dependency target receives no C standard, a dependency-declared C11 target
+retains strict C11, and HDF5-owned targets before and after that directory retain
+the selected strict parent mode. Default configurations do not load a C++
+compiler.
+
+Windows `H5pubconf.h` retains SHA-256 `55b6c7b4c523` and is byte-identical to
+the frozen baseline. Linux produces SHA-256 `6e674eb529e9`; its only baseline
+delta is the already classified undefined `H5_HAVE_TIMEZONE`, and it is
+byte-identical to the accepted strict-C17 readiness result. Complex support and
+all related sizes remain unchanged on both validators.
+
+During fixture development, setting the dependency-scope variables to empty
+was rejected by CMake as an invalid target `C_STANDARD`; the new scope test
+caught this before commit, and the implementation now temporarily removes and
+then restores both visible values and cache metadata. An initial installed
+consumer used a target namespace that this fork does not export; the accepted
+fresh consumers use the actual installed `hdf5-shared` target. A direct
+non-login WSL invocation that could not find Ninja was discarded and repeated
+through the qualified login environment. These are test-method corrections,
+not accepted product failures.
+
 ### Comparison and Validation Rules
 
 | Evidence kind | Later comparison rule |
@@ -422,10 +473,10 @@ than ordinary source defects. No C++ readiness repair is required and no
 
 ## Continuation Point
 
-Work Package 2D is complete at implementation anchor `310fb4323`; `P2-01` is
-closed and `P2-02`/`P2-03` require no readiness change. Start Work Package 2E by
-moving the default/minimum C standard before all standard-sensitive probes,
-requiring C17 with extensions disabled, rejecting lower caller requests while
-retaining later requests, removing the raw C11 option injection, and covering
-the ownership/export contract with focused CMake checks. Do not begin C++20
-readiness or baseline changes until the atomic C17 switch passes its gate.
+Work Package 2E is complete at implementation anchor `8c177f31b`; the strict
+C17 switch and its ownership, dependency, export, standalone-example, and C99
+consumer gates pass on both validators. Start Work Package 2F by refreshing the
+C++11 and strict-C++20 public-header, affected-target, and symbol checks on this
+C17 base. Confirm whether the existing `P2-03` warning remains the only C++20
+finding before deciding that no C++ readiness source repair is required. Do not
+land the C++20 baseline switch until the 2F dual-mode gate is recorded.

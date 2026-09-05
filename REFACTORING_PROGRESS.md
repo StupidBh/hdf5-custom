@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-05
+Last updated: 2026-09-06
 
 ## Purpose
 
@@ -39,12 +39,12 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Active; Work Packages 2A through 2D complete and Work Package 2E next
+- Status: Active; Work Packages 2A through 2E complete and Work Package 2F next
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
 - Phase 2 execution baseline: `a1adbc32b`
-- Phase 2 implementation anchor: `310fb4323`
+- Phase 2 implementation anchor: `8c177f31b`
 - Phase 2 execution limit: at most four active build and CTest jobs in total per
   physical host
 - Original support-contract anchor: `912fb436b`
@@ -62,6 +62,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 4 Work Package 4B implementation commits: 6
 - Stage 4 Work Package 4C implementation commits: 1
 - Stage 4 Work Package 4D implementation commits: 1
+- Phase 2 implementation commits: 2
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
@@ -126,7 +127,10 @@ GCC C++20 test delta. No exploratory implementation entered the real tree and
 no `INVESTIGATE` item remains. Work Package 2D closed the C defect at
 `310fb4323`: C11 and strict-C17 affected builds and 16-test complex selections
 pass on both validators, and Windows retains its complete generated-header
-contract.
+contract. Work Package 2E established strict C17 at `8c177f31b`: all 317
+project C compile groups, both default builds, focused tests, standalone
+examples, installs, dependency isolation, and installed C99 consumers pass on
+both validators without exporting the new build minimum.
 
 ## Completed
 
@@ -297,6 +301,13 @@ contract.
   passed, Windows installed 19 Debug PDBs, and a fresh Linux Unix Makefiles
   build passed its focused tests. The final residual and 3,935-file source-
   package path audits passed with no unresolved finding.
+- Completed Phase 2 Work Package 2E at implementation anchor `8c177f31b`.
+  Standard ownership now precedes C probes, strict C17 covers every project C
+  target, lower requests fail, later requests remain intact, dependencies keep
+  their own modes, build reports are truthful, and installed targets retain the
+  C99 consumer contract. Fresh default builds, focused tests, 85 standalone
+  example targets, installs, export scans, and C99 consumers pass on both
+  validators.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -323,11 +334,10 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Execute Phase 2 Work Package 2E as one atomic CMake baseline switch: establish
-  the C17 minimum before probes, reject lower requests, retain later requests,
-  disable extensions, cover every project-owned C target, and prevent consumer
-  or third-party leakage.
-- Continue Work Packages 2F through 2H in order after each preceding exit gate
+- Execute Phase 2 Work Package 2F on the landed C17 base: refresh C++11 and
+  strict-C++20 public-header, affected-target, warning, and symbol evidence and
+  determine whether any source readiness repair is required.
+- Continue Work Packages 2G and 2H in order after each preceding exit gate
   passes.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor while Phase 2 is active.
@@ -342,7 +352,7 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is Work Package 2E of the approved
+The current continuation point is Work Package 2F of the approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
 Work Package 2A selected execution baseline `a1adbc32b`, qualified the retained
 Windows/MSVC and Linux/GCC validators, confirmed the host-wide four-job limit,
@@ -353,8 +363,10 @@ evidence, package manifests, and cross-platform file reads. Work Package 2C
 built all four strict-mode diagnostic products from checkpoint `5b871fd3c` and
 passed 7/7 default or 9/9 C++ focused tests per validator. Work Package 2D then
 closed `P2-01` at `310fb4323`; its C11/C17 dual-mode builds and 16/16 focused
-complex tests pass on both validators. Establish the C17 CMake baseline next,
-including lower/later caller-mode policy and target/export ownership checks.
+complex tests pass on both validators. Work Package 2E landed at `8c177f31b`.
+Its 317-group strict-C17 contract, default builds, 7/7 focused tests, 85-target
+standalone builds, dependency isolation, exports, and installed C99 consumers
+pass on each validator. Resume with the 2F C++ readiness gate; do not redo 2E.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -364,7 +376,7 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Packages 2A through 2D are complete; the execution baseline is
+- Phase 2 Work Packages 2A through 2E are complete; the execution baseline is
   `a1adbc32b`. The exact validators, optional prerequisites, first/repeat
   contracts, four full Release suites, standard modes, generated files,
   headers, symbols, layouts, installs, packages, consumers, and file round
@@ -375,8 +387,10 @@ execution.
   target modes. Its MSVC complex finding is the only 2D readiness repair; the
   Linux `timezone` capability delta and GCC C++20 test warnings are classified
   retained behavior. The repair at `310fb4323` passes the dual-mode affected
-  build and 16-test complex gate on both validators. The C17 baseline switch
-  has not yet landed.
+  build and 16-test complex gate on both validators. The C17 switch at
+  `8c177f31b` passes the exact 317-group standard contract, fresh default
+  builds, focused tests, standalone examples, dependency scope, install/export,
+  generated-header, and C99 consumer gates on both validators.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

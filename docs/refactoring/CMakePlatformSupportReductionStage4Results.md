@@ -5,9 +5,10 @@
 - State: In progress
 - Work Package 4A: complete
 - Work Package 4B: complete
+- Work Package 4C: complete
 - Baseline execution date: 2026-09-05
 - Baseline checkpoint: `cafdc38e9`
-- Current implementation anchor: `ebdb99969`
+- Current implementation anchor: `8d7aa0432`
 - Stage 4 plan:
   [CMakePlatformSupportReductionStage4.md](CMakePlatformSupportReductionStage4.md)
 - Parent plan:
@@ -18,12 +19,13 @@
 
 Work Package 4A is complete. Fresh default and C++ Release baselines were
 captured on both retained target/compiler pairs before an implementation
-correction. The two required defects reproduce on both pairs, complete default
+correction. The two required defects were reproduced on both pairs, complete default
 and C++ installs and packages are recorded, and the findings have validation
 owners. The Work Package 4B repository audit is complete, its six focused
 implementation corrections end at `ebdb99969`, and its current-support
 documentation correction is recorded at `c6e2c2cb9`. Stage 4 remains in
-progress: Work Package 4C is next.
+progress. Work Package 4C repaired utility-dependent registration at
+`8d7aa0432`; Work Package 4D is next.
 
 The four-job cap is a temporary resource constraint for this Stage 4 execution,
 not a repository default or a product compatibility value. Existing presets
@@ -231,10 +233,10 @@ evidence and does not indicate a tracked packaging input change.
 On both validators, a fresh default first configure omits
 `H5TEST-mirror_vfd`. Repeating the identical configure after
 `HDF5_BUILD_UTILS=ON` has entered the cache adds exactly that test and its
-fixture property. Current CMake declares the option in `utils/CMakeLists.txt`
-after root test processing has already consumed it. This is a product-owned,
-cross-platform configure-order defect. Work Package 4C owns the correction and
-its first/second/third and ON/OFF/ON configure reproducer.
+fixture property. Baseline CMake declared the option in `utils/CMakeLists.txt`
+after root test processing had already consumed it. This was a product-owned,
+cross-platform configure-order defect. Work Package 4C repaired it at
+`8d7aa0432` and added its first/second/third and ON/OFF/ON configure reproducer.
 
 ### S4-02: optional API driver does not compile
 
@@ -253,6 +255,60 @@ confirms the later cleanup identifier `H5API_CLEAN_PROCESSES` disagrees with
 the defined `H5_API_CLEAN_PROCESSES`. Work Package 4D owns both focused fixes
 and the required process success, child failure, launch failure, timeout, and
 cleanup checks.
+
+## Work Package 4C: Stable Utility Test Registration
+
+Implementation commit `8d7aa0432` moves the sole `HDF5_BUILD_UTILS` declaration
+from `utils/CMakeLists.txt` to `CMakeBuildOptions.cmake`, before the test tree is
+processed. Its public contract remains `BOOL`, help text `Build HDF5 Utils`,
+default `ON`, and non-advanced. Explicit values are preserved. The sibling
+product options consumed by test-dependent options are already declared at the
+same central owner; the audit found no second ordering defect.
+
+Mirror test and example targets now require both `HDF5_BUILD_UTILS` and the
+effective `HDF5_ENABLE_MIRROR_VFD`. The legal Linux configuration registers the
+`mirror_server`, `mirror_server_stop`, `mirror_vfd`, and
+`use_append_chunk_mirror` targets exactly once. CTest uses a build-tree-derived
+port and these exact tests and fixtures:
+
+| Test | Fixture contract |
+| --- | --- |
+| `H5TEST-mirror_server-start` | `FIXTURES_SETUP=hdf5_mirror_server` |
+| `H5TEST-mirror_vfd` | `FIXTURES_REQUIRED=clear_H5TEST;hdf5_mirror_server` |
+| `H5TEST-mirror_server-stop` | `FIXTURES_CLEANUP=hdf5_mirror_server` |
+
+The setup runs the server from the same working directory as the client so
+relative mirror paths resolve consistently. All three tests are serial, and
+the cleanup fixture stops the server even when the functional test fails.
+
+`config/cmake/tests/HDF5UtilityRegistrationTests.cmake` performs 11 real root
+configures per pair. It compares first, second, and third relevant contracts for
+default options, explicit utilities `OFF`, and utilities plus Mirror VFD `ON`,
+then checks an `ON/OFF/ON` transition. The contract records the two cache
+entries, four target names, three test names, normalized commands, and fixture
+properties rather than relying on aggregate counts.
+
+| Pair and option state | Registered tests | Mirror tests | Stable contract SHA-256 | State |
+| --- | ---: | ---: | --- | --- |
+| Windows default or requested Mirror VFD | 2,853 | 0 | `f454c054e9753aeb63f72655b8fb0d3eb1d5289abeeb5a2d92b3d1e1a8bcff5d` | `PASS` |
+| Windows utilities `OFF` | 2,853 | 0 | `987741f1e2967e04d848b72c98250a0b034a34be80e1792c0b17e93e272621ae` | `PASS` |
+| Linux default | 2,855 | 0 | `76f8344b96b7fa464e712193e0a79c178218e9c20bfd75729b27a8e91fb1141f` | `PASS` |
+| Linux utilities `OFF` | 2,855 | 0 | `44747ac2ffc68bdc5857f7234289c6f16092266e23878f668f4ad2b8cbbbda6f` | `PASS` |
+| Linux utilities and Mirror VFD `ON` | 2,858 | 3 | `b21726d13ba4107a49f4c7c6de2a285d015267cf23c9fa5063d99e78b53e2956` | `PASS` |
+| Linux transition `OFF` with Mirror VFD retained | 2,855 | 0 | `852062bab1f93dd7b8e73c3a86b5956fb6200fd16448062129534e48840d3713` | `PASS` |
+
+On Windows, requesting the Mirror VFD is still forced `OFF` because the existing
+`fork` prerequisite is unavailable, so no unsupported target or test is
+introduced. On Linux, all four named targets and their dependencies built with
+four jobs. CTest expanded the clear fixture plus the three mirror tests and
+cleanup to five executions; all 5 passed at `HDF_TEST_EXPRESS=3`, and no server
+process remained. The 16-case platform-support policy suite also passed on both
+pairs.
+
+Fresh default totals remain the 4A values: 2,853 on Windows and 2,855 on Linux.
+The broken repeat configure previously added only `H5TEST-mirror_vfd`; it now
+remains at the fresh count. A legal Linux mirror-enabled configuration instead
+adds the three exact server/functional/cleanup tests above.
 
 ## Historical Evidence Map and Current Capability Probe
 
@@ -393,12 +449,13 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 | GNU C++ module's nested MSVC path | `49237b0af` removed the unreachable branch while retaining the effective GNU operation; 408 normalized all-warning commands and `libhdf5.settings` remained hash-identical, and MSVC/GCC C++ shared builds passed | `PASS` |
 | Parallel-HDF5 support prose | `c6e2c2cb9` scoped MPI wrappers to the accepted compiler IDs and marked Cray advice historical | `PASS` |
 | Combined-example warning suppression | `ebdb99969` applies `/w` to enabled MSVC C++ examples and keeps it out of `link.exe`; dual-host script cases and representative C/C++ example builds passed, while GNU retained `-w` on compile and compiler-driver link commands | `PASS` |
+| Utility-dependent test registration | `8d7aa0432` centralizes the option, gates mirror targets on both prerequisites, and adds real server fixtures; 11-step contracts passed on both pairs and Linux mirror tests passed 5/5 | `PASS` |
 
 ## Findings Ledger
 
 | ID | Classification | Baseline evidence | Validation owner | State |
 | --- | --- | --- | --- | --- |
-| `S4-01` | `FIX_STAGE4` | Reproduced on MSVC and GCC: identical second configure adds one mirror test and changes the contract | 4C | `FAIL` |
+| `S4-01` | `FIX_STAGE4` | Fixed at `8d7aa0432`: first/second/third and `ON/OFF/ON` contracts match; legal Linux mirror targets build and fixture-expanded tests pass 5/5 | 4C | `PASS` |
 | `S4-02` | `FIX_STAGE4` | Reproduced on MSVC and G++: real optional driver target fails on the missing generated header; cleanup spelling defect confirmed | 4D | `FAIL` |
 | `S4-03` | `FIX_STAGE4` | Current summaries and support guides agree with completed Stage 2/3 evidence; the HPC compiler-wrapper ambiguity was corrected | 4B | `PASS` |
 | `S4-04` | `KEEP_PROTECTED` | Complete fresh 65/101 header sets and separate pre/post-install contracts now exist; final comparison remains | 4E and 4F | `PASS` |
@@ -410,13 +467,14 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 
 The discarded 4A worktree source archive is a corrected validation-method
 artifact, not a product finding. Work Package 4B has no remaining
-`INVESTIGATE` or failed row. The two required `FAIL` rows stay failed until
-their focused 4C and 4D implementation commits and dual-platform checks pass.
+`INVESTIGATE` or failed row. Work Package 4C closes S4-01. S4-02 remains the
+only required `FAIL` row until its focused 4D implementation and dual-platform
+checks pass.
 
 ## Continuation Point
 
-Begin Work Package 4C from implementation anchor `ebdb99969` plus this results
-checkpoint. Add the first/second/third and ON/OFF/ON configure reproducer, move
-`HDF5_BUILD_UTILS` to a stable declaration owner without changing its default,
-and validate exact utility-dependent registration on both pairs. Work Package
-4D remains next after 4C; no 4A baseline or 4B classification is missing.
+Begin Work Package 4D from implementation anchor `8d7aa0432` plus this results
+checkpoint. Repair the optional API driver's generated-header include boundary
+and cleanup identifier, then run its required success, child-failure,
+launch-failure, timeout, and cleanup process checks on both pairs. No 4A
+baseline, 4B classification, or 4C utility-registration evidence is missing.

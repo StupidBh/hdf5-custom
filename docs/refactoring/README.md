@@ -34,10 +34,11 @@ plan in this directory.
   evidence inheritance, final dual-platform gates, and modernization handoff.
 - [Stage 4 execution results](CMakePlatformSupportReductionStage4Results.md):
   Work Package 4A baseline plus the completed Work Package 4B repository audit,
-  corrections, residual classifications, and findings ledger.
+  corrections and residual classifications, and the completed Work Package 4C
+  utility-registration repair.
 
 The Stage 4 plan and review clarifications were approved on 2026-09-05. Work
-Packages 4A and 4B are complete and Work Package 4C is next. Prefer CLion MCP
+Packages 4A through 4C are complete and Work Package 4D is next. Prefer CLion MCP
 and use the temporary Stage 4 build/CTest cap of four per physical host, shared
-by Windows and WSL on that host. Stage 3 completion and the 4A/4B results do
+by Windows and WSL on that host. Stage 3 completion and the 4A-4C results do
 not complete the overall direction.

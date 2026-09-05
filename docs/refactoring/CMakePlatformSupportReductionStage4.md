@@ -2,11 +2,11 @@
 
 ## Status
 
-- State: In progress; Work Packages 4A and 4B complete
+- State: In progress; Work Packages 4A through 4C complete
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
-- Execution requirements confirmed: maximum parallelism 4; prefer CLion MCP
+- Execution requirements confirmed: temporary maximum parallelism 4; prefer CLion MCP
 - Execution started: 2026-09-05
 - Execution results:
   [CMakePlatformSupportReductionStage4Results.md](CMakePlatformSupportReductionStage4Results.md)
@@ -18,13 +18,13 @@
 - Stage 3 final implementation anchor: `74288cbaa`
 - Stage 3 accepted completion record: `7e50c3c17`
 - Stage 4 planning baseline: `7e50c3c17`
-- Stage 4 current implementation anchor: `ebdb99969`
+- Stage 4 current implementation anchor: `8d7aa0432`
 - Required target pairs: Windows with compiler ID `MSVC`, and Linux with
   compiler ID `GNU`
 - Release-validation baselines: Windows x64 with MSVC and a Visual Studio
   generator; Linux x86_64 with GCC/G++ and Ninja
 - Secondary Linux generator check: Unix Makefiles
-- Maximum build and CTest parallelism: 4 in total per physical host
+- Temporary maximum build and CTest parallelism: 4 in total per physical host
 - Required final test level: `HDF_TEST_EXPRESS=3`
 
 The user accepted the plan's review clarifications and confirmed the execution
@@ -32,9 +32,11 @@ requirements on 2026-09-05. Execution has started, and Work Package 4A is
 complete at the reviewed `cafdc38e9` baseline. Work Package 4B is also complete
 at implementation anchor `ebdb99969`: the repository entry points, current
 support claims, presets, workflows, packaging, and residual selectors are
-classified, and the discovered gaps are repaired. Stage 3 remains Completed.
-Work Package 4C is the next execution action; no repeated plan approval is
-needed for work within these boundaries.
+classified, and the discovered gaps are repaired. Work Package 4C is complete
+at implementation anchor `8d7aa0432`; utility registration is stable and the
+legal Linux mirror test runs with its server fixtures. Stage 3 remains
+Completed. Work Package 4D is the next execution action; no repeated plan
+approval is needed for work within these boundaries.
 
 ## Purpose
 

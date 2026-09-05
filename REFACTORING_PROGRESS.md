@@ -34,7 +34,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A and 4B complete.
+- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A through 4C complete.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -43,11 +43,12 @@ behavior-preserving modernization state remain recorded in
 - Coverage documentation correction anchor: `d39cd5fa0`
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
-- Current implementation anchor: `ebdb99969`
-- Last preceding documentation anchor: `c6e2c2cb9`
+- Current implementation anchor: `8d7aa0432`
+- Last preceding documentation anchor: `b0d2e31bd`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 4 Work Package 4B implementation commits: 6
+- Stage 4 Work Package 4C implementation commits: 1
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
@@ -61,8 +62,8 @@ behavior-preserving modernization state remain recorded in
 - Stage 4 execution requirements: prefer CLion MCP; use a temporary maximum
   build/CTest parallelism of 4 per physical host, shared by Windows and WSL on
   that host; this is not a repository default or product compatibility value
-- Stage 4 execution state: Work Packages 4A and 4B complete; utility
-  registration repair is next
+- Stage 4 execution state: Work Packages 4A through 4C complete; optional API
+  driver repair is next
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -84,7 +85,8 @@ preserved effective declarations, rather than byte-identical files. The Stage
 complete fresh default/C++ baselines, and reproduced the two required defects.
 Work Package 4B audited all repository support surfaces and residuals, repaired
 six focused implementation gaps through `ebdb99969`, and left no unresolved
-classification.
+classification. Work Package 4C stabilized utility-dependent registration and
+added a working mirror-server fixture at `8d7aa0432`.
 
 ## Completed
 
@@ -226,6 +228,14 @@ classification.
   compile-only switch no longer reaches `link.exe`; GNU retains `-w` for
   compile and compiler-driver link commands. Dual-host script and target
   checks pass.
+- Moved `HDF5_BUILD_UTILS` to the centralized option owner without changing its
+  public cache contract. Mirror test targets now require both utilities and the
+  Mirror VFD, and CTest starts and stops the real mirror server through setup
+  and cleanup fixtures.
+- Added an 11-step configure-order reproducer covering default, explicit `ON`
+  and `OFF`, first/second/third configures, legal and unavailable Mirror VFD
+  prerequisites, and an `ON/OFF/ON` transition. It passes on both pairs; the
+  four Linux mirror targets build and the fixture-expanded tests pass 5/5.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -251,10 +261,7 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Execute Work Package 4C of the approved Stage 4 plan: repair and test
-  configure-order-dependent utility registration without changing the option
-  default or explicit user values.
-- Then execute Work Package 4D's optional API driver repair before artifact and
+- Execute Work Package 4D's optional API driver repair before artifact and
   final dual-platform validation in 4E and 4F.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
@@ -264,14 +271,16 @@ implementation anchor `0b9e21c34` and is detailed in
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
 review is closed at `7e50c3c17`. Stage 4 Work Package 4A is complete at baseline
 checkpoint `cafdc38e9`, and Work Package 4B is complete at implementation
-anchor `ebdb99969`, with portable evidence in the
+anchor `ebdb99969`. Work Package 4C is complete at implementation anchor
+`8d7aa0432`, with portable evidence in the
 [Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
-The next execution action is Work Package 4C: add the stable configure
-reproducer, move `HDF5_BUILD_UTILS` to its owning declaration point, and verify
-first/repeat plus ON/OFF/ON registration on both pairs. Prefer CLion MCP and use
-the Stage 4 execution cap of four build/CTest jobs per physical host, including
-Windows and WSL together. This temporary cap does not change repository
-defaults. No repeated plan approval is needed within the agreed scope.
+The next execution action is Work Package 4D: repair the optional API driver's
+generated-header include boundary and cleanup identifier, then run its required
+success, failure, timeout, and cleanup process cases on both pairs. Prefer CLion
+MCP and use the temporary Stage 4 execution cap of four build/CTest jobs per
+physical host, including Windows and WSL together. This cap does not change
+repository defaults. No repeated plan approval is needed within the agreed
+scope.
 
 ## Validation State
 
@@ -284,8 +293,13 @@ defaults. No repeated plan approval is needed within the agreed scope.
   preset listing, repository support claims, automation/packaging inventory,
   Java/Fortran removal, and exact/lexical residual classifications pass. Six
   focused implementation corrections end at `ebdb99969`.
-- S4-01 and S4-02 are reproduced failures with owners in Work Packages 4C and
-  4D. Stage 4 remains in progress; no 4C/4D repair or final-gate pass is claimed.
+- Stage 4 Work Package 4C is complete at `8d7aa0432`. The dual-platform
+  configure sequence is stable, default test totals remain 2,853/2,855, and the
+  legal Linux mirror configuration registers three exact mirror tests. Its four
+  targets build and the fixture-expanded selection passes 5/5.
+- S4-01 is repaired and passes. S4-02 remains a reproduced failure owned by
+  Work Package 4D. Stage 4 remains in progress; no 4D repair or final-gate pass
+  is claimed.
 - Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of

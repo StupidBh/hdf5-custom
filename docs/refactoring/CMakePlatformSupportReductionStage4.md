@@ -2,10 +2,11 @@
 
 ## Status
 
-- State: Proposed
+- State: Approved; execution not started
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
-- Detailed execution plan: awaiting review
+- Detailed plan and review clarifications accepted: 2026-09-05
+- Execution requirements confirmed: maximum parallelism 4; prefer CLion MCP
 - Execution started: no
 - Parent compatibility plan:
   [CMakePlatformSupportReduction.md](CMakePlatformSupportReduction.md)
@@ -20,14 +21,15 @@
 - Release-validation baselines: Windows x64 with MSVC and a Visual Studio
   generator; Linux x86_64 with GCC/G++ and Ninja
 - Secondary Linux generator check: Unix Makefiles
-- Proposed maximum build and CTest parallelism: 4, continuing Stage 3
+- Maximum build and CTest parallelism: 4 in total per physical host
 - Required final test level: `HDF_TEST_EXPRESS=3`
 
-The user accepted the audit recommendations and inherited boundaries and
-requested this plan. This document defines the proposed execution details;
-its creation does not record implementation or validation as complete.
-Stage 3 remains Completed. Review this plan before starting Work Package 4A.
-The Stage 4 results document will be created when execution evidence exists.
+The user accepted the plan's review clarifications and confirmed the execution
+requirements on 2026-09-05. The plan is approved; execution has not started.
+This documentation checkpoint records the agreed scope and requirements, not
+completed implementation or validation. Stage 3 remains Completed. Work Package
+4A is the next execution action; no repeated plan approval is needed for work
+within these boundaries. Create the results document when execution evidence exists.
 
 ## Purpose
 
@@ -166,7 +168,7 @@ An express-level-3 full enabled suite is not an exhaustive-level-0 run.
 The initial ledger contains the following known items. Their inclusion is a
 planned disposition, not a claim that this document repairs the implementation.
 
-| ID | Finding and source | Proposed disposition | Acceptance evidence |
+| ID | Finding and source | Agreed disposition | Acceptance evidence |
 | --- | --- | --- | --- |
 | `S4-01` | `HDF5_BUILD_UTILS` is declared in `utils/CMakeLists.txt` after `test/` consumes it; Stage 3 records different first/repeat test registration. | Required focused repair in 4C; preserve the intended default and explicit user values. | First, second, and third configure contracts agree per option set; utility-dependent targets/tests appear only when their prerequisites permit them. |
 | `S4-02` | The optional API driver has local include-path defects and `H5API_CLEAN_PROCESSES` spelling inconsistent with `H5_API_CLEAN_PROCESSES`. Stage 3 used validation-only corrections. | Required focused repair in 4D; validate the retained optional target with committed source. | Native MSVC/GCC target builds and process success/failure/cleanup checks, without validation-only source patches. |
@@ -183,6 +185,11 @@ one disposition:
   content, or factual history, with a concrete semantic rationale.
 - `DEFER_MODERNIZATION`: independent structural work, with a named destination,
   continuation action, and evidence that no Stage 4 gate depends on the change.
+- `DEFER_FOLLOWUP`: an independent product defect outside Stage 4, recorded in
+  the results ledger with root cause, impact, owning module, and next action.
+  Use a separate issue or defect record when available; do not classify ordinary
+  product defects as CMake modernization. No required Stage 4 gate may depend
+  on the deferred repair.
 - `DEFER_ENVIRONMENT`: an existing or explicitly agreed missing-prerequisite
   disposition, with the affected feature and evidence limits retained.
 - `INVESTIGATE`: unresolved ownership or semantics; blocks the affected batch
@@ -216,14 +223,23 @@ revert, if needed, must remain confined to that checkpoint's owned changes.
 
 ## Execution Topology and Baseline Capture
 
-- Prefer the current CLion MCP for reading, searching, inspections, and terminal
-  work. Use shell tools when the IDE lacks the needed capability. A timed-out
-  IDE command may still be running: check and finish or stop it before retrying.
+- Prefer the current CLion MCP for reading, searching, editing, inspections,
+  and terminal/build/test work. Use other tools when the MCP service is
+  unavailable, lacks the needed capability, or cannot reliably complete the
+  operation. A timed-out IDE command may still be running: check and finish or
+  stop it before retrying.
 - Qualify Windows x64/MSVC/Visual Studio and native Linux x86_64/GCC/G++/Ninja
   validators, plus GNU Make. Record exact versions and target triples as result
   evidence. Use `CL=/utf-8` on Windows and `HDF_TEST_EXPRESS=3` for test rows.
-- Keep build and CTest concurrency at most four, including concurrent rows;
-  record MPI ranks separately and avoid oversubscribing the validators.
+- Limit build and CTest concurrency to four in total per physical host.
+  Windows and WSL on the same host share that budget; independent physical
+  hosts each have their own limit of four. Divide the budget among concurrent
+  rows, or run them sequentially. Use `cmake --build ... --parallel 4` and
+  `ctest ... -j 4` only when that command owns the entire host budget; otherwise
+  lower the values. Explicitly cap IDE builds and nested dependency builds,
+  including native build-tool/compiler parallelism, so inherited presets or
+  environment settings cannot multiply or exceed the limit. Record MPI ranks
+  separately and avoid oversubscribing the validators.
 - Prefer the WSL native filesystem for Linux source/build evidence. Do not
   reuse Windows CMake caches, install prefixes, or dependency outputs on Linux.
 - Use clean tracked trees at the same commit for baseline and final gates.
@@ -294,10 +310,13 @@ passing evidence with its historical commit; never present it as a fresh run.
 
 ### Exit criteria and commit boundary
 
-Both validators are qualified; captures are complete or have an explicit
-blocking gap; named defect reproductions and validation owners are recorded.
-No unrelated baseline failure is hidden behind Stage 3 completion. Commit only
-portable evidence in a focused `docs:` checkpoint.
+Both validators are qualified, all required baseline captures are complete,
+and named defect reproductions and validation owners are recorded before 4A
+can close. A missing required baseline blocks its dependent implementation
+batch. Partial evidence may be committed and independent read-only audit work
+may continue, but neither action marks 4A complete. No unrelated baseline
+failure is hidden behind Stage 3 completion. Commit only portable evidence in
+a focused `docs:` checkpoint.
 
 ## Work Package 4B: Repository Contract Audit
 
@@ -364,6 +383,13 @@ Repair the known include-directory and process-cleanup identifier defects in
 `test/API/driver/` at their owning target/source boundary. Preserve the existing
 KWSys acquisition contract and public compiler-pair policy. Do not upgrade KWSys
 or redesign the driver. Keep generated and dependency files outside the commit.
+
+The repair scope is limited to those known defects and behavior directly
+affected by their correction. The process checks below do not authorize a
+general driver redesign. Record an independent deeper defect as
+`DEFER_FOLLOWUP` if it does not block a required Stage 4 gate. If it prevents a
+required gate, keep that gate failed and seek a focused scope decision rather
+than expanding the repair automatically or accepting a failing required case.
 
 Use the real configured optional driver target from current repository CMake.
 Document any standalone prerequisites; do not assume the driver directory is a
@@ -436,14 +462,25 @@ is insufficient: shared CMake helpers, exports, runtime code, and dependency
 handling may affect it indirectly. Rerun whenever impact cannot be excluded.
 
 The final core gate below is mandatory at one final implementation commit even
-when some optional rows inherit evidence. Later documentation-only checkpoints
+when some optional rows inherit evidence. A 4E result may satisfy the matching
+4F row directly when it used that final implementation commit, the required
+configuration, a fresh build/install tree and clean tracked source, and the
+same validation checks and environment requirements. Record the reused row's
+evidence identity explicitly; do not repeat it merely because the work-package
+label changed. Subsequent changes require the affected rows to be rerun;
+all required rows must still identify the final implementation commit, subject
+only to the documentation-only exception below. The independent 4A before-change
+baseline remains required.
+
+Later documentation-only checkpoints
 may retain that implementation evidence if their diff and package-manifest
 implications are explicitly accounted for. Do not rerun completed product tests
 solely to change a documentation commit hash.
 
 ## Final Dual-Platform Gate
 
-Run after all implementation fixes at the same clean commit on both validators.
+Collect passing results after all implementation fixes at the same clean commit
+on both validators, including qualifying 4E results under the reuse rule above.
 Use fresh build/install directories for each row. Execute all enabled default
 tests at `HDF_TEST_EXPRESS=3`, record disabled counts and reasons, and use the
 narrowest relevant fixture-aware selections for other configurations.
@@ -492,7 +529,7 @@ The six explicit Stage 2 missing-environment deferrals remain:
 
 Do not reopen these decisions just because Stage 4 starts. If an affected path
 requires new evidence, explain its impact and the missing prerequisite and
-obtain the needed validation or an explicit revision of the proposed scope.
+obtain the needed validation or an explicit revision of the approved scope.
 The associated feature remains retained. An available unsupported compiler can
 provide supplemental real rejection evidence; synthetic cases must not be
 reported as such a native compiler run.
@@ -524,7 +561,8 @@ reviewed plan; do not request repeated approval for those routine actions.
 
 Run the final matrix and repeat the tracked/generated/package residual scans.
 Close every `FIX_STAGE4` finding with evidence, classify every remaining match,
-and retain explicit environment gaps and independent modernization follow-ups.
+and retain explicit environment gaps, structural modernization follow-ups, and
+independent product defects in their separate disposition categories.
 Reconcile current docs, changelog, and all stage continuation summaries with
 the actual final implementation and tested package inputs.
 
@@ -562,7 +600,7 @@ Stage 4 and the overall platform-reduction direction complete only when:
 11. Every repository modification is committed independently of unrelated user
     changes; no uncommitted implementation is used to claim final success.
 
-The proposed completion statement is:
+The agreed completion statement is:
 
 > Project supported-platform reduction is complete: active repository and
 > delivery contracts implement Windows/MSVC and Linux/GNU, the required final

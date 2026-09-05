@@ -32,7 +32,7 @@ implementation, compatibility, and validation evidence is recorded in the
 Stage 3 results document. The completion review is closed after confirming the
 Linux plugin filename restriction and correcting the header comparison
 evidence. The separate [Stage 4 plan](CMakePlatformSupportReductionStage4.md)
-is now Proposed; Stage 4 execution has not started.
+is now approved; Stage 4 execution has not started.
 
 ## Purpose
 
@@ -731,5 +731,5 @@ The accepted completion statement is:
 > rows pass on both baselines.
 
 Do not shorten this to "platform reduction complete." The separate
-[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is Proposed for review;
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is approved;
 its final audit remains unexecuted.

@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stages 1 through 3 completed; Stage 4 plan Proposed, execution not started
+- State: Stages 1 through 3 completed; Stage 4 plan approved, execution not started
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -14,12 +14,12 @@
 - Stage 3 plan commit: `31cf74435`
 - Stage 3 implementation commit: `74288cbaa`
 - Current implementation commit: `74288cbaa`
-- Last preceding documentation commit: `7e50c3c17`
+- Last preceding documentation commit: `d55012e9e`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 3 status: Completed
 - Stage 3 completion review accepted: 2026-09-05
-- Current delivery stage: Stage 3 Completed; Stage 4 detailed plan awaiting review
+- Current delivery stage: Stage 3 Completed; Stage 4 plan approved, next is 4A
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
@@ -28,12 +28,15 @@
   [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md)
 - Stage 3 execution results:
   [`CMakePlatformSupportReductionStage3Results.md`](CMakePlatformSupportReductionStage3Results.md)
-- Stage 4 proposed execution plan:
+- Stage 4 approved execution plan:
   [`CMakePlatformSupportReductionStage4.md`](CMakePlatformSupportReductionStage4.md)
 - Stage 4 audit recommendations and inherited boundaries accepted: 2026-09-05
+- Stage 4 detailed plan and review clarifications approved: 2026-09-05
+- Stage 4 execution requirements: prefer CLion MCP; maximum build/CTest
+  parallelism 4 per physical host, shared by Windows and WSL on that host
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
-- Stages 3 and 4 detailed planning: Stage 3 Completed; Stage 4 Proposed, not executed
+- Stages 3 and 4 detailed planning: Stage 3 Completed; Stage 4 approved, not executed
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -74,7 +77,7 @@ validated before the next one changes:
    platforms and compilers in 14 atomic implementation commits. Its complete
    Windows/MSVC and Linux/GCC gate passed at `74288cbaa`.
 4. Stage 4 will perform the final project-level support audit. Its separate
-   proposed plan defines scope, focused defect repairs, evidence inheritance,
+   approved plan defines scope, focused defect repairs, evidence inheritance,
    dual-platform acceptance, and overall completion criteria.
 
 Stage 1 may be completed without a native Linux environment. That milestone
@@ -885,9 +888,11 @@ Stage 3 is marked Completed.
 
 The approved direction is a final repository-wide audit against the two-pair
 support contract after source reduction. Stage 3 is Completed. The user accepted
-the audit recommendations and inherited boundaries on 2026-09-05; the separate
-[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is Proposed for detailed
-review before execution begins.
+the audit recommendations, inherited boundaries, and review clarifications on
+2026-09-05. The separate [Stage 4 plan](CMakePlatformSupportReductionStage4.md)
+is approved; execution has not started. Work Package 4A is the next action.
+Prefer CLion MCP and limit build/CTest parallelism to four per physical host,
+with Windows and WSL sharing the same budget.
 
 The plan covers baseline capture, repository support consistency, focused
 repairs of utility test registration and the optional API driver, delivered

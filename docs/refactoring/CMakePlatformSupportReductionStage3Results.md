@@ -481,6 +481,6 @@ and substring false positives. No item remains `INVESTIGATE`.
 
 Stage 3 is Completed at implementation anchor `74288cbaa`, with its completion
 review accepted on 2026-09-05. The separate
-[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is now Proposed after
-acceptance of the audit recommendations and inherited boundaries. Its detailed
-review is the next continuation point; Stage 4 execution has not started.
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) and its review
+clarifications are now approved. Work Package 4A is the next continuation
+point; Stage 4 execution has not started.

@@ -20,7 +20,7 @@ The completed self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
-The proposed Stage 4 final project-audit plan is
+The approved Stage 4 final project-audit plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage4.md`](docs/refactoring/CMakePlatformSupportReductionStage4.md).
 This direction intentionally changes the compatibility contract by first
 reducing the CMake matrix and then removing source-level support outside
@@ -32,7 +32,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 plan Proposed, execution not started.
+- Status: Stages 1 through 3 completed; Stage 4 plan approved, execution not started.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -42,7 +42,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
 - Current implementation anchor: `74288cbaa`
-- Last preceding documentation anchor: `7e50c3c17`
+- Last preceding documentation anchor: `d55012e9e`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 1 completion state: complete
@@ -54,7 +54,9 @@ behavior-preserving modernization state remain recorded in
 - Stage 3 completion review: accepted on 2026-09-05 with the confirmed Linux
   plugin filename restriction and corrected header evidence
 - Stage 4 audit recommendations and inherited boundaries: accepted on 2026-09-05
-- Stage 4 detailed plan: Proposed; awaiting review before Work Package 4A
+- Stage 4 detailed plan and review clarifications: approved on 2026-09-05
+- Stage 4 execution requirements: prefer CLion MCP; maximum build/CTest
+  parallelism 4 per physical host, shared by Windows and WSL on that host
 - Stage 4 execution state: not started; no implementation or validation claimed
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
@@ -73,7 +75,7 @@ configurations as non-required. Stage 3 source/header reduction is complete at
 user confirmed the Linux plugin filename restriction to `lib*.so` during the
 2026-09-05 review. Corrected header evidence records expected text changes and
 preserved effective declarations, rather than byte-identical files. The Stage
-4 final-audit plan is Proposed; its execution has not started.
+4 final-audit plan is approved; its execution has not started.
 
 ## Completed
 
@@ -180,6 +182,11 @@ preserved effective declarations, rather than byte-identical files. The Stage
   acceptance, and the final modernization handoff. This is planning only.
 - Aligned current continuation links and superseding status notes with the
   completed Stage 2/3 evidence; historical validation remains versioned.
+- Recorded the approved Stage 4 clarifications: bounded API driver repair,
+  reuse of qualifying 4E evidence in 4F, complete required baselines before
+  closing 4A, and separate ordinary-defect follow-ups. Fixed the execution
+  requirements at four parallel build/test jobs per physical host and preferred
+  CLion MCP use. No Stage 4 implementation or validation has started.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -205,9 +212,9 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Review the Proposed Stage 4 execution plan, then begin Work Package 4A.
+- Begin Work Package 4A of the approved Stage 4 plan.
 - Execute the reviewed Stage 4 repository/product audit and final validation.
-  The proposed repair scope includes configure-order-dependent utility test
+  The approved repair scope includes configure-order-dependent utility test
   registration and the optional API driver's known build/process defects.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
@@ -215,12 +222,14 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Continuation Point
 
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
-review is closed at `7e50c3c17`. The user accepted the Stage 4 audit
-recommendations and inherited boundaries. The detailed
-[Stage 4 plan](docs/refactoring/CMakePlatformSupportReductionStage4.md) is now
-Proposed for review. After execution approval, start Work Package 4A by
-qualifying both validators, capturing complete fresh contracts, and recording
-the findings ledger. Stage 4 implementation and validation have not started.
+review is closed at `7e50c3c17`. The user approved the detailed
+[Stage 4 plan](docs/refactoring/CMakePlatformSupportReductionStage4.md) with its
+review clarifications and execution requirements. The next execution action is
+Work Package 4A: qualify both validators, capture complete fresh contracts,
+and record the findings ledger. Prefer CLion MCP and keep build/CTest jobs at
+most four per physical host, including Windows and WSL together. Stage 4
+implementation and validation have not started; no repeated plan approval is
+needed within the agreed scope.
 
 ## Validation State
 

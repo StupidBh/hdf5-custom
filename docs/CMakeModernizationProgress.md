@@ -33,7 +33,7 @@ The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
 CMake implementation at `b317dedc9`, and its Stage 3 source implementation at
 `74288cbaa`. Stages 1 and 2 are complete; platform-reduction Stage 3 is
 Completed, with its completion review accepted on 2026-09-05. The separate
-[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is Proposed;
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is approved;
 its execution has not started. The
 [Stage 3 results](refactoring/CMakePlatformSupportReductionStage3Results.md)
 record the accepted Linux plugin filename restriction and the corrected

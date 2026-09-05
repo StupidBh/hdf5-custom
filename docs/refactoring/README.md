@@ -6,7 +6,7 @@ or supported behavior.
 
 Each plan must define its scope, compatibility impact, ordered implementation
 phases, validation gates, deferred work, and completion criteria. A plan may be
-`Proposed`, `In progress`, `Blocked`, or `Complete`. Creating a plan does not
+`Proposed`, `Approved`, `In progress`, `Blocked`, or `Complete`. Creating a plan does not
 make it active and does not authorize skipping its validation gates.
 
 The root-level [`REFACTORING_PROGRESS.md`](../../REFACTORING_PROGRESS.md) is the
@@ -30,9 +30,11 @@ plan in this directory.
   record the completed dual-platform gate, corrected header evidence, and
   accepted completion review on 2026-09-05.
 - [Stage 4 final project audit](CMakePlatformSupportReductionStage4.md):
-  Proposed; repository/product support consistency, focused defect repairs,
+  Approved, execution not started; repository/product support consistency, focused defect repairs,
   evidence inheritance, final dual-platform gates, and modernization handoff.
 
-The Stage 4 recommendations and inherited boundaries were accepted on
-2026-09-05. Review the detailed plan before Work Package 4A; execution has not
-started. Stage 3 completion does not complete the overall direction.
+The Stage 4 plan and review clarifications were approved on 2026-09-05.
+Work Package 4A is the next execution action. Prefer CLion MCP and limit
+build/CTest parallelism to four per physical host, shared by Windows and WSL
+on that host. Execution has not started; Stage 3 completion does not complete
+the overall direction.

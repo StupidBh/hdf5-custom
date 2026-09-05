@@ -31,7 +31,7 @@ at `614dd74c0`, and its Stage 1 CMake implementation at `b317dedc9`. Platform
 reduction Stages 1 through 3 are complete: both release baselines have passed,
 and source/header reduction finished at `74288cbaa`, with the completion review
 recorded at `7e50c3c17`. The separate
-[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is Proposed;
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is approved;
 its execution has not started. General modernization remains paused, with
 implementation progress recorded separately in
 [CMakeModernizationProgress.md](CMakeModernizationProgress.md).

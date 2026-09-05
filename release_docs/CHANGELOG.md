@@ -56,6 +56,9 @@ The combined standalone examples project now applies the same compiler-pair
 check when its optional C++ examples enable the C++ language. This closes an
 entry point that previously validated only the C compiler.
 
+The unused AIX-only `H5__LARGE_FILES` generated-header template entry has been
+removed. It was neither defined nor consumed by retained builds.
+
 Linux plugin discovery now uses the `lib*.so` filename convention. Files named
 with the macOS-style `.dylib` suffix are no longer discovered, even if their
 contents are valid Linux ELF plugins. Linux plugin build outputs are unchanged.

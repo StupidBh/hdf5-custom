@@ -2,14 +2,16 @@
 
 ## Status
 
-- State: Proposed; plan design only
+- State: Approved
 - Plan drafted: 2026-09-05
 - Scope and completion boundaries confirmed: 2026-09-05
-- Implementation authorized: No
+- Implementation authorized: Yes; approved by the user on 2026-09-05
 - Planning baseline: `2e6ed711f`
+- Execution baseline: `a1adbc32b`
 - Implementation anchor: none
-- Future execution record:
-  `C17Cpp20BuildBaselineResults.md`
+- Work Package 2A: Complete
+- Execution record:
+  [C17Cpp20BuildBaselineResults.md](C17Cpp20BuildBaselineResults.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Related paused direction: [../CMakeModernization.md](../CMakeModernization.md)
 - Required target pairs: Windows with compiler ID `MSVC`, and Linux with
@@ -21,11 +23,10 @@
 - Required full-suite test level: `HDF_TEST_EXPRESS=3`
 
 This document defines a compatibility-changing language-build direction that
-is separate from the paused behavior-preserving CMake 4 modernization. It does
-not authorize implementation. Review and explicit approval of this plan are
-required before Work Package 2A starts. Creating the plan, collecting
-read-only facts, and committing plan documentation do not advance an
-implementation anchor.
+is separate from the paused behavior-preserving CMake 4 modernization. The
+user approved the plan and its build-baseline versus public-header-baseline
+distinction on 2026-09-05. Work Package 2A qualified the validators and selected
+the execution baseline; Work Package 2B is the next implementation step.
 
 The name "Phase 2" describes the next project-level refactoring direction. It
 must not be confused with the completed Stage 2 Linux/GCC validation inside
@@ -358,10 +359,17 @@ For each repository commit:
    continuation point.
 
 Pure validation creates no implementation commit. Portable evidence is added
-in focused `docs:` commits after the tested implementation anchor is fixed.
+in focused `docs:` commits after the tested implementation anchor is fixed. All
+commits remain local during this direction; do not push them as part of plan
+execution.
 
 ## Resource and Execution Rules
 
+- Prefer the CLion MCP project, search, inspection, patch, and execution tools
+  when they provide the required operation. A command-line fallback is allowed
+  when the IDE service does not expose the required evidence.
+- Reuse an existing CLion integrated terminal for successive commands. Do not
+  leave superseded terminal, build, test, server, or debugger sessions running.
 - No build or CTest invocation may request more than four parallel jobs.
 - The total number of active build and CTest jobs on one physical host must not
   exceed four. Do not run a four-job Windows workload and a four-job WSL

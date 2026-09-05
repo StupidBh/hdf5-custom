@@ -17,9 +17,14 @@ plan in this directory.
 ## Plans
 
 - [Phase 2 C17 and C++20 build baseline](C17Cpp20BuildBaseline.md):
-  Proposed; raise the project-owned core, HL, opt-in C++, tools, tests, plugins,
-  and examples to C17/C++20, repair only demonstrated blockers, exclude
-  third-party implementations, and validate with at most four active jobs.
+  Approved; Work Package 2A has qualified the validators and selected the
+  execution baseline. Raise the project-owned core, HL, opt-in C++, tools,
+  tests, plugins, and examples to C17/C++20, repair only demonstrated blockers,
+  exclude third-party implementations, and validate with at most four active
+  jobs.
+- [Phase 2 C17 and C++20 execution results](C17Cpp20BuildBaselineResults.md):
+  record validator qualification, capability discovery, baseline evidence,
+  findings, implementation anchors, and final product validation.
 - [CMake supported platform reduction](CMakePlatformSupportReduction.md):
   reduce the supported project implementation to Windows/MSVC and Linux/GCC
   through staged CMake and source/header work.
@@ -45,5 +50,5 @@ work packages completed that day at product implementation `f6ff66fed`. The
 overall supported-platform reduction direction is complete. Its four-job
 build/CTest limit was temporary for that execution and is not a permanent
 default or validation reference. The separate CMake modernization remains
-incomplete at its existing anchor. The proposed Phase 2 language-build plan is
-the current design continuation; creating it does not authorize implementation.
+incomplete at its existing anchor. The approved Phase 2 language-build plan is
+the active direction; Work Package 2B is the current continuation point.

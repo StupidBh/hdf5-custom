@@ -688,21 +688,23 @@ endmacro ()
 #-----------------------------------------------------------------------------
 message (STATUS "Checking if complex number support is available")
 
-# Check if __STDC_NO_COMPLEX__ macro is defined, in which case complex number
-# support is not available
+# Check if __STDC_NO_COMPLEX__ is defined. It rules out the ISO complex types,
+# but MSVC may still provide its compiler-specific complex types.
 HDF_FUNCTION_TEST (HAVE_STDC_NO_COMPLEX)
-if (NOT H5_HAVE_STDC_NO_COMPLEX)
+if (NOT H5_HAVE_STDC_NO_COMPLEX OR MSVC)
   CHECK_INCLUDE_FILE (complex.h ${HDF_PREFIX}_HAVE_COMPLEX_H)
   if (${HDF_PREFIX}_HAVE_COMPLEX_H)
-    # Check for C99 complex number types first
-    HDF_CHECK_TYPE_SIZE ("float _Complex" ${HDF_PREFIX}_SIZEOF_C99_FLOAT_COMPLEX)
-    HDF_CHECK_TYPE_SIZE ("double _Complex" ${HDF_PREFIX}_SIZEOF_C99_DOUBLE_COMPLEX)
-    HDF_CHECK_TYPE_SIZE ("long double _Complex" ${HDF_PREFIX}_SIZEOF_C99_LONG_DOUBLE_COMPLEX)
+    if (NOT H5_HAVE_STDC_NO_COMPLEX)
+      # Check for C99 complex number types first
+      HDF_CHECK_TYPE_SIZE ("float _Complex" ${HDF_PREFIX}_SIZEOF_C99_FLOAT_COMPLEX)
+      HDF_CHECK_TYPE_SIZE ("double _Complex" ${HDF_PREFIX}_SIZEOF_C99_DOUBLE_COMPLEX)
+      HDF_CHECK_TYPE_SIZE ("long double _Complex" ${HDF_PREFIX}_SIZEOF_C99_LONG_DOUBLE_COMPLEX)
 
-    if (${HDF_PREFIX}_SIZEOF_C99_FLOAT_COMPLEX AND
-        ${HDF_PREFIX}_SIZEOF_C99_DOUBLE_COMPLEX AND
-        ${HDF_PREFIX}_SIZEOF_C99_LONG_DOUBLE_COMPLEX)
-      set (h5_have_c99_complex_numbers 1)
+      if (${HDF_PREFIX}_SIZEOF_C99_FLOAT_COMPLEX AND
+          ${HDF_PREFIX}_SIZEOF_C99_DOUBLE_COMPLEX AND
+          ${HDF_PREFIX}_SIZEOF_C99_LONG_DOUBLE_COMPLEX)
+        set (h5_have_c99_complex_numbers 1)
+      endif ()
     endif ()
 
     # If using MSVC, the _Complex types (if available) are currently _Fcomplex,

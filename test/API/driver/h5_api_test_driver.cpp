@@ -538,7 +538,7 @@ int H5APITestDriver::Main(int argc, char* argv[])
     if (this->ClientHelper) {
         client_helper = h5_api_test_sysProcess_New();
         if (!client_helper) {
-            H5API_CLEAN_PROCESSES;
+            H5_API_CLEAN_PROCESSES;
             cerr << "H5APITestDriver: Cannot allocate h5_api_test_sysProcess to "
                     "run the client helper.\n";
             return 1;

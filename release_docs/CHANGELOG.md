@@ -147,6 +147,14 @@ functionality.
 
 ## Configuration
 
+### Restored the optional API test driver
+
+   The optional `h5_api_test_driver` target could not find its generated API
+   test configuration header and contained a misspelled process-cleanup macro.
+   Its target now owns the required HDF5 include directories, and all allocation
+   failure paths use the defined cleanup macro. Cross-platform process tests
+   cover successful and failed clients, launch failure, timeout, and cleanup.
+
 ### Stabilized utility-dependent test registration
 
    `HDF5_BUILD_UTILS` is now declared before the test tree consumes it, so a

@@ -219,5 +219,6 @@ explicitly deferred and may be validated later if their product paths become
 necessary. The historical continuation point was preparation and approval of
 the Stage 3 source/header reduction plan. Stage 3 is now Completed, with its
 completion review accepted on 2026-09-05. The current continuation point is
-the separate Stage 4 plan, as recorded in
+review of the proposed [Stage 4 plan](CMakePlatformSupportReductionStage4.md),
+as recorded in
 [REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md).

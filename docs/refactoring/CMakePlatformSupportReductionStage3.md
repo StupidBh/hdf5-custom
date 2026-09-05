@@ -31,7 +31,8 @@ complete dual-platform validation gate finished on 2026-09-05. Detailed
 implementation, compatibility, and validation evidence is recorded in the
 Stage 3 results document. The completion review is closed after confirming the
 Linux plugin filename restriction and correcting the header comparison
-evidence. Stage 4 remains unplanned and unexecuted.
+evidence. The separate [Stage 4 plan](CMakePlatformSupportReductionStage4.md)
+is now Proposed; Stage 4 execution has not started.
 
 ## Purpose
 
@@ -729,5 +730,6 @@ The accepted completion statement is:
 > supported-pair variants remain intact; affected Stage 1 and Stage 2 validation
 > rows pass on both baselines.
 
-Do not shorten this to "platform reduction complete." Stage 4 final audit
-remains unplanned and unexecuted until separately reviewed and approved.
+Do not shorten this to "platform reduction complete." The separate
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is Proposed for review;
+its final audit remains unexecuted.

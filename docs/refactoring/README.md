@@ -29,6 +29,10 @@ plan in this directory.
 - [Stage 3 validation results](CMakePlatformSupportReductionStage3Results.md):
   record the completed dual-platform gate, corrected header evidence, and
   accepted completion review on 2026-09-05.
+- [Stage 4 final project audit](CMakePlatformSupportReductionStage4.md):
+  Proposed; repository/product support consistency, focused defect repairs,
+  evidence inheritance, final dual-platform gates, and modernization handoff.
 
-Stage 4 remains unplanned and unexecuted. Its separate plan is the next
-continuation point; Stage 3 completion does not complete the overall direction.
+The Stage 4 recommendations and inherited boundaries were accepted on
+2026-09-05. Review the detailed plan before Work Package 4A; execution has not
+started. Stage 3 completion does not complete the overall direction.

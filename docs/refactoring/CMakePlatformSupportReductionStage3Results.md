@@ -480,6 +480,7 @@ and substring false positives. No item remains `INVESTIGATE`.
 > rows pass on both baselines.
 
 Stage 3 is Completed at implementation anchor `74288cbaa`, with its completion
-review accepted on 2026-09-05. The next continuation point is preparation and
-review of the Stage 4 plan. Stage 4 remains a separate, unplanned and unexecuted
-final project audit that requires its own plan and approval.
+review accepted on 2026-09-05. The separate
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is now Proposed after
+acceptance of the audit recommendations and inherited boundaries. Its detailed
+review is the next continuation point; Stage 4 execution has not started.

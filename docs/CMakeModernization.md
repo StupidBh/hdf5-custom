@@ -26,13 +26,15 @@ Generator, architecture, and exact compiler version remain outside the central
 firewall; Windows x64/Visual Studio 18 2026 and Linux x86_64/GCC with Ninja and
 Unix Makefiles are release-validation baselines.
 
-The support contract is anchored at `912fb436b`, its Stage 1 CMake
-implementation at `b317dedc9`, and its last landed support-documentation update at
-`614dd74c0`. The CMake reduction and admission-policy correction are
-implemented, and Stage 1 is complete after the Windows/MSVC build, test,
-install, package, standalone-example, and external-consumer gates passed.
-Native Linux/GCC validation is deferred. The modernization remains paused;
-this status does not start the platform plan's source-reduction stages.
+The support contract is anchored at `912fb436b`, its admission-policy correction
+at `614dd74c0`, and its Stage 1 CMake implementation at `b317dedc9`. Platform
+reduction Stages 1 through 3 are complete: both release baselines have passed,
+and source/header reduction finished at `74288cbaa`, with the completion review
+recorded at `7e50c3c17`. The separate
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is Proposed;
+its execution has not started. General modernization remains paused, with
+implementation progress recorded separately in
+[CMakeModernizationProgress.md](CMakeModernizationProgress.md).
 
 - Cache options keep their names, types, defaults, allowed values, and advanced/non-advanced status unless a
   separately approved compatibility change says otherwise.

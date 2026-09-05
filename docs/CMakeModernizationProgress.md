@@ -32,8 +32,9 @@ by the HDFS VFD remains in scope.
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
 CMake implementation at `b317dedc9`, and its Stage 3 source implementation at
 `74288cbaa`. Stages 1 and 2 are complete; platform-reduction Stage 3 is
-Completed, with its completion review accepted on 2026-09-05. Stage 4 remains
-unplanned. The
+Completed, with its completion review accepted on 2026-09-05. The separate
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is Proposed;
+its execution has not started. The
 [Stage 3 results](refactoring/CMakePlatformSupportReductionStage3Results.md)
 record the accepted Linux plugin filename restriction and the corrected
 header comparison: expected text changes preserve effective declarations,
@@ -230,12 +231,17 @@ installed runtime support a complete parallel Release build and a nine-test
 focused MPI selection. Perl `5.42.3` is found after refreshing the process
 environment.
 
-The remaining optional environment gaps are pkg-config, system zlib/libaec,
-external HDF5 filter plugins, `aws-c-s3`, JDK/JNI plus Hadoop/libhdfs, OpenSSL,
-mpiFileUtils/libcircle/DTCMP, and NSIS or WiX. Bundled zlib/libaec retrieval
-works, but generation exposes a separate export-set defect for the bundled
-dependency targets. These results are platform-reduction baseline evidence;
-the affected rows still require repetition after modernization changes them.
+At the Stage 1 checkpoint, optional environment gaps were pkg-config, system
+zlib/libaec, external HDF5 filter plugins, `aws-c-s3`, JDK/JNI plus Hadoop/libhdfs, OpenSSL,
+mpiFileUtils/libcircle/DTCMP, and NSIS or WiX. Bundled zlib/libaec generation
+also exposed an export-set defect, subsequently fixed at `81e96c889` with
+Linux/GCC and Windows/MSVC consumer validation. The
+[Stage 2 results](refactoring/CMakePlatformSupportReductionStage2Results.md)
+supersede that checkpoint's open-failure status and record passing Linux
+pkg-config/wrappers, system/bundled compression, and available optional rows.
+The six accepted Linux environment deferrals and Windows-specific gaps retain
+their recorded scope; Linux validation does not close Windows-only gaps.
+Affected rows still require repetition after modernization changes them.
 
 This evidence freezes the current install, package, and consumer behavior for
 the paused modernization. It does not complete modernization stages 7 and 8;
@@ -244,8 +250,9 @@ those checks must be repeated after their implementation changes.
 MSVC 18 is the retained Windows validation toolchain. The earlier MinGW-w64
 results are historical baseline evidence only; MinGW is no longer a supported
 way to exercise GNU branches on Windows and those results do not constitute
-Linux/GCC validation. Native Linux/GCC validation remains unavailable in the
-current environment. Clang, clang-cl, NVHPC, and Intel are outside the reduced
+Linux/GCC validation. Native Linux/GCC validators and passing evidence were
+established by Stages 2 and 3; future execution must requalify its environment.
+Clang, clang-cl, NVHPC, and Intel are outside the reduced
 support matrix and are no longer validation gaps.
 
 The CMake File API does not expose the additional target-level `LINK_FLAGS`
@@ -255,11 +262,11 @@ the normalized File API contract alone.
 
 Still required before review or declaration of modernization completion:
 
-- the deferred platform-reduction native Linux/GCC gate and later source-level
-  reduction stages;
+- the platform-reduction Stage 4 final audit and stable handoff; its preceding
+  Linux validation and source-reduction stages are complete;
 - static-only, shared-only, combined-library, Debug, and Release coverage on
   GCC, plus repetition of the Windows rows after affected modernization work;
-- native Linux/GCC coverage;
+- repeat native Linux/GCC contract coverage after affected modernization work;
 - repeat thread-safe and multi-thread concurrency configurations, and run a
   broader MPI matrix, after affected modernization changes;
 - system and bundled compression, plugins, VOL, ROS3, HDFS, and subfiling after
@@ -267,8 +274,9 @@ Still required before review or declaration of modernization completion:
 - install/export/package artifact comparison after those modernization stages
   change the implementation; and
 - repeat external build-tree, install-tree, FetchContent, `add_subdirectory()`,
-  and pkg-config consumer validation after affected changes. Direct pkg-config
-  consumption is currently unavailable because the executable is not installed.
+  and pkg-config consumer validation after affected changes. Linux pkg-config
+  and wrappers have passing Stage 2/3 evidence; Windows availability remains a
+  separate prerequisite check.
 
 Passing a focused contract comparison does not mark an untested matrix row as
 complete.

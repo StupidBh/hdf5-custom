@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stages 1 through 3 completed; Stage 4 remains unplanned
+- State: Stages 1 through 3 completed; Stage 4 plan Proposed, execution not started
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -14,12 +14,12 @@
 - Stage 3 plan commit: `31cf74435`
 - Stage 3 implementation commit: `74288cbaa`
 - Current implementation commit: `74288cbaa`
-- Last preceding documentation commit: `4b6b228c4`
+- Last preceding documentation commit: `7e50c3c17`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 3 status: Completed
 - Stage 3 completion review accepted: 2026-09-05
-- Current delivery stage: Stage 3 Completed; next is the separate Stage 4 plan
+- Current delivery stage: Stage 3 Completed; Stage 4 detailed plan awaiting review
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
@@ -28,9 +28,12 @@
   [`CMakePlatformSupportReductionStage3.md`](CMakePlatformSupportReductionStage3.md)
 - Stage 3 execution results:
   [`CMakePlatformSupportReductionStage3Results.md`](CMakePlatformSupportReductionStage3Results.md)
+- Stage 4 proposed execution plan:
+  [`CMakePlatformSupportReductionStage4.md`](CMakePlatformSupportReductionStage4.md)
+- Stage 4 audit recommendations and inherited boundaries accepted: 2026-09-05
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
-- Stages 3 and 4 detailed planning: Stage 3 Completed; Stage 4 remains unplanned and requires a separate plan
+- Stages 3 and 4 detailed planning: Stage 3 Completed; Stage 4 Proposed, not executed
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -70,9 +73,9 @@ validated before the next one changes:
 3. Stage 3 removed source and header compatibility code for unsupported
    platforms and compilers in 14 atomic implementation commits. Its complete
    Windows/MSVC and Linux/GCC gate passed at `74288cbaa`.
-4. Stage 4 will perform the final project-level support audit. Its detailed
-   scope and exit criteria will be planned after the source-reduction work is
-   defined.
+4. Stage 4 will perform the final project-level support audit. Its separate
+   proposed plan defines scope, focused defect repairs, evidence inheritance,
+   dual-platform acceptance, and overall completion criteria.
 
 Stage 1 may be completed without a native Linux environment. That milestone
 means the CMake firewall and cleanup have landed, retained Windows behavior has
@@ -794,8 +797,12 @@ plugin and VOL tests. The remaining environment-limited optional rows are:
 Bundled zlib and libaec source retrieval and dependency configuration succeed,
 but CMake generation fails because HDF5 export sets reference bundled `zlib`,
 `aec-shared`, and `sz-shared` targets that are not themselves in an export set.
-That is a non-environment optional-path defect, not a Stage 1 platform-reduction
-regression. Subfiling is intentionally unavailable on Windows and remains a
+The initial Stage 1 diagnosis classified this as a non-environment optional-path
+defect outside the reduction. That attribution was superseded by the
+[Stage 2 diagnosis](CMakePlatformSupportReductionStage2Results.md#failure-classification):
+build-tree export commit `99fbd083b` introduced the Stage 1 regression, and
+`81e96c889` fixed it with passing Linux/GCC and Windows/MSVC checks. It is not a
+current blocker. Subfiling is intentionally unavailable on Windows and remains a
 Stage 2 Linux/parallel row. None of these optional gaps removes feature support,
 invalidates the required Stage 1 gate, or substitutes for Stage 2 native
 Linux/GCC validation.
@@ -874,12 +881,19 @@ The completion review closed on 2026-09-05 with the Linux plugin filename
 restriction explicitly accepted and the header-comparison evidence corrected.
 Stage 3 is marked Completed.
 
-## Stage 4: Future Final Project Audit
+## Stage 4: Final Project Audit Plan
 
 The approved direction is a final repository-wide audit against the two-pair
-support contract after source reduction. Stage 3 is Completed; the next work
-is to define the Stage 4 checks and completion criteria in a separate plan.
-Stage 4 remains unplanned and requires user review before execution begins.
+support contract after source reduction. Stage 3 is Completed. The user accepted
+the audit recommendations and inherited boundaries on 2026-09-05; the separate
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) is Proposed for detailed
+review before execution begins.
+
+The plan covers baseline capture, repository support consistency, focused
+repairs of utility test registration and the optional API driver, delivered
+products and consumers, and a final dual-platform gate. It preserves accepted
+Stage 3 evidence limits and optional deferrals. Execution has not started;
+creating this plan does not complete Stage 4 or resume general modernization.
 
 ## Stage 1 Planned Commit Sequence
 

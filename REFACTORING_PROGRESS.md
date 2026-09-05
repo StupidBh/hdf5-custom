@@ -20,9 +20,11 @@ The completed self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
-It intentionally changes the compatibility contract by first reducing the
-CMake matrix and then removing source-level support outside Windows/MSVC and
-Linux/GCC. The underlying target architecture and the paused
+The proposed Stage 4 final project-audit plan is
+[`docs/refactoring/CMakePlatformSupportReductionStage4.md`](docs/refactoring/CMakePlatformSupportReductionStage4.md).
+This direction intentionally changes the compatibility contract by first
+reducing the CMake matrix and then removing source-level support outside
+Windows/MSVC and Linux/GCC. The underlying target architecture and the paused
 behavior-preserving modernization state remain recorded in
 [`docs/CMakeModernization.md`](docs/CMakeModernization.md) and
 [`docs/CMakeModernizationProgress.md`](docs/CMakeModernizationProgress.md).
@@ -30,7 +32,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 remains unplanned.
+- Status: Stages 1 through 3 completed; Stage 4 plan Proposed, execution not started.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -40,7 +42,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
 - Current implementation anchor: `74288cbaa`
-- Last preceding documentation anchor: `4b6b228c4`
+- Last preceding documentation anchor: `7e50c3c17`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 1 completion state: complete
@@ -51,7 +53,9 @@ behavior-preserving modernization state remain recorded in
   dual-platform gate passed
 - Stage 3 completion review: accepted on 2026-09-05 with the confirmed Linux
   plugin filename restriction and corrected header evidence
-- Later-stage detailed planning: Stage 4 remains unplanned
+- Stage 4 audit recommendations and inherited boundaries: accepted on 2026-09-05
+- Stage 4 detailed plan: Proposed; awaiting review before Work Package 4A
+- Stage 4 execution state: not started; no implementation or validation claimed
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -69,7 +73,7 @@ configurations as non-required. Stage 3 source/header reduction is complete at
 user confirmed the Linux plugin filename restriction to `lib*.so` during the
 2026-09-05 review. Corrected header evidence records expected text changes and
 preserved effective declarations, rather than byte-identical files. The Stage
-4 final audit remains unplanned and unexecuted.
+4 final-audit plan is Proposed; its execution has not started.
 
 ## Completed
 
@@ -170,6 +174,12 @@ preserved effective declarations, rather than byte-identical files. The Stage
   deltas. Four fresh C/C++ preprocessing comparisons pass on MSVC and GCC/G++.
   Withdrew the unsupported complete C++ installed-header byte comparison;
   retained source, build, consumer, and symbol evidence remains distinct.
+- Drafted the Stage 4 final-audit plan after the user accepted the audit
+  recommendations and inherited boundaries. It defines repository and product
+  audits, two focused defect repairs, evidence inheritance, dual-platform
+  acceptance, and the final modernization handoff. This is planning only.
+- Aligned current continuation links and superseding status notes with the
+  completed Stage 2/3 evidence; historical validation remains versioned.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -195,19 +205,27 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Prepare the Stage 4 final-audit plan for separate user review and approval.
+- Review the Proposed Stage 4 execution plan, then begin Work Package 4A.
+- Execute the reviewed Stage 4 repository/product audit and final validation.
+  The proposed repair scope includes configure-order-dependent utility test
+  registration and the optional API driver's known build/process defects.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
 ## Continuation Point
 
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
-review is closed. The next work is to draft and review the separate Stage 4
-final project-audit plan. Stage 4 remains unplanned and unexecuted; do not
-begin its implementation without explicit approval.
+review is closed at `7e50c3c17`. The user accepted the Stage 4 audit
+recommendations and inherited boundaries. The detailed
+[Stage 4 plan](docs/refactoring/CMakePlatformSupportReductionStage4.md) is now
+Proposed for review. After execution approval, start Work Package 4A by
+qualifying both validators, capturing complete fresh contracts, and recording
+the findings ledger. Stage 4 implementation and validation have not started.
 
 ## Validation State
 
+- Stage 4 status is planning only. No Stage 4 result document, defect repair,
+  build, or CTest evidence is claimed by the plan checkpoint.
 - Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of

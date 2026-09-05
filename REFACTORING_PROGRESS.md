@@ -34,7 +34,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Package 4A complete.
+- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A and 4B complete.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -43,10 +43,11 @@ behavior-preserving modernization state remain recorded in
 - Coverage documentation correction anchor: `d39cd5fa0`
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
-- Current implementation anchor: `74288cbaa`
-- Last preceding documentation anchor: `d55012e9e`
+- Current implementation anchor: `ebdb99969`
+- Last preceding documentation anchor: `c6e2c2cb9`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
+- Stage 4 Work Package 4B implementation commits: 6
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
@@ -57,9 +58,11 @@ behavior-preserving modernization state remain recorded in
   plugin filename restriction and corrected header evidence
 - Stage 4 audit recommendations and inherited boundaries: accepted on 2026-09-05
 - Stage 4 detailed plan and review clarifications: approved on 2026-09-05
-- Stage 4 execution requirements: prefer CLion MCP; maximum build/CTest
-  parallelism 4 per physical host, shared by Windows and WSL on that host
-- Stage 4 execution state: Work Package 4A complete; repository audit is next
+- Stage 4 execution requirements: prefer CLion MCP; use a temporary maximum
+  build/CTest parallelism of 4 per physical host, shared by Windows and WSL on
+  that host; this is not a repository default or product compatibility value
+- Stage 4 execution state: Work Packages 4A and 4B complete; utility
+  registration repair is next
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -79,6 +82,9 @@ user confirmed the Linux plugin filename restriction to `lib*.so` during the
 preserved effective declarations, rather than byte-identical files. The Stage
 4 final audit is in progress. Work Package 4A qualified both validators, froze
 complete fresh default/C++ baselines, and reproduced the two required defects.
+Work Package 4B audited all repository support surfaces and residuals, repaired
+six focused implementation gaps through `ebdb99969`, and left no unresolved
+classification.
 
 ## Completed
 
@@ -202,8 +208,24 @@ complete fresh default/C++ baselines, and reproduced the two required defects.
   both pairs: the real optional API driver target fails to find
   `H5_api_test_config.h`; the cleanup identifier mismatch is also confirmed.
 - Recorded the Stage 4 capability probe, historical evidence ownership, and
-  findings ledger in the portable Stage 4 results document. No product repair
-  has landed yet.
+  findings ledger in the portable Stage 4 results document.
+- Completed the Stage 4 repository contract audit across 204 tracked CMake
+  paths, 74 `project()` calls, presets, 57 workflows, dashboards, packaging,
+  current documentation, language-product removal, and the repeated 1,358-file
+  source/header selector inventory. No `INVESTIGATE` item remains.
+- Added the missing combined-examples C++ compiler check and extended the
+  admission suite to 16 cases. Full combined C/C++/HL examples pass on both
+  accepted pairs.
+- Removed unreachable SunOS warning guards, stale AIX/Solaris configuration
+  notes, the unused AIX generated-header macro, compiler-simulation remnants,
+  and an impossible MSVC branch in the GNU C++ flags module. Supported-pair
+  shared builds and focused generated-settings, declaration, complex-probe,
+  and command-set comparisons pass.
+- Clarified the Parallel HDF5 compiler-wrapper support boundary. Corrected
+  combined-example warning suppression so MSVC C++ receives `/w` while the
+  compile-only switch no longer reaches `link.exe`; GNU retains `-w` for
+  compile and compiler-driver link commands. Dual-host script and target
+  checks pass.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -229,12 +251,11 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Execute Work Package 4B of the approved Stage 4 plan: audit tracked entry
-  points, support claims, admission coverage, and residual platform/compiler
-  selectors, then classify every candidate.
-- Continue the reviewed Stage 4 repository/product audit and final validation.
-  The approved repair scope includes configure-order-dependent utility test
-  registration and the optional API driver's known build/process defects.
+- Execute Work Package 4C of the approved Stage 4 plan: repair and test
+  configure-order-dependent utility registration without changing the option
+  default or explicit user values.
+- Then execute Work Package 4D's optional API driver repair before artifact and
+  final dual-platform validation in 4E and 4F.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
@@ -242,14 +263,15 @@ implementation anchor `0b9e21c34` and is detailed in
 
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
 review is closed at `7e50c3c17`. Stage 4 Work Package 4A is complete at baseline
-checkpoint `cafdc38e9`, with portable evidence in the
+checkpoint `cafdc38e9`, and Work Package 4B is complete at implementation
+anchor `ebdb99969`, with portable evidence in the
 [Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
-The next execution action is Work Package 4B: enumerate tracked entry points
-and current support claims, rerun the admission suite, extend the residual
-selector scan, and classify every candidate before editing product code.
-Prefer CLion MCP and keep build/CTest jobs at most four per physical host,
-including Windows and WSL together. No repeated plan approval is needed within
-the agreed scope.
+The next execution action is Work Package 4C: add the stable configure
+reproducer, move `HDF5_BUILD_UTILS` to its owning declaration point, and verify
+first/repeat plus ON/OFF/ON registration on both pairs. Prefer CLion MCP and use
+the Stage 4 execution cap of four build/CTest jobs per physical host, including
+Windows and WSL together. This temporary cap does not change repository
+defaults. No repeated plan approval is needed within the agreed scope.
 
 ## Validation State
 
@@ -258,8 +280,12 @@ the agreed scope.
   contracts, complete isolated installs, header hashes, effective declaration
   captures, five exported-symbol sets, installed consumers, four binary
   packages, and one clean tracked-source package are recorded for both pairs.
+- Stage 4 Work Package 4B is complete. The 16-case admission suite, applicable
+  preset listing, repository support claims, automation/packaging inventory,
+  Java/Fortran removal, and exact/lexical residual classifications pass. Six
+  focused implementation corrections end at `ebdb99969`.
 - S4-01 and S4-02 are reproduced failures with owners in Work Packages 4C and
-  4D. Stage 4 remains in progress; no repair or final-gate pass is claimed.
+  4D. Stage 4 remains in progress; no 4C/4D repair or final-gate pass is claimed.
 - Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of
@@ -396,6 +422,10 @@ the agreed scope.
 - The final source/header scan reports `APPLE=3/3`, `CLANG=225/37`,
   `CYGWIN=6/5`, `DARWIN=0/0`, `FREEBSD=1/1`, `INTEL=179/14`, `MACOS=4/1`,
   `MINGW=7/6`, `NETBSD=2/2`, and `PGI=17/2`, expressed as matches/files.
+- The Stage 4 extension reports `AIX=134/6`, `HPUX=1/1`, `HP-UX=5/2`,
+  `SOLARIS=3/3`, `XL=430/29`, `IBM=29/6`, and `CRAY=25/8`; `INTELLLVM`,
+  `NVHPC`, `AOCC`, `EMSCRIPTEN`, `SUNOS`, and `SUNPRO` are zero. High-count
+  short terms include ordinary substrings and require exact-selector review.
 - Exact active unsupported selectors remain only in Bison-generated skeleton
   code in `hl/src/H5LTparse.c` and vendored compiler handling in
   `src/uthash.h`; both are protected third-party/generated content.

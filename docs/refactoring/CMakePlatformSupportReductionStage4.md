@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: In progress; Work Package 4A complete
+- State: In progress; Work Packages 4A and 4B complete
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
@@ -18,6 +18,7 @@
 - Stage 3 final implementation anchor: `74288cbaa`
 - Stage 3 accepted completion record: `7e50c3c17`
 - Stage 4 planning baseline: `7e50c3c17`
+- Stage 4 current implementation anchor: `ebdb99969`
 - Required target pairs: Windows with compiler ID `MSVC`, and Linux with
   compiler ID `GNU`
 - Release-validation baselines: Windows x64 with MSVC and a Visual Studio
@@ -28,11 +29,12 @@
 
 The user accepted the plan's review clarifications and confirmed the execution
 requirements on 2026-09-05. Execution has started, and Work Package 4A is
-complete at the reviewed `cafdc38e9` baseline. The results document records the
-qualified validators, fresh product contracts, both required defect
-reproductions, capability probe, and findings ledger. Stage 3 remains
-Completed. Work Package 4B is the next execution action; no repeated plan
-approval is needed for work within these boundaries.
+complete at the reviewed `cafdc38e9` baseline. Work Package 4B is also complete
+at implementation anchor `ebdb99969`: the repository entry points, current
+support claims, presets, workflows, packaging, and residual selectors are
+classified, and the discovered gaps are repaired. Stage 3 remains Completed.
+Work Package 4C is the next execution action; no repeated plan approval is
+needed for work within these boundaries.
 
 ## Purpose
 
@@ -243,6 +245,10 @@ revert, if needed, must remain confined to that checkpoint's owned changes.
   including native build-tool/compiler parallelism, so inherited presets or
   environment settings cannot multiply or exceed the limit. Record MPI ranks
   separately and avoid oversubscribing the validators.
+- This four-job limit is a temporary resource budget for executing this Stage 4
+  plan. It is not a product default or compatibility value and does not require
+  changing repository presets or general user commands that use another job
+  count.
 - Prefer the WSL native filesystem for Linux source/build evidence. Do not
   reuse Windows CMake caches, install prefixes, or dependency outputs on Linux.
 - Use clean tracked trees at the same commit for baseline and final gates.

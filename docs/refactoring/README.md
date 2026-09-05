@@ -33,10 +33,11 @@ plan in this directory.
   In progress; repository/product support consistency, focused defect repairs,
   evidence inheritance, final dual-platform gates, and modernization handoff.
 - [Stage 4 execution results](CMakePlatformSupportReductionStage4Results.md):
-  Work Package 4A baseline, defect reproductions, capability probe, and findings ledger.
+  Work Package 4A baseline plus the completed Work Package 4B repository audit,
+  corrections, residual classifications, and findings ledger.
 
 The Stage 4 plan and review clarifications were approved on 2026-09-05. Work
-Package 4A is complete and Work Package 4B is next. Prefer CLion MCP and limit
-build/CTest parallelism to four per physical host, shared by Windows and WSL
-on that host. Stage 3 completion and the 4A baseline do not complete the
-overall direction.
+Packages 4A and 4B are complete and Work Package 4C is next. Prefer CLion MCP
+and use the temporary Stage 4 build/CTest cap of four per physical host, shared
+by Windows and WSL on that host. Stage 3 completion and the 4A/4B results do
+not complete the overall direction.

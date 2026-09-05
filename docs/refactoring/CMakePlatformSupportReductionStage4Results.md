@@ -4,23 +4,30 @@
 
 - State: In progress
 - Work Package 4A: complete
+- Work Package 4B: complete
 - Baseline execution date: 2026-09-05
 - Baseline checkpoint: `cafdc38e9`
-- Current implementation anchor: `74288cbaa`
+- Current implementation anchor: `ebdb99969`
 - Stage 4 plan:
   [CMakePlatformSupportReductionStage4.md](CMakePlatformSupportReductionStage4.md)
 - Parent plan:
   [CMakePlatformSupportReduction.md](CMakePlatformSupportReduction.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - `HDF_TEST_EXPRESS`: `3`
-- Maximum build and CTest parallelism: 4 per physical host
+- Stage 4 build and CTest execution cap: 4 per physical host
 
 Work Package 4A is complete. Fresh default and C++ Release baselines were
 captured on both retained target/compiler pairs before an implementation
 correction. The two required defects reproduce on both pairs, complete default
 and C++ installs and packages are recorded, and the findings have validation
-owners. Stage 4 remains in progress: Work Package 4B is next, and no Stage 4
-implementation repair has landed yet.
+owners. The Work Package 4B repository audit is complete, its six focused
+implementation corrections end at `ebdb99969`, and its current-support
+documentation correction is recorded at `c6e2c2cb9`. Stage 4 remains in
+progress: Work Package 4C is next.
+
+The four-job cap is a temporary resource constraint for this Stage 4 execution,
+not a repository default or a product compatibility value. Existing presets
+and general user documentation retain their independently chosen job counts.
 
 ## Baseline Identity
 
@@ -285,25 +292,131 @@ was installed or modified.
 | RPM | `rpmbuild` absent | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
 | Native unsupported compiler | Clang, Intel, and NVIDIA compilers absent | Explicit Stage 2 deferral; synthetic policy `PASS` | `SKIP_MISSING_ENV` |
 
+## Repository Contract Audit
+
+### Entry Points and Admission
+
+The audit enumerated all 204 tracked `CMakeLists.txt` and CMake module or
+template paths and reviewed 74 `project()` calls. Most project calls are nested
+package coordinators and inherit the root admission decision. The active
+configure surfaces have these owners:
+
+| Configure surface | Languages and admission owner | State |
+| --- | --- | --- |
+| Root HDF5 project | C is checked immediately after `project()`; optional C++ is checked immediately after `ENABLE_LANGUAGE(CXX)` | `PASS` |
+| Combined standalone examples | C is checked at entry; optional C++ is now checked immediately after it is enabled | `PASS` |
+| Standalone C++ examples | C++ is checked at entry | `PASS` |
+| Optional API test driver | C++ is checked at entry | `PASS` |
+
+The C-only example subdirectories are entered through the combined examples
+coordinator; their nested `project()` calls are not documented independent
+configure surfaces. Installed packages intentionally do not apply the
+source-build firewall to downstream consumers using their own compatible
+compiler. The optional API driver still has the separate S4-02 build defects
+owned by 4D, but it cannot bypass admission.
+
+The admission suite now contains 12 central policy cases and four combined
+example cases. It passed on both Windows and Linux. The cases cover both
+accepted pairs, rejected target systems and compiler IDs, optional C++,
+generator and architecture variation, non-bypass by
+`HDF5_ALLOW_UNSUPPORTED`, and the combined examples' late C++ enablement.
+
+### Presets, Automation, Packaging, and Claims
+
+- Root preset listing exposes one applicable MSVC configure preset on Windows
+  and two applicable GNU configure presets on Linux. The examples expose one
+  applicable configure preset per host. Cross-host build/test names shown by
+  `--list-presets=all` require a corresponding configured tree and cannot
+  bypass the root firewall.
+- All 57 workflow files were enumerated; 35 invoke CMake or CTest. HDF5 source
+  build jobs use Windows/MSVC, Ubuntu/GCC, or MPI wrappers resolving to GNU.
+  Clang occurrences are formatter/analyzer tooling rather than source builds.
+- Dashboard selection is limited to the Visual Studio baseline on Windows and
+  Ninja or Unix Makefiles on Linux. HPC scripts still configure the root
+  project and therefore remain subject to its compiler firewall.
+- Packaging selects Windows ZIP with optional WiX metadata and Linux TGZ/STGZ
+  with environment-dependent DEB/RPM. Retained NSIS settings support explicit
+  Windows packaging. No macOS or other rejected-system package generator is
+  reachable. The release-index script's `.dmg` label can describe historical
+  or externally supplied artifacts and is not a source-package path.
+- Current installation and option guides state the two accepted compiler
+  pairs and the HDFS/JNI exception. The Parallel HDF5 guide now requires Linux
+  MPI wrappers to resolve to GNU and labels Cray-specific advice historical.
+  Historical release documents remain unchanged.
+- No Java or Fortran product directory, build option, language enablement,
+  target, example product, packaging component, or workflow remains. Python
+  under `HDF5Examples/` remains example code. `H5T_FORTRAN_S1` is public
+  API/file-format compatibility, and JNI discovery remains required only by
+  the retained libhdfs VFD.
+
+### Residual Selectors
+
+The repeated case-insensitive scan covered the same 1,358 tracked C/C++ source,
+header, lexer/parser, and template files as the Stage 3 final inventory. Counts
+are lexical leads expressed as matches/files:
+
+| Family | Matches/files | Family | Matches/files |
+| --- | ---: | --- | ---: |
+| `APPLE` | 3/3 | `AIX` | 134/6 |
+| `CLANG` | 225/37 | `HPUX` | 1/1 |
+| `CYGWIN` | 6/5 | `HP-UX` | 5/2 |
+| `DARWIN` | 0/0 | `INTELLLVM` | 0/0 |
+| `FREEBSD` | 1/1 | `NVHPC` | 0/0 |
+| `INTEL` | 179/14 | `AOCC` | 0/0 |
+| `MACOS` | 4/1 | `EMSCRIPTEN` | 0/0 |
+| `MINGW` | 7/6 | `SUNOS` | 0/0 |
+| `NETBSD` | 2/2 | `SOLARIS` | 3/3 |
+| `PGI` | 17/2 | `SUNPRO` | 0/0 |
+| `XL` | 430/29 | `IBM` | 29/6 |
+| `CRAY` | 25/8 |  |  |
+
+Exact preprocessor review found only `__hpux`, `_AIX`, and two `__ICC`
+occurrences in Bison-skeleton code within `hl/src/H5LTparse.c`, plus compiler
+dispatch in vendored `src/uthash.h`. Both are `KEEP_PROTECTED`; their canonical
+generated or third-party ownership is unchanged. Exact unsupported CMake
+selectors are absent outside the synthetic rejection tests.
+
+Other lexical matches are protected public/file-format names, architecture or
+interoperability data, generic supported feature probes, formatter/analyzer
+tooling, test-output normalization, and factual history. In particular,
+`bin/output_filter.sh`, `bin/warnhist`, `test/test_flush_refresh.sh.in`,
+`src/H5Tpkg.h`, and `.github/scripts/generate-index-html.sh` do not select an
+unsupported source build. There is no remaining `INVESTIGATE` item.
+
+### Corrections and Validation
+
+| Finding | Correction and evidence | State |
+| --- | --- | --- |
+| Combined examples late C++ admission | `137ebb73c` added immediate C++ validation and four script cases; full standalone C/C++/HL builds passed on MSVC and GCC | `PASS` |
+| SunOS/AIX configuration remnants | `901ef3d20` removed unreachable SunOS guards and stale AIX/Solaris notes; `20bd1a464` removed the unused AIX header template; C/C++ shared builds and generated settings/declaration comparisons passed on both pairs | `PASS` |
+| Compiler simulation remnants | `1559e52be` reduced coverage and complex probing to actual MSVC/GNU paths; fresh shared builds and expected complex configuration values passed on both pairs | `PASS` |
+| GNU C++ module's nested MSVC path | `49237b0af` removed the unreachable branch while retaining the effective GNU operation; 408 normalized all-warning commands and `libhdf5.settings` remained hash-identical, and MSVC/GCC C++ shared builds passed | `PASS` |
+| Parallel-HDF5 support prose | `c6e2c2cb9` scoped MPI wrappers to the accepted compiler IDs and marked Cray advice historical | `PASS` |
+| Combined-example warning suppression | `ebdb99969` applies `/w` to enabled MSVC C++ examples and keeps it out of `link.exe`; dual-host script cases and representative C/C++ example builds passed, while GNU retained `-w` on compile and compiler-driver link commands | `PASS` |
+
 ## Findings Ledger
 
 | ID | Classification | Baseline evidence | Validation owner | State |
 | --- | --- | --- | --- | --- |
 | `S4-01` | `FIX_STAGE4` | Reproduced on MSVC and GCC: identical second configure adds one mirror test and changes the contract | 4C | `FAIL` |
 | `S4-02` | `FIX_STAGE4` | Reproduced on MSVC and G++: real optional driver target fails on the missing generated header; cleanup spelling defect confirmed | 4D | `FAIL` |
-| `S4-03` | `FIX_STAGE4` | Known current summaries were aligned during planning; repository-wide current-claim audit remains | 4B | `NOT_RUN` |
+| `S4-03` | `FIX_STAGE4` | Current summaries and support guides agree with completed Stage 2/3 evidence; the HPC compiler-wrapper ambiguity was corrected | 4B | `PASS` |
 | `S4-04` | `KEEP_PROTECTED` | Complete fresh 65/101 header sets and separate pre/post-install contracts now exist; final comparison remains | 4E and 4F | `PASS` |
+| `S4-05` | `FIX_STAGE4` | Combined examples allowed late C++ enablement without a C++ compiler-pair check; fixed at `137ebb73c` | 4B | `PASS` |
+| `S4-06` | `FIX_STAGE4` | Unreachable SunOS branches, stale AIX/Solaris notes, and the unused AIX header macro were removed at `901ef3d20` and `20bd1a464` | 4B | `PASS` |
+| `S4-07` | `FIX_STAGE4` | Unsupported compiler-simulation paths were removed at `1559e52be` without changing pair-specific complex results | 4B | `PASS` |
+| `S4-08` | `FIX_STAGE4` | The GNU C++ flags module's impossible nested MSVC branch was removed at `49237b0af` with exact GNU command/settings equality | 4B | `PASS` |
+| `S4-09` | `FIX_STAGE4` | Combined examples now suppress MSVC C++ warnings and no longer pass `/w` to the linker; fixed at `ebdb99969` | 4B | `PASS` |
 
-No additional implementation defect was discovered during 4A. The discarded
-worktree source archive is a corrected validation-method artifact, not a
-product finding. The two required `FAIL` rows stay failed until their focused
-implementation commits and dual-platform checks pass.
+The discarded 4A worktree source archive is a corrected validation-method
+artifact, not a product finding. Work Package 4B has no remaining
+`INVESTIGATE` or failed row. The two required `FAIL` rows stay failed until
+their focused 4C and 4D implementation commits and dual-platform checks pass.
 
 ## Continuation Point
 
-Begin Work Package 4B from clean `cafdc38e9` plus this results checkpoint.
-Enumerate tracked entry points and current support claims, rerun the synthetic
-admission suite, repeat and extend the Stage 3 selector inventory, and classify
-every result before editing product code. Work Packages 4C and 4D remain
-blocked on their relevant 4B ownership classifications, but no 4A baseline is
-missing.
+Begin Work Package 4C from implementation anchor `ebdb99969` plus this results
+checkpoint. Add the first/second/third and ON/OFF/ON configure reproducer, move
+`HDF5_BUILD_UTILS` to a stable declaration owner without changing its default,
+and validate exact utility-dependent registration on both pairs. Work Package
+4D remains next after 4C; no 4A baseline or 4B classification is missing.

@@ -17,9 +17,9 @@ plan in this directory.
 ## Plans
 
 - [Phase 2 C17 and C++20 build baseline](C17Cpp20BuildBaseline.md):
-  Proposed; raise project-owned build modes to C17/C++20, repair only
-  demonstrated blockers, preserve C99/C++11 installed-header compatibility,
-  and validate both retained compiler pairs with at most four active jobs.
+  Proposed; raise the project-owned core, HL, opt-in C++, tools, tests, plugins,
+  and examples to C17/C++20, repair only demonstrated blockers, exclude
+  third-party implementations, and validate with at most four active jobs.
 - [CMake supported platform reduction](CMakePlatformSupportReduction.md):
   reduce the supported project implementation to Windows/MSVC and Linux/GCC
   through staged CMake and source/header work.

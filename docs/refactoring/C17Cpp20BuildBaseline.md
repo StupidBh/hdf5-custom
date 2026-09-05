@@ -4,6 +4,7 @@
 
 - State: Proposed; plan design only
 - Plan drafted: 2026-09-05
+- Scope and completion boundaries confirmed: 2026-09-05
 - Implementation authorized: No
 - Planning baseline: `2e6ed711f`
 - Implementation anchor: none
@@ -32,23 +33,25 @@ the supported-platform reduction plan.
 
 ## Objective
 
-Raise the minimum language modes used to build project-owned code from C11 to
-C17 and from C++11 to C++20. Establish those modes coherently in CMake, expose
-and repair only the compatibility blockers needed to configure, compile,
-link, test, install, package, and consume the existing product, and leave
-broad source modernization for later work.
+Raise the language modes used to build the project-owned core library,
+high-level library, opt-in C++ wrappers, tools, tests, plugins, and examples
+from C11/C++11 or C99/C++11 to C17/C++20. Establish those modes coherently in
+CMake and repair only the blockers that the new modes expose in configuration,
+compilation, linking, or testing. Do not perform broad source modernization.
 
 The completed Phase 2 result must satisfy all of the following:
 
-1. Every project-owned C translation unit in an in-scope configuration is
-   compiled in C17 or a caller-selected later C mode.
-2. Every project-owned C++ translation unit in an in-scope C++ configuration
-   is compiled in C++20 or a caller-selected later C++ mode.
+1. Every in-scope, project-owned C translation unit in the core library,
+   high-level library, tools, tests, plugins, or examples is compiled in C17 or
+   a caller-selected later C mode. Exact C17 is the release baseline.
+2. Every in-scope, project-owned C++ translation unit in the opt-in C++
+   wrappers, tools, tests, plugins, or examples is compiled in C++20 or a
+   caller-selected later C++ mode. Exact C++20 is the release baseline.
 3. CMake feature probes that determine generated configuration for C targets
    run in the same effective C language mode as those targets.
-4. The root build, retained standalone examples, optional project-owned code,
-   and test-only C++ helpers use the intended baseline without accidentally
-   changing third-party source requirements.
+4. The core library, high-level library, opt-in C++ wrappers, tools, tests,
+   plugins, and examples use the intended baseline without changing the
+   language requirements of third-party libraries or tools.
 5. Public C and C++ declarations, ABI, exported symbols, filenames, install
    layout, package behavior, and HDF5 file-format behavior remain compatible.
 6. Installed headers remain parseable by the existing C99 and C++11 consumer
@@ -83,13 +86,17 @@ shortcuts:
 7. Standalone examples are project-owned validation products and move to
    C17/C++20. They test the new build baseline, while separate legacy consumer
    probes protect C99/C++11 header and linkage compatibility.
-8. Fetched, vendored, or system dependencies are not project-owned language
-   migration targets. Do not patch their sources merely to make them compile
-   as C17 or C++20. Isolate their own declared language modes when inherited
-   directory state would otherwise raise their requirements.
-9. Source changes are limited to demonstrated blockers or correctness defects
-   exposed by the new modes. New language features are not introduced merely
-   because they are available.
+8. Third-party libraries and tools are outside the language migration scope,
+   whether they are found from the system, fetched, or vendored. This includes
+   compression libraries, MPI implementations, OpenSSL, AWS SDK components,
+   Hadoop/libhdfs and JNI runtimes, KWSYS, Perl, and comparable prerequisites.
+   Do not raise their language modes or patch their sources. Isolate their own
+   declared modes when inherited directory state would otherwise affect them.
+9. Source changes are limited to demonstrated configuration, compilation,
+   linking, or test blockers caused by C17/C++20. Repairs must not actively
+   introduce modern language or standard-library features. Prefer constructs
+   already valid in the old and new modes; if a repair requires a broader
+   source modernization, stop and defer it to a separately approved direction.
 10. `HDF5_ALLOW_UNSUPPORTED` continues to apply only to documented HDF5
     feature combinations. It cannot bypass the language baseline or the
     target-system/compiler firewall.
@@ -129,9 +136,11 @@ cosmetic check.
 
 ### In scope
 
-- Root and retained standalone-example CMake language-standard ownership.
-- Project-owned core C, high-level C, opt-in C++, high-level C++, tools,
-  utilities, tests, test plugins, examples, and optional feature sources.
+- Root and retained standalone-example CMake language-standard ownership for
+  project-owned targets.
+- Project-owned core library, high-level library, opt-in C++ wrappers, tools,
+  tests, plugins, examples, and their optional feature sources. This list is
+  the complete language migration scope.
 - CMake configure and feature probes whose result controls generated HDF5
   headers, sources, target composition, or runtime behavior.
 - Exact standard-mode evidence for MSVC and GCC/G++.
@@ -140,9 +149,11 @@ cosmetic check.
 - Generated `H5pubconf.h`, build settings, CMake File API, installed exports,
   pkg-config data, compiler wrappers, packages, public headers, symbol sets,
   and representative external consumers.
-- Available optional configurations affected by compiling project-owned code
-  in the new modes, including parallel, subfiling, thread-safe, concurrency,
-  compression, plugins, VOL/VFD paths, coverage, and packaging.
+- HDF5-owned integration logic and available optional configurations affected
+  by compiling project-owned code in the new modes, including parallel,
+  subfiling, thread-safe, concurrency, compression, plugins, VOL/VFD paths,
+  coverage, and packaging. Testing an integration does not place its
+  third-party dependency in the language migration scope.
 - Current build, installation, example, and release documentation, plus a
   user-visible changelog entry for the build baseline change.
 
@@ -163,7 +174,10 @@ cosmetic check.
 - Reopening unsupported compiler, target-system, Java, or Fortran support.
 - General target-scoped CMake modernization, dependency redesign, CTest
   redesign, or installation decomposition unrelated to the language baseline.
-- Updating third-party code for style or newer language use.
+- Raising the build mode of, modifying, or modernizing third-party libraries
+  and tools, including system compression libraries, MPI, OpenSSL, AWS SDK
+  components, Hadoop/libhdfs/JNI, KWSYS, and Perl. HDF5's discovery, linkage,
+  and runtime integration with them remains subject to regression validation.
 - Publishing packages, pushing commits, or modifying external systems.
 
 ## Compatibility Contract
@@ -239,6 +253,9 @@ cosmetic check.
   points. If directory-level standard variables leak into a dependency that
   does not declare the same baseline, isolate the dependency rather than edit
   its sources.
+- Treat system tools such as Perl as external capabilities only. They receive
+  no HDF5 language-standard requirement even when an HDF5 generation or test
+  path invokes them.
 - Keep KWSYS at its independently required mode while applying C++20 to the
   project-owned API driver executables.
 - Apply C17/C++20 to retained standalone examples through their own entry
@@ -283,11 +300,14 @@ they fail an agreed warnings-as-errors gate, reveal undefined or changed
 behavior, or make generated/runtime results unreliable.
 
 Allowed source repairs include private identifier changes for newly reserved
-keywords, replacement of removed library facilities with behavior-equivalent
-code, missing standard headers, conforming declarations, and narrowly scoped
-compiler differences. A public identifier conflict, public signature change,
-layout change, semantic rewrite, or broad cleanup crosses the stop line and
-requires a separate decision.
+keywords, behavior-equivalent replacement of facilities rejected by the new
+modes, missing standard headers, conforming declarations, and narrowly scoped
+compiler differences. Use syntax and library facilities already valid in both
+the old and new modes. Do not introduce concepts, ranges, modules, coroutines,
+`std::span`, or other modern features as part of a blocker repair. A public
+identifier conflict, public signature change, layout change, semantic rewrite,
+or broader modernization crosses the stop line and requires a separate
+decision.
 
 ## Risk Register
 
@@ -295,7 +315,7 @@ requires a separate decision.
 | --- | --- | --- |
 | `LS-01` | Current C feature probes run before the declared C11 baseline. Moving the standard earlier can change generated configuration. | Capture fresh pre-change probe results; compare every generated macro and classify all deltas. |
 | `LS-02` | The raw C11 option in `CMAKE_C_FLAGS` conflates target compilation, reporting, and user flags. | Remove raw standard injection; prove exact target modes and separately preserve truthful build reporting. |
-| `LS-03` | Directory-level standards can leak into fetched or vendored dependencies. | Inventory dependency target properties; isolate dependency standards and forbid opportunistic third-party patches. |
+| `LS-03` | Directory-level standards can leak into fetched, vendored, or system dependency checks. | Inventory dependency target properties; isolate dependency standards and never raise or patch third-party implementations. |
 | `LS-04` | C++20 can expose keyword, overload, lookup, removed-library, or standard-library ABI interactions not visible in text scans. | Run native MSVC/G++ builds and tests plus C++11/C++20 cross-mode installed consumers. |
 | `LS-05` | Complex, atomics, and thread probes may select different implementation paths. | Repeat generated-header, thread-safe, concurrency, parallel, and subfiling gates on fresh caches. |
 | `LS-06` | Imported targets or wrappers could accidentally force downstream C17/C++20. | Compare exports, pkg-config, wrapper output, and consumers using both legacy and new modes. |
@@ -502,7 +522,8 @@ later changes cannot affect that evidence.
    lower explicit request, and retain an explicit later request.
 3. Remove raw C11 standard-option injection and reconcile truthful build
    reporting without exporting a consumer requirement.
-4. Apply C17 to every project-owned root and standalone-example C target.
+4. Apply C17 to every project-owned C target in the core library, high-level
+   library, tools, tests, plugins, and examples.
 5. Isolate non-project dependencies that would otherwise inherit C17 without
    declaring it.
 6. Add focused CMake checks for exact standard ownership, first/repeat
@@ -547,8 +568,8 @@ later changes cannot affect that evidence.
 
 1. Set the opt-in C++ default/minimum to C++20, require it, disable extensions,
    reject a lower explicit request, and retain an explicit later request.
-2. Apply C++20 to core C++, high-level C++, project-owned test helpers, tools,
-   and standalone C++ examples.
+2. Apply C++20 to the opt-in C++ wrappers and every project-owned C++ target in
+   tools, tests, plugins, and examples.
 3. Keep KWSYS and other dependencies on their own standard contracts.
 4. Prove that C-only configurations remain independent of a C++ compiler.
 5. Add focused standard-property, opt-in activation, and export-leakage checks.
@@ -584,8 +605,8 @@ later changes cannot affect that evidence.
 | Integration styles | Required | Required | Build/install package, `add_subdirectory()`, FetchContent; pkg-config/wrappers where supported. |
 | Thread-safe/concurrency | Applicable | Required | Fresh configure/build and focused thread tests; generated atomics/thread macros reviewed. |
 | Parallel/subfiling | Environment-dependent | Required when available | Build and focused MPI/VFD tests; C++ remains outside supported parallel combination. |
-| System compression | Required when available | Required | Static/shared build, install, filter tests, and consumers. |
-| Bundled compression/plugins | Required when network/dependencies permit | Required | Dependency mode isolation, build, load/failure tests, exports, packages. |
+| System compression | Required when available | Required | Validate HDF5 discovery, linkage, filters, install, and consumers without changing the system libraries' standards. |
+| Bundled compression/plugins | Required when network/dependencies permit | Required | Isolate third-party modes; validate HDF5-owned build, loading/failure behavior, exports, and packages. |
 | Coverage | Not applicable to MSVC baseline | Required | Instrumented build/test and counter cleanup with four-job cap. |
 | Binary packages | ZIP | TGZ plus available native formats | Manifest, metadata, runtime, and consumer checks. |
 | Unix Makefiles | Not applicable | Required focused row | Configure, representative build, and tests independent of Ninja. |
@@ -694,10 +715,12 @@ Phase 2 is complete only when:
 
 - the plan has been approved and every work package has passed;
 - exact C17 and C++20 modes are proven for every applicable project-owned
-  target on both release baselines;
+  target in the core library, high-level library, opt-in C++ wrappers, tools,
+  tests, plugins, and examples on both release baselines;
 - C-only configurations remain C++-independent;
 - configure probes and product targets use coherent effective modes;
-- dependencies retain explicit, reviewed language ownership;
+- third-party libraries and tools retain their own language ownership and are
+  not modified as part of the migration;
 - all required product, optional, install, package, and consumer gates pass
   within the four-job execution limit;
 - C99/C++11 legacy consumers and C17/C++20 baseline consumers pass;
@@ -709,6 +732,8 @@ Phase 2 is complete only when:
 - the results record and portable handoff point to the tested final
   implementation anchor without machine-specific paths or transient logs.
 
-Completion establishes a newer build baseline. It does not complete broad C17
-or C++20 source modernization and does not authorize a later public-header
-minimum change without a new compatibility plan.
+Completion establishes C17 and C++20 as the project-owned build baselines and
+proves the existing supported functionality through the bounded validation
+matrix. It does not complete broad source modernization, introduce modern
+syntax as an incidental goal, or authorize a later public-header minimum
+change without a new compatibility plan.

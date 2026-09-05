@@ -39,7 +39,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Approved; Work Package 2A complete and Work Package 2B next
+- Status: Active; Work Packages 2A and 2B complete and Work Package 2C next
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
@@ -117,7 +117,9 @@ build/CTest parallelism at four jobs per physical host. HDF5-owned integration
 with third-party prerequisites remains in the regression matrix. Work Package
 2A approved the direction, selected `a1adbc32b` as the execution baseline,
 qualified both validators, and classified the current optional prerequisites.
-No C17/C++20 product configure, build, test, or implementation change has run.
+Work Package 2B froze fresh default/C++ contracts, full suites, interfaces,
+packages, consumers, and cross-platform file reads at that baseline. No
+C17/C++20 probe or implementation change has run.
 
 ## Completed
 
@@ -314,11 +316,11 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Execute Phase 2 Work Package 2B at the selected baseline: capture fresh
-  default and C++ Release contracts on both retained pairs, run both full suites
-  at `HDF_TEST_EXPRESS=3`, and establish C99/C++11 legacy consumers.
-- Continue Work Packages 2C through 2H in order after each preceding exit gate
-  passes; do not begin the external standard probe before 2B is recorded.
+- Execute Phase 2 Work Package 2C from the exact 2B evidence checkpoint in an
+  external diagnostic copy. Request strict C17/C++20, build both retained
+  pairs, and classify every finding without copying exploratory edits back.
+- Continue Work Packages 2D through 2H in order after each preceding exit gate
+  passes.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor while Phase 2 is active.
 
@@ -332,14 +334,16 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is Work Package 2B of the approved
+The current continuation point is Work Package 2C of the approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
 Work Package 2A selected execution baseline `a1adbc32b`, qualified the retained
 Windows/MSVC and Linux/GCC validators, confirmed the host-wide four-job limit,
-and completed read-only optional-capability discovery. Create fresh default and
-C++ Release builds on both pairs, capture the complete pre-migration contract,
-run the full express-level-3 suites, and establish the legacy C99/C++11
-installed consumers before beginning Work Package 2C.
+and completed read-only optional-capability discovery. Work Package 2B passed
+fresh default/C++ Release builds and full express-level-3 suites on both pairs,
+then recorded the complete pre-migration contract, C99/C++11 consumers, ABI/API
+evidence, package manifests, and cross-platform file reads. Create the 2C
+diagnostic copy from the exact 2B evidence checkpoint and classify strict
+C17/C++20 failures before changing the real tree.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -349,11 +353,14 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Package 2A is complete at execution baseline `a1adbc32b`. The
-  exact validators, storage check, four-job accounting rule, and optional
-  prerequisite classification are recorded in the Phase 2 results document.
-  No C17/C++20 configure, build, CTest, install, package, ABI, or consumer result
-  has been claimed.
+- Phase 2 Work Packages 2A and 2B are complete at execution baseline
+  `a1adbc32b`. The exact validators, optional prerequisites, first/repeat
+  contracts, four full Release suites, standard modes, generated files,
+  headers, symbols, layouts, installs, packages, consumers, and file round
+  trips are recorded in the Phase 2 results document. The full suites passed
+  2,816/2,850 enabled tests on Windows and 2,818/2,852 on Linux for
+  default/C++, with 37 disabled and zero skipped or failed in every row. No
+  strict C17/C++20 probe or implementation result has been claimed.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

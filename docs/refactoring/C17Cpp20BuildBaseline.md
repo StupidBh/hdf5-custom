@@ -10,6 +10,8 @@
 - Execution baseline: `a1adbc32b`
 - Implementation anchor: none
 - Work Package 2A: Complete
+- Work Package 2B: Complete
+- Next work package: 2C external standard probe
 - Execution record:
   [C17Cpp20BuildBaselineResults.md](C17Cpp20BuildBaselineResults.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -26,7 +28,8 @@ This document defines a compatibility-changing language-build direction that
 is separate from the paused behavior-preserving CMake 4 modernization. The
 user approved the plan and its build-baseline versus public-header-baseline
 distinction on 2026-09-05. Work Package 2A qualified the validators and selected
-the execution baseline; Work Package 2B is the next implementation step.
+the execution baseline. Work Package 2B froze the complete pre-migration
+contract at that baseline; Work Package 2C is the next implementation step.
 
 The name "Phase 2" describes the next project-level refactoring direction. It
 must not be confused with the completed Stage 2 Linux/GCC validation inside

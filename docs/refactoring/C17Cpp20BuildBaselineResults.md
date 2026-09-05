@@ -8,7 +8,8 @@
 - Implementation anchor: none
 - Work Package 2A: Complete
 - Work Package 2B: Complete
-- Work Packages 2C through 2H: Not started
+- Work Package 2C: Complete
+- Work Packages 2D through 2H: Not started
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -27,8 +28,8 @@ was changed.
 | --- | --- | --- |
 | 2A Approval and validator qualification | `PASS` | Approved at `a1adbc32b`; both required validators and optional capabilities recorded below. |
 | 2B Freeze the pre-migration contract | `PASS` | Fresh product, interface, package, consumer, and file-format evidence passed at `a1adbc32b`. |
-| 2C External standard probe | `NOT_STARTED` | Create the diagnostic-only strict C17/C++20 copy from the 2B evidence checkpoint. |
-| 2D C17 readiness repairs | `NOT_STARTED` | Wait for classified 2C findings. |
+| 2C External standard probe | `PASS` | Both strict-mode product matrices built; one C readiness defect and two retained deltas are classified below. |
+| 2D C17 readiness repairs | `NOT_STARTED` | Repair the MSVC complex-capability probe under the dual-mode gate. |
 | 2E Establish C17 | `NOT_STARTED` | Wait for the 2D dual-mode gate. |
 | 2F C++20 readiness repairs | `NOT_STARTED` | Wait for the C17 switch and classified C++ findings. |
 | 2G Establish C++20 | `NOT_STARTED` | Wait for the 2F dual-mode gate. |
@@ -301,6 +302,58 @@ have distinct byte hashes, so later compatibility compares successful
 cross-platform reads and semantic dump content rather than requiring identical
 container bytes.
 
+## Strict C17/C++20 External Probe
+
+Work Package 2C used fresh diagnostic source copies made from documentation
+checkpoint `5b871fd3c`. The copies were outside the repository and changed only
+the standard-ownership declarations required to request C17/C++20, require the
+selected standards, disable extensions, remove the raw C11 option injection,
+and restore C++20 after the API driver's third-party KWSYS population. No probe
+implementation was copied into the tracked tree.
+
+| Product | Effective modes | Build | Focused tests |
+| --- | --- | --- | --- |
+| Windows default | 317 C groups at `/std:c17` | `PASS` | 7/7 with fixtures |
+| Windows C++ | 317 C groups at `/std:c17`; 23 C++ groups at `/std:c++20` | `PASS` | 9/9 with fixtures |
+| Linux default | 317 C groups at exact `-std=c17` | `PASS` | 7/7 with fixtures |
+| Linux C++ | 317 C groups at exact `-std=c17`; 23 C++ groups at exact `-std=c++20` | `PASS` | 9/9 with fixtures |
+
+The focused selection covered the core `testhdf5` base case, high-level lite,
+and `h5diff` paths in every row, plus the C++ core and high-level packet-table
+tests in C++ rows. Default and C++ builds completed with four jobs and no
+compile or link failure. The normalized contracts contain 17,325 and 19,568
+records on Windows and 28,204 and 30,771 records on Linux for default/C++.
+Their SHA-256 values begin `0042413edf4c`, `b1325e0200bc`, `31f4df6d58d1`, and
+`3ca2a9722619`, respectively.
+
+Every product-owned C compile group moved to standard 17 and every applicable
+product-owned C++ group moved to standard 20. No default configuration loaded a
+C++ compiler. The API driver retained KWSYS at its own C++11 declaration and
+restored C++20 only for HDF5-owned driver targets, so the probe found no
+third-party standard leakage.
+
+The Linux default build retained its 28 baseline warning lines. The C++20 build
+retained the 30 C++ baseline lines and added five GCC 15 `-Wlarger-than`
+diagnostics for the two fixed-size multidimensional `new` expressions in
+`c++/test/dsets.cpp`.
+Those tests compile and pass, warnings are not promoted to errors, and the plan
+forbids source cleanup that is not required by the migration. Finding `P2-03`
+therefore records the delta without a source change.
+
+The same-validator generated-header comparison found only two feature groups:
+
+- MSVC `/std:c17` defines `__STDC_NO_COMPLEX__`; the current outer configure
+  guard consequently skips HDF5's existing `_Fcomplex`, `_Dcomplex`, and
+  `_Lcomplex` fallback. `H5_HAVE_COMPLEX_NUMBERS` and the three native complex
+  sizes disappear even though the compiler-specific implementation remains
+  available. This is a C17 readiness defect, not an accepted compatibility
+  change.
+- Strict GNU C17 hides the non-ISO `timezone` global, so `H5_HAVE_TIMEZONE`
+  changes from 1 to undefined. `H5_HAVE_TM_GMTOFF` remains 1 and is the earlier
+  branch used by `H5_make_time()`, while complex support and all type sizes are
+  unchanged. This accurately reflects strict namespace visibility and causes no
+  active runtime or ABI change.
+
 ### Comparison and Validation Rules
 
 | Evidence kind | Later comparison rule |
@@ -330,20 +383,23 @@ superseded terminal session remains.
 
 ## Findings Ledger
 
-No C17 or C++20 probe has run, so Work Package 2B creates no blocker finding.
-It freezes two facts that Work Package 2C must not lose: current GNU C targets
-effectively use GNU C11 extensions, and current MSVC C++11-minimum targets use
-the compiler's default C++14-level mode. The raw global C11 flag, duplicate C
-standard options, and missing global C++ flag in `libhdf5.settings` are known
-standard-ownership inputs for 2E/2G, not newly discovered ordinary defects.
-No `INVESTIGATE` item exists at the end of Work Package 2B.
+| ID | Owner and reproducer | Impact | Disposition and gate |
+| --- | --- | --- | --- |
+| `P2-01` | C/configure: fresh MSVC `/std:c17` configure reaches `__STDC_NO_COMPLEX__` and bypasses the MSVC type fallback in `config/ConfigureChecks.cmake`. | Removes native complex configuration and the corresponding datatype/conversion implementation from the Windows build. | `FIX_BASELINE`: let MSVC probe its supported fallback even when ISO complex is unavailable; prove C11 and C17 generated macros, build, and focused complex tests on MSVC plus GCC non-regression. |
+| `P2-02` | C/platform: fresh GCC `-std=c17` configure no longer compiles the nonstandard `timezone` global probe. | No active behavior change because `H5_HAVE_TM_GMTOFF=1` remains selected first in `H5_make_time()`; builds and smoke tests pass. | `KEEP_COMPAT`: retain the truthful undefined result in strict mode; recheck generated headers and time tests after the C17 switch. |
+| `P2-03` | C++/test warning: GCC 15 with `-std=c++20` reports five `-Wlarger-than` warnings for fixed-size multidimensional allocations in `c++/test/dsets.cpp`. | Warning-only diagnostic in test code; compilation and the C++ focused tests pass. | `DEFER_SOURCE_MODERNIZATION`: do not rewrite passing test allocation code as part of a baseline-only migration; preserve warning classification at the final gate. |
+
+The raw global C11 flag, duplicate baseline C options, and missing global C++
+flag in `libhdf5.settings` remain standard-ownership inputs for 2E/2G rather
+than ordinary source defects. No C++ readiness repair is required and no
+`INVESTIGATE` item remains at the end of Work Package 2C.
 
 ## Continuation Point
 
-Work Package 2B is complete at product baseline `a1adbc32b`; its portable
-checkpoint is the focused documentation commit containing this record. Start
-Work Package 2C by creating a fresh diagnostic source copy from that exact
-checkpoint. Change only the copied standard-ownership declarations needed to
-request strict C17/C++20, configure and build default/C++ Release on both
-validators with the four-job host limit, and classify every result before any
-source repair enters the real tree. Do not copy exploratory edits back.
+Work Package 2C is complete using diagnostic copies from checkpoint
+`5b871fd3c`; no exploratory implementation entered the repository. Start Work
+Package 2D with finding `P2-01` only. Repair the complex configure guard in the
+real tree while it still builds in C11, validate both current and strict C17
+MSVC modes plus GCC non-regression and focused complex-number behavior, then
+commit that blocker family independently. `P2-02` and `P2-03` require no source
+change. Do not begin the CMake baseline switch until the 2D gate passes.

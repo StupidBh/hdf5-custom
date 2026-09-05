@@ -164,17 +164,7 @@ endif ()
 #-----------------------------------------------------------------------------
 if (HDF5_ENABLE_ALL_WARNINGS)
   message (STATUS "....All CXX Warnings are enabled")
-  if (MSVC)
-    if (HDF5_ENABLE_DEV_WARNINGS)
-      string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-      list (APPEND HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS "/Wall" "/wd4668")
-    else ()
-      string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-      list (APPEND HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS "/W3" "/wd4100" "/wd4706" "/wd4127")
-    endif ()
-  else ()
-    list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS ${HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS})
-  endif ()
+  list (APPEND HDF5_CMAKE_CXX_WARNING_FLAGS ${HDF5_CMAKE_CXX_OPTIONAL_WARNING_FLAGS})
 endif ()
 
 #-----------------------------------------------------------------------------

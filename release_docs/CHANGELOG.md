@@ -56,6 +56,10 @@ The combined standalone examples project now applies the same compiler-pair
 check when its optional C++ examples enable the C++ language. This closes an
 entry point that previously validated only the C compiler.
 
+The Parallel HDF5 setup guide now makes clear that MPI compiler wrappers must
+still resolve to a supported compiler ID. Cray-specific guidance is labeled as
+historical and no longer implies an additional supported compiler family.
+
 The unused AIX-only `H5__LARGE_FILES` generated-header template entry has been
 removed. It was neither defined nor consumed by retained builds.
 

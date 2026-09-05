@@ -14,6 +14,13 @@ CMake. The document covers:
 - **Section 7:** Running parallel tests
 - **Appendix A:** Sample MPI-IO programs
 
+Source builds in this repository accept Windows with compiler ID `MSVC` and
+Linux with compiler ID `GNU`. The shell and batch examples below are oriented
+toward Linux/GNU HPC environments. MPI compiler wrappers must still resolve to
+the GNU compiler ID; wrappers selecting another compiler family are rejected
+during configuration. Historical Cray guidance is retained for context and
+does not expand the supported compiler pairs.
+
 ### 1.1. Requirements
 
 PHDF5 requires:
@@ -44,7 +51,9 @@ When building on HPC systems:
    - CMake version 4.0 or greater
    - MPI implementation module
 
-3. **For Cray and other systems with recommend compiler wrappers,** set compiler environment variables AFTER loading modules:
+3. **For supported Linux/GNU systems with recommended compiler wrappers,** set
+   compiler environment variables after loading modules. For example, a Cray
+   environment using a GNU backend may provide these wrapper names:
 
    ```bash
    export CC=cc
@@ -387,7 +396,11 @@ For MPICH on Linux, ensure >2GB file support by configuring MPICH with:
 
 This is available on Linux kernels 2.4 and greater.
 
-### 8.2. Cray Systems
+### 8.2. Historical Cray System Notes
+
+These notes describe earlier Cray environments and are not a current support
+claim. A current wrapper-based Linux build is accepted only when CMake
+identifies its C and optional C++ compilers as GNU.
 
 - Use `CC=cc` and `CXX=CC` after loading compiler modules
 - Unload `craype-hugepages2M` if loaded (**Note**: This is situational advice and is not a universal rule, but it may be a valid troubleshooting step if you encounter memory-related performance issues or allocation errors.)

@@ -528,7 +528,7 @@ set (H5_S3TESTS
     s3comms
 )
 
-if (HDF5_BUILD_UTILS)
+if (HDF5_BUILD_UTILS AND HDF5_ENABLE_MIRROR_VFD)
   set (H5_TESTS ${H5_TESTS} mirror_vfd)
 endif ()
 
@@ -694,7 +694,7 @@ if (HDF5_ENABLE_FORMATTERS)
   clang_format (HDF5_TEST_ttsafe_FORMAT ttsafe)
 endif ()
 
-if (HDF5_BUILD_UTILS) # requires mirror server
+if (HDF5_BUILD_UTILS AND HDF5_ENABLE_MIRROR_VFD) # requires mirror server
   #-- Adding test for mirror_vfd
   add_executable (mirror_vfd ${mirror_vfd_SOURCES})
   target_include_directories (mirror_vfd PRIVATE "${HDF5_SRC_INCLUDE_DIRS};${HDF5_SRC_BINARY_DIR}")
@@ -953,7 +953,7 @@ if (HDF5_ENABLE_FORMATTERS)
   clang_format (HDF5_TEST_use_append_chunk_FORMAT use_append_chunk)
 endif ()
 
-if (HDF5_BUILD_UTILS) # requires mirror server
+if (HDF5_BUILD_UTILS AND HDF5_ENABLE_MIRROR_VFD) # requires mirror server
   set (use_append_chunk_mirror_SOURCES ${HDF5_TEST_SOURCE_DIR}/use_append_chunk_mirror.c ${HDF5_TEST_SOURCE_DIR}/use_common.c ${HDF5_TEST_SOURCE_DIR}/use.h)
   add_executable (use_append_chunk_mirror ${use_append_chunk_mirror_SOURCES})
   hdf5_target_use_build_options (use_append_chunk_mirror)

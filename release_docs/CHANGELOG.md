@@ -147,6 +147,14 @@ functionality.
 
 ## Configuration
 
+### Stabilized utility-dependent test registration
+
+   `HDF5_BUILD_UTILS` is now declared before the test tree consumes it, so a
+   fresh configure and unchanged repeat configures register the same targets
+   and tests. Mirror VFD tests are registered only when both the VFD and its
+   server utilities are enabled, and CTest now starts and stops the required
+   mirror server through a fixture.
+
 ### Corrected GCC coverage target documentation
 
    The Linux/GCC coverage instructions incorrectly told users to build an

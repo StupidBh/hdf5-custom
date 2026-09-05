@@ -355,6 +355,7 @@ set (H5TEST_SEPARATE_TESTS
     external_env
     flush1
     flush2
+    mirror_vfd
     vds_env
 )
 foreach (h5_test ${H5_EXPRESS_TESTS})
@@ -421,6 +422,58 @@ foreach (h5_test ${H5_TESTS})
     endif ()
   endif ()
 endforeach ()
+
+if (HDF5_BUILD_UTILS AND HDF5_ENABLE_MIRROR_VFD)
+  string (SHA256 mirror_port_hash "${HDF5_BINARY_DIR}")
+  string (SUBSTRING "${mirror_port_hash}" 0 4 mirror_port_hex)
+  math (EXPR HDF5_MIRROR_TEST_PORT "20000 + (0x${mirror_port_hex} % 20000)")
+  find_program (HDF5_MIRROR_TEST_SHELL NAMES sh NO_CACHE REQUIRED)
+
+  add_test (NAME H5TEST-mirror_server-start COMMAND "${CMAKE_COMMAND}"
+      -D "TEST_PROGRAM=$<TARGET_FILE:mirror_server>"
+      -D "TEST_SHELL=${HDF5_MIRROR_TEST_SHELL}"
+      -D "TEST_PORT=${HDF5_MIRROR_TEST_PORT}"
+      -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
+      -P "${HDF_RESOURCES_DIR}/runMirrorServer.cmake"
+  )
+  set_tests_properties (H5TEST-mirror_server-start PROPERTIES
+      FIXTURES_SETUP hdf5_mirror_server
+      RUN_SERIAL TRUE
+      TIMEOUT 15
+  )
+
+  if (HDF5_ENABLE_USING_MEMCHECKER)
+    add_test (NAME H5TEST-mirror_vfd
+        COMMAND $<TARGET_FILE:mirror_vfd> "--port=${HDF5_MIRROR_TEST_PORT}"
+    )
+  else ()
+    add_test (NAME H5TEST-mirror_vfd COMMAND "${CMAKE_COMMAND}"
+        -D "TEST_PROGRAM=$<TARGET_FILE:mirror_vfd>"
+        -D "TEST_ARGS:STRING=--port=${HDF5_MIRROR_TEST_PORT}"
+        -D "TEST_EXPECT=0"
+        -D "TEST_SKIP_COMPARE=TRUE"
+        -D "TEST_OUTPUT=mirror_vfd.txt"
+        -D "TEST_LIBRARY_DIRECTORY=${CMAKE_TEST_OUTPUT_DIRECTORY}"
+        -D "TEST_FOLDER=${HDF5_TEST_BINARY_DIR}/H5TEST"
+        -P "${HDF_RESOURCES_DIR}/runTest.cmake"
+    )
+  endif ()
+  set_tests_properties (H5TEST-mirror_vfd PROPERTIES
+      FIXTURES_REQUIRED "clear_H5TEST;hdf5_mirror_server"
+      ENVIRONMENT "srcdir=${HDF5_TEST_BINARY_DIR}/H5TEST"
+      RUN_SERIAL TRUE
+      WORKING_DIRECTORY ${HDF5_TEST_BINARY_DIR}/H5TEST
+  )
+
+  add_test (NAME H5TEST-mirror_server-stop
+      COMMAND $<TARGET_FILE:mirror_server_stop> "--port=${HDF5_MIRROR_TEST_PORT}"
+  )
+  set_tests_properties (H5TEST-mirror_server-stop PROPERTIES
+      FIXTURES_CLEANUP hdf5_mirror_server
+      RUN_SERIAL TRUE
+      TIMEOUT 15
+  )
+endif ()
 
 set_tests_properties (H5TESTXPR-fheap PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})
 set_tests_properties (H5TEST-big PROPERTIES TIMEOUT ${CTEST_VERY_LONG_TIMEOUT})

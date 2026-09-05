@@ -230,6 +230,8 @@ mark_as_advanced (HDF5_BUILD_PARALLEL_TOOLS)
 
 option (HDF5_BUILD_TOOLS "Build HDF5 Tools" ON)
 
+option (HDF5_BUILD_UTILS "Build HDF5 Utils" ON)
+
 option (HDF5_ENABLE_PLUGIN_SUPPORT "Enable PLUGIN Filters" OFF)
 mark_as_advanced (HDF5_ENABLE_PLUGIN_SUPPORT)
 

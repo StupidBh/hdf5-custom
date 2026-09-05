@@ -1,57 +1,62 @@
 cmake_minimum_required (VERSION 4.0)
-project (HDF5_C_STANDARD_SCOPE C)
+project (HDF5_LANGUAGE_STANDARD_SCOPE C CXX)
 
 include (${CMAKE_CURRENT_LIST_DIR}/../../HDF5LanguageStandards.cmake)
 hdf5_configure_c_language_standard ()
+hdf5_configure_cxx_language_standard ()
 
-set (hdf5_expected_standard "${CMAKE_C_STANDARD}")
-
-function (hdf5_require_owned_standard target)
-  get_target_property (actual_standard ${target} C_STANDARD)
-  get_target_property (actual_required ${target} C_STANDARD_REQUIRED)
-  get_target_property (actual_extensions ${target} C_EXTENSIONS)
-  if (NOT actual_standard STREQUAL hdf5_expected_standard OR
+function (hdf5_require_owned_standard target language expected_standard)
+  get_target_property (actual_standard ${target} ${language}_STANDARD)
+  get_target_property (actual_required ${target} ${language}_STANDARD_REQUIRED)
+  get_target_property (actual_extensions ${target} ${language}_EXTENSIONS)
+  if (NOT "${actual_standard}" STREQUAL "${expected_standard}" OR
       NOT actual_required OR actual_extensions)
     message (FATAL_ERROR
-      "${target} has C${actual_standard}, required=${actual_required}, extensions=${actual_extensions}; "
-      "expected strict C${hdf5_expected_standard}"
+      "${target} has ${language}${actual_standard}, required=${actual_required}, "
+      "extensions=${actual_extensions}; expected strict ${language}${expected_standard}"
     )
   endif ()
 endfunction ()
 
 add_library (hdf5_owned_before STATIC owned.c)
-hdf5_require_owned_standard (hdf5_owned_before)
+add_library (hdf5_cxx_owned_before STATIC owned.cpp)
+hdf5_require_owned_standard (hdf5_owned_before C "${CMAKE_C_STANDARD}")
+hdf5_require_owned_standard (hdf5_cxx_owned_before CXX "${CMAKE_CXX_STANDARD}")
 
-hdf5_begin_dependency_c_standard_scope ()
+hdf5_begin_dependency_language_standard_scope ()
 add_subdirectory (dependency)
-hdf5_end_dependency_c_standard_scope ()
+hdf5_end_dependency_language_standard_scope ()
 
 add_library (hdf5_owned_after STATIC owned.c)
-hdf5_require_owned_standard (hdf5_owned_after)
+add_library (hdf5_cxx_owned_after STATIC owned.cpp)
+hdf5_require_owned_standard (hdf5_owned_after C "${CMAKE_C_STANDARD}")
+hdf5_require_owned_standard (hdf5_cxx_owned_after CXX "${CMAKE_CXX_STANDARD}")
 
-get_target_property (dependency_default_standard dependency_default C_STANDARD)
-get_target_property (dependency_default_required dependency_default C_STANDARD_REQUIRED)
-get_target_property (dependency_default_extensions dependency_default C_EXTENSIONS)
-foreach (dependency_default_property IN ITEMS
-    dependency_default_standard
-    dependency_default_required
-    dependency_default_extensions
-)
-  if (${dependency_default_property})
+function (hdf5_require_dependency_default target language)
+  foreach (property_suffix IN ITEMS STANDARD STANDARD_REQUIRED EXTENSIONS)
+    get_target_property (actual_property ${target} ${language}_${property_suffix})
+    if (NOT actual_property MATCHES "-NOTFOUND$")
+      message (FATAL_ERROR
+        "${target} inherited ${language}_${property_suffix}=${actual_property} from HDF5"
+      )
+    endif ()
+  endforeach ()
+endfunction ()
+
+function (hdf5_require_dependency_declared target language expected_standard)
+  get_target_property (actual_standard ${target} ${language}_STANDARD)
+  get_target_property (actual_required ${target} ${language}_STANDARD_REQUIRED)
+  get_target_property (actual_extensions ${target} ${language}_EXTENSIONS)
+  if (NOT "${actual_standard}" STREQUAL "${expected_standard}" OR
+      NOT actual_required OR actual_extensions)
     message (FATAL_ERROR
-      "Undeclared dependency property inherited HDF5's C standard: "
-      "${dependency_default_property}=${${dependency_default_property}}"
+      "Dependency declaration changed: ${language}${actual_standard}, "
+      "required=${actual_required}, extensions=${actual_extensions}"
     )
   endif ()
-endforeach ()
+endfunction ()
 
-get_target_property (dependency_declared_standard dependency_declared C_STANDARD)
-get_target_property (dependency_declared_required dependency_declared C_STANDARD_REQUIRED)
-get_target_property (dependency_declared_extensions dependency_declared C_EXTENSIONS)
-if (NOT dependency_declared_standard STREQUAL "11" OR
-    NOT dependency_declared_required OR dependency_declared_extensions)
-  message (FATAL_ERROR
-    "Dependency declaration changed: C${dependency_declared_standard}, "
-    "required=${dependency_declared_required}, extensions=${dependency_declared_extensions}"
-  )
-endif ()
+hdf5_require_dependency_default (dependency_default C)
+hdf5_require_dependency_default (dependency_cxx_default CXX)
+hdf5_require_dependency_declared (dependency_declared C 11)
+hdf5_require_dependency_declared (dependency_cxx_declared CXX 11)

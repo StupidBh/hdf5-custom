@@ -40,6 +40,16 @@ We would like to thank the many HDF5 community members who contributed to this r
 
 # ⚠️ Breaking Changes
 
+## CMake C++ builds now require C++20 for project-owned sources
+
+When `HDF5_BUILD_CPP_LIB=ON`, the CMake build now compiles HDF5-owned C++
+libraries, tools, tests, plugins, and examples in strict C++20 mode.
+`CMAKE_CXX_STANDARD` defaults to `20`; an explicit older value is rejected,
+while a compiler-supported later value is retained. Bundled third-party
+projects keep their own language settings, and installed targets do not pass a
+C++20 requirement to applications. The installed C and C++ headers retain
+their C99 and C++11 consumer compatibility baselines.
+
 ## CMake builds now require C17 for project-owned C sources
 
 The CMake build now compiles HDF5-owned C libraries, tools, tests, plugins, and

@@ -24,3 +24,16 @@ macro (hdf5_configure_c_language_standard)
   set (CMAKE_C_STANDARD_REQUIRED TRUE)
   set (CMAKE_C_EXTENSIONS OFF)
 endmacro ()
+
+macro (hdf5_configure_cxx_language_standard)
+  if (NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD}" STREQUAL "")
+    set (CMAKE_CXX_STANDARD 20)
+  elseif (CMAKE_CXX_STANDARD MATCHES "^(98|11|14|17)$")
+    message (FATAL_ERROR
+      "HDF5 examples require C++20 or later, but CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} requests an older standard."
+    )
+  endif ()
+
+  set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+  set (CMAKE_CXX_EXTENSIONS OFF)
+endmacro ()

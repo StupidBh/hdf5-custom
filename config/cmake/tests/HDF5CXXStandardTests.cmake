@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 4.0)
 
 foreach (required_variable IN ITEMS
-    HDF5_C_STANDARD_TEST_BINARY_ROOT
-    HDF5_C_STANDARD_TEST_GENERATOR
+    HDF5_CXX_STANDARD_TEST_BINARY_ROOT
+    HDF5_CXX_STANDARD_TEST_GENERATOR
 )
   if (NOT DEFINED ${required_variable} OR "${${required_variable}}" STREQUAL "")
     message (FATAL_ERROR "Missing required test variable: ${required_variable}")
@@ -13,55 +13,58 @@ cmake_path (GET CMAKE_CURRENT_LIST_DIR PARENT_PATH cmake_dir)
 cmake_path (GET cmake_dir PARENT_PATH config_dir)
 cmake_path (GET config_dir PARENT_PATH source_dir)
 cmake_path (ABSOLUTE_PATH source_dir NORMALIZE OUTPUT_VARIABLE source_dir)
-cmake_path (ABSOLUTE_PATH HDF5_C_STANDARD_TEST_BINARY_ROOT NORMALIZE
+cmake_path (ABSOLUTE_PATH HDF5_CXX_STANDARD_TEST_BINARY_ROOT NORMALIZE
   OUTPUT_VARIABLE binary_root
 )
 cmake_path (IS_PREFIX source_dir "${binary_root}" NORMALIZE binary_in_source)
 if (binary_in_source)
-  message (FATAL_ERROR "The C standard test root must be outside the source tree")
+  message (FATAL_ERROR "The C++ standard test root must be outside the source tree")
 endif ()
 
-if (NOT DEFINED HDF5_C_STANDARD_TEST_EXPECTED_GROUPS)
-  set (HDF5_C_STANDARD_TEST_EXPECTED_GROUPS 317)
+if (NOT DEFINED HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS)
+  set (HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS 23)
 endif ()
 if (WIN32)
-  set (c17_flag_regex "[-/]std:c17")
-  set (c23_flag_regex "[-/]std:clatest")
+  set (cxx20_flag_regex "[-/]std:c\\+\\+20")
+  set (cxx23_flag_regex "[-/]std:c\\+\\+(23|latest)")
 else ()
-  set (c17_flag_regex "-std=c17")
-  set (c23_flag_regex "-std=c(23|2x)")
+  set (cxx20_flag_regex "-std=c\\+\\+20")
+  set (cxx23_flag_regex "-std=c\\+\\+23")
 endif ()
 
 file (MAKE_DIRECTORY "${binary_root}/contracts")
 
-function (_hdf5_c_standard_prepare_case case_name output_variable)
+function (_hdf5_cxx_standard_prepare_case case_name output_variable)
   set (case_dir "${binary_root}/${case_name}")
   file (REMOVE_RECURSE "${case_dir}")
-  set (query_dir "${case_dir}/.cmake/api/v1/query/client-hdf5-c-standard")
+  set (query_dir "${case_dir}/.cmake/api/v1/query/client-hdf5-cxx-standard")
   file (MAKE_DIRECTORY "${query_dir}")
   file (WRITE "${query_dir}/codemodel-v2" "")
   set (${output_variable} "${case_dir}" PARENT_SCOPE)
 endfunction ()
 
-function (_hdf5_c_standard_configure source build standard expect_success expected_message)
+function (_hdf5_cxx_standard_configure source build standard option_name expect_success expected_message)
   set (configure_command
     "${CMAKE_COMMAND}" -S "${source}" -B "${build}"
-    -G "${HDF5_C_STANDARD_TEST_GENERATOR}"
+    -G "${HDF5_CXX_STANDARD_TEST_GENERATOR}"
   )
-  if (DEFINED HDF5_C_STANDARD_TEST_GENERATOR_PLATFORM AND
-      NOT HDF5_C_STANDARD_TEST_GENERATOR_PLATFORM STREQUAL "")
-    list (APPEND configure_command -A "${HDF5_C_STANDARD_TEST_GENERATOR_PLATFORM}")
+  if (DEFINED HDF5_CXX_STANDARD_TEST_GENERATOR_PLATFORM AND
+      NOT HDF5_CXX_STANDARD_TEST_GENERATOR_PLATFORM STREQUAL "")
+    list (APPEND configure_command -A "${HDF5_CXX_STANDARD_TEST_GENERATOR_PLATFORM}")
   endif ()
-  if (DEFINED HDF5_C_STANDARD_TEST_GENERATOR_TOOLSET AND
-      NOT HDF5_C_STANDARD_TEST_GENERATOR_TOOLSET STREQUAL "")
-    list (APPEND configure_command -T "${HDF5_C_STANDARD_TEST_GENERATOR_TOOLSET}")
+  if (DEFINED HDF5_CXX_STANDARD_TEST_GENERATOR_TOOLSET AND
+      NOT HDF5_CXX_STANDARD_TEST_GENERATOR_TOOLSET STREQUAL "")
+    list (APPEND configure_command -T "${HDF5_CXX_STANDARD_TEST_GENERATOR_TOOLSET}")
   endif ()
   list (APPEND configure_command -DCMAKE_BUILD_TYPE=Release -DHDF_TEST_EXPRESS=3)
-  if (NOT standard STREQUAL "DEFAULT")
-    list (APPEND configure_command "-DCMAKE_C_STANDARD=${standard}")
+  if (NOT option_name STREQUAL "NONE")
+    list (APPEND configure_command "-D${option_name}=ON")
   endif ()
-  if (DEFINED HDF5_C_STANDARD_TEST_CONFIGURE_ARGS)
-    list (APPEND configure_command ${HDF5_C_STANDARD_TEST_CONFIGURE_ARGS})
+  if (NOT standard STREQUAL "DEFAULT")
+    list (APPEND configure_command "-DCMAKE_CXX_STANDARD=${standard}")
+  endif ()
+  if (DEFINED HDF5_CXX_STANDARD_TEST_CONFIGURE_ARGS)
+    list (APPEND configure_command ${HDF5_CXX_STANDARD_TEST_CONFIGURE_ARGS})
   endif ()
 
   execute_process (
@@ -78,15 +81,15 @@ function (_hdf5_c_standard_configure source build standard expect_success expect
       message (FATAL_ERROR "Configure failed for ${build}:\n${diagnostic}")
     endif ()
   elseif (NOT configure_result)
-    message (FATAL_ERROR "Configure unexpectedly accepted C${standard} for ${source}")
+    message (FATAL_ERROR "Configure unexpectedly accepted C++${standard} for ${source}")
   elseif (NOT normalized_diagnostic MATCHES "${expected_message}")
     message (FATAL_ERROR
-      "Configure rejection for C${standard} omitted '${expected_message}':\n${diagnostic}"
+      "Configure rejection for C++${standard} omitted '${expected_message}':\n${diagnostic}"
     )
   endif ()
 endfunction ()
 
-function (_hdf5_c_standard_read_codemodel build_dir output_json output_configuration)
+function (_hdf5_cxx_standard_read_codemodel build_dir output_json output_configuration)
   set (reply_dir "${build_dir}/.cmake/api/v1/reply")
   file (GLOB index_files "${reply_dir}/index-*.json")
   list (SORT index_files)
@@ -131,15 +134,15 @@ function (_hdf5_c_standard_read_codemodel build_dir output_json output_configura
   set (${output_configuration} ${release_configuration} PARENT_SCOPE)
 endfunction ()
 
-function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag_regex output_variable)
-  _hdf5_c_standard_read_codemodel ("${build_dir}" codemodel_json configuration_index)
+function (_hdf5_cxx_standard_capture build_dir capture_name expected_standard flag_regex output_variable)
+  _hdf5_cxx_standard_read_codemodel ("${build_dir}" codemodel_json configuration_index)
   set (reply_dir "${build_dir}/.cmake/api/v1/reply")
   string (JSON target_count LENGTH
     "${codemodel_json}" configurations ${configuration_index} targets
   )
   math (EXPR target_last "${target_count} - 1")
 
-  set (c_group_count 0)
+  set (cxx_group_count 0)
   set (contract_records)
   foreach (target_index RANGE 0 ${target_last})
     string (JSON target_file GET
@@ -160,21 +163,18 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
       string (JSON language GET
         "${target_json}" compileGroups ${compile_group_index} language
       )
-      if (language STREQUAL "CXX")
-        message (FATAL_ERROR "C-only configuration unexpectedly created C++ target ${target_name}")
-      endif ()
-      if (NOT language STREQUAL "C")
+      if (NOT language STREQUAL "CXX")
         continue ()
       endif ()
 
-      math (EXPR c_group_count "${c_group_count} + 1")
+      math (EXPR cxx_group_count "${cxx_group_count} + 1")
       string (JSON actual_standard ERROR_VARIABLE standard_error GET
         "${target_json}" compileGroups ${compile_group_index} languageStandard standard
       )
       if (NOT standard_error STREQUAL "NOTFOUND" OR
           NOT actual_standard STREQUAL "${expected_standard}")
         message (FATAL_ERROR
-          "Target ${target_name} has C standard '${actual_standard}', expected '${expected_standard}'"
+          "Target ${target_name} has C++ standard '${actual_standard}', expected '${expected_standard}'"
         )
       endif ()
 
@@ -192,7 +192,7 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
       endforeach ()
       if (NOT compile_fragments MATCHES "${flag_regex}")
         message (FATAL_ERROR
-          "Target ${target_name} does not use the strict C${expected_standard} mode: ${compile_fragments}"
+          "Target ${target_name} does not use strict C++${expected_standard}: ${compile_fragments}"
         )
       endif ()
       list (APPEND contract_records
@@ -201,9 +201,9 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
     endforeach ()
   endforeach ()
 
-  if (NOT c_group_count EQUAL HDF5_C_STANDARD_TEST_EXPECTED_GROUPS)
+  if (NOT cxx_group_count EQUAL HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS)
     message (FATAL_ERROR
-      "Found ${c_group_count} C compile groups; expected ${HDF5_C_STANDARD_TEST_EXPECTED_GROUPS}"
+      "Found ${cxx_group_count} C++ compile groups; expected ${HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS}"
     )
   endif ()
 
@@ -222,8 +222,8 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
   endif ()
   foreach (export_file IN LISTS export_files)
     file (READ "${export_file}" export_content)
-    if (export_content MATCHES "c_std_[0-9]+")
-      message (FATAL_ERROR "C standard requirement leaked into ${export_file}")
+    if (export_content MATCHES "cxx_std_[0-9]+")
+      message (FATAL_ERROR "C++ standard requirement leaked into ${export_file}")
     endif ()
     file (RELATIVE_PATH relative_export "${build_dir}" "${export_file}")
     file (SHA256 "${export_file}" export_hash)
@@ -231,29 +231,21 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
   endforeach ()
 
   set (settings_file "${build_dir}/src/libhdf5.settings")
-  file (STRINGS "${settings_file}" standard_report REGEX "^[ ]+C Standard:")
-  if (NOT standard_report MATCHES "C Standard: C${expected_standard}$")
-    message (FATAL_ERROR "Unexpected C standard build report: ${standard_report}")
+  file (STRINGS "${settings_file}" standard_report REGEX "^[ ]+C\\+\\+ Standard:")
+  if (NOT standard_report MATCHES "C\\+\\+ Standard: C\\+\\+${expected_standard}$")
+    message (FATAL_ERROR "Unexpected C++ standard build report: ${standard_report}")
   endif ()
-  file (STRINGS "${settings_file}" reported_cflags REGEX "^[ ]+CFLAGS:")
-  if (reported_cflags MATCHES "[-/]std[:=]")
-    message (FATAL_ERROR "Raw standard option remains in reported CFLAGS: ${reported_cflags}")
+  file (STRINGS "${settings_file}" reported_cxxflags REGEX "^[ ]+C\\+\\+ Flags:")
+  if (reported_cxxflags MATCHES "[-/]std[:=]")
+    message (FATAL_ERROR "Raw standard option remains in reported C++ flags: ${reported_cxxflags}")
+  endif ()
+  file (READ "${build_dir}/src/H5build_settings.c" embedded_settings)
+  if (NOT embedded_settings MATCHES "C\\+\\+ Standard: C\\+\\+${expected_standard}")
+    message (FATAL_ERROR "Embedded build settings omit C++${expected_standard}")
   endif ()
   list (APPEND contract_records "report|${standard_report}")
-  file (STRINGS "${settings_file}" cxx_standard_report REGEX "^[ ]+C\\+\\+ Standard:")
-  if (NOT cxx_standard_report MATCHES "C\\+\\+ Standard: not enabled$")
-    message (FATAL_ERROR "C-only build report unexpectedly enabled C++: ${cxx_standard_report}")
-  endif ()
 
-  file (GLOB_RECURSE cxx_compiler_files LIST_DIRECTORIES FALSE
-    "${build_dir}/CMakeFiles/*/CMakeCXXCompiler.cmake"
-  )
-  if (cxx_compiler_files)
-    message (FATAL_ERROR "C-only configuration initialized a C++ compiler: ${cxx_compiler_files}")
-  endif ()
-
-  set (generated_header "${build_dir}/src/H5pubconf.h")
-  file (SHA256 "${generated_header}" generated_header_hash)
+  file (SHA256 "${build_dir}/src/H5pubconf.h" generated_header_hash)
   list (APPEND contract_records "header|H5pubconf.h|sha256=${generated_header_hash}")
 
   list (SORT contract_records)
@@ -263,51 +255,62 @@ function (_hdf5_c_standard_capture build_dir capture_name expected_standard flag
   set (${output_variable} "${contract_file}" PARENT_SCOPE)
 endfunction ()
 
-function (_hdf5_c_standard_compare baseline current description)
+function (_hdf5_cxx_standard_compare baseline current description)
   execute_process (
     COMMAND "${CMAKE_COMMAND}" -E compare_files "${baseline}" "${current}"
     RESULT_VARIABLE compare_result
   )
   if (compare_result)
     message (FATAL_ERROR
-      "C standard contract changed across ${description}:\n  ${baseline}\n  ${current}"
+      "C++ standard contract changed across ${description}:\n  ${baseline}\n  ${current}"
     )
   endif ()
 endfunction ()
 
-_hdf5_c_standard_prepare_case (default default_dir)
-_hdf5_c_standard_configure ("${source_dir}" "${default_dir}" DEFAULT TRUE "")
-_hdf5_c_standard_capture ("${default_dir}" default-first 17 "${c17_flag_regex}" default_first)
-_hdf5_c_standard_configure ("${source_dir}" "${default_dir}" DEFAULT TRUE "")
-_hdf5_c_standard_capture ("${default_dir}" default-second 17 "${c17_flag_regex}" default_second)
-_hdf5_c_standard_compare ("${default_first}" "${default_second}" "first/repeat configure")
+_hdf5_cxx_standard_prepare_case (default default_dir)
+_hdf5_cxx_standard_configure (
+  "${source_dir}" "${default_dir}" DEFAULT HDF5_BUILD_CPP_LIB TRUE ""
+)
+_hdf5_cxx_standard_capture (
+  "${default_dir}" default-first 20 "${cxx20_flag_regex}" default_first
+)
+_hdf5_cxx_standard_configure (
+  "${source_dir}" "${default_dir}" DEFAULT HDF5_BUILD_CPP_LIB TRUE ""
+)
+_hdf5_cxx_standard_capture (
+  "${default_dir}" default-second 20 "${cxx20_flag_regex}" default_second
+)
+_hdf5_cxx_standard_compare ("${default_first}" "${default_second}" "first/repeat configure")
 
-_hdf5_c_standard_prepare_case (later later_dir)
-_hdf5_c_standard_configure ("${source_dir}" "${later_dir}" 23 TRUE "")
-_hdf5_c_standard_capture ("${later_dir}" later 23 "${c23_flag_regex}" later_contract)
+_hdf5_cxx_standard_prepare_case (later later_dir)
+_hdf5_cxx_standard_configure (
+  "${source_dir}" "${later_dir}" 23 HDF5_BUILD_CPP_LIB TRUE ""
+)
+_hdf5_cxx_standard_capture ("${later_dir}" later 23 "${cxx23_flag_regex}" later_contract)
 
 foreach (scope_standard IN ITEMS DEFAULT 23)
   string (TOLOWER "${scope_standard}" scope_case_suffix)
-  _hdf5_c_standard_prepare_case ("dependency-scope-${scope_case_suffix}" scope_dir)
-  _hdf5_c_standard_configure (
-    "${CMAKE_CURRENT_LIST_DIR}/c-standard-scope" "${scope_dir}" "${scope_standard}" TRUE ""
+  _hdf5_cxx_standard_prepare_case ("dependency-scope-${scope_case_suffix}" scope_dir)
+  _hdf5_cxx_standard_configure (
+    "${CMAKE_CURRENT_LIST_DIR}/c-standard-scope" "${scope_dir}" "${scope_standard}" NONE TRUE ""
   )
 endforeach ()
 
-foreach (lower_standard IN ITEMS 90 99 11)
-  _hdf5_c_standard_prepare_case ("lower-${lower_standard}" lower_dir)
-  _hdf5_c_standard_configure (
-    "${source_dir}" "${lower_dir}" "${lower_standard}" FALSE
-    "requires C17 or later.*CMAKE_C_STANDARD=${lower_standard}"
+foreach (lower_standard IN ITEMS 98 11 14 17)
+  _hdf5_cxx_standard_prepare_case ("lower-${lower_standard}" lower_dir)
+  _hdf5_cxx_standard_configure (
+    "${source_dir}" "${lower_dir}" "${lower_standard}" HDF5_BUILD_CPP_LIB FALSE
+    "requires C\\+\\+20 or later.*CMAKE_CXX_STANDARD=${lower_standard}"
   )
 
-  _hdf5_c_standard_prepare_case ("examples-lower-${lower_standard}" examples_lower_dir)
-  _hdf5_c_standard_configure (
-    "${source_dir}/HDF5Examples" "${examples_lower_dir}" "${lower_standard}" FALSE
-    "examples require C17 or later.*CMAKE_C_STANDARD=${lower_standard}"
+  _hdf5_cxx_standard_prepare_case ("examples-lower-${lower_standard}" examples_lower_dir)
+  _hdf5_cxx_standard_configure (
+    "${source_dir}/HDF5Examples" "${examples_lower_dir}" "${lower_standard}"
+    H5EXAMPLE_BUILD_CXX FALSE
+    "examples require C\\+\\+20 or later.*CMAKE_CXX_STANDARD=${lower_standard}"
   )
 endforeach ()
 
 message (STATUS
-  "All HDF5 C standard cases passed (${HDF5_C_STANDARD_TEST_EXPECTED_GROUPS} C compile groups)"
+  "All HDF5 C++ standard cases passed (${HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS} C++ compile groups)"
 )

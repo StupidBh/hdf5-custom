@@ -155,9 +155,9 @@ function (external_szip_library)
   endif ()
 
   # Make SZIP (libaec) available for the build
-  hdf5_begin_dependency_c_standard_scope ()
+  hdf5_begin_dependency_language_standard_scope ()
   FetchContent_MakeAvailable (SZIP)
-  hdf5_end_dependency_c_standard_scope ()
+  hdf5_end_dependency_language_standard_scope ()
 
   # Hide libaec-specific items from the GUI by default
   mark_as_advanced (AEC_FUZZING)

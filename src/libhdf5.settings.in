@@ -48,6 +48,7 @@ Languages:
 
                             C++: @HDF5_BUILD_CPP_LIB@
                    C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
+                   C++ Standard: @HDF5_REPORTED_CXX_STANDARD@
                       C++ Flags: @HDF5_REPORTED_CXX_FLAGS@ @HDF5_BUILD_MODE_CXX_FLAGS@
                    H5 C++ Flags: @HDF5_CMAKE_CXX_FLAGS@
                    AM C++ Flags: @AM_CXXFLAGS@

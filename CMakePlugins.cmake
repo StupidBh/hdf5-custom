@@ -159,9 +159,9 @@ function (external_hdf5_plugins_library)
   endif ()
 
   # Make HDF5 filter plugins project available for the build
-  hdf5_begin_dependency_c_standard_scope ()
+  hdf5_begin_dependency_language_standard_scope ()
   FetchContent_MakeAvailable (HDF5_FILTER_PLUGINS)
-  hdf5_end_dependency_c_standard_scope ()
+  hdf5_end_dependency_language_standard_scope ()
 
   # Set HDF5 filter plugins directory and status variables
   set (PLUGIN_BINARY_DIR "${hdf5_filter_plugins_BINARY_DIR}" PARENT_SCOPE)

@@ -15,17 +15,19 @@ FetchContent_Declare (KWSYS
     URL_HASH ""
 )
 FetchContent_GetProperties(KWSYS)
+hdf5_begin_dependency_language_standard_scope ()
 if(NOT kwsys_POPULATED)
   set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+  set(CMAKE_CXX_EXTENSIONS OFF)
 
   set(KWSYS_NAMESPACE h5_api_test_sys)
   set(KWSYS_USE_SystemTools 1)
   set(KWSYS_USE_Process 1)
   set(KWSYS_USE_RegularExpression 1)
 endif()
-hdf5_begin_dependency_c_standard_scope ()
 FetchContent_MakeAvailable(KWSYS)
-hdf5_end_dependency_c_standard_scope ()
+hdf5_end_dependency_language_standard_scope ()
 
 add_executable(h5_api_test_driver h5_api_test_driver.cpp)
 target_include_directories(h5_api_test_driver
@@ -42,7 +44,6 @@ target_link_libraries(h5_api_test_driver h5_api_test_sys)
 
 if (BUILD_TESTING)
   add_executable (h5_api_test_driver_process h5_api_test_driver_process.cpp)
-  target_compile_features (h5_api_test_driver_process PRIVATE cxx_std_11)
   if (COMMAND hdf5_target_use_platform)
     hdf5_target_use_platform (h5_api_test_driver_process)
   endif ()

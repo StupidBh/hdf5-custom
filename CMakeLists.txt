@@ -32,6 +32,11 @@ project (HDF5 C)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/config/cmake/HDF5LanguageStandards.cmake)
 hdf5_configure_c_language_standard ()
+set (HDF5_REPORTED_CXX_STANDARD "not enabled")
+if (HDF5_BUILD_CPP_LIB)
+  hdf5_configure_cxx_language_standard ()
+  set (HDF5_REPORTED_CXX_STANDARD "C++${CMAKE_CXX_STANDARD}")
+endif ()
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/config/cmake/HDF5PlatformSupport.cmake)
 hdf5_validate_platform_support (LANGUAGES C)
@@ -758,6 +763,7 @@ if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
     endif ()
 
     include (${HDF_CONFIG_DIR}/flags/HDFCompilerCXXFlags.cmake)
+    set (HDF5_REPORTED_CXX_STANDARD "C++${CMAKE_CXX_STANDARD}")
     hdf5_configure_cxx_build_options ()
 
     add_subdirectory (c++)

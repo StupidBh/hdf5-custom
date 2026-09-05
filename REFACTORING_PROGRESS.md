@@ -24,6 +24,11 @@ The completed Stage 4 final project-audit plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage4.md`](docs/refactoring/CMakePlatformSupportReductionStage4.md).
 Its execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage4Results.md`](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
+The proposed Phase 2 language-build direction is defined in
+[`docs/refactoring/C17Cpp20BuildBaseline.md`](docs/refactoring/C17Cpp20BuildBaseline.md).
+It raises project-owned build modes to C17/C++20 while preserving the current
+public-header consumer baselines. The plan is awaiting review and does not yet
+authorize implementation.
 This direction intentionally changes the compatibility contract by first
 reducing the CMake matrix and then removing source-level support outside
 Windows/MSVC and Linux/GCC. The underlying target architecture and the paused
@@ -33,8 +38,14 @@ behavior-preserving modernization state remain recorded in
 
 ## Active Direction
 
-- Direction: Project supported-platform reduction (complete); CMake 4 modernization is next
-- Status: Stages 1 through 4 completed; overall direction complete.
+- Direction: Phase 2 C17/C++20 build-baseline planning
+- Status: Proposed plan drafted; implementation has not started and is not
+  authorized until explicit review approval.
+- Phase 2 planning baseline: `2e6ed711f`
+- Phase 2 plan anchor: `ef0ff7390`
+- Phase 2 implementation anchor: none
+- Phase 2 execution limit after approval: at most four active build and CTest
+  jobs in total per physical host
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -93,6 +104,14 @@ the optional API driver's generated-header ownership and cleanup identifier at
 both retained pairs. Work Package 4E passed the full final-implementation
 product and consumer audit, and Work Package 4F passed the remaining Debug,
 static-only, shared-only, Unix Makefiles, residual, package, and handoff gates.
+
+The proposed Phase 2 plan is a separate compatibility-changing direction. Its
+first implementation step, if approved, will establish project build baselines
+of C17 and C++20 and repair only demonstrated blockers. It explicitly keeps
+C99/C++11 installed-header consumers in the validation contract, avoids broad
+source modernization, isolates third-party language requirements, requires
+atomic local commits, and caps active build/CTest parallelism at four jobs per
+physical host. No Phase 2 implementation or validation has run.
 
 ## Completed
 
@@ -289,8 +308,12 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Resume the separate target-scoped CMake modernization from its unchanged
-  progress anchor and apply that plan's own evidence requirements.
+- Review and explicitly approve or revise the proposed
+  [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
+- Do not start its validator qualification, baseline capture, standard probe,
+  source repair, CMake implementation, or build validation before approval.
+- Preserve the separate target-scoped CMake modernization at its unchanged
+  progress anchor while Phase 2 is under review.
 
 ## Continuation Point
 
@@ -302,15 +325,24 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-Resume the separate CMake 4 modernization from unchanged implementation anchor
-`0b9e21c34`. First classify the remaining repeated MPI include expressions in
-standalone examples, package configuration, dependency-specific targets, and
-C++ targets. Then continue the dedicated compatible migration of remaining
-global compiler-flag state. Do not advance the modernization anchor until a
-new implementation batch lands and passes that plan's scoped gates.
+The current continuation point is review of the proposed
+[Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md)
+at plan anchor `ef0ff7390`. Implementation is not authorized. After explicit
+approval, start with Work Package 2A: select the execution baseline, qualify
+both retained validators, confirm the host-wide four-job resource limit, and
+perform read-only optional-capability discovery. Do not begin baseline capture
+or the external standard probe until 2A exits successfully.
+
+The separate CMake 4 modernization remains paused at implementation anchor
+`0b9e21c34`. Its preserved continuation is classification of the remaining MPI
+include expressions followed by dedicated migration of global compiler-flag
+state. Do not advance that anchor as a side effect of Phase 2 planning or
+execution.
 
 ## Validation State
 
+- Phase 2 has planning evidence only at `ef0ff7390`. No C17/C++20 configure,
+  build, CTest, install, package, ABI, or consumer result has been claimed.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

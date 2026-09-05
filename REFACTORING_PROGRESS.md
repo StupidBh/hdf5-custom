@@ -39,12 +39,12 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Active; Work Packages 2A through 2C complete and Work Package 2D next
+- Status: Active; Work Packages 2A through 2D complete and Work Package 2E next
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
 - Phase 2 execution baseline: `a1adbc32b`
-- Phase 2 implementation anchor: none
+- Phase 2 implementation anchor: `310fb4323`
 - Phase 2 execution limit: at most four active build and CTest jobs in total per
   physical host
 - Original support-contract anchor: `912fb436b`
@@ -123,7 +123,10 @@ Package 2C then built strict C17 and C++20 diagnostic copies on both retained
 pairs. It found one C readiness defect in the MSVC complex configure guard, one
 expected strict-C namespace delta for Linux `timezone`, and one warning-only
 GCC C++20 test delta. No exploratory implementation entered the real tree and
-no `INVESTIGATE` item remains.
+no `INVESTIGATE` item remains. Work Package 2D closed the C defect at
+`310fb4323`: C11 and strict-C17 affected builds and 16-test complex selections
+pass on both validators, and Windows retains its complete generated-header
+contract.
 
 ## Completed
 
@@ -320,10 +323,11 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Execute Phase 2 Work Package 2D finding `P2-01`: preserve the existing MSVC
-  complex fallback when strict C17 defines `__STDC_NO_COMPLEX__`, then pass the
-  documented C11/C17 dual-mode and focused complex gates on both compilers.
-- Continue Work Packages 2E through 2H in order after each preceding exit gate
+- Execute Phase 2 Work Package 2E as one atomic CMake baseline switch: establish
+  the C17 minimum before probes, reject lower requests, retain later requests,
+  disable extensions, cover every project-owned C target, and prevent consumer
+  or third-party leakage.
+- Continue Work Packages 2F through 2H in order after each preceding exit gate
   passes.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor while Phase 2 is active.
@@ -338,7 +342,7 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is Work Package 2D of the approved
+The current continuation point is Work Package 2E of the approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
 Work Package 2A selected execution baseline `a1adbc32b`, qualified the retained
 Windows/MSVC and Linux/GCC validators, confirmed the host-wide four-job limit,
@@ -347,9 +351,10 @@ fresh default/C++ Release builds and full express-level-3 suites on both pairs,
 then recorded the complete pre-migration contract, C99/C++11 consumers, ABI/API
 evidence, package manifests, and cross-platform file reads. Work Package 2C
 built all four strict-mode diagnostic products from checkpoint `5b871fd3c` and
-passed 7/7 default or 9/9 C++ focused tests per validator. Implement only
-finding `P2-01` in the real tree: the MSVC C17 configure path must still probe
-the supported compiler-specific complex types before the C17 baseline switch.
+passed 7/7 default or 9/9 C++ focused tests per validator. Work Package 2D then
+closed `P2-01` at `310fb4323`; its C11/C17 dual-mode builds and 16/16 focused
+complex tests pass on both validators. Establish the C17 CMake baseline next,
+including lower/later caller-mode policy and target/export ownership checks.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -359,7 +364,7 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Packages 2A through 2C are complete at execution baseline
+- Phase 2 Work Packages 2A through 2D are complete; the execution baseline is
   `a1adbc32b`. The exact validators, optional prerequisites, first/repeat
   contracts, four full Release suites, standard modes, generated files,
   headers, symbols, layouts, installs, packages, consumers, and file round
@@ -369,7 +374,9 @@ execution.
   strict external probe built all four products and proved exact C17/C++20
   target modes. Its MSVC complex finding is the only 2D readiness repair; the
   Linux `timezone` capability delta and GCC C++20 test warnings are classified
-  retained behavior. No strict-mode implementation result has yet been claimed.
+  retained behavior. The repair at `310fb4323` passes the dual-mode affected
+  build and 16-test complex gate on both validators. The C17 baseline switch
+  has not yet landed.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

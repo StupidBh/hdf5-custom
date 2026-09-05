@@ -5,11 +5,12 @@
 - State: In progress
 - Plan approval: 2026-09-05
 - Execution baseline: `a1adbc32b7604d6a57d6dcab1a965258ff48f148`
-- Implementation anchor: none
+- Implementation anchor: `310fb4323`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
-- Work Packages 2D through 2H: Not started
+- Work Package 2D: Complete
+- Work Packages 2E through 2H: Not started
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -29,8 +30,8 @@ was changed.
 | 2A Approval and validator qualification | `PASS` | Approved at `a1adbc32b`; both required validators and optional capabilities recorded below. |
 | 2B Freeze the pre-migration contract | `PASS` | Fresh product, interface, package, consumer, and file-format evidence passed at `a1adbc32b`. |
 | 2C External standard probe | `PASS` | Both strict-mode product matrices built; one C readiness defect and two retained deltas are classified below. |
-| 2D C17 readiness repairs | `NOT_STARTED` | Repair the MSVC complex-capability probe under the dual-mode gate. |
-| 2E Establish C17 | `NOT_STARTED` | Wait for the 2D dual-mode gate. |
+| 2D C17 readiness repairs | `PASS` | `310fb4323` preserves MSVC complex support in both C11 and strict C17. |
+| 2E Establish C17 | `NOT_STARTED` | Move C probe and target ownership to the strict C17 minimum. |
 | 2F C++20 readiness repairs | `NOT_STARTED` | Wait for the C17 switch and classified C++ findings. |
 | 2G Establish C++20 | `NOT_STARTED` | Wait for the 2F dual-mode gate. |
 | 2H Full product and handoff gate | `NOT_STARTED` | Wait for the tested C17/C++20 implementation anchor. |
@@ -354,6 +355,31 @@ The same-validator generated-header comparison found only two feature groups:
   unchanged. This accurately reflects strict namespace visibility and causes no
   active runtime or ABI change.
 
+## C17 Readiness Repair
+
+Commit `310fb4323` closes `P2-01`. `ConfigureChecks.cmake` now treats
+`__STDC_NO_COMPLEX__` as evidence only against the ISO `_Complex` types. MSVC
+continues into the existing `_Fcomplex`, `_Dcomplex`, and `_Lcomplex` fallback,
+while non-MSVC compilers with that macro retain the prior disabled result. No C
+source, public header, declaration, symbol, layout, or file-format logic changed.
+
+Fresh Windows C11 and strict-C17 configures both selected the MSVC fallback and
+generated `H5_HAVE_COMPLEX_NUMBERS=1` with float, double, and long-double complex
+sizes 8, 16, and 16. Their complete generated `H5pubconf.h` files are identical
+to each other, and the C11 file is identical to the frozen Windows baseline.
+Both modes built the static/shared core libraries, `dt_arith`, `ntypes`,
+`h5dump`, and its standard test-data target. The focused complex selection
+passed 16/16 in each mode at `HDF_TEST_EXPRESS=3` with four jobs.
+
+Fresh Linux C11 and strict-C17 Ninja configures continued to select the ISO C99
+complex types. Each completed 1,137 affected build steps and passed the same
+16/16 focused selection with four jobs. Their generated-header comparison has
+only the already classified `H5_HAVE_TIMEZONE` delta; every complex macro and
+size is unchanged. The first Windows C11 CTest invocation preceded the explicit
+standalone test and test-data targets and was discarded; after those targets
+were built, the accepted rerun passed. No build, CTest, CMake, Ninja, or MSBuild
+worker remains active.
+
 ### Comparison and Validation Rules
 
 | Evidence kind | Later comparison rule |
@@ -385,7 +411,7 @@ superseded terminal session remains.
 
 | ID | Owner and reproducer | Impact | Disposition and gate |
 | --- | --- | --- | --- |
-| `P2-01` | C/configure: fresh MSVC `/std:c17` configure reaches `__STDC_NO_COMPLEX__` and bypasses the MSVC type fallback in `config/ConfigureChecks.cmake`. | Removes native complex configuration and the corresponding datatype/conversion implementation from the Windows build. | `FIX_BASELINE`: let MSVC probe its supported fallback even when ISO complex is unavailable; prove C11 and C17 generated macros, build, and focused complex tests on MSVC plus GCC non-regression. |
+| `P2-01` | C/configure: fresh MSVC `/std:c17` configure reaches `__STDC_NO_COMPLEX__` and bypasses the MSVC type fallback in `config/ConfigureChecks.cmake`. | Removed native complex configuration and the corresponding datatype/conversion implementation from the diagnostic Windows build. | `CLOSED` by `310fb4323`: MSVC probes its supported fallback even when ISO complex is unavailable; C11/C17 generated macros, affected builds, and 16/16 focused tests pass on both validators. |
 | `P2-02` | C/platform: fresh GCC `-std=c17` configure no longer compiles the nonstandard `timezone` global probe. | No active behavior change because `H5_HAVE_TM_GMTOFF=1` remains selected first in `H5_make_time()`; builds and smoke tests pass. | `KEEP_COMPAT`: retain the truthful undefined result in strict mode; recheck generated headers and time tests after the C17 switch. |
 | `P2-03` | C++/test warning: GCC 15 with `-std=c++20` reports five `-Wlarger-than` warnings for fixed-size multidimensional allocations in `c++/test/dsets.cpp`. | Warning-only diagnostic in test code; compilation and the C++ focused tests pass. | `DEFER_SOURCE_MODERNIZATION`: do not rewrite passing test allocation code as part of a baseline-only migration; preserve warning classification at the final gate. |
 
@@ -396,10 +422,10 @@ than ordinary source defects. No C++ readiness repair is required and no
 
 ## Continuation Point
 
-Work Package 2C is complete using diagnostic copies from checkpoint
-`5b871fd3c`; no exploratory implementation entered the repository. Start Work
-Package 2D with finding `P2-01` only. Repair the complex configure guard in the
-real tree while it still builds in C11, validate both current and strict C17
-MSVC modes plus GCC non-regression and focused complex-number behavior, then
-commit that blocker family independently. `P2-02` and `P2-03` require no source
-change. Do not begin the CMake baseline switch until the 2D gate passes.
+Work Package 2D is complete at implementation anchor `310fb4323`; `P2-01` is
+closed and `P2-02`/`P2-03` require no readiness change. Start Work Package 2E by
+moving the default/minimum C standard before all standard-sensitive probes,
+requiring C17 with extensions disabled, rejecting lower caller requests while
+retaining later requests, removing the raw C11 option injection, and covering
+the ownership/export contract with focused CMake checks. Do not begin C++20
+readiness or baseline changes until the atomic C17 switch passes its gate.

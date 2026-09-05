@@ -100,7 +100,7 @@ int main(void)
 #ifdef HAVE_COMPLEX_NUMBERS
     #include <complex.h>
 
-    #if defined(_MSC_VER) && !defined(__llvm__) && !defined(__INTEL_LLVM_COMPILER)
+    #if defined(_MSC_VER)
 
 typedef _Fcomplex H5_float_complex;
 typedef _Dcomplex H5_double_complex;

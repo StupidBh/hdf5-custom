@@ -495,7 +495,7 @@ if (HDF5_ENABLE_COVERAGE)
         list (APPEND HDF5_SANITIZER_COMPILE_OPTIONS
             "$<$<COMPILE_LANGUAGE:${coverage_language}>:${coverage_option}>"
         )
-        if (MSVC OR CMAKE_C_SIMULATE_ID STREQUAL "MSVC")
+        if (MSVC)
           list (APPEND HDF5_PLATFORM_EXECUTABLE_LINK_OPTIONS
               "$<$<LINK_LANGUAGE:${coverage_language}>:${coverage_option}>"
           )

@@ -706,9 +706,8 @@ if (NOT H5_HAVE_STDC_NO_COMPLEX)
     endif ()
 
     # If using MSVC, the _Complex types (if available) are currently _Fcomplex,
-    # _Dcomplex and _Lcomplex. The standard types are checked for first in case
-    # MSVC uses them in the future or in case the compiler used is simulating
-    # MSVC and uses the standard types.
+    # _Dcomplex and _Lcomplex. The standard types are checked first in case
+    # MSVC uses them in the future.
     if (MSVC AND NOT h5_have_c99_complex_numbers)
       cmake_push_check_state ()
       list (APPEND CMAKE_EXTRA_INCLUDE_FILES complex.h)

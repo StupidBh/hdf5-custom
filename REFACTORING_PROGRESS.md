@@ -34,7 +34,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A through 4D complete.
+- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A through 4E complete.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -63,8 +63,8 @@ behavior-preserving modernization state remain recorded in
 - Stage 4 execution requirements: prefer CLion MCP; use a temporary maximum
   build/CTest parallelism of 4 per physical host, shared by Windows and WSL on
   that host; this is not a repository default or product compatibility value
-- Stage 4 execution state: Work Packages 4A through 4D complete; product and
-  consumer contract validation is next
+- Stage 4 execution state: Work Packages 4A through 4E complete; the remaining
+  final matrix and handoff in Work Package 4F are next
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -245,6 +245,16 @@ both retained pairs.
   Five controlled success, child-failure, launch-failure, timeout-cleanup, and
   server-cleanup tests pass on MSVC and G++, and the registered
   `h5_api_test_misc` path passes through the real driver on both pairs.
+- Completed Work Package 4E at implementation anchor `f6ff66fed`. Fresh
+  Windows/MSVC and Linux/GCC default and C++ Release products, full default
+  suites, installs, binary packages, contracts, headers, symbols, examples,
+  build/install/source consumers, Linux wrappers and pkg-config, plugin
+  behavior, compatibility selections, and a clean tracked-source package all
+  pass with every delta from 4A classified.
+- Corrected the Windows C++ symbol evidence method by sorting case-sensitively:
+  both retained raw captures contain distinct `reOpen` and `reopen` exports and
+  compare as the same 1,143-name set. This is an evidence-identifier correction,
+  not a product change.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -270,8 +280,8 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Execute Work Package 4E's artifact and consumer contract comparisons before
-  the final dual-platform validation in 4F.
+- Execute the remaining Work Package 4F Debug, static-only, shared-only, and
+  Linux Unix Makefiles rows, then reconcile the final matrix and handoff.
 - Resume the remaining target-scoped modernization work only after this
   compatibility-changing direction reaches a stable handoff point.
 
@@ -285,12 +295,14 @@ anchor `ebdb99969`. Work Package 4C is complete at implementation anchor
 [Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
 Work Package 4D is complete at implementation anchor `f6ff66fed`; both retained
 pairs build the real optional driver and pass its process and API integration
-checks. The next execution action is Work Package 4E: compare final products,
-installs, packages, symbols, examples, wrappers, plugins, and build/install/
-source consumers against 4A. Prefer CLion MCP and use the temporary Stage 4
-execution cap of four build/CTest jobs per physical host, including Windows and
-WSL together. This cap does not change repository defaults. No repeated plan
-approval is needed within the agreed scope.
+checks. Work Package 4E is complete at the same implementation anchor; its
+fresh product and consumer rows close S4-04 and qualify for reuse in 4F. The
+next execution action is Work Package 4F: run fresh Debug, static-only,
+shared-only, and Linux Unix Makefiles rows, then close the final matrix and
+handoff. Prefer CLion MCP and use the temporary Stage 4 execution cap of four
+build/CTest jobs per physical host, including Windows and WSL together. This
+cap does not change repository defaults. No repeated plan approval is needed
+within the agreed scope.
 
 ## Validation State
 
@@ -312,8 +324,14 @@ approval is needed within the agreed scope.
   controlled process tests pass 5/5 on each pair, `h5_api_test_misc` passes
   through the driver at `HDF_TEST_EXPRESS=3`, and no controlled process or PID
   file remains.
-- S4-01 and S4-02 are repaired and pass. Stage 4 remains in progress; no 4E
-  product comparison or 4F final-gate pass is claimed.
+- Stage 4 Work Package 4E is complete at implementation anchor `f6ff66fed`.
+  Windows default CTest passed 2,816/2,816 enabled tests and Linux passed
+  2,818/2,818, both with 37 disabled. Default/C++ installs, packages, contracts,
+  effective declarations, all ten platform/library symbol sets, examples,
+  consumers, Linux wrappers/pkg-config, plugins, compatibility tests, and the
+  clean source-package manifest pass with no unexplained delta.
+- S4-01 and S4-02 are repaired and S4-04's scoped product comparison passes.
+  Stage 4 remains in progress; no 4F final-gate completion is claimed.
 - Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of

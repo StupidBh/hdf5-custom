@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: In progress; Work Packages 4A through 4D complete
+- State: In progress; Work Packages 4A through 4E complete
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
@@ -36,8 +36,10 @@ classified, and the discovered gaps are repaired. Work Package 4C is complete
 at implementation anchor `8d7aa0432`; utility registration is stable and the
 legal Linux mirror test runs with its server fixtures. Stage 3 remains
 Completed. Work Package 4D repaired and validated the optional API driver at
-implementation anchor `f6ff66fed`. Work Package 4E is the next execution
-action; no repeated plan approval is needed for work within these boundaries.
+implementation anchor `f6ff66fed`. Work Package 4E validated the complete
+default/C++ products and consumer contracts at that implementation anchor.
+Work Package 4F is the next execution action; no repeated plan approval is
+needed for work within these boundaries.
 
 ## Purpose
 

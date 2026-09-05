@@ -7,6 +7,7 @@
 - Work Package 4B: complete
 - Work Package 4C: complete
 - Work Package 4D: complete
+- Work Package 4E: complete
 - Baseline execution date: 2026-09-05
 - Baseline checkpoint: `cafdc38e9`
 - Current implementation anchor: `f6ff66fed`
@@ -27,7 +28,9 @@ implementation corrections end at `ebdb99969`, and its current-support
 documentation correction is recorded at `c6e2c2cb9`. Stage 4 remains in
 progress. Work Package 4C repaired utility-dependent registration at
 `8d7aa0432`, and Work Package 4D repaired and validated the optional API driver
-at `f6ff66fed`. Work Package 4E is next.
+at `f6ff66fed`. Work Package 4E has now validated the delivered products and
+consumer contracts at that final implementation anchor. Work Package 4F is
+next.
 
 The four-job cap is a temporary resource constraint for this Stage 4 execution,
 not a repository default or a product compatibility value. Existing presets
@@ -193,7 +196,7 @@ installation.
 | Windows | C core | 3,964 | `399424dc5c5b51dd9d7a3f0584fe153fccd0ad250083f43820cafd0b37f8e5d0` | Equal | `PASS` |
 | Windows | C high-level | 124 | `d94474ecb153ccb482e0eb5e1d5a1e206ec50a6764bf58fcefe98b6d5e434787` | Equal | `PASS` |
 | Windows | Tools | 159 | `dec22664eaf83746589c0a1f23e1aedef4e2ffd3f26c6ee6d03f1a003cbe3662` | Equal | `PASS` |
-| Windows | C++ core | 1,142 | `6c1593d0c955b5d6f6d5df99483ea2b127cc032aaa964546741c045b72c94bb4` | Equal | `PASS` |
+| Windows | C++ core | 1,143 | `9cf928d3a7be4c005c6c8f2d434f6017c8c238049553729106f4345eac42d771` | Equal | `PASS` |
 | Windows | C++ high-level | 35 | `2666e98aa409e4817bbdfdc613a20e12996fb8a3f62d2d7de705ad42963c6e5e` | Equal | `PASS` |
 | Linux | C core | 4,060 | `78cbba308db66f835f7fafa4335e67528714203a47e57ff8335ca5106489ae44` | Equal | `PASS` |
 | Linux | C high-level | 166 | `48e9bc6c183f45087bbea2b9c42b0a01177384ca4b6439153049d232cb790e48` | Equal | `PASS` |
@@ -205,6 +208,14 @@ Windows default output and installation retain `hdf5.dll`, `hdf5.lib`, and
 `libhdf5.lib`, with corresponding high-level and tools forms. The C++ install
 adds the same DLL/import/static triplets for `hdf5_cpp` and `hdf5_hl_cpp`.
 Release CMake packages contain separate static and shared target exports.
+
+The original Windows C++ baseline normalization used PowerShell's default
+case-insensitive unique sort. It collapsed the distinct exported C++ names
+containing `reOpen` and `reopen` and reported 1,142 names. Re-normalizing both
+retained raw `dumpbin` captures with a case-sensitive unique sort yields the
+1,143-name set above; the corrected baseline and final manifests are byte
+identical. This supersedes only that evidence identifier and does not describe
+a product change.
 
 Linux retains `libhdf5`, `libhdf5_hl`, `libhdf5_tools`, `libhdf5_cpp`, and
 `libhdf5_hl_cpp` as applicable. Shared objects have version `1000.0.0`, SONAME
@@ -355,6 +366,136 @@ Both integrations ran at `HDF_TEST_EXPRESS=3`. The Windows validator used a
 Visual Studio generator and the Linux validator used Ninja. Builds and CTest
 used at most four jobs under the temporary Stage 4 execution constraint.
 
+## Work Package 4E: Products and Consumer Contracts
+
+Work Package 4E used fresh build, install, package, example, and consumer trees
+from a clean tracked source at documentation checkpoint `eb118c43d`. Its
+product implementation is exactly `f6ff66fed`; changes after that implementation
+anchor and before the validation checkpoint are documentation only. Windows
+used Visual Studio 18 2026 x64 with `CL=/utf-8`, and Linux used Ninja with
+GCC/G++ 15.2.0. All CTest runs used `HDF_TEST_EXPRESS=3`, and build and test
+commands stayed within the temporary four-job Stage 4 execution budget.
+
+### Fresh Products and Contracts
+
+| Pair and configuration | Build and tests | Install/package | State |
+| --- | --- | --- | --- |
+| Windows default Release | Complete static/shared build; all 2,816 enabled tests passed, with 37 disabled out of 2,853 registered | 65 headers; 120-entry ZIP | `PASS` |
+| Windows C++ Release | Complete C/C++ static/shared build; `CPP_testhdf5` and `HL_CPP_ptableTest` passed | 101 headers; 164-entry ZIP | `PASS` |
+| Linux default Release | Complete 3,153-step static/shared build; all 2,818 enabled tests passed, with 37 disabled out of 2,855 registered | 65 headers; 122-entry TGZ | `PASS` |
+| Linux C++ Release | Complete 3,277-step C/C++ static/shared build; `CPP_testhdf5` and fixture-expanded `HL_CPP_ptableTest` passed | 101 headers; 169-entry TGZ | `PASS` |
+
+The final default first and identical repeat configurations are byte-identical
+after normalization: 17,323 records on Windows and 28,204 on Linux. This closes
+S4-01 in the complete product configuration rather than only in its focused
+reproducer. Current default post-install captures contain 17,446 records on
+Windows and 28,323 on Linux. Current C++ first/post-install captures contain
+19,566/19,735 records on Windows and 30,771/30,940 on Linux.
+
+The 4A first-configure and final contracts differ only in generated
+`H5pubconf.h` and `libhdf5.settings` hashes. The settings difference is the
+explicit isolated install prefix. The configuration header difference is that
+prefix plus the approved removal of the inactive AIX-only `H5__LARGE_FILES`
+template entry. The final C++ post-install contract has no structural delta
+from 4A. The 4A default post-install capture followed the intentionally broken
+repeat configure; its only structural delta from the final capture is removal
+of the erroneous `mirror_vfd`, `use_append_chunk_mirror`, and
+`H5TEST-mirror_vfd` records and their generated CTest metadata. Those removals
+are the expected Work Package 4C correction. CPack staging paths were excluded
+by refreshing the real install manifest before the final installed captures.
+
+Installed CMake package files contain no source-build target-system/compiler
+admission call or compiler-ID check. Build-tree and installed consumers using
+the accepted compilers therefore remain governed by normal prebuilt-library
+compatibility rather than the HDF5 source-build firewall.
+
+### Headers, Libraries, and Metadata
+
+All installed header names match 4A. Apart from `H5pubconf.h`, 64 of 64 default
+and 100 of 100 C++ header files are byte-identical on each validator. The only
+raw `H5pubconf.h` changes are the two generated differences described above.
+Fresh installed-header preprocessing produced these comparisons:
+
+| Validator and input | Comparison with 4A | State |
+| --- | --- | --- |
+| MSVC C and C++ `hdf5.h`; C++ `H5Cpp.h` | Equal after removing blank lines introduced solely by the deleted inactive template entry and right-trimming lines | `PASS` |
+| GCC C11 `hdf5.h`; G++ C++11 `hdf5.h` and `H5Cpp.h` | Raw preprocessor output byte-identical | `PASS` |
+
+No public declaration, public type, layout-sensitive C/C++ source, or active
+configuration macro changed after 4A. A new layout probe was therefore not
+triggered; the exact effective-declaration, compile/link/run, and symbol checks
+retain their separate scopes.
+
+Fresh case-sensitive symbol manifests match the 4A raw captures for all five
+libraries on both validators. Counts and hashes are recorded in
+`Symbols and Binary Metadata` above, including the corrected 1,143-name Windows
+C++ baseline. Windows retains DLL/import/static triplets for C, HL, tools, C++,
+and HL C++ as applicable. Linux retains static archives plus `.so`, `.so.1000`,
+and `.so.1000.0.0`; SONAMEs remain `.so.1000` and installed RUNPATH remains
+`$ORIGIN/../lib:$ORIGIN/`. Installed `h5dump` reports version 2.3.0 without an
+ambient HDF5 path on both validators, and Linux `ldd` resolves its HDF5
+dependencies from the isolated install.
+
+The sorted binary-package path sets are exactly equal to 4A at 120/164 Windows
+ZIP entries and 122/169 Linux TGZ entries. All expected static/shared products,
+headers, tools, exports, and metadata are present; removed-language and local
+validation paths are absent.
+
+### Consumers, Wrappers, and Examples
+
+| Consumer surface | Windows | Linux | State |
+| --- | --- | --- | --- |
+| Build-tree `find_package` | C shared, HL static, and C++ shared configured, built, and passed 3/3 | Same, passed 3/3 without ambient HDF5 variables | `PASS` |
+| Install-tree `find_package` | Same three consumers passed 3/3 using only the tested install runtime path | Same, passed 3/3 without ambient HDF5 variables | `PASS` |
+| Standalone combined examples | Build-tree and install-tree C/C++/HL/HL C++ sets each passed 279/279 | Both shared sets passed 279/279; additional all-static build/install sets each passed 279/279 | `PASS` |
+| Source consumers | `add_subdirectory` and local-source FetchContent consumers each passed 1/1 | Both consumers passed 1/1 | `PASS` |
+
+The six compared parent-visible source-consumer cache settings are unchanged
+from the retained baseline: `BUILD_SHARED_LIBS`, `BUILD_TESTING`,
+`HDF5_BUILD_CPP_LIB`, `HDF5_BUILD_EXAMPLES`, `HDF5_BUILD_HL_LIB`, and
+`HDF5_BUILD_TOOLS`. An initial Windows build-tree consumer execution without
+the just-built DLL directory failed loader startup; rerunning with only that
+explicit runtime path passed 3/3. This was an invocation-environment correction,
+not a package or product failure.
+
+Linux installed `h5cc` and `h5c++` compile and run C and C++ consumers in both
+default-HL and `-nohl` modes. Their displayed link sets are respectively
+`hdf5_hl` plus `hdf5`, `hdf5` alone, `hdf5_hl_cpp` plus `hdf5_cpp`, `hdf5_hl`,
+and `hdf5`, and `hdf5_cpp` plus `hdf5`. All four installed pkg-config files
+validate, report version 2.3.0, and expose the expected libraries. A direct WSL
+invocation initially omitted the user-local `pkg-config` directory; the final
+checks used an explicit command-scoped tool path and no ambient HDF5 library
+path.
+
+### Plugins, Compatibility, and Source Package
+
+Normal plugin loading passed on both validators. On Linux, valid filter-plugin
+binaries copied under `.dylib`-only names were not registered and the controlled
+negative invocation failed as expected; the same `.so` test passed before and
+after it. This confirms the accepted Linux filename exclusion without changing
+the plugin contract. Focused error, HL compatibility, datatype API, reference,
+and conversion tests passed 11/11 with fixtures on Windows and 10/10 with
+fixtures on Linux; the separate Linux positive plugin test also passed 1/1.
+
+The final clean tracked-source TGZ has 4,103 internal package entries (4,106
+archive listing lines including three outer packaging directories) and matches
+all 3,935 tracked files exactly. Relative to 4A it adds only six tracked Stage 4
+test/documentation paths: `config/cmake/runMirrorServer.cmake`,
+`config/cmake/tests/HDF5ExamplePlatformSupportCase.cmake`,
+`config/cmake/tests/HDF5UtilityRegistrationTests.cmake`,
+`docs/refactoring/CMakePlatformSupportReductionStage4Results.md`,
+`test/API/driver/HDF5APIDriverProcessTests.cmake`, and
+`test/API/driver/h5_api_test_driver_process.cpp`. It contains no Git, IDE,
+agent, build, CPack staging, Java, or Fortran path. This later documentation
+checkpoint changes tracked document content but not the verified source-package
+path manifest; product evidence remains attached to `f6ff66fed` under the
+plan's documentation-only inheritance rule.
+
+Work Package 4E required no product correction. All product and consumer deltas
+are classified, S4-04 is closed, and its fresh default/C++ Release, install,
+package, example, consumer, wrapper, plugin, and compatibility evidence may be
+reused by Work Package 4F at implementation anchor `f6ff66fed`.
+
 ## Historical Evidence Map and Current Capability Probe
 
 Historical passing evidence remains attached to its tested implementation. It
@@ -504,7 +645,7 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 | `S4-01` | `FIX_STAGE4` | Fixed at `8d7aa0432`: first/second/third and `ON/OFF/ON` contracts match; legal Linux mirror targets build and fixture-expanded tests pass 5/5 | 4C | `PASS` |
 | `S4-02` | `FIX_STAGE4` | Fixed at `f6ff66fed`: the real optional driver builds on MSVC and G++, five controlled process tests pass on each, and registered API integration passes | 4D | `PASS` |
 | `S4-03` | `FIX_STAGE4` | Current summaries and support guides agree with completed Stage 2/3 evidence; the HPC compiler-wrapper ambiguity was corrected | 4B | `PASS` |
-| `S4-04` | `KEEP_PROTECTED` | Complete fresh 65/101 header sets and separate pre/post-install contracts now exist; final comparison remains | 4E and 4F | `PASS` |
+| `S4-04` | `KEEP_PROTECTED` | Final 65/101 header sets, effective declarations, contracts, symbols, artifacts, and consumers are compared with separate scopes and no unexplained delta | 4E and 4F | `PASS` |
 | `S4-05` | `FIX_STAGE4` | Combined examples allowed late C++ enablement without a C++ compiler-pair check; fixed at `137ebb73c` | 4B | `PASS` |
 | `S4-06` | `FIX_STAGE4` | Unreachable SunOS branches, stale AIX/Solaris notes, and the unused AIX header macro were removed at `901ef3d20` and `20bd1a464` | 4B | `PASS` |
 | `S4-07` | `FIX_STAGE4` | Unsupported compiler-simulation paths were removed at `1559e52be` without changing pair-specific complex results | 4B | `PASS` |
@@ -514,13 +655,17 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 The discarded 4A worktree source archive is a corrected validation-method
 artifact, not a product finding. Work Package 4B has no remaining
 `INVESTIGATE` or failed row. Work Packages 4C and 4D close S4-01 and S4-02;
-the findings ledger has no remaining required `FAIL` row. Product and final
-matrix gates still remain in 4E and 4F.
+the findings ledger has no remaining required `FAIL` row. Work Package 4E
+closes the product and consumer comparisons without a product correction; only
+the remaining Work Package 4F matrix rows and final handoff remain.
 
 ## Continuation Point
 
-Begin Work Package 4E from implementation anchor `f6ff66fed` plus this results
-checkpoint. Compare complete fresh products and consumer contracts against 4A,
-including installs, symbols, package metadata, examples, wrappers, plugins,
-and build/install/source consumers. No 4A baseline, 4B classification, 4C
-utility-registration, or 4D API-driver evidence is missing.
+Begin Work Package 4F from implementation anchor `f6ff66fed` plus this results
+checkpoint. Reuse the qualifying fresh 4E default/C++ Release, install,
+package, example, consumer, wrapper, plugin, compatibility, and source-package
+rows under the plan's evidence rule. Run the remaining fresh Debug,
+static-only, shared-only, and Linux Unix Makefiles rows, then reconcile the
+final matrix and modernization handoff. No 4A baseline, 4B classification, 4C
+utility-registration, 4D API-driver, or 4E product-contract evidence is
+missing.

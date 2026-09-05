@@ -28,14 +28,14 @@ Unix Makefiles are release-validation baselines.
 
 The support contract is anchored at `912fb436b`, its admission-policy correction
 at `614dd74c0`, and its Stage 1 CMake implementation at `b317dedc9`. Platform
-reduction Stages 1 through 3 are complete: both release baselines have passed,
-and source/header reduction finished at `74288cbaa`, with the completion review
-recorded at `7e50c3c17`. The separate
-[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is in
-progress; Work Packages 4A through 4D are complete, with their evidence in the
-[Stage 4 results](refactoring/CMakePlatformSupportReductionStage4Results.md).
-General modernization remains paused, with implementation progress recorded
-separately in [CMakeModernizationProgress.md](CMakeModernizationProgress.md).
+reduction Stages 1 through 4 are complete: both release baselines passed,
+source/header reduction finished at `74288cbaa`, and the final project audit
+closed at product implementation `f6ff66fed`. The separate
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) and
+[Stage 4 results](refactoring/CMakePlatformSupportReductionStage4Results.md)
+record the completed matrix and handoff. General modernization remains at its
+paused implementation anchor and is ready to resume, with progress recorded in
+[CMakeModernizationProgress.md](CMakeModernizationProgress.md).
 
 - Cache options keep their names, types, defaults, allowed values, and advanced/non-advanced status unless a
   separately approved compatibility change says otherwise.

@@ -10,7 +10,7 @@ which validation is still missing so the refactoring can continue on another
 machine without reconstructing its state from chat history or local build
 artifacts.
 
-The detailed implementation plan for the current direction is
+The detailed implementation plan for the completed compatibility-changing direction is
 [`docs/refactoring/CMakePlatformSupportReduction.md`](docs/refactoring/CMakePlatformSupportReduction.md).
 The self-contained execution plan for the completed Linux validation stage is
 [`docs/refactoring/CMakePlatformSupportReductionStage2.md`](docs/refactoring/CMakePlatformSupportReductionStage2.md).
@@ -20,7 +20,7 @@ The completed self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
-The active Stage 4 final project-audit plan is
+The completed Stage 4 final project-audit plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage4.md`](docs/refactoring/CMakePlatformSupportReductionStage4.md).
 Its execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage4Results.md`](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
@@ -33,8 +33,8 @@ behavior-preserving modernization state remain recorded in
 
 ## Active Direction
 
-- Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A through 4E complete.
+- Direction: Project supported-platform reduction (complete); CMake 4 modernization is next
+- Status: Stages 1 through 4 completed; overall direction complete.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -44,7 +44,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
 - Current implementation anchor: `f6ff66fed`
-- Last preceding documentation anchor: `31e0a6e2f`
+- Last preceding documentation anchor: `8adcde9af`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 4 Work Package 4B implementation commits: 6
@@ -60,11 +60,11 @@ behavior-preserving modernization state remain recorded in
   plugin filename restriction and corrected header evidence
 - Stage 4 audit recommendations and inherited boundaries: accepted on 2026-09-05
 - Stage 4 detailed plan and review clarifications: approved on 2026-09-05
-- Stage 4 execution requirements: prefer CLion MCP; use a temporary maximum
-  build/CTest parallelism of 4 per physical host, shared by Windows and WSL on
-  that host; this is not a repository default or product compatibility value
-- Stage 4 execution state: Work Packages 4A through 4E complete; the remaining
-  final matrix and handoff in Work Package 4F are next
+- Stage 4 execution used a temporary maximum build/CTest parallelism of 4 per
+  physical host, shared by Windows and WSL on that host; this is not a
+  repository default, product compatibility value, or permanent reference
+- Stage 4 execution state: complete; Work Packages 4A through 4F passed on
+  2026-09-05 at product implementation anchor `f6ff66fed`
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -82,7 +82,7 @@ configurations as non-required. Stage 3 source/header reduction is complete at
 user confirmed the Linux plugin filename restriction to `lib*.so` during the
 2026-09-05 review. Corrected header evidence records expected text changes and
 preserved effective declarations, rather than byte-identical files. The Stage
-4 final audit is in progress. Work Package 4A qualified both validators, froze
+4 final audit is complete. Work Package 4A qualified both validators, froze
 complete fresh default/C++ baselines, and reproduced the two required defects.
 Work Package 4B audited all repository support surfaces and residuals, repaired
 six focused implementation gaps through `ebdb99969`, and left no unresolved
@@ -90,7 +90,9 @@ classification. Work Package 4C stabilized utility-dependent registration and
 added a working mirror-server fixture at `8d7aa0432`. Work Package 4D repaired
 the optional API driver's generated-header ownership and cleanup identifier at
 `f6ff66fed`, then passed its controlled process and API integration checks on
-both retained pairs.
+both retained pairs. Work Package 4E passed the full final-implementation
+product and consumer audit, and Work Package 4F passed the remaining Debug,
+static-only, shared-only, Unix Makefiles, residual, package, and handoff gates.
 
 ## Completed
 
@@ -200,8 +202,8 @@ both retained pairs.
 - Recorded the approved Stage 4 clarifications: bounded API driver repair,
   reuse of qualifying 4E evidence in 4F, complete required baselines before
   closing 4A, and separate ordinary-defect follow-ups. Fixed the execution
-  requirements at four parallel build/test jobs per physical host and preferred
-  CLion MCP use.
+  run's temporary resource budget at four parallel build/test jobs per physical
+  host. This was not adopted as a lasting project or validation default.
 - Completed Stage 4 Work Package 4A at reviewed baseline `cafdc38e9`, whose
   differences from Stage 3 implementation `74288cbaa` are documentation only.
   Fresh Windows/MSVC and Linux/GCC default and C++ Release builds, focused
@@ -255,6 +257,12 @@ both retained pairs.
   both retained raw captures contain distinct `reOpen` and `reopen` exports and
   compare as the same 1,143-name set. This is an evidence-identifier correction,
   not a product change.
+- Completed Work Package 4F at implementation anchor `f6ff66fed`. Fresh
+  Windows/MSVC and Linux/GCC Debug, static-only, and shared-only builds and
+  fixture-aware smoke tests passed; static/shared consumers and artifact checks
+  passed, Windows installed 19 Debug PDBs, and a fresh Linux Unix Makefiles
+  build passed its focused tests. The final residual and 3,935-file source-
+  package path audits passed with no unresolved finding.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -280,29 +288,26 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Execute the remaining Work Package 4F Debug, static-only, shared-only, and
-  Linux Unix Makefiles rows, then reconcile the final matrix and handoff.
-- Resume the remaining target-scoped modernization work only after this
-  compatibility-changing direction reaches a stable handoff point.
+- No supported-platform reduction implementation or validation work remains.
+- Resume the separate target-scoped CMake modernization from its unchanged
+  progress anchor and apply that plan's own evidence requirements.
 
 ## Continuation Point
 
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
-review is closed at `7e50c3c17`. Stage 4 Work Package 4A is complete at baseline
-checkpoint `cafdc38e9`, and Work Package 4B is complete at implementation
-anchor `ebdb99969`. Work Package 4C is complete at implementation anchor
-`8d7aa0432`, with portable evidence in the
+review is closed at `7e50c3c17`. Stage 4 Work Packages 4A through 4F are
+complete, and the overall supported-platform reduction direction closes at
+product implementation anchor `f6ff66fed`. Portable evidence is in the
 [Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
-Work Package 4D is complete at implementation anchor `f6ff66fed`; both retained
-pairs build the real optional driver and pass its process and API integration
-checks. Work Package 4E is complete at the same implementation anchor; its
-fresh product and consumer rows close S4-04 and qualify for reuse in 4F. The
-next execution action is Work Package 4F: run fresh Debug, static-only,
-shared-only, and Linux Unix Makefiles rows, then close the final matrix and
-handoff. Prefer CLion MCP and use the temporary Stage 4 execution cap of four
-build/CTest jobs per physical host, including Windows and WSL together. This
-cap does not change repository defaults. No repeated plan approval is needed
-within the agreed scope.
+The temporary four-job Stage 4 resource budget expired with this execution and
+is not a lasting project or validation reference.
+
+Resume the separate CMake 4 modernization from unchanged implementation anchor
+`0b9e21c34`. First classify the remaining repeated MPI include expressions in
+standalone examples, package configuration, dependency-specific targets, and
+C++ targets. Then continue the dedicated compatible migration of remaining
+global compiler-flag state. Do not advance the modernization anchor until a
+new implementation batch lands and passes that plan's scoped gates.
 
 ## Validation State
 
@@ -330,19 +335,25 @@ within the agreed scope.
   effective declarations, all ten platform/library symbol sets, examples,
   consumers, Linux wrappers/pkg-config, plugins, compatibility tests, and the
   clean source-package manifest pass with no unexplained delta.
+- Stage 4 Work Package 4F is complete at the same product implementation.
+  Fresh Debug, static-only, and shared-only builds and fixture-expanded 7/7
+  smoke selections passed on both pairs. Static/shared artifacts and consumers,
+  the Windows Debug PDB install, and the Linux Unix Makefiles build and tests
+  passed. The final 1,359-file residual and 3,935-file package-path audits pass.
 - S4-01 and S4-02 are repaired and S4-04's scoped product comparison passes.
-  Stage 4 remains in progress; no 4F final-gate completion is claimed.
-- Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
-  and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
+  No `FIX_STAGE4`, `FAIL`, or `INVESTIGATE` item remains.
+- Current status: Stages 1 through 4 and the overall supported-platform
+  reduction direction are complete. Final Stage 4 product evidence came from
+  clean Windows/MSVC and WSL Linux/GCC trees at implementation `f6ff66fed`.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of
   2,853 registered. Debug, static-only, shared-only, C++, install, ZIP,
   standalone examples, and build/install/source-tree consumers passed.
 - Linux default Ninja Release passed all 2,818 enabled tests with 37 disabled
   out of 2,855 registered. Debug, static-only, shared-only, C++, Unix Makefiles,
   install, TGZ, wrappers, standalone examples, and all consumer modes passed.
-- The recorded default/C++ contract totals are Windows 17,446/19,566 and Linux
-  28,323/30,771, including installation records in the default totals. Counts
-  alone do not prove equality. Header text and capture-prefix deltas are
+- The final post-install default/C++ contract totals are Windows 17,446/19,735
+  and Linux 28,323/30,940. Counts alone do not prove equality. Header text and
+  capture-prefix deltas are
   explained in the corrected Stage 3 results; public declarations compare
   equal. Prior symbol, library-name, import-library, SONAME/RUNPATH, package,
   and consumer evidence remains recorded separately from header-byte checks.
@@ -465,7 +476,8 @@ within the agreed scope.
 
 ## Residual Audit
 
-- The final source/header scan reports `APPLE=3/3`, `CLANG=225/37`,
+- The final source/header scan covers 1,359 tracked files and reports
+  `APPLE=3/3`, `CLANG=225/37`,
   `CYGWIN=6/5`, `DARWIN=0/0`, `FREEBSD=1/1`, `INTEL=179/14`, `MACOS=4/1`,
   `MINGW=7/6`, `NETBSD=2/2`, and `PGI=17/2`, expressed as matches/files.
 - The Stage 4 extension reports `AIX=134/6`, `HPUX=1/1`, `HP-UX=5/2`,
@@ -479,11 +491,13 @@ within the agreed scope.
   feature/architecture behavior, formatter directives, factual history, or
   lexical false positives. No project-owned unsupported-only implementation or
   `INVESTIGATE` item remains.
-- The clean source package adds only the Stage 3 results document to the 3A
-  path manifest and excludes local build, IDE, and validation artifacts.
+- The clean Stage 4 source package contains exactly the same 3,935 files as the
+  final tracked path manifest. It excludes Git, IDE, agent, build/CPack staging,
+  Java, and Fortran directories. Documentation-only completion edits add no
+  package-input path.
 
-The qualified Windows/MSVC and Linux/GCC validators are repeatable for Stage 4.
-Preserve the versioned Stage 1 through Stage 3 records and do not reinterpret
+The qualified Windows/MSVC and Linux/GCC validators completed Stage 4. Preserve
+the versioned Stage 1 through Stage 4 records and do not reinterpret
 the six non-required Stage 2 environment deferrals as removed functionality.
 
 ## Handoff Updates

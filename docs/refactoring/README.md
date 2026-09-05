@@ -30,15 +30,15 @@ plan in this directory.
   record the completed dual-platform gate, corrected header evidence, and
   accepted completion review on 2026-09-05.
 - [Stage 4 final project audit](CMakePlatformSupportReductionStage4.md):
-  In progress; repository/product support consistency, focused defect repairs,
+  Complete; repository/product support consistency, focused defect repairs,
   evidence inheritance, final dual-platform gates, and modernization handoff.
 - [Stage 4 execution results](CMakePlatformSupportReductionStage4Results.md):
-  Work Package 4A baseline plus the completed Work Package 4B repository audit,
-  corrections and residual classifications, and the completed Work Package 4C
-  utility-registration repair and Work Package 4D API-driver repair.
+  completed Work Packages 4A through 4F, final product/consumer matrix,
+  residual/package audit, optional evidence limits, and handoff.
 
-The Stage 4 plan and review clarifications were approved on 2026-09-05. Work
-Packages 4A through 4D are complete and Work Package 4E is next. Prefer CLion MCP
-and use the temporary Stage 4 build/CTest cap of four per physical host, shared
-by Windows and WSL on that host. Stage 3 completion and the 4A-4D results do
-not complete the overall direction.
+The Stage 4 plan and review clarifications were approved on 2026-09-05, and all
+work packages completed that day at product implementation `f6ff66fed`. The
+overall supported-platform reduction direction is complete. Its four-job
+build/CTest limit was temporary for that execution and is not a permanent
+default or validation reference. The separate CMake modernization remains
+incomplete and is the next refactoring continuation.

@@ -2,12 +2,14 @@
 
 ## Status
 
-- State: In progress
+- State: Complete
 - Work Package 4A: complete
 - Work Package 4B: complete
 - Work Package 4C: complete
 - Work Package 4D: complete
 - Work Package 4E: complete
+- Work Package 4F: complete
+- Completion date: 2026-09-05
 - Baseline execution date: 2026-09-05
 - Baseline checkpoint: `cafdc38e9`
 - Current implementation anchor: `f6ff66fed`
@@ -17,24 +19,26 @@
   [CMakePlatformSupportReduction.md](CMakePlatformSupportReduction.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - `HDF_TEST_EXPRESS`: `3`
-- Stage 4 build and CTest execution cap: 4 per physical host
+- Temporary Stage 4 build and CTest execution cap used: 4 per physical host
 
 Work Package 4A is complete. Fresh default and C++ Release baselines were
 captured on both retained target/compiler pairs before an implementation
 correction. The two required defects were reproduced on both pairs, complete
 default and C++ installs and packages are recorded, and the findings have
-validation owners. The Work Package 4B repository audit is complete, its six focused
-implementation corrections end at `ebdb99969`, and its current-support
-documentation correction is recorded at `c6e2c2cb9`. Stage 4 remains in
-progress. Work Package 4C repaired utility-dependent registration at
-`8d7aa0432`, and Work Package 4D repaired and validated the optional API driver
-at `f6ff66fed`. Work Package 4E has now validated the delivered products and
-consumer contracts at that final implementation anchor. Work Package 4F is
-next.
+validation owners. Work Package 4B completed the repository audit; its six
+focused implementation corrections end at `ebdb99969`, and its current-support
+documentation correction is recorded at `c6e2c2cb9`. Work Package 4C repaired
+utility-dependent registration at `8d7aa0432`, and Work Package 4D repaired and
+validated the optional API driver at `f6ff66fed`. Work Package 4E validated the
+delivered products and consumer contracts at that final implementation anchor.
+Work Package 4F completed the remaining fresh matrix rows, repeated the
+residual and package audits, and closed the final handoff. Stage 4 and the
+overall supported-platform reduction direction are complete.
 
-The four-job cap is a temporary resource constraint for this Stage 4 execution,
-not a repository default or a product compatibility value. Existing presets
-and general user documentation retain their independently chosen job counts.
+The four-job cap was a temporary resource constraint for this Stage 4
+execution, not a repository default, product compatibility value, or permanent
+validation reference. Existing presets and general user documentation retain
+their independently chosen job counts.
 
 ## Baseline Identity
 
@@ -69,9 +73,9 @@ agent directories were not read into a package, modified, staged, or committed.
 Windows compiler invocations used `CL=/utf-8`. Build and CTest commands ran
 sequentially between Windows and WSL and used no more than four jobs. GNU Make
 was resolved and version-qualified for the secondary final check; the fresh
-Stage 4 product baselines below intentionally use Ninja, while the last full
-Unix Makefiles product build remains inherited Stage 3 evidence at
-`74288cbaa`.
+Stage 4 product baselines below intentionally use Ninja, and Work Package 4F
+adds a fresh full Unix Makefiles product build at final implementation
+`f6ff66fed`.
 
 ## Reproducible Baseline Commands
 
@@ -496,6 +500,152 @@ are classified, S4-04 is closed, and its fresh default/C++ Release, install,
 package, example, consumer, wrapper, plugin, and compatibility evidence may be
 reused by Work Package 4F at implementation anchor `f6ff66fed`.
 
+## Work Package 4F: Final Gate and Handoff
+
+Work Package 4F used clean tracked Windows and Linux source trees whose product
+implementation is exactly `f6ff66fed`. The Windows tree was at documentation
+checkpoint `8adcde9af`; the Linux tree was at `eb118c43d`. Differences after
+`f6ff66fed` are limited to plans, results, the handoff, and other current
+documentation. No CMake implementation, C/C++ source, header, test, example,
+install, export, or package-input path differs between the validators.
+
+The atomic Stage 4 implementation sequence is `137ebb73c`, `901ef3d20`,
+`20bd1a464`, `1559e52be`, `49237b0af`, and `ebdb99969` for Work Package 4B;
+`8d7aa0432` for Work Package 4C; and `f6ff66fed` for Work Package 4D. Work
+Packages 4E and 4F required no product correction.
+
+Windows used Visual Studio 18 2026 x64 and MSVC 19.51 with `CL=/utf-8`.
+Linux used GCC/G++ 15.2.0 with Ninja 1.13.2 and GNU Make 4.4.1. All test runs
+used `HDF_TEST_EXPRESS=3`. Windows and WSL commands ran sequentially, and each
+build or CTest invocation used at most four jobs. This was the temporary Stage
+4 execution budget, not a repository default or a durable product parameter.
+
+### Final Matrix
+
+| Row | Windows/MSVC result | Linux/GCC result | Evidence identity |
+| --- | --- | --- | --- |
+| Default Release | Full static/shared build and 2,816/2,816 enabled tests passed; 37 disabled out of 2,853 registered | Full 3,153-step Ninja build and 2,818/2,818 enabled tests passed; 37 disabled out of 2,855 registered | Fresh 4E row at `f6ff66fed` |
+| Debug | Fresh full build, fixture-expanded smoke 7/7, Debug install, and 19 installed library/tool PDBs passed | Fresh full 3,153-step build and fixture-expanded smoke 7/7 passed | Fresh 4F row at `f6ff66fed` |
+| Static-only Release | Fresh full build, smoke 7/7, static-only C/HL artifacts, and isolated consumer 1/1 passed | Fresh full 2,702-step build, smoke 7/7, archives without shared objects, and isolated consumer 1/1 passed | Fresh 4F row at `f6ff66fed` |
+| Shared-only Release | Fresh full build, smoke 7/7, DLL/import libraries without static C/HL archives, and isolated consumer 1/1 passed | Fresh full 2,748-step build, smoke 7/7, versioned shared objects without archives, SONAME `libhdf5.so.1000`, and isolated consumer 1/1 passed | Fresh 4F row at `f6ff66fed` |
+| C++ Release | Full C/C++ static/shared build and named core/HL C++ tests 2/2 passed | Same | Fresh 4E row at `f6ff66fed` |
+| Reconfigure | Default and explicit `ON`/`OFF`, repeated configures, unavailable prerequisites, and `ON/OFF/ON` passed | Same; legal mirror targets and fixture-expanded tests also passed 5/5 | 4C at `8d7aa0432`; later changes do not touch the option or mirror registration |
+| API driver | Driver/helper/API targets, process cases 5/5, registered API integration 1/1, and residual-process check passed | Same | 4D at final implementation `f6ff66fed` |
+| Admission | Twelve central cases plus four combined-example cases passed | Same | 4B at `ebdb99969`; 4C/4D do not change the firewall or its callers |
+| Secondary generator | Synthetic policy cases preserve generator-independent admission | Fresh full Unix Makefiles product build and smoke 7/7 passed | 4B policy evidence plus fresh 4F Linux build |
+| Install/package | Default/C++ installs and 120/164-entry ZIPs passed; fresh Debug PDB install passed | Default/C++ installs and 122/169-entry TGZ packages passed; SONAME/RUNPATH checks passed | Fresh 4E products plus the 4F Debug check |
+| Standalone examples | Build/install package sets each passed 279/279 | Shared and static build/install package sets each passed 279/279 | Fresh 4E row at `f6ff66fed` |
+| Consumers | Build/install C, HL, and C++ consumers passed 3/3 each; source consumers passed 1/1 each; fresh static/shared linkage consumers passed 1/1 each | Same, plus wrappers/pkg-config and fresh static/shared linkage consumers passed 1/1 each | Fresh 4E and 4F rows at `f6ff66fed` |
+| Compatibility | Effective headers, all five symbol families, libraries, metadata, plugins, and file/API compatibility selection 11/11 passed | Same with compatibility selection 10/10, plugin 1/1, and the accepted negative `.dylib` discovery check | Fresh 4E row at `f6ff66fed` |
+| Source package | The shared clean-source result covers both validators | 3,935 packaged files match all 3,935 tracked paths; no local or removed-language path is present | Fresh 4E archive, path manifest repeated in 4F |
+
+Before the final smoke rerun, `ctest --show-only=json-v1` confirmed the exact
+seven-test expansion in every fresh Debug, static-only, shared-only, and Unix
+Makefiles tree: the three requested tests, the C and HL setup/cleanup fixtures,
+and their `FIXTURES_REQUIRED` relationships. The subsequent fixture-aware run
+passed 7/7 in each tree. The common selection was:
+
+```text
+^(H5TEST-testhdf5-base|HL_test_lite|H5DIFF-h5diff_10)$
+```
+
+The additional configurations used these normalized commands and option sets:
+
+```powershell
+$env:CL = "/utf-8"
+cmake -S <src> -B <build-root>/debug -G "Visual Studio 18 2026" -A x64
+cmake --build <build-root>/debug --config Debug --parallel 4
+cmake --install <build-root>/debug --config Debug --prefix <install-root>/debug
+cmake -S <src> -B <build-root>/static -G "Visual Studio 18 2026" -A x64 `
+  -DBUILD_SHARED_LIBS=OFF
+cmake -S <src> -B <build-root>/shared -G "Visual Studio 18 2026" -A x64 `
+  -DBUILD_STATIC_LIBS=OFF
+cmake --build <build> --config Release --parallel 4
+$env:HDF_TEST_EXPRESS = "3"
+ctest --test-dir <build> -C <config> --output-on-failure -j 4 -R <selection>
+```
+
+```sh
+cmake -S <src> -B <build-root>/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -S <src> -B <build-root>/static -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED_LIBS=OFF
+cmake -S <src> -B <build-root>/shared -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_STATIC_LIBS=OFF
+cmake -S <src> -B <build-root>/makefiles -G "Unix Makefiles" \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build <build> --parallel 4
+HDF_TEST_EXPRESS=3 ctest --test-dir <build> \
+  --output-on-failure -j 4 -R '<selection>'
+```
+
+Fresh static/shared consumers used `find_package(HDF5 CONFIG REQUIRED
+COMPONENTS C HL)`, linked the explicit `hdf5[-hl]-static` or
+`hdf5[-hl]-shared` build-tree targets, created a file and HL dataset, and ran
+without ambient `HDF5_DIR`, `HDF5_ROOT`, or Linux library-path variables. The
+Windows shared consumer used only the just-built DLL directory at runtime.
+
+### Final Residual and Package Audit
+
+The repeated tracked scan now covers 1,359 files because 4D added
+`test/API/driver/h5_api_test_driver_process.cpp`. That file adds no selector
+match, so every lexical family count remains exactly the 4B value recorded
+under `Residual Selectors`. Exact active unsupported CMake conditions remain
+absent outside the synthetic rejection tests; the only condition-shaped scan
+hits are retained `clang-format` and `clang-tidy` developer-tool checks.
+
+The generated-header, settings, installed CMake metadata, and pkg-config scan
+of the fresh default build/install products found no removed platform macro,
+unsupported compiler selector, or rejected target-system admission check. The
+source archive was compared again after removing its documented packaging
+prefix: all 3,935 file paths equal the current tracked path set, and no Git,
+IDE, agent, build-staging, Java, or Fortran directory is present. Later 4F
+documentation edits change file contents but add no package-input path, so the
+path-manifest result remains applicable under the documentation-only rule.
+The current breaking-change entry in `release_docs/CHANGELOG.md` names the
+two-pair contract and the delivered compatibility changes consistently; no
+additional user-visible 4F behavior was introduced.
+
+### Optional Evidence Inheritance
+
+Stage 4 does not change dependency discovery or exports for compression, MPI,
+subfiling, ROS3, HDFS, signed plugins, or external filters; coverage or package
+generator implementation; or thread/concurrency runtime code. The shared
+configuration and GNU flag edits remove only rejected-system/compiler
+alternatives. MSVC/GNU generated settings, effective declarations, compile
+commands, and final products retain the accepted-pair results. The utility and
+API-driver corrections affect test registration or opt-in test-driver code,
+not those product paths. These file, target, dependency, and generated-contract
+facts support the inherited results listed below. In-tree plugin behavior was
+also rerun in 4E.
+
+The retained Stage 2 passes for bundled/system compression, parallel HDF5,
+subfiling, thread-safe/concurrency, external plugins, coverage, STGZ, and DEB
+therefore remain valid at their named commits. The six accepted missing-
+environment deferrals remain unchanged. No Stage 4 correction affects a
+deferred feature, and no required Stage 4 gate is hidden by a deferral.
+
+### Invocation Corrections
+
+An initial Windows Debug configure lost the multiword generator quoting before
+CMake parsed it; the corrected invocation configured and completed the full
+build. A direct WSL structured-listing query likewise lost shell quoting around
+the combined regular expression; exact-name queries produced the intended
+seven-test fixture set, followed by the passing formal rerun. A first source-
+archive comparison removed only one of its documented outer path components;
+using the complete package prefix produced the exact 3,935-to-3,935 result.
+These were invocation or normalization errors, not product failures, and none
+caused a repository change.
+
+All `FIX_STAGE4` findings are closed, every required matrix row passes or cites
+qualifying final-implementation evidence, no `INVESTIGATE` item remains, and
+the completion statement is established:
+
+> Project supported-platform reduction is complete: active repository and
+> delivery contracts implement Windows/MSVC and Linux/GNU, the required final
+> release-baseline gates pass, protected API/ABI/file-format behavior and the
+> accepted plugin filename boundary are preserved, and remaining optional
+> validation limits and independent follow-ups are explicitly recorded.
+
 ## Historical Evidence Map and Current Capability Probe
 
 Historical passing evidence remains attached to its tested implementation. It
@@ -518,19 +668,19 @@ was installed or modified.
 
 | Optional row | Current capability or limit | Historical evidence | Stage 4 state |
 | --- | --- | --- | --- |
-| Installed wrappers/pkg-config | Available; version and installed execution checks passed in 4A | `PASS` at `6ee2f392e`/`74288cbaa` | `PASS` |
-| System zlib/libaec | Not discoverable in the current Linux pkg-config environment | `PASS` from isolated packages at `d39cd5fa0` | `SKIP_MISSING_ENV` |
-| Bundled compression | Outbound proxy works; row not rerun | `PASS` at `81e96c889` | `NOT_RUN` |
-| Parallel HDF5 | OpenMPI 5.0.10 available; row not rerun | `PASS` at `6ee2f392e` | `NOT_RUN` |
+| Installed wrappers/pkg-config | Available; final installed execution and metadata checks passed in 4E | `PASS` at final implementation `f6ff66fed` | `PASS` |
+| System zlib/libaec | Not discoverable in the current Linux pkg-config environment | `PASS` from isolated packages at `d39cd5fa0`; dependency/export paths are unaffected | `INHERITED_PASS` |
+| Bundled compression | Outbound proxy works; row not rerun | `PASS` at `81e96c889`; dependency/export paths are unaffected | `INHERITED_PASS` |
+| Parallel HDF5 | OpenMPI 5.0.10 available; row not rerun | `PASS` at `6ee2f392e`; MPI discovery, targets, wrappers, and runtime paths are unaffected | `INHERITED_PASS` |
 | Parallel tools | mpiFileUtils/libcircle/DTCMP not discoverable | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
-| Subfiling | OpenMPI prerequisite available; row not rerun | `PASS` at `6ee2f392e` | `NOT_RUN` |
-| Thread-safe and concurrency | No external prerequisite; rows not rerun | `PASS` at `6ee2f392e` and `74288cbaa` | `NOT_RUN` |
-| External plugins | Outbound proxy works; row not rerun | `PASS` at `6ee2f392e` | `NOT_RUN` |
+| Subfiling | OpenMPI prerequisite available; row not rerun | `PASS` at `6ee2f392e`; subfiling and MPI implementation paths are unaffected | `INHERITED_PASS` |
+| Thread-safe and concurrency | No external prerequisite; rows not rerun | `PASS` at `6ee2f392e` and `74288cbaa`; runtime and option paths are unaffected | `INHERITED_PASS` |
+| External plugins | In-tree loading and filename behavior rerun; external row not rerun | `PASS` at `6ee2f392e`, with final in-tree plugin `PASS` in 4E; loader and external dependency paths are unaffected | `INHERITED_PASS` |
 | ROS3 | aws-c-s3 development package absent | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
 | HDFS | JDK, Hadoop, and libhdfs absent | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
 | Signed plugins | OpenSSL runtime exists; pkg-config metadata, development, and signing inputs absent | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
-| Coverage | lcov/genhtml 2.0-1 available; row not rerun | `PASS` at `d39cd5fa0` | `NOT_RUN` |
-| STGZ and DEB | Rows not rerun | `PASS` at `6ee2f392e` | `NOT_RUN` |
+| Coverage | lcov/genhtml 2.0-1 available; row not rerun | `PASS` at `d39cd5fa0`; the GNU-only coverage truth value and coverage targets are unchanged | `INHERITED_PASS` |
+| STGZ and DEB | Rows not rerun | `PASS` at `6ee2f392e`; Linux package-generator implementation is unaffected and final TGZ passes | `INHERITED_PASS` |
 | RPM | `rpmbuild` absent | Explicit Stage 2 deferral | `SKIP_MISSING_ENV` |
 | Native unsupported compiler | Clang, Intel, and NVIDIA compilers absent | Explicit Stage 2 deferral; synthetic policy `PASS` | `SKIP_MISSING_ENV` |
 
@@ -656,16 +806,20 @@ The discarded 4A worktree source archive is a corrected validation-method
 artifact, not a product finding. Work Package 4B has no remaining
 `INVESTIGATE` or failed row. Work Packages 4C and 4D close S4-01 and S4-02;
 the findings ledger has no remaining required `FAIL` row. Work Package 4E
-closes the product and consumer comparisons without a product correction; only
-the remaining Work Package 4F matrix rows and final handoff remain.
+closes the product and consumer comparisons without a product correction.
+Work Package 4F closes the complete matrix and handoff; no finding remains open.
 
 ## Continuation Point
 
-Begin Work Package 4F from implementation anchor `f6ff66fed` plus this results
-checkpoint. Reuse the qualifying fresh 4E default/C++ Release, install,
-package, example, consumer, wrapper, plugin, compatibility, and source-package
-rows under the plan's evidence rule. Run the remaining fresh Debug,
-static-only, shared-only, and Linux Unix Makefiles rows, then reconcile the
-final matrix and modernization handoff. No 4A baseline, 4B classification, 4C
-utility-registration, 4D API-driver, or 4E product-contract evidence is
-missing.
+Stage 4 and the overall platform-reduction direction are complete at product
+implementation anchor `f6ff66fed`. Preserve the versioned Stage 1 through 4
+results, the six accepted environment deferrals, and the documented evidence
+limits. No platform-reduction implementation or validation action remains.
+
+Resume the separate CMake 4 modernization from its unchanged implementation
+anchor `0b9e21c34`. The concrete next batch is to classify the remaining
+repeated MPI include expressions owned by standalone examples, package
+configuration, dependency-specific targets, and C++ targets, then continue the
+dedicated compatible migration of remaining global compiler-flag state. That
+work must use the modernization plan's own per-change validation requirements;
+the temporary Stage 4 four-job budget is not a permanent reference value.

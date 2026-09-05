@@ -10,8 +10,8 @@ actually landed, what is being worked on, and what remains unverified.
 - Last updated: 2026-09-05
 - Progress anchor: `0b9e21c34` (`cmake: Use MPI target includes for parallel tests`)
 - Implementation commits after the plan was accepted: 123
-- Current stage: paused at the target-scoped build infrastructure milestone
-  while the approved platform-reduction direction is active
+- Current stage: paused at the target-scoped build infrastructure milestone;
+  the platform-reduction handoff is complete and this work is ready to resume
 - Overall state: the baseline and CMake 4 correctness stages are complete;
   target-scoped infrastructure is well under way, but more than half of the
   full modernization scope remains because dependency, test, install, package,
@@ -31,12 +31,12 @@ by the HDFS VFD remains in scope.
 
 The platform-reduction support contract is anchored at `912fb436b`, its Stage 1
 CMake implementation at `b317dedc9`, and its Stage 3 source implementation at
-`74288cbaa`. Stages 1 and 2 are complete; platform-reduction Stage 3 is
-Completed, with its completion review accepted on 2026-09-05. The separate
-[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is in progress;
-Work Packages 4A through 4D are complete; their fresh baseline, defect
-reproductions, repository audit, focused corrections, and stable utility test
-registration plus optional API driver repair are recorded in the
+`74288cbaa`. Stages 1 through 4 are complete. The Stage 3 completion review was
+accepted on 2026-09-05, and the separate
+[Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) completed all
+work packages that day at product implementation `f6ff66fed`. Its fresh
+baselines, focused corrections, final product/consumer matrix, residual audit,
+and stable handoff are recorded in the
 [Stage 4 results](refactoring/CMakePlatformSupportReductionStage4Results.md). The
 [Stage 3 results](refactoring/CMakePlatformSupportReductionStage3Results.md)
 record the accepted Linux plugin filename restriction and the corrected
@@ -125,9 +125,11 @@ the repository's CMake files as a single change.
 
 ## Active Work
 
-Modernization work is paused while the platform-reduction direction reaches a
-stable handoff. At the pause point, the project-level linker flag batch was
-complete and the follow-on audit had classified the remaining flag writes:
+Modernization implementation remains paused at the recorded anchor; the
+platform-reduction direction has now reached its stable handoff, so this is the
+next direction to resume. At the pause point, the project-level linker flag
+batch was complete and the follow-on audit had classified the remaining flag
+writes:
 
 - the 32-bit toolchain files own architecture and linker search flags at the
   toolchain boundary;
@@ -149,6 +151,12 @@ targets whose prerequisites are unavailable, or C++ targets. In particular,
 parallel HDF5 and the C++ library are mutually exclusive unless
 `HDF5_ALLOW_UNSUPPORTED` is enabled, so C++ MPI cleanup is not being validated
 as a supported matrix row.
+
+Resume by classifying the remaining MPI include expressions owned by
+standalone examples, package configuration, dependency-specific targets, and
+C++ targets. Then continue the dedicated compatibility work for the remaining
+global C/C++ compiler-flag mutations. Keep the progress anchor at `0b9e21c34`
+until the first new modernization implementation batch lands.
 
 ## Remaining Work
 
@@ -263,10 +271,9 @@ copy used to preserve historical MPI executable propagation. That check used
 the generated Visual Studio projects and an actual link instead of relying on
 the normalized File API contract alone.
 
+The platform-reduction Stage 4 final audit and stable handoff are complete.
 Still required before review or declaration of modernization completion:
 
-- the platform-reduction Stage 4 final audit and stable handoff; its preceding
-  Linux validation and source-reduction stages are complete;
 - static-only, shared-only, combined-library, Debug, and Release coverage on
   GCC, plus repetition of the Windows rows after affected modernization work;
 - repeat native Linux/GCC contract coverage after affected modernization work;

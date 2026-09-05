@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Stages 1 through 3 completed; Stage 4 in progress, Work Packages 4A through 4D complete
+- State: Complete; Stages 1 through 4 passed
 - Support contract approved: 2026-09-03
 - Support-contract commit: `912fb436b`
 - Admission-policy correction commit: `614dd74c0`
@@ -14,7 +14,7 @@
 - Stage 3 plan commit: `31cf74435`
 - Stage 3 implementation commit: `74288cbaa`
 - Current implementation commit: `f6ff66fed`
-- Last preceding documentation commit: `31e0a6e2f`
+- Last preceding documentation commit: `8adcde9af`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 4 Work Package 4B implementation commits: 6
@@ -22,7 +22,7 @@
 - Stage 4 Work Package 4D implementation commits: 1
 - Stage 3 status: Completed
 - Stage 3 completion review accepted: 2026-09-05
-- Current delivery stage: Stage 3 Completed; Stage 4 Work Packages 4A through 4D complete, next is 4E
+- Current delivery stage: overall supported-platform reduction complete
 - Stage 2 execution plan:
   [`CMakePlatformSupportReductionStage2.md`](CMakePlatformSupportReductionStage2.md)
 - Stage 2 execution results:
@@ -37,12 +37,14 @@
   [`CMakePlatformSupportReductionStage4Results.md`](CMakePlatformSupportReductionStage4Results.md)
 - Stage 4 audit recommendations and inherited boundaries accepted: 2026-09-05
 - Stage 4 detailed plan and review clarifications approved: 2026-09-05
-- Stage 4 execution requirements: prefer CLion MCP; use a temporary maximum
-  build/CTest parallelism of 4 per physical host, shared by Windows and WSL on
-  that host; this is not a repository default or product compatibility value
+- Stage 4 completion: 2026-09-05 at product implementation `f6ff66fed`
+- Stage 4 execution used a temporary maximum build/CTest parallelism of 4 per
+  physical host, shared by Windows and WSL on that host; this was not and is
+  not a repository default, product compatibility value, or permanent
+  validation reference
 - Stage 2 execution scope approved: 2026-09-04
 - Stage 2 completion decision: 2026-09-04; six unavailable non-required optional configurations deferred
-- Stages 3 and 4: Stage 3 Completed; Stage 4 in progress with 4A through 4D complete
+- Stages 3 and 4: Completed
 - Stage 1 validated environment: Windows NT 10.0.26100 x64, Visual Studio 18
   2026 Insiders, MSVC 19.51.36256.0, Windows SDK 10.0.26100.0, and CMake 4.4.3
 - Available local environment: native Linux x86_64 with GCC/G++
@@ -82,20 +84,18 @@ validated before the next one changes:
 3. Stage 3 removed source and header compatibility code for unsupported
    platforms and compilers in 14 atomic implementation commits. Its complete
    Windows/MSVC and Linux/GCC gate passed at `74288cbaa`.
-4. Stage 4 will perform the final project-level support audit. Its separate
-   approved plan defines scope, focused defect repairs, evidence inheritance,
-   dual-platform acceptance, and overall completion criteria.
+4. Stage 4 completed the final project-level support audit. Its separate plan
+   and results record the focused defect repairs, evidence inheritance,
+   dual-platform acceptance, and overall completion evidence.
 
 Stage 1 may be completed without a native Linux environment. That milestone
 means the CMake firewall and cleanup have landed, retained Windows behavior has
 been validated, and the Linux/GCC path has been preserved by static reasoning.
 It does not mean Linux/GCC has been tested or that the overall plan is complete.
 
-Stages 2, 3, and 4 remain mandatory direction-level milestones. The overall
-direction is not complete when the CMake layer has been reduced, or when its
-first Linux validation passes. Detailed approval of the later stages is
-deliberately deferred; their current direction does not authorize source or
-header edits before a later plan review.
+Stages 2, 3, and 4 were mandatory direction-level milestones and are now
+complete. The separate CMake modernization remains incomplete and retains its
+own plan, implementation anchor, and validation requirements.
 
 ## Approved Policy
 
@@ -852,7 +852,9 @@ qualified fresh baselines and reproduced its two required defects. Work Package
 4B completed the repository contract audit and its six focused implementation
 repairs at `ebdb99969`. Work Package 4C repaired stable utility-dependent test
 registration at `8d7aa0432`. Work Package 4D repaired and validated the optional
-API test driver on both retained pairs at `f6ff66fed`.
+API test driver on both retained pairs at `f6ff66fed`. Work Package 4E passed
+the final-implementation product and consumer audit, and Work Package 4F passed
+the remaining matrix, residual, package, and handoff gates.
 
 ## Stage 2: Native Linux/GCC Validation
 
@@ -897,21 +899,21 @@ Stage 3 is marked Completed.
 
 ## Stage 4: Final Project Audit Plan
 
-The approved direction is a final repository-wide audit against the two-pair
-support contract after source reduction. Stage 3 is Completed. The user accepted
-the audit recommendations, inherited boundaries, and review clarifications on
-2026-09-05. The separate [Stage 4 plan](CMakePlatformSupportReductionStage4.md)
-is in progress. Work Packages 4A through 4D are complete, with evidence in the
-[Stage 4 results](CMakePlatformSupportReductionStage4Results.md); Work Package
-4E is next. Prefer CLion MCP and use the temporary Stage 4 build/CTest cap of
-four per physical host, with Windows and WSL sharing the same budget. This
-execution cap is not a repository default or product compatibility value.
+The final repository-wide audit against the two-pair support contract is
+complete. The user accepted the audit recommendations, inherited boundaries,
+and review clarifications on 2026-09-05. All Work Packages 4A through 4F in the
+[Stage 4 plan](CMakePlatformSupportReductionStage4.md) passed, with evidence in
+the [Stage 4 results](CMakePlatformSupportReductionStage4Results.md). Validation
+used a temporary Stage 4 build/CTest cap of four per physical host, with
+Windows and WSL sharing the same budget. That completed-run constraint is not a
+repository default, product compatibility value, or permanent reference.
 
-The plan covers baseline capture, repository support consistency, focused
+The completed plan covers baseline capture, repository support consistency, focused
 repairs of utility test registration and the optional API driver, delivered
 products and consumers, and a final dual-platform gate. It preserves accepted
-Stage 3 evidence limits and optional deferrals. Completing 4A through 4D does not
-complete Stage 4 or resume general modernization.
+Stage 3 evidence limits and optional deferrals. Product implementation ends at
+`f6ff66fed`; the separate CMake modernization remains incomplete and may now
+resume from its unchanged progress anchor.
 
 ## Stage 1 Planned Commit Sequence
 

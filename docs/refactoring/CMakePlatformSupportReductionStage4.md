@@ -2,12 +2,13 @@
 
 ## Status
 
-- State: In progress; Work Packages 4A through 4E complete
+- State: Complete; Work Packages 4A through 4F passed
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
 - Execution requirements confirmed: temporary maximum parallelism 4; prefer CLion MCP
 - Execution started: 2026-09-05
+- Execution completed: 2026-09-05
 - Execution results:
   [CMakePlatformSupportReductionStage4Results.md](CMakePlatformSupportReductionStage4Results.md)
 - Parent compatibility plan:
@@ -28,18 +29,15 @@
 - Required final test level: `HDF_TEST_EXPRESS=3`
 
 The user accepted the plan's review clarifications and confirmed the execution
-requirements on 2026-09-05. Execution has started, and Work Package 4A is
-complete at the reviewed `cafdc38e9` baseline. Work Package 4B is also complete
-at implementation anchor `ebdb99969`: the repository entry points, current
-support claims, presets, workflows, packaging, and residual selectors are
-classified, and the discovered gaps are repaired. Work Package 4C is complete
-at implementation anchor `8d7aa0432`; utility registration is stable and the
-legal Linux mirror test runs with its server fixtures. Stage 3 remains
-Completed. Work Package 4D repaired and validated the optional API driver at
-implementation anchor `f6ff66fed`. Work Package 4E validated the complete
-default/C++ products and consumer contracts at that implementation anchor.
-Work Package 4F is the next execution action; no repeated plan approval is
-needed for work within these boundaries.
+requirements on 2026-09-05. Work Package 4A established the reviewed
+`cafdc38e9` baseline. Work Packages 4B through 4D completed the repository
+audit and focused repairs, ending at implementation anchor `f6ff66fed`. Work
+Package 4E validated complete default/C++ products and consumer contracts at
+that anchor. Work Package 4F completed the remaining Debug, static-only,
+shared-only, and Unix Makefiles rows, repeated residual/package checks, and
+closed the handoff. Stage 4 and the overall platform-reduction direction are
+complete; the separate CMake modernization remains at its unchanged anchor and
+stage status.
 
 ## Purpose
 

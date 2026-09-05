@@ -2,12 +2,14 @@
 
 ## Status
 
-- State: Approved; execution not started
+- State: In progress; Work Package 4A complete
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
 - Execution requirements confirmed: maximum parallelism 4; prefer CLion MCP
-- Execution started: no
+- Execution started: 2026-09-05
+- Execution results:
+  [CMakePlatformSupportReductionStage4Results.md](CMakePlatformSupportReductionStage4Results.md)
 - Parent compatibility plan:
   [CMakePlatformSupportReduction.md](CMakePlatformSupportReduction.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -25,11 +27,12 @@
 - Required final test level: `HDF_TEST_EXPRESS=3`
 
 The user accepted the plan's review clarifications and confirmed the execution
-requirements on 2026-09-05. The plan is approved; execution has not started.
-This documentation checkpoint records the agreed scope and requirements, not
-completed implementation or validation. Stage 3 remains Completed. Work Package
-4A is the next execution action; no repeated plan approval is needed for work
-within these boundaries. Create the results document when execution evidence exists.
+requirements on 2026-09-05. Execution has started, and Work Package 4A is
+complete at the reviewed `cafdc38e9` baseline. The results document records the
+qualified validators, fresh product contracts, both required defect
+reproductions, capability probe, and findings ledger. Stage 3 remains
+Completed. Work Package 4B is the next execution action; no repeated plan
+approval is needed for work within these boundaries.
 
 ## Purpose
 

@@ -30,11 +30,13 @@ plan in this directory.
   record the completed dual-platform gate, corrected header evidence, and
   accepted completion review on 2026-09-05.
 - [Stage 4 final project audit](CMakePlatformSupportReductionStage4.md):
-  Approved, execution not started; repository/product support consistency, focused defect repairs,
+  In progress; repository/product support consistency, focused defect repairs,
   evidence inheritance, final dual-platform gates, and modernization handoff.
+- [Stage 4 execution results](CMakePlatformSupportReductionStage4Results.md):
+  Work Package 4A baseline, defect reproductions, capability probe, and findings ledger.
 
-The Stage 4 plan and review clarifications were approved on 2026-09-05.
-Work Package 4A is the next execution action. Prefer CLion MCP and limit
+The Stage 4 plan and review clarifications were approved on 2026-09-05. Work
+Package 4A is complete and Work Package 4B is next. Prefer CLion MCP and limit
 build/CTest parallelism to four per physical host, shared by Windows and WSL
-on that host. Execution has not started; Stage 3 completion does not complete
-the overall direction.
+on that host. Stage 3 completion and the 4A baseline do not complete the
+overall direction.

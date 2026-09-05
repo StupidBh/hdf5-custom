@@ -20,8 +20,10 @@ The completed self-contained Stage 3 source/header reduction plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage3.md`](docs/refactoring/CMakePlatformSupportReductionStage3.md).
 Its portable execution record is
 [`docs/refactoring/CMakePlatformSupportReductionStage3Results.md`](docs/refactoring/CMakePlatformSupportReductionStage3Results.md).
-The approved Stage 4 final project-audit plan is
+The active Stage 4 final project-audit plan is
 [`docs/refactoring/CMakePlatformSupportReductionStage4.md`](docs/refactoring/CMakePlatformSupportReductionStage4.md).
+Its execution record is
+[`docs/refactoring/CMakePlatformSupportReductionStage4Results.md`](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
 This direction intentionally changes the compatibility contract by first
 reducing the CMake matrix and then removing source-level support outside
 Windows/MSVC and Linux/GCC. The underlying target architecture and the paused
@@ -32,7 +34,7 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Project supported-platform reduction
-- Status: Stages 1 through 3 completed; Stage 4 plan approved, execution not started.
+- Status: Stages 1 through 3 completed; Stage 4 in progress, Work Package 4A complete.
 - Original support-contract anchor: `912fb436b`
 - Admission-policy correction anchor: `614dd74c0`
 - CMake implementation anchor: `b317dedc9`
@@ -57,7 +59,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 4 detailed plan and review clarifications: approved on 2026-09-05
 - Stage 4 execution requirements: prefer CLion MCP; maximum build/CTest
   parallelism 4 per physical host, shared by Windows and WSL on that host
-- Stage 4 execution state: not started; no implementation or validation claimed
+- Stage 4 execution state: Work Package 4A complete; repository audit is next
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -75,7 +77,8 @@ configurations as non-required. Stage 3 source/header reduction is complete at
 user confirmed the Linux plugin filename restriction to `lib*.so` during the
 2026-09-05 review. Corrected header evidence records expected text changes and
 preserved effective declarations, rather than byte-identical files. The Stage
-4 final-audit plan is approved; its execution has not started.
+4 final audit is in progress. Work Package 4A qualified both validators, froze
+complete fresh default/C++ baselines, and reproduced the two required defects.
 
 ## Completed
 
@@ -186,7 +189,21 @@ preserved effective declarations, rather than byte-identical files. The Stage
   reuse of qualifying 4E evidence in 4F, complete required baselines before
   closing 4A, and separate ordinary-defect follow-ups. Fixed the execution
   requirements at four parallel build/test jobs per physical host and preferred
-  CLion MCP use. No Stage 4 implementation or validation has started.
+  CLion MCP use.
+- Completed Stage 4 Work Package 4A at reviewed baseline `cafdc38e9`, whose
+  differences from Stage 3 implementation `74288cbaa` are documentation only.
+  Fresh Windows/MSVC and Linux/GCC default and C++ Release builds, focused
+  tests, CTest/fixture records, File API contracts, complete installs, header
+  hashes, effective declarations, symbol sets, binary packages, one clean
+  tracked-source package, and installed consumers passed.
+- Reproduced S4-01 on both pairs: an identical second default configure adds
+  only `H5TEST-mirror_vfd` and changes fixture and File API records because
+  `HDF5_BUILD_UTILS` is declared after its test consumers. Reproduced S4-02 on
+  both pairs: the real optional API driver target fails to find
+  `H5_api_test_config.h`; the cleanup identifier mismatch is also confirmed.
+- Recorded the Stage 4 capability probe, historical evidence ownership, and
+  findings ledger in the portable Stage 4 results document. No product repair
+  has landed yet.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -212,8 +229,10 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Remaining
 
-- Begin Work Package 4A of the approved Stage 4 plan.
-- Execute the reviewed Stage 4 repository/product audit and final validation.
+- Execute Work Package 4B of the approved Stage 4 plan: audit tracked entry
+  points, support claims, admission coverage, and residual platform/compiler
+  selectors, then classify every candidate.
+- Continue the reviewed Stage 4 repository/product audit and final validation.
   The approved repair scope includes configure-order-dependent utility test
   registration and the optional API driver's known build/process defects.
 - Resume the remaining target-scoped modernization work only after this
@@ -222,19 +241,25 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Continuation Point
 
 Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
-review is closed at `7e50c3c17`. The user approved the detailed
-[Stage 4 plan](docs/refactoring/CMakePlatformSupportReductionStage4.md) with its
-review clarifications and execution requirements. The next execution action is
-Work Package 4A: qualify both validators, capture complete fresh contracts,
-and record the findings ledger. Prefer CLion MCP and keep build/CTest jobs at
-most four per physical host, including Windows and WSL together. Stage 4
-implementation and validation have not started; no repeated plan approval is
-needed within the agreed scope.
+review is closed at `7e50c3c17`. Stage 4 Work Package 4A is complete at baseline
+checkpoint `cafdc38e9`, with portable evidence in the
+[Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
+The next execution action is Work Package 4B: enumerate tracked entry points
+and current support claims, rerun the admission suite, extend the residual
+selector scan, and classify every candidate before editing product code.
+Prefer CLion MCP and keep build/CTest jobs at most four per physical host,
+including Windows and WSL together. No repeated plan approval is needed within
+the agreed scope.
 
 ## Validation State
 
-- Stage 4 status is planning only. No Stage 4 result document, defect repair,
-  build, or CTest evidence is claimed by the plan checkpoint.
+- Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
+  focused tests, CTest registration/fixture JSON, first/repeat and installed
+  contracts, complete isolated installs, header hashes, effective declaration
+  captures, five exported-symbol sets, installed consumers, four binary
+  packages, and one clean tracked-source package are recorded for both pairs.
+- S4-01 and S4-02 are reproduced failures with owners in Work Packages 4C and
+  4D. Stage 4 remains in progress; no repair or final-gate pass is claimed.
 - Current status: Stage 3 Completed. Final evidence came from clean Windows/MSVC
   and WSL Linux/GCC trees at `74288cbaa`, with at most four build or CTest jobs.
 - Windows default Release passed all 2,816 enabled tests with 37 disabled out of

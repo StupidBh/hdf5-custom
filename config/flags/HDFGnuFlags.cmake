@@ -56,26 +56,24 @@
 # HDF5 library compile options - to be made available to all targets
 #-----------------------------------------------------------------------------
 
-if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-  # General flags
-  #
-  # Note that some of the flags listed here really should be developer
-  # flags (listed in a separate variable, below) but we put them here
-  # because they are not raised by the current code and we'd like to
-  # know if they do start showing up.
-  #
-  # NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
-  # warnings that are emitted. If you need it, add it at configure time.
-    # Add general CFlags for GCC versions 4.8 and above
-    if (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 4.8)
-      ADD_H5_FLAGS (HDF5_CMAKE_C_WARNING_FLAGS "${HDF_CONFIG_DIR}/gnu-warnings/general")
-      ADD_H5_FLAGS (HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/gnu-warnings/error-general")
-    endif ()
-    # gcc automatically inlines based on the optimization level
-    # this is just a failsafe
-    list (APPEND HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "-finline-functions")
-  message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
+# General flags
+#
+# Note that some of the flags listed here really should be developer
+# flags (listed in a separate variable, below) but we put them here
+# because they are not raised by the current code and we'd like to
+# know if they do start showing up.
+#
+# NOTE: Don't add -Wpadded here since we can't/won't fix the (many)
+# warnings that are emitted. If you need it, add it at configure time.
+# Add general CFlags for GCC versions 4.8 and above
+if (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 4.8)
+  ADD_H5_FLAGS (HDF5_CMAKE_C_WARNING_FLAGS "${HDF_CONFIG_DIR}/gnu-warnings/general")
+  ADD_H5_FLAGS (HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "${HDF_CONFIG_DIR}/gnu-warnings/error-general")
 endif ()
+# gcc automatically inlines based on the optimization level
+# this is just a failsafe
+list (APPEND HDF5_CMAKE_C_OPTIONAL_WARNING_FLAGS "-finline-functions")
+message (VERBOSE "CMAKE_C_FLAGS_GENERAL=${HDF5_CMAKE_C_WARNING_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Option to allow the user to enable developer warnings

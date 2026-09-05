@@ -238,19 +238,6 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
   set (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${HDF_EXTRA_C_FLAGS})
 endif ()
 
-# As of 2024, both AIX and Solaris are uncommon, but still exist! The default
-# compiler options are also often set to -m32, which produces 32-bit binaries.
-
-# 32-bit AIX compiles might require _LARGE_FILES, but we don't have a system on
-# which to test this (yet).
-#
-# https://www.ibm.com/docs/en/aix/7.1?topic=volumes-writing-programs-that-access-large-files
-
-# 32-bit Solaris probably needs _LARGEFILE_SOURCE and _FILE_OFFSET_BITS=64,
-# as in Linux, above.
-#
-# https://docs.oracle.com/cd/E23824_01/html/821-1474/lfcompile-5.html
-
 #-----------------------------------------------------------------------------
 #  Check the size in bytes of all the int and float types
 #-----------------------------------------------------------------------------

@@ -36,6 +36,7 @@ macro (BASIC_SETTINGS varname)
 
   if (H5EXAMPLE_BUILD_CXX)
     ENABLE_LANGUAGE (CXX)
+    hdf5_validate_platform_support (LANGUAGES CXX)
 
     # Match the standard the HDF5 C++ library itself is built with.
     # H5public.h includes <cinttypes>, so any C++ translation unit

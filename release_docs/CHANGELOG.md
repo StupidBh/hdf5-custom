@@ -52,6 +52,10 @@ pairs are no longer supported and fail during CMake configuration. Source and
 header compatibility implementations used only by those rejected pairs have
 also been removed.
 
+The combined standalone examples project now applies the same compiler-pair
+check when its optional C++ examples enable the C++ language. This closes an
+entry point that previously validated only the C compiler.
+
 Linux plugin discovery now uses the `lib*.so` filename convention. Files named
 with the macOS-style `.dylib` suffix are no longer discovered, even if their
 contents are valid Linux ELF plugins. Linux plugin build outputs are unchanged.

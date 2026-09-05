@@ -6,9 +6,10 @@
 - Work Package 4A: complete
 - Work Package 4B: complete
 - Work Package 4C: complete
+- Work Package 4D: complete
 - Baseline execution date: 2026-09-05
 - Baseline checkpoint: `cafdc38e9`
-- Current implementation anchor: `8d7aa0432`
+- Current implementation anchor: `f6ff66fed`
 - Stage 4 plan:
   [CMakePlatformSupportReductionStage4.md](CMakePlatformSupportReductionStage4.md)
 - Parent plan:
@@ -19,13 +20,14 @@
 
 Work Package 4A is complete. Fresh default and C++ Release baselines were
 captured on both retained target/compiler pairs before an implementation
-correction. The two required defects were reproduced on both pairs, complete default
-and C++ installs and packages are recorded, and the findings have validation
-owners. The Work Package 4B repository audit is complete, its six focused
+correction. The two required defects were reproduced on both pairs, complete
+default and C++ installs and packages are recorded, and the findings have
+validation owners. The Work Package 4B repository audit is complete, its six focused
 implementation corrections end at `ebdb99969`, and its current-support
 documentation correction is recorded at `c6e2c2cb9`. Stage 4 remains in
 progress. Work Package 4C repaired utility-dependent registration at
-`8d7aa0432`; Work Package 4D is next.
+`8d7aa0432`, and Work Package 4D repaired and validated the optional API driver
+at `f6ff66fed`. Work Package 4E is next.
 
 The four-job cap is a temporary resource constraint for this Stage 4 execution,
 not a repository default or a product compatibility value. Existing presets
@@ -252,9 +254,9 @@ h5_api_test_driver.cpp:15: fatal error: H5_api_test_config.h: No such file or di
 The compile line contains the KWSys source and binary include directories but
 not the HDF5 API generated-header directory. Independent source inspection also
 confirms the later cleanup identifier `H5API_CLEAN_PROCESSES` disagrees with
-the defined `H5_API_CLEAN_PROCESSES`. Work Package 4D owns both focused fixes
-and the required process success, child failure, launch failure, timeout, and
-cleanup checks.
+the defined `H5_API_CLEAN_PROCESSES`. Work Package 4D later repaired both
+focused defects at `f6ff66fed` and passed the required process checks on both
+retained pairs.
 
 ## Work Package 4C: Stable Utility Test Registration
 
@@ -309,6 +311,49 @@ Fresh default totals remain the 4A values: 2,853 on Windows and 2,855 on Linux.
 The broken repeat configure previously added only `H5TEST-mirror_vfd`; it now
 remains at the fresh count. A legal Linux mirror-enabled configuration instead
 adds the three exact server/functional/cleanup tests above.
+
+## Work Package 4D: Optional API Driver Reliability
+
+Implementation commit `f6ff66fed` gives the real `h5_api_test_driver` target
+the HDF5 source, generated-header, and generated API-test include directories
+required by `H5_api_test_config.h` and its `hdf5.h` dependency. It also changes
+the misspelled `H5API_CLEAN_PROCESSES` allocation-failure path to the defined
+`H5_API_CLEAN_PROCESSES` identifier. No validation-only patch is needed.
+
+The existing KWSys acquisition contract is unchanged. Both configurations used
+the repository-defined `KWSYS_TGZ_ORIGPATH` value
+`https://gitlab.kitware.com/utils/kwsys/-/archive/master` and archive name
+`kwsys-master.tar.gz`; no URL, archive name, namespace, FetchContent logic, or
+KWSys source was changed by 4D. Downloads used the command-scoped local proxy.
+Generated dependency content stayed outside the repository.
+
+Five tests use the actual driver with a small controlled child process. CTest's
+structured listing confirmed their generated commands, `HDF5_API` and
+`HDF5_API_DRIVER` labels, and 20-second outer bounds:
+
+| Test | Checked behavior |
+| --- | --- |
+| `H5API-driver-success` | A child exit of 0 is reported and returned as 0. |
+| `H5API-driver-child-failure` | Child exit 7 is reported and propagated exactly. |
+| `H5API-driver-launch-failure` | A nonexistent executable produces a nonzero driver result and launch diagnostic. |
+| `H5API-driver-timeout-cleanup` | A 30-second child is expired by the one-second driver timeout and its recorded PID is gone. |
+| `H5API-driver-server-cleanup` | A controlled server reaches `Waiting`, the client succeeds, and the server PID is gone after driver cleanup. |
+
+The wrapper applies its own 12-second bound and verifies controlled PIDs after
+the driver exits. If driver cleanup regresses, the verifier terminates only the
+process whose PID the helper wrote, then fails the test. It never selects or
+terminates unrelated processes. The five regressions are reachable only when
+`HDF5_TEST_API_ENABLE_DRIVER=ON`; the default option remains `OFF` and no
+default test is added.
+
+| Pair | Target build | Driver process tests | Registered API integration | Residual check | State |
+| --- | --- | ---: | --- | --- | --- |
+| Windows/MSVC 19.51 | `h5_api_test_driver`, helper, and `h5_api_test` passed in Release | 5/5 | `h5_api_test_misc` passed through the driver | No driver/helper process or PID file | `PASS` |
+| Linux/GCC/G++ 15.2 | The same three Ninja targets passed in Release | 5/5 | `h5_api_test_misc` passed through the driver | No driver/helper process or PID file | `PASS` |
+
+Both integrations ran at `HDF_TEST_EXPRESS=3`. The Windows validator used a
+Visual Studio generator and the Linux validator used Ninja. Builds and CTest
+used at most four jobs under the temporary Stage 4 execution constraint.
 
 ## Historical Evidence Map and Current Capability Probe
 
@@ -368,8 +413,8 @@ The C-only example subdirectories are entered through the combined examples
 coordinator; their nested `project()` calls are not documented independent
 configure surfaces. Installed packages intentionally do not apply the
 source-build firewall to downstream consumers using their own compatible
-compiler. The optional API driver still has the separate S4-02 build defects
-owned by 4D, but it cannot bypass admission.
+compiler. The optional API driver cannot bypass admission. Its separate S4-02
+build defects were repaired and validated by Work Package 4D at `f6ff66fed`.
 
 The admission suite now contains 12 central policy cases and four combined
 example cases. It passed on both Windows and Linux. The cases cover both
@@ -450,13 +495,14 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 | Parallel-HDF5 support prose | `c6e2c2cb9` scoped MPI wrappers to the accepted compiler IDs and marked Cray advice historical | `PASS` |
 | Combined-example warning suppression | `ebdb99969` applies `/w` to enabled MSVC C++ examples and keeps it out of `link.exe`; dual-host script cases and representative C/C++ example builds passed, while GNU retained `-w` on compile and compiler-driver link commands | `PASS` |
 | Utility-dependent test registration | `8d7aa0432` centralizes the option, gates mirror targets on both prerequisites, and adds real server fixtures; 11-step contracts passed on both pairs and Linux mirror tests passed 5/5 | `PASS` |
+| Optional API driver build and cleanup | `f6ff66fed` owns the generated include paths and fixes the cleanup identifier; both targets build and five process plus one registered API integration test pass on each pair without residual processes | `PASS` |
 
 ## Findings Ledger
 
 | ID | Classification | Baseline evidence | Validation owner | State |
 | --- | --- | --- | --- | --- |
 | `S4-01` | `FIX_STAGE4` | Fixed at `8d7aa0432`: first/second/third and `ON/OFF/ON` contracts match; legal Linux mirror targets build and fixture-expanded tests pass 5/5 | 4C | `PASS` |
-| `S4-02` | `FIX_STAGE4` | Reproduced on MSVC and G++: real optional driver target fails on the missing generated header; cleanup spelling defect confirmed | 4D | `FAIL` |
+| `S4-02` | `FIX_STAGE4` | Fixed at `f6ff66fed`: the real optional driver builds on MSVC and G++, five controlled process tests pass on each, and registered API integration passes | 4D | `PASS` |
 | `S4-03` | `FIX_STAGE4` | Current summaries and support guides agree with completed Stage 2/3 evidence; the HPC compiler-wrapper ambiguity was corrected | 4B | `PASS` |
 | `S4-04` | `KEEP_PROTECTED` | Complete fresh 65/101 header sets and separate pre/post-install contracts now exist; final comparison remains | 4E and 4F | `PASS` |
 | `S4-05` | `FIX_STAGE4` | Combined examples allowed late C++ enablement without a C++ compiler-pair check; fixed at `137ebb73c` | 4B | `PASS` |
@@ -467,14 +513,14 @@ unsupported source build. There is no remaining `INVESTIGATE` item.
 
 The discarded 4A worktree source archive is a corrected validation-method
 artifact, not a product finding. Work Package 4B has no remaining
-`INVESTIGATE` or failed row. Work Package 4C closes S4-01. S4-02 remains the
-only required `FAIL` row until its focused 4D implementation and dual-platform
-checks pass.
+`INVESTIGATE` or failed row. Work Packages 4C and 4D close S4-01 and S4-02;
+the findings ledger has no remaining required `FAIL` row. Product and final
+matrix gates still remain in 4E and 4F.
 
 ## Continuation Point
 
-Begin Work Package 4D from implementation anchor `8d7aa0432` plus this results
-checkpoint. Repair the optional API driver's generated-header include boundary
-and cleanup identifier, then run its required success, child-failure,
-launch-failure, timeout, and cleanup process checks on both pairs. No 4A
-baseline, 4B classification, or 4C utility-registration evidence is missing.
+Begin Work Package 4E from implementation anchor `f6ff66fed` plus this results
+checkpoint. Compare complete fresh products and consumer contracts against 4A,
+including installs, symbols, package metadata, examples, wrappers, plugins,
+and build/install/source consumers. No 4A baseline, 4B classification, 4C
+utility-registration, or 4D API-driver evidence is missing.

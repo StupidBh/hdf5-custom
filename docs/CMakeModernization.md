@@ -32,7 +32,7 @@ reduction Stages 1 through 3 are complete: both release baselines have passed,
 and source/header reduction finished at `74288cbaa`, with the completion review
 recorded at `7e50c3c17`. The separate
 [Stage 4 plan](refactoring/CMakePlatformSupportReductionStage4.md) is in
-progress; Work Packages 4A through 4C are complete, with their evidence in the
+progress; Work Packages 4A through 4D are complete, with their evidence in the
 [Stage 4 results](refactoring/CMakePlatformSupportReductionStage4Results.md).
 General modernization remains paused, with implementation progress recorded
 separately in [CMakeModernizationProgress.md](CMakeModernizationProgress.md).

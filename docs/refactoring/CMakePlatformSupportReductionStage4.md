@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: In progress; Work Packages 4A through 4C complete
+- State: In progress; Work Packages 4A through 4D complete
 - Plan drafted: 2026-09-05
 - Audit recommendations and inherited boundaries accepted: 2026-09-05
 - Detailed plan and review clarifications accepted: 2026-09-05
@@ -18,7 +18,7 @@
 - Stage 3 final implementation anchor: `74288cbaa`
 - Stage 3 accepted completion record: `7e50c3c17`
 - Stage 4 planning baseline: `7e50c3c17`
-- Stage 4 current implementation anchor: `8d7aa0432`
+- Stage 4 current implementation anchor: `f6ff66fed`
 - Required target pairs: Windows with compiler ID `MSVC`, and Linux with
   compiler ID `GNU`
 - Release-validation baselines: Windows x64 with MSVC and a Visual Studio
@@ -35,8 +35,9 @@ support claims, presets, workflows, packaging, and residual selectors are
 classified, and the discovered gaps are repaired. Work Package 4C is complete
 at implementation anchor `8d7aa0432`; utility registration is stable and the
 legal Linux mirror test runs with its server fixtures. Stage 3 remains
-Completed. Work Package 4D is the next execution action; no repeated plan
-approval is needed for work within these boundaries.
+Completed. Work Package 4D repaired and validated the optional API driver at
+implementation anchor `f6ff66fed`. Work Package 4E is the next execution
+action; no repeated plan approval is needed for work within these boundaries.
 
 ## Purpose
 

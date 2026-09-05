@@ -39,12 +39,12 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Active; Work Packages 2A through 2F complete and Work Package 2G next
+- Status: Active; Work Packages 2A through 2G complete and Work Package 2H next
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
 - Phase 2 execution baseline: `a1adbc32b`
-- Phase 2 implementation anchor: `b84f9e4a7`
+- Phase 2 implementation anchor: `1ce441445`
 - Phase 2 execution limit: at most four active build and CTest jobs in total per
   physical host
 - Original support-contract anchor: `912fb436b`
@@ -62,7 +62,7 @@ behavior-preserving modernization state remain recorded in
 - Stage 4 Work Package 4B implementation commits: 6
 - Stage 4 Work Package 4C implementation commits: 1
 - Stage 4 Work Package 4D implementation commits: 1
-- Phase 2 implementation commits: 3
+- Phase 2 implementation commits: 4
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
@@ -317,6 +317,11 @@ standard-library symbol deltas remain explicitly classified.
   installed declaration. C++11/C++20 affected targets and focused tests pass on
   both validators, C++11/C++20 installed consumers pass, legacy symbols remain
   exact, and the two strict-G++ weak standard-library additions are classified.
+- Completed Phase 2 Work Package 2G at implementation anchor `1ce441445`.
+  Strict C++20 now covers every project-owned C++ target while C-only builds
+  remain C++-independent and KWSYS retains C++11. Fresh C++ builds, focused and
+  process tests, standard contracts, settings, exports, public declarations,
+  layouts, symbols, and installed C++11/C++20 consumers pass on both validators.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -343,11 +348,9 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Execute Phase 2 Work Package 2G on the repaired C17 base: establish strict
-  C++20 ownership, dependency isolation, truthful reporting, focused CMake
-  contracts, standalone examples, exports, and legacy consumers.
-- Continue Work Package 2H after the 2G exit gate
-  passes.
+- Execute Phase 2 Work Package 2H from the tested C17/C++20 implementation:
+  complete full Release suites, the required product and optional-feature
+  matrix, packages, integration styles, cross-platform reads, and final audits.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor while Phase 2 is active.
 
@@ -361,7 +364,7 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is Work Package 2G of the approved
+The current continuation point is Work Package 2H of the approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
 Work Package 2A selected execution baseline `a1adbc32b`, qualified the retained
 Windows/MSVC and Linux/GCC validators, confirmed the host-wide four-job limit,
@@ -377,7 +380,11 @@ Its 317-group strict-C17 contract, default builds, 7/7 focused tests, 85-target
 standalone builds, dependency isolation, exports, and installed C99 consumers
 pass on each validator. Work Package 2F landed at `b84f9e4a7`; its MSVC complex
 repair and dual-mode affected-target, test, consumer, and symbol gates pass on
-both validators. Resume with the 2G C++20 CMake baseline; do not redo 2E or 2F.
+both validators. Work Package 2G landed at `1ce441445`; its 23-group C++20
+contract, fresh C++ builds, 9/9 focused tests, real KWSYS path and 5/5 process
+tests, install/export checks, legacy and baseline consumers, declarations,
+layouts, and symbols pass on both validators. Resume with the 2H full product
+and optional-feature matrix; do not redo 2E through 2G.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -387,7 +394,7 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Packages 2A through 2F are complete; the execution baseline is
+- Phase 2 Work Packages 2A through 2G are complete; the execution baseline is
   `a1adbc32b`. The exact validators, optional prerequisites, first/repeat
   contracts, four full Release suites, standard modes, generated files,
   headers, symbols, layouts, installs, packages, consumers, and file round
@@ -404,7 +411,11 @@ execution.
   generated-header, and C99 consumer gates on both validators. The readiness
   repair at `b84f9e4a7` passes affected C++11/C++20 builds and tests, installed
   dual-mode consumers, and the classified C++ symbol comparison on both
-  validators.
+  validators. The C++20 switch at `1ce441445` passes the exact 23-group standard
+  contract, fresh C++ builds, focused and KWSYS process tests, dependency scope,
+  install/export, generated-header, declaration, layout, symbol, and installed
+  C++11/C++20 consumer gates on both validators. Full suites and the broader
+  product matrix remain assigned to Work Package 2H.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

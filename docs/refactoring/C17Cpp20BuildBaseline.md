@@ -8,14 +8,15 @@
 - Implementation authorized: Yes; approved by the user on 2026-09-05
 - Planning baseline: `2e6ed711f`
 - Execution baseline: `a1adbc32b`
-- Implementation anchor: `b84f9e4a7`
+- Implementation anchor: `1ce441445`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
 - Work Package 2D: Complete
 - Work Package 2E: Complete
 - Work Package 2F: Complete
-- Next work package: 2G Establish C++20
+- Work Package 2G: Complete
+- Next work package: 2H Full product, optional, and handoff gate
 - Execution record:
   [C17Cpp20BuildBaselineResults.md](C17Cpp20BuildBaselineResults.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -38,7 +39,9 @@ probe and classified its findings. Work Package 2D repaired the only C readiness
 defect. Work Package 2E established the strict C17 project baseline without
 raising the installed-header consumer baseline or changing dependency-owned
 language modes. Work Package 2F repaired the MSVC UCRT complex-header boundary
-and passed its C++11/C++20 dual-mode gate. Work Package 2G is the next
+and passed its C++11/C++20 dual-mode gate. Work Package 2G then established
+strict C++20 for project-owned C++ targets while preserving dependency and
+installed-consumer language contracts. Work Package 2H is the next
 implementation step.
 
 The name "Phase 2" describes the next project-level refactoring direction. It

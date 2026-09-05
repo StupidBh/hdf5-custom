@@ -5,14 +5,15 @@
 - State: In progress
 - Plan approval: 2026-09-05
 - Execution baseline: `a1adbc32b7604d6a57d6dcab1a965258ff48f148`
-- Implementation anchor: `b84f9e4a76bdd42625137c607fd9c6d04ca2a5f3`
+- Implementation anchor: `1ce441445159e5f7eb689853e27195bb4be84d05`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
 - Work Package 2D: Complete
 - Work Package 2E: Complete
 - Work Package 2F: Complete
-- Work Packages 2G and 2H: Not started
+- Work Package 2G: Complete
+- Work Package 2H: Not started
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -35,8 +36,8 @@ was changed.
 | 2D C17 readiness repairs | `PASS` | `310fb4323` preserves MSVC complex support in both C11 and strict C17. |
 | 2E Establish C17 | `PASS` | `8c177f31b` establishes strict C17 for all project-owned C targets without dependency or consumer leakage. |
 | 2F C++20 readiness repairs | `PASS` | `b84f9e4a7` preserves the MSVC native-complex implementation in C++20; dual-mode targets, consumers, and symbols are classified below. |
-| 2G Establish C++20 | `NOT_STARTED` | Start from the completed 2F dual-mode gate. |
-| 2H Full product and handoff gate | `NOT_STARTED` | Wait for the tested C17/C++20 implementation anchor. |
+| 2G Establish C++20 | `PASS` | `1ce441445` establishes strict C++20 without dependency or consumer leakage. |
+| 2H Full product and handoff gate | `NOT_STARTED` | Start from the tested C17/C++20 implementation anchor. |
 
 ## Baseline Identity
 
@@ -473,6 +474,41 @@ template strategy rather than an HDF5 declaration. They are an allowed
 standard-mode artifact: all HDF5 names are unchanged and the legacy C++11
 consumer and symbol contracts remain exact.
 
+## C++20 CMake Baseline
+
+Commit `1ce441445` completes Work Package 2G. The root and retained standalone-
+example entry points select C++20 when the opt-in C++ path is enabled. Explicit
+C++98, C++11, C++14, and C++17 requests fail with a direct diagnostic; C++23 is
+retained. The selected standard is required and extensions are disabled. A
+default C-only configuration still does not load or record a C++ compiler.
+
+The dependency scope now saves, masks, and restores all C and C++ standard,
+required, and extension variables, including cache metadata. KWSYS therefore
+retains its declared C++11 mode while both HDF5-owned API driver executables use
+C++20. Installed targets remain free of `cxx_std_*` usage requirements, and
+the build settings report `C++ Standard: C++20` without presenting a standard
+switch as a global consumer flag.
+
+| Work Package 2G gate | Windows/MSVC | Linux/GCC |
+| --- | --- | --- |
+| CMake standard contract | `PASS`: 23 C++ compile groups use `stdcpp20` | `PASS`: 23 C++ compile groups use exact `-std=c++20` |
+| Fresh C++ Release build | `PASS` with at most four jobs | `PASS`: 3,398 steps with at most four jobs |
+| Focused core/HL/tool/C++ tests | 9/9 at `HDF_TEST_EXPRESS=3` | 9/9 at `HDF_TEST_EXPRESS=3` |
+| Real KWSYS dependency path | KWSYS inherits no HDF5 mode; both drivers build and process tests pass 5/5 | KWSYS uses exact C++11, both drivers use C++20, and process tests pass 5/5 |
+| Install and export scan | `PASS`: settings report C++20 and no standard leaks | `PASS`: settings report C++20 and no standard leaks |
+| Installed legacy/baseline consumers | C99/C++11 and C17/C++20 each pass 3/3 | Both modes pass 3/3 with exact C++11/C++20 compiler switches |
+| Public headers and layouts | Declaration-bearing headers and C++11/C++20 layouts have zero delta | Same result; only the classified strict-C17 `H5_HAVE_TIMEZONE` generated-header delta remains |
+| C++ symbols | Core 1,143 and HL C++ 35 names have zero delta | HL C++ 46 names have zero delta; core retains all 1,418 baseline names plus only the classified `P2-05` pair |
+
+The focused CMake script also proves identical first/repeated contracts, lower-
+standard rejection in both entry points, retention of C++23, C-only compiler
+independence, dependency isolation in default and later-standard parent modes,
+and the absence of exported C++ compile features. The five `P2-03` diagnostics
+remain unchanged. Two additional H5Location allocation-size diagnostics also
+occur twice in the frozen C++11 log and are not a baseline delta. Full CTest,
+package, optional-feature, and integration coverage remains the Work Package 2H
+gate.
+
 ### Comparison and Validation Rules
 
 | Evidence kind | Later comparison rule |
@@ -505,23 +541,25 @@ superseded terminal session remains.
 | ID | Owner and reproducer | Impact | Disposition and gate |
 | --- | --- | --- | --- |
 | `P2-01` | C/configure: fresh MSVC `/std:c17` configure reaches `__STDC_NO_COMPLEX__` and bypasses the MSVC type fallback in `config/ConfigureChecks.cmake`. | Removed native complex configuration and the corresponding datatype/conversion implementation from the diagnostic Windows build. | `CLOSED` by `310fb4323`: MSVC probes its supported fallback even when ISO complex is unavailable; C11/C17 generated macros, affected builds, and 16/16 focused tests pass on both validators. |
-| `P2-02` | C/platform: fresh GCC `-std=c17` configure no longer compiles the nonstandard `timezone` global probe. | No active behavior change because `H5_HAVE_TM_GMTOFF=1` remains selected first in `H5_make_time()`; builds and smoke tests pass. | `KEEP_COMPAT`: retain the truthful undefined result in strict mode; recheck generated headers and time tests after the C17 switch. |
-| `P2-03` | C++/test warning: GCC 15 with `-std=c++20` reports five `-Wlarger-than` warnings for fixed-size multidimensional allocations in `c++/test/dsets.cpp`. | Warning-only diagnostic in test code; compilation and the C++ focused tests pass. | `DEFER_SOURCE_MODERNIZATION`: do not rewrite passing test allocation code as part of a baseline-only migration; preserve warning classification at the final gate. |
+| `P2-02` | C/platform: fresh GCC `-std=c17` configure no longer compiles the nonstandard `timezone` global probe. | No active behavior change because `H5_HAVE_TM_GMTOFF=1` remains selected first in `H5_make_time()`; builds and smoke tests pass. | `KEEP_COMPAT`: the truthful undefined result and otherwise stable installed-header contract were rechecked at 2G; preserve the classification at the final gate. |
+| `P2-03` | C++/test warning: GCC 15 with `-std=c++20` reports five `-Wlarger-than` warnings for fixed-size multidimensional allocations in `c++/test/dsets.cpp`. | Warning-only diagnostic in test code; compilation and the C++ focused tests pass. | `DEFER_SOURCE_MODERNIZATION`: the exact five-warning set was rechecked at 2G; do not rewrite passing test allocation code and preserve the classification at the final gate. |
 | `P2-04` | C++/MSVC: after `P2-01` restores native complex support, strict C++20 redirects UCRT `<complex.h>` to `<ccomplex>` and leaves the internal `_Fcomplex` family undeclared. | HL C++ fails while compiling `H5PacketTable.cpp`; C++11 and the C core remain buildable. | `CLOSED` by `b84f9e4a7`: temporarily request the UCRT C declarations inside `H5private.h`; affected targets and tests pass in C++11/C++20 on both validators. |
-| `P2-05` | C++/GNU symbol comparison: strict C++20 emits the C1/C2 aliases of one weak `std::__cxx11::basic_string` constructor that C++11 does not export. | Two compiler-owned weak names are added; no HDF5 or HL C++ name is added, removed, or changed. | `ALLOW_STANDARD_MODE`: record the exact pair as a G++ template-instantiation artifact; preserve exact legacy C++11 symbols and recheck at 2G/2H. |
+| `P2-05` | C++/GNU symbol comparison: strict C++20 emits the C1/C2 aliases of one weak `std::__cxx11::basic_string` constructor that C++11 does not export. | Two compiler-owned weak names are added; no HDF5 or HL C++ name is added, removed, or changed. | `ALLOW_STANDARD_MODE`: the exact pair and complete legacy symbol set were rechecked at 2G; preserve the classification at 2H. |
 
 The raw global C11 flag, duplicate baseline C options, and missing global C++
 flag in `libhdf5.settings` were standard-ownership inputs rather than ordinary
-source defects. Work Package 2F closes the additional blocker that becomes
-observable only after the C17 repair enables native MSVC complex support. No
-`INVESTIGATE` item remains before the C++20 baseline switch.
+source defects. Work Package 2F closed the additional blocker that became
+observable only after the C17 repair enabled native MSVC complex support. Work
+Package 2G then established the C++20 baseline without another source repair.
+No `INVESTIGATE` item remains before the full product gate.
 
 ## Continuation Point
 
-Work Package 2F is complete at implementation anchor `b84f9e4a7`. The repaired
-MSVC complex-header path, affected C++11/C++20 targets, focused tests, installed
-consumers, and exact symbol classifications pass on both validators. Start Work
-Package 2G by moving C++ standard ownership ahead of C++-sensitive probes,
-establishing strict C++20 for every project-owned C++ target, isolating KWSYS
-and other dependencies, and adding the focused standard/export contract. Keep
-the installed C++11 consumer baseline and the `P2-03`/`P2-05` classifications.
+Work Package 2G is complete at implementation anchor `1ce441445`. Strict C++20
+ownership, C-only independence, KWSYS and dependency isolation, focused builds
+and tests, settings, exports, public declarations and layouts, installed legacy
+and baseline consumers, and exact symbol classifications pass on both
+validators. Start Work Package 2H with fresh full Release suites, the required
+product and optional-feature matrix, packages, integration styles, and final
+handoff gate. Preserve the C99/C++11 consumer baseline and the `P2-02`, `P2-03`,
+and `P2-05` classifications.

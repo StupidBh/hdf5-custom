@@ -124,6 +124,13 @@ functionality.
 
 ## Library
 
+### Restored MSVC C++20 builds with native complex support
+
+   Internal C++ translation units now request the C-compatible UCRT complex
+   declarations while including `<complex.h>`. This preserves the native MSVC
+   complex types enabled by C17 configuration without exposing the workaround
+   through installed headers.
+
 ### Restored compilation of four error-cleanup paths
 
    Restore missing statement terminators after `HDONE_ERROR` calls in event-set,

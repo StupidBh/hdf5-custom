@@ -43,7 +43,15 @@
 #include <math.h>
 
 #ifdef H5_HAVE_COMPLEX_NUMBERS
+    #if defined(_MSC_VER) && defined(__cplusplus) && !defined(_CRT_USE_C_COMPLEX_H)
+        #define _CRT_USE_C_COMPLEX_H
+        #define H5_UNDEF_CRT_USE_C_COMPLEX_H
+    #endif
     #include <complex.h>
+    #ifdef H5_UNDEF_CRT_USE_C_COMPLEX_H
+        #undef H5_UNDEF_CRT_USE_C_COMPLEX_H
+        #undef _CRT_USE_C_COMPLEX_H
+    #endif
 #endif
 
 /* POSIX headers */

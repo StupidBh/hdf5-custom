@@ -104,7 +104,7 @@ CompactNamespaces: false
 # 参数打包
 # ============================================================================
 BinPackArguments: false
-BinPackParameters: false
+BinPackParameters: "false"
 PackConstructorInitializers: Never
 
 # ============================================================================
@@ -207,7 +207,7 @@ ReferenceAlignment: Left
 
 # ---- 大括号相关 ----
 InsertBraces: true
-Cpp11BracedListStyle: false
+Cpp11BracedListStyle: "false"
 RemoveBracesLLVM: false
 
 # ---- 尾部 ----

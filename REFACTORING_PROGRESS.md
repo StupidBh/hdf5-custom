@@ -43,6 +43,7 @@ behavior-preserving modernization state remain recorded in
   authorized until explicit review approval.
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
+- Phase 2 scope clarification anchor: `2e0772f4c`
 - Phase 2 implementation anchor: none
 - Phase 2 execution limit after approval: at most four active build and CTest
   jobs in total per physical host
@@ -107,11 +108,14 @@ static-only, shared-only, Unix Makefiles, residual, package, and handoff gates.
 
 The proposed Phase 2 plan is a separate compatibility-changing direction. Its
 first implementation step, if approved, will establish project build baselines
-of C17 and C++20 and repair only demonstrated blockers. It explicitly keeps
-C99/C++11 installed-header consumers in the validation contract, avoids broad
-source modernization, isolates third-party language requirements, requires
-atomic local commits, and caps active build/CTest parallelism at four jobs per
-physical host. No Phase 2 implementation or validation has run.
+of C17 and C++20 for the project-owned core, HL, opt-in C++, tools, tests,
+plugins, and examples, and will repair only demonstrated blockers. It
+explicitly keeps C99/C++11 installed-header consumers in the validation
+contract, forbids incidental modern syntax, excludes third-party libraries and
+tools from migration, requires atomic local commits, and caps active
+build/CTest parallelism at four jobs per physical host. HDF5-owned integration
+with third-party prerequisites remains in the regression matrix. No Phase 2
+implementation or validation has run.
 
 ## Completed
 
@@ -327,11 +331,12 @@ is not a lasting project or validation reference.
 
 The current continuation point is review of the proposed
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md)
-at plan anchor `ef0ff7390`. Implementation is not authorized. After explicit
-approval, start with Work Package 2A: select the execution baseline, qualify
-both retained validators, confirm the host-wide four-job resource limit, and
-perform read-only optional-capability discovery. Do not begin baseline capture
-or the external standard probe until 2A exits successfully.
+at initial plan anchor `ef0ff7390`, including the confirmed scope clarification
+at `2e0772f4c`. Implementation is not authorized. After explicit approval,
+start with Work Package 2A: select the execution baseline, qualify both retained
+validators, confirm the host-wide four-job resource limit, and perform
+read-only optional-capability discovery. Do not begin baseline capture or the
+external standard probe until 2A exits successfully.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -341,8 +346,9 @@ execution.
 
 ## Validation State
 
-- Phase 2 has planning evidence only at `ef0ff7390`. No C17/C++20 configure,
-  build, CTest, install, package, ABI, or consumer result has been claimed.
+- Phase 2 has planning evidence through scope clarification `2e0772f4c`. No
+  C17/C++20 configure, build, CTest, install, package, ABI, or consumer result
+  has been claimed.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

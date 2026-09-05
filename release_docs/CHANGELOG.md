@@ -54,7 +54,10 @@ also been removed.
 
 The combined standalone examples project now applies the same compiler-pair
 check when its optional C++ examples enable the C++ language. This closes an
-entry point that previously validated only the C compiler.
+entry point that previously validated only the C compiler. Enabling example
+warning suppression now also applies `/w` to MSVC C++ examples instead of only
+to their C counterparts, and the compile-only switch is no longer passed to
+the MSVC linker.
 
 The Parallel HDF5 setup guide now makes clear that MPI compiler wrappers must
 still resolve to a supported compiler ID. Cray-specific guidance is labeled as

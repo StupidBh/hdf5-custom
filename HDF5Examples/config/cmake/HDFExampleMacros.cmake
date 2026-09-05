@@ -105,13 +105,13 @@ macro (BASIC_SETTINGS varname)
       # MSVC diagnoses conflicting warning levels even when /w is last.
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
       set (_hdf5_example_c_warning_suppression "/w")
-      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      if (CMAKE_CXX_COMPILER_LOADED)
         string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
         set (_hdf5_example_cxx_warning_suppression "/w")
       endif ()
     else ()
       set (_hdf5_example_c_warning_suppression "-w")
-      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      if (CMAKE_CXX_COMPILER_LOADED)
         set (_hdf5_example_cxx_warning_suppression "-w")
       endif ()
     endif ()
@@ -120,10 +120,12 @@ macro (BASIC_SETTINGS varname)
         "$<$<COMPILE_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
         "$<$<COMPILE_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
     )
-    target_link_options (hdf5_examples_platform INTERFACE
-        "$<$<LINK_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
-        "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
-    )
+    if (NOT MSVC)
+      target_link_options (hdf5_examples_platform INTERFACE
+          "$<$<LINK_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
+          "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
+      )
+    endif ()
     unset (_hdf5_example_c_warning_suppression)
     unset (_hdf5_example_cxx_warning_suppression)
 

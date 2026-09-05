@@ -87,7 +87,8 @@ run_policy_case (linux-clang FAIL Linux x86_64 Ninja "" C Clang "C compiler ID")
 run_policy_case (linux-msvc FAIL Linux x86_64 Ninja "" C MSVC "C compiler ID")
 
 # Exercise the combined standalone examples entry point, where BASIC_SETTINGS
-# enables the optional C++ language after the initial C-only policy check.
+# enables the optional C++ language after the initial C-only policy check. The
+# passing cases also verify C and C++ warning suppression for each pair.
 run_example_case (windows-example-cxx PASS Windows MSVC)
 run_example_case (windows-example-clang FAIL Windows Clang)
 run_example_case (linux-example-cxx PASS Linux GNU)

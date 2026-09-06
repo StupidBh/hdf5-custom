@@ -1915,7 +1915,13 @@ int main(int argc, char** argv)
      * way as the previous tests.
      */
     H5_mpi_set_bigio_count(oldsize);
+#ifndef H5_HAVE_WIN32_API
     single_rank_independent_io();
+#else
+    if (MAIN_PROCESS) {
+        printf("\nSingle Rank Independent I/O skipped on Windows: MS-MPI rejects >2 GiB user buffers\n");
+    }
+#endif
 
     if (mpi_rank_g == 0) {
         hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);

@@ -6,9 +6,9 @@
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Removal implementation anchor: None
+- Removal implementation anchor: `c62d134e5`
 - Work Package 4A: Complete
-- Work Package 4B: Ready to implement
+- Work Package 4B: Complete
 - Work Packages 4C through 4F: Not started
 - Plan: [NativeCppHlRemoval.md](NativeCppHlRemoval.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -18,8 +18,8 @@
 The user approved removal of the native C++ and complete high-level products
 on 2026-09-06. Approval does not include HighFive integration, a compatibility
 shim, a core C API or ABI change, a retained-tool removal, or a file-format
-change. Work Package 4A is closed; Work Package 4B may remove only the complete
-HL product and its contracts.
+change. Work Packages 4A and 4B are closed. The complete HL product is removed
+at `c62d134e5`; native C++ removal remains reserved for Work Package 4C.
 
 ## Baseline Identity
 
@@ -121,10 +121,68 @@ Profile A unsupported-combination override is explicit, the core C and
 HighFive-style consumer contracts are frozen, and no unexplained baseline
 failure remains. Work Package 4A is complete.
 
+## Work Package 4B Implementation
+
+Commit `c62d134e5` removes all 119 tracked paths below `hl/`, all 78 C HL
+example paths, all 4 C++ HL example paths, and the HL-dependent `h5watch` tool.
+It also removes the HL build option and root wiring, target and library names,
+SOVERSION data, exports, package components, pkg-config metadata, compiler-
+wrapper behavior, install/CPack components, generated settings, examples,
+tests, CI assumptions, and current product documentation.
+
+The implementation deliberately retains the native `c++/` tree and the core
+local-heap `src/H5HL*` package. No native C++ source path was deleted. The core
+C library, retained tools, file-format behavior, and HighFive audit input were
+not expanded or redesigned.
+
+## Work Package 4B Validation
+
+| Pair and configuration | Build and focused tests | Install/package contract |
+| --- | --- | --- |
+| Windows default Release | Complete build passed; retained core/filter/tool selection passed 19/19 with fixtures | Install and ZIP passed; no HL library, header, tool, component, or package entry |
+| Windows Profile B | Static map/MPI/zlib/SZIP/tools build passed; 15/17 focused tests passed | Two MS-MPI file-aggregator failures reproduce the frozen baseline and are not removal regressions |
+| Linux default Release | Complete Ninja build passed; retained core/filter/tool selection passed 15/15 with fixtures | Install and TGZ passed; exact HL artifact scans returned no matches |
+| Linux Profile B | Static map/MPI/zlib/SZIP/tools build passed; focused selection passed 17/17 | Build-tree package and dependency routing passed |
+
+All validation used `HDF_TEST_EXPRESS=3` and no build or CTest job count above
+four. Windows runtime tests explicitly included the build and dependency DLL
+directories in `PATH`; no missing-DLL result was accepted as test evidence.
+The Windows Profile B failures were `MPI_TEST_t_pmulti_dset` and
+`MPI_TEST_t_filters_parallel`, both with the previously recorded Microsoft MPI
+"No aggregators match" diagnostic. `MPI_TEST_t_mpi` passed, and both failing
+tests passed on Linux/Open MPI after the same HL removal.
+
+The repository has no Map API test or non-core `H5M*` caller. Both Profile B
+builds enabled `HDF5_ENABLE_MAP_API`, compiled the Map implementation, and a
+standalone consumer compiled and linked its `H5M*` calls through the generated
+core package target. Attempting `H5Mcreate()` with the native VOL reports its
+existing unsupported optional-method result on Windows and Linux; the same
+result reproduces at pre-removal anchor `3118d8c2c`. This is a frozen product
+limitation, not a 4B regression or an unexplained gate failure.
+
+A HighFive-style C++20 consumer configured, compiled, linked, created and read
+back a dataset, and verified its values against both post-removal default
+install trees using only the retained core C shared target. HighFive remains
+untracked and is not wired into this repository.
+
+Exact active product-contract scans found no remaining `hdf5_hl`,
+`hdf5_hl_cpp`, `HDF5_BUILD_HL_LIB`, `H5_INCLUDE_HL`, `HL`/`CXX_HL` package
+component, HL pkg-config, or `h5watch` contract. Remaining HL terms in release
+history and deeper inherited technical prose are not live product contracts;
+their final classification belongs to Work Package 4F.
+
+## Work Package 4B Gate
+
+The complete HL product and its active contracts are absent, retained default
+and acceptance-profile builds pass, focused retained tests pass subject only
+to frozen Windows/MS-MPI exceptions, post-removal installs and packages have
+no HL artifact, and dual-platform retained consumers pass. Work Package 4B is
+complete at `c62d134e5`.
+
 ## Next Continuation Point
 
-Execute Work Package 4B only: remove the complete `hl/` product, its examples,
-and all active build, install, export, package, wrapper, settings, tool, test,
-and current-documentation contracts. Preserve `src/H5HL*`, the native `c++/`
-tree, retained tools, core C API/ABI, and file-format behavior. Stop before
-Work Package 4C.
+Resume on the next machine at Work Package 4C only. Confirm implementation
+anchor `c62d134e5` and a clean tracked worktree, then remove the native `c++/`
+product and only its owned contracts. Preserve `src/H5HL*`, retained tools,
+core C API/ABI, file-format behavior, and the untracked HighFive audit input.
+Do not redo Work Package 4B unless its frozen contract changes.

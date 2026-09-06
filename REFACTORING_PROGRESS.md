@@ -35,8 +35,9 @@ It removes the native `c++/` tree, the complete `hl/` tree, and all related
 product contracts while preserving the retained core C product and the two
 required business profiles. The user approved implementation on 2026-09-06,
 and Work Package 4A has frozen the pre-removal contract at `72e36a522`, with
-pre-removal stabilization through `3118d8c2c`. Work Package 4B is the active
-continuation and is limited to complete HL product removal. Its
+pre-removal stabilization through `3118d8c2c`. Work Package 4B removed the
+complete HL product at `c62d134e5`. Work Package 4C native C++ removal is the
+next-machine continuation. Its
 execution record is
 [`docs/refactoring/NativeCppHlRemovalResults.md`](docs/refactoring/NativeCppHlRemovalResults.md).
 The HighFive dependency input is recorded in
@@ -61,7 +62,7 @@ completed supported-platform reduction plan.
 | 1 | Raise project organization and build entry points to CMake 4.0 and mechanically reject target-system/compiler pairs other than Windows/MSVC and Linux/GNU. | Complete | Yes |
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
-| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Package 4A complete, Work Package 4B next | No |
+| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Packages 4A and 4B complete, Work Package 4C next | No |
 | 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
@@ -75,7 +76,7 @@ and have no approved scope.
 ## Active Direction
 
 - Direction: Roadmap Stage 4 native C++ and HL product removal
-- Status: In progress; Work Package 4A complete and Work Package 4B next
+- Status: In progress; Work Packages 4A and 4B complete, Work Package 4C next
 - Detailed plan: `docs/refactoring/NativeCppHlRemoval.md`
 - Execution results: `docs/refactoring/NativeCppHlRemovalResults.md`
 - HighFive audit: `docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`
@@ -89,7 +90,7 @@ and have no approved scope.
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Implementation anchor: None for roadmap Stage 4
+- Implementation anchor: `c62d134e5` for roadmap Stage 4 Work Package 4B
 - Retained contract: freeze core C installed headers, symbols, package paths,
   retained tools, and file-format behavior at the future execution baseline
 - Removed contract: native C++, HL C/C++, `h5c++`, and HL-owned `h5watch`
@@ -434,21 +435,34 @@ implementation anchor `0b9e21c34` and is detailed in
   consumer are frozen. Windows/MS-MPI exceptions reproduce on the execution
   baseline, and clean Linux filesystem snapshots eliminate the earlier
   Windows-mount CRLF test contamination.
+- Completed roadmap Stage 4 Work Package 4B at `c62d134e5`. The complete
+  `hl/` tree, HL C/C++ examples and tests, `h5watch`, and all active HL build,
+  install, export, package, wrapper, settings, CI, and current product contracts
+  are removed. The native `c++/` tree and core local-heap `src/H5HL*` package
+  remain intact.
+- Passed clean post-removal default and static Profile B builds on Windows/MSVC
+  and Linux/GNU. Focused default tests passed 19/19 on Windows and 15/15 on
+  Linux; Linux Profile B passed 17/17 core/filter/MPI/tool tests. Windows
+  Profile B passed 15/17, with the two failures carrying the already frozen
+  MS-MPI "No aggregators match" disposition.
+- Passed default install and binary-package generation on both validators.
+  Exact Windows install/ZIP and Linux install/TGZ scans contain no HL library,
+  header, tool, component, or package metadata. Dual-platform installed
+  HighFive-style consumers compile, link, run, and verify data using only the
+  retained core C shared target.
 
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
-- Execute roadmap Stage 4 Work Package 4B: remove the complete HL product,
-  examples, `h5watch`, and active HL build, install, export, package, wrapper,
-  settings, test, and current-documentation contracts. Preserve the core
-  local-heap `src/H5HL*` package and the native `c++/` product.
-- Validate the 4B default build, focused core/map/filter/parallel/retained-tool
-  tests, install and package negative inventory, and retained core C and
-  HighFive-style consumer contracts on both supported compiler pairs.
-- Stop after recording and committing the 4B implementation and portable
-  validation evidence. Work Package 4C native C++ removal is the next-machine
-  continuation and is not part of the current batch.
+- Execute roadmap Stage 4 Work Package 4C on the next machine: remove the
+  native `c++/` product, its tests/examples, `h5c++`, and only the native C++
+  build, install, export, package, wrapper, settings, and documentation
+  contracts. Do not revisit the completed HL removal without new evidence.
+- Continue with Work Packages 4D through 4F only after 4C reaches its own gate.
+  Work Package 4F must classify inherited historical and technical prose that
+  still mentions removed HL interfaces; those terms are not active product
+  contracts after 4B.
 - Roadmap Stages 5 through 7 are cancelled from the active roadmap and remain
   future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
@@ -456,13 +470,13 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The immediate continuation point is Work Package 4B of the approved
+The immediate next-machine continuation point is Work Package 4C of the approved
 [roadmap Stage 4 native C++ and HL product-removal plan](docs/refactoring/NativeCppHlRemoval.md).
-Delete only the complete HL product and its active contracts, validate the
-retained product, commit the implementation and portable evidence, and stop.
-On the next machine, resume at Work Package 4C only after confirming the 4B
-anchor and clean tracked state. Do not remove or alter `src/H5HL*`; it is the
-retained core local-heap package despite the similar prefix.
+First confirm Work Package 4B implementation anchor `c62d134e5` and a clean
+tracked state. Then delete only the native C++ product and its owned contracts.
+Do not remove or alter `src/H5HL*`; it is the retained core local-heap package
+despite the similar prefix. Preserve retained tools, core C API/ABI, package
+routes, and file-format behavior.
 
 Do not wire HighFive into the HDF5 build/package or revive the deleted C++20
 internal-modernization plan as part of Stage 4. Roadmap Stages 5 through 7 have
@@ -495,7 +509,8 @@ execution.
 
 ## Validation State
 
-- Roadmap Stage 4 Work Package 4A is complete at execution baseline
+- Roadmap Stage 4 Work Packages 4A and 4B are complete. Work Package 4A used
+  execution baseline
   `72e36a522`, with pre-removal stabilization through `3118d8c2c`. Windows
   default passed 2,816 enabled tests with 37 disabled; clean Linux default
   passed 2,818 enabled tests with 37 disabled. Clean Linux Profiles A and B
@@ -504,7 +519,14 @@ execution.
   recorded in `docs/refactoring/NativeCppHlRemovalResults.md`. The exact
   product ledger, external `.cpp` classification, installed/package contract,
   and dual-platform HighFive-style consumer contract are frozen. Work Package
-  4B implementation validation has not yet run.
+  4B removed the complete HL product at `c62d134e5`. Post-removal default and
+  static Profile B builds pass on both validators; focused tests pass 19/19 and
+  15/17 on Windows, and 15/15 and 17/17 on Linux. The two Windows Profile B
+  failures are frozen MS-MPI file-aggregator exceptions. Default installs and
+  ZIP/TGZ packages have zero exact HL artifact matches, and installed
+  HighFive-style consumers pass on both validators. Map-enabled builds and
+  standalone symbol linkage pass; native `H5Mcreate()` remains unsupported by
+  the native VOL exactly as at pre-removal anchor `3118d8c2c`.
 - Phase 2 Work Packages 2A through 2H are complete; the execution baseline is
   `a1adbc32b` and the implementation anchor is `c38e58ed8`. The final
   default/C++ Release suites passed

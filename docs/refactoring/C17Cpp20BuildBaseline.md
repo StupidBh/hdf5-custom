@@ -2,13 +2,13 @@
 
 ## Status
 
-- State: Active
+- State: Complete
 - Plan drafted: 2026-09-05
 - Scope and completion boundaries confirmed: 2026-09-05
 - Implementation authorized: Yes; approved by the user on 2026-09-05
 - Planning baseline: `2e6ed711f`
 - Execution baseline: `a1adbc32b`
-- Implementation anchor: `1ce441445`
+- Implementation anchor: `c38e58ed8`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
@@ -17,8 +17,9 @@
 - Work Package 2F: Complete
 - Work Package 2G: Complete
 - Work Package 2H validation matrix: Complete
-- Work Package 2H closure: Awaiting explicit environment dispositions
-- Next gate: Approve the seven unavailable environment rows and close the handoff
+- Work Package 2H closure: Complete
+- Next gate: None for Phase 2; the separate target-scoped CMake modernization
+  remains paused at its recorded continuation point
 - Execution record:
   [C17Cpp20BuildBaselineResults.md](C17Cpp20BuildBaselineResults.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -43,9 +44,12 @@ raising the installed-header consumer baseline or changing dependency-owned
 language modes. Work Package 2F repaired the MSVC UCRT complex-header boundary
 and passed its C++11/C++20 dual-mode gate. Work Package 2G then established
 strict C++20 for project-owned C++ targets while preserving dependency and
-installed-consumer language contracts. Work Package 2H completed every runnable
-product, integration, package, and optional-feature row. Its only remaining gate
-is explicit approval of seven environment dispositions recorded in the results.
+installed-consumer language contracts. Work Package 2H completed the required
+product, integration, package, and applicable optional-feature matrix. Follow-up
+validation used the supplied Windows compression and MPI dependencies and the
+existing Linux parallel-tools dependencies, repaired the strict-C17 h5dwalk
+path, classified two Windows-only platform/runtime limitations, and recorded
+the user's approval to defer four non-critical optional configurations.
 
 The name "Phase 2" describes the next project-level refactoring direction. It
 must not be confused with the completed Stage 2 Linux/GCC validation inside
@@ -644,15 +648,26 @@ deferrals are context, not automatic evidence inheritance. Perform fresh
 capability discovery; record missing prerequisites and obtain an explicit user
 decision for each required or deferred row.
 
-The runnable matrix completed at implementation anchor `1ce441445`. Required
-default and C++ Release suites, build variants, integrations, consumers,
-packages, cross-platform file reads, standard contracts, and every available
-optional path passed. Fresh discovery left seven grouped rows unavailable:
-Windows system compression, Windows parallel/subfiling, parallel tools on both
-validators, ROS3 on both validators, HDFS on both validators, signed plugins on
-both validators, and Linux RPM packaging. These rows remain proposed
-`DEFER_ENVIRONMENT` dispositions until the user explicitly approves them; the
-work package and Phase 2 therefore remain active.
+The main runnable matrix completed at implementation anchor `1ce441445`.
+Required default and C++ Release suites, build variants, integrations,
+consumers, packages, cross-platform file reads, standard contracts, and every
+then-available optional path passed. Follow-up dependency discovery completed
+the Windows system-compression row and Windows parallel build, and established
+that subfiling is disabled on Windows by the product's `NOT WIN32` condition.
+Four-rank Windows MPI smoke coverage passed 14/14 selected tests. The separate
+`t_filters_parallel` test reproduces the same MS-MPI `No aggregators match`
+failure at the same source line on the frozen C11 execution baseline and the
+C17 result, so it is a classified pre-existing runtime limitation rather than
+a language-baseline regression.
+
+Linux parallel-tools validation exposed and repaired the remaining strict-C17
+h5dwalk blockers at `c38e58ed8`; its complete C-only build, focused tests,
+installation, and installed runtime check pass. Native Windows parallel tools
+are not an applicable validation row: mpiFileUtils v0.12 and its dependencies
+require a POSIX build/runtime surface, and h5dwalk explicitly rejects its
+fork/exec execution path on Windows. The user approved `DEFER_ENVIRONMENT` on
+2026-09-06 for ROS3 on both validators, HDFS on both validators, signed plugins
+on both validators, and Linux RPM packaging. No Work Package 2H gate remains.
 
 ### Final comparison
 

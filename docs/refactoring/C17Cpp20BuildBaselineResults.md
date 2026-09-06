@@ -2,10 +2,10 @@
 
 ## Status
 
-- State: In progress
+- State: Complete
 - Plan approval: 2026-09-05
 - Execution baseline: `a1adbc32b7604d6a57d6dcab1a965258ff48f148`
-- Implementation anchor: `1ce441445159e5f7eb689853e27195bb4be84d05`
+- Implementation anchor: `c38e58ed860463e0b9a976945a18c651c1fe1154`
 - Work Package 2A: Complete
 - Work Package 2B: Complete
 - Work Package 2C: Complete
@@ -14,7 +14,7 @@
 - Work Package 2F: Complete
 - Work Package 2G: Complete
 - Work Package 2H validation matrix: Complete
-- Work Package 2H closure: Awaiting explicit environment dispositions
+- Work Package 2H closure: Complete
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -38,7 +38,7 @@ was changed.
 | 2E Establish C17 | `PASS` | `8c177f31b` establishes strict C17 for all project-owned C targets without dependency or consumer leakage. |
 | 2F C++20 readiness repairs | `PASS` | `b84f9e4a7` preserves the MSVC native-complex implementation in C++20; dual-mode targets, consumers, and symbols are classified below. |
 | 2G Establish C++20 | `PASS` | `1ce441445` establishes strict C++20 without dependency or consumer leakage. |
-| 2H Full product and handoff gate | `PENDING_DECISION` | Every runnable row passed at `1ce441445`; explicit approval is required for seven proposed environment dispositions. |
+| 2H Full product and handoff gate | `PASS` | The main matrix passed at `1ce441445`; supplied dependencies completed Windows compression/parallel and Linux parallel-tools validation, the h5dwalk repair passed at `c38e58ed8`, and four non-critical optional rows have approved environment dispositions. |
 
 ## Baseline Identity
 
@@ -84,20 +84,21 @@ had approximately 927 GiB free, and its mounted source volume reports the same
 Windows free space. This is sufficient for the planned external build, install,
 package, contract, and consumer trees under the four-job execution policy.
 
-## Optional Capability Discovery
+## Optional Capability Discovery and Resolution
 
-The classification below records discovery only. `AVAILABLE` means that the
-required external input is currently present; it does not replace the build and
-runtime gate in Work Package 2H. `MISSING_ENV` means that no Phase 2 build should
-claim that row without a fresh capability decision. Existing Stage 2 artifacts
-are prerequisites only where explicitly named, not inherited product evidence.
+The classification below records initial discovery and later 2H resolution.
+`AVAILABLE` means that the required external input was present at qualification;
+`AVAILABLE AT 2H` identifies a later user-supplied or user-local input. Neither
+label replaces the build and runtime gate. `MISSING_ENV` means that no Phase 2
+build may claim that row. Existing Stage 2 artifacts are prerequisites only
+where explicitly named, not inherited product evidence.
 
 | Capability | Windows | Linux |
 | --- | --- | --- |
 | Network-backed bundled compression and external plugins | `AVAILABLE`: the command-scoped local proxy returned HTTP 200 from GitHub. | `AVAILABLE`: use the same host proxy without routing localhost or LAN services through it. |
-| System zlib/libaec | `MISSING_ENV`: a zlib header is present, but no libaec/SZIP headers or qualified MSVC dependency pair was found. | `AVAILABLE`: the retained isolated Stage 2 prefix contains zlib 1.3.1 and libaec/libsz 1.1.5 headers, static libraries, shared libraries, and CMake/pkg-config metadata. |
-| Parallel HDF5 and subfiling | `MISSING_ENV`: Microsoft MPI runtime is present, but standard SDK headers/libraries and `MSMPI_INC`/`MSMPI_LIB64` are absent. | `AVAILABLE`: OpenMPI 5.0.10 wrappers, headers, and launcher are present. |
-| Parallel tools | `MISSING_ENV`: mpiFileUtils/libcircle/DTCMP inputs were not found. | `MISSING_ENV`: pkg-config cannot discover mpiFileUtils, libcircle, or DTCMP. |
+| System zlib/libaec | `AVAILABLE AT 2H`: the user supplied compatible zlib 1.3.2 and libaec 1.1.7 headers, shared libraries, and package metadata. | `AVAILABLE`: the retained isolated Stage 2 prefix contains zlib 1.3.1 and libaec/libsz 1.1.5 headers, static libraries, shared libraries, and CMake/pkg-config metadata. |
+| Parallel HDF5 and subfiling | `AVAILABLE AT 2H`: the user supplied the Microsoft MPI SDK matching the installed 10.1 runtime; subfiling remains `NOT_APPLICABLE` because the option requires `NOT WIN32`. | `AVAILABLE`: OpenMPI 5.0.10 wrappers, headers, and launcher are present. |
+| Parallel tools | `NOT_APPLICABLE`: mpiFileUtils v0.12 and its dependency/runtime surface are POSIX-oriented, while h5dwalk rejects fork/exec on Windows. | `AVAILABLE AT 2H`: an existing user-local mpiFileUtils/libcircle/DTCMP prefix was found and matched to the official v0.12 source headers. |
 | Thread-safe and concurrency | `AVAILABLE`: no external prerequisite. | `AVAILABLE`: no external prerequisite. |
 | ROS3 | `MISSING_ENV`: no qualified AWS SDK input was found. | `MISSING_ENV`: aws-c-s3 development metadata is absent. |
 | HDFS | `MISSING_ENV`: JDK, Hadoop, and libhdfs inputs are absent. | `MISSING_ENV`: `javac`, Hadoop, and libhdfs inputs are absent. |
@@ -107,9 +108,11 @@ are prerequisites only where explicitly named, not inherited product evidence.
 | Installed pkg-config and wrappers | Windows pkg-config is not currently on `PATH`; wrapper checks remain product outputs. | `AVAILABLE`: pkg-config 2.5.1 is present; wrapper checks remain product outputs. |
 | Perl-dependent paths | `AVAILABLE`: Strawberry Perl 5.42.3 is present. | `AVAILABLE`: Perl 5.40.1 is present. |
 
-Missing optional inputs are not functionality removals and do not inherit the
-Stage 2 deferral decisions automatically. Work Package 2H requires a fresh user
-decision for every row that remains unavailable and is eligible for deferral.
+Missing optional inputs are not functionality removals and did not inherit the
+Stage 2 deferral decisions automatically. Follow-up discovery used the supplied
+dependency locations for every applicable priority row. On 2026-09-06 the user
+explicitly approved environment deferral of the four remaining non-critical
+optional configurations listed below.
 
 ## Pre-Migration Evidence Register
 
@@ -510,11 +513,14 @@ occur twice in the frozen C++11 log and are not a baseline delta.
 
 ## Full Product and Optional Validation
 
-Work Package 2H exercised every runnable matrix row from the exact
-`1ce441445159e5f7eb689853e27195bb4be84d05` source tree. All accepted build and
-CTest commands stayed within four active jobs per physical host, and full suites
-used `HDF_TEST_EXPRESS=3`. Validation output and generated trees remain outside
-the repository.
+Work Package 2H exercised the main matrix from the exact
+`1ce441445159e5f7eb689853e27195bb4be84d05` source tree. Follow-up optional-path
+validation used the same implementation plus the isolated h5dwalk repair at
+`c38e58ed860463e0b9a976945a18c651c1fe1154`. The repair affects only the opt-in
+parallel-tools path, so the earlier product evidence remains applicable to the
+final anchor. All accepted build and CTest commands stayed within four active
+jobs per physical host, and full suites used `HDF_TEST_EXPRESS=3`. Validation
+output and generated trees remain outside the repository.
 
 ### Required product matrix
 
@@ -548,13 +554,27 @@ Package 2B had zero name/disabled-state delta in all four Release trees.
 
 | Gate | Result |
 | --- | --- |
+| Windows system compression | The supplied zlib 1.3.2/libaec 1.1.7 packages configured without FetchContent; the C-only build, 50/50 DEFLATE/SZIP tests, install, and four static/shared build/install consumers passed with no transient path or standard leakage |
+| Windows parallel | The supplied Microsoft MPI SDK and 10.1 runtime configured a C-only strict-C17 build; the full build and a four-rank, serially scheduled 14/14 core/MPI/VFD/tool/example selection passed |
+| Windows parallel filter comparison | `t_filters_parallel` reaches MS-MPI `No aggregators match` while reopening its file at line 1407; the frozen C11 execution baseline reproduces the same failure at the same line, while an HDF5-independent 16-open MPI-IO probe passes, so this is retained as a pre-existing test/runtime limitation rather than a C17 regression |
+| Windows subfiling | `NOT_APPLICABLE`: `HDF5_ENABLE_SUBFILING_VFD` requires `NOT WIN32` in the current source |
+| Windows parallel tools | `NOT_APPLICABLE`: the official mpiFileUtils v0.12 build and dependency chain require POSIX headers/tools, and h5dwalk explicitly reports that fork/exec is unsupported on Windows; a fresh option probe stops at the absent MFU package as expected |
 | Linux parallel | Open MPI 5.0.10 full build passed; 13/13 focused MPI/VFD tests passed with exact C17 and no C++ activation |
 | Linux subfiling | Build and 3/3 fixture-aware focused tests passed with the expected generated macros |
+| Linux parallel tools | The user-local mpiFileUtils v0.12/libcircle/DTCMP libraries plus the matching official source headers completed a 3,534-step strict-C17 C-only build. The h5dwalk help and two-rank empty-rank output tests passed 2/2, installation passed, and both build-tree and installed runs produced non-empty output files. |
 | Linux system compression | Isolated zlib 1.3.1/libaec 1.1.5 build, filter tests, install, and four static/shared build/install consumers passed; no staged path leaked into exports |
 | Bundled compression/plugins | Windows and Linux preset builds passed with zlib 1.3.2, libaec 1.1.6, and configured plugins; each passed 89/89 focused filter/plugin tests |
 | Plugin failure behavior | ZFP data printed with the plugin path and failed with the expected diagnostic when the path was absent on both validators |
 | Linux coverage | Instrumented C++ Debug build and 13/13 focused tests passed; 454 `.gcda` and 1,156 `.gcno` files were observed, then `ccov-clean` removed every `.gcda` file |
 | Linux Unix Makefiles | Fresh C++ build and 13/13 focused tests passed; 213 C17 and 6 C++20 flag records confirmed exact modes independently of Ninja |
+
+The [official mpiFileUtils build guide](https://github.com/hpc/mpifileutils/blob/main/doc/rst/build.rst)
+uses MPI compiler wrappers plus shell, Make, and Autotools steps for its
+dependency chain. The Windows applicability decision additionally rests on the
+v0.12 source audit and h5dwalk's own Windows rejection, not on documentation
+wording alone. Linux strict-build warnings were confined to the dependency's
+undefined xattr macro and pre-existing h5dwalk size, sign, alignment, and unused
+code diagnostics; no remaining C17 compilation diagnostic failed the build.
 
 Bundled installs contained every plugin selected by their configured export
 lists: 11 on Windows and 12 on Linux, where JPEG was additionally enabled.
@@ -578,18 +598,15 @@ external package dependency. Linux read the Windows-created DEFLATE/SZIP file
 and Windows read the Linux-created file; normalized `h5dump` output was exactly
 equal.
 
-### Pending environment dispositions
+### Approved environment dispositions
 
 Fresh capability discovery did not find the prerequisites below. No dependency
 was installed merely to manufacture a passing row, and no product failure was
-observed. The proposed dispositions require explicit user approval before Work
-Package 2H can close.
+observed. The user classified these configurations as non-critical optional
+rows and approved their `DEFER_ENVIRONMENT` disposition on 2026-09-06.
 
-| Unavailable row | Fresh discovery | Proposed disposition |
+| Unavailable row | Fresh discovery | Approved disposition |
 | --- | --- | --- |
-| Windows system compression | No qualified MSVC libaec development-library pair | `DEFER_ENVIRONMENT` |
-| Windows parallel/subfiling | Microsoft MPI runtime exists, but SDK headers and libraries do not | `DEFER_ENVIRONMENT` |
-| Parallel tools on both validators | Required mpiFileUtils/libcircle/DTCMP toolchain is unavailable | `DEFER_ENVIRONMENT` |
 | ROS3 on both validators | No qualified AWS SDK C dependency set is available | `DEFER_ENVIRONMENT` |
 | HDFS on both validators | The required Java/Hadoop/libhdfs development stack is unavailable | `DEFER_ENVIRONMENT` |
 | Signed plugins on both validators | No qualified OpenSSL development library for the active compiler pair is available | `DEFER_ENVIRONMENT` |
@@ -627,6 +644,18 @@ pre-created destination. Two consumer-generated HDF5 files that initially used
 the source directory as their working directory were removed before the final
 repository-status check.
 
+The first Windows compression filter query used uppercase names and selected no
+tests; the accepted lowercase query passed 50/50. The initial external system-
+compression consumer assumed the bundled package's namespaced target spelling;
+the validation-only consumer was parameterized for the actual system-package
+target and all four fresh cases passed. The first Linux parallel-tools command
+did not quote a dependency path containing a dotted version, and the installed
+mpiFileUtils prefix omitted `mfu_proc.h`; the accepted run used the matching
+official v0.12 source header after confirming that the installed `mfu.h` hash
+matched that tag. An initial Windows MPI diagnostic inherited six ranks from
+tool discovery and was discarded; the accepted build cache fixes the maximum at
+four and schedules MPI CTest cases serially.
+
 ## Findings Ledger
 
 | ID | Owner and reproducer | Impact | Disposition and gate |
@@ -636,24 +665,25 @@ repository-status check.
 | `P2-03` | C++/test warning: GCC 15 with `-std=c++20` reports five `-Wlarger-than` warnings for fixed-size multidimensional allocations in `c++/test/dsets.cpp`. | Warning-only diagnostic in test code; compilation and the C++ focused tests pass. | `DEFER_SOURCE_MODERNIZATION`: the exact five-warning set was rechecked at 2G; do not rewrite passing test allocation code and preserve the classification at the final gate. |
 | `P2-04` | C++/MSVC: after `P2-01` restores native complex support, strict C++20 redirects UCRT `<complex.h>` to `<ccomplex>` and leaves the internal `_Fcomplex` family undeclared. | HL C++ fails while compiling `H5PacketTable.cpp`; C++11 and the C core remain buildable. | `CLOSED` by `b84f9e4a7`: temporarily request the UCRT C declarations inside `H5private.h`; affected targets and tests pass in C++11/C++20 on both validators. |
 | `P2-05` | C++/GNU symbol comparison: strict C++20 emits the C1/C2 aliases of one weak `std::__cxx11::basic_string` constructor that C++11 does not export. | Two compiler-owned weak names are added; no HDF5 or HL C++ name is added, removed, or changed. | `ALLOW_STANDARD_MODE`: the exact pair and complete legacy symbol set were rechecked at 2G; preserve the classification at 2H. |
+| `P2-06` | C/parallel tools: enabling `HDF5_BUILD_PARALLEL_TOOLS` activated C++ in the h5dwalk test subproject, strict C17 rejected incompatible argv pointer conversions, and a two-rank output run crashed when one rank had no local entries. | The optional Linux parallel-tools build failed; after the compile repairs, the MPI-IO path also used an uninitialized hint buffer and mishandled empty ranks and multiple buffers. | `CLOSED` by `c38e58ed8`: keep the subproject C-only, preserve argv constness with an explicit path array, initialize the hint, and make every rank participate safely while advancing buffers. The full build, 2/2 focused tests, install, and installed runtime pass. |
+| `P2-07` | C/Windows MPI: a four-rank `t_filters_parallel` run fails in MS-MPI with `No aggregators match` on the third filtered-write scenario. | One Windows-only optional test cannot complete in this validator; 14 selected core/MPI/VFD/tool/example tests pass. | `KEEP_COMPAT`: the frozen C11 execution baseline reproduces the identical failure at the same source line, while the C17 build and all other selected tests pass. This is not a language-baseline delta and no HDF5 source change is justified here. |
 
 The raw global C11 flag, duplicate baseline C options, and missing global C++
 flag in `libhdf5.settings` were standard-ownership inputs rather than ordinary
 source defects. Work Package 2F closed the additional blocker that became
 observable only after the C17 repair enabled native MSVC complex support. Work
 Package 2G then established the C++20 baseline without another source repair.
-Work Package 2H preserved every reviewed finding disposition. No `INVESTIGATE`
-product item remains; only the explicit environment decisions above block
-closure.
+Work Package 2H preserved every reviewed finding disposition, closed the
+parallel-tools blocker, and classified the Windows MPI comparison. No
+`INVESTIGATE` product item or environment decision remains.
 
 ## Continuation Point
 
-Every runnable Work Package 2H row is complete at implementation anchor
-`1ce441445`. Full suites, required product variants, available optional paths,
-packages, integration styles, installed consumers, standard and inventory
-contracts, and cross-platform reads pass. Resume by obtaining an explicit user
-decision for each of the seven proposed `DEFER_ENVIRONMENT` rows above. After
-approval, close Work Package 2H and Phase 2 in the plan, this results record, and
-the portable handoff without rerunning completed validation. Preserve the
-C99/C++11 consumer baseline and the `P2-02`, `P2-03`, and `P2-05`
-classifications.
+Work Package 2H and Phase 2 are complete at implementation anchor `c38e58ed8`.
+Full suites, required product variants, applicable optional paths, packages,
+integration styles, installed consumers, standard and inventory contracts, and
+cross-platform reads pass. The four non-critical optional environment rows have
+the approved dispositions above. Preserve the C99/C++11 consumer baseline and
+the `P2-02`, `P2-03`, `P2-05`, and `P2-07` classifications. The next distinct
+refactoring direction is the paused target-scoped CMake modernization; resume
+it only from its own recorded anchor and continuation point.

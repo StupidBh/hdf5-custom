@@ -38,14 +38,14 @@ behavior-preserving modernization state remain recorded in
 
 ## Active Direction
 
-- Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Active; Work Package 2H runnable matrix complete and environment
-  dispositions awaiting approval
+- Direction: None; Phase 2 C17/C++20 build-baseline implementation is complete
+- Status: Complete; the separate target-scoped CMake modernization remains
+  paused at its recorded continuation point
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
 - Phase 2 execution baseline: `a1adbc32b`
-- Phase 2 implementation anchor: `1ce441445`
+- Phase 2 implementation anchor: `c38e58ed8`
 - Phase 2 execution limit: at most four active build and CTest jobs in total per
   physical host
 - Original support-contract anchor: `912fb436b`
@@ -56,14 +56,14 @@ behavior-preserving modernization state remain recorded in
 - Coverage documentation correction anchor: `d39cd5fa0`
 - Stage 3 plan anchor: `31cf74435`
 - Stage 3 implementation anchor: `74288cbaa`
-- Current implementation anchor: `f6ff66fed`
+- Current implementation anchor: `c38e58ed8`
 - Last preceding documentation anchor: `8adcde9af`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
 - Stage 4 Work Package 4B implementation commits: 6
 - Stage 4 Work Package 4C implementation commits: 1
 - Stage 4 Work Package 4D implementation commits: 1
-- Phase 2 implementation commits: 4
+- Phase 2 implementation commits: 5
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
   compression, and coverage passed; six non-required optional rows were
@@ -323,13 +323,16 @@ standard-library symbol deltas remain explicitly classified.
   remain C++-independent and KWSYS retains C++11. Fresh C++ builds, focused and
   process tests, standard contracts, settings, exports, public declarations,
   layouts, symbols, and installed C++11/C++20 consumers pass on both validators.
-- Completed every runnable Phase 2 Work Package 2H validation row at
-  implementation anchor `1ce441445`. Both full default and C++ Release suites,
-  Debug/static/shared variants, installs, examples, consumers, integration
-  styles, thread modes, available MPI/subfiling and compression/plugin paths,
-  Linux coverage and Unix Makefiles, binary/source packages, exact contracts,
-  inventory comparison, and cross-platform file reads passed. Seven grouped
-  rows remain unavailable and require explicit environment dispositions.
+- Completed Phase 2 Work Package 2H at implementation anchor `c38e58ed8`.
+  Both full default and C++ Release suites, Debug/static/shared variants,
+  installs, examples, consumers, integration styles, thread modes, applicable
+  MPI/subfiling, compression/plugin and parallel-tools paths, Linux coverage
+  and Unix Makefiles, binary/source packages, exact contracts, inventory
+  comparison, and cross-platform file reads passed. The user approved
+  `DEFER_ENVIRONMENT` for ROS3, HDFS, signed plugins, and Linux RPM as
+  non-critical optional rows. Windows subfiling and parallel tools are not
+  applicable; the Windows MPI filter failure is identical on the frozen C11
+  baseline and retained as a classified runtime limitation.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -356,14 +359,9 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Obtain explicit user approval for the seven proposed Phase 2
-  `DEFER_ENVIRONMENT` rows: Windows system compression, Windows
-  parallel/subfiling, parallel tools on both validators, ROS3 on both, HDFS on
-  both, signed plugins on both, and Linux RPM packaging.
-- After approval, close Work Package 2H and Phase 2 with the final focused
-  documentation and handoff commit; do not rerun completed validation.
+- No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - Preserve the separate target-scoped CMake modernization at its unchanged
-  progress anchor while Phase 2 is active.
+  progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
@@ -375,19 +373,16 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is the final decision gate of the approved
-[Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
-Every runnable Work Package 2H row passed at implementation anchor `1ce441445`,
-including four full express-level-3 Release suites, required build/install and
-consumer variants, examples and integration styles, thread modes, Linux
-parallel/subfiling, system and bundled compression, plugins, coverage, Unix
-Makefiles, packages, standard contracts, exact CTest inventory comparison, and
-cross-platform file reads. Fresh discovery could not qualify seven grouped
-environment rows: Windows system compression, Windows parallel/subfiling,
-parallel tools on both validators, ROS3 on both, HDFS on both, signed plugins on
-both, and Linux RPM. Obtain explicit approval to record those rows as
-`DEFER_ENVIRONMENT`, then make the final Phase 2 documentation/handoff commit.
-Do not redo Work Packages 2E through 2H.
+The approved
+[Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md)
+is complete at implementation anchor `c38e58ed8`. The main product matrix passed
+at `1ce441445`; the final implementation commit touches only the opt-in
+parallel-tools path and passed its dedicated strict-C17 build, tests, install,
+and installed runtime checks. Supplied Windows dependencies also completed the
+system-compression and parallel rows. Windows subfiling and parallel tools are
+not applicable, the Windows MPI filter failure reproduces on the frozen C11
+baseline, and the four non-critical optional environment dispositions are
+approved. Do not redo Phase 2 unless its compatibility contract changes.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -397,9 +392,9 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Packages 2A through 2G and the runnable Work Package 2H matrix
-  are complete; the execution baseline is `a1adbc32b` and the implementation
-  anchor is `1ce441445`. The final default/C++ Release suites passed
+- Phase 2 Work Packages 2A through 2H are complete; the execution baseline is
+  `a1adbc32b` and the implementation anchor is `c38e58ed8`. The final
+  default/C++ Release suites passed
   2,816/2,850 enabled tests on Windows and 2,818/2,852 on Linux, with 37 disabled
   and zero failed in each default/C++ row. Exact CTest inventories have zero
   name/disabled-state delta from the frozen baseline. Debug, static/shared,
@@ -407,9 +402,12 @@ execution.
   modes, available optional features, coverage, Unix Makefiles, packages, and
   cross-platform file reads pass. The final standard contracts cover 317 C and
   23 C++ compile groups on both validators without dependency or consumer
-  leakage. `P2-01` and `P2-04` are closed; `P2-02`, `P2-03`, and `P2-05` retain
-  their reviewed dispositions. Seven unavailable environment rows await the
-  explicit user decision recorded above; no `INVESTIGATE` product finding
+  leakage. `P2-01`, `P2-04`, and `P2-06` are closed; `P2-02`, `P2-03`,
+  `P2-05`, and `P2-07` retain their reviewed dispositions. Windows system
+  compression passed 50/50 focused filter tests and four consumers. Windows
+  parallel passed a 14/14 four-rank selection, Linux parallel tools passed a
+  complete strict-C17 C-only build and 2/2 focused tests, and four optional
+  environment deferrals are approved. No `INVESTIGATE` product finding
   remains.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed

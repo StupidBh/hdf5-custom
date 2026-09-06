@@ -574,6 +574,7 @@ static void dh5tool_flist_write_text(const char* name, mfu_flist bflist)
 
     uint64_t idx = 0;
     char* ptr = NULL;
+    char empty_buffer = '\0';
 
     /* if we block things up into 128MB chunks, how many iterations
      * to write everything? */
@@ -599,7 +600,7 @@ static void dh5tool_flist_write_text(const char* name, mfu_flist bflist)
 
     /* change number of ranks to string to pass to MPI_Info */
     char str_buf[12];
-    printf(str_buf, "%d", ranks);
+    snprintf(str_buf, sizeof(str_buf), "%d", ranks);
 
     /* no. of I/O devices for lustre striping is number of ranks */
     MPI_Info_set(info, "striping_factor", str_buf);
@@ -641,20 +642,16 @@ static void dh5tool_flist_write_text(const char* name, mfu_flist bflist)
         /* compute number of bytes left to write */
         uint64_t remaining = (uint64_t)local_total - written;
 
-        /* maybe Incr pointer to our next buffer */
-        if (remaining == 0) {
-            idx++;
-            if (buf_cache[idx]->buf == NULL) {
-            }
-        }
-
         /* compute count we'll write in this iteration */
-        int write_count = (int)maxwrite;
-        if (remaining < maxwrite) {
-            write_count = (int)remaining;
+        int write_count = 0;
+        if (remaining > 0) {
+            write_count = (int)((remaining < maxwrite) ? remaining : maxwrite);
+            ptr = buf_cache[idx++]->buf;
         }
-        /* Get the buffer to output to the selected file */
-        ptr = buf_cache[idx]->buf;
+        else {
+            /* All ranks must participate in each collective write. */
+            ptr = &empty_buffer;
+        }
 
         /* collective write of file data */
         mpirc = MPI_File_write_at_all(fh, write_offset, ptr, write_count, MPI_BYTE, &status);
@@ -668,9 +665,6 @@ static void dh5tool_flist_write_text(const char* name, mfu_flist bflist)
 
         /* update number of bytes written so far */
         written += (uint64_t)write_count;
-
-        /* update pointer into our buffer */
-        ptr += write_count;
 
         /* decrement our collective write loop counter */
         all_iters--;
@@ -773,7 +767,7 @@ static int fill_file_list(mfu_flist new_flist, const char* config_filename, int 
     return index;
 }
 
-static int count_dirpaths(int argc, int startcnt, const char* argv[], int** index_out)
+static int count_dirpaths(int argc, int startcnt, char* const argv[], int** index_out)
 {
     int k;
     int path_cnt = 0;
@@ -819,7 +813,7 @@ static int count_dirpaths(int argc, int startcnt, const char* argv[], int** inde
     return path_cnt;
 }
 
-static char** copy_args(int argc, const char* argv[], int* mfu_argc, int* copy_len)
+static char** copy_args(int argc, char* const argv[], int* mfu_argc, int* copy_len)
 {
     int i, bytes_copied = 0;
     int check_mfu_args = 1;
@@ -1480,9 +1474,6 @@ int main(int argc, char* argv[])
     const char* path2 = NULL;
     size_t pathlen_total = 0;
 
-    if (numpaths && path_indices) {
-        argpaths = &argv[path_indices[0]];
-    }
     /* pointer to mfu_file src and dest objects */
     /* The dst object will only be used for tools which
      * accept 2 (or more?) file arguments */
@@ -1517,12 +1508,19 @@ int main(int argc, char* argv[])
         }
     }
     else if (numpaths > 0) {
+        argpaths = (const char**)MFU_MALLOC((size_t)numpaths * sizeof(*argpaths));
+        assert(argpaths);
+        for (i = 0; i < numpaths; i++) {
+            argpaths[i] = argv[path_indices[i]];
+        }
+
         /* allocate space for each path */
         paths = (mfu_param_path*)MFU_MALLOC((size_t)numpaths * sizeof(mfu_param_path));
         mfu_src_file = mfu_file_new();
 
         /* process each path */
-        mfu_param_path_set_all((uint64_t)numpaths, (const char**)argpaths, paths, mfu_src_file, true);
+        mfu_param_path_set_all((uint64_t)numpaths, argpaths, paths, mfu_src_file, true);
+        mfu_free(&argpaths);
 
         /* don't allow user to specify input file with walk */
         if (inputname != NULL) {

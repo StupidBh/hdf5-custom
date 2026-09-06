@@ -174,6 +174,17 @@ functionality.
 
 ## Configuration
 
+### Fixed the C17 parallel-tools build
+
+   Enabling `HDF5_BUILD_PARALLEL_TOOLS` activated a C++ compiler even when the
+   HDF5 C++ library was disabled because the h5dwalk test subproject did not
+   declare its language. The subproject now explicitly enables only C. The
+   h5dwalk argument handling also no longer performs incompatible `char **` to
+   `const char **` conversions rejected by strict C17 compilers. Its MPI-IO
+   output path now initializes the striping hint correctly, advances through
+   multiple output buffers, and safely participates in collective writes on
+   ranks with no local data.
+
 ### Restored the optional API test driver
 
    The optional `h5_api_test_driver` target could not find its generated API

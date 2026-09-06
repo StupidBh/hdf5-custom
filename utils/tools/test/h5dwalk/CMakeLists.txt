@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 4.0)
-project (HDF5_TOOLS_TEST_H5DWALK)
+project (HDF5_TOOLS_TEST_H5DWALK C)
 
 if (HDF5_BUILD_PARALLEL_TOOLS)
   add_custom_command(

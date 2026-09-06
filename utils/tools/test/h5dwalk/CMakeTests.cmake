@@ -53,3 +53,17 @@ macro (ADD_H5_TEST resultfile resultcode)
 endmacro ()
 
 ADD_H5_TEST(help-1 0 -h)
+
+if (NOT WIN32)
+  add_test (
+      NAME H5DWALK-output-empty-rank
+      COMMAND ${MPIEXEC_EXECUTABLE} ${MPIEXEC_NUMPROC_FLAG} 2 ${MPIEXEC_PREFLAGS}
+          $<TARGET_FILE:h5dwalk> ${MPIEXEC_POSTFLAGS}
+          -o "${PROJECT_BINARY_DIR}/testfiles/output-empty-rank.txt"
+          -T $<TARGET_FILE:h5dump>
+          "${HDF5_TEST_SRC_DIR}/testfiles/tnullspace.h5"
+  )
+  set_tests_properties (H5DWALK-output-empty-rank PROPERTIES
+      WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/testfiles"
+  )
+endif ()

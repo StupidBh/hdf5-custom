@@ -143,6 +143,12 @@ foreach (h5_testp ${H5P_TESTS})
   set (last_test "MPI_TEST_${h5_testp}")
 endforeach ()
 
+# MS-MPI hangs in the optimized derived-datatype path exercised by these tests.
+# Keep that path enabled for every other Windows test and for Open MPI coverage.
+if (WIN32)
+  set_property (TEST MPI_TEST_testphdf5_cchunk3 MPI_TEST_t_bigio APPEND PROPERTY ENVIRONMENT "HDF5_MPI_OPT_TYPES=0")
+endif ()
+
 # The t_pflush1 test is hard-coded to fail.
 set_tests_properties (MPI_TEST_t_pflush1 PROPERTIES WILL_FAIL "true")
 #set_property (TEST MPI_TEST_t_pflush1 PROPERTY PASS_REGULAR_EXPRESSION "PASSED")

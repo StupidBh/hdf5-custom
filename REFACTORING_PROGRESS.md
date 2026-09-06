@@ -29,12 +29,15 @@ The approved Phase 2 language-build direction is defined in
 It raises project-owned build modes to C17/C++20 while preserving the current
 public-header consumer baselines. Its execution evidence is recorded in
 [`docs/refactoring/C17Cpp20BuildBaselineResults.md`](docs/refactoring/C17Cpp20BuildBaselineResults.md).
-The proposed next direction is roadmap Stage 4, defined in
+The active direction is roadmap Stage 4, defined in
 [`docs/refactoring/NativeCppHlRemoval.md`](docs/refactoring/NativeCppHlRemoval.md).
 It removes the native `c++/` tree, the complete `hl/` tree, and all related
 product contracts while preserving the retained core C product and the two
-required business profiles. Its implementation is not yet authorized. The
-HighFive dependency input is recorded in
+required business profiles. The user approved implementation on 2026-09-06,
+and Work Package 4A is freezing the pre-removal contract at `72e36a522`. Its
+execution record is
+[`docs/refactoring/NativeCppHlRemovalResults.md`](docs/refactoring/NativeCppHlRemovalResults.md).
+The HighFive dependency input is recorded in
 [`docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`](docs/refactoring/HighFiveHDF5ApiDependencyAudit.md);
 The workspace `highfive/` header copy is an audit input but is not wired into
 the build, install, export, or package.
@@ -56,7 +59,7 @@ completed supported-platform reduction plan.
 | 1 | Raise project organization and build entry points to CMake 4.0 and mechanically reject target-system/compiler pairs other than Windows/MSVC and Linux/GNU. | Complete | Yes |
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
-| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Proposed; dependency audit and detailed plan drafted | No |
+| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Package 4A contract freeze active | No |
 | 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
@@ -69,10 +72,10 @@ and have no approved scope.
 
 ## Active Direction
 
-- Direction: Proposed roadmap Stage 4 native C++ and HL product removal
-- Status: Planning; detailed plan drafted, review pending, implementation not
-  authorized
+- Direction: Roadmap Stage 4 native C++ and HL product removal
+- Status: In progress; plan approved and Work Package 4A contract freeze active
 - Detailed plan: `docs/refactoring/NativeCppHlRemoval.md`
+- Execution results: `docs/refactoring/NativeCppHlRemovalResults.md`
 - HighFive audit: `docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`
 - HighFive audit snapshot: workspace `highfive/` version 3.3.0 at content
   manifest `25c7d5e69a69c446b8024941465449b51c9a62c2eb3ce2f981babd9fa6137910`;
@@ -81,7 +84,8 @@ and have no approved scope.
 - HighFive integration state: workspace headers present and untracked at audit
   time; not wired into CMake, installed, exported, or packaged
 - Planning source anchor: `55a930c0d`
-- Execution baseline: To be selected after plan approval
+- Plan approval: 2026-09-06
+- Execution baseline: `72e36a522`
 - Implementation anchor: None for roadmap Stage 4
 - Retained contract: freeze core C installed headers, symbols, package paths,
   retained tools, and file-format behavior at the future execution baseline
@@ -90,8 +94,8 @@ and have no approved scope.
   parallel; record the currently required `HDF5_ALLOW_UNSUPPORTED=ON`
 - Acceptance Profile B: static-only map, SZIP, tools, zlib, and parallel, with
   thread safety disabled
-- Default Stage 4 build and CTest parallelism: 6 unless a workload requires
-  less
+- Stage 4 build and CTest parallelism: maximum four active jobs in total per
+  physical host
 - Separate target-scoped CMake modernization: paused at its recorded
   continuation point
 - Phase 2 planning baseline: `2e6ed711f`

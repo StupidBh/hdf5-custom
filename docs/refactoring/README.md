@@ -21,10 +21,13 @@ plan in this directory.
   public-header and feature dependencies, and the absence of native C++ and HL
   dependencies without integrating HighFive into this repository.
 - [Roadmap Stage 4 native C++ and HL product removal](NativeCppHlRemoval.md):
-  Proposed; physically remove `c++/`, complete `hl/`, and their build, test,
+  In progress; physically remove `c++/`, complete `hl/`, and their build, test,
   install, export, package, wrapper, tool, example, and documentation
   contracts while preserving the retained core C product and the two required
-  business profiles. Implementation is not yet authorized.
+  business profiles.
+- [Roadmap Stage 4 execution results](NativeCppHlRemovalResults.md):
+  Work Package 4A baseline, contract-freeze, implementation, validation, and
+  closeout evidence for the native C++ and HL product removal.
 - [Phase 2 C17 and C++20 build baseline](C17Cpp20BuildBaseline.md):
   Complete; project-owned core, HL, opt-in C++, tools, tests, plugins, and
   examples build as C17/C++20, demonstrated blockers are repaired, third-party
@@ -63,9 +66,9 @@ incomplete and paused at its existing anchor. The Phase 2 language-build
 direction is complete at implementation `c38e58ed8`; it has no remaining
 implementation, validation, or decision gate.
 
-The proposed native C++ and HL product removal is the next stage of the
-repository roadmap. Its numbering is independent of the completed Stage 4
-audit within the supported-platform reduction plan. The former C++20 internal-
-modernization plan was abandoned and deleted before implementation. All work
-after roadmap Stage 4 is cancelled from the active roadmap and remains future
-plan to be determined.
+The native C++ and HL product removal was approved on 2026-09-06 and is the
+active repository roadmap stage. Its numbering is independent of the completed
+Stage 4 audit within the supported-platform reduction plan. The former C++20
+internal-modernization plan was abandoned and deleted before implementation.
+All work after roadmap Stage 4 is cancelled from the active roadmap and remains
+future plan to be determined.

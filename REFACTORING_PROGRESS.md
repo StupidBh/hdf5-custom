@@ -39,7 +39,8 @@ behavior-preserving modernization state remain recorded in
 ## Active Direction
 
 - Direction: Phase 2 C17/C++20 build-baseline implementation
-- Status: Active; Work Packages 2A through 2G complete and Work Package 2H next
+- Status: Active; Work Package 2H runnable matrix complete and environment
+  dispositions awaiting approval
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
@@ -322,6 +323,13 @@ standard-library symbol deltas remain explicitly classified.
   remain C++-independent and KWSYS retains C++11. Fresh C++ builds, focused and
   process tests, standard contracts, settings, exports, public declarations,
   layouts, symbols, and installed C++11/C++20 consumers pass on both validators.
+- Completed every runnable Phase 2 Work Package 2H validation row at
+  implementation anchor `1ce441445`. Both full default and C++ Release suites,
+  Debug/static/shared variants, installs, examples, consumers, integration
+  styles, thread modes, available MPI/subfiling and compression/plugin paths,
+  Linux coverage and Unix Makefiles, binary/source packages, exact contracts,
+  inventory comparison, and cross-platform file reads passed. Seven grouped
+  rows remain unavailable and require explicit environment dispositions.
 
 The completed CMake 4 modernization foundation remains available at
 implementation anchor `0b9e21c34` and is detailed in
@@ -348,9 +356,12 @@ implementation anchor `0b9e21c34` and is detailed in
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
-- Execute Phase 2 Work Package 2H from the tested C17/C++20 implementation:
-  complete full Release suites, the required product and optional-feature
-  matrix, packages, integration styles, cross-platform reads, and final audits.
+- Obtain explicit user approval for the seven proposed Phase 2
+  `DEFER_ENVIRONMENT` rows: Windows system compression, Windows
+  parallel/subfiling, parallel tools on both validators, ROS3 on both, HDFS on
+  both, signed plugins on both, and Linux RPM packaging.
+- After approval, close Work Package 2H and Phase 2 with the final focused
+  documentation and handoff commit; do not rerun completed validation.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor while Phase 2 is active.
 
@@ -364,27 +375,19 @@ product implementation anchor `f6ff66fed`. Portable evidence is in the
 The temporary four-job Stage 4 resource budget expired with this execution and
 is not a lasting project or validation reference.
 
-The current continuation point is Work Package 2H of the approved
+The current continuation point is the final decision gate of the approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md).
-Work Package 2A selected execution baseline `a1adbc32b`, qualified the retained
-Windows/MSVC and Linux/GCC validators, confirmed the host-wide four-job limit,
-and completed read-only optional-capability discovery. Work Package 2B passed
-fresh default/C++ Release builds and full express-level-3 suites on both pairs,
-then recorded the complete pre-migration contract, C99/C++11 consumers, ABI/API
-evidence, package manifests, and cross-platform file reads. Work Package 2C
-built all four strict-mode diagnostic products from checkpoint `5b871fd3c` and
-passed 7/7 default or 9/9 C++ focused tests per validator. Work Package 2D then
-closed `P2-01` at `310fb4323`; its C11/C17 dual-mode builds and 16/16 focused
-complex tests pass on both validators. Work Package 2E landed at `8c177f31b`.
-Its 317-group strict-C17 contract, default builds, 7/7 focused tests, 85-target
-standalone builds, dependency isolation, exports, and installed C99 consumers
-pass on each validator. Work Package 2F landed at `b84f9e4a7`; its MSVC complex
-repair and dual-mode affected-target, test, consumer, and symbol gates pass on
-both validators. Work Package 2G landed at `1ce441445`; its 23-group C++20
-contract, fresh C++ builds, 9/9 focused tests, real KWSYS path and 5/5 process
-tests, install/export checks, legacy and baseline consumers, declarations,
-layouts, and symbols pass on both validators. Resume with the 2H full product
-and optional-feature matrix; do not redo 2E through 2G.
+Every runnable Work Package 2H row passed at implementation anchor `1ce441445`,
+including four full express-level-3 Release suites, required build/install and
+consumer variants, examples and integration styles, thread modes, Linux
+parallel/subfiling, system and bundled compression, plugins, coverage, Unix
+Makefiles, packages, standard contracts, exact CTest inventory comparison, and
+cross-platform file reads. Fresh discovery could not qualify seven grouped
+environment rows: Windows system compression, Windows parallel/subfiling,
+parallel tools on both validators, ROS3 on both, HDFS on both, signed plugins on
+both, and Linux RPM. Obtain explicit approval to record those rows as
+`DEFER_ENVIRONMENT`, then make the final Phase 2 documentation/handoff commit.
+Do not redo Work Packages 2E through 2H.
 
 The separate CMake 4 modernization remains paused at implementation anchor
 `0b9e21c34`. Its preserved continuation is classification of the remaining MPI
@@ -394,28 +397,20 @@ execution.
 
 ## Validation State
 
-- Phase 2 Work Packages 2A through 2G are complete; the execution baseline is
-  `a1adbc32b`. The exact validators, optional prerequisites, first/repeat
-  contracts, four full Release suites, standard modes, generated files,
-  headers, symbols, layouts, installs, packages, consumers, and file round
-  trips are recorded in the Phase 2 results document. The full baseline suites
-  passed 2,816/2,850 enabled tests on Windows and 2,818/2,852 on Linux for
-  default/C++, with 37 disabled and zero skipped or failed in every row. The
-  strict external probe built all four products and proved exact C17/C++20
-  target modes. Its MSVC complex finding is the only 2D readiness repair; the
-  Linux `timezone` capability delta and GCC C++20 test warnings are classified
-  retained behavior. The repair at `310fb4323` passes the dual-mode affected
-  build and 16-test complex gate on both validators. The C17 switch at
-  `8c177f31b` passes the exact 317-group standard contract, fresh default
-  builds, focused tests, standalone examples, dependency scope, install/export,
-  generated-header, and C99 consumer gates on both validators. The readiness
-  repair at `b84f9e4a7` passes affected C++11/C++20 builds and tests, installed
-  dual-mode consumers, and the classified C++ symbol comparison on both
-  validators. The C++20 switch at `1ce441445` passes the exact 23-group standard
-  contract, fresh C++ builds, focused and KWSYS process tests, dependency scope,
-  install/export, generated-header, declaration, layout, symbol, and installed
-  C++11/C++20 consumer gates on both validators. Full suites and the broader
-  product matrix remain assigned to Work Package 2H.
+- Phase 2 Work Packages 2A through 2G and the runnable Work Package 2H matrix
+  are complete; the execution baseline is `a1adbc32b` and the implementation
+  anchor is `1ce441445`. The final default/C++ Release suites passed
+  2,816/2,850 enabled tests on Windows and 2,818/2,852 on Linux, with 37 disabled
+  and zero failed in each default/C++ row. Exact CTest inventories have zero
+  name/disabled-state delta from the frozen baseline. Debug, static/shared,
+  installs, examples, legacy/baseline consumers, integration styles, thread
+  modes, available optional features, coverage, Unix Makefiles, packages, and
+  cross-platform file reads pass. The final standard contracts cover 317 C and
+  23 C++ compile groups on both validators without dependency or consumer
+  leakage. `P2-01` and `P2-04` are closed; `P2-02`, `P2-03`, and `P2-05` retain
+  their reviewed dispositions. Seven unavailable environment rows await the
+  explicit user decision recorded above; no `INVESTIGATE` product finding
+  remains.
 - Stage 4 Work Package 4A is complete. Fresh default and C++ Release builds,
   focused tests, CTest registration/fixture JSON, first/repeat and installed
   contracts, complete isolated installs, header hashes, effective declaration

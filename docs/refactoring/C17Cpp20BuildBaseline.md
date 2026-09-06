@@ -16,7 +16,9 @@
 - Work Package 2E: Complete
 - Work Package 2F: Complete
 - Work Package 2G: Complete
-- Next work package: 2H Full product, optional, and handoff gate
+- Work Package 2H validation matrix: Complete
+- Work Package 2H closure: Awaiting explicit environment dispositions
+- Next gate: Approve the seven unavailable environment rows and close the handoff
 - Execution record:
   [C17Cpp20BuildBaselineResults.md](C17Cpp20BuildBaselineResults.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
@@ -41,8 +43,9 @@ raising the installed-header consumer baseline or changing dependency-owned
 language modes. Work Package 2F repaired the MSVC UCRT complex-header boundary
 and passed its C++11/C++20 dual-mode gate. Work Package 2G then established
 strict C++20 for project-owned C++ targets while preserving dependency and
-installed-consumer language contracts. Work Package 2H is the next
-implementation step.
+installed-consumer language contracts. Work Package 2H completed every runnable
+product, integration, package, and optional-feature row. Its only remaining gate
+is explicit approval of seven environment dispositions recorded in the results.
 
 The name "Phase 2" describes the next project-level refactoring direction. It
 must not be confused with the completed Stage 2 Linux/GCC validation inside
@@ -640,6 +643,16 @@ baseline. Re-run each available row. The six historical Stage 2 environment
 deferrals are context, not automatic evidence inheritance. Perform fresh
 capability discovery; record missing prerequisites and obtain an explicit user
 decision for each required or deferred row.
+
+The runnable matrix completed at implementation anchor `1ce441445`. Required
+default and C++ Release suites, build variants, integrations, consumers,
+packages, cross-platform file reads, standard contracts, and every available
+optional path passed. Fresh discovery left seven grouped rows unavailable:
+Windows system compression, Windows parallel/subfiling, parallel tools on both
+validators, ROS3 on both validators, HDFS on both validators, signed plugins on
+both validators, and Linux RPM packaging. These rows remain proposed
+`DEFER_ENVIRONMENT` dispositions until the user explicitly approves them; the
+work package and Phase 2 therefore remain active.
 
 ### Final comparison
 

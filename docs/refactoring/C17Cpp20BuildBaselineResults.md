@@ -13,7 +13,8 @@
 - Work Package 2E: Complete
 - Work Package 2F: Complete
 - Work Package 2G: Complete
-- Work Package 2H: Not started
+- Work Package 2H validation matrix: Complete
+- Work Package 2H closure: Awaiting explicit environment dispositions
 - Parent plan: [C17Cpp20BuildBaseline.md](C17Cpp20BuildBaseline.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -37,7 +38,7 @@ was changed.
 | 2E Establish C17 | `PASS` | `8c177f31b` establishes strict C17 for all project-owned C targets without dependency or consumer leakage. |
 | 2F C++20 readiness repairs | `PASS` | `b84f9e4a7` preserves the MSVC native-complex implementation in C++20; dual-mode targets, consumers, and symbols are classified below. |
 | 2G Establish C++20 | `PASS` | `1ce441445` establishes strict C++20 without dependency or consumer leakage. |
-| 2H Full product and handoff gate | `NOT_STARTED` | Start from the tested C17/C++20 implementation anchor. |
+| 2H Full product and handoff gate | `PENDING_DECISION` | Every runnable row passed at `1ce441445`; explicit approval is required for seven proposed environment dispositions. |
 
 ## Baseline Identity
 
@@ -505,9 +506,94 @@ standard rejection in both entry points, retention of C++23, C-only compiler
 independence, dependency isolation in default and later-standard parent modes,
 and the absence of exported C++ compile features. The five `P2-03` diagnostics
 remain unchanged. Two additional H5Location allocation-size diagnostics also
-occur twice in the frozen C++11 log and are not a baseline delta. Full CTest,
-package, optional-feature, and integration coverage remains the Work Package 2H
-gate.
+occur twice in the frozen C++11 log and are not a baseline delta.
+
+## Full Product and Optional Validation
+
+Work Package 2H exercised every runnable matrix row from the exact
+`1ce441445159e5f7eb689853e27195bb4be84d05` source tree. All accepted build and
+CTest commands stayed within four active jobs per physical host, and full suites
+used `HDF_TEST_EXPRESS=3`. Validation output and generated trees remain outside
+the repository.
+
+### Required product matrix
+
+| Gate | Windows/MSVC | Linux/GCC |
+| --- | --- | --- |
+| Default Release | Fresh C-only build; 2,816/2,816 enabled tests passed from 2,853 registered, with 37 disabled | Fresh C-only build; 2,818/2,818 enabled tests passed from 2,855 registered, with 37 disabled |
+| C++ Release | Fresh C17/C++20 build; 2,850/2,850 enabled tests passed from 2,887 registered, with 37 disabled | Fresh C17/C++20 build; 2,852/2,852 enabled tests passed from 2,889 registered, with 37 disabled |
+| Debug | C++ build and 9/9 fixture-aware focused tests passed | C++ build and 9/9 fixture-aware focused tests passed |
+| Static-only and shared-only | Both modes built and installed; artifact shapes, focused tests, and build/install consumers passed | Both modes built and installed; artifact shapes, focused tests, and build/install consumers passed |
+| Combined build/install | C, HL, C++, and HL C++ static/shared exports and consumers passed | C, HL, C++, and HL C++ static/shared exports and consumers passed |
+| Developer warnings | Full C++ build passed; reviewed warnings exposed no migration blocker | Full C++ build passed; reviewed warnings exposed no migration blocker |
+| Standalone examples | Installed-package C, C++, and HL examples passed 279/279 tests | Installed-package C, C++, and HL examples passed 279/279 tests |
+| Installed consumers | C99/C++11 and C17/C++20 modes each passed 3/3 compile/link/run tests | C99/C++11 and C17/C++20 modes each passed 3/3 compile/link/run tests |
+| Integration styles | Build-tree package, installed package, `add_subdirectory()`, and local FetchContent consumers passed | The same consumers passed; pkg-config and wrapper C17/C++20 checks also passed |
+| Thread-safe and concurrency | Both shared C-only configurations built; each passed 6/6 focused tests | Both shared C-only configurations built; each passed 6/6 focused tests |
+
+The default rows did not activate C++. Static-only and shared-only installs
+contained only their requested library shape. The external shape consumer used
+the actual static or shared imported target in all eight platform, tree, and
+linkage combinations. Generated thread and atomic macros were coherent: GNU used
+the standard atomic path and MSVC retained its supported fallback, while thread
+safety and multi-thread concurrency remained mutually exclusive.
+
+The final C and C++ standard-contract scripts passed on both validators. They
+cover 317 C compile groups and 23 C++ compile groups, repeat configuration,
+lower-standard rejection, later-standard preservation, dependency isolation,
+and export leakage. Exact sorted CTest inventory comparisons against Work
+Package 2B had zero name/disabled-state delta in all four Release trees.
+
+### Optional and generator matrix
+
+| Gate | Result |
+| --- | --- |
+| Linux parallel | Open MPI 5.0.10 full build passed; 13/13 focused MPI/VFD tests passed with exact C17 and no C++ activation |
+| Linux subfiling | Build and 3/3 fixture-aware focused tests passed with the expected generated macros |
+| Linux system compression | Isolated zlib 1.3.1/libaec 1.1.5 build, filter tests, install, and four static/shared build/install consumers passed; no staged path leaked into exports |
+| Bundled compression/plugins | Windows and Linux preset builds passed with zlib 1.3.2, libaec 1.1.6, and configured plugins; each passed 89/89 focused filter/plugin tests |
+| Plugin failure behavior | ZFP data printed with the plugin path and failed with the expected diagnostic when the path was absent on both validators |
+| Linux coverage | Instrumented C++ Debug build and 13/13 focused tests passed; 454 `.gcda` and 1,156 `.gcno` files were observed, then `ccov-clean` removed every `.gcda` file |
+| Linux Unix Makefiles | Fresh C++ build and 13/13 focused tests passed; 213 C17 and 6 C++20 flag records confirmed exact modes independently of Ninja |
+
+Bundled installs contained every plugin selected by their configured export
+lists: 11 on Windows and 12 on Linux, where JPEG was additionally enabled.
+Installed exports contained no C/C++ standard usage requirement and no
+dependency-build or transient path. Strict-C17 external consumers linked the
+actual static/shared HDF5 target and created DEFLATE/SZIP datasets in all eight
+platform, tree, and linkage combinations.
+
+### Package and format evidence
+
+| Package | Contents and validation | SHA-256 prefix |
+| --- | --- | --- |
+| Windows ZIP | 2,098 entries; independently extracted runtime, plugin, and strict-C17 shared consumer passed | `926f903edbba` |
+| Linux TGZ | 799 entries; independently extracted runtime, plugin, and strict-C17 shared consumer passed | `2e8e585b0ee5` |
+| Linux DEB | 799 entries; package `hdf5` version 2.3.0 for `amd64`; extracted runtime, plugin, and strict-C17 shared consumer passed | `fcd95e744256` |
+| Source TGZ | 4,123 archive entries representing exactly all 3,949 tracked paths at `1ce441445`; no repository or generated residue | `c1e249f42b34` |
+
+Each binary package reported HDF5 2.3.0 and included the expected HDF5,
+compression, plugin, and CMake export payload. The bundled DEB correctly had no
+external package dependency. Linux read the Windows-created DEFLATE/SZIP file
+and Windows read the Linux-created file; normalized `h5dump` output was exactly
+equal.
+
+### Pending environment dispositions
+
+Fresh capability discovery did not find the prerequisites below. No dependency
+was installed merely to manufacture a passing row, and no product failure was
+observed. The proposed dispositions require explicit user approval before Work
+Package 2H can close.
+
+| Unavailable row | Fresh discovery | Proposed disposition |
+| --- | --- | --- |
+| Windows system compression | No qualified MSVC libaec development-library pair | `DEFER_ENVIRONMENT` |
+| Windows parallel/subfiling | Microsoft MPI runtime exists, but SDK headers and libraries do not | `DEFER_ENVIRONMENT` |
+| Parallel tools on both validators | Required mpiFileUtils/libcircle/DTCMP toolchain is unavailable | `DEFER_ENVIRONMENT` |
+| ROS3 on both validators | No qualified AWS SDK C dependency set is available | `DEFER_ENVIRONMENT` |
+| HDFS on both validators | The required Java/Hadoop/libhdfs development stack is unavailable | `DEFER_ENVIRONMENT` |
+| Signed plugins on both validators | No qualified OpenSSL development library for the active compiler pair is available | `DEFER_ENVIRONMENT` |
+| Linux RPM | `rpmbuild` is unavailable | `DEFER_ENVIRONMENT` |
 
 ### Comparison and Validation Rules
 
@@ -534,7 +620,12 @@ terminal wait limit
 returned before two Windows source-consumer builds exited. The final accepted
 runs used fresh or completed trees, correct command-scoped paths, the current
 contract argument, and separately rerun passing tests. No build/test worker or
-superseded terminal session remains.
+superseded terminal session remains. The first Windows bundled-dependency build
+was stopped and replaced with a clean `/utf-8` build. A TGZ extraction command
+that attempted a cross-filesystem rename was replaced by extraction into a
+pre-created destination. Two consumer-generated HDF5 files that initially used
+the source directory as their working directory were removed before the final
+repository-status check.
 
 ## Findings Ledger
 
@@ -551,15 +642,18 @@ flag in `libhdf5.settings` were standard-ownership inputs rather than ordinary
 source defects. Work Package 2F closed the additional blocker that became
 observable only after the C17 repair enabled native MSVC complex support. Work
 Package 2G then established the C++20 baseline without another source repair.
-No `INVESTIGATE` item remains before the full product gate.
+Work Package 2H preserved every reviewed finding disposition. No `INVESTIGATE`
+product item remains; only the explicit environment decisions above block
+closure.
 
 ## Continuation Point
 
-Work Package 2G is complete at implementation anchor `1ce441445`. Strict C++20
-ownership, C-only independence, KWSYS and dependency isolation, focused builds
-and tests, settings, exports, public declarations and layouts, installed legacy
-and baseline consumers, and exact symbol classifications pass on both
-validators. Start Work Package 2H with fresh full Release suites, the required
-product and optional-feature matrix, packages, integration styles, and final
-handoff gate. Preserve the C99/C++11 consumer baseline and the `P2-02`, `P2-03`,
-and `P2-05` classifications.
+Every runnable Work Package 2H row is complete at implementation anchor
+`1ce441445`. Full suites, required product variants, available optional paths,
+packages, integration styles, installed consumers, standard and inventory
+contracts, and cross-platform reads pass. Resume by obtaining an explicit user
+decision for each of the seven proposed `DEFER_ENVIRONMENT` rows above. After
+approval, close Work Package 2H and Phase 2 in the plan, this results record, and
+the portable handoff without rerunning completed validation. Preserve the
+C99/C++11 consumer baseline and the `P2-02`, `P2-03`, and `P2-05`
+classifications.

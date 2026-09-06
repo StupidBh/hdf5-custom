@@ -3,8 +3,8 @@
 ## Scope
 
 Security reports are accepted for the products retained in this repository:
-the HDF5 C library, high-level C library, opt-in C++ wrappers, tools,
-utilities, and retained examples. Java and Fortran bindings are not present or
+the HDF5 C library, opt-in C++ wrappers, tools, utilities, and retained
+examples. The high-level, Java, and Fortran libraries are not present or
 supported here.
 
 The supported source-build environments are Windows/MSVC and Linux/GNU.

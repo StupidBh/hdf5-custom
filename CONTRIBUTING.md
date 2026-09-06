@@ -60,7 +60,6 @@ Before you begin, ensure your development machine has:
 Depending on which features you want to build or enable:
 * A C++20-compatible compiler for the opt-in C++ wrappers.
 * Perl when regenerating source headers or running tests that require its scripts.
-* `flex`/`lex` and `bison`/`yacc` if you want to modify the high-level parsers.
 * Development versions of **zlib** and **szip** for compression support.
 * An MPI-3 compatible MPI library for parallel HDF5 development.
 * AWS CRT libraries for the read-only S3 (ROS3) VFD.
@@ -115,7 +114,6 @@ Here's where to find things in the source tree:
 * **`testpar/`**: Parallel C library test code
 * **`tools/`**: Command-line tools (h5dump, h5repack, etc.)
 * **`HDF5Examples/`**: C and C++ library examples
-* **`hl/`**: High-level library source, tests, and examples
 * **`c++/`**: C++ language wrapper
 * **`bin/`**: Build scripts and miscellaneous tools
 * **`config/`**: Configuration files for CMake

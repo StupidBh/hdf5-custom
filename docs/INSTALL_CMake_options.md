@@ -23,7 +23,6 @@ Options settings for typical HDF5 configurations can be found in the [cacheinit.
   * [Compiler options](#compiler-options)
 * [Programming language wrappers options](#programming-language-wrappers-options)
   * [C++ options](#pl_cxx)
-  * [High-level library options](#hl_lib)
 * [Parallel HDF5 options](#parallel-hdf5-options)
 * [Virtual File Driver options](#virtual-file-driver-options)
 * [VOL connector options](#vol-connector-options)
@@ -160,14 +159,6 @@ These are options which are specific to HDF5's wrappers for programming language
 |:-------------|:-----|:--------|:------------|
 | `HDF5_BUILD_CPP_LIB` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 C++ wrapper interface. |
 
-### High-level C library options
-<a name="hl_lib"></a>
-
-| CMake option | Type | Default | Description |
-|:-------------|:-----|:--------|:------------|
-| `HDF5_BUILD_HL_LIB` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 high-level C wrapper interface. |
-| `HDF5_DIMENSION_SCALES_NEW_REF` | `BOOL` | `OFF` | If `ON`, the high-level C dimension scale API (H5DS) will use a newer format for reference objects. The dimension scales created in data files produced this way cannot be read by HDF5 library versions below HDF5 1.12.0. |
-
 ## Parallel HDF5 options
 
 These are options which are specific to parallel HDF5.
@@ -283,7 +274,6 @@ These are options which can be set for controlling how the HDF5 example programs
 | `HDF5_BUILD_EXAMPLES` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 library (C) example programs. |
 | `H5EXAMPLE_USE_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, build the standalone HDF5 examples against shared HDF5 libraries. Otherwise, use static HDF5 libraries. |
 | `H5EXAMPLE_BUILD_CXX` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library C++ example programs. |
-| `H5EXAMPLE_BUILD_HL` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library high-level C example programs. |
 | `H5EXAMPLE_ENABLE_PARALLEL` | `BOOL` | `OFF` | If `ON`, enables building of the parallel HDF5 library example programs. |
 | `H5EXAMPLE_BUILD_PYTHON` | `BOOL` | `OFF` | If `ON`, enables retained Python example programs. Python 3 and h5py must be available; this does not build a Python binding. |
 | `H5EXAMPLE_BUILD_FILTERS` | `BOOL` | `OFF` | If `ON`, enables filter plugin example programs. `H5EXAMPLE_USE_SHARED_LIBS` must be `ON`, and the installed package must provide shared libraries and plugin support. |
@@ -424,9 +414,8 @@ Some HDF5 feature configuration options are incompatible with each other and wil
     - `HDF5_ENABLE_THREADSAFE`
     - `HDF5_BUILD_CPP_LIB`
 
-- The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are incompatible with the high-level and C++ interfaces, as locking is not hoisted into the higher-level API calls. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following options must be disabled:
+- The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are incompatible with the C++ interface, as locking is not hoisted into its API calls. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following option must be disabled:
 
-    - `HDF5_BUILD_HL_LIB`
     - `HDF5_BUILD_CPP_LIB`
 
 - The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are mutually exclusive, only one or the other may be enabled.

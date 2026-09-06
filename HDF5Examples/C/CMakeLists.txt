@@ -24,8 +24,3 @@ if (H5EXAMPLE_ENABLE_PARALLEL AND H5_HAVE_PARALLEL AND HDF5_PROVIDES_PARALLEL)
   add_subdirectory (${PROJECT_SOURCE_DIR}/H5PAR)
 endif ()
 
-#-- Add High Level Examples
-if (H5EXAMPLE_BUILD_HL AND HDF5_PROVIDES_HL_LIB)
-  add_subdirectory (HL)
-endif ()
-

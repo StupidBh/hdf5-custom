@@ -27,8 +27,6 @@ set (${HDF5_PACKAGE_NAME}_VALID_COMPONENTS
     shared
     C
     CXX
-    HL
-    CXX_HL
     Tools
 )
 
@@ -43,7 +41,6 @@ set (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB     @HDF5_BUILD_CPP_LIB@)
 #-----------------------------------------------------------------------------
 # Features:
 #-----------------------------------------------------------------------------
-set (${HDF5_PACKAGE_NAME}_PROVIDES_HL_LIB          @HDF5_BUILD_HL_LIB@)
 set (${HDF5_PACKAGE_NAME}_PROVIDES_SHARED_LIBS     @H5_ENABLE_SHARED_LIB@)
 set (${HDF5_PACKAGE_NAME}_PROVIDES_STATIC_LIBS     @H5_ENABLE_STATIC_LIB@)
 set (${HDF5_PACKAGE_NAME}_PROVIDES_THREADS         @HDF5_THREADS_ENABLED@)
@@ -51,7 +48,6 @@ set (${HDF5_PACKAGE_NAME}_PROVIDES_THREADSAFE      @HDF5_ENABLE_THREADSAFE@)
 set (${HDF5_PACKAGE_NAME}_PROVIDES_PARALLEL        @HDF5_ENABLE_PARALLEL@)
 set (${HDF5_PACKAGE_NAME}_DEFAULT_API_VERSION     "@HDF5_DEFAULT_API_VERSION@")
 set (${HDF5_PACKAGE_NAME}_PROVIDES_DEPRECATED_SYMBOLS @HDF5_ENABLE_DEPRECATED_SYMBOLS@)
-set (${HDF5_PACKAGE_NAME}_PROVIDES_DIMENSION_SCALES_WITH_NEW_REF @DIMENSION_SCALES_WITH_NEW_REF@)
 #-----------------------------------------------------------------------------
 set (${HDF5_PACKAGE_NAME}_PROVIDES_TOOLS           @HDF5_BUILD_TOOLS@)
 set (${HDF5_PACKAGE_NAME}_PROVIDES_STATIC_TOOLS    @HDF5_BUILD_STATIC_TOOLS@)
@@ -122,14 +118,6 @@ set_and_check (${HDF5_PACKAGE_NAME}_BUILD_DIR "@PACKAGE_CURRENT_BUILD_DIR@")
 
 if (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB)
   set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR_CPP "@PACKAGE_INCLUDE_INSTALL_DIR@")
-endif ()
-
-if (${HDF5_PACKAGE_NAME}_PROVIDES_HL_LIB)
-  set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR_HL "@PACKAGE_INCLUDE_INSTALL_DIR@")
-endif ()
-
-if (${HDF5_PACKAGE_NAME}_PROVIDES_HL_LIB AND ${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB)
-  set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR_HL_CPP "@PACKAGE_INCLUDE_INSTALL_DIR@")
 endif ()
 
 if (${HDF5_PACKAGE_NAME}_PROVIDES_TOOLS)
@@ -223,11 +211,11 @@ endif ()
 if (NOT ${HDF5_PACKAGE_NAME}_FIND_COMPONENTS)
   if (${HDF5_PACKAGE_NAME}_PROVIDES_STATIC_LIBS)
     set (${HDF5_PACKAGE_NAME}_LIB_TYPE)
-    set (${HDF5_PACKAGE_NAME}_FIND_COMPONENTS C HL static)
+    set (${HDF5_PACKAGE_NAME}_FIND_COMPONENTS C static)
     set (${HDF5_PACKAGE_NAME}_FIND_REQUIRED_static_C true)
   else ()
     set (${HDF5_PACKAGE_NAME}_LIB_TYPE)
-    set (${HDF5_PACKAGE_NAME}_FIND_COMPONENTS C HL shared)
+    set (${HDF5_PACKAGE_NAME}_FIND_COMPONENTS C shared)
     set (${HDF5_PACKAGE_NAME}_FIND_REQUIRED_shared_C true)
   endif ()
 endif ()
@@ -250,10 +238,6 @@ foreach (libtype IN LISTS ${HDF5_PACKAGE_NAME}_LIB_TYPE)
       set (hdf5_comp "hdf5")
     elseif (comp STREQUAL "CXX")
       set (hdf5_comp "hdf5_cpp")
-    elseif (comp STREQUAL "HL")
-      set (hdf5_comp "hdf5_hl")
-    elseif (comp STREQUAL "CXX_HL")
-      set (hdf5_comp "hdf5_hl_cpp")
     elseif (comp STREQUAL "Tools")
       set (hdf5_comp "hdf5_tools")
     endif ()

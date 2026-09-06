@@ -45,7 +45,7 @@
  *  Sizes may be suffixed with 'g' for GB, 'm' for MB or 'k' for kB.
  *  File family names include an integer printf format such as '%%d'
  *
- * Previous Chapter \ref sec_cltools_h5mkgrp - Next Chapter \ref sec_cltools_h5watch
+ * Previous Chapter \ref sec_cltools_h5mkgrp - Next Chapter \ref sec_cltools_h5clear
  *
  * <hr>
  * Navigate back: \ref index "Main" / \ref UG / \ref CommandTools

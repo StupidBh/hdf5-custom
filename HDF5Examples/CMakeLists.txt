@@ -142,11 +142,6 @@ endif ()
 
 if (${H5_LIBVER_DIR} GREATER 16)
   #-----------------------------------------------------------------------------
-  # Build the HL Examples
-  #-----------------------------------------------------------------------------
-  option (H5EXAMPLE_BUILD_HL "Build examples HIGH Level support" OFF)
-
-  #-----------------------------------------------------------------------------
   # Build the CPP Examples
   #-----------------------------------------------------------------------------
   if (EXISTS "${H5EXAMPLES_SOURCE_DIR}/CXX" AND IS_DIRECTORY "${H5EXAMPLES_SOURCE_DIR}/CXX")
@@ -178,7 +173,6 @@ if (${H5_LIBVER_DIR} GREATER 16)
     set (H5EXAMPLE_BUILD_FILTERS OFF CACHE BOOL "Build examples PLUGIN filter support" FORCE)
   endif ()
 else ()
-  set (H5EXAMPLE_BUILD_HL OFF CACHE BOOL "Build examples High Level support" FORCE)
   set (H5EXAMPLE_BUILD_CXX OFF CACHE BOOL "Build examples C++ support" FORCE)
   set (H5EXAMPLE_BUILD_FILTERS OFF CACHE BOOL "Build examples PLUGIN filter support" FORCE)
 endif ()

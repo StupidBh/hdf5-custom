@@ -30,6 +30,15 @@ We would like to thank the many HDF5 community members who contributed to this r
 <a id="breaking-changes"></a>
 # ⚠️ Breaking Changes
 
+## High-level libraries and h5watch have been removed
+
+The complete high-level C and C++ product has been removed, including its
+headers, libraries, examples, tests, CMake components, pkg-config files, and
+the HL-dependent `h5watch` tool. The `HDF5_BUILD_HL_LIB` and
+`HDF5_DIMENSION_SCALES_NEW_REF` CMake options and the `h5cc -nohl` switch are
+no longer accepted product interfaces. The core C library, native C++ wrapper,
+retained tools, and HDF5 file-format compatibility are unchanged.
+
 ## CMake C++ builds now require C++20 for project-owned sources
 
 When `HDF5_BUILD_CPP_LIB=ON`, the CMake build now compiles HDF5-owned C++

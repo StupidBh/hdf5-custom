@@ -387,23 +387,6 @@ Navigate back: \ref index "Main"
 \li \ref subsec_filter_plugins
 \li \ref subsec_filter_summary
 
-\section sec_hl HDF5 High Level APIs
-\li \ref H5DO_UG
-    <ul>
-        <li> \ref sec_hldo_direct_chunk
-    </ul>
-\li \ref H5DS_UG
-    <ul>
-        <li> \ref sec_dim_scales_stand
-        <li> \ref sec_dim_scales_concept
-        <li> \ref sec_dim_scales_spec
-        <li> \ref sec_dim_scales_api
-    </ul>
-\li \ref H5IM_UG
-\li \ref H5LT_UG
-\li \ref H5TB_UG
-\li \ref H5PT_UG
-
 \section sec_cltools Command Line Tools for HDF5 Files
 \li \ref H5TOOL_CP_UG
 \li \ref H5TOOL_DF_UG
@@ -458,14 +441,6 @@ These documents provide additional information for the use and tuning of specifi
 </td>
   <td style="width: 198.000pt; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #228a22; vertical-align: top;padding-left: 6.00pt; padding-top: 3.00pt; padding-right: 6.00pt; padding-bottom: 3.00pt;">
   <p>Structuring the use of chunking and tuning it for performance.</p>
-</td>
-</tr>
-  <tr style="height: 36.00pt;">
-  <td style="width: 234.000pt; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #228a22; vertical-align: top;padding-left: 6.00pt; padding-top: 3.00pt; padding-right: 6.00pt; padding-bottom: 3.00pt;">
-  <p style="font-style: italic; color: #0000ff;"><span class="FM_LT_LinkText">@ref H5DO_UG</span></p>
-</td>
-  <td style="width: 198.000pt; border-bottom-style: solid; border-bottom-width: 1px; border-bottom-color: #228a22; vertical-align: top;padding-left: 6.00pt; padding-top: 3.00pt; padding-right: 6.00pt; padding-bottom: 3.00pt;">
-  <p>Describes another way that chunks can be written to datasets.</p>
 </td>
 </tr>
   <tr style="height: 88.00pt;">

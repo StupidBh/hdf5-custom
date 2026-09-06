@@ -140,7 +140,7 @@ endif ()
 # Set includes needed for build
 #-----------------------------------------------------------------------------
 set (HDF5_INCLUDES_BUILD_TIME
-    ${HDF5_SRC_INCLUDE_DIRS} ${HDF5_CPP_SRC_DIR} ${HDF5_HL_SRC_DIR}
+    ${HDF5_SRC_INCLUDE_DIRS} ${HDF5_CPP_SRC_DIR}
     ${HDF5_TOOLS_SRC_DIR} ${HDF5_SRC_BINARY_DIR}
 )
 
@@ -667,41 +667,6 @@ The HDF5 data model, file format, API, library, and tools are open and distribut
         GROUP Development
         INSTALL_TYPES Full Developer
     )
-  endif ()
-
-  if (HDF5_BUILD_HL_LIB)
-    cpack_add_component (hllibraries
-        DISPLAY_NAME "HDF5 HL Libraries"
-        DEPENDS libraries
-        GROUP Runtime
-        INSTALL_TYPES Full Developer User
-    )
-    cpack_add_component (hlheaders
-        DISPLAY_NAME "HDF5 HL Headers"
-        DEPENDS hllibraries
-        GROUP Development
-        INSTALL_TYPES Full Developer
-    )
-    cpack_add_component (hltoolsapplications
-        DISPLAY_NAME "HDF5 HL Tools Applications"
-        DEPENDS hllibraries
-        GROUP Applications
-        INSTALL_TYPES Full Developer User
-    )
-    if (HDF5_BUILD_CPP_LIB)
-      cpack_add_component (hlcpplibraries
-          DISPLAY_NAME "HDF5 HL C++ Libraries"
-          DEPENDS hllibraries
-          GROUP Runtime
-          INSTALL_TYPES Full Developer User
-      )
-      cpack_add_component (hlcppheaders
-          DISPLAY_NAME "HDF5 HL C++ Headers"
-          DEPENDS hlcpplibraries
-          GROUP Development
-          INSTALL_TYPES Full Developer
-      )
-    endif ()
   endif ()
 
 endif ()

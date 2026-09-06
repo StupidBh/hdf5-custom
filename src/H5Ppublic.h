@@ -3733,7 +3733,7 @@ extern "C"
      *          (see H5Pset_file_image_callbacks()) or with the appropriate method
      *          if file image callbacks have been set.
      *
-     * \see H5LTopen_file_image(), H5Fget_file_image(), H5Pset_file_image(),
+     * \see H5Fget_file_image(), H5Pset_file_image(),
      *      H5Pset_file_image_callbacks(), H5Pget_file_image_callbacks(),
      *      \ref H5FD_file_image_callbacks_t, \ref H5FD_file_image_op_t,
      *      \ref H5FIM_UG.
@@ -3772,7 +3772,7 @@ extern "C"
      *          passed in the most recent H5Pset_file_image_callbacks() call for the
      *          file access property list \p fapl_id.
      *
-     * \see H5LTopen_file_image(), H5Fget_file_image(), H5Pset_file_image(),
+     * \see H5Fget_file_image(), H5Pset_file_image(),
      *      H5Pset_file_image_callbacks(), H5Pget_file_image_callbacks(),
      *      \ref H5FD_file_image_callbacks_t, \ref H5FD_file_image_op_t,
      *      \ref H5FIM_UG.
@@ -4716,7 +4716,6 @@ extern "C"
      *          for links to other elements of HDF5 file image operations.
      *
      * \see
-     *    \li H5LTopen_file_image()
      *    \li H5Fget_file_image()
      *    \li H5Pget_file_image()
      *    \li H5Pset_file_image_callbacks()

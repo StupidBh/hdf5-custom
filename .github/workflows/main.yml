@@ -191,7 +191,6 @@ jobs:
             -DHDF5_ENABLE_CONCURRENCY:BOOL=OFF \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-            -DHDF5_BUILD_HL_LIB:BOOL=OFF \
             -DHDF5_BUILD_DOC:BOOL=OFF \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=${{ matrix.zlibfc }} \
             -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=${{ matrix.libaecfc }} \
@@ -218,7 +217,6 @@ jobs:
             -DHDF5_ENABLE_CONCURRENCY:BOOL=ON \
             -DHDF5_ENABLE_PARALLEL:BOOL=${{ matrix.parallel }} \
             -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
-            -DHDF5_BUILD_HL_LIB:BOOL=OFF \
             -DHDF5_BUILD_DOC=OFF \
             -DLIBAEC_USE_LOCALCONTENT=${{ matrix.localaec }} \
             -DZLIB_USE_LOCALCONTENT=${{ matrix.localzlib }} \

@@ -2688,10 +2688,6 @@ H5_DLL hid_t H5Topen_async(hid_t loc_id, const char* name, hid_t tapl_id, hid_t 
      *
      *          \note H5Tequal() can be used to compare datatypes.
      *
-     *          \note HDF5 High Level APIs that may also be of interest are: H5LTdtype_to_text()
-     *                creates a text description of a datatype. H5LTtext_to_dtype() creates an
-     *                HDF5 datatype given a text description.
-     *
      * \since 1.6.0
      *
      */

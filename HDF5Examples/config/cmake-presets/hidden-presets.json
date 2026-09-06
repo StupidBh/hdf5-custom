@@ -52,13 +52,6 @@
       "generator": "Ninja"
     },
     {
-      "name": "ci-HL",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_HL": "ON"
-      }
-    },
-    {
       "name": "ci-CPP",
       "hidden": true,
       "cacheVariables": {

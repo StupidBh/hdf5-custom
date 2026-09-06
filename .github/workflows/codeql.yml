@@ -132,7 +132,7 @@ jobs:
           #
           # The following rules are excluded only for CLI tools and benchmarks
           # via path-scoped filter-sarif patterns (see filter-sarif step below),
-          # but remain ENFORCED for the core library (src/, hl/src/):
+          # but remain ENFORCED for the core library (src/):
           #
           # - cpp/path-injection: CLI tools (h5dump, h5repack, h5import, h5jam,
           #   h5ls, h5perf) accept file paths from command-line arguments by design.
@@ -188,7 +188,7 @@ jobs:
           #   - Test directories are excluded entirely (no security value in test harnesses).
           #   - Tools-only rules: cpp/path-injection, cpp/uncontrolled-allocation-size,
           #     and cpp/world-writable-file-creation are excluded for CLI tools and
-          #     benchmarks but remain enforced for the core library (src/, hl/src/).
+          #     benchmarks but remain enforced for the core library (src/).
           patterns: |
             -**/test/**
             -**/testpar/**
@@ -196,9 +196,6 @@ jobs:
             -tools/**:cpp/path-injection
             -tools/**:cpp/uncontrolled-allocation-size
             -tools/**:cpp/world-writable-file-creation
-            -hl/tools/**:cpp/path-injection
-            -hl/tools/**:cpp/uncontrolled-allocation-size
-            -hl/tools/**:cpp/world-writable-file-creation
           input: sarif-results/cpp.sarif
           output: sarif-results/cpp.sarif
 

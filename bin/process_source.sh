@@ -14,11 +14,6 @@
 # A convenience script to process HDF5 source. This recreates some header files
 # from their input files and runs the trace script to update the H5ARG_TRACE
 # macros.
-#
-# This does NOT regenerate the parser code in the high-level library, since
-# that would probably generate a lot of churn due to different flex, etc.
-# versions. If you want to regenerate that code, use the genparser script
-# from the bin directory.
 
 echo
 echo "******************************"

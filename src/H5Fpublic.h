@@ -1095,7 +1095,7 @@ H5_DLL herr_t H5Fclose_async(hid_t file_id, hid_t es_id);
      * \attention H5Pget_file_image() will fail, returning a negative value, if the
      *            file is too large for the supplied buffer.
      *
-     * \see H5LTopen_file_image(), H5Pset_file_image(), H5Pget_file_image(),
+     * \see H5Pset_file_image(), H5Pget_file_image(),
      *      H5Pset_file_image_callbacks(), H5Pget_file_image_callbacks()
      *
      * \since 1.8.0

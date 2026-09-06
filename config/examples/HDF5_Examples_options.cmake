@@ -15,7 +15,6 @@
 ####  DEFAULT:                                                                            ###
 ####         BUILD_SHARED_LIBS:BOOL=OFF                                                   ###
 ####         H5EXAMPLE_BUILD_C:BOOL=ON                                                         ###
-####         H5EXAMPLE_BUILD_HL:BOOL=ON                                                        ###
 ####         H5EXAMPLE_BUILD_CXX:BOOL=OFF                                                      ###
 ####         H5EXAMPLE_BUILD_FILTERS:BOOL=OFF                                                  ###
 ####         H5EXAMPLE_BUILD_TESTING:BOOL=OFF                                                  ###
@@ -36,7 +35,6 @@
 #set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_C:BOOL=OFF")
 
 ### enable HL builds
-#set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_HL:BOOL=ON")
 
 ### enable C++ builds
 #set(ADD_BUILD_OPTIONS "${ADD_BUILD_OPTIONS} -DH5EXAMPLE_BUILD_CXX:BOOL=ON")

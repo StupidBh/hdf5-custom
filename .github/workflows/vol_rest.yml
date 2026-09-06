@@ -55,7 +55,6 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=${{ inputs.build_mode }} \
             -DCMAKE_INSTALL_PREFIX=${{ runner.workspace }}/hdf5_build \
             -DBUILD_STATIC_LIBS=OFF \
-            -DHDF5_BUILD_HL_LIB:BOOL=ON \
             -DHDF5_TEST_API:BOOL=ON \
             -DHDF5_ALLOW_UNSUPPORTED:BOOL=ON \
             -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF \

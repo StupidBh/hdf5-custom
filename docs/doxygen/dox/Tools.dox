@@ -19,7 +19,6 @@ There are several command line tools provided with HDF5.
 \li \ref sec_cltools_h5delete
 \li \ref sec_cltools_h5mkgrp
 \li \ref sec_cltools_h5repart
-\li \ref sec_cltools_h5watch
 
 
 <hr>

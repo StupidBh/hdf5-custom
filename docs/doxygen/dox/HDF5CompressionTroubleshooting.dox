@@ -248,7 +248,6 @@ flags will confirm that \b szip or \b gzip were compiled with the HDF5 Library. 
 \code
     $ h5cc -show
     gcc -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_BSD_SOURCE -L/mnt/hdf/packages/hdf5/v1812/Linux64_2.6/standard/lib
-      /mnt/hdf/packages/hdf5/v1812/Linux64_2.6/standard/lib/libhdf5_hl.a
       /mnt/hdf/packages/hdf5/v1812/Linux64_2.6/standard/lib/libhdf5.a -lsz -lz -lrt
       -ldl -lm -Wl,-rpath -Wl,/mnt/hdf/packages/hdf5/v1812/Linux64_2.6/standard/lib
 \endcode

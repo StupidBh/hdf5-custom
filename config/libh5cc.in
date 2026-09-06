@@ -76,9 +76,6 @@ usage() {
   echo "                          hdf5 built with shared libraries]"
   echo "    -noshlib              Compile with static HDF5 libraries [default for"
   echo "                          hdf5 built without shared libraries]"
-  echo "    -nohl                 By default, $prog_name builds and links against the"
-  echo "                          high-level HDF5 library, if it is available."
-  echo "                          Specifying the -nohl option disables this behavior."
   echo "    -norpath              By default, $prog_name adds the library directory"
   echo "                          of the HDF5 installation to the rpath of the resulting"
   echo "                          executable/library when linking against shared HDF5"
@@ -136,16 +133,6 @@ else
   USE_SHARED_LIB="${HDF5_USE_SHLIB:-no}"
 fi
 
-# If the high-level library is available, the default will be to build and
-# link against it.
-USE_HL_LIB="yes"
-HL_AVAILABLE="@HDF5_BUILD_HL_LIB@"
-if test "${HL_AVAILABLE}" = "ON"; then
-  HL_LIB_NAME="@_PKG_CONFIG_HL_LIBNAME@"
-else
-  USE_HL_LIB="no"
-fi
-
 for arg in $@ ; do
   case "$arg" in
     -help|--help|-h)
@@ -172,10 +159,6 @@ for arg in $@ ; do
     -noshlib)
       shift
       USE_SHARED_LIB="no"
-      ;;
-    -nohl)
-      shift
-      USE_HL_LIB="no"
       ;;
     -norpath)
       shift
@@ -222,12 +205,6 @@ if test "$USE_SHARED_LIB" = "no"; then
 fi
 
 pc_args="${pc_args:+${pc_args} }@_PKG_CONFIG_LIBNAME@"
-
-# Build and link against high-level library,
-# unless requested not to.
-if test "${USE_HL_LIB}" = "yes"; then
-  pc_args="${pc_args:+${pc_args} }${HL_LIB_NAME}"
-fi
 
 # Evaluate pkg-config command for later use
 pc_flags="`pkg-config $pc_args`"

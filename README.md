@@ -7,8 +7,8 @@
 # HDF5 Custom
 
 This repository is a CMake-only fork of upstream HDF5 `develop`. It contains
-the HDF5 C library and file-format implementation, the high-level C library,
-opt-in C++ wrappers, command-line tools and utilities, and retained examples.
+the HDF5 C library and file-format implementation, opt-in C++ wrappers,
+command-line tools and utilities, and retained examples.
 
 Java and Fortran sources, bindings, examples, build options, packaging, and CI
 are intentionally absent. Python files under `HDF5Examples/` are example
@@ -26,8 +26,8 @@ Generator, architecture, and exact compiler version are not central admission
 checks. Release validation uses Windows x64 with Visual Studio 18 2026 and
 Linux x86_64 with GCC/G++ and Ninja, plus a focused Unix Makefiles check.
 
-The default build enables static and shared libraries, tests, tools,
-utilities, the high-level library, and examples. C++, parallel HDF5, thread safety,
+The default build enables static and shared libraries, tests, tools, utilities,
+and examples. C++, parallel HDF5, thread safety,
 multi-thread concurrency, and external compression filters are off by
 default.
 

@@ -18,7 +18,6 @@
 #include "h5tools_ref.h"
 #include "h5tools_str.h" /* function prototypes */
 
-/* Copied from hl/src/H5LDprivate.h */
 /* Info about the list of comma-separated compound fields */
 typedef struct H5LD_memb_t
 {

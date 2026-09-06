@@ -1260,10 +1260,6 @@
  * footprint while working within the constraints of the property list mechanism. This should be a non-issue
  * for small file images, but may be a major issue for large images.
  *
- * If invoked with the appropriate flags, the #H5LTopen_file_image high level library call should deal with
- * these challenges in most cases. However, some applications may require the programmer to address these
- * issues directly.
- *
  * \subsubsection subsubsec_file_image_intro_sum HDF5 File Image Operations Function Summary
  * Functions used in file image operations are listed below.
  * <table>
@@ -1296,11 +1292,6 @@
  * <td>#H5Fget_file_image</td>
  * <td>Provides a simple way to retrieve a copy of the image of an existing, open file. For more information,
  * see section \ref FI216.</td>
- * </tr>
- * <tr>
- * <td>#H5LTopen_file_image</td>
- * <td>Provides a convenient way to open an initial file image with the Core VFD. For more information,
- * see section \ref FI221.</td>
  * </tr>
  * </table>
  *
@@ -1343,13 +1334,7 @@
  * Links to the \ref VFLTN and List of Functions documents can be found in the HDF5 \ref TN.
  *
  * \subsection subsec_file_image_api File Image C API Call Syntax
- * The C API function calls described in this chapter fall into two categories: low-level routines that are
- * part of the main HDF5 C Library and one high-level routine that is part of the “lite” API in the
- * high-level wrapper library. The high-level routine uses the low-level routines and presents frequently
- * requested functionality conveniently packaged for application developers’ use.
- *
- * \subsubsection subsubsec_file_image_api_low Low-level C API Routines
- * The purpose of this section is to describe the low-level C API routines that support file image operations.
+ * The purpose of this section is to describe the C API routines that support file image operations.
  * These routines allow an in-memory image of an HDF5 file to be opened without requiring file system I/O.
  *
  * The basic approach to opening an in-memory image of an HDF5 file is to pass the image to the Core file
@@ -1360,8 +1345,7 @@
  * copying of large file image buffers. The callback routines enable application programs to avoid this
  * problem. However, the use of these callbacks is complex and potentially hazardous: the particulars are
  * discussed in the semantics and examples chapters below (see section \ref subsubsec_file_image_semantics_cbk
- * and section \ref subsubsec_file_image_example_read respectively). Fortunately, use of the file image
- * callbacks should seldom be necessary: the #H5LTopen_file_image call should address most use cases.
+ * and section \ref subsubsec_file_image_example_read respectively).
  *
  * The property list facility in HDF5 is employed in file image operations. This facility was designed for
  * passing data, not consumable resources, into API calls. The peculiar ways in which the file image

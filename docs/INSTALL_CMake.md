@@ -144,7 +144,6 @@ The current CMake files are the source of truth for options. The most commonly u
 | `HDF5_ONLY_SHARED_LIBS`      | `OFF`   | Force a shared-only library build |
 | `BUILD_TESTING`              | `ON`    | Build the test programs           |
 | `HDF5_BUILD_TOOLS`           | `ON`    | Build command-line tools          |
-| `HDF5_BUILD_HL_LIB`          | `ON`    | Build the high-level C library    |
 | `HDF5_BUILD_CPP_LIB`         | `OFF`   | Build the C++ wrappers            |
 | `HDF5_BUILD_EXAMPLES`        | `ON`    | Build retained examples           |
 | `HDF5_BUILD_DOC`             | `OFF`   | Build documentation               |
@@ -157,7 +156,7 @@ The current CMake files are the source of truth for options. The most commonly u
 | `HDF5_ENABLE_ROS3_VFD`       | `OFF`   | Enable the ROS3 VFD               |
 | `HDF5_ENABLE_HDFS`           | `OFF`   | Enable the HDFS VFD               |
 
-The default build produces static and shared libraries, tests, tools, the high-level library, and examples. C++, MPI,
+The default build produces static and shared libraries, tests, tools, and examples. C++, MPI,
 thread safety, concurrency, and external compression filters are opt-in.
 
 Set cache entries with `-D<name>=<value>`:
@@ -166,7 +165,7 @@ Set cache entries with `-D<name>=<value>`:
 cmake -S . -B build-custom <supported-generator-options> -DHDF5_BUILD_CPP_LIB=ON
 ```
 
-Thread safety, concurrency, MPI, C++, and the high-level library have documented compatibility constraints. See
+Thread safety, concurrency, MPI, and C++ have documented compatibility constraints. See
 [INSTALL_CMake_options.md](INSTALL_CMake_options.md) before combining them.
 
 ### External dependencies

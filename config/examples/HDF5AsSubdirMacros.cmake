@@ -68,7 +68,6 @@ macro (EXTERNAL_HDF5_LIBRARY compress_type)
     set (HDF5_BUILD_CPP_LIB OFF CACHE BOOL "Build C++ support" FORCE)
     set (BUILD_TESTING OFF CACHE BOOL "Build HDF5 unit tests" FORCE)
     set (HDF5_BUILD_EXAMPLES OFF CACHE BOOL "Build HDF5 examples" FORCE)
-    set (HDF5_BUILD_HL_LIB OFF CACHE BOOL "Build the HDF5 high-level library" FORCE)
     set (HDF5_ENABLE_ZLIB_SUPPORT OFF CACHE BOOL "Enable Zlib Filters" FORCE)
     set (HDF5_ENABLE_SZIP_SUPPORT OFF CACHE BOOL "Use SZip Filter" FORCE)
   endif()
@@ -214,7 +213,6 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_PROVIDES_HL_LIB          ${HDF5_PACKAGE_NAME}_BUILD_HL_LIB)
     set (${HDF5_PACKAGE_NAME}_PROVIDES_SHARED_LIBS     ${HDF5_PACKAGE_NAME}_BUILD_SHARED_LIBS)
     set (${HDF5_PACKAGE_NAME}_PROVIDES_STATIC_LIBS     ${HDF5_PACKAGE_NAME}_BUILD_STATIC_LIBS)
     set (${HDF5_PACKAGE_NAME}_PROVIDES_THREADS         ${HDF5_PACKAGE_NAME}_ENABLE_THREADSAFE)
@@ -246,7 +244,6 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_BUILD_HL_LIB           ${HDF5_PACKAGE_NAME}_PROVIDES_HL_LIBS)
     set (${HDF5_PACKAGE_NAME}_BUILD_SHARED_LIBS      ${HDF5_PACKAGE_NAME}_PROVIDES_SHARED_LIBS)
     set (${HDF5_PACKAGE_NAME}_BUILD_STATIC_LIBS      ${HDF5_PACKAGE_NAME}_PROVIDES_STATIC_LIB)
     set (${HDF5_PACKAGE_NAME}_ENABLE_THREADSAFE      ${HDF5_PACKAGE_NAME}_PROVIDES_THREADSAFE)

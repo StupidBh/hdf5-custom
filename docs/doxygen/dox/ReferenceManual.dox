@@ -85,38 +85,6 @@ The functions provided by the HDF5 API are grouped into the following
 </td>
 </tr>
 </table>
-<table>
-<caption>High-level Reference Manual Modules</caption>
-<tr><th>Module</th><th colspan="2">Language</th><th>Description</th></tr>
-<tr>
-<th>HDF5 Lite APIs (H5LT,H5LD)</th><td>@ref H5LT "C"</td><td style="white-space: nowrap;">C++</td><td>Functions to simplify creating and manipulating datasets, attributes and other features.
-</td>
-</tr>
-<tr>
-<th>HDF5 Images API (H5IM)</th><td>@ref H5IM "C"</td><td style="white-space: nowrap;">C++</td><td>Creating and manipulating HDF5 datasets intended to be interpreted as images.
-</td>
-</tr>
-<tr>
-<th>HDF5 Table APIs (H5TB)</th><td>@ref H5TB "C"</td><td style="white-space: nowrap;">C++</td><td>Creating and manipulating HDF5 datasets intended to be interpreted as tables.
-</td>
-</tr>
-<tr>
-<th>HDF5 Packet Table APIs (H5PT)</th><td>@ref H5PT "C"</td><td style="white-space: nowrap;">C++</td><td>Creating and manipulating HDF5 datasets to support append- and read-only operations on table data.
-</td>
-</tr>
-<tr>
-<th>HDF5 Dimension Scales APIs (H5DS)</th><td>@ref H5DS "C"</td><td style="white-space: nowrap;">C++</td><td>Creating and manipulating HDF5 datasets that are associated with the dimension of another HDF5 dataset.
-</td>
-</tr>
-<tr>
-<th>HDF5 Optimizations APIs (H5DO)</th><td>@ref H5DO "C"</td><td style="white-space: nowrap;">C++</td><td>Bypassing default HDF5 behavior in order to optimize for specific use cases.
-</td>
-</tr>
-<tr>
-<th>Extensions (H5LR, H5LT)</th><td>@ref H5LR "C"</td><td style="white-space: nowrap;">C++</td><td>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 <tr>

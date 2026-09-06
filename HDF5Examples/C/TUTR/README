@@ -1,8 +1,8 @@
                                HDF5 Examples
 
-This directory contains example programs for the installed APIs and scripts to 
-compile and run them.  Examples in the c and hl/c subdirectories are always 
-installed, and those in c++ and hl/c++ will be installed when C++ is enabled.
+This directory contains example programs for the installed APIs and scripts to
+compile and run them. C examples are always installed, and C++ examples are
+installed when C++ is enabled.
 
 Running the run-all-ex.sh script in this directory will run the scripts and in 
 turn the examples in all the subdirectories where examples are installed.  The 

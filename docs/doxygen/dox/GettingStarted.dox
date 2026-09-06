@@ -37,17 +37,9 @@ Step by step instructions for learning HDF5 that include programming examples
 </table>
 
 \subsection subsec_learn_tutor The HDF Group Tutorials &amp; Examples
-These tutorials and examples are available for learning about the HDF5 High Level APIs, tools,
+These tutorials and examples are available for learning about HDF5 tools,
 Parallel HDF5, and the VDS and SWMR features:
 <table>
-<tr>
-<td style="background-color:#F5F5F5">
-[Using the High Level API](../examples/menus/high_level_menu.md)
-</td>
-<td>
-The high-level HDF5 library includes several sets of convenience and standard-use APIs to facilitate common HDF5 operations.
-</td>
-</tr>
 <tr>
 <td style="background-color:#F5F5F5">
 @ref IntroParHDF5

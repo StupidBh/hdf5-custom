@@ -376,7 +376,7 @@ typedef struct h5tool_format_t
      *   end:       a string to print after we reach the last element of
      *              each compound type. prints out before the suf.
      *
-     *   listv:    h5watch: vector containing info about the list of compound fields to be printed.
+     *   listv:    vector containing info about the list of compound fields to be printed.
      */
     const char* cmpd_name;
     const char* cmpd_sep;
@@ -569,7 +569,7 @@ typedef struct h5tools_context_t
     hsize_t acc[H5S_MAX_RANK];                   /* accumulator position */
     hsize_t pos[H5S_MAX_RANK];                   /* matrix position */
     hsize_t sm_pos;                              /* current stripmine element position */
-    const struct H5LD_memb_t* const* cmpd_listv; /* h5watch: vector containing info about the list of compound fields to be printed */
+    const struct H5LD_memb_t* const* cmpd_listv; /* Compound fields selected for printing */
     struct subset_t* sset;                       /* subsetting parameters */
     int display_index;                           /* */
     int display_char;                            /* */

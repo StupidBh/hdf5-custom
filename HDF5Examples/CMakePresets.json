@@ -21,13 +21,6 @@
       }
     },
     {
-      "name": "ci-StdHL",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_HL": "ON"
-      }
-    },
-    {
       "name": "ci-StdPlugins",
       "hidden": true,
       "cacheVariables": {

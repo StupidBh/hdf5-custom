@@ -71,7 +71,6 @@ jobs:
         run: |
           echo '[HDF5]' >> LocalPreferences.toml
           echo 'libhdf5 = "/tmp/lib/libhdf5.so"' >> LocalPreferences.toml
-          echo 'libhdf5_hl = "/tmp/lib/libhdf5_hl.so"' >> LocalPreferences.toml
 
       - uses: julia-actions/julia-buildpkg@e3eb439fad4f9aba7da2667e7510e4a46ebc46e1 # latest
 

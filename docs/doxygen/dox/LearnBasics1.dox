@@ -506,13 +506,6 @@ that they might be attached to. Because of this, the creation of a dataset requi
 the datatype and dataspace. In this tutorial, we use the HDF5 predefined datatypes (integer) and consider
 only simple dataspaces. Hence, only the creation of dataspace objects is needed.
 
-\section secLBDsetCreateHL High Level APIs
-The High Level \ref H5LT include functions that simplify and condense the steps for
-creating datasets in HDF5. The examples in the following section use the standard APIs. For a
-quick start you may prefer to look at the \ref H5LT at this time.
-
-If you plan to work with images, please look at the High Level \ref H5IM, as well.
-
 \section secLBDsetCreateProg Programming Example
 
 \subsection subsecLBDsetCreateProgDesc Description
@@ -644,10 +637,6 @@ To read from or write to a dataset, the #H5Dread and #H5Dwrite routines are used
 \endcode
 
 
-\section secLBDsetRWHL High Level APIs
-The High Level \ref H5LT include functions that simplify and condense the steps for creating and
-reading datasets. Please be sure to review them, in addition to this tutorial.
-
 \section secLBDsetRWEx Programming Example
 
 \subsection secLBDsetRWExDesc Description
@@ -744,10 +733,6 @@ To read and/or write an attribute, the calling program must contain the #H5Aread
   status = H5Awrite (attr_id, mem_type_id, buf);
 \endcode
 
-
-\section secLBAttrCreateHL High Level APIs
-The High Level \ref H5LT include functions that simplify and condense the steps for creating and
-reading datasets. Please be sure to review them, in addition to this tutorial.
 
 \section secLBAttrCreateRWEx Programming Example
 

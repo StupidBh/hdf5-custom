@@ -176,11 +176,6 @@ set (CTEST_CUSTOM_MEMCHECK_IGNORE
     H5MKGRP-clearall-objects
     ######### tools/perform #########
     PERFORM_h5perform-clearall-objects
-    ######### hl/tools #########
-    HL_TOOLS-clear-objects
-    HL_TOOLS-clean-objects
-    H5WATCH-clearall-objects
-    H5WATCH-cleanall-objects
 )
 
 list (APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE

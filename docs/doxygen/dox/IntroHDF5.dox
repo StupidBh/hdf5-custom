@@ -189,14 +189,6 @@ of object on which the function operates:
 \li @ref H5D     <b>D</b>ataset Interface
 \li @ref H5F     <b>F</b>ile Interface
 
-The HDF5 High Level APIs simplify many of the steps required to create and access objects, as well
-as providing templates for storing objects. Following is a list of the High Level APIs:
-\li @ref H5LT – simplifies steps in creating datasets and attributes
-\li @ref H5IM – defines a standard for storing images in HDF5
-\li @ref H5TB – condenses the steps required to create tables
-\li @ref H5DS – provides a standard for dimension scale storage
-\li @ref H5PT – provides a standard for storing packet data
-
 \subsubsection subsec_intro_desc_soft_tools Tools
 Useful tools for working with HDF5 files include:
 \li \ref sec_cltools_h5dump : A utility to dump or display the contents of an HDF5 File

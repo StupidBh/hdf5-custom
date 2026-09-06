@@ -1,7 +1,7 @@
 # HDF5 Examples
 
-This directory contains retained C, high-level C, C++, filter, parallel, and
-Python example programs. Availability depends on the components enabled in the
+This directory contains retained C, C++, filter, parallel, and Python example
+programs. Availability depends on the components enabled in the
 HDF5 installation. The Python files are example code, not a maintained Python
 binding.
 

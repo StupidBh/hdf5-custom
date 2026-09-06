@@ -7,7 +7,6 @@
 |`chkcopyright`|Checks if files have appropriate copyright statements|
 |`debug-ohdr`|Examines debug output from `H5O_open/close` to look for open objects|
 |`format_source`|Runs `clang-format` over the source files, applying our rules|
-|`genparser`|Creates the flex/bison-based parser files in the high-level library|
 |`iostats`|Summarizes I/O statistics emitted by instrumented runs|
 |`make_err`|Generates the H5E header files|
 |`make_vers`|Generates H5version.h|

@@ -20,7 +20,7 @@ the final authority.
 ## Quick Start
 
 The default configuration builds the static and shared C libraries, tests,
-tools, utilities, the high-level library, and examples. C++, parallel HDF5, thread
+tools, utilities, and examples. C++, parallel HDF5, thread
 safety, multi-thread concurrency, and external compression filters are off by
 default.
 

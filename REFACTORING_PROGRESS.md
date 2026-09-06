@@ -29,18 +29,71 @@ The approved Phase 2 language-build direction is defined in
 It raises project-owned build modes to C17/C++20 while preserving the current
 public-header consumer baselines. Its execution evidence is recorded in
 [`docs/refactoring/C17Cpp20BuildBaselineResults.md`](docs/refactoring/C17Cpp20BuildBaselineResults.md).
-This direction intentionally changes the compatibility contract by first
-reducing the CMake matrix and then removing source-level support outside
-Windows/MSVC and Linux/GCC. The underlying target architecture and the paused
-behavior-preserving modernization state remain recorded in
+The proposed next direction is roadmap Stage 4, defined in
+[`docs/refactoring/NativeCppHlRemoval.md`](docs/refactoring/NativeCppHlRemoval.md).
+It removes the native `c++/` tree, the complete `hl/` tree, and all related
+product contracts while preserving the retained core C product and the two
+required business profiles. Its implementation is not yet authorized. The
+HighFive dependency input is recorded in
+[`docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`](docs/refactoring/HighFiveHDF5ApiDependencyAudit.md);
+The workspace `highfive/` header copy is an audit input but is not wired into
+the build, install, export, or package.
+The completed supported-platform direction intentionally changed the
+compatibility contract by first reducing the CMake matrix and then removing
+source-level support outside Windows/MSVC and Linux/GCC. The underlying target
+architecture and the paused behavior-preserving modernization state remain recorded in
 [`docs/CMakeModernization.md`](docs/CMakeModernization.md) and
 [`docs/CMakeModernizationProgress.md`](docs/CMakeModernizationProgress.md).
 
+## Refactoring Roadmap
+
+The repository-level roadmap uses the following stage names. These stages are
+separate from the internal Stage 1 through Stage 4 work packages of the
+completed supported-platform reduction plan.
+
+| Roadmap stage | Goal | State | Completion |
+| --- | --- | --- | --- |
+| 1 | Raise project organization and build entry points to CMake 4.0 and mechanically reject target-system/compiler pairs other than Windows/MSVC and Linux/GNU. | Complete | Yes |
+| 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
+| 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
+| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Proposed; dependency audit and detailed plan drafted | No |
+| 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
+| 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
+| 7 | No current goal. | Future plan TBD | No |
+
+Roadmap Stage 4 is an intentional compatibility break only for the removed
+native C++ and HL products. It does not authorize a core C API, ABI, installed-
+header, retained-tool, or file-format change, and it does not authorize
+HighFive integration. All later stages are cancelled from the active roadmap
+and have no approved scope.
+
 ## Active Direction
 
-- Direction: None; Phase 2 C17/C++20 build-baseline implementation is complete
-- Status: Complete; the separate target-scoped CMake modernization remains
-  paused at its recorded continuation point
+- Direction: Proposed roadmap Stage 4 native C++ and HL product removal
+- Status: Planning; detailed plan drafted, review pending, implementation not
+  authorized
+- Detailed plan: `docs/refactoring/NativeCppHlRemoval.md`
+- HighFive audit: `docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`
+- HighFive audit snapshot: workspace `highfive/` version 3.3.0 at content
+  manifest `25c7d5e69a69c446b8024941465449b51c9a62c2eb3ce2f981babd9fa6137910`;
+  compared with upstream commit
+  `959ec30c5cee48ff4dbb458b9f233beded708a36`
+- HighFive integration state: workspace headers present and untracked at audit
+  time; not wired into CMake, installed, exported, or packaged
+- Planning source anchor: `55a930c0d`
+- Execution baseline: To be selected after plan approval
+- Implementation anchor: None for roadmap Stage 4
+- Retained contract: freeze core C installed headers, symbols, package paths,
+  retained tools, and file-format behavior at the future execution baseline
+- Removed contract: native C++, HL C/C++, `h5c++`, and HL-owned `h5watch`
+- Acceptance Profile A: shared-only map, SZIP, thread safety, tools, zlib, and
+  parallel; record the currently required `HDF5_ALLOW_UNSUPPORTED=ON`
+- Acceptance Profile B: static-only map, SZIP, tools, zlib, and parallel, with
+  thread safety disabled
+- Default Stage 4 build and CTest parallelism: 6 unless a workload requires
+  less
+- Separate target-scoped CMake modernization: paused at its recorded
+  continuation point
 - Phase 2 planning baseline: `2e6ed711f`
 - Phase 2 plan anchor: `ef0ff7390`
 - Phase 2 scope clarification anchor: `2e0772f4c`
@@ -60,9 +113,9 @@ behavior-preserving modernization state remain recorded in
 - Last preceding documentation anchor: `8adcde9af`
 - Stage 1 CMake implementation commits: 19
 - Stage 3 source/header implementation commits: 14
-- Stage 4 Work Package 4B implementation commits: 6
-- Stage 4 Work Package 4C implementation commits: 1
-- Stage 4 Work Package 4D implementation commits: 1
+- Supported-platform Stage 4 Work Package 4B implementation commits: 6
+- Supported-platform Stage 4 Work Package 4C implementation commits: 1
+- Supported-platform Stage 4 Work Package 4D implementation commits: 1
 - Phase 2 implementation commits: 5
 - Stage 1 completion state: complete
 - Stage 2 execution scope: complete; core gate, bundled compression, system
@@ -72,13 +125,16 @@ behavior-preserving modernization state remain recorded in
   dual-platform gate passed
 - Stage 3 completion review: accepted on 2026-09-05 with the confirmed Linux
   plugin filename restriction and corrected header evidence
-- Stage 4 audit recommendations and inherited boundaries: accepted on 2026-09-05
-- Stage 4 detailed plan and review clarifications: approved on 2026-09-05
-- Stage 4 execution used a temporary maximum build/CTest parallelism of 4 per
+- Supported-platform Stage 4 audit recommendations and inherited boundaries:
+  accepted on 2026-09-05
+- Supported-platform Stage 4 detailed plan and review clarifications: approved
+  on 2026-09-05
+- Supported-platform Stage 4 execution used a temporary maximum build/CTest parallelism of 4 per
   physical host, shared by Windows and WSL on that host; this is not a
   repository default, product compatibility value, or permanent reference
-- Stage 4 execution state: complete; Work Packages 4A through 4F passed on
-  2026-09-05 at product implementation anchor `f6ff66fed`
+- Supported-platform Stage 4 execution state: complete; Work Packages 4A
+  through 4F passed on 2026-09-05 at product implementation anchor
+  `f6ff66fed`
 
 The approved endpoint accepts two target-system/compiler pairs: Windows with
 compiler ID `MSVC`, and Linux with compiler ID `GNU`. Generator, architecture,
@@ -355,23 +411,57 @@ implementation anchor `0b9e21c34` and is detailed in
   and parallel-test libraries and executables.
 - Preserved the supported product surface, option names, generated products,
   installation layout, and consumer-visible behavior in the completed batches.
+- Audited the workspace HighFive 3.3.0 header tree without product integration. Its
+  content manifest is
+  `25c7d5e69a69c446b8024941465449b51c9a62c2eb3ce2f981babd9fa6137910` and
+  differs from the upstream comparison in four documented files. It references
+  147 distinct HDF5 C functions, conditionally uses the parallel and filter
+  surfaces, and has no native HDF5 C++, HL, or H5M API dependency.
+- Abandoned and deleted the unimplemented C++20 internal-modernization plan.
+  Drafted the replacement roadmap Stage 4 plan for physical removal of native
+  `c++/`, complete `hl/`, and every related product contract.
 
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
+- Review and approve or revise the proposed roadmap Stage 4 native C++ and HL
+  product-removal plan. No Stage 4 implementation or fresh baseline capture
+  has started.
+- After approval, select a clean execution baseline and execute Work Package
+  4A to qualify both validators, regenerate the exact removal ledger, classify
+  retained C++ infrastructure, and freeze core C, package, consumer, tool, and
+  HighFive-style dependency contracts.
+- Roadmap Stages 5 through 7 are cancelled from the active roadmap and remain
+  future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-Stage 3 is Completed at implementation anchor `74288cbaa`; its completion
-review is closed at `7e50c3c17`. Stage 4 Work Packages 4A through 4F are
-complete, and the overall supported-platform reduction direction closes at
+The immediate continuation point is review of the proposed
+[roadmap Stage 4 native C++ and HL product-removal plan](docs/refactoring/NativeCppHlRemoval.md)
+against the completed
+[HighFive dependency audit](docs/refactoring/HighFiveHDF5ApiDependencyAudit.md).
+Do not implement or capture an execution baseline until the removal ledger,
+core C preservation boundary, two acceptance profiles, HighFive-style external
+consumer check, and negative product-contract gates are approved. After
+approval, Work Package 4A selects one clean tracked baseline, qualifies
+Windows/MSVC and Linux/GNU, creates the results document, classifies all
+remaining project-owned C++ sources, and records fresh positive and negative
+contract evidence.
+
+Do not wire HighFive into the HDF5 build/package or revive the deleted C++20
+internal-modernization plan as part of Stage 4. Roadmap Stages 5 through 7 have
+no active scope.
+
+Supported-platform Stage 3 is complete at implementation anchor `74288cbaa`;
+its completion review is closed at `7e50c3c17`. Supported-platform Stage 4 Work
+Packages 4A through 4F are complete, and that overall direction closes at
 product implementation anchor `f6ff66fed`. Portable evidence is in the
-[Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
-The temporary four-job Stage 4 resource budget expired with this execution and
-is not a lasting project or validation reference.
+[supported-platform Stage 4 results](docs/refactoring/CMakePlatformSupportReductionStage4Results.md).
+Its temporary four-job resource budget expired with that execution and is not
+a lasting project or validation reference.
 
 The approved
 [Phase 2 C17/C++20 build-baseline plan](docs/refactoring/C17Cpp20BuildBaseline.md)
@@ -392,6 +482,11 @@ execution.
 
 ## Validation State
 
+- Roadmap Stage 4 has a completed read-only HighFive dependency audit and
+  planning evidence only. No removal implementation validation has run, no
+  execution baseline has been selected, and no results document exists.
+  Historical Phase 2 and supported-platform evidence is an input to Work
+  Package 4A but does not replace its required fresh baseline.
 - Phase 2 Work Packages 2A through 2H are complete; the execution baseline is
   `a1adbc32b` and the implementation anchor is `c38e58ed8`. The final
   default/C++ Release suites passed
@@ -615,3 +710,8 @@ After each coherent refactoring batch:
 7. Commit every repository modification as an atomic, independently revertible
    local checkpoint after its required checks pass. Never include unrelated
    user changes or generated artifacts.
+8. Use the qualified `roadmap Stage 4 native C++ and HL product removal` name so
+   it is not confused with the completed Stage 4 audit inside the supported-
+   platform reduction plan.
+9. Keep roadmap Stages 5 through 7 marked `Future plan TBD`; they are cancelled
+   from the active roadmap and have no implementation authority.

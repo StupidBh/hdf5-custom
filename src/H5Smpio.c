@@ -804,14 +804,17 @@ static herr_t H5S__mpio_reg_hyper_type(H5S_t* space, size_t elmt_size, MPI_Datat
             }
             else if (MPI_SUCCESS != (mpi_code = MPI_Type_contiguous((int)d[i].block, inner_type, &block_type))) {
                 HMPI_GOTO_ERROR(FAIL, "MPI_Type_contiguous failed", mpi_code)
+            }
 
-                /* As of version 4.0, OpenMPI now turns off MPI-1 API calls by default,
-                 * so we're using the MPI-2 version even though we don't need the lb
-                 * value.
-                 */
-                {
-                    MPI_Aint unused_lb_arg;
-                    MPI_Type_get_extent(inner_type, &unused_lb_arg, &inner_extent);
+            /* As of version 4.0, OpenMPI now turns off MPI-1 API calls by default,
+             * so we're using the MPI-2 version even though we don't need the lb
+             * value.
+             */
+            {
+                MPI_Aint unused_lb_arg;
+
+                if (MPI_SUCCESS != (mpi_code = MPI_Type_get_extent(inner_type, &unused_lb_arg, &inner_extent))) {
+                    HMPI_GOTO_ERROR(FAIL, "MPI_Type_get_extent failed", mpi_code)
                 }
             }
             stride_in_bytes = inner_extent * (MPI_Aint)d[i].strid;

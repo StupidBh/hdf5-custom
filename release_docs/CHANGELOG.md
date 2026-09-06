@@ -99,6 +99,14 @@ functionality.
 
 ## Library
 
+### Restored large MPI datatype construction
+
+   Large MPI datatype construction now queries the input datatype extent on
+   every successful path. A formatting-only change had accidentally moved two
+   extent queries into error branches, leaving displacement calculations with
+   uninitialized values and causing parallel I/O verification failures,
+   invalid-datatype errors, or crashes.
+
 ### Restored MSVC C++20 builds with native complex support
 
    Internal C++ translation units now request the C-compatible UCRT complex

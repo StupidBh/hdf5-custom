@@ -524,14 +524,17 @@ herr_t H5_mpio_create_large_type(hsize_t num_elements, MPI_Aint stride_bytes, MP
         else if (MPI_SUCCESS !=
                  (mpi_code = MPI_Type_create_hvector((int)(num_elements - (hsize_t)num_big_types * bigio_count_g), 1, stride_bytes, old_type, &leftover_type))) {
             HMPI_GOTO_ERROR(FAIL, "MPI_Type_create_hvector failed", mpi_code)
+        }
 
-            /* As of version 4.0, OpenMPI now turns off MPI-1 API calls by default,
-             * so we're using the MPI-2 version even though we don't need the lb
-             * value.
-             */
-            {
-                MPI_Aint unused_lb_arg;
-                MPI_Type_get_extent(old_type, &unused_lb_arg, &old_extent);
+        /* As of version 4.0, OpenMPI now turns off MPI-1 API calls by default,
+         * so we're using the MPI-2 version even though we don't need the lb
+         * value.
+         */
+        {
+            MPI_Aint unused_lb_arg;
+
+            if (MPI_SUCCESS != (mpi_code = MPI_Type_get_extent(old_type, &unused_lb_arg, &old_extent))) {
+                HMPI_GOTO_ERROR(FAIL, "MPI_Type_get_extent failed", mpi_code)
             }
         }
 

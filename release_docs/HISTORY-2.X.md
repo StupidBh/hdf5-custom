@@ -1,42 +1,21 @@
-# HDF5 History
-============
+# HDF5 2.x Release History
 
-This file contains development history of the HDF5 2.X.X releases
+This file archives finalized 2.x release notes. Language bindings, platforms,
+and build systems named in an older release section describe that release and
+do not expand the current fork's supported scope.
 
-04.      Release Information for hdf5-2.2.0
-03.      Release Information for hdf5-2.1.1
-02.      Release Information for hdf5-2.1.0
-01.      Release Information for hdf5-2.0.0
+These archived notes did not embed their platform matrices; their former
+Wiki/CDash links were live views rather than immutable evidence for a specific
+release and are therefore not repeated in each section.
 
-[Search on the string '%%%%' for section breaks of each release.]
+- [HDF5 2.2.0](#hdf5-220)
+- [HDF5 2.1.1](#hdf5-211)
+- [HDF5 2.1.0](#hdf5-210)
+- [HDF5 2.0.0](#hdf5-200)
 
-%%%%2.2.0%%%%
+## HDF5 2.2.0
 
 HDF5 version 2.2.0 released on 2026-07-28
-
----
-
-# 🔺 HDF5 Changelog
-All notable changes to this project will be documented in this file. This document describes the differences between this release and the previous
-HDF5 release, platforms tested, and known problems in this release.
-
-For releases prior to version 2.0.0, please see the release.txt file and for more details check the HISTORY*.txt files in the HDF5 source.
-
-# 🔗 Quick Links
-* [HDF5 documentation](https://support.hdfgroup.org/documentation/hdf5/latest/)
-* [Official HDF5 releases](https://support.hdfgroup.org/downloads/index.html)
-* [Changes from Release to Release and New Features in the HDF5-2.x.y](https://support.hdfgroup.org/releases/hdf5/documentation/release_specific_info.md)
-* [Getting help, questions, or comments](https://github.com/HDFGroup/hdf5#help-and-support)
-
-## 📖 Contents
-* [Executive Summary](CHANGELOG.md#execsummary)
-* [Breaking Changes](CHANGELOG.md#%EF%B8%8F-breaking-changes)
-* [Deprecations](CHANGELOG.md#-deprecations)
-* [New Features & Improvements](CHANGELOG.md#-new-features--improvements)
-* [Bug Fixes](CHANGELOG.md#-bug-fixes)
-* [Support for new platforms and languages](CHANGELOG.md#-support-for-new-platforms-and-languages)
-* [Platforms Tested](CHANGELOG.md#%EF%B8%8F-platforms-tested)
-* [Known Problems](CHANGELOG.md#-known-problems)
 
 # 🔆 Executive Summary: HDF5 Version 2.2.0
 
@@ -108,10 +87,6 @@ We would like to thank the many HDF5 community members who contributed to this r
 ### Added a CMake module to locate zlib-ng for zlib support
 
    A new `FindZLIBNG.cmake` CMake module has been added. This module is intended to locate zlib-ng on the system for zlib support in HDF5 when zlib-ng was built with Autotools instead of CMake. When zlib-ng support is enabled in HDF5 with the `HDF5_ENABLE_ZLIB_SUPPORT` and `HDF5_USE_ZLIB_NG` options, this module will first check for an existing CMake-built zlib-ng and use that if it's available. Otherwise, the module will heuristically search for zlib-ng on the system. If necessary, the module can be hinted toward a particular zlib-ng installation by setting the CMake variable `ZLIBNG_ROOT` to point to a directory.
-
-### Added a CMake module to locate libaec for SZIP support
-
-   A new `Findlibaec.cmake` CMake module has been added. This module is intended to locate libaec on the system for SZIP support in HDF5 when libaec was built with Autotools instead of CMake. When SZIP support is enabled in HDF5 with the `HDF5_ENABLE_SZIP_SUPPORT` option, this module will first check for an existing CMake-built libaec and use that if it's available. Otherwise, the module will heuristically search for libaec on the system. If necessary, the module can be hinted toward a particular libaec installation by setting the CMake variable `libaec_ROOT` to point to a directory. If it is known that a CMake-built libaec installation exists on the system in a non-standard location, the CMake variable `libaec_DIR` can instead be set to a directory containing a `libaec-config.cmake` file to cause the module to prefer that libaec installation.
 
 ## Library
 
@@ -362,13 +337,6 @@ The `h5repack` tool now obtains its default low and high library version bounds 
 
 ## Testing
 
-# ✨ Support for new platforms and languages
-
-# ☑️ Platforms Tested
-
-A table of platforms tested can be seen on the [wiki](https://github.com/HDFGroup/hdf5/wiki/Platforms-Tested).
-Current test results are available [here](https://my.cdash.org/index.php?project=HDF5).
-
 # ⛔ Known Problems
 
 - When performing implicit datatype conversion on specific non-IEEE floating-point format data, HDF5 may improperly convert some data values:
@@ -430,11 +398,7 @@ Current test results are available [here](https://my.cdash.org/index.php?project
    cray-mpich on theta and with XL compilers on ppc64le platforms.
 
 - File space may not be released when overwriting or deleting certain nested variable length or reference types.
-
-Known problems in previous releases can be found in the HISTORY*.txt files in the HDF5 source. Please report any new problems found to <a href="mailto:help@hdfgroup.org">help@hdfgroup.org</a>.
-
-
-%%%%2.1.1%%%%
+## HDF5 2.1.1
 
 HDF5 version 2.1.1 released on 2026-03-23
 
@@ -448,30 +412,9 @@ HDF5 version 2.1.1 released on 2026-03-23
 ---
 
 
-%%%%2.1.0%%%%
+## HDF5 2.1.0
 
 HDF5 version 2.1.0 released on 2026-03-02
-
-# 🔺 HDF5 Changelog
-All notable changes to this project will be documented in this file. This document describes the differences between this release and the previous
-HDF5 release, platforms tested, and known problems in this release.
-
-For releases prior to version 2.0.0, please see the release.txt file and for more details check the HISTORY*.txt files in the HDF5 source.
-
-# 🔗 Quick Links
-* [HDF5 documentation](https://support.hdfgroup.org/documentation/hdf5/latest/)
-* [Official HDF5 releases](https://support.hdfgroup.org/downloads/index.html)
-* [Changes from Release to Release and New Features in the HDF5-2.x.y](https://support.hdfgroup.org/releases/hdf5/documentation/release_specific_info.md)
-* [Getting help, questions, or comments](https://github.com/HDFGroup/hdf5#help-and-support)
-
-## 📖 Contents
-* [Executive Summary](CHANGELOG.md#execsummary)
-* [Breaking Changes](CHANGELOG.md#%EF%B8%8F-breaking-changes)
-* [New Features & Improvements](CHANGELOG.md#-new-features--improvements)
-* [Bug Fixes](CHANGELOG.md#-bug-fixes)
-* [Support for new platforms and languages](CHANGELOG.md#-support-for-new-platforms-and-languages)
-* [Platforms Tested](CHANGELOG.md#%EF%B8%8F-platforms-tested)
-* [Known Problems](CHANGELOG.md#-known-problems)
 
 # 🔆 Executive Summary: HDF5 Version 2.1.0
 
@@ -639,13 +582,6 @@ We would like to thank the many HDF5 community members who contributed to this r
 
 ## Testing
 
-# ✨ Support for new platforms and languages
-
-# ☑️ Platforms Tested
-
-A table of platforms tested can be seen on the [wiki](https://github.com/HDFGroup/hdf5/wiki/Platforms-Tested).
-Current test results are available [here](https://my.cdash.org/index.php?project=HDF5).
-
 # ⛔ Known Problems
 
 - When performing implicit datatype conversion on specific non-IEEE floating-point format data, HDF5 may improperly convert some data values:
@@ -707,64 +643,39 @@ Current test results are available [here](https://my.cdash.org/index.php?project
    cray-mpich on theta and with XL compilers on ppc64le platforms.
 
 - File space may not be released when overwriting or deleting certain nested variable length or reference types.
-
-Known problems in previous releases can be found in the HISTORY*.txt files in the HDF5 source. Please report any new problems found to <a href="mailto:help@hdfgroup.org">help@hdfgroup.org</a>.
-
-
-%%%%2.0.0%%%%
+## HDF5 2.0.0
 
 HDF5 version 2.0.0 released on 2025-11-11
-
-# 🔺 HDF5 Changelog
-All notable changes to this project will be documented in this file. This document describes the differences between this release and the previous
-HDF5 release, platforms tested, and known problems in this release.
-
-For releases prior to version 2.0.0, please see the release.txt file and for more details check the HISTORY*.txt files in the HDF5 source.
-
-# 🔗 Quick Links
-* [HDF5 documentation](https://support.hdfgroup.org/documentation/hdf5/latest/)
-* [Official HDF5 releases](https://support.hdfgroup.org/downloads/index.html)
-* [Changes from Release to Release and New Features in the HDF5-2.x.y](https://support.hdfgroup.org/releases/hdf5/documentation/release_specific_info.md)
-* [Getting help, questions, or comments](https://github.com/HDFGroup/hdf5#help-and-support)
-
-## 📖 Contents
-* [Executive Summary](CHANGELOG.md#execsummary)
-* [Breaking Changes](CHANGELOG.md#%EF%B8%8F-breaking-changes)
-* [New Features & Improvements](CHANGELOG.md#-new-features--improvements)
-* [Bug Fixes](CHANGELOG.md#-bug-fixes)
-* [Support for new platforms and languages](CHANGELOG.md#-support-for-new-platforms-and-languages)
-* [Platforms Tested](CHANGELOG.md#%EF%B8%8F-platforms-tested)
-* [Known Problems](CHANGELOG.md#-known-problems)
 
 # 🔆 Executive Summary: HDF5 Version 2.0.0
 
 ## Performance Enhancements:
 
-- Up to [2500% faster](CHANGELOG.md#rtree) Virtual Dataset read/write operations
-- [30% faster opening](CHANGELOG.md#layoutcopydelay) and [25% faster closing](CHANGELOG.md#fileformat) of virtual datasets.
-- [Reduced memory overhead](CHANGELOG.md#fileformat) via shared name strings and optimized spatial search algorithms for virtual datasets.
+- Up to [2500% faster](#rtree) Virtual Dataset read/write operations
+- [30% faster opening](#layoutcopydelay) and [25% faster closing](#fileformat) of virtual datasets.
+- [Reduced memory overhead](#fileformat) via shared name strings and optimized spatial search algorithms for virtual datasets.
 
 ## Significant Advancements:
 
-- Full [UTF-8](CHANGELOG.md#utf-8) filename support on Windows, resolving encoding issues from previous versions.
-- Introduction of [bfloat16 predefined datatypes](CHANGELOG.md#added-predefined-datatypes-for-bfloat16-data) for efficient machine learning conversions.
-- First-class support for [complex numbers](CHANGELOG.md#complex), eliminating manual workarounds in scientific applications.
-- A [new, larger chunk size limit](CHANGELOG.md#added-support-for-large-chunks), in multi-petabytes, replaces the previous 4 GiB limit.
+- Full [UTF-8](#utf-8) filename support on Windows, resolving encoding issues from previous versions.
+- Introduction of [bfloat16 predefined datatypes](#added-predefined-datatypes-for-bfloat16-data) for efficient machine learning conversions.
+- First-class support for [complex numbers](#complex), eliminating manual workarounds in scientific applications.
+- A [new, larger chunk size limit](#added-support-for-large-chunks), in multi-petabytes, replaces the previous 4 GiB limit.
 
 ## Updated Foundation:
 
-- New [file format](CHANGELOG.md#fileformat) version (4.0) and compliance with the C11 standard.
+- New [file format](#fileformat) version (4.0) and compliance with the C11 standard.
 - Adopted [semantic versioning](https://github.com/HDFGroup/hdf5/wiki/HDF5-Version-Numbers-and-Branch-Strategy) to clearly convey changes between versions.
 
 > [!IMPORTANT]
 >
-> - Transitioned to [CMake-only](CHANGELOG.md#cmake) builds, and Autotools is no longer in use.
+> - Transitioned to [CMake-only](#cmake) builds, and Autotools is no longer in use.
 > - Renamed library state variables, notably `HDF5_ENABLE_PARALLEL` is now `HDF5_PROVIDES_PARALLEL`, see PR [#5716](https://github.com/HDFGroup/hdf5/pull/5716) for more details.
 > - The default setting for `H5Fset_libver_bounds` has been updated to set the lower bound to the HDF5 library version 1.8. This change ensures that users can take advantage of the library's optimal performance and the latest features by default. If users need their files to be compatible with older versions of the HDF5 library, they will need to adjust this lower bound manually.
 
 ## Enhanced Features:
 
-- Improved [ROS3 VFD](CHANGELOG.md#ros3) capabilities using the aws-c-s3 library.
+- Improved [ROS3 VFD](#ros3) capabilities using the aws-c-s3 library.
 
 ## Java Enhancements:
 
@@ -788,7 +699,7 @@ We would like to thank the many HDF5 community members who contributed to HDF5 2
 
 ### Autotools support was removed from HDF5<a name="cmake">
 
-   CMake is now the build system available in HDF5 code. Version 3.26 or later is required. See the [AutotoolsToCMakeOptions.md](AutotoolsToCMakeOptions.md) file for highlights of the CMake HDF5 install layout and CMake options to use in place of former Autotools options.
+   CMake is now the build system available in HDF5 code. Version 3.26 or later was required for this release. See the current [Autotools compatibility note](../docs/AutotoolsToCMakeOptions.md) for present-day context.
 
 ### Fixed problems with family driver and user block
 
@@ -1077,7 +988,7 @@ If the ROS3 VFD cannot determine an AWS region from one of these locations, an e
 
 New API functions `H5Pset_fapl_ros3_endpoint()` and `H5Pget_fapl_ros3_endpoint()` have been added for use with the ROS3 VFD. These functions set/get an alternate endpoint URL to use when opening files with the ROS3 VFD. This is useful in cases where the application needs to access files that are in a location other than the standard `s3.<region-code>.amazonaws.com`, which is what the ROS3 VFD uses when an alternate endpoint URL isn't specified. The ROS3 VFD also checks the `AWS_ENDPOINT_URL_S3` and `AWS_ENDPOINT_URL` environment variables for an alternate endpoint URL if one isn't specified with `H5Pset_fapl_ros3_endpoint()`.
 
-Instructions for building the ROS3 VFD with the `aws-c-s3` library are in the [INSTALL_S3.txt](./INSTALL_S3.txt) file. The ROS3 VFD and information about the usage of the driver are described in the HDF5 user's guide.
+Instructions for building the ROS3 VFD with the `aws-c-s3` library are in [INSTALL_S3.md](../docs/INSTALL_S3.md). The ROS3 VFD and information about the usage of the driver are described in the HDF5 user's guide.
 
 ### Renamed some API decorations
 
@@ -1336,10 +1247,6 @@ Added Fortran wrapper `h5fdsubfiling_get_file_mapping_f()` for the subfiling fil
 
 ## Library
 
-### Fixed problems with the family driver and user block
-
-   When using a user block with the family driver, the driver would inappropriately subtract the user block size for each member file when calculating member EOAs. This could cause a failure when an address overflowed the calculated eoa. The driver would also add the user block size when returning the EOF. Modified the family driver to not consider the user block, as it is handled by the H5FD layer. The user block now spans the first X bytes of the family array, for example a 4 KiB user block with 3 KiB member size will take up the entire first member and the first 1 KiB of the second. This may cause compatibility issues with preexisting family files with user blocks, though the way it worked before was inconsistent if it worked at all.
-
 ### Fixed security issue CVE-2025-7067
 
    Fixed a heap buffer overflow in H5FS__sinfo_serialize_node_cb() by discarding file free space sections from the file free space manager when they are found to be invalid. Specifically crafted HDF5 files can result in an attempt to insert duplicate or overlapping file free space sections into a file free space manager, later resulting in a buffer overflow when the same free space section is serialized to the file multiple times.
@@ -1533,7 +1440,7 @@ Added Fortran wrapper `h5fdsubfiling_get_file_mapping_f()` for the subfiling fil
 
    In addition, the `<LIB_PKG_NAME>_ROOT` environment variables must be set, where `<LIB_PKG_NAME>` is one of `ZLIB`, `ZLIBNG`, `SZIP`, `libaec`, `PLUGIN`. Note that libaec is the expected name for using the libaec library in place of original szip.
 
-   See INSTALL_CMake.txt for more detailed information.
+   See [INSTALL_CMake.md](../docs/INSTALL_CMake.md) for current build information.
 
 ### Changed the zlib/szip compression find message to FATAL ERROR
 
@@ -1591,13 +1498,6 @@ Added Fortran wrapper `h5fdsubfiling_get_file_mapping_f()` for the subfiling fil
 ### Added skipping of a few parallel tests for OpenMPI 5.0.5
 
    An issue in OpenMPI 5.0.5 causes a few parallel HDF5 tests (mpiodup, props, fapl_preserve) to fail. These tests are now skipped for that release of OpenMPI. The issue has been fixed in the 5.0.6 release of OpenMPI.
-
-# ✨ Support for new platforms and languages
-
-# ☑️ Platforms Tested
-
-A table of platforms tested can be seen on the [wiki](https://github.com/HDFGroup/hdf5/wiki/Platforms-Tested).
-Current test results are available [here](https://my.cdash.org/index.php?project=HDF5).
 
 # ⛔ Known Problems
 
@@ -1657,5 +1557,3 @@ Current test results are available [here](https://my.cdash.org/index.php?project
    cray-mpich on theta and with XL compilers on ppc64le platforms.
 
 - File space may not be released when overwriting or deleting certain nested variable length or reference types.
-
-Known problems in previous releases can be found in the HISTORY*.txt files in the HDF5 source. Please report any new problems found to <a href="mailto:help@hdfgroup.org">help@hdfgroup.org</a>.

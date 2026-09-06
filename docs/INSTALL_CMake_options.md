@@ -50,7 +50,7 @@ These are some common options that come from CMake itself and are not specific t
 | CMake option | Type | Default | Description |
 |:-------------|:-----|:--------|:------------|
 | `CMAKE_INSTALL_PREFIX` | `STRING` | Varies by platform | HDF5 installation directory prefix. See [CMAKE_INSTALL_PREFIX](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html). |
-| `CMAKE_BUILD_TYPE` | `STRING` | `Release` | HDF5 build type. See [CMAKE_BUILD_TYPE](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html). Valid values are `Release`, `Debug`, `RelWithDebInfo`, `MinSizeRel` and `Developer`. |
+| `CMAKE_BUILD_TYPE` | `STRING` | `Release` | Build type for single-config generators. Valid values are `Release`, `Debug`, `RelWithDebInfo`, `MinSizeRel`, and `Developer`. Multi-config generators use `CMAKE_CONFIGURATION_TYPES`; the default Visual Studio list does not include `Developer`. |
 | `CMAKE_C_STANDARD` | `STRING` | `17` | Selects the ISO C standard for project-owned HDF5 sources. Values below C17 are rejected; a supported later value is retained but does not replace the exact C17 release-validation baseline. |
 | `CMAKE_CXX_STANDARD` | `STRING` | `20` | Selects the ISO C++ standard when the opt-in C++ components are enabled. Values below C++20 are rejected; a supported later value is retained but does not replace the exact C++20 release-validation baseline. |
 
@@ -71,15 +71,16 @@ These options concern the general build process of the main HDF5 libraries, util
 |:-------------|:-----|:--------|:------------|
 | `BUILD_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, builds shared HDF5 libraries. |
 | `BUILD_STATIC_LIBS` | `BOOL` | `ON` | If `ON`, builds static HDF5 libraries. |
+| `HDF5_ONLY_SHARED_LIBS` | `BOOL` | `OFF` | If `ON`, forces shared libraries on and static libraries and static tools off. Setting `BUILD_STATIC_LIBS=OFF` also forces this option on. |
 | `BUILD_STATIC_EXECS` | `BOOL` | `OFF` | If `ON`, builds statically-linked executables. **NOTE:** The `BUILD_STATIC_EXECS` option is only valid on some UNIX operating systems. It adds the `-static` flag to `CMAKE_EXE_LINKER_FLAGS`. This flag is not available on Windows and some modern Linux systems will ignore the flag. |
 | `HDF5_DEFAULT_API_VERSION` | `STRING` | `v200` | Specifies the default HDF5 API version to use when compiling HDF5 libraries. Valid values are `v200` (2.x API), `v114` (1.14.x API), `v112` (1.12.x API), `v110` (1.10.x API), `v18` (1.8.x API) and `v16` (1.6.x API). See [API Compatibility Macros](https://support.hdfgroup.org/documentation/hdf5/latest/api-compat-macros.html#title5) for more information on this option. |
 | `HDF5_ALLOW_UNSUPPORTED` | `BOOL` | `OFF` | If `ON`, allows configuring and building HDF5 with unsupported combinations of features. Otherwise, causes a configuration error if an unsupported combination is enabled. See [Unsupported option combinations](#unsupported_combos) for a list of unsupported combinations. |
-| `HDF5_ENABLE_CONCURRENCY` | `BOOL` | `OFF` | If `ON`, enables building of a multi-thread concurrent HDF5 library. Requires C11 threads, Win32 threads or Pthreads. Requires shared HDF5 libraries on Windows. **NOTE:** Currently non-functional and experimental. |
+| `HDF5_ENABLE_CONCURRENCY` | `BOOL` | `OFF` | If `ON`, enables the multi-thread concurrent HDF5 library. Requires C11 threads, Win32 threads, or Pthreads; on Windows it also requires shared-only libraries. See [Unsupported option combinations](#unsupported-option-combinations) for incompatible products. |
 | `HDF5_ENABLE_THREADSAFE` | `BOOL` | `OFF` | If `ON`, enables building of a thread-safe HDF5 library. Requires C11 threads, Win32 threads or Pthreads. Requires shared HDF5 libraries on Windows. |
 | `HDF5_ENABLE_NONSTANDARD_FEATURES` | `BOOL` | `ON` | If `ON`, enables non-standard programming language features. If `OFF`, disables all non-standard programming language features. Each feature has its own separate option. |
 | `HDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16` | `BOOL` | `ON` (if `_Float16` type is supported) | If `ON`, enables building of support for the `_Float16` 16-bit floating-point datatype. |
 | `HDF5_BUILD_TOOLS` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 tool programs (`h5dump`, `h5ls`, etc.) |
-| `HDF5_BUILD_STATIC_TOOLS` | `BOOL` | `OFF` | If `ON`, HDF5 tool programs are linked against static HDF5 libraries when built. Otherwise, HDF5 tool programs are linked against shared HDF5 libraries when built. Has no effect if `HDF5_BUILD_TOOLS` is `OFF`. If `ON` and `BUILD_STATIC_LIBS` is `OFF`, causes a configuration error. |
+| `HDF5_BUILD_STATIC_TOOLS` | `BOOL` | `OFF` | If `ON`, links HDF5 tools against static HDF5 libraries. If static libraries are unavailable, configuration warns and forces shared tools instead. If shared libraries are unavailable, configuration forces static tools on. Has no effect when `HDF5_BUILD_TOOLS` is `OFF`. |
 | `HDF5_BUILD_UTILS` | `BOOL` | `ON` | If `ON`, enables building of additional HDF5 utility programs, scripts, etc. |
 | `HDF5_BUILD_DOC` | `BOOL` | `OFF` | If `ON`, enables building of HDF5 documentation. Requires doxygen to be found by CMake in order to build. |
 | `HDF5_ENABLE_DEPRECATED_SYMBOLS` | `BOOL` | `ON` | If `ON`, deprecated public HDF5 API symbols are built into its libraries. Otherwise, these symbols will not be available. |
@@ -97,6 +98,9 @@ These options concern the general build process of the main HDF5 libraries, util
 | `HDF5_ENABLE_DOXY_WARNINGS` | `BOOL` | `OFF` | If `ON`, causes a build failure if doxygen parsing has warnings. Has no effect if  `HDF5_BUILD_DOC` is `OFF`. |
 | `HDF5_USE_FOLDERS` | `BOOL` | `ON` | If `ON`, enables folder grouping of HDF5 build projects in IDEs. See [USE_FOLDERS](https://cmake.org/cmake/help/latest/prop_gbl/USE_FOLDERS.html) for more information. |
 | `HDF5_GENERATE_HEADERS` | `BOOL` | `OFF` | If `ON`, enables (re-)generation of some HDF5 source files. Intended for HDF5 developers only. Requires perl. |
+| `HDF5_REQUIRE_SIGNED_PLUGINS` | `BOOL` | `OFF` | If `ON`, requires runtime plugins to carry a signature verified by a trusted public key. Requires OpenSSL 1.1.0 or later and builds the `h5sign` tool when tools are enabled. See [PLUGIN_SIGNATURE_README.md](PLUGIN_SIGNATURE_README.md). |
+| `HDF5_PLUGIN_KEYSTORE_DIR` | `PATH` | `""` (empty string) | Compile-time default directory containing trusted public-key PEM files. Available when signed plugins are required; `HDF5_PLUGIN_KEYSTORE` can override it at runtime unless the keystore is locked. |
+| `HDF5_LOCK_PLUGIN_KEYSTORE` | `BOOL` | `OFF` | If `ON`, prevents the runtime environment from overriding `HDF5_PLUGIN_KEYSTORE_DIR`. Requires signed plugins and a non-empty compile-time keystore directory. |
 
 ### Installation options
 
@@ -125,7 +129,7 @@ These options control how platform-specific binary installers and source package
 | `HDF5_NO_PACKAGES` | `BOOL` | `OFF` | If `ON`, disables CPack support and the ability to create HDF5 packages. |
 | `HDF5_PACKAGE_EXTLIBS` | `BOOL` | `OFF` | If `ON`, HDF5 packages created with CPack will include any external libraries that were built alongside HDF5, such as zlib. **NOTE:** Be aware that this could overwrite system libraries if these packages are installed to a system-wide location. |
 | `HDF5_PACK_EXAMPLES` | `BOOL` | `OFF` | If `ON`, HDF5 packages created with CPack will include the HDF5 example programs. |
-| `HDF_PACKAGE_NAMESPACE` | `STRING` | `hdf5::` | Specifies a string to use for namespacing CMake targets created by HDF5. |
+| `HDF_PACKAGE_NAMESPACE` | `STRING` | `""` (empty string) | Specifies the namespace for exported CMake targets. Supplied release cache presets set it to `hdf5::`; a manual configuration leaves it empty unless explicitly set. |
 | `HDF_PACKAGE_EXT` | `STRING` | `""` (empty string) | Specifies a suffix to add to the names of several files included in HDF5 packages created. |
 
 ### Compiler options
@@ -277,12 +281,12 @@ These are options which can be set for controlling how the HDF5 example programs
 | CMake option | Type | Default | Description |
 |:-------------|:-----|:--------|:------------|
 | `HDF5_BUILD_EXAMPLES` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 library (C) example programs. |
-| `USE_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, build the HDF5 library example programs against shared HDF5 libraries. Otherwise, use static HDF5 libraries. |
+| `H5EXAMPLE_USE_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, build the standalone HDF5 examples against shared HDF5 libraries. Otherwise, use static HDF5 libraries. |
 | `H5EXAMPLE_BUILD_CXX` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library C++ example programs. |
 | `H5EXAMPLE_BUILD_HL` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library high-level C example programs. |
 | `H5EXAMPLE_ENABLE_PARALLEL` | `BOOL` | `OFF` | If `ON`, enables building of the parallel HDF5 library example programs. |
-| `H5EXAMPLE_BUILD_PYTHON` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library Python ([h5py](https://docs.h5py.org/en/stable/)) example programs. Python3 support must be available. |
-| `H5EXAMPLE_BUILD_FILTERS` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library filter plugins example programs. `USE_SHARED_LIBS` must be `ON` and shared HDF5 libraries must be available. |
+| `H5EXAMPLE_BUILD_PYTHON` | `BOOL` | `OFF` | If `ON`, enables retained Python example programs. Python 3 and h5py must be available; this does not build a Python binding. |
+| `H5EXAMPLE_BUILD_FILTERS` | `BOOL` | `OFF` | If `ON`, enables filter plugin example programs. `H5EXAMPLE_USE_SHARED_LIBS` must be `ON`, and the installed package must provide shared libraries and plugin support. |
 | `H5EXAMPLE_BUILD_TESTING` | `BOOL` | `OFF` | If `ON`, enables testing of the HDF5 library example programs. |
 | `H5EXAMPLE_USE_200_API` | `BOOL` | `OFF` | If `ON`, compile the HDF5 library examples programs using the HDF5 2.0.0 API. |
 | `H5EXAMPLE_USE_114_API` | `BOOL` | `OFF` | If `ON`, compile the HDF5 library examples programs using the HDF5 1.14 API. |
@@ -324,7 +328,7 @@ These are options which control how HDF5 testing is built and executed.
 | `HDF_TEST_EXPRESS` | `STRING` | `3` | Specifies how exhaustive HDF5 testing should be, with smaller values causing more exhaustive testing to be performed. Valid values are `0`, `1`, `2`, `3`, where `0` means to perform exhaustive testing and `3` means to perform the quickest testing. |
 | `CTEST_TEST_TIMEOUT` | `STRING` | `1200` | Specifies the maximum amount of time (in seconds) before a test program will be terminated due to a timeout. If modified, `DART_TESTING_TIMEOUT` should be updated as well. |
 | `DART_TESTING_TIMEOUT` | `STRING` | `1200` | Specifies the maximum amount of time (in seconds) before a test program will be terminated due to a timeout. If modified, `CTEST_TEST_TIMEOUT` should be updated as well. |
-| `HDF5_DISABLE_TESTS_REGEX` | `STRING` | `""` (empty string) | Specifies a regular expression string which can be used to disable specific HDF5 tests with names matching the specified string. For general naming patterns of HDF5 tests, see [INSTALL_CMake.md](./INSTALL_CMake.md#section-xiii). |
+| `HDF5_DISABLE_TESTS_REGEX` | `STRING` | `""` (empty string) | Specifies a regular expression used to disable matching HDF5 tests. For test selection examples, see [INSTALL_CMake.md](./INSTALL_CMake.md#test-selection). |
 | `HDF5_TEST_SERIAL` | `BOOL` | `ON` | If `ON`, enables testing of HDF5's serial (i.e., non-parallel) tests. |
 | `HDF5_TEST_PARALLEL` | `BOOL` | `ON` (if `HDF5_ENABLE_PARALLEL` is `ON`) | If `ON`, enables testing of HDF5's parallel tests. |
 | `HDF5_TEST_TOOLS` | `BOOL` | `ON` (if `HDF5_BUILD_TOOLS` is `ON`) | If `ON`, enables testing of HDF5's tool programs. |

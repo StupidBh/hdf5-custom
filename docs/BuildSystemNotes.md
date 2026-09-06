@@ -1,6 +1,6 @@
 # HDF5 Build System Summary
 
-HDF5 2.0 uses CMake 4.0 or later and requires out-of-source builds. The
+The HDF5 2.3 development tree uses CMake 4.0 or later and requires out-of-source builds. The
 primary configuration files are `CMakeLists.txt`, `CMakeBuildOptions.cmake`,
 `CMakeTests.cmake`, `CMakeInstallation.cmake`, `CMakeVOL.cmake`, and
 `CMakePlugins.cmake`.
@@ -8,7 +8,7 @@ primary configuration files are `CMakeLists.txt`, `CMakeBuildOptions.cmake`,
 ## Supported Libraries
 
 The repository builds the C library, the optional C++ wrapper, the high-level
-C library, command-line tools, examples, VOL connectors, and VFDs. Static and
+C library, command-line tools, utilities, examples, VOL connectors, and VFDs. Static and
 shared libraries are controlled by `BUILD_STATIC_LIBS` and
 `BUILD_SHARED_LIBS`.
 
@@ -37,8 +37,8 @@ cmake --workflow --preset ci-StdShar-GNUC-S3 --fresh
 cmake --workflow --preset ci-StdShar-MSVC --fresh
 ```
 
-Build directories are normally created under `build/<presetName>` and install
-directories under `install/<presetName>`.
+Preset build directories are created under `build/<presetName>` and install
+directories under `install/<presetName>` in the parent directory of the source tree.
 
 ## Tests And CI
 

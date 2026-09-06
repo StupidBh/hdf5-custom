@@ -17,7 +17,7 @@
 <a id="section-i"></a>
 ## I. Preconditions
 
-* Refer to [INSTALL.md](./INSTALL.md) for preconditions and instructions for building HDF5.
+* Refer to [INSTALL.md](./INSTALL.md) for preconditions and instructions for building HDF5. This fork supports ROS3 source builds only on Windows/MSVC and Linux/GNU.
 
 ---
 
@@ -134,13 +134,13 @@ cmake --build aws-c-s3/build --target install --parallel <num-jobs>
 HDF5 uses CMake's `find_package()` mechanism to locate the `aws-c-s3` library, so as long as it is installed to a standard location, the CMake option `HDF5_ENABLE_ROS3_VFD=ON` simply needs to be passed when configuring HDF5 in order to enable the ROS3 VFD, as in:
 
 ```bash
-cmake -DHDF5_ENABLE_ROS3_VFD=ON ..
+cmake -S . -B build-ros3 -DHDF5_ENABLE_ROS3_VFD=ON
 ```
 
 If the `aws-c-s3` library is installed to a non-standard location, the environment variable `CMAKE_PREFIX_PATH` should be set to that path when configuring HDF5, as in:
 
 ```bash
-CMAKE_PREFIX_PATH=<install-path> cmake -DHDF5_ENABLE_ROS3_VFD=ON ..
+cmake -S . -B build-ros3 -DCMAKE_PREFIX_PATH=<install-path> -DHDF5_ENABLE_ROS3_VFD=ON
 ```
 
 Refer to [INSTALL_CMake.md](./INSTALL_CMake.md) for more general instructions on building HDF5 with CMake.
@@ -153,13 +153,13 @@ Refer to [INSTALL_CMake.md](./INSTALL_CMake.md) for more general instructions on
 The ROS3 VFD is tested using a combination of docker, s3proxy and the AWS CLI. If the `docker` and `aws` executables are available in standard locations which CMake can find and the docker daemon is running, the ROS3 VFD tests can be enabled by passing the CMake option `HDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=ON`, as in:
 
 ```bash
-cmake -DHDF5_ENABLE_ROS3_VFD=ON -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=ON ..
+cmake -S . -B build-ros3 -DHDF5_ENABLE_ROS3_VFD=ON -DHDF5_ENABLE_ROS3_VFD_DOCKER_PROXY=ON
 ```
 
 If everything configured correctly, the ROS3 VFD tests can be run with:
 
 ```bash
-ctest -R "S3TEST" -VV .
+ctest --test-dir build-ros3 -R "S3TEST" --output-on-failure -j 6
 ```
 
 These tests are separated into different groups based on the particular functionality being tested. For each group of tests, the CMake logic will bring up s3proxy, create a testing bucket and populate that bucket with any testing files needed, run all of the tests for the testing group and then bring down s3proxy.

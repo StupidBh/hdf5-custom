@@ -1,61 +1,29 @@
-# HDF5 Build and Install Suggestions for Windows and Visual Studio (Full Version)
+# Using HDF5 in a Visual Studio Project
 
-**These suggestions are for Visual Studio users.**
+HDF5 itself must be built with CMake. On Windows, this repository supports an
+MSVC compiler; the release-validation baseline uses Visual Studio 18 2026 and
+x64. For a downstream application, a CMake project using the installed HDF5
+package is preferred because it carries include paths, definitions, and
+transitive libraries automatically. See
+[USING_HDF5_CMake.md](USING_HDF5_CMake.md).
 
-Instructions for building and testing HDF5 applications using CMake can
-be found in the [USING_HDF5_CMake.md](./USING_HDF5_CMake.md) file found in this folder.
+For an existing Visual Studio project that cannot use CMake:
 
-> **NOTE:** Building applications with the dynamic/shared HDF5 libraries requires that the `H5_BUILT_AS_DYNAMIC_LIB` compile definition be used. Go to "Project" and select "Properties", find "Configuration Properties", and then "C/C++"and then "Preprocessor". Add `H5_BUILT_AS_DYNAMIC_LIB` to Preprocessor definitions.
+1. Match the HDF5 package architecture, build configuration, and MSVC runtime
+   ABI. Do not mix Debug and Release libraries.
+2. Add the installation's `include` directory to the compiler include path and
+   its `lib` directory to the linker search path.
+3. Select the libraries for the components actually installed. Use
+   `libhdf5.settings` and the files in the package's `lib` directory as the
+   source of truth; optional C++, high-level, compression, and parallel
+   libraries are configuration-dependent.
+4. When linking the shared C library, define `H5_BUILT_AS_DYNAMIC_LIB` for the
+   consumer and make the HDF5 DLLs available through the application's runtime
+   search path. Do not define it for a static link.
+5. Link any required external dependency libraries using versions compatible
+   with those recorded in `libhdf5.settings`.
 
-The following two sections are helpful if you do not use CMake to build
-your applications.
-
-## Using Visual Studio 2010 and above with HDF5 Libraries built with Visual Studio 2010 and above
-
-Set up path for external libraries and headers. The path settings will need to be in the project property sheets per project.
-Go to "Project" and select "Properties", find "Configuration Properties",
-and then "VC++ Directories".
-
-If you are building on 64-bit Windows, find the "Platform" dropdown and select "x64". Add the header path to the "Include Directories" setting. Add the library path to the "Library Directories" setting.
-
-Select Linker->Input and beginning with the "Additional Dependencies" line,
-enter the library names. The external libraries should be listed first, followed
-by the HDF5 library, and then optionally the HDF5 High Level or C++
-libraries. For example, to compile a C++ application, enter: `hdf5.lib hdf5_cpp.lib`.
-
-For static linking:
-* HDF5 libraries: `libhdf5.lib libhdf5_cpp.lib`
-* Compression libraries: `libszaec.lib libaec.lib libzlib.lib`
-* System libraries: `shlwapi.lib`
-
-## Using Visual Studio 2008 with HDF5 Libraries built with Visual Studio 2008
-
-Set up the path for external libraries and headers. Invoke Microsoft Visual Studio and go to "Tools" and select "Options", find "Projects", and then "VC++ Directories".
-
-If you are building on 64-bit Windows, find the "Platform" dropdown
-and select "x64". Find the box "Show directories for", choose "Include files", add the
-header path (i.e. `c:\Program Files\HDF_Group\HDF5\2.0.x\include`)
-to the included directories.
-
-Find the box "Show directories for", choose "Library files", add the
-library path (i.e. `c:\Program Files\HDF_Group\HDF5\2.0.x\lib`)
-to the library directories.
-
-Select Project->Properties->Linker->Input and beginning with the
-"Additional Dependencies" line, enter the library names. The
-external libraries should be listed first, followed by the HDF5
-library, and then optionally the HDF5 High Level or C++
-libraries. For example, to compile a C++ application, enter:
-`hdf5.lib hdf5_cpp.lib`.
-
-For static linking:
-* HDF5 libraries: `libhdf5.lib libhdf5_cpp.lib`
-* Compression libraries: `libszaec.lib libaec.lib libzlib.lib`
-* System libraries: `shlwapi.lib`
-
-## Helpful Pointers
-
-A community support forum is available; please see:
-https://forum.hdfgroup.org/c/hdf5/8.
-
-Or send email to help@hdfgroup.org for further assistance.
+Run a small read/write program before integrating the package into a larger
+application. The standalone examples in `HDF5Examples/` provide suitable
+smoke tests; their build procedure is documented in
+[USING_CMake_Examples.md](USING_CMake_Examples.md).

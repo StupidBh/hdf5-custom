@@ -1,10 +1,11 @@
-v2.3.0 --- July X , 2026
+v2.3.0 --- Unreleased
 
 # 🔺 HDF5 Changelog
 All notable changes to this project will be documented in this file. This document describes the differences between this release and the previous
 HDF5 release, platforms tested, and known problems in this release.
 
-For releases prior to version 2.0.0, please see the release.txt file and for more details check the HISTORY*.txt files in the HDF5 source.
+Released 2.x notes are archived in [HISTORY-2.X.md](HISTORY-2.X.md). Earlier
+upstream history is available from the corresponding upstream release tags.
 
 # 🔗 Quick Links
 * [HDF5 documentation](https://support.hdfgroup.org/documentation/hdf5/latest/)
@@ -13,31 +14,20 @@ For releases prior to version 2.0.0, please see the release.txt file and for mor
 * [Getting help, questions, or comments](https://github.com/HDFGroup/hdf5#help-and-support)
 
 ## 📖 Contents
-* [Executive Summary](CHANGELOG.md#execsummary)
-* [Breaking Changes](CHANGELOG.md#%EF%B8%8F-breaking-changes)
-* [Deprecations](CHANGELOG.md#-deprecations)
-* [New Features & Improvements](CHANGELOG.md#-new-features--improvements)
-* [Bug Fixes](CHANGELOG.md#-bug-fixes)
-* [Support for new platforms and languages](CHANGELOG.md#-support-for-new-platforms-and-languages)
-* [Platforms Tested](CHANGELOG.md#%EF%B8%8F-platforms-tested)
-* [Known Problems](CHANGELOG.md#-known-problems)
+* [Executive Summary](#execsummary)
+* [Breaking Changes](#breaking-changes)
+* [Bug Fixes](#bug-fixes)
+* [Platforms Tested](#platforms-tested)
+* [Known Problems](#known-problems)
 
+<a id="execsummary"></a>
 # 🔆 Executive Summary: HDF5 Version 2.3.0
-
-
-## Performance Enhancements:
-
-
-## Significant Advancements:
-
-
-## Enhanced Features:
-
 
 ## Acknowledgements:
 
 We would like to thank the many HDF5 community members who contributed to this release of HDF5.
 
+<a id="breaking-changes"></a>
 # ⚠️ Breaking Changes
 
 ## CMake C++ builds now require C++20 for project-owned sources
@@ -104,32 +94,7 @@ by the optional HDFS VFD and C-level file-format compatibility types such as
 `H5T_FORTRAN_S1` remain available because they serve retained C library
 functionality.
 
-
-# 🪦 Deprecations
-
-
-# 🚀 New Features & Improvements
-
-## Configuration
-
-
-## Library
-
-## Parallel Library
-
-## C++ Library
-
-## Tools
-
-## High-Level APIs
-
-## C Packet Table API
-
-## Internal header file
-
-## Documentation
-
-
+<a id="bug-fixes"></a>
 # 🪲 Bug Fixes
 
 ## Library
@@ -282,23 +247,16 @@ functionality.
    have been fixed for cases where elements wrap to new lines according to the particular tool's
    column limit setting.
 
-## Performance
-
-## High-Level Library
-
-## Documentation
-
-## C++ APIs
-
-## Testing
-
-# ✨ Support for new platforms and languages
-
+<a id="platforms-tested"></a>
 # ☑️ Platforms Tested
 
-A table of platforms tested can be seen on the [wiki](https://github.com/HDFGroup/hdf5/wiki/Platforms-Tested).
-Current test results are available [here](https://my.cdash.org/index.php?project=HDF5).
+The supported release-validation baselines are Windows x64 with MSVC using
+Visual Studio 18 2026 and Linux x86_64 with GCC/G++ using Ninja, plus a focused
+Unix Makefiles check. Exact completed configurations and test results must be
+recorded before this release is finalized; the support policy alone is not
+evidence that validation passed.
 
+<a id="known-problems"></a>
 # ⛔ Known Problems
 
 - When performing implicit datatype conversion on specific non-IEEE floating-point format data, HDF5 may improperly convert some data values:
@@ -313,27 +271,6 @@ Current test results are available [here](https://my.cdash.org/index.php?project
 
    If possible, an application should perform I/O with these datatypes using an in-memory type that matches the specific floating-point format and perform explicit data conversion outside of HDF5, if necessary. Otherwise, read/written values should be verified to be correct.
 
-- When the library detects and builds in support for the _Float16 datatype, an issue has been observed on at least one MacOS 14 system where the library fails to initialize due to not being able to detect the byte order of the _Float16 type [#4310](https://github.com/HDFGroup/hdf5/issues/4310):
-
-     #5: H5Tinit_float.c line 308 in H5T__fix_order(): failed to detect byte order
-     major: Datatype
-     minor: Unable to initialize object
-
-   If this issue is encountered, support for the _Float16 type can be disabled with a configuration option:
-
-     `CMake: HDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16=OFF`
-
-- When HDF5 is compiled with NVHPC versions 23.5 - 23.9 (additional versions may also be applicable) and with -O2 (or higher) and -DNDEBUG, test failures occur in the following tests:
-
-   - H5PLUGIN-filter_plugin
-   - H5TEST-flush2
-   - H5TEST-testhdf5-base
-   - MPI_TEST_t_filters_parallel
-
-  Also, NVHPC will fail to compile the test/tselect.c test file with a compiler error of `use of undefined value` when the optimization level is -O2 or higher.
-
-   This is confirmed to be a [bug in the nvc compiler](https://forums.developer.nvidia.com/t/hdf5-no-longer-compiles-with-nv-23-9/269045) that has been fixed as of 23.11. If you are using an affected version of the NVidia compiler, the work-around is to set the optimization level to -O1.
-
 - CMake files do not behave correctly with paths containing spaces
 
    Do not use spaces in paths because the required escaping for handling spaces results in very complex and fragile build files.
@@ -344,12 +281,8 @@ Current test results are available [here](https://my.cdash.org/index.php?project
 
    The subsetting option works correctly in serial `h5diff`.
 
-- Several tests currently fail on certain platforms:
-   MPI_TEST-t_bigio fails with spectrum-mpi on ppc64le platforms.
-
-   MPI_TEST-t_subfiling_vfd and MPI_TEST_EXAMPLES-ph5_subfiling fail with
-   cray-mpich on theta and with XL compilers on ppc64le platforms.
-
 - File space may not be released when overwriting or deleting certain nested variable length or reference types.
 
-Known problems in previous releases can be found in the HISTORY*.txt files in the HDF5 source. Please report any new problems found to <a href="mailto:help@hdfgroup.org">help@hdfgroup.org</a>.
+Known problems in previous releases can be found in
+[HISTORY-2.X.md](HISTORY-2.X.md). Report new upstream HDF5 problems through
+the [HDF Help Desk](https://help.hdfgroup.org/).

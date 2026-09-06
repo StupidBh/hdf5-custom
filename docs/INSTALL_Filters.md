@@ -68,7 +68,7 @@ Additional CMake options for controlling how specific filters are found/used inc
   - `LIBAEC_TGZ_NAME` (`<filename>` Default: `libaec-<libaec_version>.tar.gz`) - Specifies the base filename of a compressed file containing the libaec source code which will be used when `HDF5_ALLOW_EXTERNAL_SUPPORT` is `TGZ` and `SZIP_USE_EXTERNAL` is `ON`. Combined with either `TGZPATH` or `LIBAEC_TGZ_ORIGPATH`, depending on the value of `LIBAEC_USE_LOCALCONTENT`, to form a full path to the compressed file.
   - `LIBAEC_TGZ_ORIGPATH` (`<url>` Default: `https://github.com/MathisRosenhauer/libaec/releases/download/v<libaec_version>`) - Specifies the URL to retrieve a compressed file containing the libaec source code from when `HDF5_ALLOW_EXTERNAL_SUPPORT` is `TGZ`, `SZIP_USE_EXTERNAL` is `ON` and `LIBAEC_USE_LOCALCONTENT` is `OFF`. Combined with `LIBAEC_TGZ_NAME` to form a full URL for the download.
   - `LIBAEC_PACKAGE_NAME` (`<string>` Default: `libaec`) - The package name to use when locating libaec libraries with CMake's [find_package()](https://cmake.org/cmake/help/latest/command/find_package.html). Usually should be left to the default value but may need to be modified in rare circumstances.
-  - `HDF5_ENABLE_SZIP_ENCODING` (`ON`/`OFF` Default: `ON`) - Specifies whether encoding should be enabled for the HDF5 szip filter. Deprecated option that is no longer used.
+  - `HDF5_ENABLE_SZIP_ENCODING` (`ON`/`OFF` Default: `ON`) - Controls whether encoding is enabled for the HDF5 SZIP-compatible filter when libaec/SZIP support is available.
 
 ### HDF5 filter plugins options
 

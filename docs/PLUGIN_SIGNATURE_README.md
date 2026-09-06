@@ -106,8 +106,8 @@ h5sign -p my_plugin.so -k my_private_key.pem -v
 ```
 
 The tool appends the RSA signature and a 14-byte footer to the end of the
-plugin file. The binary loader ignores trailing data, so the signed plugin
-loads normally on all platforms.
+plugin file. The binary loaders on the supported Windows and Linux platforms
+accept the trailing signature data.
 
 ### Re-signing a Plugin
 
@@ -162,13 +162,11 @@ to revoke. Lines starting with `#` are comments; empty lines are ignored.
 Note: the revocation entry is **not** the raw signature itself hex-encoded.
 It is the SHA-256 digest of the raw signature bytes, represented as 64 hex
 characters (32 bytes). This provides a fixed-length identifier regardless of
-RSA key size. To compute the hash for a signed plugin:
-
-```bash
-# Extract the raw signature, then hash it
-h5sign -p my_plugin.so -v   # displays signature details
-# Use OpenSSL to compute SHA-256 of the raw signature bytes
-```
+RSA key size. `h5sign` signs or re-signs a plugin; it does not extract an
+existing raw signature. This repository does not provide a
+signature-extraction command. To create a revocation identifier, extract the
+signature bytes according to the footer format below with a binary-aware tool,
+then compute their SHA-256 digest.
 
 ```text
 # Example revoked_signatures.txt
@@ -232,6 +230,8 @@ Signed plugins have this structure:
 +-----------------------------+
 ```
 
+The complete signed plugin is limited to 1 GiB by the signer and verifier.
+
 ### Supported Algorithms
 
 | Algorithm | Padding | Security Level |
@@ -245,9 +245,9 @@ Signed plugins have this structure:
 
 ### Performance
 
-Verification time is dominated by I/O to read the plugin file for hashing,
-plus ~1-5ms for the RSA operation. Plugins are cached by the HDF5 plugin
-loader, so each plugin is verified only once per process.
+Verification time is dominated by reading and hashing the plugin plus the RSA
+operation. Plugins are cached by the HDF5 plugin loader, so each plugin is
+verified only once per process.
 
 ---
 
@@ -264,7 +264,8 @@ A: Yes. Users only need your single public key.
 A: HDF5 refuses to load the plugin and returns an error.
 
 **Q: Does signing increase plugin size?**
-A: Minimally — 256-512 bytes for the signature plus 14 bytes for the footer.
+A: Yes. The increase is the RSA signature size determined by the key, plus the
+14-byte footer.
 
 **Q: Are signatures platform-specific?**
 A: No. A signed plugin retains its signature across platforms (though the
@@ -282,6 +283,5 @@ A: Yes. All operations are local; no internet required.
 
 ---
 
-**Document Version**: 1.2
-**Last Updated**: 2026-03-20
-**HDF5 Version**: 2.2.0+
+The CMake cache variables for this feature are also listed in
+[INSTALL_CMake_options.md](INSTALL_CMake_options.md).

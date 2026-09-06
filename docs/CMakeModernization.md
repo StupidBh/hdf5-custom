@@ -154,7 +154,7 @@ and `utils/`. Tests and examples move only after the libraries they consume are 
 
 ### 5. Modernize dependencies
 
-Move zlib, zlib-ng, libaec, MPI, threads, HDFS, CURL/ROS3, plugins, and VOL connectors to imported targets and
+Move zlib, zlib-ng, libaec, MPI, threads, HDFS, AWS CRT/ROS3, plugins, and VOL connectors to imported targets and
 modern FetchContent flows. Preserve system-vs-bundled selection, offline/local archives, target aliases, package
 exports, and install ownership.
 

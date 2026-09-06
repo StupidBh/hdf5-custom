@@ -117,8 +117,8 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DBUILD_SHARED_LIBS=ON \
       -DBUILD_TESTING=ON \
       ..
-cmake --build . --config Release
-ctest . -C Release
+cmake --build . --config Release --parallel 6
+ctest . -C Release --output-on-failure -j 6
 cmake --install . --prefix /path/to/install
 ```
 
@@ -236,7 +236,6 @@ Example for a parallel build on an HPC system:
 
 ```bash
 cmake \
-  -C ../hdf5-<version>/config/cmake/cacheinit.cmake \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=/install/path \
   -DHDF5_ENABLE_PARALLEL:BOOL=ON \
@@ -254,7 +253,7 @@ cmake \
 ### 5.3. Build
 
 ```bash
-cmake --build . --config Release -j 8
+cmake --build . --config Release --parallel 6
 ```
 
 ### 5.4. Test
@@ -340,8 +339,8 @@ this test is slow.
 Controls test thoroughness:
 
 ```bash
-export HDF5_TEST_EXPRESS=3    # Quick tests (default)
-export HDF5_TEST_EXPRESS=0    # Exhaustive tests
+cmake -S <source> -B <build> -DHDF_TEST_EXPRESS=3  # Quick tests (default)
+cmake -S <source> -B <build> -DHDF_TEST_EXPRESS=0  # Exhaustive tests
 ```
 
 #### Test Timeout
@@ -379,7 +378,7 @@ ctest -R "H5TEST"              # Core library tests
 ctest -R "MPI_TEST"            # Parallel/MPI tests
 ctest -R "CPP"                 # C++ tests
 ctest -E "MPI_TEST"            # Exclude parallel tests
-ctest --parallel 4             # Run 4 tests in parallel
+ctest --output-on-failure -j 6 # Run 6 tests in parallel
 ```
 
 ---

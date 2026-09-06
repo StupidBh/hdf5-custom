@@ -2,13 +2,11 @@
 
 ## Intro
 
-HDF5 can be configured using CMake.
+This fork is configured with CMake only and requires CMake 4.0 or later.
 
-Configuration information for the HDF5 library and tools is
-specific to the repository folders. Each subdirectory of the project
-has its own CMake build and test files. Basic library configuration will generally
-be found in the root's `CMakeLists.txt` with support for macros and settings
-in this config directory.
+Configuration information for the HDF5 library and tools is distributed across
+the root and subdirectory `CMakeLists.txt` files. Shared modules, templates,
+compiler settings, and installation support live in this directory.
 
 
 This directory contains a few important things:

@@ -25,19 +25,15 @@ on the system.
 I/O capabilities should be enabled. Note that the "native" HDF5 VOL connector doesn't support
 this functionality, so these tests are directed towards VOL connectors that do.
 
-`HDF5_TEST_ENABLE_DRIVER` (Default: `OFF`) - Determines whether the API test driver program should
+`HDF5_TEST_API_ENABLE_DRIVER` (Default: `OFF`) - Determines whether the API test driver program should
 be built. This driver program is useful when a VOL connector relies upon a server executable
 (as well as possible additional executables) in order to function. The driver program can be
 supplied with a server executable and server/client arguments to use when running the API
 tests.
 
-`HDF5_TEST_API_SERVER` (Default: empty string) - If `HDF5_TEST_ENABLE_DRIVER` is set to `ON`, this
+`HDF5_TEST_API_SERVER` (Default: empty string) - If `HDF5_TEST_API_ENABLE_DRIVER` is set to `ON`, this
 option should be edited to point to the server executable that the driver program should attempt
 to launch before running the API tests.
-
-### Autotools
-
-Currently unsupported
 
 ### Usage
 
@@ -64,27 +60,9 @@ and would therefore set:
 `HDF5_PLUGIN_PATH` - This environment variable should be set to the directory that contains the built
 library for the VOL connector to be used.
 
-Once these are set, the HDF5 API tests will attempt to automatically load the specified VOL connector
-and use it when running tests. If HDF5 is unable to locate or load the VOL connector specified, it
-will fall back to running the tests with the native HDF5 VOL connector and an error similar to the
-following will appear in the test output:
-
-    HDF5-DIAG: Error detected in HDF5 (X.XX.X) MPI-process 0:
-      #000: /home/user/git/hdf5/src/H5.c line 1010 in H5open(): library initialization failed
-        major: Function entry/exit
-        minor: Unable to initialize object
-      #001: /home/user/git/hdf5/src/H5.c line 277 in H5_init_library(): unable to initialize vol interface
-        major: Function entry/exit
-        minor: Unable to initialize object
-      #002: /home/user/git/hdf5/src/H5VLint.c line 199 in H5VL_init_phase2(): unable to set default VOL connector
-        major: Virtual Object Layer
-        minor: Can't set value
-      #003: /home/user/git/hdf5/src/H5VLint.c line 429 in H5VL__set_def_conn(): can't register connector
-        major: Virtual Object Layer
-        minor: Unable to register new ID
-      #004: /home/user/git/hdf5/src/H5VLint.c line 1321 in H5VL__register_connector_by_name(): unable to load VOL connector
-        major: Virtual Object Layer
-        minor: Unable to initialize object
+Once these are set, the HDF5 API tests will attempt to load and use the specified VOL connector. If the
+connector cannot be located or loaded, the test fails instead of silently running against the native
+connector. The HDF5 diagnostic identifies the connector initialization failure.
 
 ### Help and Support
 

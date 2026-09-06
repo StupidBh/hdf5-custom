@@ -9,8 +9,13 @@
 
 ## Introduction
 
-The [HDF5 library version 2.0.0](https://www.hdfgroup.org/2025/11/10/release-of-hdf5-2-0-0-newsletter-207/) was released on **November 10, 2025**.
+The HDF5 2.x release history records version 2.0.0 on **November 11, 2025**.
 This guide is written for “ordinary” HDF5 users: people who have real applications and workflows, want the upgrade to be boring, and mainly need clarity on **risk, compatibility, and a practical upgrade plan**.
+
+This is a historical migration guide for the 2.0 transition. The current
+source tree identifies itself as 2.3.0 and requires CMake 4.0; current build
+options and supported platforms are documented in
+[INSTALL_CMake.md](INSTALL_CMake.md).
 
 With few exceptions, the recommendations in this guide apply to the 1.x family of releases. However, if you are contemplating an HDF5 library upgrade, our recommendation is to move directly to 2.0.0 to take advantage of the latest features and improvements. 
 
@@ -191,9 +196,9 @@ The HDF5 download page also gives an example of building a 1.10-era application 
 **CMake example:**
 
 ```cmake
-find_package(HDF5 REQUIRED COMPONENTS C)
+find_package(HDF5 CONFIG REQUIRED COMPONENTS C shared)
 add_executable(my_app main.c)
-target_link_libraries(my_app PRIVATE HDF5::HDF5)
+target_link_libraries(my_app PRIVATE ${HDF5_C_SHARED_LIBRARY})
 
 # If your codebase expects 1.14 APIs:
 target_compile_definitions(my_app PRIVATE H5_USE_114_API)

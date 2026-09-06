@@ -45,9 +45,8 @@ dedicated to making the contribution process enjoyable and straightforward.
 Before you begin, ensure your development machine has:
 
 ### Required Tools
-* **A C11-compatible C compiler** (MSVC on Windows is supported).
-* **A build system:** **CMake** is required.
-* **Perl:** Needed to run build and test scripts, even on Windows.
+* **A C17-compatible C compiler:** MSVC on Windows or GNU C on Linux.
+* **CMake 4.0 or later:** CMake is the only supported build system.
 * **Git:** For version control.
   - If you are new to Git and GitHub, we encourage you to check out
     the [GitHub tutorial](https://guides.github.com/activities/hello-world/), which takes about 10 minutes to complete.
@@ -59,11 +58,12 @@ Before you begin, ensure your development machine has:
 
 ### Optional Components
 Depending on which features you want to build or enable:
-* A _C++11_-compatible compiler for the C++ wrappers.
+* A C++20-compatible compiler for the opt-in C++ wrappers.
+* Perl when regenerating source headers or running tests that require its scripts.
 * `flex`/`lex` and `bison`/`yacc` if you want to modify the high-level parsers.
 * Development versions of **zlib** and **szip** for compression support.
 * An MPI-3 compatible MPI library for parallel HDF5 development.
-* `curl` and other components for the read-only S3 VFD.
+* AWS CRT libraries for the read-only S3 (ROS3) VFD.
 
 ---
 
@@ -72,8 +72,8 @@ Depending on which features you want to build or enable:
 The HDF5 source code is hosted on GitHub:
 
 ```bash
-git clone https://github.com/HDFGroup/hdf5.git
-cd hdf5
+git clone https://github.com/StupidBh/hdf5-custom.git
+cd hdf5-custom
 ```
 
 ---
@@ -84,21 +84,19 @@ cd hdf5
 
 CMake is the required build system for all platforms:
 
-1. **Create a build directory:**
-   ```bash
-   mkdir build && cd build
-   ```
+Configure and build out of source. On Linux/GNU, for example:
 
-2. **Configure the build:**
-   ```bash
-   cmake -G "Unix Makefiles" -DHDF5_ENABLE_DEVELOPER_MODE=ON ..
-   ```
-   The `HDF5_ENABLE_DEVELOPER_MODE` option enables debug symbols, warnings as errors, and other developer-friendly settings.
+```bash
+cmake -S . -B build -G Ninja -DHDF5_ENABLE_DEV_WARNINGS=ON
+cmake --build build --parallel 6
+ctest --test-dir build --output-on-failure -j 6
+```
 
-3. **Build the library:**
-   ```bash
-   make
-   ```
+On Windows, use the Visual Studio 18 2026 x64 workflow documented in
+[`docs/INSTALL_CMake.md`](docs/INSTALL_CMake.md). There is no
+`HDF5_ENABLE_DEVELOPER_MODE` option. Single-config generators can use
+`CMAKE_BUILD_TYPE=Developer`, but the default Visual Studio configuration list
+does not include `Developer`.
 
 ### Developer Build Tips
 
@@ -106,7 +104,7 @@ CMake is the required build system for all platforms:
                        internal memory pools that can hide memory issues.
 * **Developer Warnings:** Enable extra warnings with `HDF5_ENABLE_DEV_WARNINGS:BOOL=ON` (generates significant
                           output but can be useful).
-* **Warnings as Errors:** The CI system builds with `-Werror`, so fix all compiler warnings before submitting pull requests.
+* **Warnings as Errors:** Use `HDF5_ENABLE_WARNINGS_AS_ERRORS=ON` for a strict local build and fix warnings before submitting pull requests.
 
 ## Source Code Overview
 

@@ -180,38 +180,11 @@ For compression dependencies and filter plugins, see
 
 ## Instrumentation
 
-### MSVC AddressSanitizer
-
-AddressSanitizer is the only retained compiler sanitizer configuration. It requires Windows x64/MSVC:
-
-```powershell
-$env:CL = "/utf-8"
-cmake -S . -B build-msvc18-asan -G "Visual Studio 18 2026" -A x64 -DHDF5_ENABLE_SANITIZERS=ON -DHDF5_USE_SANITIZER=Address
-cmake --build build-msvc18-asan --config Debug --parallel 6
-ctest --test-dir build-msvc18-asan -C Debug --output-on-failure -j 6
-```
-
-### GCC coverage
-
-Coverage is available only on Linux with GCC and requires `lcov` and
-`genhtml`. Use a Debug build and enable both the HDF5 integration option and the coverage module option:
-
-```bash
-cmake -S . -B build-gcc-coverage -G Ninja \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_C_COMPILER=gcc \
-  -DCMAKE_CXX_COMPILER=g++ \
-  -DHDF5_ENABLE_COVERAGE=ON \
-  -DCODE_COVERAGE=ON
-cmake --build build-gcc-coverage --parallel 6
-ctest --test-dir build-gcc-coverage --output-on-failure -j 6
-```
-
-The build instruments HDF5 targets and test execution writes GCC coverage
-counter data beside their object files. The top-level HDF5 build provides the
-`ccov-clean` target to reset those counters, but it does not provide an HTML
-report target. Use an external gcov/lcov workflow when a report is required.
-See [the instrumentation README](../config/sanitizer/README.md) for details.
+The retained sanitizer integration is AddressSanitizer on Windows x64/MSVC.
+Coverage instrumentation is available on Linux/GNU with gcov, lcov, and
+genhtml. The required cache options, exact commands, report limitations, and
+developer analyzer helpers are maintained in
+[the instrumentation README](../config/sanitizer/README.md).
 
 `HDF5_ENABLE_DEV_WARNINGS=ON` enables the repository's stricter compiler diagnostics. There is no
 `HDF5_ENABLE_DEVELOPER_MODE` option and the default Visual Studio configuration list does not contain a `Developer`

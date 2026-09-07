@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-07
+Last updated: 2026-09-08
 
 ## Purpose
 
@@ -29,22 +29,23 @@ The approved Phase 2 language-build direction is defined in
 It raises project-owned build modes to C17/C++20 while preserving the current
 public-header consumer baselines. Its execution evidence is recorded in
 [`docs/refactoring/C17Cpp20BuildBaselineResults.md`](docs/refactoring/C17Cpp20BuildBaselineResults.md).
-The active direction is roadmap Stage 4, defined in
+The most recently completed direction is roadmap Stage 4, defined in
 [`docs/refactoring/NativeCppHlRemoval.md`](docs/refactoring/NativeCppHlRemoval.md).
 It removes the native `c++/` tree, the complete `hl/` tree, and all related
 product contracts while preserving the retained core C product and the two
 required business profiles. The user approved implementation on 2026-09-06,
 and Work Package 4A has frozen the pre-removal contract at `72e36a522`, with
 pre-removal stabilization through `3118d8c2c`. Work Package 4B removed the
-    complete HL product at `c62d134e5`, and Work Package 4C removed the native
-    C++ product at `3dc988a48`. Work Package 4D normalized package and consumer
-    contracts at `81dff5168`; Work Package 4E is the next continuation. Its
+complete HL product at `c62d134e5`, and Work Package 4C removed the native C++
+product at `3dc988a48`. Work Package 4D normalized package and consumer
+contracts at `81dff5168`; Work Packages 4E and 4F completed the full product
+matrix and residual audit at evidence anchor `f120c1c95`. Its
 execution record is
 [`docs/refactoring/NativeCppHlRemovalResults.md`](docs/refactoring/NativeCppHlRemovalResults.md).
 The HighFive dependency input is recorded in
 [`docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`](docs/refactoring/HighFiveHDF5ApiDependencyAudit.md);
-The workspace `highfive/` header copy is an audit input but is not wired into
-the build, install, export, or package.
+the workspace `highfive/` header copy was tracked separately at `c461ae3e8` but
+is not wired into the HDF5 build, install, export, or native binary package.
 The completed supported-platform direction intentionally changed the
 compatibility contract by first reducing the CMake matrix and then removing
 source-level support outside Windows/MSVC and Linux/GCC. The underlying target
@@ -63,21 +64,21 @@ completed supported-platform reduction plan.
 | 1 | Raise project organization and build entry points to CMake 4.0 and mechanically reject target-system/compiler pairs other than Windows/MSVC and Linux/GNU. | Complete | Yes |
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
-| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Packages 4A through 4D complete, Work Package 4E next | No |
+| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
 | 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
 Roadmap Stage 4 is an intentional compatibility break only for the removed
-native C++ and HL products. It does not authorize a core C API, ABI, installed-
-header, retained-tool, or file-format change, and it does not authorize
-HighFive integration. All later stages are cancelled from the active roadmap
-and have no approved scope.
+native C++ and HL products. It did not change the core C API, ABI, installed-
+header declarations, retained tools, or file format, and it did not integrate
+HighFive into HDF5 products. All later stages are cancelled from the active
+roadmap and have no approved scope.
 
-## Active Direction
+## Last Completed Direction
 
 - Direction: Roadmap Stage 4 native C++ and HL product removal
-- Status: In progress; Work Packages 4A through 4D complete, Work Package 4E next
+- Status: Complete; Work Packages 4A through 4F passed
 - Detailed plan: `docs/refactoring/NativeCppHlRemoval.md`
 - Execution results: `docs/refactoring/NativeCppHlRemovalResults.md`
 - HighFive audit: `docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`
@@ -85,15 +86,19 @@ and have no approved scope.
   manifest `25c7d5e69a69c446b8024941465449b51c9a62c2eb3ce2f981babd9fa6137910`;
   compared with upstream commit
   `959ec30c5cee48ff4dbb458b9f233beded708a36`
-- HighFive integration state: workspace headers present and untracked at audit
-  time; not wired into CMake, installed, exported, or packaged
+- HighFive integration state: workspace headers were untracked at audit time
+  and tracked separately at `c461ae3e8`; they are not wired into HDF5 CMake,
+  installed, exported, or included in native binary packages
 - Planning source anchor: `55a930c0d`
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Implementation anchor: `81dff5168` for roadmap Stage 4 Work Package 4D
+- Implementation anchor: `81dff5168` for the completed product contract
+- Product-matrix source anchor: `55bad410b`
+- Post-matrix audit-input anchor: `c461ae3e8`
+- Validation and closeout evidence anchor: `f120c1c95`
 - Retained contract: freeze core C installed headers, symbols, package paths,
-  retained tools, and file-format behavior at the future execution baseline
+  retained tools, and file-format behavior at the pre-removal execution baseline
 - Removed contract: native C++, HL C/C++, `h5c++`, and HL-owned `h5watch`
 - Acceptance Profile A: shared-only map, SZIP, thread safety, tools, zlib, and
   parallel; record the currently required `HDF5_ALLOW_UNSUPPORTED=ON`
@@ -466,19 +471,25 @@ implementation anchor `0b9e21c34` and is detailed in
   install-tree, `add_subdirectory()`, local FetchContent, retained C, and
   HighFive-style consumers compile, link, and run on both validators. Negative
   target, variable, metadata, wrapper, tool, and artifact checks also pass.
+- Completed roadmap Stage 4 Work Package 4E from clean source anchor
+  `55bad410b`. Default, shared Profile A, and static Profile B complete builds,
+  full suites, installs, and binary packages ran on Windows/MSVC and Linux/GNU
+  at `HDF_TEST_EXPRESS=3` and at most four jobs. Linux passed 2,735, 3,153, and
+  3,110 enabled tests; Windows default passed 2,733, and the two profiles had
+  only their frozen MS-MPI failures and Profile A hang. Unix Makefiles,
+  retained feature, Map, cross-read, package, and HighFive consumer gates pass.
+- Completed roadmap Stage 4 Work Package 4F at evidence anchor `f120c1c95`.
+  Windows and Linux core C symbol sets match the pre-removal freeze, core C and
+  cross-platform sources are unchanged, all 147 HighFive dependencies remain,
+  and install, target, tool, test, and residual deltas contain only approved
+  native C++/HL removals. No unresolved active contract reference remains.
 
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
-- Execute roadmap Stage 4 Work Package 4E: run clean default, Profile A, and
-  Profile B Release matrices on both retained validators, plus the Linux Unix
-  Makefiles row and focused retained feature, consumer, package, wrapper, MPI,
-  filter, map, file-read, and HighFive checks.
-- Continue with Work Package 4F only after 4E reaches its own gate.
-  Work Package 4F must classify inherited historical and technical prose that
-  still mentions removed HL interfaces; those terms are not active product
-  contracts after 4B.
+- No roadmap Stage 4 implementation, validation, audit, or documentation gate
+  remains.
 - Roadmap Stages 5 through 7 are cancelled from the active roadmap and remain
   future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
@@ -486,17 +497,16 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The immediate continuation point is Work Package 4E of the approved
-[roadmap Stage 4 native C++ and HL product-removal plan](docs/refactoring/NativeCppHlRemoval.md).
-First confirm Work Package 4D implementation anchor `81dff5168` and a clean
-tracked state. Then execute every required default/Profile A/Profile B row from
-clean out-of-source trees at `HDF_TEST_EXPRESS=3`, with an aggregate maximum of
-four jobs. Do not remove or alter `src/H5HL*`; preserve retained tools, core C
-API/ABI, package routes, and file-format behavior.
+There is no active roadmap continuation. Roadmap Stage 4 is complete at product
+implementation anchor `81dff5168` and validation evidence anchor `f120c1c95`.
+Roadmap Stages 5 through 7 remain future plan to be determined and require a
+new explicit scope before work begins.
 
-Do not wire HighFive into the HDF5 build/package or revive the deleted C++20
-internal-modernization plan as part of Stage 4. Roadmap Stages 5 through 7 have
-no active scope.
+The separately paused CMake modernization may resume only after explicit
+direction, from progress anchor `0b9e21c34` and the continuation recorded in
+[`docs/CMakeModernizationProgress.md`](docs/CMakeModernizationProgress.md). Do
+not infer HighFive integration or revive the deleted C++20 internal-
+modernization plan from this completed stage.
 
 Supported-platform Stage 3 is complete at implementation anchor `74288cbaa`;
 its completion review is closed at `7e50c3c17`. Supported-platform Stage 4 Work

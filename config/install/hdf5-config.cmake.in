@@ -28,6 +28,16 @@ set (${HDF5_PACKAGE_NAME}_VALID_COMPONENTS
     C
     Tools
 )
+foreach (requested_component IN LISTS ${HDF5_PACKAGE_NAME}_FIND_COMPONENTS)
+  if (NOT requested_component IN_LIST ${HDF5_PACKAGE_NAME}_VALID_COMPONENTS)
+    set (${HDF5_PACKAGE_NAME}_FOUND FALSE)
+    set (${HDF5_PACKAGE_NAME}_NOT_FOUND_MESSAGE
+        "Unsupported HDF5 component '${requested_component}'. Valid components: ${${HDF5_PACKAGE_NAME}_VALID_COMPONENTS}"
+    )
+    return ()
+  endif ()
+endforeach ()
+unset (requested_component)
 
 set (${HDF5_PACKAGE_NAME}_BUILD_MODE       @HDF_CFG_NAME@)
 
@@ -225,6 +235,7 @@ foreach (comp IN LISTS ${HDF5_PACKAGE_NAME}_FIND_COMPONENTS)
 endforeach ()
 foreach (libtype IN LISTS ${HDF5_PACKAGE_NAME}_LIB_TYPE)
   foreach (comp IN LISTS ${HDF5_PACKAGE_NAME}_FIND_COMPONENTS)
+    unset (hdf5_comp)
     if (comp STREQUAL "C")
       set (hdf5_comp "hdf5")
     elseif (comp STREQUAL "Tools")

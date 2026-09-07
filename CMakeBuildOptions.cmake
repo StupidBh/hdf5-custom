@@ -1,5 +1,14 @@
 # Put all top-level build options into one place
 # This file will be included at the beginning of the root CMakeLists.txt
+foreach (removed_product_option IN ITEMS HDF5_BUILD_CPP_LIB HDF5_BUILD_HL_LIB)
+  if (DEFINED ${removed_product_option})
+    message (FATAL_ERROR
+      "${removed_product_option} was removed with the native C++ and high-level products; remove this option"
+    )
+  endif ()
+endforeach ()
+unset (removed_product_option)
+
 option (HDF5_USE_FOLDERS "Enable folder grouping of projects in IDEs." ON)
 mark_as_advanced (HDF5_USE_FOLDERS)
 

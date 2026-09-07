@@ -35,8 +35,8 @@ Navigate back: \ref index "Main" / \ref GettingStarted / \ref LearnBasics
 The HDF5 library provides several interfaces, or APIs. These APIs provide routines for creating,
 accessing, and manipulating HDF5 files and objects.
 
-The library itself is implemented in C and provides an optional C++ wrapper. This tutorial discusses the use
-of the C functions.
+The library is implemented in C. This tutorial discusses the use of its C
+functions.
 
 All C routines in the HDF5 library begin with a prefix of the form H5*, where * is one or two uppercase
 letters indicating the type of object on which the function operates.

@@ -22,7 +22,7 @@ if (binary_in_source)
 endif ()
 
 if (NOT DEFINED HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS)
-  set (HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS 23)
+  set (HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS 2)
 endif ()
 if (WIN32)
   set (cxx20_flag_regex "[-/]std:c\\+\\+20")
@@ -59,6 +59,9 @@ function (_hdf5_cxx_standard_configure source build standard option_name expect_
   list (APPEND configure_command -DCMAKE_BUILD_TYPE=Release -DHDF_TEST_EXPRESS=3)
   if (NOT option_name STREQUAL "NONE")
     list (APPEND configure_command "-D${option_name}=ON")
+  endif ()
+  if (option_name STREQUAL "HDF5_TEST_API_ENABLE_DRIVER")
+    list (APPEND configure_command "-DHDF5_TEST_API_SERVER=${CMAKE_COMMAND}")
   endif ()
   if (NOT standard STREQUAL "DEFAULT")
     list (APPEND configure_command "-DCMAKE_CXX_STANDARD=${standard}")
@@ -154,6 +157,9 @@ function (_hdf5_cxx_standard_capture build_dir capture_name expected_standard fl
     endif ()
 
     string (JSON target_name GET "${target_json}" name)
+    if (NOT target_name MATCHES "^h5_api_test_driver(_process)?$")
+      continue ()
+    endif ()
     string (JSON compile_group_count LENGTH "${target_json}" compileGroups)
     if (NOT compile_group_count)
       continue ()
@@ -230,21 +236,6 @@ function (_hdf5_cxx_standard_capture build_dir capture_name expected_standard fl
     list (APPEND contract_records "export|${relative_export}|sha256=${export_hash}")
   endforeach ()
 
-  set (settings_file "${build_dir}/src/libhdf5.settings")
-  file (STRINGS "${settings_file}" standard_report REGEX "^[ ]+C\\+\\+ Standard:")
-  if (NOT standard_report MATCHES "C\\+\\+ Standard: C\\+\\+${expected_standard}$")
-    message (FATAL_ERROR "Unexpected C++ standard build report: ${standard_report}")
-  endif ()
-  file (STRINGS "${settings_file}" reported_cxxflags REGEX "^[ ]+C\\+\\+ Flags:")
-  if (reported_cxxflags MATCHES "[-/]std[:=]")
-    message (FATAL_ERROR "Raw standard option remains in reported C++ flags: ${reported_cxxflags}")
-  endif ()
-  file (READ "${build_dir}/src/H5build_settings.c" embedded_settings)
-  if (NOT embedded_settings MATCHES "C\\+\\+ Standard: C\\+\\+${expected_standard}")
-    message (FATAL_ERROR "Embedded build settings omit C++${expected_standard}")
-  endif ()
-  list (APPEND contract_records "report|${standard_report}")
-
   file (SHA256 "${build_dir}/src/H5pubconf.h" generated_header_hash)
   list (APPEND contract_records "header|H5pubconf.h|sha256=${generated_header_hash}")
 
@@ -269,13 +260,13 @@ endfunction ()
 
 _hdf5_cxx_standard_prepare_case (default default_dir)
 _hdf5_cxx_standard_configure (
-  "${source_dir}" "${default_dir}" DEFAULT HDF5_BUILD_CPP_LIB TRUE ""
+  "${source_dir}" "${default_dir}" DEFAULT HDF5_TEST_API_ENABLE_DRIVER TRUE ""
 )
 _hdf5_cxx_standard_capture (
   "${default_dir}" default-first 20 "${cxx20_flag_regex}" default_first
 )
 _hdf5_cxx_standard_configure (
-  "${source_dir}" "${default_dir}" DEFAULT HDF5_BUILD_CPP_LIB TRUE ""
+  "${source_dir}" "${default_dir}" DEFAULT HDF5_TEST_API_ENABLE_DRIVER TRUE ""
 )
 _hdf5_cxx_standard_capture (
   "${default_dir}" default-second 20 "${cxx20_flag_regex}" default_second
@@ -284,7 +275,7 @@ _hdf5_cxx_standard_compare ("${default_first}" "${default_second}" "first/repeat
 
 _hdf5_cxx_standard_prepare_case (later later_dir)
 _hdf5_cxx_standard_configure (
-  "${source_dir}" "${later_dir}" 23 HDF5_BUILD_CPP_LIB TRUE ""
+  "${source_dir}" "${later_dir}" 23 HDF5_TEST_API_ENABLE_DRIVER TRUE ""
 )
 _hdf5_cxx_standard_capture ("${later_dir}" later 23 "${cxx23_flag_regex}" later_contract)
 
@@ -299,18 +290,11 @@ endforeach ()
 foreach (lower_standard IN ITEMS 98 11 14 17)
   _hdf5_cxx_standard_prepare_case ("lower-${lower_standard}" lower_dir)
   _hdf5_cxx_standard_configure (
-    "${source_dir}" "${lower_dir}" "${lower_standard}" HDF5_BUILD_CPP_LIB FALSE
+    "${source_dir}" "${lower_dir}" "${lower_standard}" HDF5_TEST_API_ENABLE_DRIVER FALSE
     "requires C\\+\\+20 or later.*CMAKE_CXX_STANDARD=${lower_standard}"
-  )
-
-  _hdf5_cxx_standard_prepare_case ("examples-lower-${lower_standard}" examples_lower_dir)
-  _hdf5_cxx_standard_configure (
-    "${source_dir}/HDF5Examples" "${examples_lower_dir}" "${lower_standard}"
-    H5EXAMPLE_BUILD_CXX FALSE
-    "examples require C\\+\\+20 or later.*CMAKE_CXX_STANDARD=${lower_standard}"
   )
 endforeach ()
 
 message (STATUS
-  "All HDF5 C++ standard cases passed (${HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS} C++ compile groups)"
+  "All retained HDF5 C++ standard cases passed (${HDF5_CXX_STANDARD_TEST_EXPECTED_GROUPS} C++ compile groups)"
 )

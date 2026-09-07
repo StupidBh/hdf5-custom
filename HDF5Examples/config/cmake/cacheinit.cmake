@@ -12,8 +12,6 @@ set (H5EXAMPLE_BUILD_TESTING ON CACHE BOOL "Build HDF5 Unit Testing" FORCE)
 
 
 
-#set (H5EXAMPLE_BUILD_CXX ON CACHE BOOL "Build C++ support" FORCE)
-
 #set (H5EXAMPLE_BUILD_FILTERS ON CACHE BOOL "Build filter support" FORCE)
 
 

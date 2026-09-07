@@ -31,18 +31,10 @@ macro (BASIC_SETTINGS varname)
     set (CMAKE_MFC_FLAG 0)
   endif ()
 
-  if (H5EXAMPLE_BUILD_CXX)
-    hdf5_configure_cxx_language_standard ()
-    ENABLE_LANGUAGE (CXX)
-    hdf5_validate_platform_support (LANGUAGES CXX)
-  endif ()
-
   #-----------------------------------------------------------------------------
   # Compiler specific flags : Shouldn't there be compiler tests for these
   #-----------------------------------------------------------------------------
-  if (CMAKE_ANSI_CFLAGS AND
-      (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR
-       (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")))
+  if (CMAKE_ANSI_CFLAGS AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
     separate_arguments (_hdf5_example_ansi_cflags NATIVE_COMMAND "${CMAKE_ANSI_CFLAGS}")
     foreach (_hdf5_example_ansi_cflag IN LISTS _hdf5_example_ansi_cflags)
       if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -51,14 +43,6 @@ macro (BASIC_SETTINGS varname)
         )
         target_link_options (hdf5_examples_platform INTERFACE
             "$<$<LINK_LANGUAGE:C>:${_hdf5_example_ansi_cflag}>"
-        )
-      endif ()
-      if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options (hdf5_examples_platform INTERFACE
-            "$<$<COMPILE_LANGUAGE:CXX>:${_hdf5_example_ansi_cflag}>"
-        )
-        target_link_options (hdf5_examples_platform INTERFACE
-            "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_ansi_cflag}>"
         )
       endif ()
     endforeach ()
@@ -78,15 +62,6 @@ macro (BASIC_SETTINGS varname)
         "$<$<LINK_LANGUAGE:C>:-fmessage-length=0>"
     )
   endif ()
-  if (CMAKE_CXX_COMPILER_LOADED AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options (hdf5_examples_platform INTERFACE
-        "$<$<COMPILE_LANGUAGE:CXX>:-fmessage-length=0>"
-    )
-    target_link_options (hdf5_examples_platform INTERFACE
-        "$<$<LINK_LANGUAGE:CXX>:-fmessage-length=0>"
-    )
-  endif ()
-
   #-----------------------------------------------------------------------------
   # Option to allow the user to disable compiler warnings
   #-----------------------------------------------------------------------------
@@ -96,29 +71,19 @@ macro (BASIC_SETTINGS varname)
       # MSVC diagnoses conflicting warning levels even when /w is last.
       string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
       set (_hdf5_example_c_warning_suppression "/w")
-      if (CMAKE_CXX_COMPILER_LOADED)
-        string (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        set (_hdf5_example_cxx_warning_suppression "/w")
-      endif ()
     else ()
       set (_hdf5_example_c_warning_suppression "-w")
-      if (CMAKE_CXX_COMPILER_LOADED)
-        set (_hdf5_example_cxx_warning_suppression "-w")
-      endif ()
     endif ()
 
     target_compile_options (hdf5_examples_platform INTERFACE
         "$<$<COMPILE_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
-        "$<$<COMPILE_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
     )
     if (NOT MSVC)
       target_link_options (hdf5_examples_platform INTERFACE
           "$<$<LINK_LANGUAGE:C>:${_hdf5_example_c_warning_suppression}>"
-          "$<$<LINK_LANGUAGE:CXX>:${_hdf5_example_cxx_warning_suppression}>"
       )
     endif ()
     unset (_hdf5_example_c_warning_suppression)
-    unset (_hdf5_example_cxx_warning_suppression)
 
     if (WIN32)
       target_compile_definitions (hdf5_examples_platform INTERFACE _CRT_SECURE_NO_WARNINGS)
@@ -166,9 +131,6 @@ macro (HDF5_SUPPORT)
     else ()
       set (FIND_HDF_COMPONENTS C static)
     endif ()
-    if (H5EXAMPLE_BUILD_CXX)
-      set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} CXX)
-    endif ()
     message (STATUS "HDF5 find comps: ${FIND_HDF_COMPONENTS}")
     set (SEARCH_PACKAGE_NAME ${HDF5_PACKAGE_NAME})
 
@@ -181,9 +143,6 @@ macro (HDF5_SUPPORT)
       if (NOT HDF5_static_C_FOUND AND NOT HDF5_shared_C_FOUND)
         #find library from non-dual-binary package
         set (FIND_HDF_COMPONENTS C)
-        if (H5EXAMPLE_BUILD_CXX)
-          set (FIND_HDF_COMPONENTS ${FIND_HDF_COMPONENTS} CXX)
-        endif ()
         message (STATUS "HDF5 find comps: ${FIND_HDF_COMPONENTS}")
 
         find_package (HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS ${FIND_HDF_COMPONENTS})
@@ -235,22 +194,6 @@ macro (HDF5_SUPPORT)
          endif()
           set (H5EXAMPLE_HDF5_DUMP_EXECUTABLE $<TARGET_FILE:${HDF5_NAMESPACE}h5dump>)
         endif()
-
-        if (NOT HDF5_static_CXX_FOUND AND NOT HDF5_shared_CXX_FOUND)
-          set (H5EXAMPLE_BUILD_CXX OFF CACHE BOOL "Build CXX support" FORCE)
-          message (STATUS "HDF5 CXX libs not found - disable build of CXX examples")
-        else ()
-          if (H5EXAMPLE_BUILD_CXX AND ${HDF5_PROVIDES_CPP_LIB})
-            if (H5EXAMPLE_USE_SHARED_LIBS AND HDF5_shared_CXX_FOUND)
-              set (H5EXAMPLE_HDF5_LINK_LIBS ${H5EXAMPLE_HDF5_LINK_LIBS} ${HDF5_CXX_SHARED_LIBRARY})
-            elseif (HDF5_static_CXX_FOUND)
-              set (H5EXAMPLE_HDF5_LINK_LIBS ${H5EXAMPLE_HDF5_LINK_LIBS} ${HDF5_CXX_STATIC_LIBRARY})
-            else ()
-              set (H5EXAMPLE_BUILD_CXX OFF CACHE BOOL "Build CXX support" FORCE)
-              message (STATUS "HDF5 CXX libs not found - disable build of CXX examples")
-            endif ()
-          endif ()
-        endif ()
 
       endif ()
     else ()
@@ -377,11 +320,6 @@ endmacro ()
 #
 # This macro is used to convert HDF5 1.X built CMake hdf5-config.cmake variables to HDF5 2.x built names.
 macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
-    #-----------------------------------------------------------------------------
-    # Languages:
-    #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB     ${HDF5_PACKAGE_NAME}_BUILD_CPP_LIB)
-    #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
     set (${HDF5_PACKAGE_NAME}_PROVIDES_SHARED_LIBS     ${HDF5_PACKAGE_NAME}_BUILD_SHARED_LIBS)

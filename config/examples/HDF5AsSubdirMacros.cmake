@@ -65,7 +65,6 @@ macro (EXTERNAL_HDF5_LIBRARY compress_type)
   if(NOT hdf5lib_POPULATED)
     # Adjust variables before FetchContent adds HDF5 to this build.
     set (BUILD_SHARED_LIBS OFF CACHE BOOL "Build Shared Libraries" FORCE)
-    set (HDF5_BUILD_CPP_LIB OFF CACHE BOOL "Build C++ support" FORCE)
     set (BUILD_TESTING OFF CACHE BOOL "Build HDF5 unit tests" FORCE)
     set (HDF5_BUILD_EXAMPLES OFF CACHE BOOL "Build HDF5 examples" FORCE)
     set (HDF5_ENABLE_ZLIB_SUPPORT OFF CACHE BOOL "Enable Zlib Filters" FORCE)
@@ -207,10 +206,6 @@ endmacro ()
 macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
   if (NOT ARGN)
     #-----------------------------------------------------------------------------
-    # Languages:
-    #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB     ${HDF5_PACKAGE_NAME}_BUILD_CPP_LIB)
-    #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------
     set (${HDF5_PACKAGE_NAME}_PROVIDES_SHARED_LIBS     ${HDF5_PACKAGE_NAME}_BUILD_SHARED_LIBS)
@@ -237,10 +232,6 @@ macro (EXTERNAL_HDF5_STATUS) # add argument REV to convert from 2.x to 1.x names
     set (${HDF5_PACKAGE_NAME}_PROVIDES_SUBFILING_VFD  ${HDF5_PACKAGE_NAME}_ENABLE_SUBFILING_VFD)
     set (${HDF5_PACKAGE_NAME}_PROVIDES_PLUGIN_SUPPORT ${HDF5_PACKAGE_NAME}_ENABLE_PLUGIN_SUPPORT)
   else ()
-    #-----------------------------------------------------------------------------
-    # Languages:
-    #-----------------------------------------------------------------------------
-    set (${HDF5_PACKAGE_NAME}_BUILD_CPP_LIB     ${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB)
     #-----------------------------------------------------------------------------
     # Features:
     #-----------------------------------------------------------------------------

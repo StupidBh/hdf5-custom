@@ -20,9 +20,8 @@ the final authority.
 ## Quick Start
 
 The default configuration builds the static and shared C libraries, tests,
-tools, utilities, and examples. C++, parallel HDF5, thread
-safety, multi-thread concurrency, and external compression filters are off by
-default.
+tools, utilities, and examples. Parallel HDF5, thread safety, multi-thread
+concurrency, and external compression filters are off by default.
 
 ```bash
 cmake -S . -B build
@@ -43,8 +42,8 @@ cmake --install build-msvc18 --config Release --prefix <install-prefix>
 
 The supplied `ci-StdShar-GNUC` and `ci-StdShar-MSVC` workflow presets are
 release-oriented configurations. They enable additional components, including
-C++ and common compression/plugin features, and therefore are not equivalent
-to the default configuration above.
+common compression and plugin features, and therefore are not equivalent to
+the default configuration above.
 
 ## Optional Dependencies
 

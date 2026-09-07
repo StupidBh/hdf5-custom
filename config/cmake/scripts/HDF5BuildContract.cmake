@@ -411,7 +411,6 @@ if (install_dir AND EXISTS "${install_dir}")
     "${install_dir}/*-targets-*.cmake"
     "${install_dir}/*.pc"
     "${install_dir}/h5cc"
-    "${install_dir}/h5c++"
     "${install_dir}/libhdf5.settings"
   )
   list (APPEND generated_contract_files ${installed_contract_files})

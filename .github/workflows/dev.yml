@@ -80,7 +80,6 @@ jobs:
                  -DHDF5_ENABLE_DEBUG_H5B2=ON \
                  -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON \
                  -DHDF5_ENABLE_PARALLEL:BOOL=OFF \
-                 -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
                  -DHDF5_BUILD_DOC=OFF \
                  -DLIBAEC_USE_LOCALCONTENT=OFF \
                  -DZLIB_USE_LOCALCONTENT=OFF \
@@ -163,7 +162,7 @@ jobs:
         run: |
           mkdir "${{ runner.workspace }}/build"
           Set-Location -Path "${{ runner.workspace }}\\build"
-          cmake -C ${{ github.workspace }}/hdfsrc/config/cmake/cacheinit.cmake -G "Visual Studio 18 2026" -A x64 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DHDF5_ENABLE_ALL_WARNINGS=ON -DHDF5_ENABLE_DEV_WARNINGS=ON -DHDF5_ENABLE_DEBUG_H5B2=ON -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_CPP_LIB=OFF -DHDF5_BUILD_DOC=OFF -DLIBAEC_USE_LOCALCONTENT=OFF -DZLIB_USE_LOCALCONTENT=OFF -DHDF_TEST_EXPRESS=0 ${{ github.workspace }}/hdfsrc
+          cmake -C ${{ github.workspace }}/hdfsrc/config/cmake/cacheinit.cmake -G "Visual Studio 18 2026" -A x64 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DHDF5_ENABLE_ALL_WARNINGS=ON -DHDF5_ENABLE_DEV_WARNINGS=ON -DHDF5_ENABLE_DEBUG_H5B2=ON -DHDF5_ENABLE_DEBUG_H5FS_ASSERT=ON -DHDF5_ENABLE_PARALLEL:BOOL=OFF -DHDF5_BUILD_DOC=OFF -DLIBAEC_USE_LOCALCONTENT=OFF -DZLIB_USE_LOCALCONTENT=OFF -DHDF_TEST_EXPRESS=0 ${{ github.workspace }}/hdfsrc
 
       - name: Build
         run: cmake --build . --parallel 3 --config Debug

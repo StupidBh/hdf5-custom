@@ -27,7 +27,7 @@ provides these public workflows:
 \li <tt>ci-StdShar-GNUC-S3</tt> - Linux x86_64/GCC workflow with ROS3.
 
 Each workflow configures, builds, tests, and creates a package. The standard
-settings build the C and C++ libraries, tools, examples, compression support,
+settings build the C library, tools, examples, compression support,
 and configured plugins. See the preset JSON for the exact inherited cache
 variables.
 
@@ -78,7 +78,7 @@ project presets limit builds to six jobs and tests to four jobs.
 
 For a one-time change, append cache options to the configure command:
 \code
-cmake --preset ci-StdShar-GNUC -DHDF5_BUILD_CPP_LIB=OFF
+cmake --preset ci-StdShar-GNUC -DHDF5_ENABLE_DEV_WARNINGS=ON
 \endcode
 
 For repeatable local settings, create <tt>CMakeUserPresets.json</tt> beside
@@ -114,7 +114,7 @@ The public root file includes
 <tt>config/cmake-presets/hidden-presets.json</tt>. The hidden file owns common
 directories, configurations, compiler selection, generator selection, job
 limits, and the retained MSVC AddressSanitizer building blocks. The public root
-file composes those blocks with compression, examples, plugins, C++, and ROS3
+file composes those blocks with compression, examples, plugins, and ROS3
 settings.
 
 The GNU toolchain preset selects

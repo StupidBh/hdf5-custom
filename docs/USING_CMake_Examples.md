@@ -48,7 +48,6 @@ On Windows, add `-G "Visual Studio 18 2026" -A x64` when configuring and
 | --- | --- | --- |
 | `H5EXAMPLE_BUILD_TESTING` | `OFF` | Register and run example tests |
 | `H5EXAMPLE_USE_SHARED_LIBS` | `ON` | Prefer shared HDF5 libraries |
-| `H5EXAMPLE_BUILD_CXX` | `OFF` | Build C++ examples |
 | `H5EXAMPLE_BUILD_FILTERS` | `OFF` | Build plugin filter examples |
 | `H5EXAMPLE_ENABLE_PARALLEL` | `OFF` | Build parallel examples with MPI |
 | `H5EXAMPLE_BUILD_PYTHON` | `OFF` | Run retained Python examples |

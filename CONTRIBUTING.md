@@ -58,7 +58,7 @@ Before you begin, ensure your development machine has:
 
 ### Optional Components
 Depending on which features you want to build or enable:
-* A C++20-compatible compiler for the opt-in C++ wrappers.
+* A C++20-compatible compiler for project-owned C++ test infrastructure.
 * Perl when regenerating source headers or running tests that require its scripts.
 * Development versions of **zlib** and **szip** for compression support.
 * An MPI-3 compatible MPI library for parallel HDF5 development.
@@ -113,8 +113,7 @@ Here's where to find things in the source tree:
 * **`test/`**: C library test code
 * **`testpar/`**: Parallel C library test code
 * **`tools/`**: Command-line tools (h5dump, h5repack, etc.)
-* **`HDF5Examples/`**: C and C++ library examples
-* **`c++/`**: C++ language wrapper
+* **`HDF5Examples/`**: Retained C, parallel, filter, and Python examples
 * **`bin/`**: Build scripts and miscellaneous tools
 * **`config/`**: Configuration files for CMake
 * **`docs/`**: User guides, installation instructions, and Doxygen API documentation

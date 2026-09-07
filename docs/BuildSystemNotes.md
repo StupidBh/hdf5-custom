@@ -7,14 +7,13 @@ primary configuration files are `CMakeLists.txt`, `CMakeBuildOptions.cmake`,
 
 ## Supported Libraries
 
-The repository builds the C library, the optional C++ wrapper, command-line
-tools, utilities, examples, VOL connectors, and VFDs. Static and
+The repository builds the C library, command-line tools, utilities, examples,
+VOL connectors, and VFDs. Static and
 shared libraries are controlled by `BUILD_STATIC_LIBS` and
 `BUILD_SHARED_LIBS`.
 
 Common feature options include:
 
-- `HDF5_BUILD_CPP_LIB`
 - `HDF5_BUILD_TOOLS`
 - `HDF5_ENABLE_PARALLEL`
 - `HDF5_ENABLE_THREADSAFE`
@@ -41,7 +40,7 @@ directories under `install/<presetName>` in the parent directory of the source t
 
 ## Tests And CI
 
-CTest covers the core C library, C++ wrapper, tools, examples, VFDs, VOL
+CTest covers the core C library, tools, examples, VFDs, VOL
 connectors, and parallel MPI configurations. GitHub
 Actions project-build jobs exercise Windows x64 with MSVC and Linux x86_64
 with GCC. Separate workflows perform formatting, static analysis, release

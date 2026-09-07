@@ -122,7 +122,6 @@ The Ninja form is:
 cmake -S . -B build-gcc-ninja -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER=gcc \
-  -DCMAKE_CXX_COMPILER=g++ \
   -DCMAKE_INSTALL_PREFIX="$PWD/install-gcc"
 cmake --build build-gcc-ninja --parallel 6
 ctest --test-dir build-gcc-ninja --output-on-failure -j 6
@@ -144,7 +143,6 @@ The current CMake files are the source of truth for options. The most commonly u
 | `HDF5_ONLY_SHARED_LIBS`      | `OFF`   | Force a shared-only library build |
 | `BUILD_TESTING`              | `ON`    | Build the test programs           |
 | `HDF5_BUILD_TOOLS`           | `ON`    | Build command-line tools          |
-| `HDF5_BUILD_CPP_LIB`         | `OFF`   | Build the C++ wrappers            |
 | `HDF5_BUILD_EXAMPLES`        | `ON`    | Build retained examples           |
 | `HDF5_BUILD_DOC`             | `OFF`   | Build documentation               |
 | `HDF5_ENABLE_PARALLEL`       | `OFF`   | Enable MPI support                |
@@ -156,16 +154,16 @@ The current CMake files are the source of truth for options. The most commonly u
 | `HDF5_ENABLE_ROS3_VFD`       | `OFF`   | Enable the ROS3 VFD               |
 | `HDF5_ENABLE_HDFS`           | `OFF`   | Enable the HDFS VFD               |
 
-The default build produces static and shared libraries, tests, tools, and examples. C++, MPI,
+The default build produces static and shared libraries, tests, tools, and examples. MPI,
 thread safety, concurrency, and external compression filters are opt-in.
 
 Set cache entries with `-D<name>=<value>`:
 
 ```console
-cmake -S . -B build-custom <supported-generator-options> -DHDF5_BUILD_CPP_LIB=ON
+cmake -S . -B build-custom <supported-generator-options> -DHDF5_ENABLE_DEV_WARNINGS=ON
 ```
 
-Thread safety, concurrency, MPI, and C++ have documented compatibility constraints. See
+Thread safety, concurrency, and MPI have documented compatibility constraints. See
 [INSTALL_CMake_options.md](INSTALL_CMake_options.md) before combining them.
 
 ### External dependencies

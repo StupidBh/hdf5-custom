@@ -102,15 +102,6 @@
 #define H5TOOLS_DLLVAR H5_VAR_IMPORT
 #endif
 
-/* C++ library */
-#if defined(hdf5_cpp_shared_EXPORTS)
-#define H5CPP_DLL    H5_API_EXPORT
-#define H5CPP_DLLVAR H5_VAR_EXPORT
-#else
-#define H5CPP_DLL    H5_API_IMPORT
-#define H5CPP_DLLVAR H5_VAR_IMPORT
-#endif
-
 #else
 
 /* Static library decorations */
@@ -122,8 +113,6 @@
 #define H5TESTPAR_DLLVAR extern
 #define H5TOOLS_DLL
 #define H5TOOLS_DLLVAR extern
-#define H5CPP_DLL
-#define H5CPP_DLLVAR extern
 #endif /* H5_BUILT_AS_DYNAMIC_LIB */
 
 #endif /* H5API_ADPT_H */

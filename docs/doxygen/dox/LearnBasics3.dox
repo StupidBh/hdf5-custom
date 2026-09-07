@@ -738,14 +738,13 @@ See the \ref secLBCompilingVS section for compiling with Visual Studio.
 \section secLBCompilingLinux Compile Scripts
 When the library is built, the following compile shell scripts are included:
 \li h5cc:  pkg-config based compile shell script for HDF5 C programs
-\li h5c++: pkg-config based compile shell script for HDF5 C++ programs
 
 These scripts are easily used to compile single file applications, such as those included in the tutorial.
 <table>
 <tr>
 <th><strong>Warning</strong>
 </th>
-<td>The h5cc and h5c++ compile scripts rely on the pkg-config files in lib/pkgconfig.
+<td>The h5cc compile script relies on the pkg-config files in lib/pkgconfig.
 </td>
 </tr>
 </table>
@@ -764,9 +763,8 @@ To see how the libraries linked in with a compile script were configured and bui
 \endcode
 
 <h4>Detailed Description of Unix Compile Scripts:</h4>
-The h5cc and h5c++ pkg-config compile scripts come with the HDF5 binary distributions (include files,
-libraries, and utilities) for the platforms we support. The h5c++ utility is present only
-if the library was built with C++.
+The h5cc pkg-config compile script comes with the HDF5 binary distributions
+(include files, libraries, and utilities) for the platforms we support.
 
 <h4>USING_HDF5_CMake.md:</h4>
 
@@ -804,9 +802,8 @@ See <a href="https://\SRCURL/docs/USING_CMake_Examples.md">USING_CMake_Examples.
           and add the required HDF5 install/lib path to the list.
           (Ex: "C:\Program Files\HDF_Group\HDF5\1.10.9\lib\hdf5.lib")
 
-      3.2 For static builds, the external libraries should be added.
-          For example, to compile a C++ application, enter:
-          libhdf5_cpp.lib libhdf5.lib libz.lib libszaec.lib libaec.lib
+      3.2 For static builds, add the required external libraries after
+          libhdf5.lib.
 
 \section secLBCompilingLibs HDF5 Libraries
 Following are the libraries included with HDF5. Whether you are using the Unix compile scripts or
@@ -824,26 +821,22 @@ they are specified is important on Linux:
 <tr>
 <td>
 \code
-HDF5 C++ Library
 HDF5 C Library
 \endcode
 </td>
 <td>
 \code
-libhdf5_cpp.a
 libhdf5.a
 \endcode
 </td>
 <td>
 \code
-libhdf5_cpp.a
 libhdf5.a
 \endcode
 </td>
 <td>
 <em>Windows</em>
 \code
-libhdf5_cpp.lib
 libhdf5.lib
 \endcode
 </td>
@@ -861,25 +854,21 @@ libhdf5.lib
 <tr>
 <td>
 \code
-HDF5 C++ Library
 HDF5 C Library
 \endcode
 </td>
 <td>
 \code
-libhdf5_cpp.so
 libhdf5.so
 \endcode
 </td>
 <td>
 \code
-libhdf5_cpp.dylib
 libhdf5.dylib
 \endcode
 </td>
 <td>
 \code
-hdf5_cpp.lib
 hdf5.lib
 \endcode
 </td>

@@ -136,19 +136,10 @@ jobs:
           abi-compliance-checker -l ${{ inputs.file_base }} -old ABI-0.dump -new ABI-1.dump
         continue-on-error: true
 
-      - name: Run cpp ABI report
-        run: |
-          abi-dumper ${{ steps.set-hdf5lib-refname.outputs.HDF5R_ROOT }}/lib/libhdf5_cpp.so -o ABI-2.dump -public-headers ${{ steps.set-hdf5lib-refname.outputs.HDF5R_ROOT }}/include
-          abi-dumper ${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/lib/libhdf5_cpp.so -o ABI-3.dump -public-headers ${{ steps.set-hdf5lib-name.outputs.HDF5_ROOT }}/include
-          abi-compliance-checker -l ${{ inputs.file_base }}_cpp -old ABI-2.dump -new ABI-3.dump
-        continue-on-error: true
-
       - name: Copy ABI reports
         run: |
           ls -l compat_reports/${{ inputs.file_base }}/X_to_Y
           cp compat_reports/${{ inputs.file_base }}/X_to_Y/compat_report.html ${{ inputs.file_base }}-hdf5_compat_report.html
-          ls -l compat_reports/${{ inputs.file_base }}_cpp/X_to_Y
-          cp compat_reports/${{ inputs.file_base }}_cpp/X_to_Y/compat_report.html ${{ inputs.file_base }}-hdf5_cpp_compat_report.html
         continue-on-error: true
 
       - name: List files for the report spaces (Linux)
@@ -162,7 +153,6 @@ jobs:
           mkdir "${{ runner.workspace }}/buildabi"
           mkdir "${{ runner.workspace }}/buildabi/hdf5"
           cp ${{ inputs.file_base }}-hdf5_compat_report.html ${{ runner.workspace }}/buildabi/hdf5
-          cp ${{ inputs.file_base }}-hdf5_cpp_compat_report.html ${{ runner.workspace }}/buildabi/hdf5
           cd "${{ runner.workspace }}/buildabi"
           tar -zcvf ${{ inputs.file_base }}.html.abi.reports.tar.gz hdf5
         shell: bash

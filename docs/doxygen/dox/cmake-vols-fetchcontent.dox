@@ -130,8 +130,8 @@ Assuming that the HDF5 source code has been checked out and a build directory
 has been created, running the following CMake command from that build directory
 will retrieve, build and test the HDF5 Asynchronous I/O VOL connector while
 building HDF5. Note that <strong>[hdf5 options]</strong> represents other build options that
-would typically be passed when building HDF5, such as <code>CMAKE_INSTALL_PREFIX</code>,
-<code>HDF5_BUILD_CPP_LIB</code>, etc.
+would typically be passed when building HDF5, such as <code>CMAKE_INSTALL_PREFIX</code>
+and <code>HDF5_BUILD_TOOLS</code>.
 
 \code
     cmake [hdf5 options]
@@ -221,4 +221,3 @@ fail due to being unable to load the necessary libraries for its dependencies.
 Navigate back: \ref index "Main" / \ref TN
 
 */
-

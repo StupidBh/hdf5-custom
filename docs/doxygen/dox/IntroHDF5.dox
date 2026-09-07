@@ -177,7 +177,7 @@ Attributes look similar to HDF5 datasets in that they have a datatype and datasp
 do not support partial I/O operations, and they cannot be compressed or extended.
 
 \subsection subsec_intro_desc_soft HDF5 Software
-The HDF5 software is written in C and includes an optional C++ wrapper.
+The HDF5 software is written in C.
 The HDF5 binary distribution consists of the HDF5 libraries, include files, command-line
 utilities, scripts for compiling applications, and example programs.
 
@@ -192,7 +192,7 @@ of object on which the function operates:
 \subsubsection subsec_intro_desc_soft_tools Tools
 Useful tools for working with HDF5 files include:
 \li \ref sec_cltools_h5dump : A utility to dump or display the contents of an HDF5 File
-\li h5cc, h5c++ :  pkg-config based shell scripts for compiling applications
+\li h5cc :          pkg-config based shell script for compiling C applications
 \li HDFView :      A graphical browser for HDF (HDF4 and HDF5) files
 
 <h4>h5dump</h4>
@@ -216,10 +216,10 @@ Some useful \ref sec_cltools_h5dump options are included below:
    -n                          Display the contents of the file
 \endcode
 
-<h4>h5cc, h5c++</h4>
-The built HDF5 binaries include the h5cc and h5c++ compile scripts for compiling applications.
-When using these scripts there is no need to specify the HDF5 libraries and include files.
-Compiler options can be passed to the scripts.
+<h4>h5cc</h4>
+The built HDF5 binaries include the h5cc compile script for compiling C applications.
+When using this script there is no need to specify the HDF5 libraries and include files.
+Compiler options can be passed to the script.
 
 <h4>HDFView</h4>
 The HDFView tool allows browsing of data in HDF (HDF4 and HDF5) files. 
@@ -229,7 +229,7 @@ The HDF5 Application Programming Interface is extensive, but a few functions do 
 
 To introduce the programming model, examples in Python and C are included below. The Python examples
 use the HDF5 Python APIs (h5py). See the Examples from "Learning the Basics" page for complete examples
-that can be downloaded and run for C, C++, and Python.
+that can be downloaded and run for C and Python.
 
 The general paradigm for working with objects in HDF5 is to:
 \li Open the object.
@@ -595,7 +595,7 @@ on the <a href="http://hdfeos.org/">HDF-EOS Tools and Information Center</a> pag
 \li <a href="https://\SRCURL/HDF5Examples">Examples in the Source Code</a>
 
 \section secHDF5ExamplesCompile How To Compile
-For information on compiling in C and C++, see: \ref LBCompiling
+For information on compiling in C, see: \ref LBCompiling
 
 \section secHDF5ExamplesOther Other Examples
 <a href="http://hdfeos.org/zoo/index.php">IDL, MATLAB, and NCL Examples for HDF-EOS</a>

@@ -505,11 +505,10 @@ typedef union
  * with the -pedantic flag or similar where we get warnings
  * about _Float16 not being an ISO C type.
  *
- * Due to the inclusion of H5private.h from the C++ wrappers,
- * this typedef creation must be avoided when __cplusplus is
- * defined to avoid build failures on ARM64 Macs. GCC and
- * Clang either do not currently provide a _Float16 type for
- * C++ on ARM64, or may need an additional compile-time flag.
+ * This header is also included by project-owned C++ test
+ * infrastructure, so this typedef creation must be avoided
+ * when __cplusplus is defined. Some C++ compilers do not
+ * provide a _Float16 type or require an additional flag.
  */
 #if defined(H5_HAVE__FLOAT16) && !defined(__cplusplus)
     #if defined(__GNUC__)

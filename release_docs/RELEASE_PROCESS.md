@@ -5,9 +5,9 @@ does not set an organizational release cadence or security-support lifetime.
 
 ## Release Scope
 
-Release artifacts cover the retained C library, high-level C library, opt-in
-C++ wrappers, tools, utilities, and examples. Java and Fortran products are
-not part of this fork. Source release validation is limited to Windows/MSVC
+Release artifacts cover the retained C library, tools, utilities, and examples.
+Native C++, high-level, Java, and Fortran products are not part of this fork.
+Source release validation is limited to Windows/MSVC
 and Linux/GNU; the release baselines are Windows x64 with Visual Studio 18
 2026 and Linux x86_64 with GCC/G++ and Ninja, plus a focused Unix Makefiles
 check.
@@ -56,8 +56,7 @@ to configure without requiring regeneration tools.
 
 At minimum, validate:
 
-- static and shared libraries, tests, tools, high-level C, examples, and the
-  opt-in C++ wrappers
+- static and shared libraries, tests, tools, and examples
 - the Windows/MSVC and Linux/GNU release baselines
 - Debug and Release where behavior differs
 - install trees and CMake package consumption for static and shared variants

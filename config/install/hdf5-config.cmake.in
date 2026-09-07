@@ -26,7 +26,6 @@ set (${HDF5_PACKAGE_NAME}_VALID_COMPONENTS
     static
     shared
     C
-    CXX
     Tools
 )
 
@@ -34,10 +33,6 @@ set (${HDF5_PACKAGE_NAME}_BUILD_MODE       @HDF_CFG_NAME@)
 
 #-----------------------------------------------------------------------------
 # User Options
-#-----------------------------------------------------------------------------
-# Languages:
-#-----------------------------------------------------------------------------
-set (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB     @HDF5_BUILD_CPP_LIB@)
 #-----------------------------------------------------------------------------
 # Features:
 #-----------------------------------------------------------------------------
@@ -115,10 +110,6 @@ set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@" "${${HDF5_
 
 set (${HDF5_PACKAGE_NAME}_SHARE_DIR "@PACKAGE_SHARE_INSTALL_DIR@")
 set_and_check (${HDF5_PACKAGE_NAME}_BUILD_DIR "@PACKAGE_CURRENT_BUILD_DIR@")
-
-if (${HDF5_PACKAGE_NAME}_PROVIDES_CPP_LIB)
-  set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR_CPP "@PACKAGE_INCLUDE_INSTALL_DIR@")
-endif ()
 
 if (${HDF5_PACKAGE_NAME}_PROVIDES_TOOLS)
   set (${HDF5_PACKAGE_NAME}_INCLUDE_DIR_TOOLS "@PACKAGE_INCLUDE_INSTALL_DIR@")
@@ -236,8 +227,6 @@ foreach (libtype IN LISTS ${HDF5_PACKAGE_NAME}_LIB_TYPE)
   foreach (comp IN LISTS ${HDF5_PACKAGE_NAME}_FIND_COMPONENTS)
     if (comp STREQUAL "C")
       set (hdf5_comp "hdf5")
-    elseif (comp STREQUAL "CXX")
-      set (hdf5_comp "hdf5_cpp")
     elseif (comp STREQUAL "Tools")
       set (hdf5_comp "hdf5_tools")
     endif ()

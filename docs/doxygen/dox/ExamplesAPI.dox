@@ -4,7 +4,7 @@ Navigate back: \ref index "Main" / \ref GettingStarted
 <hr>
 
 \section sec_exapi_desc Examples Description
-The examples below point to the C and C++ examples in the hdf5-examples GitHub repository. Examples for older versions of HDF5
+The examples below point to the C examples in this repository. Examples for older versions of HDF5
 are handled by setting the appropriate USE_API_xxx definition. HDF5-1.6 examples are in a "16"-named subdirectory.
 
 

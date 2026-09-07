@@ -7,7 +7,7 @@
 #
 # - Enforces out-of-source builds for safety and cleanliness.
 # - Supports configuration as a subproject (HDF5_EXTERNALLY_CONFIGURED).
-# - Provides options for building shared/static libraries, tools, examples, and C++ bindings.
+# - Provides options for building shared/static libraries, tools, and examples.
 # - Handles versioning, installation paths, and library naming customization.
 # - Integrates with external dependencies (zlib, szip, MPI, HDFS, etc.).
 # - Supports advanced features: thread-safety, concurrency, plugins, code coverage, and more.
@@ -32,11 +32,6 @@ project (HDF5 C)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/config/cmake/HDF5LanguageStandards.cmake)
 hdf5_configure_c_language_standard ()
-set (HDF5_REPORTED_CXX_STANDARD "not enabled")
-if (HDF5_BUILD_CPP_LIB)
-  hdf5_configure_cxx_language_standard ()
-  set (HDF5_REPORTED_CXX_STANDARD "C++${CMAKE_CXX_STANDARD}")
-endif ()
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/config/cmake/HDF5PlatformSupport.cmake)
 hdf5_validate_platform_support (LANGUAGES C)
@@ -173,14 +168,12 @@ set (HDF5_LIB_BASE              "hdf5")
 set (HDF5_LIB_CORE              "")
 set (HDF5_TEST_LIB_CORE         "_test")
 set (HDF5_TEST_PAR_LIB_CORE     "_testpar")
-set (HDF5_CPP_LIB_CORE          "_cpp")
 set (HDF5_TOOLS_LIB_CORE        "_tools")
 set (HDF5_UTILS_LIB_CORE        "_utils")
 
 set (HDF5_LIB_CORENAME              "${HDF5_LIB_BASE}")
 set (HDF5_TEST_LIB_CORENAME         "${HDF5_LIB_BASE}${HDF5_TEST_LIB_CORE}")
 set (HDF5_TEST_PAR_LIB_CORENAME     "${HDF5_LIB_BASE}${HDF5_TEST_PAR_LIB_CORE}")
-set (HDF5_CPP_LIB_CORENAME          "${HDF5_LIB_BASE}${HDF5_CPP_LIB_CORE}")
 set (HDF5_TOOLS_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_TOOLS_LIB_CORE}")
 set (HDF5_UTILS_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_UTILS_LIB_CORE}")
 
@@ -190,7 +183,6 @@ set (HDF5_UTILS_LIB_CORENAME        "${HDF5_LIB_BASE}${HDF5_UTILS_LIB_CORE}")
 set (HDF5_LIB_NAME              "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_TEST_LIB_NAME         "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_TEST_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_TEST_PAR_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_TEST_PAR_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
-set (HDF5_CPP_LIB_NAME          "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_CPP_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_TOOLS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_TOOLS_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 set (HDF5_UTILS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HDF5_LIB_INFIX}${HDF5_UTILS_LIB_CORE}${HDF5_EXTERNAL_LIB_SUFFIX}")
 
@@ -200,13 +192,11 @@ set (HDF5_UTILS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_BASE}${HD
 set (HDF5_LIB_TARGET              "${HDF5_LIB_CORENAME}-static")
 set (HDF5_TEST_LIB_TARGET         "${HDF5_TEST_LIB_CORENAME}-static")
 set (HDF5_TEST_PAR_LIB_TARGET     "${HDF5_TEST_PAR_LIB_CORENAME}-static")
-set (HDF5_CPP_LIB_TARGET          "${HDF5_CPP_LIB_CORENAME}-static")
 set (HDF5_TOOLS_LIB_TARGET        "${HDF5_TOOLS_LIB_CORENAME}-static")
 set (HDF5_UTILS_LIB_TARGET        "${HDF5_UTILS_LIB_CORENAME}-static")
 set (HDF5_LIBSH_TARGET            "${HDF5_LIB_CORENAME}-shared")
 set (HDF5_TEST_LIBSH_TARGET       "${HDF5_TEST_LIB_CORENAME}-shared")
 set (HDF5_TEST_PAR_LIBSH_TARGET   "${HDF5_TEST_PAR_LIB_CORENAME}-shared")
-set (HDF5_CPP_LIBSH_TARGET        "${HDF5_CPP_LIB_CORENAME}-shared")
 set (HDF5_TOOLS_LIBSH_TARGET      "${HDF5_TOOLS_LIB_CORENAME}-shared")
 set (HDF5_UTILS_LIBSH_TARGET      "${HDF5_UTILS_LIB_CORENAME}-shared")
 
@@ -220,8 +210,6 @@ set (HDF5_TEST_SRC_DIR         ${HDF5_SOURCE_DIR}/test)
 set (HDF5_TEST_PAR_DIR         ${HDF5_SOURCE_DIR}/testpar)
 set (HDF5_TEST_API_SRC_DIR     ${HDF5_SOURCE_DIR}/test/API)
 set (HDF5_TEST_API_PAR_SRC_DIR ${HDF5_SOURCE_DIR}/testpar/API)
-set (HDF5_CPP_SRC_DIR          ${HDF5_SOURCE_DIR}/c++/src)
-set (HDF5_CPP_TST_DIR          ${HDF5_SOURCE_DIR}/c++/test)
 set (HDF5_TOOLS_ROOT_DIR       ${HDF5_SOURCE_DIR}/tools)
 set (HDF5_TOOLS_SRC_DIR        ${HDF5_SOURCE_DIR}/tools/src)
 set (HDF5_TOOLS_TST_DIR        ${HDF5_SOURCE_DIR}/tools/test)
@@ -274,17 +262,6 @@ if (H5_TOOLS_SOVERS_EXISTS)
   math (EXPR H5_TOOLS_SOVERS_MAJOR ${H5_TOOLS_SOVERS_INTERFACE}-${H5_TOOLS_SOVERS_RELEASE})
   message (VERBOSE "SOVERSION_TOOLS: ${H5_TOOLS_SOVERS_MAJOR}.${H5_TOOLS_SOVERS_RELEASE}.${H5_TOOLS_SOVERS_MINOR}")
 endif ()
-string (REGEX MATCH ".*LT_CXX_VERS_INTERFACE[ \t]+=[ \t]+([0-9]*).*$" H5_CXX_SOVERS_EXISTS ${_lt_vers_am_contents})
-if (H5_CXX_SOVERS_EXISTS)
-  string (REGEX REPLACE ".*LT_CXX_VERS_INTERFACE[ \t]+=[ \t]+([0-9]*).*$"
-      "\\1" H5_CXX_SOVERS_INTERFACE ${_lt_vers_am_contents})
-  string (REGEX REPLACE ".*LT_CXX_VERS_REVISION[ \t]+=[ \t]+([0-9]*).*$"
-      "\\1" H5_CXX_SOVERS_MINOR ${_lt_vers_am_contents})
-  string (REGEX REPLACE ".*LT_CXX_VERS_AGE[ \t]+=[ \t]+([0-9]*).*$"
-      "\\1" H5_CXX_SOVERS_RELEASE ${_lt_vers_am_contents})
-  math (EXPR H5_CXX_SOVERS_MAJOR ${H5_CXX_SOVERS_INTERFACE}-${H5_CXX_SOVERS_RELEASE})
-  message (VERBOSE "SOVERSION_CXX: ${H5_CXX_SOVERS_MAJOR}.${H5_CXX_SOVERS_RELEASE}.${H5_CXX_SOVERS_MINOR}")
-endif ()
 #-----------------------------------------------------------------------------
 # Basic HDF5 stuff here
 #-----------------------------------------------------------------------------
@@ -308,13 +285,6 @@ if (H5_TOOLS_SOVERS_EXISTS)
 else ()
   set (HDF5_TOOLS_PACKAGE_SOVERSION "${H5_LIB_SOVERS_MAJOR}.${H5_LIB_SOVERS_RELEASE}.${H5_LIB_SOVERS_MINOR}")
   set (HDF5_TOOLS_PACKAGE_SOVERSION_MAJOR "${H5_LIB_SOVERS_MAJOR}")
-endif ()
-if (H5_CXX_SOVERS_EXISTS)
-  set (HDF5_CXX_PACKAGE_SOVERSION "${H5_CXX_SOVERS_MAJOR}.${H5_CXX_SOVERS_RELEASE}.${H5_CXX_SOVERS_MINOR}")
-  set (HDF5_CXX_PACKAGE_SOVERSION_MAJOR "${H5_CXX_SOVERS_MAJOR}")
-else ()
-  set (HDF5_CXX_PACKAGE_SOVERSION "${H5_LIB_SOVERS_MAJOR}.${H5_LIB_SOVERS_RELEASE}.${H5_LIB_SOVERS_MINOR}")
-  set (HDF5_CXX_PACKAGE_SOVERSION_MAJOR "${H5_LIB_SOVERS_MAJOR}")
 endif ()
 set (HDF5_PACKAGE_STRING "${HDF5_PACKAGE_NAME} ${HDF5_PACKAGE_VERSION_STRING}")
 set (HDF5_PACKAGE_TARNAME "${HDF5_PACKAGE}${HDF_PACKAGE_EXT}")
@@ -684,28 +654,6 @@ if (HDF5_ENABLE_PLUGIN_SUPPORT)
 #    if (HDF5_PACKAGE_EXTLIBS AND NOT HDF5_NO_PACKAGES AND HDF5_PLUGINS_FOUND)
 #      PACKAGE_PLUGIN_LIBRARY (${HDF5_ALLOW_EXTERNAL_SUPPORT})
 #    endif ()
-  endif ()
-endif ()
-
-#-----------------------------------------------------------------------------
-# Option to build HDF5 C++ Library
-#-----------------------------------------------------------------------------
-if (EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
-  if (HDF5_BUILD_CPP_LIB)
-    # check for unsupported options
-    if (HDF5_ENABLE_PARALLEL)
-      if (NOT HDF5_ALLOW_UNSUPPORTED)
-        message (FATAL_ERROR " **** Parallel and C++ options are mutually exclusive, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-      else ()
-        message (VERBOSE " **** Allowing unsupported Parallel and C++ options **** ")
-      endif ()
-    endif ()
-
-    include (${HDF_CONFIG_DIR}/flags/HDFCompilerCXXFlags.cmake)
-    set (HDF5_REPORTED_CXX_STANDARD "C++${CMAKE_CXX_STANDARD}")
-    hdf5_configure_cxx_build_options ()
-
-    add_subdirectory (c++)
   endif ()
 endif ()
 

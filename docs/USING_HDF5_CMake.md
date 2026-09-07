@@ -29,10 +29,10 @@ ctest --test-dir build --output-on-failure -j 6
 ```
 
 Use `static` instead of `shared` and link
-`${HDF5_C_STATIC_LIBRARY}` for the static C library. Other package components
-include `CXX` and `Tools`, but they are available only when the HDF5
-installation was built with the corresponding products. Consult
-`libhdf5.settings` in the installation for the exact feature set.
+`${HDF5_C_STATIC_LIBRARY}` for the static C library. The other product
+component is `Tools`, available when the installation was built with the
+command-line tools. Consult `libhdf5.settings` in the installation for the
+exact feature set.
 
 When using shared libraries, the HDF5 runtime directory must be visible to the
 loader, normally through `PATH` on Windows or an install-time/runtime search

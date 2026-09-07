@@ -1,8 +1,7 @@
                                HDF5 Examples
 
-This directory contains example programs for the installed APIs and scripts to
-compile and run them. C examples are always installed, and C++ examples are
-installed when C++ is enabled.
+This directory contains C example programs for the installed API and scripts to
+compile and run them.
 
 Running the run-all-ex.sh script in this directory will run the scripts and in 
 turn the examples in all the subdirectories where examples are installed.  The 
@@ -12,5 +11,5 @@ example programs.  Note that h5redeploy must be run if these binaries are
 copied or extracted in a directory other than the one where they were initially 
 installed.  Compile scripts from other locations can be used by setting an 
 environment variable prefix to the path of the directory containing the bin 
-directory with the compile scripts h5cc and h5c++. For example, export
-prefix=/usr/local/hdf5 to use those scripts in /usr/local/hdf5/bin.
+directory with the h5cc compile script. For example, export
+prefix=/usr/local/hdf5 to use that script in /usr/local/hdf5/bin.

@@ -41,7 +41,6 @@ endfunction ()
 # Define some CMake variables for use later in the project
 #-----------------------------------------------------------------------------
 set (H5EXAMPLE_C_SRC_DIR          ${H5EXAMPLES_SOURCE_DIR}/C)
-set (H5EXAMPLE_CXX_SRC_DIR        ${H5EXAMPLES_SOURCE_DIR}/CXX)
 #-----------------------------------------------------------------------------
 # Basic HDF5Examples stuff here
 #-----------------------------------------------------------------------------
@@ -142,15 +141,6 @@ endif ()
 
 if (${H5_LIBVER_DIR} GREATER 16)
   #-----------------------------------------------------------------------------
-  # Build the CPP Examples
-  #-----------------------------------------------------------------------------
-  if (EXISTS "${H5EXAMPLES_SOURCE_DIR}/CXX" AND IS_DIRECTORY "${H5EXAMPLES_SOURCE_DIR}/CXX")
-    option (H5EXAMPLE_BUILD_CXX "Build examples C++ support" OFF)
-  else ()
-    set (H5EXAMPLE_BUILD_CXX OFF CACHE BOOL "Build examples C++ support" FORCE)
-  endif ()
-
-  #-----------------------------------------------------------------------------
   # Option to build filter examples
   #-----------------------------------------------------------------------------
   if (EXISTS "${H5EXAMPLES_SOURCE_DIR}/C/H5FLT" AND IS_DIRECTORY "${H5EXAMPLES_SOURCE_DIR}/C/H5FLT")
@@ -173,7 +163,6 @@ if (${H5_LIBVER_DIR} GREATER 16)
     set (H5EXAMPLE_BUILD_FILTERS OFF CACHE BOOL "Build examples PLUGIN filter support" FORCE)
   endif ()
 else ()
-  set (H5EXAMPLE_BUILD_CXX OFF CACHE BOOL "Build examples C++ support" FORCE)
   set (H5EXAMPLE_BUILD_FILTERS OFF CACHE BOOL "Build examples PLUGIN filter support" FORCE)
 endif ()
 
@@ -181,9 +170,6 @@ endif ()
 # Build examples
 #-----------------------------------------------------------------------------
 add_subdirectory (C)
-if (H5EXAMPLE_BUILD_CXX AND HDF5_PROVIDES_CPP_LIB)
-  add_subdirectory (CXX)
-endif ()
 if (H5EXAMPLE_BUILD_PYTHON)
   add_subdirectory (PYTHON)
 endif ()

@@ -532,22 +532,6 @@
  *
  * Information on the C API changes can be found above.
  *
- * \subsubsection subsubsec_vol_lang_c C++
- * <ul>
- * <li>The \b visit_operator_t callback now uses a #H5O_info2_t parameter instead of #H5O_info1_t
- * so the callback can be passed to \ref H5Ovisit3() internally. This affects the H5Object::visit()
- * method.</li>
- * <li>The H5Location::getObjinfo() methods now take #H5O_info2_t parameters.</li>
- * <li>The H5Location::getLinkInfo() methods now return #H5L_info2_t structs.</li>
- * <li> H5File::isHdf5 uses \ref H5Fis_accessible(), though it always passes #H5P_DEFAULT
- * as the fapl. It will only work with arbitrary VOL connectors if the default
- * VOL connector is changed via the environment variable.</li>
- * </ul>
- *
- * The C++ wrappers do not allow opening HDF5 file objects by address or token.
- *
- * The public H5VL API calls found in H5VLpublic.h were NOT added to the C++ API.
- *
  * \subsection subsec_vol_cl Using VOL Connectors With The HDF5 Command-Line Tools
  * The following command-line tools are VOL-aware and can be used with arbitrary VOL connectors:
  * \li (p)\ref sec_cltools_h5diff

@@ -2,13 +2,14 @@
 
 ## Project Structure & Module Organization
 
-Core C code is in `src/`, C++ wrappers in `c++/`, and command-line programs in `tools/`. Tests live in `test/` and `testpar/`, examples in `HDF5Examples/`, CMake support in `config/`, and documentation in `docs/` and `release_docs/`.
+Core C code is in `src/`, and command-line programs are in `tools/`. Tests live in `test/` and `testpar/`,
+examples in `HDF5Examples/`, CMake support in `config/`, and documentation in `docs/` and `release_docs/`.
 
 ## Repository Profile & Sources of Truth
 
 This is a CMake-only fork of upstream `develop` with a minimum CMake version of 4.0. The supported product
-surface is the core C library, the opt-in C++ wrappers, tools, utilities, and retained
-examples. Java and Fortran sources, build options, examples, packaging, and CI were deliberately removed.
+surface is the core C library, tools, utilities, and retained examples. Native C++,
+high-level, Java, and Fortran products were deliberately removed.
 Python content under `HDF5Examples/` is example code, not a Python library binding maintained here.
 
 For repository behavior, prefer the current source tree and CMake definitions over inherited prose. In
@@ -18,14 +19,14 @@ history still mention Java or Fortran; those references do not expand this fork'
 under `HDF5_ENABLE_HDFS` is intentionally retained because libhdfs requires it, not because Java bindings are
 supported.
 
-The default build enables static and shared libraries, tests, tools, and examples. C++,
-parallel HDF5, thread safety, multi-thread concurrency, and external compression filters are off by default.
+The default build enables static and shared libraries, tests, tools, and examples.
+Parallel HDF5, thread safety, multi-thread concurrency, and external compression filters are off by default.
 
 `REFACTORING_PROGRESS.md` is the portable handoff for the active refactoring direction. It records completed
 work, remaining work, the implementation anchor, the next continuation point, and validation gaps so work can
 resume on another machine without relying on chat history or local build artifacts. Read it before continuing a
 refactoring and update it after each coherent batch. Keep it aligned with the direction's detailed implementation
-document, currently `docs/CMakeModernizationProgress.md`, and never add absolute local paths, transient build
+document, currently `docs/refactoring/NativeCppHlRemoval.md`, and never add absolute local paths, transient build
 directories, or machine-specific logs.
 
 Detailed plans for compatibility-changing refactoring directions live under `docs/refactoring/`. Create or
@@ -68,9 +69,8 @@ dataset creation follows `H5Dcreate2()` -> `H5D__create_api_common()` -> `H5VL_d
 user-visible object behavior. Raw file access ultimately passes through the VFL/VFD, while dataset filters are
 handled by `H5Z`.
 
-C++ wrappers are opt-in (`HDF5_BUILD_CPP_LIB=OFF` by default). The high-level
-library has been removed; `src/H5HL*` remains because it is the core local-heap
-package, not the former high-level product.
+The native C++ and high-level products have been removed. `src/H5HL*` remains
+because it is the core local-heap package, not the former high-level product.
 Release version macros live in `src/H5public.h` and feed the top-level CMake package version.
 
 ## Focused Development Workflow

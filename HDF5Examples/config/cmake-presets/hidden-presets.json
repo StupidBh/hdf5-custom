@@ -27,8 +27,7 @@
       "name": "ci-MSVC",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl"
+        "CMAKE_C_COMPILER": "cl"
       },
       "condition": {
         "type": "equals",
@@ -50,13 +49,6 @@
         "rhs": "Linux"
       },
       "generator": "Ninja"
-    },
-    {
-      "name": "ci-CPP",
-      "hidden": true,
-      "cacheVariables": {
-        "H5EXAMPLE_BUILD_CXX": "ON"
-      }
     },
     {
       "name": "ci-x64-Debug-MSVC",

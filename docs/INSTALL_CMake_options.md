@@ -1,6 +1,6 @@
 # HDF5 CMake build options
 
-The tables below document the CMake options that can be set to control how HDF5 is built. Options are typically set by passing them in the form of `-D<OPTION>=<VALUE>` when configuring HDF5. For example, `-DHDF5_BUILD_CPP_LIB=ON` will enable building of the HDF5 C++ wrapper. See [the CMake documentation](https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry) for a short description of option types and their associated values.
+The tables below document the CMake options that can be set to control how HDF5 is built. Options are typically set by passing them in the form of `-D<OPTION>=<VALUE>` when configuring HDF5. For example, `-DHDF5_BUILD_TOOLS=OFF` disables the command-line tools. See [the CMake documentation](https://cmake.org/cmake/help/latest/command/set.html#set-cache-entry) for a short description of option types and their associated values.
 
 The CMake build accepts Windows with compiler ID `MSVC` and Linux with compiler
 ID `GNU`. Generator, architecture, and exact compiler version are not firewall
@@ -21,8 +21,6 @@ Options settings for typical HDF5 configurations can be found in the [cacheinit.
   * [Installation options](#installation-options)
   * [Packaging options](#packaging-options)
   * [Compiler options](#compiler-options)
-* [Programming language wrappers options](#programming-language-wrappers-options)
-  * [C++ options](#pl_cxx)
 * [Parallel HDF5 options](#parallel-hdf5-options)
 * [Virtual File Driver options](#virtual-file-driver-options)
 * [VOL connector options](#vol-connector-options)
@@ -51,15 +49,15 @@ These are some common options that come from CMake itself and are not specific t
 | `CMAKE_INSTALL_PREFIX` | `STRING` | Varies by platform | HDF5 installation directory prefix. See [CMAKE_INSTALL_PREFIX](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html). |
 | `CMAKE_BUILD_TYPE` | `STRING` | `Release` | Build type for single-config generators. Valid values are `Release`, `Debug`, `RelWithDebInfo`, `MinSizeRel`, and `Developer`. Multi-config generators use `CMAKE_CONFIGURATION_TYPES`; the default Visual Studio list does not include `Developer`. |
 | `CMAKE_C_STANDARD` | `STRING` | `17` | Selects the ISO C standard for project-owned HDF5 sources. Values below C17 are rejected; a supported later value is retained but does not replace the exact C17 release-validation baseline. |
-| `CMAKE_CXX_STANDARD` | `STRING` | `20` | Selects the ISO C++ standard when the opt-in C++ components are enabled. Values below C++20 are rejected; a supported later value is retained but does not replace the exact C++20 release-validation baseline. |
+| `CMAKE_CXX_STANDARD` | `STRING` | `20` | Selects the ISO C++ standard for retained project-owned C++ test infrastructure, currently the optional API test driver. Values below C++20 are rejected when that infrastructure is enabled. |
 
 HDF5 requires the selected C standard and disables C language extensions for
 its own libraries, tools, tests, plugins, and examples. This source-build
 requirement is kept private: bundled third-party projects retain their own
 language settings, and installed HDF5 targets do not impose C17 on consumers.
-The same rules apply to C++20 when `HDF5_BUILD_CPP_LIB=ON`: HDF5-owned C++
-targets use strict C++20, dependency settings remain private, and installed
-targets do not impose C++20 on consumers.
+Retained project-owned C++ test targets use strict C++20 when enabled.
+Dependency settings remain private, and installed targets do not impose C++20
+on consumers.
 Installed C headers continue to support the documented C99 consumer baseline.
 
 ## General options
@@ -147,17 +145,6 @@ These options are generally passed through to the compiler to influence most or 
 | `HDF5_ENABLE_SYMBOLS` | `STRING` | `OFF` | If `YES`, adds compilation flags to enable debugging symbols, independent of the build type and optimization level. If `NO`, adds compilation flags to strip debugging symbols. Valid values are `YES`, `NO` and `OFF`. |
 | `HDF5_ENABLE_PROFILING` | `BOOL` | `OFF` | If `ON`, adds compilation flags for profiling, independent of the build type. |
 | `HDF5_ENABLE_OPTIMIZATION` | `BOOL` | `OFF` | If `ON`, adds compilation flags for optimization, independent of the build type. |
-
-## Programming language wrappers options
-
-These are options which are specific to HDF5's wrappers for programming languages.
-
-### C++ options
-<a name="pl_cxx"></a>
-
-| CMake option | Type | Default | Description |
-|:-------------|:-----|:--------|:------------|
-| `HDF5_BUILD_CPP_LIB` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 C++ wrapper interface. |
 
 ## Parallel HDF5 options
 
@@ -273,7 +260,6 @@ These are options which can be set for controlling how the HDF5 example programs
 |:-------------|:-----|:--------|:------------|
 | `HDF5_BUILD_EXAMPLES` | `BOOL` | `ON` | If `ON`, enables building of the HDF5 library (C) example programs. |
 | `H5EXAMPLE_USE_SHARED_LIBS` | `BOOL` | `ON` | If `ON`, build the standalone HDF5 examples against shared HDF5 libraries. Otherwise, use static HDF5 libraries. |
-| `H5EXAMPLE_BUILD_CXX` | `BOOL` | `OFF` | If `ON`, enables building of the HDF5 library C++ example programs. |
 | `H5EXAMPLE_ENABLE_PARALLEL` | `BOOL` | `OFF` | If `ON`, enables building of the parallel HDF5 library example programs. |
 | `H5EXAMPLE_BUILD_PYTHON` | `BOOL` | `OFF` | If `ON`, enables retained Python example programs. Python 3 and h5py must be available; this does not build a Python binding. |
 | `H5EXAMPLE_BUILD_FILTERS` | `BOOL` | `OFF` | If `ON`, enables filter plugin example programs. `H5EXAMPLE_USE_SHARED_LIBS` must be `ON`, and the installed package must provide shared libraries and plugin support. |
@@ -322,7 +308,6 @@ These are options which control how HDF5 testing is built and executed.
 | `HDF5_TEST_SERIAL` | `BOOL` | `ON` | If `ON`, enables testing of HDF5's serial (i.e., non-parallel) tests. |
 | `HDF5_TEST_PARALLEL` | `BOOL` | `ON` (if `HDF5_ENABLE_PARALLEL` is `ON`) | If `ON`, enables testing of HDF5's parallel tests. |
 | `HDF5_TEST_TOOLS` | `BOOL` | `ON` (if `HDF5_BUILD_TOOLS` is `ON`) | If `ON`, enables testing of HDF5's tool programs. |
-| `HDF5_TEST_CPP` | `BOOL` | `ON` (if `HDF5_BUILD_CPP_LIB` is `ON`) | If `ON`, enables testing of HDF5's C++ wrapper interface. |
 | `HDF5_TEST_EXAMPLES` | `BOOL` | `ON` (if `HDF5_BUILD_EXAMPLES` is `ON`) | If `ON`, enables testing of HDF5's example programs. |
 | `HDF5_TEST_API` | `BOOL` | `ON` | If `ON`, enables testing of HDF5's API tests. |
 | `HDF5_TEST_API_INSTALL` | `BOOL` | `OFF` | If `ON`, installs HDF5's API test programs on the system when installing HDF5. Has no effect if `HDF5_TEST_API` is `OFF`. |
@@ -346,7 +331,6 @@ These are options that control how the HDF5 compiler wrapper scripts are built.
 | CMake option | Type | Default | Description |
 |:-------------|:-----|:--------|:------------|
 | `HDF5_H5CC_C_COMPILER` | `STRING` | C compiler set at configure time for serial HDF5. <br /> MPI C compiler set at configure time for parallel HDF5 (usually `mpicc` or similar). | The program to use for compiling programs with `h5cc`. |
-| `HDF5_H5CC_CXX_COMPILER` | `STRING` | C++ compiler set at configure time. | The program to use for compiling programs with `h5c++`. |
 
 ## Debugging options
 
@@ -408,14 +392,8 @@ These are options that are deprecated in favor of other options and may be remov
 
 Some HDF5 feature configuration options are incompatible with each other and will cause a configuration error if enabled together without setting the `HDF5_ALLOW_UNSUPPORTED` option to `ON`. These features may or may not work together; they are simply combinations that are not tested or officially supported.
 
-- The parallel HDF5 library, enabled with `HDF5_ENABLE_PARALLEL` set to `ON`, is incompatible with the multi-thread concurrency and thread-safe features, as well as the C++ wrapper interface. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following options must be disabled:
+- The parallel HDF5 library, enabled with `HDF5_ENABLE_PARALLEL` set to `ON`, is incompatible with the multi-thread concurrency and thread-safe features. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following options must be disabled:
 
     - `HDF5_ENABLE_CONCURRENCY`
     - `HDF5_ENABLE_THREADSAFE`
-    - `HDF5_BUILD_CPP_LIB`
-
-- The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are incompatible with the C++ interface, as locking is not hoisted into its API calls. Unless `HDF5_ALLOW_UNSUPPORTED` has been specified, the following option must be disabled:
-
-    - `HDF5_BUILD_CPP_LIB`
-
 - The multi-thread concurrency (`HDF5_ENABLE_CONCURRENCY`) and thread-safe (`HDF5_ENABLE_THREADSAFE`) features are mutually exclusive, only one or the other may be enabled.

@@ -6,9 +6,6 @@
 # below. Keep this list small; add specific path rules instead of expanding it.
 * @jhendersonHDF
 
-# ── Language bindings ─────────────────────────────────────────────────────────
-/c++/                 @bmribler @glennsong09
-
 # ── Core C library ────────────────────────────────────────────────────────────
 /src/                 @fortnern @jhendersonHDF @mattjala @vchoi-hdfgroup @glennsong09
 /src/H5FDsubfiling/   @jhendersonHDF @brtnfld @fortnern

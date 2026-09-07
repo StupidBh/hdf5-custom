@@ -146,7 +146,6 @@ cmake -DHDF5_ENABLE_PARALLEL=ON ..
 | `-DHDF5_ENABLE_PARALLEL=ON` | Enable parallel HDF5 (required) |
 | `-DBUILD_SHARED_LIBS=ON` | Build shared libraries |
 | `-DBUILD_STATIC_LIBS=ON` | Build static libraries |
-| `-DHDF5_BUILD_CPP_LIB=OFF` | C++ disabled in parallel builds |
 | `-DHDF5_ENABLE_THREADSAFE=OFF` | Thread safety disabled in parallel builds |
 | `-DHDF5_ENABLE_SUBFILING_VFD=ON` | Enable subfiling VFD (parallel I/O optimization) |
 | `-DMPIEXEC_EXECUTABLE=mpiexec` | MPI launcher executable |
@@ -203,7 +202,7 @@ Add after `HDF5config.cmake,` separated by commas:
 |--------|-------------|
 | `HPC=sbatch` | Use SLURM batch system |
 | `HPC=bsub` | Use LSF batch system |
-| `MPI=true` | Enable parallel (disables C++ and threadsafe) |
+| `MPI=true` | Enable parallel (disables thread safety) |
 | `LOCAL_BATCH_SCRIPT_ARGS="--account=<acct>"` | Supply batch job account information |
 
 #### Examples
@@ -239,7 +238,6 @@ cmake \
   -DCMAKE_BUILD_TYPE:STRING=Release \
   -DCMAKE_INSTALL_PREFIX:PATH=/install/path \
   -DHDF5_ENABLE_PARALLEL:BOOL=ON \
-  -DHDF5_BUILD_CPP_LIB:BOOL=OFF \
   -DHDF5_ENABLE_THREADSAFE:BOOL=OFF \
   -DHDF5_ENABLE_ZLIB_SUPPORT:BOOL=OFF \
   -DHDF5_ENABLE_SZIP_SUPPORT:BOOL=OFF \
@@ -376,7 +374,6 @@ To run specific test suites:
 ```bash
 ctest -R "H5TEST"              # Core library tests
 ctest -R "MPI_TEST"            # Parallel/MPI tests
-ctest -R "CPP"                 # C++ tests
 ctest -E "MPI_TEST"            # Exclude parallel tests
 ctest --output-on-failure -j 6 # Run 6 tests in parallel
 ```

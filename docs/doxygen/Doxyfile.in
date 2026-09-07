@@ -723,9 +723,7 @@ FILE_PATTERNS  = H5*public.h H5*module.h H5*develop.h H5FD*.h \
                  H5version.h \
                  *.dox \
                  h5copy.h h5diff_main.h h5dump.h h5format_convert.h h5import.h h5jam.h h5ls.h h5repack.h h5stat.h \
-                 h5clear.h h5debug.h h5delete.h h5mkgrp.h h5repart.h \
-                 @HDF5_CPP_SRC_DIR@/*.h \
-                 @HDF5_CPP_SRC_DIR@/*.cpp
+                 h5clear.h h5debug.h h5delete.h h5mkgrp.h h5repart.h
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.

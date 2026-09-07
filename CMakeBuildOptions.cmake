@@ -138,14 +138,6 @@ function (hdf5_validate_threadsafe_options)
       message (VERBOSE " **** Allowing unsupported parallel and thread-safety options **** ")
     endif ()
   endif ()
-  if (HDF5_BUILD_CPP_LIB)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** C++ and thread-safety options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported C++ and thread-safety options **** ")
-    endif ()
-  endif ()
-
   # Check for threading package
   if (NOT Threads_FOUND)
     message (FATAL_ERROR " **** thread-safety option requires a threading package and none was found **** ")
@@ -175,14 +167,6 @@ function (hdf5_validate_concurrency_options)
       message (VERBOSE " **** Allowing unsupported parallel and multi-threaded concurrency options **** ")
     endif ()
   endif ()
-  if (HDF5_BUILD_CPP_LIB)
-    if (NOT HDF5_ALLOW_UNSUPPORTED)
-      message (FATAL_ERROR " **** C++ and multi-threaded concurrency options are not supported, override with HDF5_ALLOW_UNSUPPORTED option **** ")
-    else ()
-      message (VERBOSE " **** Allowing unsupported C++ and multi-threaded concurrency options **** ")
-    endif ()
-  endif ()
-
   # Check for threading package
   if (NOT Threads_FOUND)
     message (FATAL_ERROR " **** multi-threaded concurrency option requires a threading package and none was found **** ")
@@ -227,8 +211,6 @@ cmake_dependent_option (HDF5_LOCK_PLUGIN_KEYSTORE
   OFF "HDF5_REQUIRE_SIGNED_PLUGINS" OFF
 )
 mark_as_advanced (HDF5_LOCK_PLUGIN_KEYSTORE)
-
-option (HDF5_BUILD_CPP_LIB "Build HDF5 C++ Library" OFF)
 
 option (HDF5_BUILD_EXAMPLES "Build HDF5 Library Examples" ON)
 

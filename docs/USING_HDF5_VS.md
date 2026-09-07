@@ -15,8 +15,8 @@ For an existing Visual Studio project that cannot use CMake:
    its `lib` directory to the linker search path.
 3. Select the libraries for the components actually installed. Use
    `libhdf5.settings` and the files in the package's `lib` directory as the
-   source of truth; optional C++, compression, and parallel
-   libraries are configuration-dependent.
+   source of truth; optional compression and parallel libraries are
+   configuration-dependent.
 4. When linking the shared C library, define `H5_BUILT_AS_DYNAMIC_LIB` for the
    consumer and make the HDF5 DLLs available through the application's runtime
    search path. Do not define it for a static link.

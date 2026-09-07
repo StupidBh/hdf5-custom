@@ -56,7 +56,6 @@
       "name": "ci-CPP",
       "hidden": true,
       "cacheVariables": {
-        "HDF5_BUILD_CPP_LIB": "ON"
       }
     },
     {

@@ -33,11 +33,6 @@ LT_VERS_REVISION = 0
 ## Note that this versioning system doesn't attempt to handle
 ## the effects of the H5_V1_x_COMPAT flag.
 ##
-## Version numbers for wrapper shared library files.
-LT_CXX_VERS_INTERFACE = 1000
-LT_CXX_VERS_AGE = 0
-LT_CXX_VERS_REVISION = 0
-
 LT_TOOLS_VERS_INTERFACE = 1000
 LT_TOOLS_VERS_AGE = 0
 LT_TOOLS_VERS_REVISION = 0

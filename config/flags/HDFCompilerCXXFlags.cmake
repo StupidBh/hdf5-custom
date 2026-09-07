@@ -129,9 +129,6 @@ if (CMAKE_CXX_COMPILER_LOADED)
   string (PREPEND HDF5_REPORTED_CXX_FLAGS "${HDF5_REPORTED_CXX_FLAGS_PREFIX}")
   string (APPEND HDF5_REPORTED_CXX_FLAGS "${HDF5_REPORTED_CXX_FLAGS_SUFFIX}")
 
-  set (_HDF5_H5CC_CXX_COMPILER ${CMAKE_CXX_COMPILER})
-  set (HDF5_H5CC_CXX_COMPILER ${_HDF5_H5CC_CXX_COMPILER} CACHE STRING "C++ compiler to use in h5c++")
-  mark_as_advanced (HDF5_H5CC_CXX_COMPILER)
 endif ()
 
 #-----------------------------------------------------------------------------

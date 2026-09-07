@@ -9,7 +9,6 @@ cache variables and defaults. Common conceptual replacements include:
 
 | Former build concern | Current CMake setting |
 | --- | --- |
-| Enable C++ wrappers | `HDF5_BUILD_CPP_LIB=ON` |
 | Enable parallel HDF5 | `HDF5_ENABLE_PARALLEL=ON` |
 | Enable zlib or SZIP-compatible filters | `HDF5_ENABLE_ZLIB_SUPPORT=ON` or `HDF5_ENABLE_SZIP_SUPPORT=ON` |
 | Select the default compatibility API | `HDF5_DEFAULT_API_VERSION=<version>` |

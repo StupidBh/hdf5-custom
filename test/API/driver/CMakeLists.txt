@@ -3,6 +3,8 @@ project(H5_API_TEST_DRIVER CXX)
 
 include (${CMAKE_CURRENT_LIST_DIR}/../../../config/cmake/HDF5PlatformSupport.cmake)
 hdf5_validate_platform_support (LANGUAGES CXX)
+include (${HDF_CONFIG_DIR}/flags/HDFCompilerCXXFlags.cmake)
+hdf5_configure_cxx_build_options ()
 
 if (NOT KWSYS_USE_LOCALCONTENT)
   set (KWSYS_URL ${KWSYS_TGZ_ORIGPATH}/${KWSYS_TGZ_NAME})

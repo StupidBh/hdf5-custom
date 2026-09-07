@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-06
+Last updated: 2026-09-07
 
 ## Purpose
 
@@ -36,8 +36,8 @@ product contracts while preserving the retained core C product and the two
 required business profiles. The user approved implementation on 2026-09-06,
 and Work Package 4A has frozen the pre-removal contract at `72e36a522`, with
 pre-removal stabilization through `3118d8c2c`. Work Package 4B removed the
-complete HL product at `c62d134e5`. Work Package 4C native C++ removal is the
-next-machine continuation. Its
+    complete HL product at `c62d134e5`, and Work Package 4C removed the native
+    C++ product at `3dc988a48`. Work Package 4D is the next continuation. Its
 execution record is
 [`docs/refactoring/NativeCppHlRemovalResults.md`](docs/refactoring/NativeCppHlRemovalResults.md).
 The HighFive dependency input is recorded in
@@ -62,7 +62,7 @@ completed supported-platform reduction plan.
 | 1 | Raise project organization and build entry points to CMake 4.0 and mechanically reject target-system/compiler pairs other than Windows/MSVC and Linux/GNU. | Complete | Yes |
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
-| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Packages 4A and 4B complete, Work Package 4C next | No |
+| 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | In progress; Work Packages 4A through 4C complete, Work Package 4D next | No |
 | 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
@@ -76,7 +76,7 @@ and have no approved scope.
 ## Active Direction
 
 - Direction: Roadmap Stage 4 native C++ and HL product removal
-- Status: In progress; Work Packages 4A and 4B complete, Work Package 4C next
+- Status: In progress; Work Packages 4A through 4C complete, Work Package 4D next
 - Detailed plan: `docs/refactoring/NativeCppHlRemoval.md`
 - Execution results: `docs/refactoring/NativeCppHlRemovalResults.md`
 - HighFive audit: `docs/refactoring/HighFiveHDF5ApiDependencyAudit.md`
@@ -90,7 +90,7 @@ and have no approved scope.
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Implementation anchor: `c62d134e5` for roadmap Stage 4 Work Package 4B
+- Implementation anchor: `3dc988a48` for roadmap Stage 4 Work Package 4C
 - Retained contract: freeze core C installed headers, symbols, package paths,
   retained tools, and file-format behavior at the future execution baseline
 - Removed contract: native C++, HL C/C++, `h5c++`, and HL-owned `h5watch`
@@ -450,16 +450,26 @@ implementation anchor `0b9e21c34` and is detailed in
   header, tool, component, or package metadata. Dual-platform installed
   HighFive-style consumers compile, link, run, and verify data using only the
   retained core C shared target.
+- Completed roadmap Stage 4 Work Package 4C at `3dc988a48`. The native `c++/`
+  tree, native C++ examples, libraries, headers, tests, `h5c++`, options,
+  exports, package metadata, settings, CI assumptions, and current product
+  documentation are removed. Separately owned API-driver C++20 infrastructure
+  remains.
+- Passed clean default Release builds and focused 12-test selections on
+  Windows/MSVC and Linux/GNU. Installs, binary and source packages, artifact
+  scans, workflow/preset parsing, and the retained C++20/C++23/lower-standard
+  contract matrix pass on both validators at `HDF_TEST_EXPRESS=3` and at most
+  four parallel jobs.
 
 ## Remaining
 
 - No supported-platform reduction implementation or validation work remains.
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
-- Execute roadmap Stage 4 Work Package 4C on the next machine: remove the
-  native `c++/` product, its tests/examples, `h5c++`, and only the native C++
-  build, install, export, package, wrapper, settings, and documentation
-  contracts. Do not revisit the completed HL removal without new evidence.
-- Continue with Work Packages 4D through 4F only after 4C reaches its own gate.
+- Execute roadmap Stage 4 Work Package 4D: normalize the retained package and
+  consumer contracts and add deliberate dual-platform negative checks for the
+  removed options, components, targets, headers, libraries, metadata, wrappers,
+  and tools.
+- Continue with Work Packages 4E and 4F only after 4D reaches its own gate.
   Work Package 4F must classify inherited historical and technical prose that
   still mentions removed HL interfaces; those terms are not active product
   contracts after 4B.
@@ -470,13 +480,14 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The immediate next-machine continuation point is Work Package 4C of the approved
+The immediate continuation point is Work Package 4D of the approved
 [roadmap Stage 4 native C++ and HL product-removal plan](docs/refactoring/NativeCppHlRemoval.md).
-First confirm Work Package 4B implementation anchor `c62d134e5` and a clean
-tracked state. Then delete only the native C++ product and its owned contracts.
-Do not remove or alter `src/H5HL*`; it is the retained core local-heap package
-despite the similar prefix. Preserve retained tools, core C API/ABI, package
-routes, and file-format behavior.
+First confirm Work Package 4C implementation anchor `3dc988a48` and a clean
+tracked state. Then make removed option and component rejection deliberate,
+exercise build-tree, install-tree, `add_subdirectory()`, FetchContent-style, and
+HighFive-style retained consumers, and prove removed artifacts stay absent.
+Do not remove or alter `src/H5HL*`; preserve retained tools, core C API/ABI,
+package routes, and file-format behavior.
 
 Do not wire HighFive into the HDF5 build/package or revive the deleted C++20
 internal-modernization plan as part of Stage 4. Roadmap Stages 5 through 7 have

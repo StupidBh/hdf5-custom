@@ -6,10 +6,11 @@
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Removal implementation anchor: `c62d134e5`
+- Removal implementation anchor: `3dc988a48`
 - Work Package 4A: Complete
 - Work Package 4B: Complete
-- Work Packages 4C through 4F: Not started
+- Work Package 4C: Complete
+- Work Packages 4D through 4F: Not started
 - Plan: [NativeCppHlRemoval.md](NativeCppHlRemoval.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -18,8 +19,8 @@
 The user approved removal of the native C++ and complete high-level products
 on 2026-09-06. Approval does not include HighFive integration, a compatibility
 shim, a core C API or ABI change, a retained-tool removal, or a file-format
-change. Work Packages 4A and 4B are closed. The complete HL product is removed
-at `c62d134e5`; native C++ removal remains reserved for Work Package 4C.
+change. Work Packages 4A through 4C are closed. The complete HL product is
+removed at `c62d134e5`, and the native C++ product is removed at `3dc988a48`.
 
 ## Baseline Identity
 
@@ -179,10 +180,46 @@ to frozen Windows/MS-MPI exceptions, post-removal installs and packages have
 no HL artifact, and dual-platform retained consumers pass. Work Package 4B is
 complete at `c62d134e5`.
 
+## Work Package 4C Implementation
+
+Commit `3dc988a48` removes all 96 tracked paths below `c++/`, the 22 native C++
+example paths below `HDF5Examples/CXX`, and the native C++ API guide. It also
+removes `HDF5_BUILD_CPP_LIB`, root and example wiring, native C++ targets and
+exports, `H5Cpp.h` and companion installed headers, `h5c++`, C++ pkg-config and
+install components, generated product settings, CI assumptions, and current
+product documentation.
+
+The five classified C++ implementation files outside the removed trees remain.
+The API test driver continues to own strict C++20 configuration; dependency
+scope tests retain their lower-language isolation. The core C library,
+`src/H5HL*`, retained tools, file-format behavior, and untracked HighFive audit
+input were not changed or integrated.
+
+## Work Package 4C Validation
+
+| Pair | Build and focused tests | Install/package contract | Retained C++ contract |
+| --- | --- | --- | --- |
+| Windows/MSVC | Default Release complete build passed; focused selection passed 12/12 with fixtures | Install, binary ZIP, and source ZIP passed; no native C++ artifact or active contract | Default C++20, C++23 preservation, dependency scope, and C++98/11/14/17 rejection passed with 2 driver compile groups |
+| Linux/GNU | Default Release complete Ninja build passed; focused selection passed 12/12 with fixtures | Install, binary TGZ, and source TGZ passed; no native C++ artifact or active contract | The same retained standard matrix passed with 2 driver compile groups |
+
+All validation used `HDF_TEST_EXPRESS=3`, and no build or CTest job count
+exceeded four. The generated CMake caches, install metadata, package manifests,
+and source archives contain no native C++ product path, library, header,
+wrapper, component, or removed option. All 57 workflow YAML files, affected
+preset JSON, and CMake preset expansion also parse successfully.
+
+## Work Package 4C Gate
+
+The native C++ product and its active contracts are absent, retained default
+products build on both validators, focused retained tests pass, installed and
+packaged trees are clean, and separately owned C++20 infrastructure retains its
+dual-platform standard contract. Work Package 4C is complete at `3dc988a48`.
+
 ## Next Continuation Point
 
-Resume on the next machine at Work Package 4C only. Confirm implementation
-anchor `c62d134e5` and a clean tracked worktree, then remove the native `c++/`
-product and only its owned contracts. Preserve `src/H5HL*`, retained tools,
-core C API/ABI, file-format behavior, and the untracked HighFive audit input.
-Do not redo Work Package 4B unless its frozen contract changes.
+Resume at Work Package 4D only. Confirm implementation anchor `3dc988a48` and a
+clean tracked worktree, then normalize the retained package and consumer
+contracts and add deliberate negative checks for all removed products. Preserve
+`src/H5HL*`, retained tools, core C API/ABI, file-format behavior, and the
+untracked HighFive audit input. Do not redo Work Packages 4B or 4C unless their
+frozen contracts change.

@@ -326,8 +326,9 @@ The final active-file search covers deleted directories, options, components,
 targets, headers, libraries, wrappers, examples, and `h5watch`. Active matches
 remain only in the deliberate top-level rejection and the negative contract
 harness. Matches in `hdf5_1_8.dox`, the versioned software-change documents,
-release history, and this execution record are historical facts rather than
-live product claims. No unclassified active reference remains.
+the paused `CMakeModernizationProgress.md` evidence, release history, and this
+execution record are historical facts rather than live product claims. No
+unclassified active reference remains.
 
 The Work Package 4A retained-contract comparison produced these exact results:
 

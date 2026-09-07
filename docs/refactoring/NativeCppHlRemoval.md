@@ -10,7 +10,7 @@ Plan approval: 2026-09-06
 
 Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 
-Implementation anchor: `3dc988a48`
+Implementation anchor: `81dff5168`
 
 ## Decision
 

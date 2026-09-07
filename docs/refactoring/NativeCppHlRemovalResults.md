@@ -6,11 +6,12 @@
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 - Pre-removal stabilization anchor: `3118d8c2c`
-- Removal implementation anchor: `3dc988a48`
+- Removal implementation anchor: `81dff5168`
 - Work Package 4A: Complete
 - Work Package 4B: Complete
 - Work Package 4C: Complete
-- Work Packages 4D through 4F: Not started
+- Work Package 4D: Complete
+- Work Packages 4E and 4F: Not started
 - Plan: [NativeCppHlRemoval.md](NativeCppHlRemoval.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -215,11 +216,43 @@ products build on both validators, focused retained tests pass, installed and
 packaged trees are clean, and separately owned C++20 infrastructure retains its
 dual-platform standard contract. Work Package 4C is complete at `3dc988a48`.
 
+## Work Package 4D Implementation and Validation
+
+Commit `81dff5168` makes both removed top-level options fail with an explicit
+migration diagnostic and makes the installed CMake package reject `CXX`, `HL`,
+and `CXX_HL` before loading targets or dependencies. The package exports only
+the retained `static`, `shared`, `C`, and `Tools` component vocabulary.
+
+A reusable contract harness passed on Windows/MSVC and Linux/GNU. On each
+validator it covered:
+
+- explicit rejection of `HDF5_BUILD_CPP_LIB` and `HDF5_BUILD_HL_LIB`;
+- rejection of all three removed components through both build-tree and
+  install-tree packages;
+- compile, link, and execution of retained C consumers through both package
+  routes;
+- compile, link, and execution through `add_subdirectory()` and local-source
+  FetchContent integration;
+- compile, link, dataset write/read, and value verification for the workspace
+  HighFive headers through both package routes; and
+- absence of removed targets, variables, headers, libraries, pkg-config files,
+  wrappers, tools, and generated contract text.
+
+The HighFive headers remain untracked audit input and were not added to any
+HDF5 build, export, install, or package surface. No contract workload exceeded
+four build jobs.
+
+## Work Package 4D Gate
+
+All retained consumer routes pass and every removed option, component, target,
+variable, and artifact check has the expected dual-platform result. Work
+Package 4D is complete at `81dff5168`.
+
 ## Next Continuation Point
 
-Resume at Work Package 4D only. Confirm implementation anchor `3dc988a48` and a
-clean tracked worktree, then normalize the retained package and consumer
-contracts and add deliberate negative checks for all removed products. Preserve
-`src/H5HL*`, retained tools, core C API/ABI, file-format behavior, and the
-untracked HighFive audit input. Do not redo Work Packages 4B or 4C unless their
-frozen contracts change.
+Resume at Work Package 4E only. Confirm implementation anchor `81dff5168` and a
+clean tracked worktree, then execute clean default, Profile A, Profile B, Unix
+Makefiles, focused feature, cross-platform read, package, and HighFive consumer
+validation on both retained pairs. Preserve `src/H5HL*`, retained tools, core C
+API/ABI, file-format behavior, and the untracked HighFive audit input. Do not
+redo Work Packages 4B through 4D unless their frozen contracts change.

@@ -1,0 +1,7 @@
+Package: libaec
+Version: 1.1.7
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 26e2a66f398b7c186b6bdd1c019abb172ec2e08fb69e58a0fe9c63325e6387d6
+Description: Adaptive Entropy Coding library

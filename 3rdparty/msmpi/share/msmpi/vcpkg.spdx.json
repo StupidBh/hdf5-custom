@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.2.1/schemas/spdx-schema.json",
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentNamespace": "https://spdx.org/spdxdocs/msmpi-x64-windows-10.1.12498#5-4571625b-8c61-4541-b3b3-bdd5548ac7d4",
+  "name": "msmpi:x64-windows@10.1.12498#5 6adb2ebb45b3c72292610c9aa31f46d87b55a9c16df10131d5f06d1bdecd0124",
+  "creationInfo": {
+    "creators": [
+      "Tool: vcpkg-2025-07-21-d4b65a2b83ae6c3526acd1c6f3b51aff2a884533"
+    ],
+    "created": "2025-08-25T14:12:08Z"
+  },
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "GENERATES",
+      "relatedSpdxElement": "SPDXRef-binary"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-0"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-1"
+    },
+    {
+      "spdxElementId": "SPDXRef-port",
+      "relationshipType": "CONTAINS",
+      "relatedSpdxElement": "SPDXRef-file-2"
+    },
+    {
+      "spdxElementId": "SPDXRef-binary",
+      "relationshipType": "GENERATED_FROM",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-0",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "CONTAINED_BY",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    }
+  ],
+  "packages": [
+    {
+      "name": "msmpi",
+      "SPDXID": "SPDXRef-port",
+      "versionInfo": "10.1.12498#5",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/msmpi",
+      "homepage": "https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "Microsoft MPI (MS-MPI) is a Microsoft implementation of the Message Passing Interface standard for developing and running parallel applications on the Windows platform.",
+      "comment": "This is the port (recipe) consumed by vcpkg."
+    },
+    {
+      "name": "msmpi:x64-windows",
+      "SPDXID": "SPDXRef-binary",
+      "versionInfo": "6adb2ebb45b3c72292610c9aa31f46d87b55a9c16df10131d5f06d1bdecd0124",
+      "downloadLocation": "NONE",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "comment": "This is a binary package built by vcpkg."
+    },
+    {
+      "SPDXID": "SPDXRef-resource-0",
+      "name": "msmpisdk-${MSMPI_VERSION}-b0087dfd.msi",
+      "packageFileName": "msmpisdk-${MSMPI_VERSION}-b0087dfd.msi",
+      "downloadLocation": "https://download.microsoft.com/download/a/5/2/a5207ca5-1203-491a-8fb8-906fd68ae623/msmpisdk.msi",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "b0087dfd21423bf87b94b17d7cb03576838585371bbf8b03cca95c3ad73670108c7bc6517b0de852ef595072cc4143be2011636e7242bcb080394d94294848a7"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-resource-1",
+      "name": "msmpisetup-${MSMPI_VERSION}.exe",
+      "packageFileName": "msmpisetup-${MSMPI_VERSION}.exe",
+      "downloadLocation": "https://download.microsoft.com/download/a/5/2/a5207ca5-1203-491a-8fb8-906fd68ae623/msmpisetup.exe",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA512",
+          "checksumValue": "1ee463e7dfc3e55a7ac048fdfde13fef09a5eea4b74d8fd7c22a7aad667a025b467ce939e5de308e25bbc186c3fe66e0e24ac03a3741656fc7558f2af2fa132a"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "fileName": "./mpi-wrapper.cmake",
+      "SPDXID": "SPDXRef-file-0",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b0252c29a4bfe94869e8f58318dbedc5cee080f404a2b14562d223dbda98fb5f"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./portfile.cmake",
+      "SPDXID": "SPDXRef-file-1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ac67c8463f2437b787f387425d9f6726626c44ebef5f0a8079f3727db971a031"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./vcpkg.json",
+      "SPDXID": "SPDXRef-file-2",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c0bb381a66a2d2512088be6db06ab92d9619f03c39ad13e4a51cb5887996de35"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ]
+}

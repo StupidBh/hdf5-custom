@@ -2,16 +2,19 @@
 
 ## Status
 
-- State: In progress
+- State: Complete
 - Plan approval: 2026-09-06
 - Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 - Pre-removal stabilization anchor: `3118d8c2c`
 - Removal implementation anchor: `81dff5168`
+- Product-matrix source anchor: `55bad410b`
+- Post-matrix audit-input anchor: `c461ae3e8`
 - Work Package 4A: Complete
 - Work Package 4B: Complete
 - Work Package 4C: Complete
 - Work Package 4D: Complete
-- Work Packages 4E and 4F: Not started
+- Work Package 4E: Complete
+- Work Package 4F: Complete
 - Plan: [NativeCppHlRemoval.md](NativeCppHlRemoval.md)
 - Portable handoff: [../../REFACTORING_PROGRESS.md](../../REFACTORING_PROGRESS.md)
 - Required `HDF_TEST_EXPRESS`: `3`
@@ -20,7 +23,7 @@
 The user approved removal of the native C++ and complete high-level products
 on 2026-09-06. Approval does not include HighFive integration, a compatibility
 shim, a core C API or ABI change, a retained-tool removal, or a file-format
-change. Work Packages 4A through 4C are closed. The complete HL product is
+change. Work Packages 4A through 4F are closed. The complete HL product is
 removed at `c62d134e5`, and the native C++ product is removed at `3dc988a48`.
 
 ## Baseline Identity
@@ -32,9 +35,11 @@ repair and cover Windows/MS-MPI failures without changing the planned HL or
 native C++ product boundary. Untracked `.codex/`, `.idea/`, and `highfive/`
 entries are excluded from the product baseline and all implementation commits.
 
-The workspace `highfive/` header tree remains an untracked, content-pinned
-audit and consumer input. It is not part of the HDF5 build, installation,
-exports, source package, or binary package.
+The workspace `highfive/` header tree was an untracked, content-pinned audit
+and consumer input through the product-matrix source anchor. It was subsequently
+tracked at `c461ae3e8`, after the Stage 4 product changes, without any HDF5
+CMake, source, test, install, export, or binary-package wiring. The final
+HighFive consumers use that tracked 3.3.0 content.
 
 ## Qualified Validators
 
@@ -52,10 +57,13 @@ exports, source package, or binary package.
 | State | Qualified | Qualified |
 
 Windows compiler invocations use `CL=/utf-8`. Windows and WSL workloads ran
-sequentially, with no build or CTest job count above four. The CLion MCP
-service was unavailable, so validation used normal PowerShell and WSL
-terminals. Build, install, package, contract, and evidence outputs remain
-outside the tracked source tree.
+sequentially, with no build or CTest job count above four. Work Packages 4A
+through 4D used normal PowerShell and WSL terminals while CLion MCP was
+unavailable. Work Packages 4E and 4F used the active CLion MCP service for
+repository navigation, short build/test commands, diagnostics, and audits;
+long complete builds and full CTest runs used persistent terminal sessions
+because the MCP terminal has a bounded execution timeout. All generated output
+remains outside the tracked source tree.
 
 ## Work Package 4A Inventory
 
@@ -248,11 +256,116 @@ All retained consumer routes pass and every removed option, component, target,
 variable, and artifact check has the expected dual-platform result. Work
 Package 4D is complete at `81dff5168`.
 
+## Work Package 4E Product Matrix
+
+All six required Release configurations were built from a clean Git archive
+at `55bad410b`, with `HDF_TEST_EXPRESS=3` and no build or CTest job count above
+four. Configure, complete build, install, and native binary package generation
+passed for every row.
+
+| Pair and configuration | Registered | CTest-pass classification | Failed | Disabled | Skipped |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Windows default | 2,770 | 2,733 | 0 | 37 | 0 |
+| Windows Profile A | 3,157 | 3,143 | 4 | 10 | 0 |
+| Windows Profile B | 3,114 | 3,101 | 3 | 10 | 0 |
+| Linux default | 2,772 | 2,735 | 0 | 37 | 0 |
+| Linux Profile A | 3,163 | 3,153 | 0 | 10 | 0 |
+| Linux Profile B | 3,120 | 3,110 | 0 | 10 | 0 |
+
+The four Windows Profile A failures are the frozen
+`MPI_TEST_t_pmulti_dset`, `MPI_TEST_t_select_io_dset`,
+`MPI_TEST_t_filters_parallel`, and `MPI_TEST_t_2Gio` baseline exceptions. Its
+`MPI_TEST_t_pflush1` case also reproduced the frozen hang; targeted termination
+produced the expected nonzero result for its `WILL_FAIL` property, so CTest
+classified that case as passed even though it did not complete normally. The
+three Windows Profile B failures are the frozen `MPI_TEST_t_pmulti_dset`,
+`MPI_TEST_t_select_io_dset`, and `MPI_TEST_t_filters_parallel` exceptions. No
+new or unexplained failure occurred. Both Linux/Open MPI profiles passed every
+enabled test, including the corresponding parallel I/O cases.
+
+| Pair and configuration | Install entries | Binary-package entries | Removed-product matches |
+| --- | ---: | ---: | ---: |
+| Windows default | 107 | 107 | 0 |
+| Windows Profile A | 105 | 105 | 0 |
+| Windows Profile B | 103 | 103 | 0 |
+| Linux default | 104 | 107 | 0 |
+| Linux Profile A | 102 | 105 | 0 |
+| Linux Profile B | 100 | 103 | 0 |
+
+The Linux Unix Makefiles row configured successfully and built the selected
+static and shared core libraries, API driver, cross-platform reader, `h5dump`,
+and retained C example. Its focused API selection passed 8/8, the cross-read
+fixture group passed 3/3 after explicitly building its documented
+`HDF5_TEST_LIB_files` prerequisite, and the C example group passed 2/2.
+
+Standalone Map consumers compiled, linked, and passed 1/1 against both shared
+Profile A and static Profile B installs on both validators. They confirmed the
+existing native-VOL unsupported optional-method result. One initial Linux
+launch omitted the libaec runtime directory and could not load `libsz.so.2`;
+the correctly provisioned gate passed and the setup-only result is not product
+evidence.
+
+The complete package/consumer harness passed on both validators. Its final
+Linux repetition covered build-tree and install-tree C consumers, removed
+option and component rejection, `add_subdirectory()`, local FetchContent, and
+two HighFive dataset write/read consumers. The matching Windows harness passed
+the same routes. Full suites and focused checks jointly cover retained C
+examples, API drivers, tools, filters, MPI/parallel, Profile A thread safety,
+and cross-platform file reads.
+
+## Work Package 4E Gate
+
+Every required matrix row is complete. All deviations are identical to frozen
+Windows/MS-MPI exceptions, every retained consumer route passes, and no removed
+product artifact or contract appears in a build, install, export, binary
+package, or consumer surface.
+
+## Work Package 4F Residual Audit
+
+The final active-file search covers deleted directories, options, components,
+targets, headers, libraries, wrappers, examples, and `h5watch`. Active matches
+remain only in the deliberate top-level rejection and the negative contract
+harness. Matches in `hdf5_1_8.dox`, the versioned software-change documents,
+release history, and this execution record are historical facts rather than
+live product claims. No unclassified active reference remains.
+
+The Work Package 4A retained-contract comparison produced these exact results:
+
+- Windows `dumpbin` export sets are identical at 3,964 core C symbols, and
+  Linux `nm -D` export sets are identical at 4,060 core C symbols.
+- Core `src/H5*.c` implementation files, cross-platform reader sources, and
+  cross-platform fixtures have no diff from `3118d8c2c`.
+- The common installed core header set is preserved. The only removed default
+  install headers are the eight frozen HL headers; edits in retained public
+  headers remove HL documentation references without changing declarations.
+- The default install library-name delta contains only the four HL library
+  files, the retained-tool delta contains only `h5watch`, and the installed
+  export-target delta contains only `hdf5_hl-shared` and `h5watch`.
+- The default CTest inventory removes 83 tests and adds none; all 83 are frozen
+  HL example, HL library, or `h5watch` tests. Native C++ test deltas were
+  separately frozen and closed by Work Package 4C.
+- Re-extraction from the final HighFive 3.3.0 headers yields the same 147 HDF5
+  C function dependencies as the audited table, with no missing or extra name.
+
+After the full product matrix, `1aa4282c3` added repository-local copies of the
+already qualified Windows dependency inputs and `c461ae3e8` tracked the audited
+HighFive headers. The diff from `55bad410b` to that audit-input anchor contains
+only `3rdparty/**` and `highfive/**`; no CMake, HDF5 source, test, example,
+install, export, package-definition, or current product-documentation input
+changed. These additions therefore do not alter the validated HDF5 product
+graph. HighFive remains absent from HDF5 targets, installs, exports, and native
+binary packages.
+
+## Work Package 4F Gate
+
+Every removed contract has positive absence evidence, every frozen retained
+contract has passing evidence, and the residual search has no unresolved active
+reference. Roadmap Stage 4 is complete.
+
 ## Next Continuation Point
 
-Resume at Work Package 4E only. Confirm implementation anchor `81dff5168` and a
-clean tracked worktree, then execute clean default, Profile A, Profile B, Unix
-Makefiles, focused feature, cross-platform read, package, and HighFive consumer
-validation on both retained pairs. Preserve `src/H5HL*`, retained tools, core C
-API/ABI, file-format behavior, and the untracked HighFive audit input. Do not
-redo Work Packages 4B through 4D unless their frozen contracts change.
+No roadmap Stage 4 work remains. Roadmap Stages 5 through 7 have no approved
+scope and remain future plan to be determined. Resume the separately paused
+CMake modernization only after explicit direction and from its own recorded
+anchor; do not infer a HighFive integration project from this completed removal
+stage.

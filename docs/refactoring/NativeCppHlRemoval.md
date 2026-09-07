@@ -1,8 +1,8 @@
 # Native C++ and High-Level Product Removal Plan
 
-State: In progress
+State: Complete
 
-Last updated: 2026-09-07
+Last updated: 2026-09-08
 
 Planning source anchor: `55a930c0d`
 
@@ -12,6 +12,10 @@ Execution baseline: `72e36a522bf2f4f2c272f0edae14705139e35deb`
 
 Implementation anchor: `81dff5168`
 
+Product-matrix source anchor: `55bad410b`
+
+Post-matrix audit-input anchor: `c461ae3e8`
+
 ## Decision
 
 Roadmap Stage 4 will physically remove the repository's native `c++/` tree,
@@ -20,14 +24,18 @@ is to build, test, install, export, package, document, or consume those
 products.
 
 The replacement C++ direction is HighFive. The workspace `highfive/` header
-copy is an audit input, but it is not wired into the build, install, export, or
-package in this stage. The content-pinned dependency audit is
+copy is an audit input, but it is not wired into the HDF5 build, install,
+export, or native binary package in this stage. It was untracked when this plan
+was approved and was subsequently tracked at `c461ae3e8`, after the product
+matrix, without product integration. The content-pinned dependency audit is
 [`HighFiveHDF5ApiDependencyAudit.md`](HighFiveHDF5ApiDependencyAudit.md).
 
 The user approved this plan on 2026-09-06 without broadening it into HighFive
 integration. Work Package 4A selected the clean tracked execution baseline
-above and is freezing the exact pre-removal contracts before product changes
-begin.
+above and froze the exact pre-removal contracts before product changes began.
+Work Packages 4A through 4F are complete; detailed implementation and
+validation evidence is in
+[`NativeCppHlRemovalResults.md`](NativeCppHlRemovalResults.md).
 
 ## Intended Endpoint
 
@@ -390,7 +398,8 @@ Roadmap Stage 4 is complete only when:
 3. Core C headers, API/ABI, file-format behavior, retained tools, and all 147
    audited HighFive dependencies remain available.
 4. HighFive-style consumers compile, link, and run using the workspace headers
-   without HighFive being integrated into the HDF5 build or package.
+   without HighFive being integrated into the HDF5 build, install, export, or
+   native binary package.
 5. Positive retained-contract evidence and negative removed-contract evidence
    are recorded in a portable results document.
 6. The residual audit has no unresolved active reference.

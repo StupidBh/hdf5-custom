@@ -2,7 +2,7 @@
 
 State: Complete (snapshot audit only)
 
-Last updated: 2026-09-06
+Last updated: 2026-09-08
 
 ## Decision and Scope
 
@@ -11,16 +11,17 @@ This document records which HDF5 interfaces are referenced by the workspace
 native HDF5 C++ and high-level products while retaining the core C interfaces
 needed by the future HighFive consumer.
 
-The workspace header copy is present but was untracked at audit time. This
-audit does not wire it into CMake, install it, export it, package it, or make it
-part of the current HDF5 product. A temporary external checkout was used only
-as a read-only upstream comparison and is not a repository input.
+The workspace header copy was present but untracked at audit time. It was later
+tracked at `c461ae3e8`, after the Stage 4 product matrix, without HDF5 CMake,
+install, export, or native binary-package wiring. Tracking the audit input does
+not make it part of the HDF5 product. A temporary external checkout was used
+only as a read-only upstream comparison and is not a repository input.
 
 ## Audited Snapshot
 
 | Field | Value |
 | --- | --- |
-| Workspace source | Untracked header-only tree at repository path `highfive/` |
+| Workspace source | Header-only tree at repository path `highfive/`; untracked at audit time and tracked at `c461ae3e8` |
 | Declared version | 3.3.0 |
 | Content-manifest SHA-256 | `25c7d5e69a69c446b8024941465449b51c9a62c2eb3ce2f981babd9fa6137910` |
 | Upstream comparison | HighFive `main` commit `959ec30c5cee48ff4dbb458b9f233beded708a36` dated 2026-05-09 |
@@ -137,6 +138,17 @@ status is a separate decision.
 3. Package cleanup must preserve the current core package targets. Upstream
    HighFive's `HDF5::HDF5` expectation is a future integration question, not
    authority to add or change an HDF5 package target during Stage 4.
-4. HighFive source ownership/tracking, version policy, CMake integration,
-   installation layout, exported targets, tests, and public API policy remain
-   future work. They are not authorized by this audit or by Stage 4 removal.
+4. HighFive source tracking changed separately at `c461ae3e8`. Version policy,
+   CMake integration, installation layout, exported targets, tests, and public
+   API policy remain future work and are not authorized by this audit or by
+   Stage 4 removal.
+
+## Stage 4 Closeout Check
+
+The final tracked HighFive 3.3.0 tree still contains 76 `.hpp` files and one
+`.in` template. Re-extraction of direct calls and the seven manually reviewed
+property-list getter function pointers produces exactly the same 147 names as
+the table above, with no missing or additional dependency. Dual-platform
+consumers compile, link, create a dataset, read it back, and verify its values
+through the retained core C package target. No HighFive target, installed
+header, export, or native binary-package artifact was added by Stage 4.

@@ -19,9 +19,10 @@ plan in this directory.
 - [HighFive HDF5 API dependency audit](HighFiveHDF5ApiDependencyAudit.md):
   Complete snapshot audit; records the 147 HDF5 C function dependencies,
   public-header and feature dependencies, and the absence of native C++ and HL
-  dependencies without integrating HighFive into this repository.
+  dependencies. The audited headers are tracked as repository input but remain
+  outside the HDF5 build, install, export, and binary-package products.
 - [Roadmap Stage 4 native C++ and HL product removal](NativeCppHlRemoval.md):
-  In progress; physically remove `c++/`, complete `hl/`, and their build, test,
+  Complete; physically removed `c++/`, complete `hl/`, and their build, test,
   install, export, package, wrapper, tool, example, and documentation
   contracts while preserving the retained core C product and the two required
   business profiles.
@@ -66,9 +67,9 @@ incomplete and paused at its existing anchor. The Phase 2 language-build
 direction is complete at implementation `c38e58ed8`; it has no remaining
 implementation, validation, or decision gate.
 
-The native C++ and HL product removal was approved on 2026-09-06 and is the
-active repository roadmap stage. Its numbering is independent of the completed
-Stage 4 audit within the supported-platform reduction plan. The former C++20
-internal-modernization plan was abandoned and deleted before implementation.
-All work after roadmap Stage 4 is cancelled from the active roadmap and remains
-future plan to be determined.
+The native C++ and HL product removal was approved on 2026-09-06 and completed
+on 2026-09-08. Its numbering is independent of the completed Stage 4 audit
+within the supported-platform reduction plan. The former C++20 internal-
+modernization plan was abandoned and deleted before implementation. All work
+after roadmap Stage 4 is cancelled from the active roadmap and remains future
+plan to be determined.

@@ -55,6 +55,23 @@ architecture and the paused behavior-preserving modernization state remain recor
 
 ## Refactoring Roadmap
 
+The proposed next direction is [Stage 5 core C17 internal modernization](docs/refactoring/CoreC17Modernization.md).
+Detailed planning was requested on 2026-09-08. Implementation has not started;
+the first execution step is a bounded candidate inventory and dual-platform
+baseline. Build/CTest parallelism is capped at six jobs per physical host.
+Windows uses the supplied `3rdparty` dependencies; Linux prerequisites are
+obtained through WSL. Stage 5 is planned as successive bounded rounds, each
+preserving the original complete installed-header freeze and the fixed HighFive
+audit dependency inventory. System zlib/SZIP shared and static configurations
+require full suites on both platforms with registered/disabled/skipped-test
+reconciliation. Windows compression linkage follows supplied `3rdparty` forms;
+Linux tests shared/static HDF5 against both shared and static compression inputs
+(four rows), provisioned through WSL. 5A determines concrete functions, tools,
+test selections and scheduling from evidence without relaxing fixed contracts.
+MPI/thread extensions are secondary
+with explicit coverage gaps and no accepted new regression. HighFive remains
+external. This is plan refinement only, with no execution or commit requested.
+
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
 completed supported-platform reduction plan.
@@ -65,15 +82,16 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | No current goal. Previous public C++ API redesign direction is cancelled from the active roadmap. | Future plan TBD | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Proposed; plan refined, implementation not started | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
 Roadmap Stage 4 is an intentional compatibility break only for the removed
 native C++ and HL products. It did not change the core C API, ABI, installed-
 header declarations, retained tools, or file format, and it did not integrate
-HighFive into HDF5 products. All later stages are cancelled from the active
-roadmap and have no approved scope.
+HighFive into HDF5 products. Stage 5 now has a proposed bounded C17 plan;
+Stages 6 and 7 have no approved execution scope. The C++ modernization proposal
+is superseded by the core C direction.
 
 ## Last Completed Direction
 
@@ -490,17 +508,20 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stages 5 through 7 are cancelled from the active roadmap and remain
-  future plan to be determined.
+- Roadmap Stage 5 has a detailed proposed core C17 plan. Work Packages 5A
+  through 5F remain unexecuted; freeze exact candidates and baselines first.
+- Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-There is no active roadmap continuation. Roadmap Stage 4 is complete at product
+The next proposed roadmap continuation is Work Package 5A of
+[CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md): qualify
+validators, inventory candidates, and freeze a bounded pilot and baseline.
+Implementation has not started. Roadmap Stage 4 remains complete at product
 implementation anchor `81dff5168` and validation evidence anchor `f120c1c95`.
-Roadmap Stages 5 through 7 remain future plan to be determined and require a
-new explicit scope before work begins.
+Roadmap Stages 6 and 7 have no approved execution scope.
 
 The separately paused CMake modernization may resume only after explicit
 direction, from progress anchor `0b9e21c34` and the continuation recorded in
@@ -779,5 +800,6 @@ After each coherent refactoring batch:
 8. Use the qualified `roadmap Stage 4 native C++ and HL product removal` name so
    it is not confused with the completed Stage 4 audit inside the supported-
    platform reduction plan.
-9. Keep roadmap Stages 5 through 7 marked `Future plan TBD`; they are cancelled
-   from the active roadmap and have no implementation authority.
+9. Keep roadmap Stage 5 aligned with the proposed core C17 plan and its actual
+   execution evidence; do not label planning as implementation. Stages 6 and 7
+   remain `Future plan TBD` with no approved execution scope.

@@ -16,6 +16,16 @@ plan in this directory.
 
 ## Plans
 
+- [Stage 5 core C17 internal modernization](CoreC17Modernization.md):
+  Proposed multi-round plan; each round preserves all installed headers,
+  API/ABI, the fixed HighFive C dependency inventory and file behavior. System
+  compression requires full suites with test-inventory reconciliation: Windows
+  uses supplied dependency forms and Linux covers all four HDF5/compression
+  shared/static combinations. MPI/thread
+  extensions are secondary with explicit coverage limits. Implementation has not started.
+  Maximum build/CTest parallelism is six per host; Windows dependencies come
+  from `3rdparty`, and Linux dependencies are obtained through WSL.
+
 - [HighFive HDF5 API dependency audit](HighFiveHDF5ApiDependencyAudit.md):
   Complete snapshot audit; records the 147 HDF5 C function dependencies,
   public-header and feature dependencies, and the absence of native C++ and HL
@@ -70,6 +80,8 @@ implementation, validation, or decision gate.
 The native C++ and HL product removal was approved on 2026-09-06 and completed
 on 2026-09-08. Its numbering is independent of the completed Stage 4 audit
 within the supported-platform reduction plan. The former C++20 internal-
-modernization plan was abandoned and deleted before implementation. All work
-after roadmap Stage 4 is cancelled from the active roadmap and remains future
-plan to be determined.
+modernization plan was abandoned and deleted before implementation. A new
+bounded core C17 modernization direction is proposed as roadmap Stage 5 on
+2026-09-08; its implementation and validation have not started. Stages 6 and 7
+remain future plan to be determined. HighFive remains an external product whose
+public C interface needs constrain compatibility, not an implementation target.

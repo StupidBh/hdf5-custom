@@ -30,6 +30,10 @@
 #define FILTER3_ID 259
 #define FILTER4_ID 260
 
+#ifdef H5_HAVE_WIN32_API
+    #define WINDOWS_ENV_PATH_LIMIT 32767
+#endif
+
 static const char* FILENAME[] = { "filter_plugin", NULL };
 #define FILENAME_BUF_SIZE 1024
 
@@ -1446,11 +1450,31 @@ error:
  */
 static herr_t test_path_iteration(void)
 {
+#ifdef H5_HAVE_WIN32_API
+    H5PL_key_t key;
+    H5PL_search_params_t search_params;
+    const void* plugin_info = NULL;
+    bool found = false;
+#endif
+
     TESTING("plugin path iteration with directory entries");
 
     if (H5PL__path_table_iterate(H5PL_ITER_TYPE_ALL, path_iteration_cb, NULL) < 0) {
         TEST_ERROR;
     }
+
+#ifdef H5_HAVE_WIN32_API
+    key.id = H5Z_FILTER_MAX;
+    search_params.type = H5PL_TYPE_FILTER;
+    search_params.key = &key;
+
+    if (H5PL__find_plugin_in_path_table(&search_params, &found, &plugin_info) < 0) {
+        TEST_ERROR;
+    }
+    if (found || plugin_info) {
+        TEST_ERROR;
+    }
+#endif
 
     PASSED();
     return SUCCEED;
@@ -1458,6 +1482,104 @@ static herr_t test_path_iteration(void)
 error:
     return FAIL;
 } /* end test_path_iteration() */
+
+#ifdef H5_HAVE_WIN32_API
+/*-------------------------------------------------------------------------
+ * Function:  test_windows_path_expansion
+ *
+ * Purpose:   Tests successful Windows environment expansion and verifies
+ *            that expansion failures do not modify the path table.
+ *
+ * Return:    SUCCEED/FAIL
+ *
+ *-------------------------------------------------------------------------
+ */
+static herr_t test_windows_path_expansion(void)
+{
+    const char* const env_name = "HDF5_WINDOWS_PLUGIN_PATH_TEST";
+    char* long_path = NULL;
+    unsigned int n_paths;
+    char path[256];
+    herr_t ret;
+    bool env_set = false;
+
+    TESTING("Windows plugin path environment expansion");
+
+    if (HDsetenv(env_name, "expanded_plugin_path", true) < 0) {
+        TEST_ERROR;
+    }
+    env_set = true;
+
+    if (H5PLappend("%HDF5_WINDOWS_PLUGIN_PATH_TEST%") < 0) {
+        TEST_ERROR;
+    }
+    if (H5PLget(0, path, sizeof(path)) <= 0 || strcmp(path, "expanded_plugin_path") != 0) {
+        TEST_ERROR;
+    }
+
+    if (H5PLreplace("%HDF5_WINDOWS_PLUGIN_PATH_TEST%\\replacement", 0) < 0) {
+        TEST_ERROR;
+    }
+    if (H5PLget(0, path, sizeof(path)) <= 0 || strcmp(path, "expanded_plugin_path\\replacement") != 0) {
+        TEST_ERROR;
+    }
+
+    if (NULL == (long_path = (char*)malloc((size_t)WINDOWS_ENV_PATH_LIMIT + 1))) {
+        TEST_ERROR;
+    }
+    memset(long_path, 'x', (size_t)WINDOWS_ENV_PATH_LIMIT);
+    long_path[WINDOWS_ENV_PATH_LIMIT] = '\0';
+
+    H5E_BEGIN_TRY
+    {
+        ret = H5PLappend(long_path);
+    }
+    H5E_END_TRY
+    if (ret >= 0) {
+        TEST_ERROR;
+    }
+    if (H5PLsize(&n_paths) < 0 || n_paths != 1) {
+        TEST_ERROR;
+    }
+    if (H5PLget(0, path, sizeof(path)) <= 0 || strcmp(path, "expanded_plugin_path\\replacement") != 0) {
+        TEST_ERROR;
+    }
+
+    H5E_BEGIN_TRY
+    {
+        ret = H5PLreplace(long_path, 0);
+    }
+    H5E_END_TRY
+    if (ret >= 0) {
+        TEST_ERROR;
+    }
+    if (H5PLsize(&n_paths) < 0 || n_paths != 1) {
+        TEST_ERROR;
+    }
+    if (H5PLget(0, path, sizeof(path)) <= 0 || strcmp(path, "expanded_plugin_path\\replacement") != 0) {
+        TEST_ERROR;
+    }
+
+    if (H5PLremove(0) < 0) {
+        TEST_ERROR;
+    }
+    if (HDunsetenv(env_name) < 0) {
+        TEST_ERROR;
+    }
+    env_set = false;
+
+    free(long_path);
+    PASSED();
+    return SUCCEED;
+
+error:
+    if (env_set) {
+        HDunsetenv(env_name);
+    }
+    free(long_path);
+    return FAIL;
+} /* end test_windows_path_expansion() */
+#endif
 
 /*-------------------------------------------------------------------------
  * Function:  test_filter_numbers
@@ -1810,6 +1932,11 @@ int main(void)
 
     /* Test the APIs for access to the filter plugin path table */
     nerrors += (test_path_api_calls() < 0 ? 1 : 0);
+
+#ifdef H5_HAVE_WIN32_API
+    /* Test Windows environment expansion and unchanged failure state */
+    nerrors += (test_windows_path_expansion() < 0 ? 1 : 0);
+#endif
 
     /* Test filter numbers */
     nerrors += (test_filter_numbers() < 0 ? 1 : 0);

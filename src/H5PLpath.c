@@ -136,9 +136,12 @@ static herr_t H5PL__insert_at(const char* path, unsigned int idx)
 
     /* Insert the copy of the search path into the table at the specified index */
     H5PL_paths_g[idx] = path_copy;
+    path_copy = NULL;
     H5PL_num_paths_g++;
 
 done:
+    path_copy = (char*)H5MM_xfree(path_copy);
+
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5PL__insert_at() */
 
@@ -216,8 +219,11 @@ static herr_t H5PL__replace_at(const char* path, unsigned int idx)
 
     /* Copy the search path into the table at the specified index */
     H5PL_paths_g[idx] = path_copy;
+    path_copy = NULL;
 
 done:
+    path_copy = (char*)H5MM_xfree(path_copy);
+
     FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5PL__replace_at() */
 
@@ -736,6 +742,7 @@ static herr_t H5PL__path_table_iterate_process_path(const char* plugin_path, H5P
 
             /* Ignore directories */
             if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                path = (char*)H5MM_xfree(path);
                 continue;
             }
 
@@ -959,6 +966,7 @@ static herr_t H5PL__find_plugin_in_path(const H5PL_search_params_t* search_param
 
             /* Ignore directories */
             if (fdFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                path = (char*)H5MM_xfree(path);
                 continue;
             }
 

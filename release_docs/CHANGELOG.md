@@ -100,11 +100,12 @@ functionality.
 
 ## Library
 
-### Fixed a memory leak while iterating over plugin paths on Linux
+### Fixed memory leaks while managing plugin paths
 
-   Linux plugin iteration now releases the temporary path allocated for an
-   entry when that entry is a directory. Repeated scans of plugin search paths
-   containing plugin-shaped directories no longer leak memory.
+   Plugin iteration and lookup now release the temporary path allocated for an
+   entry when that entry is a directory. Windows also releases an untransferred
+   path copy when environment-variable expansion fails during insertion or
+   replacement. Repeated plugin path operations no longer retain these buffers.
 
 ### Restored large MPI datatype construction
 

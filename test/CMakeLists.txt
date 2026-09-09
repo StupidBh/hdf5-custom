@@ -134,6 +134,13 @@ if (BUILD_SHARED_LIBS)
   # make plugins dir
   file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir1")
   file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir2")
+  if (WIN32)
+    file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir1/nested_plugin1.dll")
+    file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir1/nested_plugin2.dll")
+  else ()
+    file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir1/libnested_plugin1.so")
+    file (MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/filter_plugin_dir1/libnested_plugin2.so")
+  endif ()
 
   #-----------------------------------------------------------------------------
   # Generate test RSA key pair for plugin signing if signature verification is enabled

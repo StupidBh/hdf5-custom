@@ -100,6 +100,12 @@ functionality.
 
 ## Library
 
+### Fixed a memory leak while iterating over plugin paths on Linux
+
+   Linux plugin iteration now releases the temporary path allocated for an
+   entry when that entry is a directory. Repeated scans of plugin search paths
+   containing plugin-shaped directories no longer leak memory.
+
 ### Restored large MPI datatype construction
 
    Large MPI datatype construction now queries the input datatype extent on

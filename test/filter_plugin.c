@@ -69,6 +69,16 @@ static int** orig_dynlib1_g = NULL;
 static int** orig_dynlib2_g = NULL;
 static int** orig_dynlib4_g = NULL;
 
+/* Callback for exercising plugin path iteration. */
+static herr_t path_iteration_cb(H5PL_type_t plugin_type, const void* plugin_info, void* op_data)
+{
+    (void)plugin_type;
+    (void)plugin_info;
+    (void)op_data;
+
+    return H5_ITER_CONT;
+}
+
 /*-------------------------------------------------------------------------
  * Function:  free_2D_array
  *
@@ -1425,6 +1435,31 @@ error:
 } /* end test_path_api_calls() */
 
 /*-------------------------------------------------------------------------
+ * Function:  test_path_iteration
+ *
+ * Purpose:   Exercises plugin path iteration when plugin-shaped directory
+ *            entries are present in a search directory.
+ *
+ * Return:    SUCCEED/FAIL
+ *
+ *-------------------------------------------------------------------------
+ */
+static herr_t test_path_iteration(void)
+{
+    TESTING("plugin path iteration with directory entries");
+
+    if (H5PL__path_table_iterate(H5PL_ITER_TYPE_ALL, path_iteration_cb, NULL) < 0) {
+        TEST_ERROR;
+    }
+
+    PASSED();
+    return SUCCEED;
+
+error:
+    return FAIL;
+} /* end test_path_iteration() */
+
+/*-------------------------------------------------------------------------
  * Function:  test_filter_numbers
  *
  * Purpose:   Tests the filter numbers are handled correctly
@@ -1769,6 +1804,9 @@ int main(void)
     /************************************/
     /* TEST THE FILTER PLUGIN API CALLS */
     /************************************/
+
+    /* Exercise search paths containing plugin-shaped directory entries */
+    nerrors += (test_path_iteration() < 0 ? 1 : 0);
 
     /* Test the APIs for access to the filter plugin path table */
     nerrors += (test_path_api_calls() < 0 ? 1 : 0);

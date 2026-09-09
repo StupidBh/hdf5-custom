@@ -652,6 +652,7 @@ static herr_t H5PL__path_table_iterate_process_path(const char* plugin_path, H5P
 
             /* If it is a directory, skip it */
             if (S_ISDIR(my_stat.st_mode)) {
+                path = (char*)H5MM_xfree(path);
                 continue;
             }
 

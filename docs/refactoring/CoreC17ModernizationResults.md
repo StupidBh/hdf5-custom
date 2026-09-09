@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; R3-5A complete; next continuation is R3-5B pilot.
+- State: Active; R3-5B complete; R3-5C/R3-5D not applicable; next R3-5E.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -12,10 +12,11 @@
 - R2-5B pilot implementation anchor: `6851af92b`.
 - R2-5D implementation anchor: `fb09d9fc9`.
 - R3-5A planning source anchor: `a13ae7c8a`.
+- R3-5B implementation anchor: `a206f0a6e`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R3-5B `H5_get_option` const-correctness pilot.
+- Current continuation: R3-5E final product and compatibility matrix.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -885,3 +886,48 @@ subject to confirmation against the actual diff.
 The preceding warning is reproduced, all mandatory dependencies remain
 available, exact selection and checks are frozen, and no Round 3 product source
 has been edited. R3-5A is complete.
+
+## R3-5B Characterization and Pilot
+
+Implementation anchor `a206f0a6e` changes only the short-option branch's local
+`cp` declaration from `char *` to `const char *`. `clang-format` 22.1.0 leaves
+the rest of `H5system.c` unchanged. The `H5_get_option` declaration and
+definition signature, library exports, 19 invocation sites, option string,
+global/static state, evaluation order, returns, diagnostics, and long-option
+allocation path are byte-identical to the preceding implementation.
+
+A fresh Linux-filesystem source snapshot configured for C17 Release with GNU
+developer warnings and completed all 3,011 build steps. The build log contains
+zero `H5_get_option` warnings, removing the exact preceding
+`-Wdiscarded-qualifiers` diagnostic without adding another diagnostic in that
+function. A fresh Windows/MSVC Release configuration used command-scoped
+`/utf-8`, enabled developer warnings, and completed the full default build.
+
+The focused results at `HDF_TEST_EXPRESS=0` are:
+
+| Check | Result |
+| --- | --- |
+| Windows Release | Complete default build passed; exact repository zlib/libaec DLL preflight passed; selected tool tests passed 5/5 |
+| Linux Release/Ninja | Complete default build passed; selected tool tests passed 5/5; target warning absent |
+| Windows Debug | Complete default build passed; selected tool tests passed 5/5 |
+| Linux Debug/Ninja | Complete default build passed; selected tool tests passed 5/5 |
+| Linux Valgrind 3.26.0 | `h5stat -h` freed 2,875/2,875 allocations and `h5stat --help` freed 2,876/2,876; both have zero live blocks and zero errors |
+| Linux Unix Makefiles | Library and selected tools built; after the required `h5diff_files` fixture target, the selected tests passed 5/5 |
+| Linux Open MPI 5.0.10 | `h5perf` built; two-rank `-h` printed the expected usage and returned its designed status 1 |
+| Windows MS-MPI 10.1 | `h5perf` built; two-rank `-h` printed the expected usage and returned its designed status 1 |
+
+The exact selected tests are `H5DIFF-h5diff_10`, `H5DIFF-h5diff_15`,
+`H5CLEAR_CMP-h5clr_usage_h`, `H5STAT-h5stat_help1`, and
+`H5STAT-h5stat_help2`. The first Unix Makefiles execution followed a target-only
+build and passed four cases, while `H5DIFF-h5diff_15` could not open the absent
+generated `h5diff_basic*.h5` inputs. Building the repository's
+`h5diff_files`/`h5diffgentest` fixture targets staged those inputs and the
+identical five-test selection then passed. This is test-tree assembly, not a
+product failure.
+
+R3-5C is `NOT_APPLICABLE`: the one-line qualifier edit acquires, transfers, and
+releases no resource and changes no cleanup structure. The borrowed pointer
+still refers to the same immutable option string for the same lexical extent.
+R3-5D is also `NOT_APPLICABLE`: R3-P1 is the complete frozen round scope and no
+follow-on was admitted. R3-5B through R3-5D are complete; the mandatory R3-5E
+matrix remains open.

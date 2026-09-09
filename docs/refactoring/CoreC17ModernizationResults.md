@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; R2-5B and R2-5C complete; next continuation is R2-5D.
+- State: Active; R2-5B through R2-5D complete; next continuation is R2-5E.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -10,10 +10,11 @@
 - Round 1 implementation anchor: `2a966388e`.
 - R2-5A planning source anchor: `c3f97252e`.
 - R2-5B pilot implementation anchor: `6851af92b`.
+- R2-5D implementation anchor: `fb09d9fc9`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R2-5D frozen Windows ownership follow-ons.
+- Current continuation: R2-5E final Round 2 compatibility matrix.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -500,8 +501,8 @@ selected.
 | ID | Exact functions | Decision | Evidence, transformation, and boundary |
 | --- | --- | --- | --- |
 | `R2-P1` | POSIX `H5PL__path_table_iterate_process_path` | `IMPLEMENTED; 6851af92b` | A matching directory entry allocated `path` and continued without releasing it; a later matching entry overwrote the owner. Two plugin-shaped directories and the package iterator kept the preceding implementation functionally successful while Valgrind exposed two definitely lost buffers. The temporary path is now released before the existing `continue`; enumeration, callbacks, diagnostics, and handle cleanup are preserved. |
-| `R2-F1` | Windows `H5PL__path_table_iterate_process_path`; Windows `H5PL__find_plugin_in_path` | `SELECTED FOLLOW-ON; DEFECT` | The same directory branch retains `path` across `continue`. Mirror the demonstrated pilot ownership correction only after R2-5C. Stage two `.dll`-shaped directories and cover iteration plus a missing-filter lookup; preserve Win32 enumeration and error behavior. |
-| `R2-F2` | `H5PL__insert_at`; `H5PL__replace_at` | `SELECTED FOLLOW-ON; DEFECT` | After `H5MM_strdup`, failed Windows environment expansion leaves the local copy owned by the caller but the current `done` path does not release it. Free the untransferred copy on failure. Cover normal `%VAR%` expansion, an over-capacity expansion failure, unchanged table size/content, append, and replace. No success-path result or error category changes. |
+| `R2-F1` | Windows `H5PL__path_table_iterate_process_path`; Windows `H5PL__find_plugin_in_path` | `IMPLEMENTED; fb09d9fc9` | The same directory branch retained `path` across `continue`. Both Windows helpers now mirror the demonstrated pilot ownership correction. Two `.dll`-shaped directories cover iteration and a missing-filter lookup while preserving Win32 enumeration and error behavior. |
+| `R2-F2` | `H5PL__insert_at`; `H5PL__replace_at` | `IMPLEMENTED; fb09d9fc9` | After `H5MM_strdup`, failed Windows environment expansion left the local copy owned by the caller but the `done` path did not release it. Both functions now release only an untransferred copy. Normal `%VAR%` expansion and over-capacity append/replace failures preserve table size and content; success results and error categories are unchanged. |
 | `R2-D1` | `H5PL__expand_path_table` | `DEFECT; DEFER` | Direct assignment of `H5MM_realloc` can lose the table on allocation failure. The existing 42-path test covers successful growth, but no deterministic allocator-failure hook exists. Defer until a separately frozen test-only hook or other reliable reproducer is justified. |
 | `R2-D2` | `H5PL__create_path_table` | `DEFECT; DEFER` | A failure after one or more appended tokens frees the pointer array without releasing owned entries. It shares the missing deterministic allocation-failure coverage problem with R2-D1 and is not needed for the selected pilot. |
 | `R2-I1` | `H5PL__find_plugin_in_path_table` | `INVESTIGATE` | The found-path guard tests the output-parameter address rather than `*plugin_info`. Do not change it without a reproducer and plugin-return contract analysis. |
@@ -607,3 +608,46 @@ still has no deterministic allocator-failure hook; the pilot supplies no reason
 to edit them without coverage. The R2-5C gate is complete: all pilot cleanup
 paths are mapped, the functional and memory checks pass, and no ownership
 ambiguity remains. R2-5D may now begin with only R2-F1 and R2-F2.
+
+## R2-5D Windows Follow-ons and Focused Validation
+
+Implementation anchor `fb09d9fc9` closes R2-F1 by releasing the current
+per-entry path before the existing Windows directory `continue` in both plugin
+iteration and lookup. Each `FindFirstFileA` result remains owned by its helper
+until the unchanged `FindClose` cleanup, while regular-file, open, callback,
+found, and error exits retain their preceding order and result.
+
+The same anchor closes R2-F2 by keeping each duplicated insertion/replacement
+path in the local `path_copy` owner until successful table assignment. A
+successful transfer clears the local pointer; the common `done` path releases
+only a non-null, untransferred copy. Windows environment expansion failure
+therefore releases the original copy that `H5_expand_windows_env_vars` leaves
+untouched. Insert failure does not grow the logical table, and replacement
+failure leaves the old table entry owned and unchanged. No table path is freed
+by the new cleanup after a successful transfer.
+
+The extended Windows test passed against the preceding product source before
+the R2-5D edit, establishing that its iterator, missing-filter lookup,
+environment-expansion success, and unchanged-state failure expectations do not
+depend on the correction. After the edit, qualifying Windows and Linux Ninja
+Release runs of `H5PLUGIN-filter_plugin` passed 1/1 at
+`HDF_TEST_EXPRESS=0`. The Windows run used command-scoped `/utf-8` and exact
+preflight resolution of the build-tree HDF5 DLLs plus the repository
+`z.dll`, `aec.dll`, and `szip.dll`. Linux Memcheck again reported all 152,654
+allocations freed, zero live bytes, and zero errors.
+
+Complete Debug builds succeeded on both validators, followed by focused Debug
+runs passing 1/1 at express level 0. The focused Linux Unix Makefiles build
+also passed after explicitly building the four filter plugin libraries required
+by the test. Building only the `filter_plugin` executable did not stage those
+fixtures and produced the expected missing-filter failure; that incomplete
+build precondition is excluded from product evidence.
+
+Legal thread-safe configurations passed the same focused test on Windows and
+Linux. The Windows configuration used shared libraries only, as required by
+the supported thread-safe combination, and repeated exact dependency-DLL
+preflight. The Linux parallel configuration enabled MPI, subfiling, and VFD
+testing; its registered filter, VFD, and VOL plugin tests passed 3/3 at express
+level 0. No lock, serialization, public signature, export, installed artifact,
+or file-format behavior changed. R2-5D is complete; R2-5E is the next and final
+Round 2 gate.

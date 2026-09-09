@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; R2-5B and R2-5C complete; next continuation is R2-5D.
+- State: Active; R2-5B through R2-5D complete; next continuation is R2-5E.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -23,8 +23,9 @@ and all compatibility gates; R1-5F closed the round at implementation anchor
 `2a966388e`. The next round must repeat 5A before selecting product edits.
 R2-5A froze a resource-ownership batch in `H5PLpath.c` against that accepted
 endpoint. R2-5B reproduced and corrected the POSIX directory-entry leak at
-`6851af92b`; R2-5C closed its ownership audit. R2-5D now considers only the
-frozen Windows follow-on functions.
+`6851af92b`; R2-5C closed its ownership audit. R2-5D implemented the two
+frozen Windows follow-ons at `fb09d9fc9` and passed the focused cross-platform
+validation gate. R2-5E is the final Round 2 compatibility matrix.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -530,7 +531,10 @@ test source changed between that endpoint and the R2 planning source anchor
 R2-5B and R2-5C are complete at pilot implementation anchor `6851af92b`. The
 same focused test that exposed two definitely lost POSIX directory-path buffers
 passes without a Valgrind error after the correction, and the complete pilot
-ownership map is recorded. The next execution step is R2-5D: implement and test
-only the frozen R2-F1 and R2-F2 Windows follow-ons. Exact scope and checks are
-recorded in
+ownership map is recorded. R2-5D is complete at implementation anchor
+`fb09d9fc9`: the two symmetric Windows directory paths and untransferred
+environment-expansion copies are released, with focused Release, Debug, Unix
+Makefiles, thread-safe, parallel, and memory gates passing. The next execution
+step is R2-5E, the frozen full compatibility and packaging matrix. Exact scope
+and checks are recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

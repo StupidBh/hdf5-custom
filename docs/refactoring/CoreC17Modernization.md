@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; R1-5A/R1-5B complete, R1-5C/R1-5D not applicable.
+- State: Active; Round 1 complete; next continuation is R2-5A.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -18,6 +18,9 @@ The user confirmed the compatibility boundaries and validation priorities
 below during plan discussion. R1-5A froze the contracts, candidate ledger,
 environment, and clean baseline. R1-5B implemented and characterized the pilot;
 the actual diff closed R1-5C and R1-5D as `NOT_APPLICABLE`.
+R1-5E completed the mandatory dual-platform default and compression matrices
+and all compatibility gates; R1-5F closed the round at implementation anchor
+`2a966388e`. The next round must repeat 5A before selecting product edits.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -505,11 +508,17 @@ passing build alone never establish completion.
 
 ## Current Continuation
 
-Execution is active at baseline `dd7204035`. R1-5A is complete with the frozen
-contracts, exact candidate ledger, dependency forms, and dual-platform baseline
-recorded in [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).
-The selected pilot is the const-correct extraction of duplicated reverse path
-scans used by `H5_dirname` and `H5_basename` in `H5system.c`. R1-5B and its
-focused Windows/Linux, Debug, Valgrind, Unix Makefiles, and parallel subfiling
-checks pass. R1-5C and R1-5D are `NOT_APPLICABLE` for this resource-neutral,
-single-batch pilot. The next execution step is R1-5E; R1-5F remains open.
+Round 1 is complete from original baseline `dd7204035` through implementation
+anchor `2a966388e`. The const-correct file-local reverse path scans used by
+`H5_dirname` and `H5_basename` passed focused, Debug, Valgrind, Unix Makefiles,
+parallel subfiling, complete default, and mandatory system-compression checks
+on both validators. Installed headers, API/ABI, exports, layouts, packages,
+consumers, the fixed HighFive inventory, and cross-platform format behavior
+match the frozen contracts. Exact evidence is in
+[CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).
+
+The next execution step is R2-5A. Retain `dd7204035` as the original Stage 5
+contract anchor and `2a966388e` as the preceding accepted implementation.
+Requalify relevant environment inputs and characterize the exact
+`H5PLpath.c` functions, callers, global state, ownership, and Windows
+environment behavior before selecting any Round 2 source edit.

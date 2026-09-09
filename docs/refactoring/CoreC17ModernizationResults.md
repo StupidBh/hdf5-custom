@@ -2,15 +2,16 @@
 
 ## Status
 
-- State: Active; R1-5A and R1-5B complete; R1-5C/R1-5D not applicable.
+- State: Active; Round 1 complete; next continuation is R2-5A.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
 - R1-5A evidence anchor: `bd6de77dd`.
+- Round 1 implementation anchor: `2a966388e`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R1-5E product and compatibility matrix.
+- Current continuation: R2-5A inventory, environment bridge, and candidate selection.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -79,8 +80,8 @@ The selected functions pass strings and output pointers and expose no associated
 structure layout. Their associated-layout disposition is `NOT_APPLICABLE`.
 The inherited x64 public layout anchors remain 8-byte size/alignment for `hid_t`,
 `hsize_t`, and `haddr_t`, and 24/80/40/72-byte size with 8-byte alignment for
-`H5A_info_t`, `H5F_info2_t`, `H5L_info2_t`, and `H5O_info2_t`. The default
-C/C++ C-header consumer checks will recheck these anchors at R1-5E.
+`H5A_info_t`, `H5F_info2_t`, `H5L_info2_t`, and `H5O_info2_t`. The R1-5E
+installed C17 probes rechecked these anchors on both validators.
 
 ### HighFive Compatibility Floor
 
@@ -259,4 +260,159 @@ passed 3/3. This was validation-tree assembly, not a product failure.
 The actual diff confirms the R1-5C `NOT_APPLICABLE` disposition: no resource is
 acquired, released, or transferred and no cleanup structure changes. R1-5D is
 also `NOT_APPLICABLE` because the frozen round admits no second implementation
-candidate. R1-5B, R1-5C, and R1-5D are complete; R1-5E remains open.
+candidate. R1-5B, R1-5C, and R1-5D are complete; R1-5E evidence follows.
+
+## R1-5E Final Product and Compatibility Matrix
+
+All final Release suites used `HDF_TEST_EXPRESS=3` and no more than six jobs.
+Each Windows executable run first resolved `z.dll`, `aec.dll`, and `szip.dll`
+from the repository `3rdparty` dependency bins. No run with an unresolved or
+different DLL source is included below.
+
+| Validator/configuration | Passed enabled | Disabled | Registered | Time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default | 2,733 | 37 | 2,770 | 121.18 s |
+| Windows SC-A, shared HDF5/supplied shared compression | 2,896 | 10 | 2,906 | 123.93 s |
+| Windows SC-B, static HDF5/supplied shared compression | 2,853 | 10 | 2,863 | 124.65 s |
+| Linux default | 2,735 | 37 | 2,772 | 127.13 s |
+| Linux shared HDF5/shared system compression | 2,898 | 10 | 2,908 | 135.93 s |
+| Linux shared HDF5/static supplied compression | 2,898 | 10 | 2,908 | 136.89 s |
+| Linux static HDF5/shared system compression | 2,855 | 10 | 2,865 | 135.56 s |
+| Linux static HDF5/static supplied compression | 2,855 | 10 | 2,865 | 135.40 s |
+
+Every row completed configure, complete Release build, full enabled CTest suite,
+and install. Exact Linux registered-name and disabled-state comparisons report
+zero delta for the default and all four compression rows. A separately rebuilt
+Windows original-anchor default reports the same exact 2,770-name inventory and
+37 disabled markers as the final build. The Windows compression totals and
+disabled counts equal their frozen clean baselines; no CMake or test definition
+is in the implementation diff. Expected gzip, SZIP, filter, example, and tool
+tests were registered and executed in the compression suites.
+
+The accepted Linux default uses the same configure inputs as the frozen
+baseline. An earlier extra run with a custom install prefix also passed 2,735
+enabled tests, but changed generated plug-in/wrapper settings and is not used
+for contract equality.
+
+### Compression, Installs, and Packages
+
+Installed standalone C examples linked to each of the six compression package
+rows, then wrote and read datasets through both `H5Z_FILTER_DEFLATE` and
+`H5Z_FILTER_SZIP`. Discovery and binary inspection established these forms:
+
+| Row | Consumer/package linkage evidence |
+| --- | --- |
+| Windows SC-A | `hdf5-shared`; zlib 1.3.2 and libaec 1.1.7 import libraries/DLLs |
+| Windows SC-B | `hdf5-static`; the same supplied dependency import libraries/DLLs |
+| Linux shared/shared | consumer needs `libhdf5.so`; it needs system `libz.so.1` and `libsz.so.2` |
+| Linux shared/static | consumer needs `libhdf5.so`; it has no compression `NEEDED` entry |
+| Linux static/shared | consumer directly needs system `libz.so.1` and `libsz.so.2` |
+| Linux static/static | link uses `libhdf5.a`, `libz.a`, `libsz.a`, and `libaec.a`; no compression `NEEDED` entry |
+
+The supplied libaec package selects static targets only when
+`libaec_USE_STATIC_LIBS=ON`; CMake's zlib module likewise needs
+`ZLIB_USE_STATIC_LIBS=ON` to select the supplied archive. The fully static
+installed consumer passed with both explicit selections. Omitting them fails
+the same way against the original-anchor install because the dependency config
+otherwise defines shared libaec targets; this is a pre-existing downstream
+selection requirement, not a Round 1 delta or an accepted silent fallback.
+
+CPack produced ZIP packages for both Windows compression rows and TGZ packages
+for all four Linux rows. Their regular-file counts are 97/95 for Windows SC-A/
+SC-B and 91/91/87/87 for the four Linux rows in table order. Every package
+contains the HDF5 CMake target files and zlib/libaec dependency discovery.
+
+Default binary-package comparison also passed. The Windows baseline/final ZIPs
+have the same 101 paths and byte-identical installed headers. Three source-text
+entries differ only because the two Windows checkouts materialized the same Git
+blobs with LF versus CRLF; their normalized text is identical. Remaining
+content differences are rebuilt binaries, for which byte identity is not an
+acceptance claim. The Linux baseline/final TGZs have the same 90 regular files,
+four symlinks, paths, link targets, and byte-identical installed headers; only
+rebuilt libraries and tools differ in content.
+
+### Headers, ABI, Exports, and Consumers
+
+Equivalent default installs preserve all 57 header names and contents, all 20
+exported CMake target names, and the 101-file Windows and 90-file/four-symlink
+Linux path inventories. The four generated-header hashes exactly equal the
+R1-5A values. `H5private.h` is unchanged from the original anchor.
+
+The final default export sets exactly match the frozen manifests: Windows has
+3,964 names with hash
+`399424dc5c5b51dd9d7a3f0584fe153fccd0ad250083f43820cafd0b37f8e5d0`,
+and Linux has 4,060 names with hash
+`5cc9627d28b615df09e1a4bf879f9fa9b1feec7abbec3cdc1c4f95f3998fb673`.
+`H5_dirname` and `H5_basename` remain exported; the two new helpers do not.
+
+Installed C99 `find_package` consumers and direct strict-C17 consumers compile,
+link, run, and report HDF5 2.3.0 on both validators. C++11 consumption of the C
+headers also passes with G++ `-std=c++11`; MSVC uses its lowest explicit
+`/std:c++14` mode because it has no distinct C++11 switch. Separate C17 static
+assertion consumers on both x64 validators rechecked the seven frozen public
+size/alignment anchors and linked and ran against the final shared installs.
+The existing API-version tests cover the v16, v18, v110, v112, v114, and v200
+alias configurations.
+
+The repository's retained-product integration contract script passes on both
+validators. It builds and runs build-tree and install-tree `find_package`
+consumers plus isolated `add_subdirectory()` and local-source `FetchContent`
+consumers. HighFive is neither built nor added to the product.
+
+### HighFive, Format, and Secondary Checks
+
+Re-extraction of the fixed audit gives exactly 147 identifiers, all present in
+the installed header closure. The default Windows library exports 135 spellings
+directly. Under the default v200 mapping, `H5Lget_info`, `H5Literate`,
+`H5Oget_info`, and `H5Rdereference` resolve to exported `H5Lget_info2`,
+`H5Literate2`, `H5Oget_info3`, and `H5Rdereference2`. A parallel Linux library
+exports each of the remaining eight collective/MPIO functions. Compression
+consumers exercise `H5Pset_deflate`, `H5Pset_szip`, and filter availability.
+The tracked `highfive/` tree has no change from its audit-input anchor, while
+the complete header identity protects the associated types, constants,
+callbacks, and feature guards.
+
+Explicit format fixtures were created by the original and final libraries on
+both platforms. Original and final `h5diff` tools on Windows and Linux read the
+opposite-platform files and report semantic equality. The full suites also pass
+the existing compatibility readers and tool golden-output cases. The selected
+helpers do not reach encoding or decoding.
+
+The only indirect production users are the subfiling/IOC VFD sources. The
+six-rank Linux subfiling test and its fixtures passed 3/3 with Open MPI 5.0.10.
+No thread/global-state/allocator path is reachable from the change, so separate
+thread-safe and concurrency rows remain not applicable. Both complete Debug
+builds and focused level-0 runs passed; the Windows Debug library emitted its
+PDB. Valgrind 3.26.0 reported no definite/indirect leak in the focused Linux
+run, and the GNU/Unix Makefiles focused build and run passed. The scans are not
+a newly introduced hot path, so no performance experiment was required.
+
+Two validation setup results were rejected rather than treated as product
+evidence: a Windows run without the dependency DLL path, and concurrent Linux
+examples started in one working directory that contended for the same output
+files. The former was rerun after exact DLL preflight; the latter was rerun in
+isolated directories without an HDF5 diagnostic. A mis-cased package hint and
+the target-only Linux fixture-staging issue described above were likewise
+corrected before their passing reruns.
+
+## R1-5F Round Closeout
+
+Round 1 is complete at implementation commit `2a966388e`, one atomic product
+commit after evidence anchor `bd6de77dd`. Reverting that implementation commit
+is the complete product rollback; the two helpers are file-local and no later
+product commit depends on them. The original Stage 5 installed-header/API/ABI
+freeze, diagnostic policy, fixed 147-entry HighFive floor, file-format contract,
+and mandatory compression matrix remain unchanged for later rounds.
+
+All selected work is implemented and every mandatory Round 1 gate passes. The
+deferred candidates `R1-D1` through `R1-D5` retain their recorded dispositions;
+no deferred item was silently admitted and no Stage 5 compatibility gap remains
+from this pilot. Round completion does not close the multi-round Stage 5
+direction.
+
+The next continuation is R2-5A. Start from original anchor `dd7204035` and
+accepted Round 1 anchor `2a966388e`, requalify the relevant environment, and
+characterize exact `H5PLpath.c` functions, callers, global state, ownership, and
+Windows environment behavior before deciding whether any item is selectable.
+Do not edit product source until the R2 function-level ledger and validation
+specification are frozen.

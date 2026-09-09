@@ -57,8 +57,10 @@ architecture and the paused behavior-preserving modernization state remain recor
 
 The active direction is [Stage 5 core C17 internal modernization](docs/refactoring/CoreC17Modernization.md).
 Detailed planning was requested on 2026-09-08 and execution began on
-2026-09-09. R1-5A and R1-5B are complete, and R1-5C/R1-5D are not applicable
-to the resource-neutral pilot. Its portable evidence is in
+2026-09-09. Round 1 is complete at implementation anchor `2a966388e`, with one
+atomic product implementation commit after R1-5A evidence anchor `bd6de77dd`.
+R1-5C/R1-5D were not applicable to the resource-neutral pilot. Its portable
+evidence is in
 [`docs/refactoring/CoreC17ModernizationResults.md`](docs/refactoring/CoreC17ModernizationResults.md).
 Build/CTest parallelism is capped at six jobs per physical host.
 Windows uses the supplied `3rdparty` dependencies; Linux prerequisites are
@@ -73,7 +75,7 @@ path scans in `H5_dirname` and `H5_basename`, and fixed the exact tools, tests,
 and scheduling without relaxing the protected contracts. MPI/thread extensions
 are secondary
 with explicit coverage gaps and no accepted new regression. HighFive remains
-external. R1-5E is the current validation continuation.
+external. R1-5E and R1-5F passed; R2-5A is the current continuation.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -85,7 +87,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R1-5A/R1-5B complete, R1-5C/R1-5D not applicable | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Round 1 complete; next R2-5A | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -504,6 +506,15 @@ implementation anchor `0b9e21c34` and is detailed in
   cross-platform sources are unchanged, all 147 HighFive dependencies remain,
   and install, target, tool, test, and residual deltas contain only approved
   native C++/HL removals. No unresolved active contract reference remains.
+- Completed roadmap Stage 5 Round 1 at implementation anchor `2a966388e` in one
+  product commit. The file-local, const-correct reverse path scans used by
+  `H5_dirname` and `H5_basename` pass focused level-0, Debug, Valgrind, Unix
+  Makefiles, and six-rank subfiling checks. Both default Release suites, both
+  Windows system-compression suites, and all four Linux compression linkage
+  suites pass at express level 3. Installs, ZIP/TGZ packages, installed C99/C17/
+  C++ C-header consumers, CMake integration styles, the complete header/export/
+  layout/HighFive contracts, and four-way cross-platform format reads pass with
+  no unexplained delta.
 
 ## Remaining
 
@@ -511,24 +522,27 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 R1-5A and R1-5B are complete. R1-5C and R1-5D are
-  `NOT_APPLICABLE`; R1-5E and R1-5F remain.
+- Roadmap Stage 5 Round 1 is complete. Later bounded rounds remain; Round 2 has
+  no selected implementation until R2-5A freezes its function-level ledger and
+  validation specification.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is Work Package R1-5E of
-[CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md): run the
-final product and compatibility matrix for the const-correct file-local path
-scan helpers now used by `H5_dirname` and `H5_basename`. R1-5A through R1-5D
-evidence is recorded in
+The next roadmap continuation is R2-5A of
+[CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
+original Stage 5 contract anchor `dd7204035` and preceding accepted Round 1
+implementation `2a966388e`. Requalify relevant environment inputs, then
+characterize exact `H5PLpath.c` functions, callers, global state, ownership,
+and Windows environment behavior before deciding whether any item is
+selectable. Freeze the Round 2 ledger and validation specification before any
+product edit. Round 1 evidence is complete in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
-The focused Release, Debug, Valgrind, Unix Makefiles, and Linux parallel
-subfiling checks pass. Roadmap Stage 4 remains complete at product implementation
-anchor `81dff5168` and validation evidence anchor `f120c1c95`.
-Roadmap Stages 6 and 7 have no approved execution scope.
+Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`
+and validation evidence anchor `f120c1c95`. Roadmap Stages 6 and 7 have no
+approved execution scope.
 
 The separately paused CMake modernization may resume only after explicit
 direction, from progress anchor `0b9e21c34` and the continuation recorded in
@@ -563,6 +577,19 @@ execution.
 
 ## Validation State
 
+- Roadmap Stage 5 Round 1 is complete at implementation anchor `2a966388e`.
+  Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled tests; Linux
+  default plus four compression-linkage rows passed 2,735/2,898/2,898/2,855/
+  2,855. Every full suite ran at `HDF_TEST_EXPRESS=3`, with 37 disabled in each
+  default and 10 disabled in each compression row. Exact registered-name and
+  disabled-state comparisons have no delta. All installs and six compression
+  binary packages completed; installed filter examples wrote and read DEFLATE
+  and SZIP data through the intended dependency forms. Default ZIP/TGZ paths,
+  public headers, CMake targets, generated headers, exports, layouts, C99/C17/
+  C++ consumers, integration styles, the fixed 147-entry HighFive floor, and
+  cross-platform semantic reads match the original freeze. Windows execution
+  evidence includes exact repository dependency-DLL preflight; executions that
+  lacked it are classified as environment errors and excluded.
 - Roadmap Stage 4 Work Packages 4A and 4B are complete. Work Package 4A used
   execution baseline
   `72e36a522`, with pre-removal stabilization through `3118d8c2c`. Windows

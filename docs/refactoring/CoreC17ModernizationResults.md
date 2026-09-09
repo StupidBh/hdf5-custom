@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; R2-5B through R2-5D complete; next continuation is R2-5E.
+- State: Active; Round 2 complete; next continuation is R3-5A scope freeze.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -14,7 +14,7 @@
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R2-5E final Round 2 compatibility matrix.
+- Current continuation: R3-5A scope and baseline freeze.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -649,5 +649,122 @@ the supported thread-safe combination, and repeated exact dependency-DLL
 preflight. The Linux parallel configuration enabled MPI, subfiling, and VFD
 testing; its registered filter, VFD, and VOL plugin tests passed 3/3 at express
 level 0. No lock, serialization, public signature, export, installed artifact,
-or file-format behavior changed. R2-5D is complete; R2-5E is the next and final
-Round 2 gate.
+or file-format behavior changed. R2-5D is complete; R2-5E evidence follows.
+
+## R2-5E Final Product and Compatibility Matrix
+
+All final Release suites used `HDF_TEST_EXPRESS=3` and no more than six jobs.
+Before every Windows CTest or installed executable run, the build or install
+HDF5 DLL directory where applicable and the repository zlib/libaec dependency
+directories were placed first in `PATH`; each resolved DLL path was asserted
+before execution. No missing-DLL or differently resolved run is acceptance
+evidence.
+
+| Validator/configuration | Passed enabled | Disabled | Registered | Time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default | 2,733 | 37 | 2,770 | 135.23 s |
+| Windows SC-A, shared HDF5/supplied shared compression | 2,896 | 10 | 2,906 | 126.39 s |
+| Windows SC-B, static HDF5/supplied shared compression | 2,853 | 10 | 2,863 | 126.14 s |
+| Linux default | 2,735 | 37 | 2,772 | 128.47 s |
+| Linux shared HDF5/shared system compression | 2,898 | 10 | 2,908 | 137.37 s |
+| Linux shared HDF5/static supplied compression | 2,898 | 10 | 2,908 | 136.91 s |
+| Linux static HDF5/shared system compression | 2,855 | 10 | 2,865 | 136.10 s |
+| Linux static HDF5/static supplied compression | 2,855 | 10 | 2,865 | 134.83 s |
+
+Every row completed a full Release build, enabled CTest suite, and install.
+Exact registered-name and disabled-state comparisons against the corresponding
+Round 1 row have zero delta. The accepted Linux configuration explicitly
+stabilized package discovery: default disabled optional PkgConfig discovery,
+while compression rows pinned the already qualified PkgConfig executable. This
+removed inherited-shell metadata variability without changing dependency
+selection or product behavior.
+
+### Compression, Installs, and Packages
+
+Installed gzip and SZIP C examples built and ran against both Windows and all
+four Linux compression rows. Each reported the requested filter and read back
+the expected maximum value 1,890. Binary inspection reconfirmed the frozen
+linkage forms:
+
+| Row | Final linkage evidence |
+| --- | --- |
+| Windows SC-A | consumer needs `hdf5.dll`; `hdf5.dll` needs repository `z.dll` and `szip.dll` |
+| Windows SC-B | consumer directly needs repository `z.dll` and `szip.dll` |
+| Linux shared/shared | consumer needs `libhdf5.so`; it needs system `libz.so.1` and `libsz.so.2` |
+| Linux shared/static | consumer needs `libhdf5.so`; it has no compression `NEEDED` entry |
+| Linux static/shared | consumer directly needs system `libz.so.1` and `libsz.so.2` |
+| Linux static/static | link uses `libhdf5.a`, `libz.a`, `libsz.a`, and `libaec.a`; no compression `NEEDED` entry |
+
+CPack produced the two Windows ZIPs and all five Linux TGZs. The Windows
+compression packages contain 97/95 regular files and the Linux compression
+packages contain 91/91/87/87 regular files in table order, with zero path delta
+from Round 1. Equivalent default installs and packages preserve 101 Windows
+files and 90 Linux regular files plus four symlinks. All 20 installed CMake
+target names are unchanged.
+
+The Windows compression installs contain the same 57 header contents as their
+Round 1 counterparts, including byte-identical `H5pubconf.h`. The accepted
+Linux default header closure is also byte-identical. In each independently
+prefixed Linux compression row, the sole header-content delta is the expected
+configured install directory inside `H5_DEFAULT_PLUGINDIR`; all other lines and
+all other installed headers are identical.
+
+### Headers, ABI, Consumers, HighFive, and Format
+
+The default installs preserve all 57 public header names and contents against
+both `dd7204035` and `2a966388e`. Generated configuration, version, error, and
+overflow headers retain their frozen hashes. The public-header source diff is
+empty. The final default export manifests remain exactly 3,964 Windows names
+and 4,060 Linux names with the Round 1 hashes; the existing `H5PL` symbols stay
+exported and the new ownership logic adds no symbol or signature.
+
+Installed C99 `find_package` consumers and direct strict-C17 consumers compile,
+link, run, and report HDF5 2.3.0 on both validators. C++ consumption of the C
+headers passes under G++ C++11 and MSVC's lowest explicit C++14 mode. The seven
+frozen x64 size/alignment assertions pass. The retained-product integration
+contract passes build-tree and install-tree `find_package`, isolated
+`add_subdirectory`, local `FetchContent`, and negative removed-product checks on
+both platforms.
+
+Re-extraction of the fixed HighFive audit still produces exactly 147 identifiers
+and the tracked HighFive header tree is unchanged from its audit anchor. All 147
+map to installed declarations. Windows resolves 139 direct or version-aliased
+exports, and the parallel Linux library supplies the remaining eight MPI
+symbols, leaving no missing entry.
+
+Final Windows and Linux compression writers produced equivalent gzip datasets.
+Round 1 and Round 2 `h5diff` tools on both platforms read the cross-platform
+outputs and report semantic equality. Final default tools also read and compare
+the frozen Round 1 cross-platform fixtures. No encoding, datatype, layout, or
+file-format contract changed.
+
+Two setup corrections are excluded from acceptance evidence. Linux Unix
+Makefiles focused validation initially built only the executable and therefore
+did not stage its four required plugin fixtures; the complete fixture build and
+identical test then passed. Final Linux package metadata was regenerated with
+stable PkgConfig selection. Windows SC-A/SC-B were reconfigured to the frozen
+install-prefix input and their complete builds, full suites, installs, packages,
+examples, headers, linkage, and format checks were rerun; only those final runs
+are recorded above.
+
+## R2-5F Round Closeout
+
+Round 2 is complete at product implementation anchor `fb09d9fc9`. The POSIX
+pilot is `6851af92b`; the later Windows follow-ons depend on its expanded shared
+test fixture, so a complete rollback reverts `fb09d9fc9` before `6851af92b`.
+Documentation-only commits do not alter that product rollback group.
+
+All selected ownership defects are corrected and every mandatory focused,
+memory, full-suite, package, ABI, consumer, HighFive, and format gate passes.
+R2-D1, R2-D2, R2-I1, and R2-D3 retain their recorded dispositions, and the
+Round 1 deferred ledger remains unchanged. No deferred candidate was admitted
+silently. The selected code is non-hot plugin-path administration, so the
+predeclared non-hot rationale remains sufficient and no performance experiment
+was required.
+
+The original Stage 5 installed-header/API/ABI freeze at `dd7204035`, preceding
+accepted Round 1 anchor `2a966388e`, diagnostic policy, fixed 147-entry HighFive
+floor, file-format contract, and mandatory compression matrix remain in force.
+The next continuation is R3-5A: requalify the relevant environment and freeze a
+new bounded candidate ledger, ownership/behavior model, and validation
+specification before selecting or editing any product source.

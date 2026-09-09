@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; R2-5B through R2-5D complete; next continuation is R2-5E.
+- State: Active; Round 2 complete; next continuation is R3-5A scope freeze.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -25,7 +25,8 @@ R2-5A froze a resource-ownership batch in `H5PLpath.c` against that accepted
 endpoint. R2-5B reproduced and corrected the POSIX directory-entry leak at
 `6851af92b`; R2-5C closed its ownership audit. R2-5D implemented the two
 frozen Windows follow-ons at `fb09d9fc9` and passed the focused cross-platform
-validation gate. R2-5E is the final Round 2 compatibility matrix.
+validation gate. R2-5E repeated the complete compatibility matrix and R2-5F
+closed Round 2. The next round must begin with R3-5A scope and baseline freeze.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -534,7 +535,11 @@ passes without a Valgrind error after the correction, and the complete pilot
 ownership map is recorded. R2-5D is complete at implementation anchor
 `fb09d9fc9`: the two symmetric Windows directory paths and untransferred
 environment-expansion copies are released, with focused Release, Debug, Unix
-Makefiles, thread-safe, parallel, and memory gates passing. The next execution
-step is R2-5E, the frozen full compatibility and packaging matrix. Exact scope
-and checks are recorded in
+Makefiles, thread-safe, parallel, and memory gates passing. R2-5E repeated all
+eight full Release rows, installs, packages, linkage, consumers, protected
+headers/exports/layouts, the fixed HighFive inventory, and cross-platform format
+checks without an unexplained delta. R2-5F closes the round with R2-D1, R2-D2,
+R2-I1, R2-D3, and the earlier backlog still deferred. The next execution step
+is R3-5A: freeze a new bounded candidate ledger and validation specification
+before any further product edit. Exact evidence is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

@@ -77,8 +77,9 @@ are secondary
 with explicit coverage gaps and no accepted new regression. HighFive remains
 external. R1-5E/R1-5F passed. R2-5B corrected the POSIX plugin-directory path
 leak at `6851af92b`, R2-5C closed the pilot ownership audit, and R2-5D closed
-the two frozen Windows follow-ons at `fb09d9fc9`. R2-5E is the current
-continuation.
+the two frozen Windows follow-ons at `fb09d9fc9`. The complete eight-row
+Release and compatibility matrix passed, R2-5F closed Round 2, and R3-5A scope
+freeze is the current continuation.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -90,7 +91,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Round 1 and R2-5B through R2-5D complete; next R2-5E | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 and 2 complete; next R3-5A | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -530,6 +531,12 @@ implementation anchor `0b9e21c34` and is detailed in
   insertion/replacement copy. Focused Release, Debug, Unix Makefiles,
   thread-safe, Linux Memcheck, and Linux parallel filter/VFD/VOL plugin gates
   pass at express level 0. No locking or protected contract changed.
+- Completed roadmap Stage 5 R2-5E and R2-5F at product anchor `fb09d9fc9`.
+  The Windows default/SC-A/SC-B and Linux default plus four compression rows
+  pass all 22,723 enabled Release tests at express level 3. Installs, ZIP/TGZ
+  packages, exact inventories, filter write/read, linkage, consumers,
+  integration styles, headers, exports, layouts, the fixed HighFive inventory,
+  and cross-platform format checks pass without an unexplained contract delta.
 
 ## Remaining
 
@@ -537,26 +544,24 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Round 1 and R2-5A through R2-5D are complete. R2-5E remains
-  as the final Round 2 full compatibility, install, package, consumer, and
-  cross-platform format gate. R2-D1, R2-D2, R2-I1, R2-D3, later rounds, and
-  the preceding deferred backlog remain outside this batch.
+- Roadmap Stage 5 Rounds 1 and 2 are complete. R2-D1, R2-D2, R2-I1, R2-D3,
+  later rounds, and the preceding deferred backlog remain outside the completed
+  batch. R3-5A must freeze the next scope and baseline before a product edit.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is R2-5E of
+The next roadmap continuation is R3-5A of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
-original Stage 5 contract anchor `dd7204035` and preceding accepted Round 1
-implementation `2a966388e`; the accepted POSIX pilot is `6851af92b`, and the
-complete Round 2 implementation is `fb09d9fc9`. Run the frozen Windows
-default/SC-A/SC-B and Linux default plus four compression-linkage full Release
-suites at express level 3. Repeat installs, packages, filter write/read,
-linkage, installed consumers, integration styles, headers, exports, signatures,
-layouts, test inventories, HighFive evidence, and cross-platform format reads
-against the frozen anchors. Exact Round 1 and R2-5A through R2-5D evidence is in
+original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
+`2a966388e`, and accepted Round 2 implementation `fb09d9fc9`. Requalify the
+relevant supported-platform environment and freeze a new bounded candidate
+ledger, ownership/behavior model, affected-feature map, and exact focused/final
+validation specification before editing product source. Do not silently admit
+R2-D1, R2-D2, R2-I1, R2-D3, or any earlier deferred candidate. Exact Round 1
+and Round 2 evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`
 and validation evidence anchor `f120c1c95`. Roadmap Stages 6 and 7 have no
@@ -621,7 +626,18 @@ execution.
   subfiling, and VFD-test configuration passes filter/VFD/VOL plugin coverage
   3/3. Linux Memcheck frees all 152,654 allocations with zero errors. Every
   qualifying Windows execution used `/utf-8` and exact build-tree HDF5 plus
-  repository zlib/libaec DLL resolution. R2-5E remains outstanding.
+  repository zlib/libaec DLL resolution.
+- Roadmap Stage 5 R2-5E and R2-5F are complete at product implementation anchor
+  `fb09d9fc9`. Windows default/SC-A/SC-B pass 2,733/2,896/2,853 enabled tests;
+  Linux default plus four compression-linkage rows pass 2,735/2,898/2,898/
+  2,855/2,855. Every suite ran at `HDF_TEST_EXPRESS=3`, with 37 disabled in
+  each default and 10 disabled in each compression row. Exact test inventories,
+  installs, packages, headers, exports, signatures, layouts, linkage, installed
+  consumers, integration styles, the fixed 147-entry HighFive inventory, and
+  cross-platform semantic format reads pass. Every Windows execution used
+  command-scoped `/utf-8` where compilation applied and exact HDF5 plus
+  repository zlib/libaec DLL preflight. Round 2 has no remaining validation gap;
+  deferred candidates remain outside its scope.
 - Roadmap Stage 5 Round 1 is complete at implementation anchor `2a966388e`.
   Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled tests; Linux
   default plus four compression-linkage rows passed 2,735/2,898/2,898/2,855/

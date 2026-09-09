@@ -218,7 +218,7 @@ static char* H5FD__family_get_default_printf_filename(const char* old_filename)
     const char* suffix = "-%06d";
     size_t old_filename_len = 0;
     size_t new_filename_len = 0;
-    char* file_extension = NULL;
+    const char* file_extension = NULL;
     char* tmp_buffer = NULL;
     char* ret_value = NULL;
 

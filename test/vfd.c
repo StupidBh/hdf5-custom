@@ -1362,6 +1362,81 @@ error:
 } /* end test_family() */
 
 /*-------------------------------------------------------------------------
+ * Function:    test_family_default_filename
+ *
+ * Purpose:     Tests default family member filename generation.
+ *
+ * Return:      Success:        0
+ *              Failure:        -1
+ *
+ *-------------------------------------------------------------------------
+ */
+static herr_t test_family_default_filename(void)
+{
+    static const struct
+    {
+        const char* base_name;
+        const char* member_name;
+    } cases[] = { { "family_default_h5.h5", "family_default_h5-000000.h5" },
+                  { "family_default_other.data", "family_default_other-000000.data" },
+                  { "family_default_none", "family_default_none-000000" } };
+
+    hid_t file = H5I_INVALID_HID;
+    hid_t fapl = H5I_INVALID_HID;
+    size_t u;
+
+    TESTING("default FAMILY member filenames");
+
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
+        TEST_ERROR;
+    }
+    if (H5Pset_driver(fapl, H5FD_FAMILY, NULL) < 0) {
+        TEST_ERROR;
+    }
+
+    for (u = 0; u < NELMTS(cases); u++) {
+        if ((file = H5Fcreate(cases[u].base_name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
+            TEST_ERROR;
+        }
+        if (H5Fclose(file) < 0) {
+            TEST_ERROR;
+        }
+        file = H5I_INVALID_HID;
+
+        if (HDaccess(cases[u].member_name, F_OK) < 0) {
+            TEST_ERROR;
+        }
+        if (H5Fdelete(cases[u].base_name, fapl) < 0) {
+            TEST_ERROR;
+        }
+        if (HDaccess(cases[u].member_name, F_OK) >= 0) {
+            TEST_ERROR;
+        }
+    }
+
+    if (H5Pclose(fapl) < 0) {
+        TEST_ERROR;
+    }
+
+    PASSED();
+    return SUCCEED;
+
+error:
+    H5E_BEGIN_TRY
+    {
+        H5Fclose(file);
+        H5Pclose(fapl);
+    }
+    H5E_END_TRY
+
+    for (u = 0; u < NELMTS(cases); u++) {
+        HDremove(cases[u].member_name);
+    }
+
+    return FAIL;
+} /* end test_family_default_filename() */
+
+/*-------------------------------------------------------------------------
  * Function:    test_family_compat
  *
  * Purpose:     Tests the backward compatibility for FAMILY driver.
@@ -6400,6 +6475,7 @@ int main(void)
     nerrors += test_core() < 0 ? 1 : 0;
     nerrors += test_direct() < 0 ? 1 : 0;
     nerrors += test_family() < 0 ? 1 : 0;
+    nerrors += test_family_default_filename() < 0 ? 1 : 0;
     nerrors += test_family_compat() < 0 ? 1 : 0;
     nerrors += test_family_member_fapl() < 0 ? 1 : 0;
     nerrors += test_multi() < 0 ? 1 : 0;

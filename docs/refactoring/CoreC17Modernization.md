@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Round 2 complete; next continuation is R3-5A scope freeze.
+- State: Active; R3-5A complete; next continuation is R3-5B pilot.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -27,6 +27,8 @@ endpoint. R2-5B reproduced and corrected the POSIX directory-entry leak at
 frozen Windows follow-ons at `fb09d9fc9` and passed the focused cross-platform
 validation gate. R2-5E repeated the complete compatibility matrix and R2-5F
 closed Round 2. The next round must begin with R3-5A scope and baseline freeze.
+R3-5A has now frozen a single const-correctness pilot in the short-option
+branch of `H5_get_option`; no follow-on function is admitted to Round 3.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -540,6 +542,10 @@ eight full Release rows, installs, packages, linkage, consumers, protected
 headers/exports/layouts, the fixed HighFive inventory, and cross-platform format
 checks without an unexplained delta. R2-5F closes the round with R2-D1, R2-D2,
 R2-I1, R2-D3, and the earlier backlog still deferred. The next execution step
-is R3-5A: freeze a new bounded candidate ledger and validation specification
-before any further product edit. Exact evidence is recorded in
+was R3-5A, which froze one `H5_get_option` local const-correctness pilot against
+accepted Round 2 anchor `fb09d9fc9` without admitting any deferred candidate.
+The next execution step is R3-5B: change only the borrowed short-option scan
+pointer, then run the frozen warning, focused tool, Debug, generator, MPI, and
+memory checks. R3-5C and R3-5D are expected to be `NOT_APPLICABLE` if the
+actual diff remains resource- and follow-on-neutral. Exact evidence is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

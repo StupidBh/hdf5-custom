@@ -78,8 +78,9 @@ with explicit coverage gaps and no accepted new regression. HighFive remains
 external. R1-5E/R1-5F passed. R2-5B corrected the POSIX plugin-directory path
 leak at `6851af92b`, R2-5C closed the pilot ownership audit, and R2-5D closed
 the two frozen Windows follow-ons at `fb09d9fc9`. The complete eight-row
-Release and compatibility matrix passed, R2-5F closed Round 2, and R3-5A scope
-freeze is the current continuation.
+Release and compatibility matrix passed, and R2-5F closed Round 2. R3-5A now
+freezes one const-correctness pilot in the short-option branch of
+`H5_get_option`; R3-5B is the current continuation.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -91,7 +92,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 and 2 complete; next R3-5A | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 and 2 plus R3-5A complete; next R3-5B | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -537,6 +538,13 @@ implementation anchor `0b9e21c34` and is detailed in
   packages, exact inventories, filter write/read, linkage, consumers,
   integration styles, headers, exports, layouts, the fixed HighFive inventory,
   and cross-platform format checks pass without an unexplained contract delta.
+- Completed roadmap Stage 5 R3-5A from planning source anchor `a13ae7c8a`.
+  Product, test, CMake, toolchain, and dependency inputs match the accepted
+  Round 2 endpoint, so its complete eight-row result is the reused Round 3
+  baseline. A clean Linux C17 developer-warning build reproduced the selected
+  `H5_get_option` discarded-qualifier warning. The one-local-pointer scope,
+  19 callers, ownership and behavior boundaries, deferred backlog, and exact
+  focused/final validation are frozen before product edits.
 
 ## Remaining
 
@@ -544,24 +552,25 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 and 2 are complete. R2-D1, R2-D2, R2-I1, R2-D3,
-  later rounds, and the preceding deferred backlog remain outside the completed
-  batch. R3-5A must freeze the next scope and baseline before a product edit.
+- Roadmap Stage 5 Rounds 1 and 2 plus R3-5A are complete. R3-P1 is the only
+  selected Round 3 pilot. R2-D1, R2-D2, R2-I1, R2-D3, later rounds, and the
+  preceding deferred backlog remain outside the frozen batch.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is R3-5A of
+The next roadmap continuation is R3-5B of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
 `2a966388e`, and accepted Round 2 implementation `fb09d9fc9`. Requalify the
-relevant supported-platform environment and freeze a new bounded candidate
-ledger, ownership/behavior model, affected-feature map, and exact focused/final
-validation specification before editing product source. Do not silently admit
-R2-D1, R2-D2, R2-I1, R2-D3, or any earlier deferred candidate. Exact Round 1
-and Round 2 evidence is in
+selected Linux warning after changing only the borrowed short-option scan
+pointer in `H5_get_option` to `const char *`, then run the frozen dual-platform
+focused, Debug, Unix Makefiles, MPI, and Valgrind checks. Confirm R3-5C and
+R3-5D as `NOT_APPLICABLE` if the actual diff remains ownership- and
+follow-on-neutral. Do not silently admit R2-D1, R2-D2, R2-I1, R2-D3, or any
+earlier deferred candidate. Exact Round 1 through R3-5A evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`
 and validation evidence anchor `f120c1c95`. Roadmap Stages 6 and 7 have no
@@ -600,6 +609,15 @@ execution.
 
 ## Validation State
 
+- Roadmap Stage 5 R3-5A is complete from planning source anchor `a13ae7c8a`.
+  The accepted Round 2 endpoint's eight full-suite rows and complete contract
+  evidence remain the qualified Round 3 baseline because relevant source,
+  configuration, toolchain, and dependency inputs are identical. Windows and
+  Linux environments and dependency forms were requalified. A clean Linux C17
+  developer-warning build reproduced the single selected
+  `H5_get_option`/`-Wdiscarded-qualifiers` diagnostic. The exact one-local
+  transformation, all 19 callers, ownership/state boundaries, and focused/final
+  gates are frozen; Round 3 still has zero product implementation commits.
 - Roadmap Stage 5 R2-5A is complete from planning source anchor `c3f97252e`.
   Product/test/CMake sources exactly match the accepted Round 1 endpoint.
   Windows MSVC/CMake and exact repository zlib/libaec DLL/import-library inputs,

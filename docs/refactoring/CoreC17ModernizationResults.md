@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Round 2 complete; next continuation is R3-5A scope freeze.
+- State: Active; R3-5A complete; next continuation is R3-5B pilot.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -11,10 +11,11 @@
 - R2-5A planning source anchor: `c3f97252e`.
 - R2-5B pilot implementation anchor: `6851af92b`.
 - R2-5D implementation anchor: `fb09d9fc9`.
+- R3-5A planning source anchor: `a13ae7c8a`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R3-5A scope and baseline freeze.
+- Current continuation: R3-5B `H5_get_option` const-correctness pilot.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -768,3 +769,119 @@ floor, file-format contract, and mandatory compression matrix remain in force.
 The next continuation is R3-5A: requalify the relevant environment and freeze a
 new bounded candidate ledger, ownership/behavior model, and validation
 specification before selecting or editing any product source.
+
+## R3-5A Frozen Scope and Baseline
+
+### Environment Bridge and Reused Baseline
+
+The Round 3 planning source is `a13ae7c8a`. Its only tracked changes after the
+accepted Round 2 product anchor `fb09d9fc9` are Round 2 documentation.
+`src/`, `test/`, `testpar/`, `tools/`, `utils/`, `config/`, `HDF5Examples/`,
+and the top-level CMake definitions have no delta. The `H5system.c` Git blob is
+still `851255b7854b70c4440e2bfdd2ecf9cd5facb328`, so the original anchor
+remains `dd7204035`, the preceding accepted implementation is `fb09d9fc9`, and
+the cumulative product delta consists only of the accepted Round 1 and Round 2
+changes.
+
+Relevant environment inputs were requalified without a material change:
+
+| Validator | Requalified inputs |
+| --- | --- |
+| Windows x64 | Visual Studio 18 2026 Insiders 18.10.12120.281, MSVC 19.51.36256/toolset 14.51.36231, CMake/CTest 4.4.3, and clang-format 22.1.0 |
+| Linux x86_64 | Ubuntu 26.04.1 under WSL, GCC/G++ 15.2.0, CMake 4.2.3, Ninja 1.13.2, GNU Make 4.4.1, Valgrind 3.26.0, and Open MPI 5.0.10 |
+
+The Windows x64 zlib 1.3.2 and libaec 1.1.7 DLLs and import libraries retain
+the Round 2 SHA-256 values. Linux retains system zlib 1.3.1 and libaec 1.1.5 in
+shared and static forms plus the pinned PIC-capable zlib 1.3.2/libaec 1.1.7
+static prefix used by the supplied-static rows. No prerequisite acquisition,
+proxy change, or persistent environment change was required.
+
+Because product, test, CMake, toolchain, and dependency inputs are identical,
+the complete Round 2 endpoint is the Round 3 starting baseline under the
+evidence-reuse rule. Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled
+tests, and Linux default plus four compression rows passed 2,735/2,898/2,898/
+2,855/2,855. Their exact test inventories, installs, packages, consumers,
+headers, ABI/exports/layouts, HighFive mapping, linkage, and format evidence
+remain applicable. The Round 3 implementation must repeat the complete final
+matrix and cannot inherit these baseline passes as final evidence.
+
+### Frozen Contracts, Callers, and Ownership
+
+Round 3 inherits the complete 57-header freeze, 3,964-name Windows and
+4,060-name Linux export manifests, public layouts, generated settings, install
+and target inventories, C99/C17/C++ C-header consumers, API aliases, file-format
+fixtures, and fixed 147-entry HighFive inventory. `H5_get_option`, `H5_opterr`,
+`H5_optind`, and `H5_optarg` are library exports declared in non-installed
+`H5private.h`; their names, signatures, types, and linkage remain frozen.
+
+There are 19 actual `H5_get_option` invocation sites: 14 in retained command-line
+tools, four in tool test/performance programs, and one in `h5dwalk`. They cover
+`h5copy`, `h5diff`, `h5dump`, `h5format_convert`, `h5jam`, `h5unjam`,
+`pio_perf`, `sio_perf`, `h5repack`, `h5sign`, `h5stat`, `h5clear`, `h5mkgrp`,
+`h5gentest`, `getub`, `tellub`, `zip_perf`, and `h5dwalk`; `h5dump` calls the
+parser twice. The fixed HighFive inventory does not use this private parser.
+
+In the selected short-option branch, `opts` is a borrowed `const char *`, and
+the local `cp` only points into that string, advances, and reads the following
+option marker. It never writes through the pointer and owns no storage. The
+long-option branch owns its `strdup` result until the existing `free`; all
+`H5_optarg` values remain borrowed pointers into `argv`. The static scan index,
+three exported global variables, argument advancement, wildcard handling,
+return values, and diagnostic text are untouched. No allocation, cleanup,
+identifier, callback, VOL/VFD/filter dispatch, file format, or public layout is
+reachable from the proposed qualifier-only change.
+
+### R3 Candidate Ledger
+
+| ID | Exact functions | Decision | Evidence, transformation, and boundary |
+| --- | --- | --- | --- |
+| `R3-P1` | `H5system.c`: short-option branch of `H5_get_option` | `SELECTED PILOT` | A clean Linux C17 developer-warning build at the preceding implementation reports `-Wdiscarded-qualifiers` when `strchr(opts, optchar)` is assigned to `char *cp`. Change only this borrowed local to `const char *`. Preserve the exported declaration/definition signature, evaluation order, pointer advancement, globals, results, and diagnostics. |
+| `R3-K1` | `H5_get_option` long-option branch, global parser state, declaration, and all callers | `KEEP` | Resource handling, parser reentrancy, signature/caller casts, option semantics, and diagnostic cleanup are independent work with wider compatibility risk and no need for this pilot. |
+| `R3-D1` | R2-D1, R2-D2, R2-I1, R2-D3 and R1-D1 through R1-D4 | `DEFER` | Their frozen allocation-failure, behavior, file-format, shared-container, or performance constraints remain unchanged; none is admitted to Round 3. |
+
+R3-P1 is the complete Round 3 implementation scope. The proposed edit is one
+local pointer qualifier and is not a user-visible behavior change, so it needs
+no changelog entry. The branch performs the same `strchr`, increment, and byte
+tests, and the command-line parser is not a measured hot path; no performance
+experiment is warranted. R3-5C and R3-5D are provisionally `NOT_APPLICABLE`,
+subject to confirmation against the actual diff.
+
+### R3 Validation Specification
+
+- R3-5B changes only `cp` to `const char *` and formats `H5system.c`. A clean
+  Linux C17 `HDF5_ENABLE_DEV_WARNINGS=ON` build must remove the exact
+  `H5_get_option` discarded-qualifier warning without introducing a new warning.
+  MSVC uses the same developer-warning configuration and command-scoped
+  `/utf-8`; both validators complete the default Release build.
+- On Windows and Linux, run the exact five-test focused selection
+  `H5DIFF-h5diff_10`, `H5DIFF-h5diff_15`, `H5CLEAR_CMP-h5clr_usage_h`,
+  `H5STAT-h5stat_help1`, and `H5STAT-h5stat_help2` at
+  `HDF_TEST_EXPRESS=0`. It exercises short help, long help, and an attached
+  long-option value through three retained callers; compare outputs and
+  diagnostics to the preceding implementation. Existing complete tool suites
+  provide the broader caller coverage; no new legacy aggregate test is added
+  for a qualifier-only change.
+- Complete Debug builds and the same focused selection run on both validators.
+  Linux Valgrind runs the short and long `h5stat` help cases with an error exit
+  for definite/indirect leaks. Linux Unix Makefiles builds the library and the
+  three selected tools and runs the focused cases.
+- The direct parallel caller requires Linux/Open MPI and Windows/MS-MPI parallel
+  builds of `pio_perf` plus its help/argument-parser smoke invocation. Other
+  thread-safe, VOL, VFD, and filter paths do not call the parser and have no
+  state, ownership, or signature impact from this local qualifier.
+- R3-5E repeats Windows default/SC-A/SC-B and Linux default plus all four
+  compression-linkage full Release suites at `HDF_TEST_EXPRESS=3` and at most
+  six jobs. It repeats installs/packages, linkage, consumers, integration
+  styles, complete headers/exports/signatures/layouts, exact test inventories,
+  the fixed HighFive evidence, and cross-platform format reads against both
+  `dd7204035` and `fb09d9fc9` where applicable.
+- C99, C17, C++11, and the v16/v18/v110/v112/v114/v200 API-alias consumers
+  retain the R1 specification. `H5_get_option` is absent from all installed
+  headers and the HighFive table, but the entire inherited contract is still
+  checked at final acceptance. Major Windows and WSL builds run serially;
+  focused ordinary CTest uses no more than six workers, and MPI ranks run apart
+  from full suites with no surviving helper process.
+
+The preceding warning is reproduced, all mandatory dependencies remain
+available, exact selection and checks are frozen, and no Round 3 product source
+has been edited. R3-5A is complete.

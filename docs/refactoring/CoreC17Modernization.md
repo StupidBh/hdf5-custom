@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; R2-5A complete; next continuation is R2-5B.
+- State: Active; R2-5B and R2-5C complete; next continuation is R2-5D.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -22,9 +22,9 @@ R1-5E completed the mandatory dual-platform default and compression matrices
 and all compatibility gates; R1-5F closed the round at implementation anchor
 `2a966388e`. The next round must repeat 5A before selecting product edits.
 R2-5A froze a resource-ownership batch in `H5PLpath.c` against that accepted
-endpoint. R2-5B begins with the reproducible POSIX directory-entry leak before
-R2-5C maps the full selected ownership changes and R2-5D considers the frozen
-Windows follow-on functions.
+endpoint. R2-5B reproduced and corrected the POSIX directory-entry leak at
+`6851af92b`; R2-5C closed its ownership audit. R2-5D now considers only the
+frozen Windows follow-on functions.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -527,9 +527,10 @@ toolchains and dependency inputs match the Round 1 endpoint, and no product or
 test source changed between that endpoint and the R2 planning source anchor
 `c3f97252e`, so its qualifying endpoint evidence is the R2 starting baseline.
 
-The next execution step is R2-5B. Add the frozen nested-directory reproducer to
-`filter_plugin`, run it against the preceding implementation, and apply only
-the selected POSIX `H5PL__path_table_iterate_process_path` pilot correction.
-R2-5C then records the resulting ownership evidence before any selected Windows
-follow-on enters R2-5D. Exact scope and checks are recorded in
+R2-5B and R2-5C are complete at pilot implementation anchor `6851af92b`. The
+same focused test that exposed two definitely lost POSIX directory-path buffers
+passes without a Valgrind error after the correction, and the complete pilot
+ownership map is recorded. The next execution step is R2-5D: implement and test
+only the frozen R2-F1 and R2-F2 Windows follow-ons. Exact scope and checks are
+recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

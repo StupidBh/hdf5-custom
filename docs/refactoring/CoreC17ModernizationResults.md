@@ -2,17 +2,18 @@
 
 ## Status
 
-- State: Active; R2-5A complete; next continuation is R2-5B.
+- State: Active; R2-5B and R2-5C complete; next continuation is R2-5D.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
 - R1-5A evidence anchor: `bd6de77dd`.
 - Round 1 implementation anchor: `2a966388e`.
 - R2-5A planning source anchor: `c3f97252e`.
+- R2-5B pilot implementation anchor: `6851af92b`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R2-5B characterization and POSIX resource pilot.
+- Current continuation: R2-5D frozen Windows ownership follow-ons.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -498,7 +499,7 @@ selected.
 
 | ID | Exact functions | Decision | Evidence, transformation, and boundary |
 | --- | --- | --- | --- |
-| `R2-P1` | POSIX `H5PL__path_table_iterate_process_path` | `SELECTED PILOT; DEFECT` | A matching directory entry allocates `path` and continues without releasing it; a later matching entry overwrites the owner. Add two plugin-shaped directories and invoke the package iterator so the preceding implementation remains functionally successful but Valgrind exposes the leak. Release the temporary path before the existing `continue`; preserve enumeration, callbacks, diagnostics, and handle cleanup. |
+| `R2-P1` | POSIX `H5PL__path_table_iterate_process_path` | `IMPLEMENTED; 6851af92b` | A matching directory entry allocated `path` and continued without releasing it; a later matching entry overwrote the owner. Two plugin-shaped directories and the package iterator kept the preceding implementation functionally successful while Valgrind exposed two definitely lost buffers. The temporary path is now released before the existing `continue`; enumeration, callbacks, diagnostics, and handle cleanup are preserved. |
 | `R2-F1` | Windows `H5PL__path_table_iterate_process_path`; Windows `H5PL__find_plugin_in_path` | `SELECTED FOLLOW-ON; DEFECT` | The same directory branch retains `path` across `continue`. Mirror the demonstrated pilot ownership correction only after R2-5C. Stage two `.dll`-shaped directories and cover iteration plus a missing-filter lookup; preserve Win32 enumeration and error behavior. |
 | `R2-F2` | `H5PL__insert_at`; `H5PL__replace_at` | `SELECTED FOLLOW-ON; DEFECT` | After `H5MM_strdup`, failed Windows environment expansion leaves the local copy owned by the caller but the current `done` path does not release it. Free the untransferred copy on failure. Cover normal `%VAR%` expansion, an over-capacity expansion failure, unchanged table size/content, append, and replace. No success-path result or error category changes. |
 | `R2-D1` | `H5PL__expand_path_table` | `DEFECT; DEFER` | Direct assignment of `H5MM_realloc` can lose the table on allocation failure. The existing 42-path test covers successful growth, but no deterministic allocator-failure hook exists. Defer until a separately frozen test-only hook or other reliable reproducer is justified. |
@@ -555,3 +556,54 @@ benchmark is defined.
 The current endpoint has no unexplained relevant baseline failure, all mandatory
 dependencies are available, exact selection and checks are frozen, and no
 product source has been edited. R2-5A is complete.
+
+## R2-5B Characterization and POSIX Pilot
+
+The focused `filter_plugin` fixture now creates two plugin-shaped directory
+entries in its first search directory and invokes the package path iterator
+before the existing path API test empties the table. Against the preceding
+implementation, `H5PLUGIN-filter_plugin` passed functionally on both retained
+validators at `HDF_TEST_EXPRESS=0`. Linux CTest Memcheck nevertheless reported
+one defect: 162 bytes in two blocks were definitely lost from
+`H5PL__path_table_iterate`, exactly matching the two staged directories.
+
+Implementation anchor `6851af92b` releases the per-entry `path` allocation
+before the POSIX directory branch continues. The qualifying Windows build used
+command-scoped `CL=/utf-8`; its focused Release test passed 1/1 after exact
+preflight resolution of the repository `z.dll`, `aec.dll`, and `szip.dll`.
+The Linux Ninja Release test also passed 1/1. Both used
+`HDF_TEST_EXPRESS=0`. The repeated Linux CTest Memcheck run reported zero bytes
+in zero blocks at exit, all 152,654 allocations freed, and zero errors. No new
+compiler warning is attributable to the one-line ownership correction.
+
+The implementation changes no public or package signature, export, table
+content, callback order, plugin search order, diagnostic frame, or handle
+cleanup. The test adds only build-tree directories and a package-friend callback;
+no installed artifact or file-format path changes. R2-5B is complete.
+
+## R2-5C Resource and Function Structure
+
+The pilot ownership audit covers every exit after the POSIX iterator acquires
+resources:
+
+- `H5MM_calloc` gives the current loop iteration sole ownership of `path`.
+  A regular file releases it at the loop tail; stat/open/callback failure and
+  callback stop reach `done`, which releases the current value.
+- A directory neither transfers nor exposes `path`. The new release occurs
+  before `continue`; `H5MM_xfree` returns null, so later cleanup cannot double
+  release it.
+- `HDopendir` gives the function ownership of `dirp`; every post-open exit still
+  reaches the unchanged `HDclosedir` cleanup. The edit does not alter handle
+  lifetime or error ordering.
+- Plugin metadata remains owned by the plugin cache/opening layer. The iterator
+  callback receives borrowed values, and the pilot does not change that
+  ownership.
+
+The Windows iterator and lookup directory branches retain the demonstrated
+symmetrical defect and are admitted as R2-F1. The untransferred Windows
+environment-expansion copies in insertion and replacement remain admitted as
+R2-F2. Allocation-failure-only R2-D1/R2-D2 remain deferred because the repository
+still has no deterministic allocator-failure hook; the pilot supplies no reason
+to edit them without coverage. The R2-5C gate is complete: all pilot cleanup
+paths are mapped, the functional and memory checks pass, and no ownership
+ambiguity remains. R2-5D may now begin with only R2-F1 and R2-F2.

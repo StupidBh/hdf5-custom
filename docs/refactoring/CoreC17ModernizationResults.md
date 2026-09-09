@@ -2,8 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 3 complete; R4-5A through R4-5D complete;
-  next R4-5E.
+- State: Active; Rounds 1 through 4 complete; next R5-5A.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -19,7 +18,7 @@
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
 - R4-5A evidence anchor: `c6421eac6`.
 - R4-5B implementation anchor: `720d882ee`.
-- Current continuation: R4-5E final product and compatibility matrix.
+- Current continuation: R5-5A scope and baseline freeze.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -986,10 +985,14 @@ All eight rows installed successfully. CPack produced three Windows ZIPs and
 five Linux TGZs. Windows default/SC-A/SC-B packages contain 101/97/95 files.
 The Linux default package has 91 regular files and four symlinks; the two
 shared-HDF5 compression packages each have 87 regular files and four symlinks,
-and the two static-HDF5 packages each have 87 regular files. Package paths match
-the corresponding Round 1 archives exactly. They also match the retained R2
-archives except for the three corrected `bin/h5cc` omissions documented above.
-The install path inventories match R2 exactly.
+and the two static-HDF5 packages each have 87 regular files. The three Windows
+and four Linux compression package paths match the corresponding Round 1
+archives exactly. Reinspection during Round 4 found that the retained Round 1
+Linux default TGZ lacks `bin/h5cc`; the fresh Round 3 default package contains
+that accepted installed compiler wrapper, so the earlier all-five Linux claim
+is withdrawn. The Round 3 packages match the retained R2 archives except for
+the three corrected `bin/h5cc` omissions documented above. The install path
+inventories match R2 exactly.
 
 Default installs retain all 57 installed header names and byte-identical
 contents against both `dd7204035` and `fb09d9fc9`. The compression installs also
@@ -1213,4 +1216,113 @@ releases no resource and changes no cleanup edge. The borrowed pointer retains
 the same immutable input and lexical lifetime. R4-5D is also
 `NOT_APPLICABLE`: R4-P1 and R4-T1 are the complete frozen round scope, and no
 follow-on or deferred candidate was admitted. R4-5B through R4-5D are
-complete; the mandatory R4-5E matrix remains open.
+complete.
+
+## R4-5E Final Product and Compatibility Matrix
+
+All eight fresh Release rows ran at `HDF_TEST_EXPRESS=3`, with no more than six
+jobs and the major Windows and WSL builds serialized:
+
+| Configuration | Passed | Disabled | Registered | Time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default | 2,733 | 37 | 2,770 | 137.45 s |
+| Windows shared HDF5/shared supplied compression | 2,896 | 10 | 2,906 | 139.35 s |
+| Windows static HDF5/shared supplied compression | 2,853 | 10 | 2,863 | 138.83 s |
+| Linux default | 2,735 | 37 | 2,772 | 129.54 s |
+| Linux shared HDF5/shared system compression | 2,898 | 10 | 2,908 | 135.92 s |
+| Linux shared HDF5/static supplied compression | 2,898 | 10 | 2,908 | 135.20 s |
+| Linux static HDF5/shared system compression | 2,855 | 10 | 2,865 | 134.94 s |
+| Linux static HDF5/static supplied compression | 2,855 | 10 | 2,865 | 134.30 s |
+
+All 22,723 enabled tests passed. The only tests not run are the same 37 or 10
+explicitly disabled cases. Structured comparison with the corresponding Round
+3 rows gives zero delta in registered test names, disabled names, normalized
+commands, and fixture properties. The six API-default executables for v16,
+v18, v110, v112, v114, and v200 passed both validators directly at express
+level 0.
+
+### Installs, Packages, Dependencies, and Consumers
+
+All eight rows installed outside the repository and packaged successfully as
+three Windows ZIPs and five Linux TGZs. Windows default/SC-A/SC-B packages
+contain 101/97/95 paths. The Linux default package contains 91 regular files
+and four symlinks; the two shared-HDF5 packages each contain 87 regular files
+and four symlinks, and the two static-HDF5 packages each contain 87 regular
+files. Every Round 4 package path manifest exactly matches its Round 3 row.
+The three Windows and four Linux compression manifests also match Round 1.
+The Linux default row retains the accepted `bin/h5cc` addition relative to the
+retained Round 1 default archive. All install path inventories match Round 3.
+
+Every install retains 57 public headers. Default Windows and Linux header
+contents and `libhdf5.settings` are byte-identical to Round 3. Each compression
+row differs in only `H5pubconf.h`, where the configured
+`H5_DEFAULT_PLUGINDIR` contains that row's new install prefix. No source public
+header changed. The default generated configuration, version, error, and
+overflow headers retain the frozen contents; compression version, error, and
+overflow headers do likewise. Default installs expose 20 CMake target names
+and compression installs expose 18, with zero Round 3 delta.
+
+Windows compression caches select the repository zlib and libaec inputs and
+define `H5_HAVE_MAP_API 1`. The shared-HDF5 Windows library in SC-A loads
+`z.dll` and `szip.dll`; the statically linked HDF5 tools in SC-B load those
+same supplied compression DLLs. All four Linux compression rows define
+`H5_HAVE_MAP_API 1`. The shared-dependency rows load `libz.so.1` and
+`libsz.so.2`; the static-dependency rows use the frozen PIC archives and add no
+compression `NEEDED` entry to the inspected HDF5 library or tool.
+
+Fresh installed C99, strict-C17, G++ C++11, and MSVC C++14 C-header consumers
+compile, link, run, and report HDF5 2.3.0. The seven frozen x64 type and
+structure layout assertions pass. Build-tree and install-tree `find_package`
+consumers, build-tree and install-tree HighFive consumers, isolated
+`add_subdirectory`, and local `FetchContent` consumers pass on both platforms.
+Build-tree and install-tree requests for CXX, HL, and CXX_HL are rejected, as
+are the removed `HDF5_BUILD_CPP_LIB` and `HDF5_BUILD_HL_LIB` options.
+
+Installed gzip and SZIP examples build and run against both Windows and all
+four Linux compression packages. All 12 executions report the requested
+filter and read back the expected maximum value 1,890. Shared and static HDF5
+selection and all dependency locations were supplied explicitly.
+
+Three preliminary Windows probe setups were discarded before acceptance: one
+PowerShell helper parameter consumed `HDF5_DIR`, one build-tree CTest run did
+not put the Visual Studio configuration directory on `PATH`, and the first
+example probes did not fully select the frozen dependency and shared/static
+parameters. Each was corrected and rerun from a fresh probe tree; none reached
+an accepted product-runtime failure.
+
+### ABI, HighFive, and Format
+
+The default case-sensitive export sets remain exactly 3,964 Windows names and
+4,060 Linux names with zero Round 3 delta. `H5_get_option` remains exported.
+The unchanged public headers and passing layout probes preserve the frozen
+signature and layout contract.
+
+The fixed HighFive audit still contains exactly 147 C identifiers across the
+unchanged 77-file tracked HighFive tree. All 147 appear in the current tree and
+both installed header closures. The Windows default library exports 135
+directly; the four v200 aliases resolve through `H5version.h` to
+`H5Lget_info2`, `H5Literate2`, `H5Oget_info3`, and `H5Rdereference2`. A fresh
+minimal parallel Linux shared build exports the remaining eight frozen
+MPIO/collective functions. The HighFive input has zero tree delta from its
+fixed audit anchor.
+
+Current Windows and Linux gzip example files differ at the byte level but are
+semantically interchangeable. Original Stage 5, Round 3, and Round 4 Windows
+and Linux `h5diff` binaries all compare both current files successfully.
+Current default Windows and Linux `h5diff` binaries also compare all four
+frozen Round 1 cross-platform fixtures with their canonical counterpart. No
+file-format delta was found.
+
+## R4-5F Round Closeout
+
+Round 4 is complete at implementation anchor `720d882ee`. The selected local
+qualifier and direct family-filename characterization pass the focused gate,
+the complete eight-row matrix, and every inherited compatibility contract.
+R4-5C and R4-5D remain `NOT_APPLICABLE`; R4-D1 through R4-D3 and the earlier
+backlog remain deferred. No public header, API/ABI, target, package contract,
+HighFive dependency, observable filename, or file-format change was accepted.
+
+The next continuation is R5-5A. It must requalify the source and environment
+against accepted Round 4 anchor `720d882ee`, freeze a new exact candidate
+ledger and validation specification, and make no product edit before that
+gate. No Round 5 candidate is currently selected.

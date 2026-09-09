@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 3 complete; next R4-5A.
+- State: Active; Rounds 1 through 3 complete; R4-5A complete; next R4-5B.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -16,7 +16,8 @@
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R4-5A inventory, environment, and baseline freeze.
+- R4-5A evidence anchor: this document's next commit.
+- Current continuation: R4-5B characterization and pilot.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1051,3 +1052,115 @@ The original Stage 5 contract at `dd7204035`, accepted R1 implementation
 compression matrix remain in force. The next continuation is R4-5A: requalify
 the relevant environment and freeze a new bounded candidate ledger, ownership
 and behavior model, and validation specification before any product edit.
+
+## R4-5A Frozen Scope and Baseline
+
+### Environment Bridge and Reused Baseline
+
+The Round 4 planning source is `82913bddb`. Its only tracked changes after the
+accepted Round 3 product anchor `a206f0a6e` are Round 3 documentation. `src/`,
+`test/`, `testpar/`, `tools/`, `utils/`, `config/`, `HDF5Examples/`, and the
+top-level CMake definitions have zero delta. `src/H5FDfamily.c` retains Git
+blob `9af4fb7815f0178d14194196a172e65e7ddc5da9`, and `test/vfd.c` retains blob
+`0bfe524207e22998b156115bb1a3f0bce52aa8a2`. The original contract anchor
+remains `dd7204035`, and the preceding accepted implementation remains
+`a206f0a6e`.
+
+The supported validators were requalified without a material change. Windows
+x64 retains Visual Studio 18 2026 Insiders 18.10.12120.281, MSVC
+19.51.36256/toolset 14.51.36231, CMake/CTest 4.4.3, clang-format 22.1.0, and
+command-scoped `/utf-8`. Linux x86_64 retains Ubuntu 26.04.1 under WSL,
+GCC/G++ 15.2.0, CMake 4.2.3, Ninja 1.13.2, GNU Make 4.4.1, Valgrind 3.26.0,
+and Open MPI 5.0.10. The repository Windows zlib 1.3.2/libaec 1.1.7 inputs,
+Linux system zlib 1.3.1/libaec 1.1.5 inputs, and the pinned PIC-capable static
+zlib 1.3.2/libaec 1.1.7 prefix remain available. No proxy, dependency, or
+persistent environment change was required.
+
+Because product, test, CMake, toolchain, and dependency inputs are unchanged,
+the complete accepted Round 3 endpoint is reused as the Round 4 behavioral
+starting baseline under the evidence-reuse rule. Its eight Release rows passed
+all 22,723 enabled tests, including corrected Map-enabled Linux compression
+and complete package evidence. The exact test inventories, installs, packages,
+linkage, consumers, headers, exports, layouts, fixed HighFive inventory, and
+format results remain the comparison baseline. Round 4 must nevertheless
+repeat the complete final matrix before acceptance.
+
+The preceding clean Linux C17 developer-warning build reports exactly two
+`-Wdiscarded-qualifiers` instances in
+`H5FD__family_get_default_printf_filename`, where `strstr` and `strrchr`
+results from a `const char *` input are assigned to `char *file_extension`.
+The retained Windows and Linux Release `H5TEST-vfd` baseline passes 3/3 with
+its setup and cleanup fixtures at `HDF_TEST_EXPRESS=0`. Direct retained
+`h5mkgrp` executions through the family default-driver configuration produce
+`alpha-000000.h5`, `beta-000000.data`, and `gamma-000000` on both validators,
+establishing the three naming branches before any product edit.
+
+### Frozen Contracts, Callers, and Ownership
+
+`H5FD__family_get_default_printf_filename` is file-local and has exactly two
+call sites, both in `H5FDfamily.c`: the default-configuration branches of
+`H5FD__family_open` and `H5FD__family_delete`. Its declaration, definition
+signature, return type, callers, VFD class callbacks, and all installed family
+VFD APIs remain frozen.
+
+`old_filename` is a borrowed immutable string. `file_extension` only points
+inside that string and is used for a null test, pointer subtraction, and a
+read-only `%s` conversion; it is never written through, freed, returned, or
+stored. `tmp_buffer` is the only allocation owned by the helper. On success its
+ownership transfers through `ret_value` to the existing caller; on failure the
+existing `done` path releases it. The suffix, length arithmetic, allocation,
+branch order, formatting calls, results, errors, and cleanup are unchanged.
+No identifier, callback, lock, VOL/filter dispatch, member I/O, file-format
+encoding, public layout, or installed declaration is reachable from changing
+the borrowed local's qualifier.
+
+### R4 Candidate Ledger
+
+| ID | Exact functions | Decision | Evidence, transformation, and boundary |
+| --- | --- | --- | --- |
+| `R4-P1` | `H5FDfamily.c`: `H5FD__family_get_default_printf_filename` | `SELECTED PILOT` | Change only local `file_extension` from `char *` to `const char *`. This removes the two reproduced qualifier-loss diagnostics while preserving both call sites, all three filename branches, allocation ownership, output bytes, and errors. |
+| `R4-T1` | `test/vfd.c`: new family default-configuration characterization | `SELECTED TEST` | Through public `H5Pset_driver(..., H5FD_FAMILY, NULL)`, create and delete names ending in `.h5`, another extension, and no extension. Check the exact member names before deletion and their absence afterward, exercising both helper callers without exposing the helper. |
+| `R4-K1` | Remaining family VFD implementation and public/package declarations | `KEEP` | Signatures, VFD registration, configuration, allocation/cleanup, member enumeration, errors, and file behavior require no change for the local qualifier correction. |
+| `R4-D1` | `H5FDsplitter.c`: analogous default W/O filename diagnostic | `DEFER` | It belongs to a separate user-visible VFD and requires its own default-configuration characterization; symmetry does not admit it to this round. |
+| `R4-D2` | Other retained const diagnostics in `H5Fint.c`, `H5trace.c`, and tools | `DEFER` | Their macros, trace parsing, or intentionally mutable command-line inputs have different contracts and callers; they are outside this single-helper pilot. |
+| `R4-D3` | R2-D1, R2-D2, R2-I1, R2-D3 and R1-D1 through R1-D4 | `DEFER` | Their allocation-failure, behavior, file-format, shared-container, or performance constraints remain unchanged and none is admitted to Round 4. |
+
+R4-P1 and R4-T1 are the complete Round 4 implementation scope. The product
+edit is one local qualifier and is not user-visible, so no changelog entry is
+required. The helper runs only during default family open/delete filename
+normalization and the transformation does not change its work, so no benchmark
+is warranted. R4-5C and R4-5D are provisionally `NOT_APPLICABLE`, subject to
+confirmation against the actual diff.
+
+### R4 Validation Specification
+
+- R4-5B changes only the selected local qualifier and adds the frozen modern
+  `h5test.h` characterization. Format both touched C files. Fresh default
+  Release builds use developer warnings on Linux and Windows; the exact two
+  GNU diagnostics must disappear without a new diagnostic in the helper or
+  test.
+- On both validators, run `H5TEST-vfd` with its setup/cleanup fixtures at
+  `HDF_TEST_EXPRESS=0` in Release and Debug. Confirm its output includes the
+  new family default-filename case and compare the exact three created names
+  to the retained baseline. Linux repeats the focused build/test with Unix
+  Makefiles and runs the focused executable under Valgrind with definite and
+  indirect leaks treated as errors.
+- Direct retained `h5mkgrp` family-driver probes repeat the `.h5`, other
+  extension, and no-extension cases on both validators. No MPI, thread-safety,
+  splitter, VOL, filter, or compression-specific focused row owns changed
+  state or control flow from this qualifier-only helper edit.
+- R4-5E repeats Windows default/SC-A/SC-B and Linux default plus all four
+  compression-linkage full Release suites at `HDF_TEST_EXPRESS=3`, with major
+  Windows and WSL builds serial and no more than six jobs. Repeat installs,
+  packages, dependency linkage, consumers, integration styles, complete
+  headers/exports/signatures/layouts, exact test inventories, fixed HighFive
+  evidence, and cross-platform format reads against the inherited anchors.
+- Retain the inherited C99, strict-C17, C++11/MSVC C++14 C-header consumers,
+  v16/v18/v110/v112/v114/v200 API-alias checks, Map requirement, system
+  compression business gate, 57-header freeze, 3,964/4,060 export sets, and
+  147-entry HighFive floor. Missing or changed evidence is a stop condition,
+  not grounds to expand the candidate scope.
+
+The environment bridge, warning reproduction, direct behavior baseline,
+ownership model, exact selection, deferrals, and checks are frozen. No Round 4
+product or test source has been edited. R4-5A is complete.

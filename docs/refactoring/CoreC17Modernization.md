@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 3 complete; next R4-5A.
+- State: Active; Rounds 1 through 3 complete; R4-5A complete; next R4-5B.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -33,7 +33,10 @@ R3-5B implemented it at `a206f0a6e` and passed the frozen focused checks;
 the actual diff confirms R3-5C and R3-5D are `NOT_APPLICABLE`. R3-5E repeated
 the complete mandatory matrix, corrected the historical Linux Map/package
 evidence discrepancies, and R3-5F closed the round. The next round must begin
-with R4-5A scope and baseline freeze.
+with R4-5A scope and baseline freeze. R4-5A has now frozen one file-local
+const-correctness pilot in the family VFD default-filename helper plus its
+direct modern-harness characterization. No other warning or deferred item is
+admitted to Round 4; R4-5B is the next step.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -556,7 +559,9 @@ memory checks pass. The one-line actual diff confirms R3-5C and R3-5D are
 `NOT_APPLICABLE`. R3-5E repeated all eight full Release rows and the complete
 compatibility contract. It also corrected the retained R1/R2 Linux
 compression rows' missing Map configuration and three incomplete retained R2
-TGZ inventories. R3-5F closes the round without an unresolved gap. The next
-execution step is R4-5A; no Round 4 candidate is selected yet. Exact evidence
+TGZ inventories. R3-5F closes the round without an unresolved gap. R4-5A
+subsequently froze one family VFD const-correctness pilot and its exact
+characterization and validation gates against accepted Round 3 anchor
+`a206f0a6e`. The next execution step is R4-5B. Exact evidence
 is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

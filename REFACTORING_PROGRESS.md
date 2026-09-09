@@ -57,8 +57,8 @@ architecture and the paused behavior-preserving modernization state remain recor
 
 The active direction is [Stage 5 core C17 internal modernization](docs/refactoring/CoreC17Modernization.md).
 Detailed planning was requested on 2026-09-08 and execution began on
-2026-09-09. Round 1 Work Package 5A is complete; product implementation has not
-started. Its portable evidence is in
+2026-09-09. R1-5A and R1-5B are complete, and R1-5C/R1-5D are not applicable
+to the resource-neutral pilot. Its portable evidence is in
 [`docs/refactoring/CoreC17ModernizationResults.md`](docs/refactoring/CoreC17ModernizationResults.md).
 Build/CTest parallelism is capped at six jobs per physical host.
 Windows uses the supplied `3rdparty` dependencies; Linux prerequisites are
@@ -73,7 +73,7 @@ path scans in `H5_dirname` and `H5_basename`, and fixed the exact tools, tests,
 and scheduling without relaxing the protected contracts. MPI/thread extensions
 are secondary
 with explicit coverage gaps and no accepted new regression. HighFive remains
-external. R1-5B is the current implementation continuation.
+external. R1-5E is the current validation continuation.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -85,7 +85,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Round 1 Work Package 5A complete, implementation not started | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R1-5A/R1-5B complete, R1-5C/R1-5D not applicable | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -511,23 +511,23 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Round 1 Work Package 5A is complete. R1-5B, R1-5E, and
-  R1-5F remain; R1-5C and R1-5D are `NOT_APPLICABLE` for the selected pilot.
+- Roadmap Stage 5 R1-5A and R1-5B are complete. R1-5C and R1-5D are
+  `NOT_APPLICABLE`; R1-5E and R1-5F remain.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is Work Package R1-5B of
-[CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md): preserve
-the existing `th5_system.c` characterization while extracting the duplicated
-reverse path scans used by `H5_dirname` and `H5_basename` into const-correct,
-file-local helpers. R1-5A evidence is recorded in
+The next roadmap continuation is Work Package R1-5E of
+[CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md): run the
+final product and compatibility matrix for the const-correct file-local path
+scan helpers now used by `H5_dirname` and `H5_basename`. R1-5A through R1-5D
+evidence is recorded in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
-Product implementation has not started. Roadmap Stage 4 remains complete at
-product
-implementation anchor `81dff5168` and validation evidence anchor `f120c1c95`.
+The focused Release, Debug, Valgrind, Unix Makefiles, and Linux parallel
+subfiling checks pass. Roadmap Stage 4 remains complete at product implementation
+anchor `81dff5168` and validation evidence anchor `f120c1c95`.
 Roadmap Stages 6 and 7 have no approved execution scope.
 
 The separately paused CMake modernization may resume only after explicit

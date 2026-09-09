@@ -1047,6 +1047,43 @@ char* Wstrcasestr_wrap(const char* haystack, const char* needle)
  */
 
 /*-------------------------------------------------------------------------
+ * Function:    H5__path_trim_trailing_separators
+ *
+ * Purpose:     Move END backward over path separators without crossing PATH.
+ *
+ * Return:      The adjusted end pointer
+ *
+ *-------------------------------------------------------------------------
+ */
+static const char* H5__path_trim_trailing_separators(const char* path, const char* end)
+{
+    while (end != path && end[-1] == H5_DIR_SEPC) {
+        end--;
+    }
+
+    return end;
+}
+
+/*-------------------------------------------------------------------------
+ * Function:    H5__path_component_start
+ *
+ * Purpose:     Move END to the start of its path component without crossing
+ *              PATH.
+ *
+ * Return:      The path component start pointer
+ *
+ *-------------------------------------------------------------------------
+ */
+static const char* H5__path_component_start(const char* path, const char* end)
+{
+    while (end != path && end[-1] != H5_DIR_SEPC) {
+        end--;
+    }
+
+    return end;
+}
+
+/*-------------------------------------------------------------------------
  * Function:    H5_dirname
  *
  * Purpose:     Similar to dirname(3) but more portable across platforms.
@@ -1061,7 +1098,7 @@ char* Wstrcasestr_wrap(const char* haystack, const char* needle)
  */
 herr_t H5_dirname(const char* path, char** dirname)
 {
-    char* sep;
+    const char* sep;
     char* out = NULL;
     herr_t ret_value = SUCCEED;
 
@@ -1089,9 +1126,7 @@ herr_t H5_dirname(const char* path, char** dirname)
              * pathname. Skip this and any other preceding trailing
              * file separator characters
              */
-            while (sep != path && sep[-1] == H5_DIR_SEPC) {
-                sep--;
-            }
+            sep = H5__path_trim_trailing_separators(path, sep);
 
             if (sep == path) {
                 /* Contrived case: "//", "///" and similar */
@@ -1104,9 +1139,7 @@ herr_t H5_dirname(const char* path, char** dirname)
                  * backwards to a previous file separator character,
                  * if any.
                  */
-                while (sep != path && sep[-1] != H5_DIR_SEPC) {
-                    sep--;
-                }
+                sep = H5__path_component_start(path, sep);
 
                 if (sep == path) {
                     /* No directory component found, just return "." */
@@ -1120,9 +1153,7 @@ herr_t H5_dirname(const char* path, char** dirname)
             ptrdiff_t len;
 
             /* Skip a possible run of duplicate file separator characters */
-            while (sep != path && sep[-1] == H5_DIR_SEPC) {
-                sep--;
-            }
+            sep = H5__path_trim_trailing_separators(path, sep);
 
             if (sep == path) {
                 /* Pathname of form "/usr/" */
@@ -1223,25 +1254,21 @@ herr_t H5_basename(const char* path, char** basename)
              * pathname. Skip this and any other preceding trailing
              * file separator characters
              */
-            while (sep != path && sep[-1] == H5_DIR_SEPC) {
-                sep--;
-            }
+            sep = H5__path_trim_trailing_separators(path, sep);
 
             if (sep == path) {
                 /* Contrived case: "//", "///" and similar */
                 out = H5MM_strdup(H5_DIR_SEPS);
             }
             else {
-                const char* c_ptr = sep;
+                const char* c_ptr;
                 ptrdiff_t len;
 
                 /*
                  * Skip back to a previous file separator character,
                  * if any, and form final filename component
                  */
-                while (c_ptr != path && c_ptr[-1] != H5_DIR_SEPC) {
-                    c_ptr--;
-                }
+                c_ptr = H5__path_component_start(path, sep);
 
                 len = sep - c_ptr;
                 assert(len >= 0);

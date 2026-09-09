@@ -2,14 +2,15 @@
 
 ## Status
 
-- State: Active; Round 1 Work Package 5A complete, product source unchanged.
+- State: Active; R1-5A and R1-5B complete; R1-5C/R1-5D not applicable.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
+- R1-5A evidence anchor: `bd6de77dd`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R1-5B characterization and pilot implementation.
+- Current continuation: R1-5E product and compatibility matrix.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -218,3 +219,44 @@ not product test results.
 R1-5A has no unexplained relevant baseline failure, all required dependencies
 are available, and the selected scope and acceptance checks are frozen. Its gate
 is complete.
+
+## R1-5B Characterization and Pilot
+
+The pilot adds `H5__path_trim_trailing_separators` and
+`H5__path_component_start` as typed `static` helpers in `H5system.c`. The
+existing scans in `H5_dirname` and `H5_basename` call them without changing
+branch conditions, allocations, result lengths, errors, or cleanup. The local
+separator pointer in `H5_dirname` is now `const char *`; the frozen declarations
+in `H5private.h` are unchanged. `clang-format` 22.1.0 formatted the one modified
+C file.
+
+No new test was added to the legacy `testhdf5` aggregate. Its existing
+`th5_system.c` partition already covers both null-argument failures, empty paths,
+roots, paths without separators, repeated leading and trailing separators,
+ordinary paths, and contrived combinations. The focused results are:
+
+| Check | Result |
+| --- | --- |
+| Windows Release | Incremental MSVC build passed; `H5TEST-testhdf5-base` plus fixtures passed 3/3; direct `h5system` at express level 0 passed |
+| Linux Release/Ninja | Complete build passed; `H5TEST-testhdf5-base` plus fixtures passed 3/3; direct `h5system` at express level 0 passed |
+| Windows Debug | Complete default build passed; direct `h5system` at express level 0 passed after repository DLL preflight |
+| Linux Debug/Ninja | Complete default build passed; direct `h5system` at express level 0 passed |
+| Linux Valgrind 3.26.0 | Focused Release `h5system` passed with error exit enabled for definite/indirect leaks |
+| Linux Unix Makefiles | Focused Release build and `h5system` at express level 0 passed |
+| Linux Open MPI 5.0.10 | Six-rank `MPI_TEST_t_subfiling_vfd` plus fixtures passed 3/3 |
+
+The GNU warning build no longer reports the selected discarded-qualifier
+diagnostic in `H5_dirname`; the unrelated `H5_get_option` diagnostic remains as
+frozen in `R1-D5`. The MSVC build reports only its pre-existing warning classes
+plus informational optimizer decisions to inline the new file-local helpers.
+
+The first Linux CTest attempt followed a target-only build and failed unrelated
+array/misc cases because that target does not stage `tarrold.h5`, `tmtimeo.h5`,
+and other aggregate fixtures. The directly selected `h5system` partition passed,
+then a complete build staged the fixtures and the identical CTest selection
+passed 3/3. This was validation-tree assembly, not a product failure.
+
+The actual diff confirms the R1-5C `NOT_APPLICABLE` disposition: no resource is
+acquired, released, or transferred and no cleanup structure changes. R1-5D is
+also `NOT_APPLICABLE` because the frozen round admits no second implementation
+candidate. R1-5B, R1-5C, and R1-5D are complete; R1-5E remains open.

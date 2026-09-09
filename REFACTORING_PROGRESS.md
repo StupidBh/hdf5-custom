@@ -82,9 +82,10 @@ Release and compatibility matrix passed, and R2-5F closed Round 2. R3-5A froze
 one const-correctness pilot in the short-option branch of `H5_get_option`.
 R3-5B implemented it at `a206f0a6e`, and R3-5C/R3-5D are not applicable;
 the complete R3-5E compatibility matrix passed and R3-5F closed Round 3.
-R4-5A has frozen one family VFD default-filename const-correctness pilot and
-its direct modern-harness characterization. The current continuation is
-R4-5B.
+R4-5A froze one family VFD default-filename const-correctness pilot and its
+direct modern-harness characterization. R4-5B implemented it at `720d882ee`
+and passed the focused gate; R4-5C/R4-5D are not applicable. The current
+continuation is R4-5E.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -96,7 +97,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 3 complete; R4-5A complete; next R4-5B | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 3 complete; R4-5A through R4-5D complete; next R4-5E | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -574,6 +575,15 @@ implementation anchor `0b9e21c34` and is detailed in
   pointer and allocation ownership, exact one-qualifier product edit, direct
   three-branch `h5test.h` characterization, deferred backlog, and focused/final
   gates are frozen before source edits.
+- Completed roadmap Stage 5 R4-5B through R4-5D at implementation anchor
+  `720d882ee`. Fresh Windows/MSVC and Linux/GNU Release and Debug builds pass;
+  the focused VFD fixture set passes 3/3 at express level 0 on both validators,
+  including the new `.h5`, other-extension, and extensionless case. Linux
+  Valgrind reports 12,217 allocations/frees, zero live blocks, and zero errors;
+  Unix Makefiles passes after its explicit repository fixture target. Direct
+  `h5mkgrp` family-driver filenames exactly match the pre-edit baseline. The
+  actual edit changes no resource edge and admits no follow-on, so R4-5C and
+  R4-5D are not applicable.
 
 ## Remaining
 
@@ -581,7 +591,8 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 through 3 are complete and R4-5A is complete.
+- Roadmap Stage 5 Rounds 1 through 3 are complete and R4-5A through R4-5D are
+  complete; the mandatory R4-5E final matrix and R4-5F closeout remain.
   R2-D1, R2-D2, R2-I1, R2-D3, later rounds, and the preceding deferred
   backlog remain outside the frozen Round 4 scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
@@ -590,15 +601,16 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The next roadmap continuation is R4-5B of
+The next roadmap continuation is R4-5E of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
 `2a966388e`, accepted Round 2 implementation `fb09d9fc9`, and accepted Round 3
-implementation `a206f0a6e`. Implement only R4-P1 and R4-T1 as frozen: one
-borrowed local qualifier in `H5FD__family_get_default_printf_filename` and the
-direct three-branch family default-configuration characterization in
-`test/vfd.c`. Then run the frozen focused gate before deciding R4-5C/R4-5D.
-Do not silently admit R4-D1 through R4-D3 or any earlier deferred candidate.
+implementation `a206f0a6e`. Preserve Round 4 implementation anchor
+`720d882ee` and execute the frozen Windows default/SC-A/SC-B plus Linux default
+and four compression-linkage full Release rows, followed by the complete
+install, package, linkage, consumer, ABI/export/layout, HighFive, and
+cross-platform format gates. Do not silently admit R4-D1 through R4-D3 or any
+earlier deferred candidate.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

@@ -2,7 +2,8 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 3 complete; R4-5A complete; next R4-5B.
+- State: Active; Rounds 1 through 3 complete; R4-5A through R4-5D complete;
+  next R4-5E.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -16,8 +17,9 @@
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- R4-5A evidence anchor: this document's next commit.
-- Current continuation: R4-5B characterization and pilot.
+- R4-5A evidence anchor: `c6421eac6`.
+- R4-5B implementation anchor: `720d882ee`.
+- Current continuation: R4-5E final product and compatibility matrix.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1164,3 +1166,51 @@ confirmation against the actual diff.
 The environment bridge, warning reproduction, direct behavior baseline,
 ownership model, exact selection, deferrals, and checks are frozen. No Round 4
 product or test source has been edited. R4-5A is complete.
+
+## R4-5B Characterization and Pilot
+
+Implementation anchor `720d882ee` changes only the borrowed local
+`file_extension` declaration from `char *` to `const char *` in
+`H5FD__family_get_default_printf_filename`. The added modern `h5test.h` case
+uses public `H5Pset_driver(..., H5FD_FAMILY, NULL)`, creates and closes each
+base file, verifies the exact first member name, deletes through `H5Fdelete`,
+and verifies that member's removal for `.h5`, another extension, and no
+extension. The helper signature, its two call sites, allocation and error
+paths, VFD callbacks, public declarations, and on-disk data are unchanged.
+`clang-format` 22.1.0 formatted both touched C files.
+
+A fresh Linux-filesystem Release source snapshot with GNU developer warnings
+completed all 3,011 build steps. The two frozen discarded-qualifier diagnostics
+at the `strstr` and `strrchr` assignments are absent, and the changed helper and
+new test report no GNU diagnostic. A fresh Windows/MSVC Release build completed
+with command-scoped `/utf-8`. Its normalized 13 pre-existing
+`H5FDfamily.c` diagnostic locations/classes match the Round 3 build; the new
+test adds only MSVC high-warning informational optimizer/Spectre advisories,
+not a qualifier or correctness diagnostic.
+
+The focused results at `HDF_TEST_EXPRESS=0` are:
+
+| Check | Result |
+| --- | --- |
+| Windows Release | Complete default build passed; `H5TEST-vfd` plus setup/cleanup passed 3/3; direct output includes `default FAMILY member filenames` and reports all VFD tests passed |
+| Linux Release/Ninja | Complete default build passed; the same focused selection passed 3/3 and direct output includes the new case |
+| Windows Debug | Complete default build passed; the same focused selection passed 3/3 |
+| Linux Debug/Ninja | Complete default build passed; the same focused selection passed 3/3 |
+| Linux Valgrind 3.26.0 | Full focused `vfd` execution made and freed 12,217 allocations, left zero live blocks, and reported zero errors |
+| Linux Unix Makefiles | The selected target and repository fixture target built; the same focused selection passed 3/3 |
+| Direct Windows/Linux tool probes | `h5mkgrp` through the default family driver produced `alpha-000000.h5`, `beta-000000.data`, and `gamma-000000` on both validators, exactly matching the pre-edit baseline |
+
+The first Unix Makefiles execution followed the focused target-only build. The
+new default-filename case passed, while the existing
+family/multi compatibility cases could not open `family_v16-*` and
+`multi_file_v16-*` inputs because target `vfd` does not stage them. Building
+the repository's `HDF5_TEST_LIB_files` target copied the required fixtures and
+the identical three-test selection then passed. This is test-tree assembly,
+not a product failure.
+
+R4-5C is `NOT_APPLICABLE`: the actual product edit acquires, transfers, and
+releases no resource and changes no cleanup edge. The borrowed pointer retains
+the same immutable input and lexical lifetime. R4-5D is also
+`NOT_APPLICABLE`: R4-P1 and R4-T1 are the complete frozen round scope, and no
+follow-on or deferred candidate was admitted. R4-5B through R4-5D are
+complete; the mandatory R4-5E matrix remains open.

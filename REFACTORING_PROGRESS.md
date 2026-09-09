@@ -81,7 +81,8 @@ the two frozen Windows follow-ons at `fb09d9fc9`. The complete eight-row
 Release and compatibility matrix passed, and R2-5F closed Round 2. R3-5A froze
 one const-correctness pilot in the short-option branch of `H5_get_option`.
 R3-5B implemented it at `a206f0a6e`, and R3-5C/R3-5D are not applicable;
-R3-5E is the current continuation.
+the complete R3-5E compatibility matrix passed and R3-5F closed Round 3. The
+current continuation is R4-5A; no Round 4 candidate is selected yet.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -93,7 +94,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 and 2 plus R3-5A through R3-5D complete; next R3-5E | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 3 complete; next R4-5A | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -536,13 +537,16 @@ implementation anchor `0b9e21c34` and is detailed in
 - Completed roadmap Stage 5 R2-5E and R2-5F at product anchor `fb09d9fc9`.
   The Windows default/SC-A/SC-B and Linux default plus four compression rows
   pass all 22,723 enabled Release tests at express level 3. Installs, ZIP/TGZ
-  packages, exact inventories, filter write/read, linkage, consumers,
+  packages, filter write/read, linkage, consumers,
   integration styles, headers, exports, layouts, the fixed HighFive inventory,
-  and cross-platform format checks pass without an unexplained contract delta.
+  and cross-platform format checks passed. R3 later qualified the historical
+  Linux Map configuration and three archived package inventories as described
+  below.
 - Completed roadmap Stage 5 R3-5A from planning source anchor `a13ae7c8a`.
   Product, test, CMake, toolchain, and dependency inputs match the accepted
-  Round 2 endpoint, so its complete eight-row result is the reused Round 3
-  baseline. A clean Linux C17 developer-warning build reproduced the selected
+  Round 2 endpoint, so its eight-row result was reused as the Round 3 behavioral
+  baseline. The final audit did not reuse its nonconforming Linux Map/package
+  claims. A clean Linux C17 developer-warning build reproduced the selected
   `H5_get_option` discarded-qualifier warning. The one-local-pointer scope,
   19 callers, ownership and behavior boundaries, deferred backlog, and exact
   focused/final validation are frozen before product edits.
@@ -553,6 +557,14 @@ implementation anchor `0b9e21c34` and is detailed in
   Windows/MS-MPI direct-caller checks pass. The actual diff changes no resource
   or cleanup structure and admits no follow-on, so R3-5C/R3-5D are not
   applicable.
+- Completed roadmap Stage 5 R3-5E and R3-5F at product anchor `a206f0a6e`.
+  Windows default/SC-A/SC-B and Linux default plus four compression rows pass
+  all 22,723 enabled Release tests at express level 3. Installs, packages,
+  filter write/read, dependency linkage, exact CTest inventories, C/C++ and
+  HighFive consumers, integration styles, headers, exports, layouts, and
+  cross-platform format reads pass. R3 corrected the historical R1/R2 Linux
+  compression Map omission and regenerated three R2 TGZ inventories that had
+  omitted `h5cc`; fresh R3 evidence matches the protected Round 1 package paths.
 
 ## Remaining
 
@@ -560,25 +572,24 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 and 2 plus R3-5A through R3-5D are complete. R3-5E
-  and R3-5F remain. R2-D1, R2-D2, R2-I1, R2-D3, later rounds, and the preceding
-  deferred backlog remain outside the frozen batch.
+- Roadmap Stage 5 Rounds 1 through 3 are complete. R2-D1, R2-D2, R2-I1,
+  R2-D3, later rounds, and the preceding deferred backlog remain outside the
+  completed Round 3 scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is R3-5E of
+The next roadmap continuation is R4-5A of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
-`2a966388e`, accepted Round 2 implementation `fb09d9fc9`, and Round 3
-implementation `a206f0a6e`. Run the complete Windows default/SC-A/SC-B and
-Linux default plus four compression-linkage Release suites, then repeat the
-frozen install, package, linkage, consumer, header, ABI/export/layout,
-HighFive, inventory, and cross-platform format gates. Do not silently admit
-R2-D1, R2-D2, R2-I1, R2-D3, or any earlier deferred candidate. Exact Round 1
-through R3-5D evidence is in
+`2a966388e`, accepted Round 2 implementation `fb09d9fc9`, and accepted Round 3
+implementation `a206f0a6e`. Requalify the relevant environment and freeze a
+bounded candidate ledger, ownership and behavior model, and exact validation
+specification before editing product source. Do not silently admit R2-D1,
+R2-D2, R2-I1, R2-D3, or any earlier deferred candidate. Exact Round 1 through
+Round 3 evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`
 and validation evidence anchor `f120c1c95`. Roadmap Stages 6 and 7 have no
@@ -617,23 +628,19 @@ execution.
 
 ## Validation State
 
-- Roadmap Stage 5 R3-5B through R3-5D are complete at implementation anchor
-  `a206f0a6e`. Complete Windows and Linux Release/Debug builds and the exact
-  five-test tool selection pass. The Linux GNU build removes the selected
-  warning; Valgrind frees 2,875/2,875 and 2,876/2,876 allocations with zero
-  errors for short/long help. Linux Unix Makefiles and both supported MPI
-  direct `h5perf` callers pass. The one-line actual diff changes no resource or
-  cleanup structure, and the frozen scope has no follow-on. The eight-row
-  R3-5E final matrix remains required and has not been inherited from baseline.
-- Roadmap Stage 5 R3-5A is complete from planning source anchor `a13ae7c8a`.
-  The accepted Round 2 endpoint's eight full-suite rows and complete contract
-  evidence remain the qualified Round 3 baseline because relevant source,
-  configuration, toolchain, and dependency inputs are identical. Windows and
-  Linux environments and dependency forms were requalified. A clean Linux C17
-  developer-warning build reproduced the single selected
-  `H5_get_option`/`-Wdiscarded-qualifiers` diagnostic. The exact one-local
-  transformation, all 19 callers, ownership/state boundaries, and focused/final
-  gates are frozen; Round 3 still has zero product implementation commits.
+- Roadmap Stage 5 Round 3 is complete at implementation anchor `a206f0a6e`.
+  R3-5A froze the one-local-pointer scope from planning source `a13ae7c8a`.
+  Complete Windows and Linux Release/Debug builds and the exact five-test tool
+  selection pass. The Linux GNU build removes the selected warning; Valgrind
+  frees 2,875/2,875 and 2,876/2,876 allocations with zero errors. Linux Unix
+  Makefiles and both supported MPI direct `h5perf` callers pass. The one-line
+  actual diff changes no resource or cleanup structure and has no follow-on.
+  The final eight Release rows pass all 22,723 enabled tests at express level 3;
+  exact test/fixture inventories, installs, packages, linkage, filter examples,
+  headers, exports, layouts, consumers, HighFive mapping, integration styles,
+  and cross-platform format reads pass. Retained R1/R2 caches later showed that
+  their Linux compression rows had Map API disabled, so that portion was not
+  reused as conforming evidence; all four R3 rows explicitly enable Map.
 - Roadmap Stage 5 R2-5A is complete from planning source anchor `c3f97252e`.
   Product/test/CMake sources exactly match the accepted Round 1 endpoint.
   Windows MSVC/CMake and exact repository zlib/libaec DLL/import-library inputs,
@@ -670,8 +677,11 @@ execution.
   consumers, integration styles, the fixed 147-entry HighFive inventory, and
   cross-platform semantic format reads pass. Every Windows execution used
   command-scoped `/utf-8` where compilation applied and exact HDF5 plus
-  repository zlib/libaec DLL preflight. Round 2 has no remaining validation gap;
-  deferred candidates remain outside its scope.
+  repository zlib/libaec DLL preflight. R3 reinspection found two historical
+  evidence discrepancies: the Linux compression rows had Map disabled, and
+  three retained R2 Linux TGZs omitted `h5cc` although their install trees did
+  not. Round 3 closes the cumulative gates; those original R2 claims are not
+  treated as gap-free. Deferred candidates remain outside its scope.
 - Roadmap Stage 5 Round 1 is complete at implementation anchor `2a966388e`.
   Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled tests; Linux
   default plus four compression-linkage rows passed 2,735/2,898/2,898/2,855/
@@ -684,7 +694,9 @@ execution.
   C++ consumers, integration styles, the fixed 147-entry HighFive floor, and
   cross-platform semantic reads match the original freeze. Windows execution
   evidence includes exact repository dependency-DLL preflight; executions that
-  lacked it are classified as environment errors and excluded.
+  lacked it are classified as environment errors and excluded. The retained
+  caches show that the historical Linux compression rows had Map disabled;
+  R3 supplies the missing Map-enabled Linux acceptance evidence.
 - Roadmap Stage 4 Work Packages 4A and 4B are complete. Work Package 4A used
   execution baseline
   `72e36a522`, with pre-removal stabilization through `3118d8c2c`. Windows

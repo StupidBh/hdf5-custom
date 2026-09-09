@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; R3-5B complete; R3-5C/R3-5D not applicable; next R3-5E.
+- State: Active; Rounds 1 through 3 complete; next R4-5A.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -30,7 +30,10 @@ closed Round 2. The next round must begin with R3-5A scope and baseline freeze.
 R3-5A has now frozen a single const-correctness pilot in the short-option
 branch of `H5_get_option`; no follow-on function is admitted to Round 3.
 R3-5B implemented it at `a206f0a6e` and passed the frozen focused checks;
-the actual diff confirms R3-5C and R3-5D are `NOT_APPLICABLE`.
+the actual diff confirms R3-5C and R3-5D are `NOT_APPLICABLE`. R3-5E repeated
+the complete mandatory matrix, corrected the historical Linux Map/package
+evidence discrepancies, and R3-5F closed the round. The next round must begin
+with R4-5A scope and baseline freeze.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -542,14 +545,18 @@ environment-expansion copies are released, with focused Release, Debug, Unix
 Makefiles, thread-safe, parallel, and memory gates passing. R2-5E repeated all
 eight full Release rows, installs, packages, linkage, consumers, protected
 headers/exports/layouts, the fixed HighFive inventory, and cross-platform format
-checks without an unexplained delta. R2-5F closes the round with R2-D1, R2-D2,
-R2-I1, R2-D3, and the earlier backlog still deferred. The next execution step
-was R3-5A, which froze one `H5_get_option` local const-correctness pilot against
-accepted Round 2 anchor `fb09d9fc9` without admitting any deferred candidate.
-R3-5B is complete at implementation anchor `a206f0a6e`. The borrowed
-short-option scan pointer is now const-correct; the frozen warning, focused
-tool, Debug, generator, MPI, and memory checks pass. The one-line actual diff
-confirms R3-5C and R3-5D are `NOT_APPLICABLE`. The next execution step is
-R3-5E: run the complete mandatory product and compatibility matrix before
-Round 3 can close. Exact evidence is recorded in
+checks. R3 later qualified the historical Linux Map configuration and three R2
+archive inventories rather than inheriting those claims. R2-5F closes the round
+with R2-D1, R2-D2, R2-I1, R2-D3, and the earlier backlog still deferred. R3-5A froze one
+`H5_get_option` local const-correctness pilot against accepted Round 2 anchor
+`fb09d9fc9` without admitting any deferred candidate. R3-5B is complete at
+implementation anchor `a206f0a6e`. The borrowed short-option scan pointer is
+now const-correct; the frozen warning, focused tool, Debug, generator, MPI, and
+memory checks pass. The one-line actual diff confirms R3-5C and R3-5D are
+`NOT_APPLICABLE`. R3-5E repeated all eight full Release rows and the complete
+compatibility contract. It also corrected the retained R1/R2 Linux
+compression rows' missing Map configuration and three incomplete retained R2
+TGZ inventories. R3-5F closes the round without an unresolved gap. The next
+execution step is R4-5A; no Round 4 candidate is selected yet. Exact evidence
+is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).

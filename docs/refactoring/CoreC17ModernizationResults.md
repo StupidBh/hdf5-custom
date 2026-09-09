@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; R3-5B complete; R3-5C/R3-5D not applicable; next R3-5E.
+- State: Active; Rounds 1 through 3 complete; next R4-5A.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -16,7 +16,7 @@
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R3-5E final product and compatibility matrix.
+- Current continuation: R4-5A inventory, environment, and baseline freeze.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -161,7 +161,11 @@ The Linux default used developer warnings and recorded the selected
 ### System Compression Matrix
 
 External dependency fetching was off and `HDF5_ALLOW_UNSUPPORTED` was off in
-every row. Map API, tools, zlib, SZIP, and SZIP encoding were on.
+every row. Tools, zlib, SZIP, and SZIP encoding were on. The Windows rows had
+Map API enabled. R3-5E later established from the retained caches that the four
+Linux rows had Map API disabled despite the original record saying otherwise;
+their results therefore were not Linux Map-enabled acceptance evidence. R3-5E
+repeats all four rows with `HDF5_ENABLE_MAP_API=ON` and closes that gap.
 
 | Validator/configuration | Actual dependency form | Release result |
 | --- | --- | --- |
@@ -697,12 +701,14 @@ linkage forms:
 | Linux static/shared | consumer directly needs system `libz.so.1` and `libsz.so.2` |
 | Linux static/static | link uses `libhdf5.a`, `libz.a`, `libsz.a`, and `libaec.a`; no compression `NEEDED` entry |
 
-CPack produced the two Windows ZIPs and all five Linux TGZs. The Windows
-compression packages contain 97/95 regular files and the Linux compression
-packages contain 91/91/87/87 regular files in table order, with zero path delta
-from Round 1. Equivalent default installs and packages preserve 101 Windows
-files and 90 Linux regular files plus four symlinks. All 20 installed CMake
-target names are unchanged.
+CPack produced the two Windows ZIPs and all five Linux TGZs. The original R2
+record reported zero package-path delta from Round 1. R3-5E reinspection of the
+retained archives found that the R2 Linux shared/shared, shared/static, and
+static/shared TGZs each omitted `bin/h5cc`, although their corresponding install
+trees and all Round 1 archives contained it. That zero-delta package claim is
+withdrawn; the product install trees were intact, and fresh R3 packages restore
+the exact Round 1 path inventory. All 20 default installed CMake target names
+remain unchanged.
 
 The Windows compression installs contain the same 57 header contents as their
 Round 1 counterparts, including byte-identical `H5pubconf.h`. The accepted
@@ -798,13 +804,17 @@ static prefix used by the supplied-static rows. No prerequisite acquisition,
 proxy change, or persistent environment change was required.
 
 Because product, test, CMake, toolchain, and dependency inputs are identical,
-the complete Round 2 endpoint is the Round 3 starting baseline under the
-evidence-reuse rule. Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled
+the complete Round 2 endpoint was initially reused as the Round 3 behavioral
+starting baseline under the evidence-reuse rule. Windows default/SC-A/SC-B
+passed 2,733/2,896/2,853 enabled
 tests, and Linux default plus four compression rows passed 2,735/2,898/2,898/
 2,855/2,855. Their exact test inventories, installs, packages, consumers,
 headers, ABI/exports/layouts, HighFive mapping, linkage, and format evidence
-remain applicable. The Round 3 implementation must repeat the complete final
-matrix and cannot inherit these baseline passes as final evidence.
+remain applicable subject to the historical corrections above. In particular,
+the retained R1/R2 Linux compression caches have Map API disabled, and three
+retained R2 Linux archives omit `h5cc`; neither claim is reused as conforming
+Map/package evidence. The Round 3 implementation must repeat the complete final
+matrix and cannot inherit the preceding passes as final evidence.
 
 ### Frozen Contracts, Callers, and Ownership
 
@@ -930,4 +940,114 @@ releases no resource and changes no cleanup structure. The borrowed pointer
 still refers to the same immutable option string for the same lexical extent.
 R3-5D is also `NOT_APPLICABLE`: R3-P1 is the complete frozen round scope and no
 follow-on was admitted. R3-5B through R3-5D are complete; the mandatory R3-5E
-matrix remains open.
+matrix was still open at this checkpoint; final evidence follows.
+
+## R3-5E Final Product and Compatibility Matrix
+
+All final Release suites used `HDF_TEST_EXPRESS=3` and no more than six jobs.
+Windows compilation used command-scoped `/utf-8`; every Windows compression
+execution put the exact repository zlib/libaec DLL directories first in
+`PATH`. The accepted results are:
+
+| Validator/configuration | Passed enabled | Disabled | Registered | Time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default | 2,733 | 37 | 2,770 | 130.65 s |
+| Windows SC-A, shared HDF5/supplied shared compression | 2,896 | 10 | 2,906 | 137.21 s |
+| Windows SC-B, static HDF5/supplied shared compression | 2,853 | 10 | 2,863 | 136.85 s |
+| Linux default | 2,735 | 37 | 2,772 | 128.46 s |
+| Linux shared HDF5/shared system compression | 2,898 | 10 | 2,908 | 135.93 s |
+| Linux shared HDF5/static supplied compression | 2,898 | 10 | 2,908 | 136.49 s |
+| Linux static HDF5/shared system compression | 2,855 | 10 | 2,865 | 135.08 s |
+| Linux static HDF5/static supplied compression | 2,855 | 10 | 2,865 | 143.86 s |
+
+All 22,723 enabled tests passed. Structured CTest comparison against the
+corresponding R2 builds gives zero delta in registered names, disabled names,
+normalized commands, and fixture relationships for every row. The only tests
+not run are the same 37 or 10 explicitly disabled baseline cases; there is no
+additional runtime skip. The six API-default executables for v16, v18, v110,
+v112, v114, and v200 also passed 6/6 on each validator at express level 0.
+
+The Windows compression caches select the repository import libraries and both
+generated configurations define `H5_HAVE_MAP_API 1`. All four Linux compression
+rows explicitly set `HDF5_ENABLE_MAP_API=ON` and define the same macro. The
+shared-dependency rows resolve distribution zlib 1.3.1 and libaec 1.1.5; the
+static-dependency rows resolve the pinned PIC zlib 1.3.2 `libz.a` and libaec
+1.1.7 `libsz.a`/`libaec.a`. Dynamic inspection shows `libz.so.1` and
+`libsz.so.2` only in the shared-dependency rows. The first shared/static probe
+that selected `libz.so`/`libsz.so` was discarded and rebuilt with explicit
+static-selection options and paths before acceptance.
+
+### Installs, Packages, and Consumers
+
+All eight rows installed successfully. CPack produced three Windows ZIPs and
+five Linux TGZs. Windows default/SC-A/SC-B packages contain 101/97/95 files.
+The Linux default package has 91 regular files and four symlinks; the two
+shared-HDF5 compression packages each have 87 regular files and four symlinks,
+and the two static-HDF5 packages each have 87 regular files. Package paths match
+the corresponding Round 1 archives exactly. They also match the retained R2
+archives except for the three corrected `bin/h5cc` omissions documented above.
+The install path inventories match R2 exactly.
+
+Default installs retain all 57 installed header names and byte-identical
+contents against both `dd7204035` and `fb09d9fc9`. The compression installs also
+retain 57 names. Their only Windows header-content delta from R2 is the expected
+configured `H5_DEFAULT_PLUGINDIR`; the four Linux rows additionally change the
+previously missing `H5_HAVE_MAP_API` definition to 1. No source public header
+changed. Default `libhdf5.settings` is byte-identical to R2, and generated
+version, error, overflow, and configuration headers retain the frozen content.
+The default/compression CMake target sets remain 20/18 names with zero delta.
+
+Installed C99, strict-C17, G++ C++11, and MSVC `/std:c++14` C-header consumers
+compile, link, run, and report HDF5 2.3.0. The seven frozen x64 layout assertions
+pass. The full retained-product contract passes build-tree and install-tree
+`find_package`, isolated `add_subdirectory`, local `FetchContent`, HighFive
+consumer, and removed-product negative checks on both platforms. Installed
+gzip and SZIP examples build and run against both Windows and all four Linux
+compression packages; all 12 executions report the requested filter and read
+back the expected maximum value 1,890.
+
+### ABI, HighFive, and Format
+
+The default case-sensitive export sets remain exactly 3,964 Windows names and
+4,060 Linux names with zero delta from both comparison anchors. The exported
+`H5_get_option` spelling remains present and its non-installed `H5private.h`
+declaration is unchanged. Default public headers and the seven layout probes
+therefore preserve the frozen signatures and associated layouts.
+
+Re-extraction of the fixed HighFive table produces exactly 147 identifiers,
+all present in both the tracked HighFive tree and installed header closure. The
+default Windows library exports 135 directly; the four default v200 aliases
+resolve to `H5Lget_info2`, `H5Literate2`, `H5Oget_info3`, and
+`H5Rdereference2`, and the Round 3 parallel Linux build exports the remaining
+eight MPIO/collective functions. The 77-file tracked HighFive tree has zero
+diff from audit anchor `c461ae3e8`; dual-platform consumers create and read the
+expected dataset.
+
+Current Windows and Linux compression writers produced semantically equivalent
+gzip datasets. The original `dd7204035`, preceding `fb09d9fc9`, and current
+`a206f0a6e` Windows and Linux `h5diff` tools all read and compare those files
+successfully. Current default tools on both platforms also read and compare the
+four frozen Round 1 cross-platform fixtures. No encoding, datatype, layout, or
+file-format contract changed.
+
+## R3-5F Round Closeout
+
+Round 3 is complete at product implementation anchor `a206f0a6e`. It contains
+one independently revertible product commit after R3-5A; reverting that commit
+restores the preceding implementation. Documentation-only commits do not alter
+the rollback unit. R3-5C and R3-5D remain `NOT_APPLICABLE`, and no deferred
+candidate was admitted.
+
+The complete warning, focused, memory, generator, MPI caller, full-suite,
+package, ABI, consumer, HighFive, and format gates pass. The selected parser
+branch is non-hot, so the predeclared no-benchmark rationale remains sufficient.
+The historical Linux Map and R2 TGZ inventory discrepancies are explicitly
+corrected above; the final R3 matrix satisfies the frozen contract without an
+unresolved validation gap.
+
+The original Stage 5 contract at `dd7204035`, accepted R1 implementation
+`2a966388e`, accepted R2 implementation `fb09d9fc9`, diagnostic policy, fixed
+147-entry HighFive floor, API/ABI and file-format restrictions, and mandatory
+compression matrix remain in force. The next continuation is R4-5A: requalify
+the relevant environment and freeze a new bounded candidate ledger, ownership
+and behavior model, and validation specification before any product edit.

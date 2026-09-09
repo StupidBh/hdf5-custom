@@ -2,16 +2,17 @@
 
 ## Status
 
-- State: Active; Round 1 complete; next continuation is R2-5A.
+- State: Active; R2-5A complete; next continuation is R2-5B.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
 - R1-5A evidence anchor: `bd6de77dd`.
 - Round 1 implementation anchor: `2a966388e`.
+- R2-5A planning source anchor: `c3f97252e`.
 - Detailed plan: [CoreC17Modernization.md](CoreC17Modernization.md).
 - Fixed external interface audit:
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
-- Current continuation: R2-5A inventory, environment bridge, and candidate selection.
+- Current continuation: R2-5B characterization and POSIX resource pilot.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -410,9 +411,147 @@ no deferred item was silently admitted and no Stage 5 compatibility gap remains
 from this pilot. Round completion does not close the multi-round Stage 5
 direction.
 
-The next continuation is R2-5A. Start from original anchor `dd7204035` and
-accepted Round 1 anchor `2a966388e`, requalify the relevant environment, and
-characterize exact `H5PLpath.c` functions, callers, global state, ownership, and
-Windows environment behavior before deciding whether any item is selectable.
-Do not edit product source until the R2 function-level ledger and validation
-specification are frozen.
+At Round 1 closeout, R2-5A was the recorded continuation: retain original anchor
+`dd7204035` and accepted Round 1 anchor `2a966388e`, then requalify the relevant
+environment and characterize `H5PLpath.c` before selecting source edits. The
+resulting frozen ledger and validation specification follow.
+
+## R2-5A Frozen Scope and Baseline
+
+### Environment Bridge and Reused Baseline
+
+The Round 2 planning source is `c3f97252e`; its only tracked changes after
+`2a966388e` are Round 1 documentation. `src/`, `test/`, `testpar/`, `tools/`,
+`config/`, `HDF5Examples/`, and the top-level CMake definitions have no delta.
+The `H5PLpath.c` Git blob remains
+`a1eb49808cd5232fdf5a20670439535ae2763ef4`. The original anchor remains
+`dd7204035`, and cumulative product comparison therefore contains only the
+accepted Round 1 `H5system.c` implementation.
+
+Relevant environment inputs are unchanged from the qualified Round 1 endpoint:
+
+| Validator | Requalified inputs |
+| --- | --- |
+| Windows x64 | Visual Studio 18 2026 Insiders 18.10.12120.281, MSVC 19.51.36256/toolset 14.51.36231, CMake/CTest 4.4.3, and clang-format 22.1.0 |
+| Linux x86_64 | Ubuntu 26.04.1 under WSL, GCC/G++ 15.2.0, CMake 4.2.3, Ninja 1.13.2, GNU Make 4.4.1, and Valgrind 3.26.0 |
+
+Windows dependency preflight again resolves the repository copies of `z.dll`,
+`aec.dll`, and `szip.dll` before executable validation. The supplied x64 zlib
+1.3.2 and libaec 1.1.7 `.lib` files contain import descriptors and `__imp_`
+members, so the mandatory Windows rows continue to use shared compression DLLs.
+Their binaries and package-version inputs have the same SHA-256 values recorded
+for Round 1. Linux system packages remain zlib 1.3.1 and libaec 1.1.5 with both
+shared objects and archives; the pinned PIC-capable zlib 1.3.2/libaec 1.1.7
+source-build inputs remain the required static-dependency form for the two
+supplied-static rows. Open MPI 5.0.10 remains available for secondary Linux
+parallel validation. No new prerequisite was acquired and no proxy or persistent
+environment change was needed.
+
+Under the plan's evidence-reuse rule, all eight passing Round 1 endpoint suites
+are the Round 2 starting baseline: Windows default/SC-A/SC-B passed
+2,733/2,896/2,853 enabled tests, and Linux default plus four compression rows
+passed 2,735/2,898/2,898/2,855/2,855. Their exact registered/disabled inventories,
+installs, packages, consumers, ABI/export/header checks, HighFive mapping, and
+format evidence remain applicable. A new final implementation cannot reuse
+those results and must run the complete mandatory matrix again.
+
+### Frozen Contracts and Call Graph
+
+Round 2 inherits the complete 57-header content freeze, 3,964-name Windows and
+4,060-name Linux export manifests, public layouts, generated settings, install
+and target inventories, C99/C17/C++ C-header consumers, API aliases, file-format
+fixtures, and fixed 147-entry HighFive inventory. The protected HighFive table
+does not call `H5PL` directly; its `H5Zfilter_avail` entry reaches dynamic plugin
+lookup indirectly and remains in focused and compression coverage.
+
+The relevant Windows library exports the seven public path APIs
+`H5PLappend`, `H5PLprepend`, `H5PLreplace`, `H5PLinsert`, `H5PLremove`,
+`H5PLget`, and `H5PLsize`; library-private `H5PL_iterate`; and all eleven
+`H5PL__*` path-table functions declared in `H5PLpkg.h`. Their names and
+signatures are frozen. Selected edits add no header declaration, type, public
+layout, or exported helper.
+
+The exact caller paths are:
+
+- public path APIs -> the matching `H5PL__*` path-table wrapper -> file-local
+  insertion/replacement helpers;
+- package initialization/termination -> `H5PL__create_path_table` /
+  `H5PL__close_path_table`;
+- filter, VOL, and VFD lookup -> `H5PL_load` ->
+  `H5PL__find_plugin_in_path_table` -> platform-specific directory search;
+- native VOL file-open fallback -> `H5PL_iterate` ->
+  `H5PL__path_table_iterate` -> platform-specific directory iteration.
+
+The static `H5PL_paths_g` owns both its allocated pointer array and every
+non-null path string. `H5PL_num_paths_g` identifies the compact owned prefix;
+`H5PL_path_capacity_g` bounds the allocation. `H5PL__insert_at` and
+`H5PL__replace_at` own `path_copy` until assignment transfers it to the table.
+On Windows, `H5_expand_windows_env_vars` replaces that pointer only on success
+and deliberately leaves the caller's original allocation unchanged on failure.
+The two platform directory helpers own each temporary candidate path and their
+directory enumeration handles. All state and helper types are file-local; no
+associated public layout exists. Calls occur under existing HDF5 API/package
+initialization serialization. Locking and global-state architecture are not
+selected.
+
+### R2 Candidate Ledger
+
+| ID | Exact functions | Decision | Evidence, transformation, and boundary |
+| --- | --- | --- | --- |
+| `R2-P1` | POSIX `H5PL__path_table_iterate_process_path` | `SELECTED PILOT; DEFECT` | A matching directory entry allocates `path` and continues without releasing it; a later matching entry overwrites the owner. Add two plugin-shaped directories and invoke the package iterator so the preceding implementation remains functionally successful but Valgrind exposes the leak. Release the temporary path before the existing `continue`; preserve enumeration, callbacks, diagnostics, and handle cleanup. |
+| `R2-F1` | Windows `H5PL__path_table_iterate_process_path`; Windows `H5PL__find_plugin_in_path` | `SELECTED FOLLOW-ON; DEFECT` | The same directory branch retains `path` across `continue`. Mirror the demonstrated pilot ownership correction only after R2-5C. Stage two `.dll`-shaped directories and cover iteration plus a missing-filter lookup; preserve Win32 enumeration and error behavior. |
+| `R2-F2` | `H5PL__insert_at`; `H5PL__replace_at` | `SELECTED FOLLOW-ON; DEFECT` | After `H5MM_strdup`, failed Windows environment expansion leaves the local copy owned by the caller but the current `done` path does not release it. Free the untransferred copy on failure. Cover normal `%VAR%` expansion, an over-capacity expansion failure, unchanged table size/content, append, and replace. No success-path result or error category changes. |
+| `R2-D1` | `H5PL__expand_path_table` | `DEFECT; DEFER` | Direct assignment of `H5MM_realloc` can lose the table on allocation failure. The existing 42-path test covers successful growth, but no deterministic allocator-failure hook exists. Defer until a separately frozen test-only hook or other reliable reproducer is justified. |
+| `R2-D2` | `H5PL__create_path_table` | `DEFECT; DEFER` | A failure after one or more appended tokens frees the pointer array without releasing owned entries. It shares the missing deterministic allocation-failure coverage problem with R2-D1 and is not needed for the selected pilot. |
+| `R2-I1` | `H5PL__find_plugin_in_path_table` | `INVESTIGATE` | The found-path guard tests the output-parameter address rather than `*plugin_info`. Do not change it without a reproducer and plugin-return contract analysis. |
+| `R2-D3` | Windows `service[2048]` construction in both directory helpers | `DEFER` | Truncation/long-path behavior is a separate user-visible path contract, not incidental ownership cleanup. |
+| `R2-K1` | path-table globals; `H5PL__make_space_at`; public/package wrappers and headers | `KEEP` | Struct consolidation, lock redesign, signature changes, and unrelated index/error cleanup provide no necessary benefit to this batch and would enlarge the state or ABI risk. |
+
+R2-P1 is the only R2-5B product edit. R2-F1 and R2-F2 may enter R2-5D only
+after the pilot's R2-5C ownership evidence passes. R2-D1, R2-D2, R2-I1,
+R2-D3, all remaining `H5PLpath.c` functions, and the Round 1 deferred backlog
+are outside this round's implementation scope.
+
+The selected defects change only resource retention on already-defined branches:
+the public success/failure result, search order, callback order, table contents,
+and major/minor errors stay unchanged. Record the correction in
+`release_docs/CHANGELOG.md` with the implementation, separate from any later
+behavior-preserving refactor. There is no disk serialization or format reach.
+The affected code is non-hot administration/filesystem scanning; releasing one
+skipped-entry allocation adds no experiment-worthy work, so no performance
+benchmark is defined.
+
+### R2 Validation Specification
+
+- Before the pilot source edit, add the focused nested-directory coverage to
+  the existing `h5test`-based `filter_plugin` target. Stage two directory names
+  that pass each platform's plugin filename filter. Run it against
+  `2a966388e`; require functional success and a Linux Valgrind leak. After the
+  pilot require the same functional result with no definite/indirect leak.
+- Run `H5PLUGIN-filter_plugin` at `HDF_TEST_EXPRESS=0` on Windows Release and
+  Linux Release after every applicable implementation commit. Windows execution
+  must first assert exact resolution of the repository zlib/libaec DLLs.
+- R2-F1 requires Windows iterator and missing-filter directory coverage. R2-F2
+  additionally requires Windows `%VAR%` append/replace success and over-capacity
+  failure with unchanged table state. Linux compiles and runs the shared test
+  source but does not pretend to exercise Win32 expansion.
+- R2-5C maps every selected local allocation, transfer, `continue`, `done`
+  cleanup, and directory handle. Allocation-failure branches without a reliable
+  hook retain the explicit R2-D1/R2-D2 deferral rather than an untested edit.
+- Complete Debug builds and focused plugin runs are required on both validators.
+  Run the focused Linux target and test with Unix Makefiles. Run focused legal
+  thread-safe builds on both validators because the table is global, plus Linux
+  parallel filter/VOL/VFD plugin coverage. No lock behavior is changed.
+- Final R2-5E repeats Windows default/SC-A/SC-B and Linux default plus all four
+  compression-linkage full Release suites at express level 3 and at most six
+  jobs. It also repeats installs/packages, filter write/read, linkage proof,
+  installed consumers, integration styles, headers/exports/signatures/layouts,
+  exact test inventories, HighFive evidence, and cross-platform format reads
+  against both `dd7204035` and `2a966388e` where applicable.
+- Major builds run serially across Windows and WSL. Focused ordinary CTest uses
+  at most six workers; MPI work accounts for registered ranks and runs apart
+  from full suites. No helper process is allowed to outlive its validation row.
+
+The current endpoint has no unexplained relevant baseline failure, all mandatory
+dependencies are available, exact selection and checks are frozen, and no
+product source has been edited. R2-5A is complete.

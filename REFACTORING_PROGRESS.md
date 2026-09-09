@@ -59,8 +59,8 @@ The active direction is [Stage 5 core C17 internal modernization](docs/refactori
 Detailed planning was requested on 2026-09-08 and execution began on
 2026-09-09. Round 1 is complete at implementation anchor `2a966388e`, with one
 atomic product implementation commit after R1-5A evidence anchor `bd6de77dd`.
-R1-5C/R1-5D were not applicable to the resource-neutral pilot. Its portable
-evidence is in
+R1-5C/R1-5D were not applicable to the resource-neutral pilot. R2-5A has now
+frozen a resource-ownership round in `H5PLpath.c`. Its portable evidence is in
 [`docs/refactoring/CoreC17ModernizationResults.md`](docs/refactoring/CoreC17ModernizationResults.md).
 Build/CTest parallelism is capped at six jobs per physical host.
 Windows uses the supplied `3rdparty` dependencies; Linux prerequisites are
@@ -75,7 +75,8 @@ path scans in `H5_dirname` and `H5_basename`, and fixed the exact tools, tests,
 and scheduling without relaxing the protected contracts. MPI/thread extensions
 are secondary
 with explicit coverage gaps and no accepted new regression. HighFive remains
-external. R1-5E and R1-5F passed; R2-5A is the current continuation.
+external. R1-5E/R1-5F passed and R2-5A is complete; R2-5B is the current
+continuation.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -87,7 +88,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Round 1 complete; next R2-5A | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Round 1 and R2-5A complete; next R2-5B | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -522,23 +523,23 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Round 1 is complete. Later bounded rounds remain; Round 2 has
-  no selected implementation until R2-5A freezes its function-level ledger and
-  validation specification.
+- Roadmap Stage 5 Round 1 and R2-5A are complete. R2-P1 is the selected POSIX
+  directory-entry resource pilot; the frozen Windows follow-ons may enter only
+  after R2-5C. Later rounds and deferred candidates remain.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-The next roadmap continuation is R2-5A of
+The next roadmap continuation is R2-5B of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035` and preceding accepted Round 1
-implementation `2a966388e`. Requalify relevant environment inputs, then
-characterize exact `H5PLpath.c` functions, callers, global state, ownership,
-and Windows environment behavior before deciding whether any item is
-selectable. Freeze the Round 2 ledger and validation specification before any
-product edit. Round 1 evidence is complete in
+implementation `2a966388e`. Add the frozen nested-directory coverage to the
+existing `filter_plugin` target, demonstrate the preceding POSIX leak under
+Valgrind, then apply only the selected POSIX iterator correction. R2-5C must
+record full ownership evidence before the selected Windows follow-ons enter
+R2-5D. Exact Round 1 and R2-5A evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`
 and validation evidence anchor `f120c1c95`. Roadmap Stages 6 and 7 have no
@@ -577,6 +578,15 @@ execution.
 
 ## Validation State
 
+- Roadmap Stage 5 R2-5A is complete from planning source anchor `c3f97252e`.
+  Product/test/CMake sources exactly match the accepted Round 1 endpoint.
+  Windows MSVC/CMake and exact repository zlib/libaec DLL/import-library inputs,
+  plus Linux GCC/CMake/Ninja/Make/Valgrind, system compression, and Open MPI
+  inputs were requalified without a relevant change. The Round 1 endpoint's
+  eight full-suite rows and complete compatibility evidence are therefore the
+  R2 starting baseline under the plan's cadence rule. The function-level
+  selection, defect dispositions, ownership map, callers, affected features,
+  and exact focused/final checks are frozen before product edits.
 - Roadmap Stage 5 Round 1 is complete at implementation anchor `2a966388e`.
   Windows default/SC-A/SC-B passed 2,733/2,896/2,853 enabled tests; Linux
   default plus four compression-linkage rows passed 2,735/2,898/2,898/2,855/

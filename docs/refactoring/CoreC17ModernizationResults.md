@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4 and R5-5A are complete; later Stage 5 rounds remain unselected.
+- State: Active; Rounds 1 through 4, R5-5A, and R6-5B are complete; R6-5E/5F remain pending.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -21,7 +21,8 @@
 - R5-5A planning/implementation date: 2026-09-19.
 - R5-5A implementation anchor: `74a8f0b79`.
 - R6-5A planning source anchor: `609b8865e`.
-- Current continuation: R6-5A freezes one H5trace local qualifier pilot; implementation and validation remain pending.
+- R6-5A implementation anchor: `21307ae3e`.
+- Current continuation: run the mandatory R6-5E default/compression matrix, then close R6-5F or record its validation gap.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1495,3 +1496,34 @@ trace output. R6-5B therefore requires a focused H5trace object rebuild and
 the existing base/trace-reachable test coverage at express level 0, followed
 by the default Release and Debug checks. New commands remain capped at two
 parallel jobs; the historical R1-R4 six-job evidence is unchanged.
+
+## R6-5B Pilot Validation
+
+Implementation anchor `21307ae3e` keeps `rest` as the mutable `strtol`
+end-pointer and uses a separate `const char *scan` for the borrowed `strchr`
+result. The first direct `const char *rest` formulation was rejected by the
+Linux C17 compiler because `strtol` requires `char **`; no incompatible cast
+or API change was retained.
+
+The focused gate passes on both validators. Windows/MSVC Release rebuilt the
+shared library and `testhdf5`; `H5TEST-testhdf5-base` plus its clear/cleanup
+fixtures passed 3/3 at express level 0. The same Debug target and fixture
+selection passed 3/3 with command-scoped `/utf-8`. Linux/GNU Release rebuilt
+the shared library and `testhdf5` with developer warnings and trace enabled;
+after the repository `HDF5_TEST_LIB_files` fixture target generated the
+reference inputs, the same CTest selection passed 3/3 at express level 0.
+
+The initial Linux test invocation without generated fixtures is classified as
+a setup-only miss: it failed solely on absent reference files and passed after
+the existing fixture target ran. The initial Windows Debug compile without
+`/utf-8` is likewise an environment-only encoding failure; the required
+command-scoped setting passed on rerun. The selected H5trace object emits no
+new qualifier-loss diagnostic, and the exported helper signature, trace
+state, output, resources, public headers, ABI/layout, and file format remain
+unchanged.
+
+R6-5C and R6-5D are provisionally `NOT_APPLICABLE`: the corrected pilot has
+no resource edge, cleanup branch, or second admitted candidate. R6-5E and
+R6-5F are intentionally still open because the mandatory complete default
+and six-row compression Release matrix, installs, packages, and inherited
+compatibility gates have not yet been rerun for this new implementation.

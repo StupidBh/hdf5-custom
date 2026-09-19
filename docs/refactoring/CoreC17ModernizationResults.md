@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4 complete; R5-5A pilot has passed the mandatory build and compression matrix and remains open for contract gates.
+- State: Active; Rounds 1 through 4 and R5-5A are complete; later Stage 5 rounds remain unselected.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -19,7 +19,8 @@
 - R4-5A evidence anchor: `c6421eac6`.
 - R4-5B implementation anchor: `720d882ee`.
 - R5-5A planning/implementation date: 2026-09-19.
-- Current continuation: R5-5A installed-contract and compatibility validation; new build and CTest work remains capped at two jobs.
+- R5-5A implementation anchor: `74a8f0b79`.
+- Current continuation: preserve the completed R5-5A evidence and select a future bounded candidate only after a new 5A freeze.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1420,6 +1421,54 @@ files; and RPM packaging requires `rpmbuild`. These are reachability and
 packaging coverage gaps, not failures of the selected Splitter change.
 
 The mandatory full-suite matrix and initial install/package checks are complete.
-Installed C/C++ consumer probes, exact header/API/ABI/export/layout comparisons,
-format fixtures, and final cross-platform compatibility gates remain open, so
-R5-5A and Round 5 are not complete.
+
+### R5-5A Contract Gates and Closeout
+
+The installed-contract gates were rerun against the current R5 build outputs.
+Windows SC-A and SC-B installs each contain the frozen 57 public headers; all
+non-generated installed content is byte-identical to its Round 4 counterpart.
+The Linux default, HS-DA, and HS-DS installs likewise contain 57 headers and
+zero normalized content delta. Generated configuration headers and settings
+retain only their expected platform, dependency, or install-prefix values.
+
+Windows C99, strict C17, C++11 C-header, and HighFive consumers pass against
+the shared SC-A install. The same C17, C++11, layout, and HighFive probes pass
+against the static SC-B install. Linux default and both shared compression
+install rows pass the C17, C++11, and layout probes; the default static archive
+passes direct C17, C++11, layout, and HighFive consumers. The Windows and
+Linux static/shared package target routes therefore remain usable without
+adding a consumer prerequisite.
+
+The default Linux shared export set remains 4,060 names with zero delta from
+Round 4; the Windows shared SC-A set remains 3,988 names with zero same-row
+delta. The default Windows frozen set remains 3,964 names in the accepted
+default build. The fixed HighFive extraction still yields 147 identifiers.
+Current non-parallel installs provide 135 direct identifiers plus the four
+v200 aliases (`H5Lget_info2`, `H5Literate2`, `H5Oget_info3`, and
+`H5Rdereference2`); the eight MPIO identifiers remain conditional and absent
+only from non-parallel headers/exports. All seven x64 layout assertions pass.
+
+All six API-version tests (`v16`, `v18`, `v110`, `v112`, `v114`, and `v200`)
+pass from the current Linux build. The focused Splitter VFD partition and its
+clear/cleanup fixtures pass 3/3 again. Current compression-enabled `h5diff`
+reads the retained gzip and SZIP fixtures from both prior platform/profile
+rows with zero differences, and the prior R4 tool reads a current R5
+`h5repack` output with zero differences. Current Windows ZIP path inventories
+remain 103 entries (SC-A) and 101 entries (SC-B), matching R4; the Linux
+HS-DA TGZ inventory remains 104 entries. HighFive shared consumers pass on
+both validators, and the static consumers pass on both validators.
+
+The first default Linux install attempt exposed only an incomplete local build
+tree: CMake's install script referenced optional static/tool artifacts that had
+not yet been materialized. Building those existing targets and rerunning the
+same install completed successfully; no source or product failure resulted.
+The first compressed `h5diff` attempt used a no-filter default install and
+reported unavailable filters; rerunning with the matching compression install
+passed. These setup corrections are excluded from acceptance failures.
+
+R5-5A is complete at product implementation anchor `74a8f0b79`. R5-5C and
+R5-5D are `NOT_APPLICABLE`: the one-line local qualifier change adds no
+resource edge, cleanup branch, or second admitted candidate. R5-5F closes the
+round without a public header, ABI/layout, export, package, HighFive,
+observable filename, or file-format delta. R2-D1, R2-D2, R2-I1, R2-D3, the
+R1-R4 deferred backlog, and later Stage 5 rounds remain explicitly deferred.

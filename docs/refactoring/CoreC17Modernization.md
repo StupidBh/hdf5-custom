@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4 complete; R5-5A mandatory matrix passed and contract gates remain.
+- State: Active; Rounds 1 through 4 and R5-5A complete; later Stage 5 rounds remain unselected.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -576,8 +576,8 @@ eight-row Release matrix, installs, packages, dependency linkage, consumers,
 integration styles, headers, exports, layouts, fixed HighFive inventory, and
 cross-platform format reads all pass. R4-5F closes the round at implementation
 anchor `720d882ee` without an accepted compatibility delta. R5-5A's focused
-checks, mandatory default/compression suites, and initial install/package checks
-now pass; installed consumers and final compatibility gates remain. Exact evidence is recorded in
+checks, mandatory default/compression suites, installed consumers, and final
+compatibility gates now pass. Exact evidence is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).
 
 R5-5A freezes one local qualifier correction in
@@ -588,3 +588,12 @@ implementation must preserve all three helper callers and all compatibility
 contracts. R5-5A does not admit other const diagnostics or earlier deferred
 items. New build, CTest, and validation commands are capped at two jobs; the
 historical six-job settings in R1-R4 evidence remain unchanged.
+
+R5-5A is now closed at implementation anchor `74a8f0b79`. The mandatory
+default/compression matrix and focused Splitter checks passed, followed by
+installed C99/C17/C++11, static/shared, HighFive, header, export, layout,
+package, API-version, and cross-format gates on the qualified Windows/MSVC
+and Linux/GCC validators. No public, ABI/layout, package, HighFive,
+observable-filename, or file-format delta was accepted. R5-5C and R5-5D are
+`NOT_APPLICABLE`; the remaining deferred ledger is unchanged. A future Stage
+5 round must begin with a fresh 5A scope and baseline freeze.

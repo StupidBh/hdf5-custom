@@ -113,6 +113,10 @@ R7-5A freezes one local qualifier correction in the absolute-filename fallback
 branch of `H5F_prefix_open_file` against accepted R6 endpoint `21307ae3e`.
 Only the borrowed local pointer is admitted; the shared delimiter macro, its
 mutable calls, both callers, and all compatibility contracts remain frozen.
+R7-5B implements that correction at `c0cd478bd`; Linux Release and Windows
+Release/Debug rebuilds pass, and external/VDS tests plus fixtures pass 4/4 at
+express level 0 in each configuration. R7-5C/R7-5D are not applicable; the
+mandatory R7-5E matrix remains open.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -124,7 +128,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R7-5A scope frozen | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R7-5B complete; R7-5E pending | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -641,6 +645,11 @@ implementation anchor `0b9e21c34` and is detailed in
   consumer, API/ABI, HighFive, and format gates; all passed with no
   compatibility delta. Exact counts and linkage evidence are recorded in
   `CoreC17ModernizationResults.md`.
+- Completed roadmap Stage 5 R7-5A and R7-5B at implementation anchor
+  `c0cd478bd`. The absolute-filename fallback pointer is now const-correct;
+  Linux Release and Windows Release/Debug focused builds pass, and the
+  external/VDS fixture selection passes 4/4 at express level 0 in all three
+  configurations. R7-5C/R7-5D are not applicable.
 
 ## Remaining
 
@@ -649,19 +658,20 @@ implementation anchor `0b9e21c34` and is detailed in
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
 - Roadmap Stage 5 Rounds 1 through 6 are complete without a compatibility
-  delta. R7-5A is frozen but not implemented. R2-D1, R2-D2, R2-I1, R2-D3, the
-  R1-R4 deferred backlog, other retained const diagnostics, and any later
-  candidate remain outside the accepted scope.
+  delta. R7-5B is complete, while its mandatory full Release matrix and
+  inherited compatibility gates remain. R2-D1, R2-D2, R2-I1, R2-D3, the R1-R4
+  deferred backlog, other retained const diagnostics, and any later candidate
+  remain outside the accepted scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-R6-5F is complete at product implementation anchor `21307ae3e`; R7-5A now
-freezes only the `H5F_prefix_open_file` absolute-filename local qualifier
-correction. The next action is R7-5B implementation plus the focused H5F
-object rebuild and external/VDS tests at express level 0. Preserve original
+R7-5B is complete at product implementation anchor `c0cd478bd`; the next
+action is R7-5E's mandatory default/compression Release matrix, installs,
+packages, and inherited header/export/layout, consumer, HighFive, API-version,
+and cross-format gates. Preserve original
 Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
 `2a966388e`, accepted Round 2 implementation `fb09d9fc9`, accepted Round 3
 implementation `a206f0a6e`,

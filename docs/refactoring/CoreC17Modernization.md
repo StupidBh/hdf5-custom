@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 6 complete; R7-5A scope is frozen.
+- State: Active; Rounds 1 through 6 and R7-5B complete; R7-5E is pending.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -621,3 +621,10 @@ and planning source anchor `fe694f3d7`; the intervening tracked changes are
 documentation-only. No other const diagnostic or deferred candidate is
 admitted to Round 7. R7-5B begins with the focused H5F object rebuild and the
 existing external-link and VDS tests at express level 0.
+R7-5B is complete at implementation anchor `c0cd478bd`. The one-line local
+qualifier correction removes the selected GNU warning; Windows Release and
+Debug and Linux Release rebuilds pass, and the external/VDS fixture selection
+passes 4/4 at express level 0 in all three configurations. R7-5C and R7-5D
+are `NOT_APPLICABLE` because the edit adds no resource edge, cleanup branch,
+or follow-on candidate. R7-5E must run the mandatory default/compression
+matrix and inherited compatibility gates before the round can close.

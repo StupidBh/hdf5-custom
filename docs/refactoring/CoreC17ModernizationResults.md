@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 6 are complete; R7-5A scope is frozen.
+- State: Active; Rounds 1 through 6 and R7-5B are complete; R7-5E is pending.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -24,7 +24,8 @@
 - R6-5A implementation anchor: `21307ae3e`.
 - R6-5E/5F validation date: 2026-09-19.
 - R7-5A planning source anchor: `fe694f3d7`.
-- Current continuation: implement the frozen R7-5B local qualifier correction and run its focused gate.
+- R7-5B implementation anchor: `c0cd478bd`.
+- Current continuation: run the R7-5E mandatory matrix and inherited compatibility gates.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1596,3 +1597,28 @@ H5F object rebuild with the selected warning absent, followed by those tests
 and their fixtures at `HDF_TEST_EXPRESS=0` on Windows/MSVC and Linux/GNU.
 Release and Debug coverage remains required before the final matrix. New build
 and CTest commands remain capped at two jobs.
+
+## R7-5B Pilot Validation
+
+Implementation anchor `c0cd478bd` changes only the absolute-filename fallback
+branch's borrowed `ptr` local from `char *` to `const char *`. The shared
+delimiter macro, the mutable resolved-name call, the private helper signature,
+both callers, search order, copied basename, resources, errors, public headers,
+ABI/export, and file format are unchanged.
+
+The focused gate passes on both validators with no more than two build or test
+jobs. Linux/GNU C17 Release rebuilt `H5Fint.c`, the shared library, both test
+programs, and the repository fixtures with developer warnings enabled. The
+selected `-Wdiscarded-qualifiers` diagnostic is absent; the build retains one
+unrelated pre-existing `test/vds.c` strict-overflow warning. Windows/MSVC
+Release and Debug rebuilt the same targets with command-scoped `/utf-8`; only
+the existing high-warning SDK, padding, optimizer, and Spectre advisories were
+reported.
+
+`H5TEST-external`, `H5TEST-vds`, and their setup/cleanup fixtures pass 4/4 at
+`HDF_TEST_EXPRESS=0` in Linux Release, Windows Release, and Windows Debug. The
+VDS test times were 483.61, 132.47, and 154.60 seconds respectively. R7-5C and
+R7-5D are `NOT_APPLICABLE`: the one-line qualifier edit introduces no resource
+edge, cleanup branch, or second admitted candidate. The mandatory R7-5E full
+Release matrix, installs, packages, and inherited compatibility gates remain
+open; this focused result does not close Round 7.

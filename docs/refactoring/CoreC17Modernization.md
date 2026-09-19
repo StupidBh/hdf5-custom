@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4, R5-5A, and R6-5B complete; R6-5E/5F pending.
+- State: Active; Rounds 1 through 4, R5-5A, and R6-5F complete; the next round is not yet selected.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -607,7 +607,9 @@ other retained const diagnostics or any earlier deferred item; R6-5B must
 start with the focused H5trace rebuild and existing trace-reachable tests.
 R6-5B is complete at implementation anchor `21307ae3e`: Windows Release and
 Debug and Linux Release focused selections pass 3/3 at express level 0 after
-the required fixture setup. R6-5C and R6-5D are `NOT_APPLICABLE`. The next
-continuation is R6-5E: rerun the mandatory default Release and Windows/Linux
-system-compression matrix, then complete the inherited install, package,
-consumer, API/ABI, HighFive, and format gates before R6-5F closeout.
+the required fixture setup. R6-5C and R6-5D are `NOT_APPLICABLE`. R6-5E and
+R6-5F are now complete: the mandatory default/compression matrix and inherited
+install, package, consumer, API/ABI, HighFive, and format gates pass on the
+qualified Windows/MSVC and Linux/GCC validators with no compatibility delta.
+The next continuation is a fresh 5A scope and baseline freeze; no later
+candidate is admitted until that scope is written and accepted.

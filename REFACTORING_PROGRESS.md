@@ -106,8 +106,9 @@ and R6-5B implemented it at `21307ae3e`. Windows Release/Debug and Linux
 Release focused selections pass 3/3 at express level 0 after the existing
 reference-fixture target is run. The first Linux missing-fixture run and the
 first Windows Debug no-`/utf-8` compile are setup-only failures and pass after
-their required corrections. R6-5C/R6-5D are not applicable; the mandatory
-R6-5E default/compression matrix and R6-5F closeout remain open.
+their required corrections. R6-5C/R6-5D are not applicable. R6-5E and R6-5F
+now close the full default/compression matrix and inherited install, package,
+consumer, API/ABI, HighFive, and format gates with no compatibility delta.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -119,7 +120,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R6-5B pilot complete; R6-5E/5F pending | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R6-5F complete; next round unselected | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -626,13 +627,16 @@ implementation anchor `0b9e21c34` and is detailed in
   package, filename, or file-format delta. Setup-only corrections for an
   incomplete local build tree and a no-filter comparison are excluded from the
   acceptance result.
-- Completed roadmap Stage 5 R6-5A/R6-5B at implementation anchor
+- Completed roadmap Stage 5 R6-5A through R6-5F at implementation anchor
   `21307ae3e`. The H5trace array-parser pilot keeps the mutable `strtol`
   end-pointer and uses a separate `const char *scan` for the borrowed
   `strchr` result. Windows Release/Debug and Linux Release focused selections
   pass 3/3 at express level 0; no exported signature, trace output, resource,
-  public-header, ABI/layout, or file-format contract changed. The full R6-5E
-  default/compression matrix and R6-5F closeout are still pending.
+  public-header, ABI/layout, or file-format contract changed. R6-5E/5F then
+  reran the seven-row Release matrix and inherited install/package,
+  consumer, API/ABI, HighFive, and format gates; all passed with no
+  compatibility delta. Exact counts and linkage evidence are recorded in
+  `CoreC17ModernizationResults.md`.
 
 ## Remaining
 
@@ -640,8 +644,7 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 through 4 and R5-5A are complete; R6-5B is a
-  completed pilot with R6-5E/5F still open. R5-5A closed without a
+- Roadmap Stage 5 Rounds 1 through 4, R5-5A, and R6-5F are complete without a
   compatibility delta. R2-D1, R2-D2, R2-I1, R2-D3, the R1-R4 deferred backlog,
   other retained const diagnostics, and any later candidate remain outside the
   accepted scope.
@@ -651,16 +654,15 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-R6-5B focused validation is complete at product implementation anchor
-`21307ae3e`; the mandatory R6-5E default/compression matrix and inherited
-contract gates are the next action. Preserve original Stage 5 contract anchor
+R6-5F is complete at product implementation anchor `21307ae3e`; the next
+action is a fresh R6 successor 5A scope and baseline freeze. Preserve original Stage 5 contract anchor
 `dd7204035`, accepted Round 1 implementation `2a966388e`, accepted Round 2
 implementation `fb09d9fc9`, accepted Round 3 implementation `a206f0a6e`,
 accepted Round 4 implementation `720d882ee`, and accepted R5 implementation
 `74a8f0b79` as cumulative comparison anchors. Do not admit another candidate
-until R6-5E/5F closes or explicitly records an unresolved validation gap. New
-build/CTest validation remains capped at two jobs, while historical R1-R4
-six-job evidence remains unchanged.
+until the successor 5A scope is written and accepted. New build/CTest
+validation remains capped at two jobs, while historical R1-R4 six-job evidence
+remains unchanged.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

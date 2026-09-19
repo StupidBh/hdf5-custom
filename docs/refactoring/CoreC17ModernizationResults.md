@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4, R5-5A, and R6-5B are complete; R6-5E/5F remain pending.
+- State: Active; Rounds 1 through 4, R5-5A, and R6-5F are complete; the next round is not yet selected.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -22,7 +22,8 @@
 - R5-5A implementation anchor: `74a8f0b79`.
 - R6-5A planning source anchor: `609b8865e`.
 - R6-5A implementation anchor: `21307ae3e`.
-- Current continuation: run the mandatory R6-5E default/compression matrix, then close R6-5F or record its validation gap.
+- R6-5E/5F validation date: 2026-09-19.
+- Current continuation: start a fresh 5A scope and baseline freeze for the next bounded C17 round.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1522,8 +1523,51 @@ new qualifier-loss diagnostic, and the exported helper signature, trace
 state, output, resources, public headers, ABI/layout, and file format remain
 unchanged.
 
-R6-5C and R6-5D are provisionally `NOT_APPLICABLE`: the corrected pilot has
-no resource edge, cleanup branch, or second admitted candidate. R6-5E and
-R6-5F are intentionally still open because the mandatory complete default
-and six-row compression Release matrix, installs, packages, and inherited
-compatibility gates have not yet been rerun for this new implementation.
+R6-5C and R6-5D are `NOT_APPLICABLE`: the corrected pilot has no resource
+edge, cleanup branch, or second admitted candidate. R6-5E completed the
+mandatory matrix and inherited contract gates. All new Release builds and
+CTest runs used at most two jobs and `HDF5_TEST_EXPRESS=3`.
+
+| Configuration | Passed | Disabled | Registered | CTest time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default, no compression | 2,733 | 37 | 2,770 | 210.45 s |
+| Windows shared HDF5/shared supplied compression (SC-A) | 2,896 | 10 | 2,906 | not retained |
+| Windows static HDF5/shared supplied compression (SC-B) | 2,853 | 10 | 2,863 | 249.61 s |
+| Linux shared HDF5/shared system compression (HS-DA) | 2,898 | 10 | 2,908 | 287.78 s |
+| Linux shared HDF5/static supplied compression (HS-DS) | 2,898 | 10 | 2,908 | 288.66 s |
+| Linux static HDF5/shared system compression (HA-DA) | 2,855 | 10 | 2,865 | 271.95 s |
+| Linux static HDF5/static supplied compression (HA-DS) | 2,855 | 10 | 2,865 | 281.03 s |
+
+The Windows SC-A/SC-B rows resolved repository zlib 1.3.2 and libaec 1.1.7;
+the default row intentionally keeps compression and Map API disabled. All
+Linux rows enabled the Map API. HS-DA/HA-DA used system zlib 1.3.1 and libaec
+1.1.5, while HS-DS/HA-DS used the supplied PIC static zlib 1.3.2 and libaec
+1.1.7 inputs. `readelf`/`ldd` linkage checks match those choices: shared
+compression appears as `libz.so.1`/`libsz.so.2` dependencies, while the
+supplied-static shared-HDF5 row has no compression `NEEDED` entries.
+
+Each row installed successfully and produced a separate package. Installed
+trees contain 57 public headers; Windows ZIP inventories are 107/103/101
+entries in default/SC-A/SC-B order, and Linux TGZ inventories are 104/104/100/
+100 in HS-DA/HS-DS/HA-DA/HA-DS order. The current Windows default and SC-A
+installed C99 consumers compile, link, and run; Linux C99/C17/C++11 consumers
+pass for all four rows. Linux `add_subdirectory()` and local-source
+`FetchContent` consumers, shared and static HighFive consumers, and all six
+API-version aliases (`v16`, `v18`, `v110`, `v112`, `v114`, `v200`) pass.
+
+The Windows default export set remains 3,964 names, and the Map-API-enabled
+SC-A set remains 3,988 names. The Linux Map-API-enabled shared export set has
+4,084 names and its sorted name set is identical to the accepted R5 Map-API
+baseline. All non-generated installed headers are byte-identical to the R5
+headers; only the expected generated `H5pubconf.h` differs by configuration.
+Current Linux `h5diff` reads the gzip and SZIP example fixtures from every
+opposite compression row and reads the current Windows h5diff fixture with
+zero differences. The fixed 147-entry HighFive inventory and seven x64 layout
+assertions remain unchanged.
+
+R6-5F closes the round at implementation anchor `21307ae3e`: the one-line
+H5trace qualifier correction introduces no public header, ABI/export,
+package, HighFive, observable filename, or file-format delta. R2-D1, R2-D2,
+R2-I1, R2-D3, the R1-R4 deferred backlog, and later Stage 5 candidates remain
+explicitly deferred. Optional ROS3, HDFS, mpiFileUtils/libcircle/DTCMP,
+signed-plugin OpenSSL, and RPM environments remain secondary coverage gaps.

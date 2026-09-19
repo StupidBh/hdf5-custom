@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4 complete; next R5-5A.
+- State: Active; Rounds 1 through 4 complete; R5-5A pilot under focused validation.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -18,7 +18,8 @@
   [HighFiveHDF5ApiDependencyAudit.md](HighFiveHDF5ApiDependencyAudit.md).
 - R4-5A evidence anchor: `c6421eac6`.
 - R4-5B implementation anchor: `720d882ee`.
-- Current continuation: R5-5A scope and baseline freeze.
+- R5-5A planning/implementation date: 2026-09-19.
+- Current continuation: R5-5A focused validation; remaining validation is capped at two jobs.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1322,7 +1323,75 @@ R4-5C and R4-5D remain `NOT_APPLICABLE`; R4-D1 through R4-D3 and the earlier
 backlog remain deferred. No public header, API/ABI, target, package contract,
 HighFive dependency, observable filename, or file-format change was accepted.
 
-The next continuation is R5-5A. It must requalify the source and environment
-against accepted Round 4 anchor `720d882ee`, freeze a new exact candidate
-ledger and validation specification, and make no product edit before that
-gate. No Round 5 candidate is currently selected.
+The next continuation is R5-5A. It requalified the source and environment
+against accepted Round 4 anchor `720d882ee`, then froze the exact candidate
+ledger and validation specification below. No other Round 5 candidate is
+admitted.
+
+## R5-5A Scope and Baseline Freeze
+
+R5-5A explicitly admits one new candidate after requalifying the accepted Round
+4 endpoint `720d882ee`; it does not silently reopen Round 4. The analogous
+Splitter item was recorded as `R4-D1` because it needed its own default-
+configuration characterization. That characterization is now the sole R5
+pilot scope:
+
+| ID | Exact scope | Decision | Frozen boundary |
+| --- | --- | --- | --- |
+| `R5-P1` | `src/H5FDsplitter.c`: `H5FD__splitter_get_default_wo_path` | `SELECTED PILOT` | Change only the borrowed `file_extension` local from `char *` to `const char *`; preserve the helper signature, all three filename branches, output bytes, errors, and the three existing callers. |
+| `R5-T1` | `test/vfd.c`: `test_splitter_default_filename` | `SELECTED TEST` | Through public `H5Pset_driver(..., H5FD_SPLITTER, NULL)`, create and delete `.h5`, other-extension, and extensionless names; check the exact default W/O names before deletion and absence afterward. This exercises the open and delete default-path branches without exposing the helper. |
+| `R5-K1` | Remaining Splitter VFD implementation, public headers, package wiring, and unrelated diagnostics | `KEEP` | No signature, ABI/layout, registration, dispatch, resource, file-format, target, or dependency change is admitted. |
+| `R5-D1` | Other const diagnostics and all prior deferred items | `DEFER` | No additional warning cleanup, macro change, tool edit, ownership work, or performance work enters this batch. |
+
+The product edit is local and non-user-visible. It changes no public header,
+export, ABI/layout, HighFive dependency, resource edge, observable filename,
+or file-format rule. The direct callers remain the Splitter open path and the
+two default Splitter delete paths; the characterization covers the public
+driver setup and deletion API.
+
+R5-5A validation is intentionally narrower than a round closeout until this
+pilot is proven: run the focused VFD build and test at `HDF_TEST_EXPRESS=0`,
+then the required Debug/Release and retained contract gates. Every new build,
+CTest, and validation command uses no more than two parallel jobs. Historical
+R1-R4 records retain their original six-job execution settings and are not
+rewritten. A failed or unavailable required validator leaves R5 incomplete.
+
+### R5-5A Pilot Validation Status
+
+The fresh MSVC 19.51/Ninja Release configuration completed with development
+warnings disabled. Its complete build was started with `--parallel 2` but
+stopped in the unrelated `test/dt_arith.c` compilation because this MSVC/Ninja
+configuration did not define `H5_SIZEOF_FLOAT` after the CMake float-size
+probe failed. This is an environment/configuration validation gap, not a
+diagnostic from the selected Splitter edit.
+
+The focused `vfd` target rebuilt successfully with `--parallel 2`; the strict
+MSVC `/Wall` tree also compiled `H5FDsplitter.c` as a single object with
+`-j 2`, with no qualifier-loss diagnostic at the edited helper. After building
+the registered reference-file fixture target, `H5TEST-vfd` passed at
+`HDF_TEST_EXPRESS=0` with CTest `--parallel 2`. Direct execution of the same
+binary also passed, including the new default Splitter W/O filename test.
+
+Additional R5-5A validation now recorded:
+
+- A fresh Windows x64 Visual Studio 18 2026 Release build with
+  `HDF5_ENABLE_DEV_WARNINGS=ON`, command-scoped `CL=/utf-8`, and build/CTest
+  parallelism capped at two completed successfully. The default suite passed
+  2,733/2,733 enabled tests, with 37 disabled out of 2,770 registered tests;
+  `H5TEST-vfd` and its clear/cleanup fixtures passed 3/3 at
+  `HDF_TEST_EXPRESS=0`.
+- A fresh Linux WSL x86_64 GCC 15.2/Ninja Release build completed the selected
+  VFD target and reference fixtures with two jobs. `H5TEST-vfd` and its
+  clear/cleanup fixtures passed 3/3 at `HDF_TEST_EXPRESS=0`; the output
+  includes the default Splitter W/O filename case and all expected VFD checks.
+  Valgrind 3.26.0 reported 12,856 allocations and frees, zero live blocks, and
+  zero errors for the focused executable.
+- The Linux validator has system zlib 1.3.1 and libaec 1.1.5 in both shared
+  and archive forms. The pinned PIC-capable zlib 1.3.2/libaec 1.1.7 static
+  inputs also remain available under the qualified WSL dependency prefix.
+  Open MPI 5.0.10, CMake 4.2.3, Ninja 1.13.2, Valgrind 3.26.0, Perl 5.40.1,
+  and pkg-config 2.5.1 are available.
+
+The complete Linux compression-linkage matrix, repeated installed/package and
+consumer contracts, and final cross-platform compatibility gates remain open,
+so R5-5A and Round 5 are not complete.

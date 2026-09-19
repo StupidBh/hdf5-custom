@@ -521,7 +521,7 @@ static herr_t H5FD__splitter_get_default_wo_path(char* new_path, size_t new_path
 {
     const char* suffix = "_wo";
     size_t old_filename_len = 0;
-    char* file_extension = NULL;
+    const char* file_extension = NULL;
     herr_t ret_value = SUCCEED;
 
     FUNC_ENTER_PACKAGE

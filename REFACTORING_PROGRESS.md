@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-09
+Last updated: 2026-09-19
 
 ## Purpose
 
@@ -62,7 +62,9 @@ atomic product implementation commit after R1-5A evidence anchor `bd6de77dd`.
 R1-5C/R1-5D were not applicable to the resource-neutral pilot. R2-5A has now
 frozen a resource-ownership round in `H5PLpath.c`. Its portable evidence is in
 [`docs/refactoring/CoreC17ModernizationResults.md`](docs/refactoring/CoreC17ModernizationResults.md).
-Build/CTest parallelism is capped at six jobs per physical host.
+Build/CTest parallelism for the remaining Stage 5 work is capped at two jobs
+per physical host. Historical R1-R4 evidence retains its recorded six-job
+execution settings.
 Windows uses the supplied `3rdparty` dependencies; Linux prerequisites are
 obtained through WSL. Stage 5 is planned as successive bounded rounds, each
 preserving the original complete installed-header freeze and the fixed HighFive
@@ -86,7 +88,14 @@ R4-5A froze one family VFD default-filename const-correctness pilot and its
 direct modern-harness characterization. R4-5B implemented it at `720d882ee`
 and passed the focused gate; R4-5C/R4-5D are not applicable. The complete
 R4-5E matrix passed and R4-5F closed Round 4 without a compatibility delta.
-The current continuation is R5-5A scope and baseline freeze.
+R5-5A now explicitly selects the previously deferred Splitter default-filename
+characterization as its sole pilot; it is a new-round admission, not a silent
+extension of R4. The current continuation is the R5-5A focused validation.
+Focused validation now passes on both validators: Windows default Release
+CTest passed 2,733 enabled tests with 37 disabled, and Linux Release built the
+VFD target and fixtures with the focused test passing under CTest and Valgrind
+with zero errors and zero live blocks. The complete Linux compression matrix
+and final installed-contract gates remain open.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -98,7 +107,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 4 complete; next R5-5A | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R5-5A Splitter pilot under focused validation | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -603,8 +612,9 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 through 4 are complete. R5-5A scope and baseline
-  freeze is next; no Round 5 candidate is currently selected. R2-D1, R2-D2,
+- Roadmap Stage 5 Rounds 1 through 4 are complete. R5-5A has selected one
+ Splitter default-filename const-correctness pilot and its direct VFD
+ characterization; focused and required contract validation remain. R2-D1, R2-D2,
   R2-I1, R2-D3, later rounds, and the preceding deferred backlog remain
   outside the accepted Round 4 scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
@@ -613,15 +623,17 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The next roadmap continuation is R5-5A of
+The next roadmap continuation is R5-5A focused validation of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
 `2a966388e`, accepted Round 2 implementation `fb09d9fc9`, and accepted Round 3
 implementation `a206f0a6e`. Treat Round 4 implementation anchor `720d882ee` as
-the accepted endpoint. Requalify the source, toolchains, dependencies, and
-retained contracts; then freeze an exact Round 5 candidate ledger and focused
-and final validation specification before any product edit. Do not silently
-admit R4-D1 through R4-D3 or any earlier deferred candidate.
+the accepted endpoint. R5-5A requalified the source, toolchains, dependencies,
+and retained contracts, then froze an exact candidate ledger and focused and
+final validation specification. It explicitly admits the former R4-D1
+Splitter item as its sole new-round pilot; do not admit R4-D2, R4-D3, or any
+earlier deferred candidate. New build/CTest validation is capped at two jobs,
+while historical R1-R4 six-job evidence remains unchanged.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

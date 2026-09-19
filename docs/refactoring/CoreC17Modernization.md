@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4 complete; next R5-5A.
+- State: Active; Rounds 1 through 4 complete; R5-5A pilot selected and under validation.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -39,8 +39,9 @@ direct modern-harness characterization. No other warning or deferred item is
 admitted to Round 4. R4-5B implemented the pilot at `720d882ee` and passed the
 frozen focused gate; the actual diff confirms R4-5C and R4-5D are
 `NOT_APPLICABLE`. R4-5E repeated the complete mandatory matrix, and R4-5F
-closed the round without a compatibility delta. The next round must begin with
-R5-5A scope and baseline freeze; no Round 5 candidate is currently selected.
+closed the round without a compatibility delta. R5-5A now explicitly admits
+the previously deferred Splitter default-filename characterization as its sole
+pilot; it is a new round scope, not a silent extension of R4.
 It does not reopen completed Stages
 1 through 4 or resume the separately paused CMake modernization. Planning is
 not implementation or validation evidence. The first execution deliverable is
@@ -207,14 +208,14 @@ remain outside the round. Later rounds inherit this rule.
 
 ## Environment and Resource Rules
 
-- Maximum build parallelism: 6. CTest also uses at most 6 jobs. Windows and WSL
-  on the same physical host share an aggregate six-job budget; run their major
+- Maximum build parallelism: 2. CTest also uses at most 2 jobs. Windows and WSL
+  on the same physical host share an aggregate two-job budget; run their major
   workloads sequentially. Account for MPI ranks/nested builds and reduce CTest
-  concurrency for process-heavy tests rather than launching six MPI jobs each
+  concurrency for process-heavy tests rather than launching two MPI jobs each
   with six ranks.
   In 5A record scheduling weights/serial groups for MPI ranks, long-lived test
   servers and nested dependency builds. Account for helpers that outlive their
-  launching command; do not apply -j 6 independently at every nesting level.
+  launching command; do not apply -j 2 independently at every nesting level.
 - Windows: x64, MSVC, Visual Studio 18 2026, command-scoped CL=/utf-8. Discover
   and prefer the supplied `3rdparty/zlib`, `3rdparty/libaec`, and
   `3rdparty/msmpi` inputs. Record versions, architecture, library forms, and
@@ -575,5 +576,14 @@ eight-row Release matrix, installs, packages, dependency linkage, consumers,
 integration styles, headers, exports, layouts, fixed HighFive inventory, and
 cross-platform format reads all pass. R4-5F closes the round at implementation
 anchor `720d882ee` without an accepted compatibility delta. The next execution
-step is R5-5A scope and baseline freeze. Exact evidence is recorded in
+step is the R5-5A Splitter pilot and its focused validation. Exact evidence is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).
+
+R5-5A freezes one local qualifier correction in
+`H5FD__splitter_get_default_wo_path` and one direct `h5test.h` characterization
+in `test/vfd.c`. The characterization covers default `.h5`, other-extension,
+and extensionless W/O filenames through the public Splitter driver setup. The
+implementation must preserve all three helper callers and all compatibility
+contracts. R5-5A does not admit other const diagnostics or earlier deferred
+items. New build, CTest, and validation commands are capped at two jobs; the
+historical six-job settings in R1-R4 evidence remain unchanged.

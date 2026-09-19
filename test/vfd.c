@@ -158,6 +158,7 @@ static int run_splitter_test(const struct splitter_dataset_def* data, bool ignor
 static int splitter_RO_test(const struct splitter_dataset_def* data, hid_t child_fapl_id);
 static int splitter_tentative_open_test(hid_t child_fapl_id);
 static int file_exists(const char* filename, hid_t fapl_id);
+static herr_t test_splitter_default_filename(void);
 
 static herr_t run_ctl_test(uint64_t op_code, uint64_t flags, ctl_test_opc_type opc_type, hid_t fapl_id);
 static H5FD_t* H5FD__ctl_test_vfd_open(const char* name, unsigned flags, hid_t fapl_id, haddr_t maxaddr);
@@ -3830,6 +3831,97 @@ error:
     return -1;
 } /* end test_splitter() */
 
+/*-------------------------------------------------------------------------
+ * Function:    test_splitter_default_filename
+ *
+ * Purpose:     Tests default Splitter W/O channel filename generation.
+ *
+ * Return:      Success:        0
+ *              Failure:        -1
+ *
+ *-------------------------------------------------------------------------
+ */
+static herr_t test_splitter_default_filename(void)
+{
+    static const struct
+    {
+        const char* base_name;
+        const char* wo_name;
+    } cases[] = { { "splitter_default_h5.h5", "splitter_default_h5_wo.h5" },
+                  { "splitter_default_other.data", "splitter_default_other_wo.data" },
+                  { "splitter_default_none", "splitter_default_none_wo" } };
+
+    char base_name[H5FD_SPLITTER_PATH_MAX + 1];
+    char wo_name[H5FD_SPLITTER_PATH_MAX + 1];
+    hid_t file = H5I_INVALID_HID;
+    hid_t fapl = H5I_INVALID_HID;
+    size_t u;
+
+    TESTING("default SPLITTER W/O filenames");
+
+    if ((fapl = H5Pcreate(H5P_FILE_ACCESS)) < 0) {
+        TEST_ERROR;
+    }
+    if (H5Pset_driver(fapl, H5FD_SPLITTER, NULL) < 0) {
+        TEST_ERROR;
+    }
+
+    for (u = 0; u < NELMTS(cases); u++) {
+        if (h5_fixname_no_suffix(cases[u].base_name, H5P_DEFAULT, base_name, sizeof(base_name)) == NULL) {
+            TEST_ERROR;
+        }
+        if (h5_fixname_no_suffix(cases[u].wo_name, H5P_DEFAULT, wo_name, sizeof(wo_name)) == NULL) {
+            TEST_ERROR;
+        }
+        HDremove(base_name);
+        HDremove(wo_name);
+
+        if ((file = H5Fcreate(base_name, H5F_ACC_TRUNC, H5P_DEFAULT, fapl)) < 0) {
+            TEST_ERROR;
+        }
+        if (H5Fclose(file) < 0) {
+            TEST_ERROR;
+        }
+        file = H5I_INVALID_HID;
+
+        if (HDaccess(wo_name, F_OK) < 0) {
+            TEST_ERROR;
+        }
+        if (H5Fdelete(base_name, fapl) < 0) {
+            TEST_ERROR;
+        }
+        if (HDaccess(base_name, F_OK) >= 0 || HDaccess(wo_name, F_OK) >= 0) {
+            TEST_ERROR;
+        }
+    }
+
+    if (H5Pclose(fapl) < 0) {
+        TEST_ERROR;
+    }
+
+    PASSED();
+    return SUCCEED;
+
+error:
+    H5E_BEGIN_TRY
+    {
+        H5Fclose(file);
+        H5Pclose(fapl);
+    }
+    H5E_END_TRY
+
+    for (u = 0; u < NELMTS(cases); u++) {
+        if (h5_fixname_no_suffix(cases[u].base_name, H5P_DEFAULT, base_name, sizeof(base_name)) != NULL) {
+            HDremove(base_name);
+        }
+        if (h5_fixname_no_suffix(cases[u].wo_name, H5P_DEFAULT, wo_name, sizeof(wo_name)) != NULL) {
+            HDremove(wo_name);
+        }
+    }
+
+    return FAIL;
+} /* end test_splitter_default_filename() */
+
 #undef SPLITTER_TEST_FAULT
 
 /*****************************************************************************
@@ -6485,6 +6577,7 @@ int main(void)
     nerrors += test_windows() < 0 ? 1 : 0;
     nerrors += test_ros3() < 0 ? 1 : 0;
     nerrors += test_splitter() < 0 ? 1 : 0;
+    nerrors += test_splitter_default_filename() < 0 ? 1 : 0;
     nerrors += test_vector_io("sec2") < 0 ? 1 : 0;
     nerrors += test_vector_io("stdio") < 0 ? 1 : 0;
     nerrors += test_selection_io("sec2") < 0 ? 1 : 0;

@@ -915,7 +915,7 @@ herr_t H5F_prefix_open_file(bool try,
 
         /* Adjust temporary file name if file not opened */
         if (NULL == src_file) {
-            char* ptr;
+            const char* ptr;
 
             /* Get last component of file_name */
             H5_GET_LAST_DELIMITER(file_name, ptr)

@@ -231,9 +231,9 @@ herr_t H5_trace_args(H5RS_str_t* rs, const char* type, va_list ap)
                 type = rest + 1;
             }
             else {
-                rest = (char*)strchr(type, ']');
-                assert(rest);
-                type = rest + 1;
+                const char* scan = strchr(type, ']');
+                assert(scan);
+                type = scan + 1;
                 asize_idx = -1;
             }
         } /* end if */

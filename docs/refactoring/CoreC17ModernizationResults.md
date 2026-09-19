@@ -20,7 +20,8 @@
 - R4-5B implementation anchor: `720d882ee`.
 - R5-5A planning/implementation date: 2026-09-19.
 - R5-5A implementation anchor: `74a8f0b79`.
-- Current continuation: preserve the completed R5-5A evidence and select a future bounded candidate only after a new 5A freeze.
+- R6-5A planning source anchor: `609b8865e`.
+- Current continuation: R6-5A freezes one H5trace local qualifier pilot; implementation and validation remain pending.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1472,3 +1473,25 @@ resource edge, cleanup branch, or second admitted candidate. R5-5F closes the
 round without a public header, ABI/layout, export, package, HighFive,
 observable filename, or file-format delta. R2-D1, R2-D2, R2-I1, R2-D3, the
 R1-R4 deferred backlog, and later Stage 5 rounds remain explicitly deferred.
+
+## R6-5A Scope and Baseline Freeze
+
+R6-5A requalifies the accepted R5 implementation endpoint `74a8f0b79`.
+Between that endpoint and planning source anchor `609b8865e`, tracked changes
+are documentation-only; the selected H5trace source and its callers are
+unchanged. This round admits one borrowed-pointer qualifier correction and no
+other R4-D2 or earlier deferred item.
+
+| ID | Exact scope | Decision | Frozen boundary |
+| --- | --- | --- | --- |
+| `R6-P1` | `src/H5trace.c`: array-type branch of `H5_trace_args` | `SELECTED PILOT` | Keep mutable `rest` for the `strtol` end pointer, introduce a separate `const char *scan` for the borrowed `strchr` result, and remove its cast; preserve the exported helper signature, type-string cursor advancement, assertions, output text, diagnostics, and all callers. |
+| `R6-K1` | Remaining H5trace parser, trace state, public/private declarations, and package wiring | `KEEP` | No parser rewrite, trace-state change, signature/ABI change, macro change, or unrelated diagnostic cleanup is admitted. |
+| `R6-D1` | R2-D1, R2-D2, R2-I1, R2-D3, R1-D1 through R1-D4, and other retained const diagnostics | `DEFER` | Their allocation-failure, behavior, file-format, shared-container, platform, or caller contracts remain outside this pilot. |
+
+The selected local is borrowed from the read-only `type` string and is used
+only to locate the closing array bracket before advancing that same cursor. It
+does not write through the pointer, acquire or release resources, or alter the
+trace output. R6-5B therefore requires a focused H5trace object rebuild and
+the existing base/trace-reachable test coverage at express level 0, followed
+by the default Release and Debug checks. New commands remain capped at two
+parallel jobs; the historical R1-R4 six-job evidence is unchanged.

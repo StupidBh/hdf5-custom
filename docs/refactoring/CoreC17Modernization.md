@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4 and R5-5A complete; later Stage 5 rounds remain unselected.
+- State: Active; Rounds 1 through 4 and R5-5A complete; R6-5A scope frozen and implementation pending.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -596,4 +596,12 @@ package, API-version, and cross-format gates on the qualified Windows/MSVC
 and Linux/GCC validators. No public, ABI/layout, package, HighFive,
 observable-filename, or file-format delta was accepted. R5-5C and R5-5D are
 `NOT_APPLICABLE`; the remaining deferred ledger is unchanged. A future Stage
-5 round must begin with a fresh 5A scope and baseline freeze.
+5 round must begin with a fresh 5A scope and baseline freeze. R6-5A now freezes
+one H5trace borrowed-pointer qualifier correction against that endpoint. The
+only admitted source change is the `strchr` result in the array-type branch of
+`H5_trace_args`: the `strtol` end pointer remains mutable, while the separate
+borrowed scan pointer is `const char *` and needs no cast.
+The helper signature, parser cursor movement, trace output, declarations,
+callers, and all protected contracts remain frozen. R6-5A does not admit the
+other retained const diagnostics or any earlier deferred item; R6-5B must
+start with the focused H5trace rebuild and existing trace-reachable tests.

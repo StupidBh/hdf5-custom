@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 6 and R7-5B are complete; R7-5E is pending.
+- State: Active; Rounds 1 through 7 are complete; no later candidate is admitted.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -25,7 +25,9 @@
 - R6-5E/5F validation date: 2026-09-19.
 - R7-5A planning source anchor: `fe694f3d7`.
 - R7-5B implementation anchor: `c0cd478bd`.
-- Current continuation: run the R7-5E mandatory matrix and inherited compatibility gates.
+- R7-5E/5F validation date: 2026-09-20.
+- Current continuation: preserve the R7 endpoint and defer the next candidate to a
+  fresh 5A scope and baseline freeze.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1619,6 +1621,52 @@ reported.
 `HDF_TEST_EXPRESS=0` in Linux Release, Windows Release, and Windows Debug. The
 VDS test times were 483.61, 132.47, and 154.60 seconds respectively. R7-5C and
 R7-5D are `NOT_APPLICABLE`: the one-line qualifier edit introduces no resource
-edge, cleanup branch, or second admitted candidate. The mandatory R7-5E full
-Release matrix, installs, packages, and inherited compatibility gates remain
-open; this focused result does not close Round 7.
+edge, cleanup branch, or second admitted candidate.
+
+## R7-5E Matrix and Contract Gates
+
+R7-5E reran the mandatory default/compression Release matrix with
+`HDF_TEST_EXPRESS=3` and no more than two build or test jobs per command. The
+Windows SC-A and SC-B rows used the repository zlib 1.3.2 and libaec 1.1.7
+DLLs on `PATH`; the default row intentionally kept compression and Map API
+disabled. Linux HS-DA and HA-DA used system zlib 1.3.1 and libaec 1.1.5;
+HS-DS and HA-DS used supplied PIC static zlib 1.3.2 and libaec 1.1.7.
+
+| Configuration | Passed | Disabled | Registered | CTest time |
+| --- | ---: | ---: | ---: | ---: |
+| Windows default, no compression | 2,733 | 37 | 2,770 | not retained |
+| Windows shared HDF5/shared supplied compression (SC-A) | 2,896 | 10 | 2,906 | 280.74 s |
+| Windows static HDF5/shared supplied compression (SC-B) | 2,853 | 10 | 2,863 | 284.97 s |
+| Linux shared HDF5/shared system compression (HS-DA) | 2,898 | 10 | 2,908 | 298.59 s |
+| Linux shared HDF5/static supplied compression (HS-DS) | 2,898 | 10 | 2,908 | 293.89 s |
+| Linux static HDF5/shared system compression (HA-DA) | 2,855 | 10 | 2,865 | 289.44 s |
+| Linux static HDF5/static supplied compression (HA-DS) | 2,855 | 10 | 2,865 | 295.12 s |
+
+Every enabled test passed in all seven rows. Each row installed successfully
+and produced a package. Installed trees contain 57 public headers; Windows ZIP
+inventories are 107/103/101 entries in default/SC-A/SC-B order, and Linux TGZ
+inventories are 108/108/100/100 in HS-DA/HS-DS/HA-DA/HA-DS order. The Windows
+default and Map-API SC-A export sets remain 3,964 and 3,988 names. The Linux
+Map-API shared export set remains 4,084 names. Non-generated installed headers
+are byte-identical to the R6 installs. The current shared Linux C99 consumers
+compile, link, and run against both HS rows; the static rows retain their
+accepted static consumer and full-suite coverage from R6, with no public
+header or package-target change. The inherited C17/C++11, HighFive,
+add_subdirectory, FetchContent, API-version, x64-layout, and cross-format
+checks therefore remain valid at this internal-only endpoint.
+
+The first SC-A invocation without the repository compression DLL directories
+on `PATH` failed with Windows loader status `0xc0000135`; the same complete
+suite passed after the required environment correction. This is a setup-only
+miss, not a product failure.
+
+## R7-5F Round Closeout
+
+R7-5F closes Round 7 at implementation anchor `c0cd478bd`. The one-line H5F
+qualifier correction introduces no public header, ABI/export, package,
+HighFive, observable filename, or file-format delta. R2-D1, R2-D2, R2-I1,
+R2-D3, the R1-R4 deferred backlog, other retained const diagnostics, and
+later Stage 5 candidates remain explicitly deferred. Optional ROS3, HDFS,
+mpiFileUtils/libcircle/DTCMP, signed-plugin OpenSSL, and RPM environments
+remain secondary coverage gaps. A future round must begin with a fresh 5A
+scope and baseline freeze.

@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 6 and R7-5B complete; R7-5E is pending.
+- State: Active; Rounds 1 through 7 complete; no later candidate is admitted.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -626,5 +626,7 @@ qualifier correction removes the selected GNU warning; Windows Release and
 Debug and Linux Release rebuilds pass, and the external/VDS fixture selection
 passes 4/4 at express level 0 in all three configurations. R7-5C and R7-5D
 are `NOT_APPLICABLE` because the edit adds no resource edge, cleanup branch,
-or follow-on candidate. R7-5E must run the mandatory default/compression
-matrix and inherited compatibility gates before the round can close.
+or follow-on candidate. R7-5E reran the mandatory seven-row
+default/compression Release matrix, installs, packages, and inherited contract
+gates with no compatibility delta. R7-5F closes the round at `c0cd478bd`; later
+candidates remain deferred until a fresh 5A scope and baseline freeze.

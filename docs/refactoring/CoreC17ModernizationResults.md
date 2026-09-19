@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4, R5-5A, and R6-5F are complete; the next round is not yet selected.
+- State: Active; Rounds 1 through 6 are complete; R7-5A scope is frozen.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -23,7 +23,8 @@
 - R6-5A planning source anchor: `609b8865e`.
 - R6-5A implementation anchor: `21307ae3e`.
 - R6-5E/5F validation date: 2026-09-19.
-- Current continuation: start a fresh 5A scope and baseline freeze for the next bounded C17 round.
+- R7-5A planning source anchor: `fe694f3d7`.
+- Current continuation: implement the frozen R7-5B local qualifier correction and run its focused gate.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1571,3 +1572,27 @@ package, HighFive, observable filename, or file-format delta. R2-D1, R2-D2,
 R2-I1, R2-D3, the R1-R4 deferred backlog, and later Stage 5 candidates remain
 explicitly deferred. Optional ROS3, HDFS, mpiFileUtils/libcircle/DTCMP,
 signed-plugin OpenSSL, and RPM environments remain secondary coverage gaps.
+
+## R7-5A Scope and Baseline Freeze
+
+R7-5A requalifies accepted R6 implementation endpoint `21307ae3e`. The
+tracked changes through planning source anchor `fe694f3d7` are
+documentation-only; `H5Fint.c`, its private declaration, both callers, and the
+focused tests are unchanged. The existing Linux/GNU C17 developer-warning
+build reproduces one `-Wdiscarded-qualifiers` diagnostic at the absolute-name
+branch of `H5F_prefix_open_file`.
+
+| ID | Exact scope | Decision | Frozen boundary |
+| --- | --- | --- | --- |
+| `R7-P1` | `src/H5Fint.c`: absolute-filename fallback branch of `H5F_prefix_open_file` | `SELECTED PILOT` | Change only the borrowed local `ptr` from `char *` to `const char *`. Preserve the helper signature, both `H5Dvirtual.c` and `H5Lexternal.c` callers, path checks, cursor advancement, copied basename, search order, errors, and resources. |
+| `R7-K1` | `H5_GET_LAST_DELIMITER`, the mutable resolved-name branch, and the remaining H5F implementation | `KEEP` | The shared macro and calls that truncate owned strings remain mutable. No private/public declaration, macro, ABI/export, resource, file-format, or diagnostic-flow change is admitted. |
+| `R7-D1` | Other retained const diagnostics and the earlier deferred ledger | `DEFER` | No tool cleanup, allocation-failure work, shared-container change, path-contract change, or second candidate enters this round. |
+
+The selected pointer is borrowed from the read-only `file_name` parameter and
+is only incremented and passed to `strncpy`; the branch never writes through
+it. The existing `H5TEST-external` target covers absolute external-link paths,
+and `H5TEST-vds` covers the other direct caller. R7-5B requires the focused
+H5F object rebuild with the selected warning absent, followed by those tests
+and their fixtures at `HDF_TEST_EXPRESS=0` on Windows/MSVC and Linux/GNU.
+Release and Debug coverage remains required before the final matrix. New build
+and CTest commands remain capped at two jobs.

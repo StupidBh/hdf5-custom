@@ -109,6 +109,10 @@ first Windows Debug no-`/utf-8` compile are setup-only failures and pass after
 their required corrections. R6-5C/R6-5D are not applicable. R6-5E and R6-5F
 now close the full default/compression matrix and inherited install, package,
 consumer, API/ABI, HighFive, and format gates with no compatibility delta.
+R7-5A freezes one local qualifier correction in the absolute-filename fallback
+branch of `H5F_prefix_open_file` against accepted R6 endpoint `21307ae3e`.
+Only the borrowed local pointer is admitted; the shared delimiter macro, its
+mutable calls, both callers, and all compatibility contracts remain frozen.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the
@@ -120,7 +124,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R6-5F complete; next round unselected | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; R7-5A scope frozen | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -644,23 +648,26 @@ implementation anchor `0b9e21c34` and is detailed in
 - No Phase 2 C17/C++20 implementation, validation, or decision gate remains.
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
-- Roadmap Stage 5 Rounds 1 through 4, R5-5A, and R6-5F are complete without a
-  compatibility delta. R2-D1, R2-D2, R2-I1, R2-D3, the R1-R4 deferred backlog,
-  other retained const diagnostics, and any later candidate remain outside the
-  accepted scope.
+- Roadmap Stage 5 Rounds 1 through 6 are complete without a compatibility
+  delta. R7-5A is frozen but not implemented. R2-D1, R2-D2, R2-I1, R2-D3, the
+  R1-R4 deferred backlog, other retained const diagnostics, and any later
+  candidate remain outside the accepted scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
 
 ## Continuation Point
 
-R6-5F is complete at product implementation anchor `21307ae3e`; the next
-action is a fresh R6 successor 5A scope and baseline freeze. Preserve original Stage 5 contract anchor
-`dd7204035`, accepted Round 1 implementation `2a966388e`, accepted Round 2
-implementation `fb09d9fc9`, accepted Round 3 implementation `a206f0a6e`,
-accepted Round 4 implementation `720d882ee`, and accepted R5 implementation
-`74a8f0b79` as cumulative comparison anchors. Do not admit another candidate
-until the successor 5A scope is written and accepted. New build/CTest
+R6-5F is complete at product implementation anchor `21307ae3e`; R7-5A now
+freezes only the `H5F_prefix_open_file` absolute-filename local qualifier
+correction. The next action is R7-5B implementation plus the focused H5F
+object rebuild and external/VDS tests at express level 0. Preserve original
+Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
+`2a966388e`, accepted Round 2 implementation `fb09d9fc9`, accepted Round 3
+implementation `a206f0a6e`,
+accepted Round 4 implementation `720d882ee`, accepted R5 implementation
+`74a8f0b79`, and accepted R6 implementation `21307ae3e` as cumulative
+comparison anchors. Do not admit another candidate during Round 7. New build/CTest
 validation remains capped at two jobs, while historical R1-R4 six-job evidence
 remains unchanged.
 Exact Round 1 through Round 4 scope evidence is in

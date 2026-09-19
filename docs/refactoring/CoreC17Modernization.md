@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4, R5-5A, and R6-5F complete; the next round is not yet selected.
+- State: Active; Rounds 1 through 6 complete; R7-5A scope is frozen.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -611,5 +611,13 @@ the required fixture setup. R6-5C and R6-5D are `NOT_APPLICABLE`. R6-5E and
 R6-5F are now complete: the mandatory default/compression matrix and inherited
 install, package, consumer, API/ABI, HighFive, and format gates pass on the
 qualified Windows/MSVC and Linux/GCC validators with no compatibility delta.
-The next continuation is a fresh 5A scope and baseline freeze; no later
-candidate is admitted until that scope is written and accepted.
+R7-5A now freezes one local qualifier correction in the absolute-filename
+fallback branch of `H5F_prefix_open_file`. Change only that branch's borrowed
+`ptr` local from `char *` to `const char *`; preserve the shared
+`H5_GET_LAST_DELIMITER` macro, its mutable call sites, the helper signature,
+both callers, search order, filenames, diagnostics, and all compatibility
+contracts. The accepted R6 product anchor is unchanged between `21307ae3e`
+and planning source anchor `fe694f3d7`; the intervening tracked changes are
+documentation-only. No other const diagnostic or deferred candidate is
+admitted to Round 7. R7-5B begins with the focused H5F object rebuild and the
+existing external-link and VDS tests at express level 0.

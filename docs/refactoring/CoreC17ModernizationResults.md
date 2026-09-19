@@ -1392,6 +1392,14 @@ Additional R5-5A validation now recorded:
   Open MPI 5.0.10, CMake 4.2.3, Ninja 1.13.2, Valgrind 3.26.0, Perl 5.40.1,
   and pkg-config 2.5.1 are available.
 
+The following optional environment rows are explicitly deferred and do not
+block the R5-5A mandatory default/compression acceptance: ROS3 requires the
+`aws-c-s3` CMake package (and Docker/AWS CLI only for its proxy tests); HDFS
+requires JDK/JNI, Hadoop, and `libhdfs`; parallel tools require mpiFileUtils,
+libcircle, and DTCMP; signed-plugin validation requires OpenSSL development
+files; and RPM packaging requires `rpmbuild`. These are reachability and
+packaging coverage gaps, not failures of the selected Splitter change.
+
 The complete Linux compression-linkage matrix, repeated installed/package and
 consumer contracts, and final cross-platform compatibility gates remain open,
 so R5-5A and Round 5 are not complete.

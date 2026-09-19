@@ -95,7 +95,9 @@ Focused validation now passes on both validators: Windows default Release
 CTest passed 2,733 enabled tests with 37 disabled, and Linux Release built the
 VFD target and fixtures with the focused test passing under CTest and Valgrind
 with zero errors and zero live blocks. The complete Linux compression matrix
-and final installed-contract gates remain open.
+and final installed-contract gates remain open. Optional ROS3, HDFS,
+mpiFileUtils/libcircle/DTCMP, signed-plugin OpenSSL, and RPM environments are
+recorded as deferred secondary coverage and do not block this mandatory gate.
 
 The repository-level roadmap uses the following stage names. These stages are
 separate from the internal Stage 1 through Stage 4 work packages of the

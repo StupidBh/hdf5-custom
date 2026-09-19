@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 4 complete; R5-5A pilot under focused validation.
+- State: Active; Rounds 1 through 4 complete; R5-5A pilot has passed the mandatory build and compression matrix and remains open for contract gates.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -19,7 +19,7 @@
 - R4-5A evidence anchor: `c6421eac6`.
 - R4-5B implementation anchor: `720d882ee`.
 - R5-5A planning/implementation date: 2026-09-19.
-- Current continuation: R5-5A focused validation; remaining validation is capped at two jobs.
+- Current continuation: R5-5A installed-contract and compatibility validation; new build and CTest work remains capped at two jobs.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1392,6 +1392,25 @@ Additional R5-5A validation now recorded:
   Open MPI 5.0.10, CMake 4.2.3, Ninja 1.13.2, Valgrind 3.26.0, Perl 5.40.1,
   and pkg-config 2.5.1 are available.
 
+- The mandatory R5-5A Release compression matrix passed with `HDF_TEST_EXPRESS=3`
+  and no more than two build/CTest jobs per command:
+
+  | Configuration | Passed | Disabled | Registered | Time |
+  | --- | ---: | ---: | ---: | ---: |
+  | Windows shared HDF5/shared supplied compression | 2,896 | 10 | 2,906 | 228.93 s |
+  | Windows static HDF5/shared supplied compression | 2,853 | 10 | 2,863 | 227.28 s |
+  | Linux shared HDF5/shared system compression | 2,898 | 10 | 2,908 | 229.02 s |
+  | Linux shared HDF5/static supplied compression | 2,898 | 10 | 2,908 | 220.28 s |
+  | Linux static HDF5/shared system compression | 2,855 | 10 | 2,865 | 220.09 s |
+  | Linux static HDF5/static supplied compression | 2,855 | 10 | 2,865 | 219.17 s for final row |
+
+  Each row completed a full Release build and enabled CTest suite with zero
+  failures. The Windows rows resolved zlib 1.3.2 and libaec 1.1.7 from the
+  repository `3rdparty` prefix; Linux shared rows used zlib 1.3.1/libaec 1.1.5,
+  while Linux static rows used the qualified PIC zlib 1.3.2/libaec 1.1.7
+  archives. The four Linux rows were installed and produced CPack packages;
+  both Windows rows were likewise installed and packaged successfully.
+
 The following optional environment rows are explicitly deferred and do not
 block the R5-5A mandatory default/compression acceptance: ROS3 requires the
 `aws-c-s3` CMake package (and Docker/AWS CLI only for its proxy tests); HDFS
@@ -1400,6 +1419,7 @@ libcircle, and DTCMP; signed-plugin validation requires OpenSSL development
 files; and RPM packaging requires `rpmbuild`. These are reachability and
 packaging coverage gaps, not failures of the selected Splitter change.
 
-The complete Linux compression-linkage matrix, repeated installed/package and
-consumer contracts, and final cross-platform compatibility gates remain open,
-so R5-5A and Round 5 are not complete.
+The mandatory full-suite matrix and initial install/package checks are complete.
+Installed C/C++ consumer probes, exact header/API/ABI/export/layout comparisons,
+format fixtures, and final cross-platform compatibility gates remain open, so
+R5-5A and Round 5 are not complete.

@@ -90,12 +90,14 @@ and passed the focused gate; R4-5C/R4-5D are not applicable. The complete
 R4-5E matrix passed and R4-5F closed Round 4 without a compatibility delta.
 R5-5A now explicitly selects the previously deferred Splitter default-filename
 characterization as its sole pilot; it is a new-round admission, not a silent
-extension of R4. The current continuation is the R5-5A focused validation.
-Focused validation now passes on both validators: Windows default Release
-CTest passed 2,733 enabled tests with 37 disabled, and Linux Release built the
-VFD target and fixtures with the focused test passing under CTest and Valgrind
-with zero errors and zero live blocks. The complete Linux compression matrix
-and final installed-contract gates remain open. Optional ROS3, HDFS,
+extension of R4. Focused validation now passes on both validators: Windows
+default Release CTest passed 2,733 enabled tests with 37 disabled, and Linux
+Release built the VFD target and fixtures with the focused test passing under
+CTest and Valgrind with zero errors and zero live blocks. The Windows two-row
+and Linux four-row mandatory compression matrix also passed with zero failures;
+all six rows installed and produced CPack packages. Installed consumer, exact
+header/API/ABI/export/layout, format, and final compatibility gates remain
+open. Optional ROS3, HDFS,
 mpiFileUtils/libcircle/DTCMP, signed-plugin OpenSSL, and RPM environments are
 recorded as deferred secondary coverage and do not block this mandatory gate.
 
@@ -615,8 +617,10 @@ implementation anchor `0b9e21c34` and is detailed in
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
 - Roadmap Stage 5 Rounds 1 through 4 are complete. R5-5A has selected one
- Splitter default-filename const-correctness pilot and its direct VFD
- characterization; focused and required contract validation remain. R2-D1, R2-D2,
+  Splitter default-filename const-correctness pilot and its direct VFD
+  characterization; focused validation and the mandatory default/compression
+  suites pass, while installed consumers and required compatibility contracts
+  remain. R2-D1, R2-D2,
   R2-I1, R2-D3, later rounds, and the preceding deferred backlog remain
   outside the accepted Round 4 scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
@@ -625,7 +629,8 @@ implementation anchor `0b9e21c34` and is detailed in
 
 ## Continuation Point
 
-The next roadmap continuation is R5-5A focused validation of
+The next roadmap continuation is R5-5A installed-contract and compatibility
+validation of
 [CoreC17Modernization.md](docs/refactoring/CoreC17Modernization.md). Preserve
 original Stage 5 contract anchor `dd7204035`, accepted Round 1 implementation
 `2a966388e`, accepted Round 2 implementation `fb09d9fc9`, and accepted Round 3

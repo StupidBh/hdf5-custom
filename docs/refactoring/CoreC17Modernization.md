@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 4 complete; R5-5A pilot selected and under validation.
+- State: Active; Rounds 1 through 4 complete; R5-5A mandatory matrix passed and contract gates remain.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -575,8 +575,9 @@ baseline on both validators. R4-5C and R4-5D are `NOT_APPLICABLE`. The
 eight-row Release matrix, installs, packages, dependency linkage, consumers,
 integration styles, headers, exports, layouts, fixed HighFive inventory, and
 cross-platform format reads all pass. R4-5F closes the round at implementation
-anchor `720d882ee` without an accepted compatibility delta. The next execution
-step is the R5-5A Splitter pilot and its focused validation. Exact evidence is recorded in
+anchor `720d882ee` without an accepted compatibility delta. R5-5A's focused
+checks, mandatory default/compression suites, and initial install/package checks
+now pass; installed consumers and final compatibility gates remain. Exact evidence is recorded in
 [CoreC17ModernizationResults.md](CoreC17ModernizationResults.md).
 
 R5-5A freezes one local qualifier correction in

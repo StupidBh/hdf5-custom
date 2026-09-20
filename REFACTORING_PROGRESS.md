@@ -1,6 +1,6 @@
 # Refactoring Progress
 
-Last updated: 2026-09-19
+Last updated: 2026-09-20
 
 ## Purpose
 
@@ -655,6 +655,12 @@ implementation anchor `0b9e21c34` and is detailed in
   compatibility delta; R7-5F closes the round at the same implementation
   anchor. Exact counts and package/export evidence are recorded in
   `CoreC17ModernizationResults.md`.
+- Post-R7 Windows requalification completed with the supplied dependency
+  policy preserved: a fresh MSVC development-warning build completed all 374
+  HDF5 shared-library build steps with `/utf-8` and two build jobs, and the
+  exact external/VDS selection passed 4/4 at express level 0. The warning
+  output contained only known SDK or compatibility classes; no additional
+  safe Stage 5 candidate was admitted.
 
 ## Remaining
 
@@ -683,6 +689,10 @@ accepted Round 4 implementation `720d882ee`, accepted R5 implementation
 comparison anchors. Do not admit another candidate during Round 7. New build/CTest
 validation remains capped at two jobs, while historical R1-R4 six-job evidence
 remains unchanged.
+The post-R7 warning/source audit found no bounded candidate that can be admitted
+without reopening an intentional mutable-input path or a frozen compatibility
+contract. The next Stage 5 action remains a fresh 5A scope and baseline freeze;
+do not manufacture an R8 implementation from the remaining diagnostics.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

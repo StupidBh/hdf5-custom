@@ -1670,3 +1670,14 @@ later Stage 5 candidates remain explicitly deferred. Optional ROS3, HDFS,
 mpiFileUtils/libcircle/DTCMP, signed-plugin OpenSSL, and RPM environments
 remain secondary coverage gaps. A future round must begin with a fresh 5A
 scope and baseline freeze.
+
+## Post-R7 Requalification (2026-09-20)
+
+A fresh Windows/MSVC development-warning requalification used the supplied
+repository dependency policy and a two-job build cap. The HDF5 shared-library
+build completed all 374 build steps with command-scoped `/utf-8`. The exact
+`H5TEST-external`/`H5TEST-vds` selection and its fixtures passed 4/4 at
+`HDF5_TEST_EXPRESS=0`. The broad warning output contained only known SDK or
+compatibility warning classes; no new bounded candidate met the Stage 5
+admission rules. No source, public-header, ABI/export, package, or file-format
+change was made by this requalification.

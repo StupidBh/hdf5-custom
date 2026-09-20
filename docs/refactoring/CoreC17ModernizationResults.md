@@ -2,8 +2,8 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 7 are complete; R8-5A is frozen and its pilot is pending.
-- Execution date: 2026-09-09.
+- State: Active; Rounds 1 through 7 are complete; R8-5B is complete and R8-5E remains pending.
+- Execution date: 2026-09-20.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
 - R1-5A evidence anchor: `bd6de77dd`.
@@ -27,8 +27,9 @@
 - R7-5B implementation anchor: `c0cd478bd`.
 - R7-5E/5F validation date: 2026-09-20.
 - R8-5A planning source anchor: `d822a78f3`.
-- Current continuation: implement and focus-test the single R8-5A candidate before
-  deciding whether R8-5C/R8-5D apply and rerunning the mandatory R8-5E matrix.
+- R8-5B implementation anchor: `3611126c9`.
+- Current continuation: retain the R8-5B pilot and decide whether to run the
+  mandatory R8-5E matrix before closing Round 8.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1709,3 +1710,29 @@ rebuild and the same four test/fixture cases at `HDF_TEST_EXPRESS=0` on Windows
 and Linux, with development warnings enabled. New build and CTest commands
 remain capped at two jobs. No performance experiment is required: this is a
 non-hot local qualifier-only edit.
+
+## R8-5B Pilot Validation
+
+Implementation anchor `3611126c9` changes only the borrowed `env_prefix` local
+in `H5F_prefix_open_file()` from `char *` to `const char *`. The copied
+`tmp_env_prefix` remains mutable for `H5F__getenv_prefix_name()`, and the
+resolved-name branch remains mutable because it truncates owned storage. No
+helper signature, caller, error path, resource operation, public header,
+ABI/export, package, filename, or file-format contract changed.
+
+The focused H5F rebuild and existing external-link/VDS fixture selection passed
+4/4 at `HDF_TEST_EXPRESS=0` on both retained validators. Windows/MSVC Debug
+rebuilt `hdf5-static`, `external`, and `vds` under the Visual Studio 18 2026
+developer environment with command-scoped `/utf-8`; the selection completed in
+108.26 seconds. Linux/GCC Release rebuilt `hdf5-shared`, `external`, and `vds`
+in the retained WSL Ninja tree; the selection completed in 444.07 seconds.
+The builds reported only the existing MSVC SDK/padding and GCC baseline warning
+classes; no diagnostic was attributable to the qualifier change. A direct
+PowerShell invocation before loading the MSVC developer environment failed to
+find `inttypes.h`; the retry with the required developer environment passed and
+is the qualifying result.
+
+R8-5C and R8-5D are `NOT_APPLICABLE`: the one-line local qualifier edit adds no
+resource edge, cleanup branch, or follow-on candidate. R8-5E has not been run;
+the focused pilot is accepted, but Round 8 remains open until its final matrix
+disposition is recorded.

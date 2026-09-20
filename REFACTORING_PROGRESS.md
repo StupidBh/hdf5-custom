@@ -129,7 +129,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 7 complete; R8-5A frozen, pilot pending | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 7 complete; R8-5B complete, R8-5E pending | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -665,8 +665,14 @@ implementation anchor `0b9e21c34` and is detailed in
   `c0cd478bd` at planning source `d822a78f3`. The frozen pilot changes only
   the `env_prefix` local in `H5F_prefix_open_file()` from `char *` to
   `const char *`; the copied `tmp_env_prefix` remains mutable for the existing
-  delimiter parser. R8-5B is pending focused rebuild and external/VDS fixture
-  validation; no follow-on candidate or final matrix result is claimed yet.
+  delimiter parser. The focused R8-5B rebuild and external/VDS fixture
+  validation are recorded below; no follow-on candidate or final matrix result
+  is claimed yet.
+- Completed roadmap Stage 5 R8-5B at implementation anchor `3611126c9`.
+  Windows/MSVC Debug and Linux/GCC Release rebuilt the affected H5F targets;
+  external/VDS plus fixtures passed 4/4 at express level 0 on both validators.
+  R8-5C/R8-5D are not applicable. The mandatory R8-5E matrix remains open by
+  explicit scope decision; no final Round 8 compatibility claim is made.
 
 ## Remaining
 
@@ -675,7 +681,8 @@ implementation anchor `0b9e21c34` and is detailed in
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
 - Roadmap Stage 5 Rounds 1 through 7 are complete without a compatibility
-  delta. R8-5A is frozen but not implemented or accepted. R2-D1, R2-D2, R2-I1,
+  delta. R8-5B is focused-validated but R8-5E remains pending, so Round 8 is
+  not closed. R2-D1, R2-D2, R2-I1,
   R2-D3, the R1-R4 deferred backlog, other retained const diagnostics, and
   later candidates remain outside the accepted scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
@@ -696,10 +703,11 @@ accepted Round 4 implementation `720d882ee`, accepted R5 implementation
 comparison anchors. Do not admit another candidate during Round 7. New build/CTest
 validation remains capped at two jobs, while historical R1-R4 six-job evidence
 remains unchanged.
-R8-5A now freezes the single `env_prefix` qualifier pilot in
-`H5F_prefix_open_file()` against the R7 endpoint. Implement only this local
-change, then run the focused H5F rebuild and external/VDS fixture selection;
-do not admit another candidate until that gate passes.
+R8-5B is complete at `3611126c9`: the single `env_prefix` qualifier pilot in
+`H5F_prefix_open_file()` passed the focused H5F rebuild and external/VDS fixture
+selection on both validators. R8-5C/R8-5D are not applicable. The next action
+is to record the R8-5E matrix disposition; do not admit another candidate while
+Round 8 remains open.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

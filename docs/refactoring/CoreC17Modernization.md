@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 7 complete; R8-5A frozen and pilot pending.
+- State: Active; Rounds 1 through 7 complete; R8-5B complete and R8-5E pending.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -630,5 +630,8 @@ or follow-on candidate. R7-5E reran the mandatory seven-row
 default/compression Release matrix, installs, packages, and inherited contract
 gates with no compatibility delta. R7-5F closes the round at `c0cd478bd`; R8-5A
 now freezes one local H5F environment-pointer qualifier pilot against that
-endpoint. R8-5B must start with the focused H5F rebuild and existing
-external/VDS tests before any follow-on or final matrix work is admitted.
+endpoint. R8-5B started with the focused H5F rebuild and existing external/VDS
+tests before any follow-on or final matrix work was admitted. R8-5B is now
+complete at `3611126c9`; R8-5C/R8-5D are `NOT_APPLICABLE`, and
+the focused pilot passed on both validators. The mandatory R8-5E matrix remains
+the only open Round 8 gate.

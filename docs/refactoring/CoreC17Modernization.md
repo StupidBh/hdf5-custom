@@ -2,7 +2,7 @@
 
 ## Status and Purpose
 
-- State: Active; Rounds 1 through 7 complete; no later candidate is admitted.
+- State: Active; Rounds 1 through 7 complete; R8-5A frozen and pilot pending.
 - Planning date: 2026-09-08.
 - Planning source anchor: `05582e903`.
 - Execution baseline: `dd7204035`, frozen by Work Package R1-5A.
@@ -628,5 +628,7 @@ passes 4/4 at express level 0 in all three configurations. R7-5C and R7-5D
 are `NOT_APPLICABLE` because the edit adds no resource edge, cleanup branch,
 or follow-on candidate. R7-5E reran the mandatory seven-row
 default/compression Release matrix, installs, packages, and inherited contract
-gates with no compatibility delta. R7-5F closes the round at `c0cd478bd`; later
-candidates remain deferred until a fresh 5A scope and baseline freeze.
+gates with no compatibility delta. R7-5F closes the round at `c0cd478bd`; R8-5A
+now freezes one local H5F environment-pointer qualifier pilot against that
+endpoint. R8-5B must start with the focused H5F rebuild and existing
+external/VDS tests before any follow-on or final matrix work is admitted.

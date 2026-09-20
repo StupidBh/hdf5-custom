@@ -2,7 +2,7 @@
 
 ## Status
 
-- State: Active; Rounds 1 through 7 are complete; no later candidate is admitted.
+- State: Active; Rounds 1 through 7 are complete; R8-5A is frozen and its pilot is pending.
 - Execution date: 2026-09-09.
 - Original Stage 5 source anchor: `dd7204035`.
 - Preceding accepted product anchor: `81dff5168`.
@@ -26,8 +26,9 @@
 - R7-5A planning source anchor: `fe694f3d7`.
 - R7-5B implementation anchor: `c0cd478bd`.
 - R7-5E/5F validation date: 2026-09-20.
-- Current continuation: preserve the R7 endpoint and defer the next candidate to a
-  fresh 5A scope and baseline freeze.
+- R8-5A planning source anchor: `d822a78f3`.
+- Current continuation: implement and focus-test the single R8-5A candidate before
+  deciding whether R8-5C/R8-5D apply and rerunning the mandatory R8-5E matrix.
 
 The tracked product sources, tests, examples, and CMake definitions at
 `dd7204035` are byte-identical to `81dff5168`. The intervening tracked changes
@@ -1681,3 +1682,30 @@ build completed all 374 build steps with command-scoped `/utf-8`. The exact
 compatibility warning classes; no new bounded candidate met the Stage 5
 admission rules. No source, public-header, ABI/export, package, or file-format
 change was made by this requalification.
+
+## R8-5A Scope and Baseline Freeze
+
+R8-5A requalifies accepted R7 implementation endpoint `c0cd478bd`. The
+tracked changes through planning source anchor `d822a78f3` are documentation-only;
+the accepted H5F implementation, its private declaration, both callers, and the
+focused tests are unchanged. R7's seven-row Release matrix, installs, packages,
+and inherited compatibility gates are therefore the qualifying starting
+baseline under the validation-cadence rule. The supplied Windows dependency
+inputs remain `3rdparty/zlib` 1.3.2 and `3rdparty/libaec` 1.1.7 in the accepted
+shared-DLL form; the Linux shared/static compression inputs and toolchains are
+unchanged from R7.
+
+| ID | Exact scope | Decision | Frozen boundary |
+| --- | --- | --- | --- |
+| `R8-P1` | `src/H5Fint.c`: `env_prefix` local in `H5F_prefix_open_file` | `SELECTED PILOT` | Change only `char *env_prefix` to `const char *env_prefix`. Preserve `getenv` selection, the copied mutable `tmp_env_prefix`, `H5F__getenv_prefix_name`, prefix search order, errors, cleanup, both callers, and all protected contracts. |
+| `R8-K1` | `H5F__getenv_prefix_name`, `tmp_env_prefix`, resolved-name branch, and all other H5F code | `KEEP` | The copied environment string remains mutable because the helper inserts terminators. The resolved-name branch remains mutable because it truncates owned storage. No helper signature, macro, public/private declaration, ABI/export, resource, file-format, or diagnostic-flow change is admitted. |
+| `R8-D1` | Other retained const diagnostics and the earlier deferred ledger | `DEFER` | No environment ownership redesign, path-contract change, allocation change, tool cleanup, or second candidate enters this round. |
+
+The selected pointer is borrowed from `getenv`, read only to create the owned
+copy used by the existing mutable parser, and never passed to a mutating API.
+The direct callers remain `H5Dvirtual.c` and `H5Lexternal.c`; the existing
+external-link and VDS tests cover both paths. R8-5B starts with the focused H5F
+rebuild and the same four test/fixture cases at `HDF_TEST_EXPRESS=0` on Windows
+and Linux, with development warnings enabled. New build and CTest commands
+remain capped at two jobs. No performance experiment is required: this is a
+non-hot local qualifier-only edit.

@@ -129,7 +129,7 @@ completed supported-platform reduction plan.
 | 2 | Remove project-owned source and header implementation support for target systems and compilers outside the retained pairs while preserving protected public and file-format compatibility constants. | Complete | Yes |
 | 3 | Raise project-owned build modes to strict C17/C++20 and repair only blockers caused by the language-mode change, without general source modernization. | Complete | Yes |
 | 4 | Delete native `c++/`, complete `hl/`, and their build, test, install, export, package, wrapper, tool, example, and documentation contracts while preserving the core C product and required acceptance profiles. | Complete; Work Packages 4A through 4F passed | Yes |
-| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 7 complete; next candidate not admitted | No |
+| 5 | Modernize core C internals in successive bounded C17 rounds, preserving all installed headers, API/ABI, the fixed HighFive C dependency inventory, and file/behavior contracts. | Active; Rounds 1 through 7 complete; R8-5A frozen, pilot pending | No |
 | 6 | No current goal. Previous C17 internal C modernization direction is cancelled from the active roadmap. | Future plan TBD | No |
 | 7 | No current goal. | Future plan TBD | No |
 
@@ -661,6 +661,12 @@ implementation anchor `0b9e21c34` and is detailed in
   exact external/VDS selection passed 4/4 at express level 0. The warning
   output contained only known SDK or compatibility classes; no additional
   safe Stage 5 candidate was admitted.
+- Started roadmap Stage 5 R8-5A from accepted implementation anchor
+  `c0cd478bd` at planning source `d822a78f3`. The frozen pilot changes only
+  the `env_prefix` local in `H5F_prefix_open_file()` from `char *` to
+  `const char *`; the copied `tmp_env_prefix` remains mutable for the existing
+  delimiter parser. R8-5B is pending focused rebuild and external/VDS fixture
+  validation; no follow-on candidate or final matrix result is claimed yet.
 
 ## Remaining
 
@@ -669,8 +675,9 @@ implementation anchor `0b9e21c34` and is detailed in
 - No roadmap Stage 4 implementation, validation, audit, or documentation gate
   remains.
 - Roadmap Stage 5 Rounds 1 through 7 are complete without a compatibility
-  delta. R2-D1, R2-D2, R2-I1, R2-D3, the R1-R4 deferred backlog, other retained
-  const diagnostics, and any later candidate remain outside the accepted scope.
+  delta. R8-5A is frozen but not implemented or accepted. R2-D1, R2-D2, R2-I1,
+  R2-D3, the R1-R4 deferred backlog, other retained const diagnostics, and
+  later candidates remain outside the accepted scope.
 - Roadmap Stages 6 and 7 remain future plan to be determined.
 - Preserve the separate target-scoped CMake modernization at its unchanged
   progress anchor until that direction is explicitly resumed.
@@ -689,10 +696,10 @@ accepted Round 4 implementation `720d882ee`, accepted R5 implementation
 comparison anchors. Do not admit another candidate during Round 7. New build/CTest
 validation remains capped at two jobs, while historical R1-R4 six-job evidence
 remains unchanged.
-The post-R7 warning/source audit found no bounded candidate that can be admitted
-without reopening an intentional mutable-input path or a frozen compatibility
-contract. The next Stage 5 action remains a fresh 5A scope and baseline freeze;
-do not manufacture an R8 implementation from the remaining diagnostics.
+R8-5A now freezes the single `env_prefix` qualifier pilot in
+`H5F_prefix_open_file()` against the R7 endpoint. Implement only this local
+change, then run the focused H5F rebuild and external/VDS fixture selection;
+do not admit another candidate until that gate passes.
 Exact Round 1 through Round 4 scope evidence is in
 [CoreC17ModernizationResults.md](docs/refactoring/CoreC17ModernizationResults.md).
 Roadmap Stage 4 remains complete at product implementation anchor `81dff5168`

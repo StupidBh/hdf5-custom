@@ -945,7 +945,7 @@ herr_t H5F_prefix_open_file(bool try,
 
     /* Try searching from paths set in the environment variable */
     if (src_file == NULL) {
-        char* env_prefix;
+        const char* env_prefix;
 
         /* Get the appropriate environment variable */
         if (H5F_PREFIX_VDS == prefix_type) {
